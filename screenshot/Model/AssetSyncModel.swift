@@ -449,7 +449,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                             self.syteProcessing(imageClassification: imageClassification, imageData: imageData, orImageUrlString:nil, assetId: asset.localIdentifier)
                         } else { // Screenshot taken while app in background (or killed)
                             AccumulatorModel.screenshot.addAssetId(asset.localIdentifier)
-                            AccumulatorModel.screenshot.incrementUninformedCount()
+                            AccumulatorModel.screenshotUninformed.incrementUninformedCount()
                             if  ApplicationStateModel.sharedInstance.isBackground() {
                                 DispatchQueue.main.async {
                                     // The accumulator updates the count in an async block.
@@ -501,7 +501,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                     DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
                         if managedObjectContext.screenshotWith(assetId: asset.localIdentifier) == nil {
                             AccumulatorModel.screenshot.addAssetId(asset.localIdentifier)
-                            AccumulatorModel.screenshot.incrementUninformedCount()
+                            AccumulatorModel.screenshotUninformed.incrementUninformedCount()
                             if self.shouldSendPushWhenFindFashionWithoutUserScreenshotAction && ApplicationStateModel.sharedInstance.isBackground(){
                                 self.processingQ.async {
                                     if self.shouldSendPushWhenFindFashionWithoutUserScreenshotAction && ApplicationStateModel.sharedInstance.isBackground(){  //need to check twice due to async craziness
@@ -569,7 +569,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
             }
         }
         
-        content.badge = NSNumber(value: AccumulatorModel.screenshot.newCount)
+        content.badge = NSNumber(value: AccumulatorModel.screenshotUninformed.uninformedCount)
         
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.1, repeats: false)
         let request = UNNotificationRequest(identifier: identifier,

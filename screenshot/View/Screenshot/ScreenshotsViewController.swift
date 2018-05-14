@@ -88,10 +88,6 @@ class ScreenshotsViewController: BaseViewController {
         
         syncEmptyListView()
         self.updateHasNewScreenshot()
-        
-        if let tabBarController = tabBarController as? MainTabBarController {
-            tabBarController.syncScreenshotTabBadgeCount()
-        }
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -102,12 +98,6 @@ class ScreenshotsViewController: BaseViewController {
         }
         
         self.hideProductBarIfLessThan4ShowIf4OrMoreWithoutAnimation()
-        
-        AccumulatorModel.screenshot.resetUninformedCount()
-        
-        if let tabBarController = tabBarController as? MainTabBarController {
-            tabBarController.syncScreenshotTabBadgeCount()
-        }
     }
     
     @objc func applicationDidEnterBackground(_ notification:Notification) {
@@ -314,9 +304,6 @@ extension ScreenshotsViewController : FetchedResultsControllerManagerDelegate {
         change.applyChanges(collectionView: collectionView)
         syncEmptyListView()
         
-        if let tabBarController = tabBarController as? MainTabBarController {
-            tabBarController.syncScreenshotTabBadgeCount()
-        }
     }
 }
 
@@ -713,6 +700,7 @@ extension ScreenshotsViewController:ScreenshotNotificationCollectionViewCellDele
         switch cell.contentText {
             case .importSingleScreenshot:
                 if let assetId = self.notificationCellAssetId() {
+                    AccumulatorModel.screenshotUninformed.decrementUninformedCount(by:1)
                     AssetSyncModel.sharedInstance.importPhotosToScreenshot(assetIds: [assetId], source: .screenshot)
                 }else{
                     self.delegate?.screenshotsViewControllerWantsToPresentPicker(self, openScreenshots: true)

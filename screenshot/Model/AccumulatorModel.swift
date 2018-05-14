@@ -7,10 +7,18 @@
 //
 
 import Foundation
+import UIKit
 
+extension Notification.Name {
+    static let ScreenshotUninformedAccumulatorModelDidChange = Notification.Name(rawValue: "io.crazeapp.screenshot.ScreenshotUninformedAccumulatorModelDidChange")
+    static let FavoriteAccumulatorModelDidChange =  Notification.Name(rawValue: "io.crazeapp.screenshot.FavoriteAccumulatorModelDidChange")
+}
 class AccumulatorModel: NSObject {
     static let screenshot = ScreenshotAccumulatorModel()
+    static let screenshotUninformed = ScreenshotUninformedAccumulatorModel()
+
     static let favorite = FavoriteAccumulatorModel()
+    
 }
 
 class ScreenshotAccumulatorModel: NSObject {
@@ -65,19 +73,7 @@ class ScreenshotAccumulatorModel: NSObject {
         }
     }
     
-    // MARK: Uninformed Screenshots
-    
-    var uninformedCount: Int {
-        return UserDefaults.standard.integer(forKey: UserDefaultsKeys.uninformedScreenshotsCount)
-    }
-    
-    func incrementUninformedCount() {
-        UserDefaults.standard.set(uninformedCount + 1, forKey: UserDefaultsKeys.uninformedScreenshotsCount)
-    }
-    
-    func resetUninformedCount() {
-        UserDefaults.standard.set(0, forKey: UserDefaultsKeys.uninformedScreenshotsCount)
-    }
+   
     
 }
 
@@ -90,11 +86,65 @@ class FavoriteAccumulatorModel: NSObject {
     }
     
     func incrementUninformedCount() {
-        UserDefaults.standard.set(uninformedCount + 1, forKey: UserDefaultsKeys.uninformedFavoritesCount)
+        DispatchQueue.mainAsyncIfNeeded {
+            UserDefaults.standard.set(self.uninformedCount + 1, forKey: UserDefaultsKeys.uninformedFavoritesCount)
+            NotificationCenter.default.post(name: .FavoriteAccumulatorModelDidChange, object: nil)
+
+        }
+    }
+    func decrementUninformedCount(by:Int) {
+        DispatchQueue.mainAsyncIfNeeded {
+            var newCount = self.uninformedCount - by
+            if newCount < 0 {
+                newCount = 0
+            }
+            UserDefaults.standard.set(newCount, forKey: UserDefaultsKeys.uninformedFavoritesCount)
+            NotificationCenter.default.post(name: .FavoriteAccumulatorModelDidChange, object: nil)
+            
+        }
     }
     
     func resetUninformedCount() {
-        UserDefaults.standard.set(0, forKey: UserDefaultsKeys.uninformedFavoritesCount)
+        DispatchQueue.mainAsyncIfNeeded {
+            
+            UserDefaults.standard.set(0, forKey: UserDefaultsKeys.uninformedFavoritesCount)
+            NotificationCenter.default.post(name: .FavoriteAccumulatorModelDidChange, object: nil)
+        }
+    }
+}
+
+
+
+class ScreenshotUninformedAccumulatorModel: NSObject {
+    
+    var uninformedCount: Int {
+        return UserDefaults.standard.integer(forKey: UserDefaultsKeys.uninformedScreenshotsCount)
+    }
+    
+    
+    func decrementUninformedCount(by:Int) {
+        DispatchQueue.mainAsyncIfNeeded {
+            var newCount = self.uninformedCount - by
+            if newCount < 0 {
+                newCount = 0
+            }
+            UserDefaults.standard.set(newCount, forKey: UserDefaultsKeys.uninformedScreenshotsCount)
+            NotificationCenter.default.post(name: .ScreenshotUninformedAccumulatorModelDidChange, object: nil)
+            
+        }
+    }
+    func incrementUninformedCount() {
+        DispatchQueue.mainAsyncIfNeeded {
+            UserDefaults.standard.set(self.uninformedCount + 1, forKey: UserDefaultsKeys.uninformedScreenshotsCount)
+            NotificationCenter.default.post(name: .ScreenshotUninformedAccumulatorModelDidChange, object: nil)
+        }
+    }
+    
+    func resetUninformedCount() {
+        DispatchQueue.mainAsyncIfNeeded {
+            UserDefaults.standard.set(0, forKey: UserDefaultsKeys.uninformedScreenshotsCount)
+            NotificationCenter.default.post(name: .ScreenshotUninformedAccumulatorModelDidChange, object: nil)
+        }
     }
     
 }
