@@ -300,6 +300,7 @@ class NetworkingPromise : NSObject {
         }
         var request = URLRequest(url: url)
         request.addValue("bearer \(Constants.shoppableToken)", forHTTPHeaderField: "Authorization")
+        request.addValue(AnalyticsUser.current.identifier, forHTTPHeaderField: "cid")
         let sessionConfiguration = URLSessionConfiguration.default
         sessionConfiguration.timeoutIntervalForResource = 60
         let promise = URLSession(configuration: sessionConfiguration).dataTask(with: request).asDictionary()
@@ -313,6 +314,7 @@ class NetworkingPromise : NSObject {
         }
         var request = URLRequest(url: url)
         request.addValue("bearer \(Constants.shoppableToken)", forHTTPHeaderField: "Authorization")
+        request.addValue(AnalyticsUser.current.identifier, forHTTPHeaderField: "cid")
         let sessionConfiguration = URLSessionConfiguration.default
         sessionConfiguration.timeoutIntervalForResource = 60
         let promise = URLSession(configuration: sessionConfiguration).dataTask(with: request).asDictionary()
@@ -326,6 +328,7 @@ class NetworkingPromise : NSObject {
         }
         var request = URLRequest(url: url)
         request.addValue("bearer \(Constants.shoppableToken)", forHTTPHeaderField: "Authorization")
+        request.addValue(AnalyticsUser.current.identifier, forHTTPHeaderField: "cid")
         let sessionConfiguration = URLSessionConfiguration.default
         sessionConfiguration.timeoutIntervalForResource = 60
         return URLSession(configuration: sessionConfiguration).dataTask(with: request).asDataAndResponse().then { (data, response) -> Promise<Bool> in
@@ -351,6 +354,7 @@ class NetworkingPromise : NSObject {
         request.httpMethod = "POST"
         request.addValue("bearer \(Constants.shoppableToken)", forHTTPHeaderField: "Authorization")
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.addValue(AnalyticsUser.current.identifier, forHTTPHeaderField: "cid")
         request.httpBody = jsonDatafy(object: jsonObject)
         let sessionConfiguration = URLSessionConfiguration.default
         sessionConfiguration.timeoutIntervalForResource = 60
@@ -394,6 +398,7 @@ class NetworkingPromise : NSObject {
         }
         var request = URLRequest(url: url)
         request.addValue("bearer \(Constants.shoppableToken)", forHTTPHeaderField: "Authorization")
+        request.addValue(AnalyticsUser.current.identifier, forHTTPHeaderField: "cid")
         let sessionConfiguration = URLSessionConfiguration.default
         sessionConfiguration.timeoutIntervalForRequest = 60
         return URLSession(configuration: sessionConfiguration).dataTask(with: request).asDataAndResponse().then { data, response -> Promise<([[String : Any]], [String])> in
@@ -451,7 +456,7 @@ class NetworkingPromise : NSObject {
     
     func nativeCheckout(remoteId: String, card: Card, cvv: String, shippingAddress: ShippingAddress) -> Promise<[[String : Any]]> {
         guard let url = URL(string: Constants.shoppableHosted + "/api/v3/token/\(Constants.shoppableToken)/checkout") else {
-            let error = NSError(domain: "Craze", code: 37, userInfo: [NSLocalizedDescriptionKey: "Cannot form nativeCheckout url from shoppableDomain:\(Constants.shoppableDomain)"])
+            let error = NSError(domain: "Craze", code: 37, userInfo: [NSLocalizedDescriptionKey: "Cannot form nativeCheckout url from shoppableHosted:\(Constants.shoppableHosted)"])
             return Promise(error: error)
         }
         var request = URLRequest(url: url)
@@ -460,6 +465,7 @@ class NetworkingPromise : NSObject {
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         request.addValue("http://screenshopit.com", forHTTPHeaderField: "Referer")
         request.addValue("no-cache", forHTTPHeaderField: "Cache-Control")
+        request.addValue(AnalyticsUser.current.identifier, forHTTPHeaderField: "cid")
         let tuple = divideByLastSpace(fullName: card.fullName)
         let billingFirstName = tuple.0
         let billingLastName = tuple.1
