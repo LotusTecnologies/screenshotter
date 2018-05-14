@@ -11,26 +11,27 @@ import UIKit
 extension Notification.Name {
     static let AsyncOperationTagMonitorCenterDidChange = Notification.Name(rawValue: "io.crazeapp.screenshot.AsyncOperationTagMonitorCenterDidChange")
 }
-protocol AsyncOperationTagMonitorDelegate : class {
-    func asyncOperationTagMonitorDidStart(_ monitor:AsyncOperationTagMonitor)
-    func asyncOperationTagMonitorDidStop(_ monitor:AsyncOperationTagMonitor)
+protocol AsyncOperationMonitorDelegate : class {
+    func asyncOperationMonitorDidStart(_ monitor:AsyncOperationMonitor)
+    func asyncOperationMonitorDidStop(_ monitor:AsyncOperationMonitor)
 }
 
-class AsyncOperationTagMonitor {
-    weak var delegate:AsyncOperationTagMonitorDelegate?
+class AsyncOperationMonitor {
+    weak var delegate:AsyncOperationMonitorDelegate?
     private(set) var didStart = false
     let tags:[AsyncOperationTag]
     
-    init(tags:[AsyncOperationTag], delegate:AsyncOperationTagMonitorDelegate) {
+    init(tags:[AsyncOperationTag], delegate:AsyncOperationMonitorDelegate) {
         self.tags = tags
         self.delegate = delegate
         self.didStart = self.calculateDidStart()
+        
         NotificationCenter.default.addObserver(self, selector: #selector(asyncOperationDidChange(_:)), name: .AsyncOperationTagMonitorCenterDidChange, object: nil)
     }
     private func calculateDidStart() -> Bool{
         var count = 0
-        self.tags.forEach { count +=  AsyncOperationTagMonitorCenter.shared.countFor(tag: $0) }
-
+        self.tags.forEach { count +=  AsyncOperationMonitorCenter.shared.countFor(tag: $0) }
+        
         return count > 0
     }
     @objc private func asyncOperationDidChange(_ notification:Notification){
@@ -45,11 +46,13 @@ class AsyncOperationTagMonitor {
                 let oldValue = self.didStart
                 let newValue = calculateDidStart()
                 if oldValue != newValue {
-                    self.didStart = newValue
-                    if newValue {
-                        self.delegate?.asyncOperationTagMonitorDidStart(self)
-                    }else{
-                        self.delegate?.asyncOperationTagMonitorDidStop(self)
+                    DispatchQueue.main.async {
+                        self.didStart = newValue
+                        if newValue {
+                            self.delegate?.asyncOperationMonitorDidStart(self)
+                        }else{
+                            self.delegate?.asyncOperationMonitorDidStop(self)
+                        }
                     }
                 }
             }
@@ -61,12 +64,12 @@ class AsyncOperationTagMonitor {
     
 }
 
-class AsyncOperationTagMonitorCenter {
-    static let shared = AsyncOperationTagMonitorCenter()
-
-    private var runningTags:[String:[String:Int]] = [:]
+class AsyncOperationMonitorCenter {
+    static let shared = AsyncOperationMonitorCenter()
     
-    private func typeDict(_ type:String) -> [String:Int] {
+    private var runningTags:[AsyncOperationTag.TagType:[String:Int]] = [:]
+    
+    private func typeDict(_ type:AsyncOperationTag.TagType) -> [String:Int] {
         if let dict = self.runningTags[type]{
             return dict
         }else{
@@ -87,22 +90,23 @@ class AsyncOperationTagMonitorCenter {
                 startedTags.append(tag)
             }
             count = count + 1
-            categoryDict[tag.value] = count
+            
+            self.runningTags[tag.type]?[tag.value] = count
         }
-       
+        
         self.tagStarted(startedTags)
     }
     
     public func registerStopped(tags:[AsyncOperationTag]) {
         var endedTags:[AsyncOperationTag] = []
-
+        
         tags.forEach { (tag) in
             var categoryDict:[String:Int] = self.typeDict(tag.type)
-
+            
             var count = categoryDict[tag.value, default:1] // getting 1 at this point is a bug!
             count = count - 1
-            categoryDict[tag.value] = count
-
+            self.runningTags[tag.type]?[tag.value] = count
+            
             if count == 0 {
                 endedTags.append(tag)
             }
@@ -115,7 +119,7 @@ class AsyncOperationTagMonitorCenter {
         let categoryDict:[String:Int] = self.typeDict(tag.type)
         let count = categoryDict[tag.value] ?? 0
         return count
-
+        
     }
     
     func tagsEnded(_ tags:[AsyncOperationTag]) {
@@ -128,11 +132,16 @@ class AsyncOperationTagMonitorCenter {
     
 }
 
+
 class AsyncOperationTag: Equatable {
-    var type:String
+    enum TagType : String {
+        case assetId
+        case shoppableId
+    }
+    var type:TagType
     var value:String
     
-    init(type:String, value:String) {
+    init(type:TagType, value:String) {
         self.type = type
         self.value = value
     }
@@ -140,9 +149,8 @@ class AsyncOperationTag: Equatable {
     public static func == (lhs: AsyncOperationTag, rhs: AsyncOperationTag) -> Bool{
         return lhs.type == rhs.type && lhs.value == lhs.value
     }
-
+    
 }
-
 class AsyncOperation: Operation {
     private var _executing = false {
         willSet {
@@ -186,14 +194,14 @@ class AsyncOperation: Operation {
     convenience init(timeout:TimeInterval?, completion:@escaping ((@escaping() -> ()) -> ())) {
         self.init(timeout: timeout, tags: [], completion: completion)
     }
-
+    
     init(timeout:TimeInterval?, tags:[AsyncOperationTag], completion:@escaping ((@escaping() -> ()) -> ())) {
         self.tags = tags
         self.executionBlock = completion
         self.timeout = timeout
         super.init()
     }
-
+    
     private func finishedExecuting(){
         self.executing(false)
         self.finish(true)
@@ -206,14 +214,14 @@ class AsyncOperation: Operation {
         }
         
         executing(true)
-//        let date = Date()
-        AsyncOperationTagMonitorCenter.shared.registerStarted(tags: self.tags)
+        //        let date = Date()
+        AsyncOperationMonitorCenter.shared.registerStarted(tags: self.tags)
         if let timeout = timeout {
             DispatchQueue.global(qos: .background).asyncAfter(deadline: .now() + timeout, execute: {
                 if !self.isFinished {
                     self.executing(false)
                     self.finish(true)
-                    AsyncOperationTagMonitorCenter.shared.registerStopped(tags:  self.tags)
+                    AsyncOperationMonitorCenter.shared.registerStopped(tags: self.tags)
                     //print("operation completed - timeout \(date.timeIntervalSinceNow)")
                 }
             })
@@ -223,7 +231,7 @@ class AsyncOperation: Operation {
                 if !self.isFinished {
                     self.executing(false)
                     self.finish(true)
-                    AsyncOperationTagMonitorCenter.shared.registerStopped(tags:  self.tags)
+                    AsyncOperationMonitorCenter.shared.registerStopped(tags: self.tags)
                     //print("operation completed \(date.timeIntervalSinceNow)")
                     
                 }else{
@@ -234,7 +242,7 @@ class AsyncOperation: Operation {
             print("CRITICAL bug in asyncOperation")
             self.executing(false)
             self.finish(true)
-            AsyncOperationTagMonitorCenter.shared.registerStopped(tags:  self.tags)
+            AsyncOperationMonitorCenter.shared.registerStopped(tags: self.tags)
         }
         self.executionBlock = nil
     }
@@ -244,26 +252,26 @@ extension AsyncOperation {
     convenience init(timeout:TimeInterval?, assetId:String?, shoppableOffersUrl:String?, completion:@escaping ((@escaping() -> ()) -> ())) {
         var tags:[AsyncOperationTag] = []
         if let assetId = assetId {
-            tags.append(AsyncOperationTag.init(type: "assetId", value: assetId))
+            tags.append(AsyncOperationTag.init(type: .assetId, value: assetId))
         }
         if let shoppableOffersUrl = shoppableOffersUrl {
-            tags.append(AsyncOperationTag.init(type: "shoppableId", value: shoppableOffersUrl))
+            tags.append(AsyncOperationTag.init(type: .shoppableId, value: shoppableOffersUrl))
         }
         self.init(timeout: timeout, tags: tags, completion: completion)
     }
 }
 
-extension AsyncOperationTagMonitor {
-    convenience init(assetId:String?, shoppableOffersUrl:String?, delegate:AsyncOperationTagMonitorDelegate) {
+extension AsyncOperationMonitor {
+    convenience init(assetId:String?, shoppableOffersUrl:String?, delegate:AsyncOperationMonitorDelegate) {
         var tags:[AsyncOperationTag] = []
         if let assetId = assetId {
-            tags.append(AsyncOperationTag.init(type: "assetId", value: assetId))
+            tags.append(AsyncOperationTag.init(type: .assetId, value: assetId))
         }
         if let shoppableOffersUrl = shoppableOffersUrl {
-            tags.append(AsyncOperationTag.init(type: "shoppableId", value: shoppableOffersUrl))
+            tags.append(AsyncOperationTag.init(type: .shoppableId, value: shoppableOffersUrl))
         }
         self.init(tags: tags, delegate: delegate)
     }
-
+    
 }
 
