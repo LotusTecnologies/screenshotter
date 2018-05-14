@@ -143,7 +143,6 @@
     </entity>
     <entity name="Variant" representedClassName="Variant" syncable="YES" codeGenerationType="class">
         <attribute name="color" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="dateModified" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="imageURLs" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="price" optional="YES" attributeType="Float" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="size" optional="YES" attributeType="String" syncable="YES"/>
@@ -162,6 +161,6 @@
         <element name="Screenshot" positionX="-191" positionY="-114" width="128" height="420"/>
         <element name="ShippingAddress" positionX="718" positionY="393" width="128" height="75"/>
         <element name="Shoppable" positionX="-38" positionY="18" width="128" height="255"/>
-        <element name="Variant" positionX="124" positionY="636" width="128" height="165"/>
+        <element name="Variant" positionX="124" positionY="636" width="128" height="150"/>
     </elements>
 </model>
