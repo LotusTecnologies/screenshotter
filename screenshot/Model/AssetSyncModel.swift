@@ -129,27 +129,29 @@ extension AssetSyncModel {
                         }
                     }
                     if let imageData = imageData {
-                        let addedScreenshot = DataModel.sharedInstance.saveScreenshot(managedObjectContext: managedObjectContext,
-                                                                                      assetId: urlString,
-                                                                                      createdAt: Date(),
-                                                                                      isRecognized: true,
-                                                                                      source: .shuffle,
-                                                                                      isHidden: false,
-                                                                                      imageData: imageData,
-                                                                                      classification: nil)
-                        addedScreenshot.uploadedImageURL = urlString
-                        addedScreenshot.shoppablesCount = 0
-                        addedScreenshot.syteJson = "h"
-                        addedScreenshot.isNew = false //Always entered immediatly when added
-                        
-                        // download stye stuff for URL
-                        AssetSyncModel.sharedInstance.syteProcessing(imageClassification: .human, imageData: nil, orImageUrlString: urlString, assetId: urlString)
-                        
-                        if let callback = callback {
-                            let addedScreenshotOID = addedScreenshot.objectID
-                            DispatchQueue.main.async {
-                                if let mainScreenshot = DataModel.sharedInstance.mainMoc().object(with: addedScreenshotOID) as? Screenshot {
-                                    callback(mainScreenshot)
+                        DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
+                            let addedScreenshot = DataModel.sharedInstance.saveScreenshot(managedObjectContext: managedObjectContext,
+                                                                                          assetId: urlString,
+                                                                                          createdAt: Date(),
+                                                                                          isRecognized: true,
+                                                                                          source: .shuffle,
+                                                                                          isHidden: false,
+                                                                                          imageData: imageData,
+                                                                                          classification: nil)
+                            addedScreenshot.uploadedImageURL = urlString
+                            addedScreenshot.shoppablesCount = 0
+                            addedScreenshot.syteJson = "h"
+                            addedScreenshot.isNew = false //Always entered immediatly when added
+                            
+                            // download stye stuff for URL
+                            AssetSyncModel.sharedInstance.syteProcessing(imageClassification: .human, imageData: nil, orImageUrlString: urlString, assetId: urlString)
+                            
+                            if let callback = callback {
+                                let addedScreenshotOID = addedScreenshot.objectID
+                                DispatchQueue.main.async {
+                                    if let mainScreenshot = DataModel.sharedInstance.mainMoc().object(with: addedScreenshotOID) as? Screenshot {
+                                        callback(mainScreenshot)
+                                    }
                                 }
                             }
                         }
