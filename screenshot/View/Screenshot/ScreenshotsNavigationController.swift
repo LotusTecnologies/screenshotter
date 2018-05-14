@@ -72,14 +72,22 @@ extension ScreenshotsNavigationController {
     
     @objc func pickerViewControllerDidCancel() {
         self.dismiss(animated: true) {
-            if self.needsToPresentPushAlert() {
-                self.presentPushAlert()
+            if self.needsToPresentPushPrompt {
+                self.presentPushPrompt()
             }
         }
     }
     
     @objc func pickerViewControllerDidFinish(){
         self.dismiss(animated: true, completion: nil)
+    }
+}
+
+extension ScreenshotsNavigationController: ViewControllerLifeCycle {
+    func viewController(_ viewController: UIViewController, didDisappear animated: Bool) {
+        if viewController.isKind(of: ProductsViewController.self) && needsToPresentPushPrompt {
+            presentPushPrompt()
+        }
     }
 }
 
@@ -104,6 +112,7 @@ extension ScreenshotsNavigationController :ScreenshotsViewControllerDelegate{
     func screenshotsViewControllerDeletedLastScreenshot(_  viewController:ScreenshotsViewController){
         
     }
+    
     func screenshotsViewControllerWantsToPresentPicker(_  viewController:ScreenshotsViewController, openScreenshots:Bool){
         self.presentPickerViewController(openScreenshots:openScreenshots)
     }
@@ -135,6 +144,7 @@ typealias ScreenshotsNavigationControllerProducts = ScreenshotsNavigationControl
 extension ScreenshotsNavigationControllerProducts {
     func createProductsViewController(screenshot: Screenshot) -> ProductsViewController {
         let productsViewController = ProductsViewController(screenshot: screenshot)
+        productsViewController.lifeCycleDelegate = self
         return productsViewController
     }
     
@@ -148,25 +158,36 @@ extension ScreenshotsNavigationControllerProducts {
     }
 }
 
-extension ScreenshotsNavigationController { //push permission
-    func needsToPresentPushAlert() -> Bool {
+typealias ScreenshotsNavigationControllerPushPermission = ScreenshotsNavigationController
+extension ScreenshotsNavigationControllerPushPermission {
+    fileprivate var needsToPresentPushPrompt: Bool {
         return !UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingPresentedPushAlert) && PermissionsManager.shared.hasPermission(for: .photo)
     }
     
-    func presentPushAlert(){
-        let alertController = UIAlertController.init(title: "screenshot.permission.push.title".localized, message: "screenshot.permission.push.message".localized, preferredStyle: .alert)
-        alertController.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .default, handler: { (a) in
-            PermissionsManager.shared.requestPermission(for: .push, response: { (granted) in
-                if (granted) {
+    fileprivate func presentPushPrompt(){
+        let viewController = NotificationPromptViewController()
+        viewController.notificationButton.addTarget(self, action: #selector(notificationPromptContinueAction), for: .touchUpInside)
+        viewController.cancelButton.addTarget(self, action: #selector(notificationPromptCancelAction), for: .touchUpInside)
+        present(viewController, animated: true, completion: nil)
+        
+        UserDefaults.standard.set(true, forKey: UserDefaultsKeys.onboardingPresentedPushAlert)
+    }
+    
+    @objc fileprivate func notificationPromptContinueAction() {
+        dismiss(animated: true) {
+            PermissionsManager.shared.requestPermission(for: .push, response: { granted in
+                if granted {
                     self.screenshotsNavigationControllerDelegate?.screenshotsNavigationControllerDidGrantPushPermissions(self)
                     Analytics.trackAcceptedPushPermissions()
                 } else {
                     Analytics.trackDeniedPushPermissions()
                 }
             })
-        }))
-        self.present(alertController, animated: true, completion: nil)
-        UserDefaults.standard.set(true, forKey: UserDefaultsKeys.onboardingPresentedPushAlert)
+        }
+    }
+    
+    @objc fileprivate func notificationPromptCancelAction() {
+        dismiss(animated: true, completion: nil)
     }
 }
 
