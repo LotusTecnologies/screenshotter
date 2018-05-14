@@ -659,6 +659,20 @@ extension ProductsViewControllerProducts{
         }
     }
     
+    func titleOrder(a: Product, b: Product) -> Bool? {
+        if let aDisplayTitle = a.calculatedDisplayTitle?.lowercased(),
+            let bDisplayTitle = b.calculatedDisplayTitle?.lowercased(),
+            aDisplayTitle != bDisplayTitle {
+            return aDisplayTitle < bDisplayTitle
+        } else if a.calculatedDisplayTitle == nil && b.calculatedDisplayTitle != nil {
+            return false // Empty brands at end
+        } else if a.calculatedDisplayTitle != nil && b.calculatedDisplayTitle == nil {
+            return true // Empty brands at end
+        } else {
+            return nil
+        }
+    }
+    
     func productsForShoppable(_ shoppable:Shoppable) -> [Product] {
         if let mask = shoppable.getLast()?.rawValue,
           var products = shoppable.products?.filtered(using: NSPredicate(format: "(optionsMask & %d) == %d", mask, mask)) as? Set<Product> {
@@ -675,20 +689,7 @@ extension ProductsViewControllerProducts{
             case .priceDes :
                 productArray = products.sorted { stockOrder(a: $0, b: $1) ?? ($0.floatPrice > $1.floatPrice) }
             case .brands :
-                productArray = products.sorted { (a, b) -> Bool in
-                    if let stock = stockOrder(a: a, b: b) {
-                        return stock
-                    } else if let aDisplayTitle = a.calculatedDisplayTitle?.lowercased(),
-                      let bDisplayTitle = b.calculatedDisplayTitle?.lowercased(),
-                      aDisplayTitle != bDisplayTitle {
-                        return aDisplayTitle < bDisplayTitle
-                    } else if a.calculatedDisplayTitle == nil && b.calculatedDisplayTitle != nil {
-                        return false // Empty brands at end
-                    } else if a.calculatedDisplayTitle != nil && b.calculatedDisplayTitle == nil {
-                        return true // Empty brands at end
-                    }
-                    return a.order < b.order // Tertiary sort
-                }
+                productArray = products.sorted { stockOrder(a: $0, b: $1) ?? titleOrder(a: $0, b: $1) ?? ($0.order < $1.order) }
             }
             return productArray
         }

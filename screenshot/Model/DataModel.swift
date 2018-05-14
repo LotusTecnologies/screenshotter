@@ -620,7 +620,6 @@ extension DataModel {
         variantToSave.sku = sku
         variantToSave.url = url
         variantToSave.imageURLs = imageURLs
-        variantToSave.dateModified = Date()
         return variantToSave
     }
     

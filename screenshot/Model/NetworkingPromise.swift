@@ -392,15 +392,11 @@ class NetworkingPromise : NSObject {
             print("networking checkStock url error:\(error)")
             return Promise(error: error)
         }
-        print("GMK networking checkStock url:\(url)")
         var request = URLRequest(url: url)
         request.addValue("bearer \(Constants.shoppableToken)", forHTTPHeaderField: "Authorization")
         let sessionConfiguration = URLSessionConfiguration.default
         sessionConfiguration.timeoutIntervalForRequest = 60
         return URLSession(configuration: sessionConfiguration).dataTask(with: request).asDataAndResponse().then { data, response -> Promise<([[String : Any]], [String])> in
-            if let dataString = String(data: data, encoding: .utf8) {
-                print("GMK dataString:\(dataString)")
-            }
             guard let httpResponse = response as? HTTPURLResponse else {
                 let error = NSError(domain: "Craze", code: 42, userInfo: [NSLocalizedDescriptionKey: "checkStock no http response for url:\(String(describing: request.url))"])
                 print("checkStock no httpResponse")
