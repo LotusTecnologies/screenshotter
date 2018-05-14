@@ -96,6 +96,18 @@ extension CGRect {
         }
         return nil
     }
+    
+    func relativePositionOf(point:CGPoint) -> CGPoint {
+        let xPercent = (point.x / self.width)
+        let yPercent = (point.y / self.height)
+        return CGPoint.init(x: xPercent, y: yPercent)
+    }
+    
+    func absolutePositionOf(relativePoint:CGPoint) -> CGPoint{
+        let x = relativePoint.x * self.width
+        let y = relativePoint.y * self.height
+        return CGPoint.init(x: x, y: y)
+    }
 }
 extension CGPoint {
     static func pointFrom(array:[Any]?) -> CGPoint? {

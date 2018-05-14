@@ -87,6 +87,10 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         notificationCenter.addObserver(self, selector: #selector(applicationUserDidTakeScreenshot(_:)), name: .UIApplicationUserDidTakeScreenshot, object: nil)
         notificationCenter.addObserver(self, selector: #selector(applicationFetchedAppSettings(_:)), name: .fetchedAppSettings, object: nil)
         
+        notificationCenter.addObserver(self, selector: #selector(syncFavoriteTabBadgeCount), name: .FavoriteAccumulatorModelDidChange, object: nil)
+        notificationCenter.addObserver(self, selector: #selector(syncScreenshotTabBadgeCount), name: .ScreenshotUninformedAccumulatorModelDidChange, object: nil)
+
+
         AssetSyncModel.sharedInstance.screenshotDetectionDelegate = self
         
         cartItemFrc = DataModel.sharedInstance.cartItemFrc(delegate: self)
@@ -105,7 +109,8 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         self.lifeCycleDelegate?.viewController(self, willAppear: animated)
         
         self.refreshTabBarSettingsBadge()
-        syncScreenshotTabBadgeCount()
+        self.syncScreenshotTabBadgeCount()
+        self.syncFavoriteTabBadgeCount()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -195,8 +200,15 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
                 if let tabTitle = viewcontroller.title {
                     Analytics.trackTabBarTapped(tab: tabTitle)
                 }
+                if viewcontroller != screenshotsNavigationController {
+                    AccumulatorModel.screenshotUninformed.resetUninformedCount()
+                }
+                if viewcontroller != favoritesNavigationController {
+                    AccumulatorModel.favorite.resetUninformedCount()
+                }
             }
         }
+    
     }
     
     func presentTabBarSettingsBadge() {
@@ -257,9 +269,14 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         cartNavigationController.tabBarItem.badgeValue = count > 0 ? "\(count)" : nil
     }
     
-    func syncScreenshotTabBadgeCount() {
-        let count = DataModel.sharedInstance.countNewScreenshots()
+    @objc func syncScreenshotTabBadgeCount() {
+        let count = AccumulatorModel.screenshotUninformed.uninformedCount
         screenshotsNavigationController.tabBarItem.badgeValue = count > 0 ? "\(count)" : nil
+    }
+    
+    @objc func syncFavoriteTabBadgeCount() {
+        let count = AccumulatorModel.favorite.uninformedCount
+        favoritesNavigationController.tabBarItem.badgeValue = count > 0 ? "\(count)" : nil
     }
     
     // MARK: View Controllers

@@ -12,6 +12,8 @@ import CreditCardValidator
 import PhoneNumberKit
 
 class FormCardTableViewCell: FormNumberTableViewCell {
+    let cameraButton = UIButton()
+    
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -22,7 +24,57 @@ class FormCardTableViewCell: FormNumberTableViewCell {
         textFieldController = TextFieldFormatter(with: .card)
 //        textField.isSecureTextEntry = true
         
+        let image = UIImage(named: "FormCamera")?.withRenderingMode(.alwaysTemplate)
+        
+        cameraButton.contentEdgeInsets = UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0)
+        cameraButton.tintColor = .gray3
+        cameraButton.setImage(image, for: .normal)
+        cameraButton.sizeToFit()
+        
         Appsee.markView(asSensitive: textField)
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        syncCameraButtonVisibility()
+    }
+    
+    func syncCameraButtonVisibility() {
+        guard CardIOUtilities.canReadCardWithCamera() else {
+            return
+        }
+        
+        if (textField.text ?? "").isEmpty && (textField.placeholder ?? "").isEmpty {
+            accessoryView = cameraButton
+        }
+        else {
+            accessoryView = nil
+        }
+    }
+    
+    override func textFieldTextDidBeginEditing() {
+        super.textFieldTextDidBeginEditing()
+        
+        accessoryView = nil
+    }
+    
+    override func textFieldTextDidEndEditing() {
+        super.textFieldTextDidEndEditing()
+        
+        syncCameraButtonVisibility()
+    }
+    
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        if accessoryView == cameraButton {
+            let cameraHorizontalMargin = bounds.size.width - cameraButton.frame.maxX
+            let cameraRect = cameraButton.frame.insetBy(dx: -cameraHorizontalMargin, dy: 0)
+            
+            if cameraRect.contains(point) {
+                return cameraButton
+            }
+        }
+        
+        return super.hitTest(point, with: event)
     }
 }
 

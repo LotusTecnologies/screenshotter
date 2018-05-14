@@ -24,6 +24,7 @@ def shared_pods
     pod 'CreditCardValidator'
     pod 'Whisper'
     pod 'PhoneNumberKit'
+    pod 'CardIO'
 end
 
 target 'screenshot' do

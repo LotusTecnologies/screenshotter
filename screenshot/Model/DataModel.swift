@@ -525,7 +525,10 @@ extension DataModel {
         return nil
     }
     
-    func deleteVariants(managedObjectContext: NSManagedObjectContext, product: Product) {
+    func deleteVariants(managedObjectContext: NSManagedObjectContext, product: Product, shouldUpdateDateChecked: Bool = true) {
+        if shouldUpdateDateChecked {
+            product.dateCheckedStock = Date()
+        }
         if product.hasVariants {
             let variants = product.availableVariants as? Set<Variant>
             variants?.forEach { managedObjectContext.delete($0) }
@@ -544,20 +547,23 @@ extension DataModel {
                 fetchRequest.propertiesToFetch = ["partNumber"]
                 fetchRequest.fetchLimit = 600
                 let optionsMaskInt = ProductsOptionsMask.global.rawValue
-                fetchRequest.predicate = NSPredicate(format: "shoppable.screenshot == %@ AND (optionsMask & %d) == %d", screenshotOID, optionsMaskInt, optionsMaskInt)
+                let anHourAgo = NSDate(timeIntervalSinceNow: -60 * 60)
+                fetchRequest.predicate = NSPredicate(format: "shoppable.screenshot == %@ AND (optionsMask & %d) == %d AND ( dateCheckedStock == nil || dateCheckedStock < %@ )", screenshotOID, optionsMaskInt, optionsMaskInt, anHourAgo)
                 fetchRequest.sortDescriptors = nil
                 
                 do {
                     let results = try managedObjectContext.fetch(fetchRequest)
-                    if let partNumbers = results.compactMap({ $0["partNumber"] }) as? [String] {
-                        print("GMK count:\(partNumbers.count)  partNumbers:\(partNumbers)")
+                    let partNumbers = results.compactMap { $0["partNumber"] as? String }
+                    if partNumbers.count > 0 {
                         fulfill(partNumbers)
+                        return
                     }
                 } catch {
                     self.receivedCoreDataError(error: error)
                     print("partNumbers results with error:\(error)")
                 }
-                fulfill([])
+                let error = NSError(domain: "Craze", code: 78, userInfo: [NSLocalizedDescriptionKey : "No partNumbers to check."])
+                reject(error)
             }
         }
     }
@@ -614,7 +620,6 @@ extension DataModel {
         variantToSave.sku = sku
         variantToSave.url = url
         variantToSave.imageURLs = imageURLs
-        variantToSave.dateModified = Date()
         return variantToSave
     }
     
@@ -659,6 +664,7 @@ extension DataModel {
             }
         }
         rootProduct.hasVariants = hasVariants
+        rootProduct.dateCheckedStock = Date()
         if shouldSave {
             managedObjectContext.saveIfNeeded()
         }
@@ -1077,8 +1083,10 @@ extension DataModel {
                     }
                     product.isFavorite = false
                     product.dateFavorited = nil
+                    AccumulatorModel.favorite.decrementUninformedCount(by:results.count)
                 }
                 try managedObjectContext.save()
+                
             } catch {
                 self.receivedCoreDataError(error: error)
                 print("unfavorite objectIDs:\(moiArray) results with error:\(error)")
@@ -1109,11 +1117,6 @@ extension DataModel {
     // Must be called on main.
     public func countTotalScreenshots() -> Int {
         let predicate = NSPredicate(format: "shoppablesCount > 0")
-        return countScreenshotWorkhorse(predicate: predicate)
-    }
-    
-    func countNewScreenshots() -> Int {
-        let predicate = NSPredicate(format: "isNew > 0 AND isHidden == false")
         return countScreenshotWorkhorse(predicate: predicate)
     }
     
@@ -1689,6 +1692,9 @@ extension Product {
                 if toFavorited {
                     let score = UserDefaults.standard.integer(forKey: UserDefaultsKeys.gameScore)
                     UserDefaults.standard.set(score + 1, forKey: UserDefaultsKeys.gameScore)
+                    AccumulatorModel.favorite.incrementUninformedCount()
+                }else{
+                    AccumulatorModel.favorite.decrementUninformedCount(by:1)
                 }
             } catch {
                 DataModel.sharedInstance.receivedCoreDataError(error: error)
@@ -1760,6 +1766,10 @@ extension Matchstick {
                     AssetSyncModel.sharedInstance.processingQ.async {
                         AssetSyncModel.sharedInstance.saveShoppables(assetId: assetId, uploadedURLString: uploadedImageURL, segments: segments)
                     }
+                    DispatchQueue.main.async {
+                        AccumulatorModel.screenshotUninformed.incrementUninformedCount()
+                    }
+                    
                     if let callback = callback {
                         let addedScreenshotOID = addedScreenshot.objectID
                         DispatchQueue.main.async {
