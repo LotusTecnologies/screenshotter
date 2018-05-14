@@ -1536,7 +1536,7 @@ extension Shoppable {
                         actualFilteredProductCount > 0 {
                         continue
                     }
-                    AssetSyncModel.sharedInstance.reExtractProducts(shoppableId: shoppable.objectID, optionsMask: optionsMask, offersURL: offersURL)
+                    AssetSyncModel.sharedInstance.reExtractProducts( shoppableId: shoppable.objectID, optionsMask: optionsMask, offersURL: offersURL)
                 }
                 try managedObjectContext.save()
                 DispatchQueue.main.async(execute: callback)

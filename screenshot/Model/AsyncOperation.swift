@@ -249,26 +249,26 @@ class AsyncOperation: Operation {
 }
 
 extension AsyncOperation {
-    convenience init(timeout:TimeInterval?, assetId:String?, shoppableOffersUrl:String?, completion:@escaping ((@escaping() -> ()) -> ())) {
+    convenience init(timeout:TimeInterval?, assetId:String?, shoppableId:String?, completion:@escaping ((@escaping() -> ()) -> ())) {
         var tags:[AsyncOperationTag] = []
         if let assetId = assetId {
             tags.append(AsyncOperationTag.init(type: .assetId, value: assetId))
         }
-        if let shoppableOffersUrl = shoppableOffersUrl {
-            tags.append(AsyncOperationTag.init(type: .shoppableId, value: shoppableOffersUrl))
+        if let shoppableId = shoppableId {
+            tags.append(AsyncOperationTag.init(type: .shoppableId, value: shoppableId))
         }
         self.init(timeout: timeout, tags: tags, completion: completion)
     }
 }
 
 extension AsyncOperationMonitor {
-    convenience init(assetId:String?, shoppableOffersUrl:String?, delegate:AsyncOperationMonitorDelegate) {
+    convenience init(assetId:String?, shoppableId:String?, delegate:AsyncOperationMonitorDelegate) {
         var tags:[AsyncOperationTag] = []
         if let assetId = assetId {
             tags.append(AsyncOperationTag.init(type: .assetId, value: assetId))
         }
-        if let shoppableOffersUrl = shoppableOffersUrl {
-            tags.append(AsyncOperationTag.init(type: .shoppableId, value: shoppableOffersUrl))
+        if let shoppableId = shoppableId {
+            tags.append(AsyncOperationTag.init(type: .shoppableId, value: shoppableId))
         }
         self.init(tags: tags, delegate: delegate)
     }
