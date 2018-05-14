@@ -1083,8 +1083,10 @@ extension DataModel {
                     }
                     product.isFavorite = false
                     product.dateFavorited = nil
+                    AccumulatorModel.favorite.decrementUninformedCount(by:results.count)
                 }
                 try managedObjectContext.save()
+                
             } catch {
                 self.receivedCoreDataError(error: error)
                 print("unfavorite objectIDs:\(moiArray) results with error:\(error)")
@@ -1115,11 +1117,6 @@ extension DataModel {
     // Must be called on main.
     public func countTotalScreenshots() -> Int {
         let predicate = NSPredicate(format: "shoppablesCount > 0")
-        return countScreenshotWorkhorse(predicate: predicate)
-    }
-    
-    func countNewScreenshots() -> Int {
-        let predicate = NSPredicate(format: "isNew > 0 AND isHidden == false")
         return countScreenshotWorkhorse(predicate: predicate)
     }
     
@@ -1695,6 +1692,9 @@ extension Product {
                 if toFavorited {
                     let score = UserDefaults.standard.integer(forKey: UserDefaultsKeys.gameScore)
                     UserDefaults.standard.set(score + 1, forKey: UserDefaultsKeys.gameScore)
+                    AccumulatorModel.favorite.incrementUninformedCount()
+                }else{
+                    AccumulatorModel.favorite.decrementUninformedCount(by:1)
                 }
             } catch {
                 DataModel.sharedInstance.receivedCoreDataError(error: error)
@@ -1766,6 +1766,10 @@ extension Matchstick {
                     AssetSyncModel.sharedInstance.processingQ.async {
                         AssetSyncModel.sharedInstance.saveShoppables(assetId: assetId, uploadedURLString: uploadedImageURL, segments: segments)
                     }
+                    DispatchQueue.main.async {
+                        AccumulatorModel.screenshotUninformed.incrementUninformedCount()
+                    }
+                    
                     if let callback = callback {
                         let addedScreenshotOID = addedScreenshot.objectID
                         DispatchQueue.main.async {

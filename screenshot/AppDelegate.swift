@@ -103,7 +103,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         SilentPushSubscriptionManager.sharedInstance.updateSubscriptionsIfNeeded()
         
-        NotificationCenter.default.addObserver(self, selector: #selector(accumulatorModelNumberDidChange(_:)), name: .accumulatorModelDidUpdate, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(badgeNumberDidChange(_:)), name: .ScreenshotUninformedAccumulatorModelDidChange, object: nil)
         
         if application.applicationState == .background,
             let remoteNotification = launchOptions?[.remoteNotification] as? [String: AnyObject],
@@ -595,17 +595,9 @@ extension AppDelegate {
         }
     }
     
-    @objc fileprivate func accumulatorModelNumberDidChange(_ notification: Notification) {
-        let count = AccumulatorModel.sharedInstance.getNewScreenshotsCount()
-        
-        // TODO: neither of the below approaches seem to work...
+    @objc fileprivate func badgeNumberDidChange(_ notification: Notification) {
+        let count = AccumulatorModel.screenshotUninformed.uninformedCount
         UIApplication.shared.applicationIconBadgeNumber = count
-        
-//        let content = UNMutableNotificationContent()
-//        content.badge = NSNumber(value: count)
-//        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.1, repeats: false)
-//        let request = UNNotificationRequest(identifier: "UpdateBadge", content: content, trigger: trigger)
-//        UNUserNotificationCenter.current().add(request)
     }
 }
 

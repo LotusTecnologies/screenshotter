@@ -122,6 +122,7 @@
 		C540885A1FE90E2200198955 /* FloatingActionButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C540884F1FE90E2200198955 /* FloatingActionButton.swift */; };
 		C540885B1FE90E2200198955 /* HelperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54088501FE90E2200198955 /* HelperView.swift */; };
 		C54124C020A3204700CA03DB /* CartGiftCardConfirmationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54124BF20A3204700CA03DB /* CartGiftCardConfirmationViewController.swift */; };
+		C54124C220A8308600CA03DB /* AccumulatorModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54124C120A8308600CA03DB /* AccumulatorModel.swift */; };
 		C543695020453CDF00599134 /* ProductView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C543694F20453CDF00599134 /* ProductView.swift */; };
 		C543696220468C4100599134 /* SegmentedDropDownControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C543696120468C4100599134 /* SegmentedDropDownControl.swift */; };
 		C54369642046B4E800599134 /* ProductCartBarButtonItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54369632046B4E800599134 /* ProductCartBarButtonItem.swift */; };
@@ -366,6 +367,7 @@
 		C540884F1FE90E2200198955 /* FloatingActionButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FloatingActionButton.swift; sourceTree = "<group>"; };
 		C54088501FE90E2200198955 /* HelperView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HelperView.swift; sourceTree = "<group>"; };
 		C54124BF20A3204700CA03DB /* CartGiftCardConfirmationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartGiftCardConfirmationViewController.swift; sourceTree = "<group>"; };
+		C54124C120A8308600CA03DB /* AccumulatorModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccumulatorModel.swift; sourceTree = "<group>"; };
 		C543694F20453CDF00599134 /* ProductView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductView.swift; sourceTree = "<group>"; };
 		C543696120468C4100599134 /* SegmentedDropDownControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SegmentedDropDownControl.swift; sourceTree = "<group>"; };
 		C54369632046B4E800599134 /* ProductCartBarButtonItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductCartBarButtonItem.swift; sourceTree = "<group>"; };
@@ -584,6 +586,7 @@
 		C5278FB81F3C38510090E422 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				C54124C120A8308600CA03DB /* AccumulatorModel.swift */,
 				C5278FB91F3C38510090E422 /* AssetSyncModel.swift */,
 				C5278FBA1F3C38510090E422 /* DataModel.swift */,
 				C5278FBD1F3C38510090E422 /* Model.xcdatamodeld */,
@@ -1415,6 +1418,7 @@
 				31C0C81B20A2CD14002EE95B /* ProductsCollectionViewCell.swift in Sources */,
 				C5DDC0DC2015C6D900B009BF /* AttributedString.swift in Sources */,
 				525691881FD5DD51008D728D /* UsageStreak.swift in Sources */,
+				C54124C220A8308600CA03DB /* AccumulatorModel.swift in Sources */,
 				C53B46581FBC3DFA00A8C886 /* NotificationCenterKeys.swift in Sources */,
 				3125446C2091C3A0009410D5 /* (null) in Sources */,
 				52E547441FE2487B00627D6D /* ScreenshotHelper.swift in Sources */,

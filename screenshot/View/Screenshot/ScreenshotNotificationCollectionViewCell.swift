@@ -213,7 +213,7 @@ class ScreenshotNotificationCollectionViewCell: ShadowCollectionViewCell {
             text = "screenshot.import.latest".localized
             break
         case .importMultipleScreenshots:
-            text = "screenshot.import.multiple".localized(withFormat: AccumulatorModel.sharedInstance.getNewScreenshotsCount())
+            text = "screenshot.import.multiple".localized(withFormat: AccumulatorModel.screenshot.newCount)
             break
         case .importVeryManyScreenshots:
             text = "screenshot.import.very_many".localized

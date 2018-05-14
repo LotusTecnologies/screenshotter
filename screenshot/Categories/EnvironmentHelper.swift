@@ -26,3 +26,13 @@ extension UIApplication {
         #endif
     }
 }
+
+extension DispatchQueue {
+    static func mainAsyncIfNeeded(_ work:@escaping ()->Void ){
+        if Thread.isMainThread {
+            work()
+        }else{
+            DispatchQueue.main.async(execute: work)
+        }
+    }
+}

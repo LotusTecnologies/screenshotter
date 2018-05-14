@@ -93,6 +93,9 @@ extension ScreenshotsNavigationController :ScreenshotsViewControllerDelegate{
             self.pushViewController(productsViewController, animated: true)
             
             if (screenshot.isNew) {
+                if screenshot.source == .discover {
+                    AccumulatorModel.screenshotUninformed.decrementUninformedCount(by:1)
+                }
                 screenshot.setViewed()
             }
             

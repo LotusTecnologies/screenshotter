@@ -23,6 +23,10 @@ class UserDefaultsKeys  {
     // Screenshot
     static let newScreenshotsCount = "NewScreenshotsCount"
     static let newScreenshotsAssetIds = "NewScreenshotsAssetIds"
+    static let uninformedScreenshotsCount = "UninformedScreenshotsCount"
+    
+    // Favorites
+    static let uninformedFavoritesCount = "UninformedFavoritesCount"
 
     // Product
     static let productGender = "ProductGender"
