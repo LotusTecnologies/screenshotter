@@ -22,9 +22,9 @@ class TutorialNavigationController : UINavigationController {
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
-        let welcomeSlide = TutorialWelcomeSlideViewController()
-        welcomeSlide.delegate = self
-        self.viewControllers = [welcomeSlide]
+        let welcomeViewController = OnboardingWelcomeViewController()
+        welcomeViewController.delegate = self
+        viewControllers = [welcomeViewController]
         
         Analytics.trackStartedTutorialVideo()
         
@@ -52,8 +52,8 @@ extension TutorialNavigationController : UINavigationControllerDelegate {
     }
 }
 
-extension TutorialNavigationController: TutorialWelcomeSlideViewControllerDelegate {
-    func tutorialWelcomeSlideViewControllerDidComplete(_ viewController:TutorialWelcomeSlideViewController) {
+extension TutorialNavigationController: OnboardingWelcomeViewControllerDelegate {
+    func onboardingWelcomeViewControllerDidComplete(_ viewController: OnboardingWelcomeViewController) {
         Analytics.trackOnboardingWelcome()
         
         let signup = TutorialEmailSlideViewController()

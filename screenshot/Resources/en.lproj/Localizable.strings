@@ -223,6 +223,10 @@
 "notification.screenshot.shoppable" = "Your screenshot is shoppable in the screenshot tab";
 "notification.title" = "Ready to shop?";
 
+"onboarding.welcome.content" = "Take a screenshot.\nShop it.";
+"onboarding.welcome.continue" = "Get Started";
+"onboarding.welcome.header" = "Welcome to";
+
 "partners.content" = "Screenshop makes it easy to turn any app into shopping inspiration. When you take a screenshot on Instagram, Facebook, Snapchat or any other app with photos, we analyze the image for fashion or furniture and then show you products from 400+ brands we’re partnered with.\n\nScreenshop automatically imports screenshots you take that are detected as fashion or furniture related, so you can start shopping immediately. Screenshots you take that aren’t relevant won’t clutter up your collection thanks to our image recognition technology.\n\nWe also programatically determine what categories your photo fits - women’s clothing, men’s clothing, Kids, plus size, furniture, etc, and let you sort manually to fine tune your fashion hunt based on size, price, brands or gender.\n\nOur visual search is powered by our partners, %@";
 "partners.title" = "Our Technology";
 
@@ -388,9 +392,6 @@
 "tutorial.try.title" = "Try It Out";
 "tutorial.video.mute.detail" = "In order to hear the sound in the video, please turn up the volume on your phone!";
 "tutorial.video.mute.title" = "Turn up the volume!";
-"tutorial.welcome.detail" = "Any fashion picture you screenshot becomes shoppable in the app";
-"tutorial.welcome.start" = "Get Started";
-"tutorial.welcome.title" = "Welcome to ";
 
 "update.force.message" = "You need to update to the latest version to keep using Screenshop.";
 "update.force.title" = "Update Required";
