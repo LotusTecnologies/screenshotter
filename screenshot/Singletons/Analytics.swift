@@ -12,6 +12,7 @@ import Appsee
 import Branch
 import FBSDKCoreKit
 import Whisper
+import AdSupport
 
 extension Bool {
     func toStringLiteral() -> String {
@@ -334,16 +335,25 @@ class AnalyticsTrackers : NSObject {
     
     class SegmentAnalyticsTracker : NSObject, AnalyticsTracker {
         func track(_ event: String, properties: [AnyHashable : Any]? = nil) {
+            guard ASIdentifierManager.shared().isAdvertisingTrackingEnabled else {
+                return
+            }
             SEGAnalytics.shared().track(event, properties: properties as? [String : Any])
         }
         
         func identify(_ user: AnalyticsUser) {
+            guard ASIdentifierManager.shared().isAdvertisingTrackingEnabled else {
+                return
+            }
             SEGAnalytics.shared().identify(user.identifier, traits: user.analyticsProperties)
         }
     }
     
     class AppseeAnalyticsTracker : NSObject, AnalyticsTracker {
         func track(_ event: String, properties: [AnyHashable : Any]? = nil) {
+            guard ASIdentifierManager.shared().isAdvertisingTrackingEnabled else {
+                return
+            }
             // Appsee properties can't exceed 300 bytes.
             // https://www.appsee.com/docs/ios/api?section=events
             
@@ -367,6 +377,9 @@ class AnalyticsTrackers : NSObject {
         }
         
         func identify(_ user: AnalyticsUser) {
+            guard ASIdentifierManager.shared().isAdvertisingTrackingEnabled else {
+                return
+            }
             Appsee.setUserID(user.email ?? user.identifier)
             Appsee.addEvent("User Properties", withProperties: user.analyticsProperties)
         }
@@ -374,10 +387,12 @@ class AnalyticsTrackers : NSObject {
     
     class BranchAnalyticsTracker : NSObject, AnalyticsTracker {
         func track(_ event: String, properties: [AnyHashable : Any]? = nil) {
+            // Branch checks isAdvertisingTrackingEnabled in setup in AppDelegate.
             Branch.getInstance().userCompletedAction(event, withState: properties ?? [:])
         }
         
         func identify(_ user: AnalyticsUser) {
+            // Branch checks isAdvertisingTrackingEnabled in setup in AppDelegate.
             Branch.getInstance().setIdentity(user.email ?? user.identifier)
             
             if let isEmpty = user.email?.isEmpty, isEmpty == false {
@@ -389,17 +404,25 @@ class AnalyticsTrackers : NSObject {
     
     class IntercomAnalyticsTracker : NSObject, AnalyticsTracker {
         func track(_ event: String, properties: [AnyHashable : Any]? = nil) {
+            guard ASIdentifierManager.shared().isAdvertisingTrackingEnabled else {
+                return
+            }
             IntercomHelper.sharedInstance.record(event: event, properties: properties)
         }
         
         func identify(_ user: AnalyticsUser) {
+            guard ASIdentifierManager.shared().isAdvertisingTrackingEnabled else {
+                return
+            }
             IntercomHelper.sharedInstance.register(user: user)
         }
     }
     
     class KochavaAnalyticsTracker : NSObject, AnalyticsTracker {
         func track(_ event: String, properties: [AnyHashable : Any]? = nil) {
-            
+            guard ASIdentifierManager.shared().isAdvertisingTrackingEnabled else {
+                return
+            }
             if let kEvent = KochavaEvent(eventTypeEnum: .custom) {
                 kEvent.nameString = event
                 kEvent.customEventNameString = event
@@ -412,6 +435,9 @@ class AnalyticsTrackers : NSObject {
         }
         
         func identify(_ user: AnalyticsUser) {
+            guard ASIdentifierManager.shared().isAdvertisingTrackingEnabled else {
+                return
+            }
         }
     }
 }
