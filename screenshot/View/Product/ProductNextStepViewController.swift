@@ -9,8 +9,8 @@
 import UIKit
 
 class ProductNextStepViewController: UIViewController {
-    let cartButton = MainButton()
     let continueButton = MainButton()
+    let cancelButton = MainButton()
     
     fileprivate let transitioning = ViewControllerTransitioningDelegate(presentation: .intrinsicContentSize, transition: .modal)
     
@@ -62,25 +62,25 @@ class ProductNextStepViewController: UIViewController {
         imageView.trailingAnchor.constraint(equalTo: label.leadingAnchor, constant: -.padding).isActive = true
         imageView.centerYAnchor.constraint(equalTo: label.centerYAnchor).isActive = true
         
-        cartButton.translatesAutoresizingMaskIntoConstraints = false
-        cartButton.backgroundColor = .crazeGreen
-        cartButton.setTitle("product.next_step.cart".localized, for: .normal)
-        view.addSubview(cartButton)
-        cartButton.setContentCompressionResistancePriority(UILayoutPriority.required, for: .vertical)
-        cartButton.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
-        cartButton.topAnchor.constraint(equalTo: label.bottomAnchor, constant: .padding).isActive = true
-        cartButton.leadingAnchor.constraint(equalTo: layoutGuide.leadingAnchor).isActive = true
-        cartButton.trailingAnchor.constraint(equalTo: layoutGuide.trailingAnchor).isActive = true
-        
         continueButton.translatesAutoresizingMaskIntoConstraints = false
         continueButton.backgroundColor = .crazeGreen
         continueButton.setTitle("product.next_step.continue".localized, for: .normal)
         view.addSubview(continueButton)
         continueButton.setContentCompressionResistancePriority(UILayoutPriority.required, for: .vertical)
         continueButton.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
-        continueButton.topAnchor.constraint(equalTo: cartButton.bottomAnchor, constant: .padding).isActive = true
+        continueButton.topAnchor.constraint(equalTo: label.bottomAnchor, constant: .padding).isActive = true
         continueButton.leadingAnchor.constraint(equalTo: layoutGuide.leadingAnchor).isActive = true
-        continueButton.bottomAnchor.constraint(equalTo: layoutGuide.bottomAnchor).isActive = true
         continueButton.trailingAnchor.constraint(equalTo: layoutGuide.trailingAnchor).isActive = true
+        
+        cancelButton.translatesAutoresizingMaskIntoConstraints = false
+        cancelButton.backgroundColor = .crazeGreen
+        cancelButton.setTitle("product.next_step.cancel".localized, for: .normal)
+        view.addSubview(cancelButton)
+        cancelButton.setContentCompressionResistancePriority(UILayoutPriority.required, for: .vertical)
+        cancelButton.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
+        cancelButton.topAnchor.constraint(equalTo: continueButton.bottomAnchor, constant: .padding).isActive = true
+        cancelButton.leadingAnchor.constraint(equalTo: layoutGuide.leadingAnchor).isActive = true
+        cancelButton.bottomAnchor.constraint(equalTo: layoutGuide.bottomAnchor).isActive = true
+        cancelButton.trailingAnchor.constraint(equalTo: layoutGuide.trailingAnchor).isActive = true
     }
 }
