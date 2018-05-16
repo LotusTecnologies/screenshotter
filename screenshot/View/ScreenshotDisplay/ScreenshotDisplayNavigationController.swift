@@ -28,7 +28,7 @@ class ScreenshotDisplayNavigationController : UINavigationController {
         navigationBar.isTranslucent = true
         navigationBar.tintColor = .white
         
-        screenshotDisplayViewController.navigationItem.titleView = UIImageView(image: UIImage(named: "LogoWhite20h"))
+        screenshotDisplayViewController.navigationItem.titleView = UIImageView(image: UIImage(named: "BrandLogoWhite20h"))
         screenshotDisplayViewController.navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(named: "ControlX"), style: .plain, target: self, action: #selector(closeAction))
 //        screenshotDisplayViewController.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(shareAction))
         

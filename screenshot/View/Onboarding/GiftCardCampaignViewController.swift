@@ -52,10 +52,10 @@ class GiftCardCampaignViewController: UIViewController {
         let topBackground = UIView()
         topBackground.backgroundColor = .white
 
-        let topLine = UIImageView.init(image: UIImage(named: "redgradientTopLine"))
+        let topLine = UIImageView.init(image: UIImage(named: "BrandGradientBorder"))
         topLine.contentMode = .scaleToFill
         
-        let bottomBackground = UIImageView.init(image: UIImage.init(named: "halfconfetti"))
+        let bottomBackground = UIImageView.init(image: UIImage.init(named: "BrandConfettiContentBackground"))
         
         let backgroundLine = UIView()
         backgroundLine.backgroundColor = .gray9

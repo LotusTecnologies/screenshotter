@@ -34,7 +34,7 @@ class GiftCardDoneViewController: UIViewController {
 
         
         
-        let topLine = UIImageView.init(image: UIImage(named: "redgradientTopLine"))
+        let topLine = UIImageView.init(image: UIImage(named: "BrandGradientBorder"))
         topLine.contentMode = .scaleToFill
 
         let background = UIImageView.init(image: UIImage.init(named: "confetti"))

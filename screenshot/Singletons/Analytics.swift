@@ -12,6 +12,7 @@ import Appsee
 import Branch
 import FBSDKCoreKit
 import Whisper
+import AdSupport
 
 extension Bool {
     func toStringLiteral() -> String {
@@ -56,7 +57,10 @@ class Analytics {
         }
         
         properties["screenshot-source"] = screenshot.source.rawValue
-
+        
+        if let screenshotId = screenshot.screenshotId {
+            properties["screenshot-id"] = screenshotId
+        }
         
 
         self.addScreenshotProperitesFrom(trackingData: screenshot.trackingInfo, toProperties: &properties)
@@ -141,7 +145,6 @@ class Analytics {
         }
         if let offerURL = product.offer {
             properties["product-offerURL"] = offerURL
-            
         }
         
         let options = ProductsOptionsMask.init(rawValue: Int(product.optionsMask))
@@ -155,6 +158,9 @@ class Analytics {
         
         if let partNumber = product.partNumber {
             properties["product-partNumber"] = partNumber
+            properties["proudct-isUsc"] = NSNumber.init(value: true)
+        }else{
+            properties["proudct-isUsc"] = NSNumber.init(value: false)
         }
 
         if let shoppable = product.shoppable{
@@ -171,6 +177,9 @@ class Analytics {
         if let product = cartItem.product{
             propertiesFor(product).forEach { properties[$0] = $1 }
         }
+        if let cart = cartItem.cart{
+            propertiesFor(cart).forEach { properties[$0] = $1 }
+        }
         
         properties["product-quantity"] = NSNumber(value:cartItem.quantity)
         if let color = cartItem.color {
@@ -184,6 +193,8 @@ class Analytics {
         if let sku = cartItem.sku {
             properties["product-sku"] = sku
         }
+        
+        
 
         return properties
 
@@ -319,7 +330,7 @@ public class AnalyticsUser : NSObject {
 }
 
 protocol AnalyticsTracker {
-    func track(_ event: String, properties: [AnyHashable : Any]?)
+    func track(_ event: String, properties: [AnyHashable : Any]?, sendEvenIfAdvertisingTrackingIsOptOut:Bool?)
     func identify(_ user: AnalyticsUser)
 }
 
@@ -333,51 +344,63 @@ class AnalyticsTrackers : NSObject {
     let branch = BranchAnalyticsTracker()
     
     class SegmentAnalyticsTracker : NSObject, AnalyticsTracker {
-        func track(_ event: String, properties: [AnyHashable : Any]? = nil) {
-            SEGAnalytics.shared().track(event, properties: properties as? [String : Any])
+        func track(_ event: String, properties: [AnyHashable : Any]? = nil, sendEvenIfAdvertisingTrackingIsOptOut:Bool? = false ){
+            if  ASIdentifierManager.shared().isAdvertisingTrackingEnabled || sendEvenIfAdvertisingTrackingIsOptOut == true {
+                SEGAnalytics.shared().track(event, properties: properties as? [String : Any])
+            }
         }
         
         func identify(_ user: AnalyticsUser) {
+            guard ASIdentifierManager.shared().isAdvertisingTrackingEnabled else {
+                return
+            }
             SEGAnalytics.shared().identify(user.identifier, traits: user.analyticsProperties)
         }
     }
     
     class AppseeAnalyticsTracker : NSObject, AnalyticsTracker {
-        func track(_ event: String, properties: [AnyHashable : Any]? = nil) {
-            // Appsee properties can't exceed 300 bytes.
-            // https://www.appsee.com/docs/ios/api?section=events
-            
-            let finalKeys = (properties ?? [:]).keys.filter {
-                let propertyLength = "\(event)\($0)\(properties![$0] ?? ""))".lengthOfBytes(using: .utf8)
-                return propertyLength < 300
-            }
-            
-            if finalKeys.count > 0 {
-                let props = finalKeys.reduce([:]) { (final, key) -> [AnyHashable : Any] in
-                    var copy = final
-                    copy[key] = properties?[key]
-                    return copy
+        func track(_ event: String, properties: [AnyHashable : Any]? = nil, sendEvenIfAdvertisingTrackingIsOptOut:Bool? = false ){
+            if  ASIdentifierManager.shared().isAdvertisingTrackingEnabled || sendEvenIfAdvertisingTrackingIsOptOut == true {
+                // Appsee properties can't exceed 300 bytes.
+                // https://www.appsee.com/docs/ios/api?section=events
+                
+                let finalKeys = (properties ?? [:]).keys.filter {
+                    let propertyLength = "\(event)\($0)\(properties![$0] ?? ""))".lengthOfBytes(using: .utf8)
+                    return propertyLength < 300
                 }
                 
-                Appsee.addEvent(event, withProperties: props)
-                
-            } else {
-                Appsee.addEvent(event)
+                if finalKeys.count > 0 {
+                    let props = finalKeys.reduce([:]) { (final, key) -> [AnyHashable : Any] in
+                        var copy = final
+                        copy[key] = properties?[key]
+                        return copy
+                    }
+                    
+                    Appsee.addEvent(event, withProperties: props)
+                    
+                } else {
+                    Appsee.addEvent(event)
+                }
             }
         }
         
         func identify(_ user: AnalyticsUser) {
+            guard ASIdentifierManager.shared().isAdvertisingTrackingEnabled else {
+                return
+            }
             Appsee.setUserID(user.email ?? user.identifier)
             Appsee.addEvent("User Properties", withProperties: user.analyticsProperties)
         }
     }
     
     class BranchAnalyticsTracker : NSObject, AnalyticsTracker {
-        func track(_ event: String, properties: [AnyHashable : Any]? = nil) {
+        func track(_ event: String, properties: [AnyHashable : Any]? = nil, sendEvenIfAdvertisingTrackingIsOptOut:Bool? = false ){
+            // Branch checks isAdvertisingTrackingEnabled in setup in AppDelegate.
             Branch.getInstance().userCompletedAction(event, withState: properties ?? [:])
         }
         
         func identify(_ user: AnalyticsUser) {
+            // Branch checks isAdvertisingTrackingEnabled in setup in AppDelegate.
             Branch.getInstance().setIdentity(user.email ?? user.identifier)
             
             if let isEmpty = user.email?.isEmpty, isEmpty == false {
@@ -388,30 +411,39 @@ class AnalyticsTrackers : NSObject {
     
     
     class IntercomAnalyticsTracker : NSObject, AnalyticsTracker {
-        func track(_ event: String, properties: [AnyHashable : Any]? = nil) {
-            IntercomHelper.sharedInstance.record(event: event, properties: properties)
+        func track(_ event: String, properties: [AnyHashable : Any]? = nil, sendEvenIfAdvertisingTrackingIsOptOut:Bool? = false ){
+            if  ASIdentifierManager.shared().isAdvertisingTrackingEnabled || sendEvenIfAdvertisingTrackingIsOptOut == true {
+                IntercomHelper.sharedInstance.record(event: event, properties: properties)
+            }
         }
         
         func identify(_ user: AnalyticsUser) {
+            guard ASIdentifierManager.shared().isAdvertisingTrackingEnabled else {
+                return
+            }
             IntercomHelper.sharedInstance.register(user: user)
         }
     }
     
     class KochavaAnalyticsTracker : NSObject, AnalyticsTracker {
-        func track(_ event: String, properties: [AnyHashable : Any]? = nil) {
-            
-            if let kEvent = KochavaEvent(eventTypeEnum: .custom) {
-                kEvent.nameString = event
-                kEvent.customEventNameString = event
-                //Do not track properties - there is an bug in ios 10 that will cause freezing.
-                kEvent.userIdString = AnalyticsUser.current.identifier
-                kEvent.userNameString = AnalyticsUser.current.name
-                KochavaTracker.shared.send(kEvent)
-                
+        func track(_ event: String, properties: [AnyHashable : Any]? = nil, sendEvenIfAdvertisingTrackingIsOptOut:Bool? = false ){
+            if  ASIdentifierManager.shared().isAdvertisingTrackingEnabled || sendEvenIfAdvertisingTrackingIsOptOut == true {
+                if let kEvent = KochavaEvent(eventTypeEnum: .custom) {
+                    kEvent.nameString = event
+                    kEvent.customEventNameString = event
+                    //Do not track properties - there is an bug in ios 10 that will cause freezing.
+                    kEvent.userIdString = AnalyticsUser.current.identifier
+                    kEvent.userNameString = AnalyticsUser.current.name
+                    KochavaTracker.shared.send(kEvent)
+                    
+                }
             }
         }
         
         func identify(_ user: AnalyticsUser) {
+            guard ASIdentifierManager.shared().isAdvertisingTrackingEnabled else {
+                return
+            }
         }
     }
 }

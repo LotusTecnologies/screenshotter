@@ -208,17 +208,9 @@ fileprivate extension ProductViewControllerProductView {
             }
             
             let quantity = max(1, Int(productView.selectionQuantityItem?.selectedPickerItem ?? "") ?? 1)
-            
             ShoppingCartModel.shared.update(variant: variant, quantity: Int16(quantity))
             
-            if !UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingPresentedGiftCard),
-                let navigationController = navigationController as? ScreenshotsNavigationController
-            {
-                navigationController.presentGiftCardCampaign()
-            }
-            else {
-                presentNextStep()
-            }
+            presentNextStep()
         }
         else {
             func displayErrorItems() {
@@ -261,13 +253,25 @@ fileprivate extension ProductViewControllerProductView {
     
     fileprivate func presentNextStep() {
         let nextStepViewController = ProductNextStepViewController()
-        nextStepViewController.cartButton.addTarget(self, action: #selector(presentCart), for: .touchUpInside)
-        nextStepViewController.continueButton.addTarget(self, action: #selector(dismissNextStep), for: .touchUpInside)
+        nextStepViewController.continueButton.addTarget(self, action: #selector(nextStepContinueAction), for: .touchUpInside)
+        nextStepViewController.cancelButton.addTarget(self, action: #selector(nextStepCancelAction), for: .touchUpInside)
         present(nextStepViewController, animated: true, completion: nil)
     }
     
-    @objc fileprivate func dismissNextStep() {
+    @objc fileprivate func nextStepContinueAction() {
+        presentCart { [weak self] in
+            if let navigationController = self?.navigationController as? ScreenshotsNavigationController {
+                navigationController.presentGiftCardCampaignIfNeeded()
+            }
+        }
+    }
+    
+    @objc fileprivate func nextStepCancelAction() {
         dismiss(animated: true, completion: nil)
+        
+        if let navigationController = navigationController as? ScreenshotsNavigationController {
+            navigationController.presentGiftCardCampaignIfNeeded()
+        }
     }
     
     // MARK: Favorite
@@ -417,12 +421,12 @@ fileprivate extension ProductViewControllerStructuredProduct {
 
 typealias ProductViewControllerCart = ProductViewController
 fileprivate extension ProductViewControllerCart {
-    @objc func presentCart() {
+    @objc func presentCart(completion: (()->())? = nil) {
         if presentedViewController != nil {
             dismiss(animated: true, completion: nil)
         }
         
-        present(CartNavigationController(), animated: true, completion: nil)
+        present(CartNavigationController(), animated: true, completion: completion)
     }
     
     func syncCartItemCount() {

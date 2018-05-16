@@ -20,6 +20,7 @@ enum ScreenshotSource : String {
     case shuffle
     case share
     case tutorial
+    case nativeShare = "native-share" //Andriod only - here for completment of analytics
 }
 
 class DataModel: NSObject {
@@ -1433,7 +1434,7 @@ extension Screenshot {
 extension Shoppable {
     public func relatedImagesUrl() -> URL? {
         if let urlString = self.relatedImagesURLString {
-            return URL.urlWith(string: urlString, queryParameters: ["feed":"mns_ctl"])
+            return URL.urlWith(string: urlString, queryParameters: ["feed":"craze_ctl"])
         }
         return nil
     }

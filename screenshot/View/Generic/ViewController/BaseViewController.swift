@@ -58,6 +58,6 @@ class BaseViewController: UIViewController {
     // MARK: - Extra
     
     func addNavigationItemLogo() {
-        self.navigationItem.titleView = UIImageView(image: UIImage(named: "Logo20h"))
+        self.navigationItem.titleView = UIImageView(image: UIImage(named: "BrandLogo20h"))
     }
 }

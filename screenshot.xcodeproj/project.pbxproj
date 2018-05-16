@@ -136,6 +136,8 @@
 		C565333B2019D81C00F022D4 /* ProductViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C565333A2019D81C00F022D4 /* ProductViewController.swift */; };
 		C56F889C1FE9478D0006914C /* TappableTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56F889B1FE9478D0006914C /* TappableTextView.swift */; };
 		C5709E451FC57B4500AB2D04 /* EnumProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5709E441FC57B4500AB2D04 /* EnumProtocol.swift */; };
+		C572C0D820AADA98004B0A17 /* OnboardingWelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C572C0D720AADA98004B0A17 /* OnboardingWelcomeViewController.swift */; };
+		C572C0DB20AAE602004B0A17 /* BlankHeaderConfettiContentTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C572C0DA20AAE602004B0A17 /* BlankHeaderConfettiContentTemplate.swift */; };
 		C572FEFE205C00070046BFEB /* Hind-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C572FEF9205C00050046BFEB /* Hind-Light.ttf */; };
 		C572FEFF205C00070046BFEB /* Hind-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C572FEFA205C00050046BFEB /* Hind-Bold.ttf */; };
 		C572FF00205C00070046BFEB /* Hind-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C572FEFB205C00060046BFEB /* Hind-Regular.ttf */; };
@@ -146,7 +148,6 @@
 		C58FA0ED20A95FC300072966 /* TutorialVideoOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0E120A95FC200072966 /* TutorialVideoOverlayView.swift */; };
 		C58FA0EE20A95FC300072966 /* NotificationPromptViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0E220A95FC200072966 /* NotificationPromptViewController.swift */; };
 		C58FA0EF20A95FC300072966 /* CampaignPromotionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0E320A95FC200072966 /* CampaignPromotionViewController.swift */; };
-		C58FA0F020A95FC300072966 /* TutorialWelcomeSlideViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0E420A95FC200072966 /* TutorialWelcomeSlideViewController.swift */; };
 		C58FA0F120A95FC300072966 /* TutorialTrySlideViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0E520A95FC200072966 /* TutorialTrySlideViewController.swift */; };
 		C58FA0F220A95FC300072966 /* VideoDisplayingViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0E620A95FC200072966 /* VideoDisplayingViewControllerDelegate.swift */; };
 		C58FA0F320A95FC300072966 /* TutorialVideoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0E720A95FC200072966 /* TutorialVideoViewController.swift */; };
@@ -381,6 +382,8 @@
 		C565333A2019D81C00F022D4 /* ProductViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductViewController.swift; sourceTree = "<group>"; };
 		C56F889B1FE9478D0006914C /* TappableTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TappableTextView.swift; sourceTree = "<group>"; };
 		C5709E441FC57B4500AB2D04 /* EnumProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnumProtocol.swift; sourceTree = "<group>"; };
+		C572C0D720AADA98004B0A17 /* OnboardingWelcomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingWelcomeViewController.swift; sourceTree = "<group>"; };
+		C572C0DA20AAE602004B0A17 /* BlankHeaderConfettiContentTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlankHeaderConfettiContentTemplate.swift; sourceTree = "<group>"; };
 		C572FEF9205C00050046BFEB /* Hind-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Hind-Light.ttf"; sourceTree = "<group>"; };
 		C572FEFA205C00050046BFEB /* Hind-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Hind-Bold.ttf"; sourceTree = "<group>"; };
 		C572FEFB205C00060046BFEB /* Hind-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Hind-Regular.ttf"; sourceTree = "<group>"; };
@@ -391,7 +394,6 @@
 		C58FA0E120A95FC200072966 /* TutorialVideoOverlayView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialVideoOverlayView.swift; sourceTree = "<group>"; };
 		C58FA0E220A95FC200072966 /* NotificationPromptViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotificationPromptViewController.swift; sourceTree = "<group>"; };
 		C58FA0E320A95FC200072966 /* CampaignPromotionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CampaignPromotionViewController.swift; sourceTree = "<group>"; };
-		C58FA0E420A95FC200072966 /* TutorialWelcomeSlideViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialWelcomeSlideViewController.swift; sourceTree = "<group>"; };
 		C58FA0E520A95FC200072966 /* TutorialTrySlideViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialTrySlideViewController.swift; sourceTree = "<group>"; };
 		C58FA0E620A95FC200072966 /* VideoDisplayingViewControllerDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoDisplayingViewControllerDelegate.swift; sourceTree = "<group>"; };
 		C58FA0E720A95FC200072966 /* TutorialVideoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialVideoViewController.swift; sourceTree = "<group>"; };
@@ -836,6 +838,7 @@
 				C50D200D1FEBE6CD005CFA4F /* ScrollRevealController.swift */,
 				C5D57930203EDD6200A076FE /* TableView */,
 				C54088441FE90E2200198955 /* TableViewCell */,
+				C572C0D920AAE5D2004B0A17 /* Template */,
 				C540884A1FE90E2200198955 /* TextView */,
 				C54369652046D6E500599134 /* ViewController */,
 				C5F37C9D20555C0C0072FE1D /* ViewControllerTransitioning */,
@@ -964,6 +967,14 @@
 			path = Extension;
 			sourceTree = "<group>";
 		};
+		C572C0D920AAE5D2004B0A17 /* Template */ = {
+			isa = PBXGroup;
+			children = (
+				C572C0DA20AAE602004B0A17 /* BlankHeaderConfettiContentTemplate.swift */,
+			);
+			path = Template;
+			sourceTree = "<group>";
+		};
 		C58FA0C820A95FB000072966 /* Onboarding */ = {
 			isa = PBXGroup;
 			children = (
@@ -972,12 +983,12 @@
 				C58FA0E920A95FC300072966 /* GiftCardCampaignViewController.swift */,
 				C58FA0EC20A95FC300072966 /* GiftCardDoneViewController.swift */,
 				C58FA0E220A95FC200072966 /* NotificationPromptViewController.swift */,
+				C572C0D720AADA98004B0A17 /* OnboardingWelcomeViewController.swift */,
 				C58FA0EA20A95FC300072966 /* TutorialEmailSlideViewController.swift */,
 				C58FA0E820A95FC300072966 /* TutorialNavigationController.swift */,
 				C58FA0E520A95FC200072966 /* TutorialTrySlideViewController.swift */,
 				C58FA0E120A95FC200072966 /* TutorialVideoOverlayView.swift */,
 				C58FA0E720A95FC200072966 /* TutorialVideoViewController.swift */,
-				C58FA0E420A95FC200072966 /* TutorialWelcomeSlideViewController.swift */,
 				C58FA0E620A95FC200072966 /* VideoDisplayingViewControllerDelegate.swift */,
 			);
 			path = Onboarding;
@@ -1512,6 +1523,7 @@
 				C528005D2051342B004DD7A3 /* BorderButton.swift in Sources */,
 				C5FF413E200B817400342DEC /* DiscoverScreenshotCollectionViewLayout.swift in Sources */,
 				C54088291FE90C8E00198955 /* FavoritesViewController.swift in Sources */,
+				C572C0DB20AAE602004B0A17 /* BlankHeaderConfettiContentTemplate.swift in Sources */,
 				3125448F209871B4009410D5 /* Analytics+api.swift in Sources */,
 				C5336D1D203ACE7B00A7B4B0 /* CartNavigationController.swift in Sources */,
 				C50E25EE207DEC49003C8D24 /* CheckoutShippingTableViewCell.swift in Sources */,
@@ -1535,7 +1547,6 @@
 				31CE1115203BF0BC000156EE /* ScreenshotProductBarCollectionViewCell.swift in Sources */,
 				E49261D6206A704C006FE84E /* UIImage+craze.swift in Sources */,
 				C53B46561FBC39B400A8C886 /* AppSettings.swift in Sources */,
-				C58FA0F020A95FC300072966 /* TutorialWelcomeSlideViewController.swift in Sources */,
 				C540881B1FE90C8E00198955 /* ShoppableCollectionViewCell.swift in Sources */,
 				C54088591FE90E2200198955 /* MainButton.swift in Sources */,
 				C543696220468C4100599134 /* SegmentedDropDownControl.swift in Sources */,
@@ -1604,6 +1615,7 @@
 				C540880E1FE90C8E00198955 /* LoadingViewController.swift in Sources */,
 				31C0C81F20A2CD14002EE95B /* ProductsOptions.swift in Sources */,
 				E4859E19203044E100A26985 /* ScreenshotDisplayViewController.swift in Sources */,
+				C572C0D820AADA98004B0A17 /* OnboardingWelcomeViewController.swift in Sources */,
 				C540885B1FE90E2200198955 /* HelperView.swift in Sources */,
 				C50DBB7D207B398100BB206E /* CheckoutOrderViewController.swift in Sources */,
 				5273E3811F7ACE0300C832F8 /* Analytics.swift in Sources */,
@@ -1763,7 +1775,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 139;
+				CURRENT_PROJECT_VERSION = 140;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/dev/;
 				INFOPLIST_FILE = screenshot/dev/Info.plist;
@@ -1793,7 +1805,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 139;
+				CURRENT_PROJECT_VERSION = 140;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/dev/;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -1881,7 +1893,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 139;
+				CURRENT_PROJECT_VERSION = 140;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/prd/;
 				INFOPLIST_FILE = screenshot/prd/Info.plist;
@@ -1964,7 +1976,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 139;
+				CURRENT_PROJECT_VERSION = 140;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/prd/;
 				INFOPLIST_FILE = screenshot/prd/Info.plist;
