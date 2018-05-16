@@ -160,7 +160,7 @@ class Analytics {
             properties["product-partNumber"] = partNumber
             properties["proudct-isUsc"] = NSNumber.init(value: true)
         }else{
-            properties["proudct-isUsc"] = NSNumber.init(value: true)
+            properties["proudct-isUsc"] = NSNumber.init(value: false)
         }
 
         if let shoppable = product.shoppable{
