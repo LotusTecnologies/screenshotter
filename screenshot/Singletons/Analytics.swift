@@ -57,7 +57,10 @@ class Analytics {
         }
         
         properties["screenshot-source"] = screenshot.source.rawValue
-
+        
+        if let screenshotId = screenshot.screenshotId {
+            properties["screenshot-id"] = screenshotId
+        }
         
 
         self.addScreenshotProperitesFrom(trackingData: screenshot.trackingInfo, toProperties: &properties)
@@ -142,7 +145,6 @@ class Analytics {
         }
         if let offerURL = product.offer {
             properties["product-offerURL"] = offerURL
-            
         }
         
         let options = ProductsOptionsMask.init(rawValue: Int(product.optionsMask))
@@ -156,6 +158,9 @@ class Analytics {
         
         if let partNumber = product.partNumber {
             properties["product-partNumber"] = partNumber
+            properties["proudct-isUsc"] = NSNumber.init(value: true)
+        }else{
+            properties["proudct-isUsc"] = NSNumber.init(value: true)
         }
 
         if let shoppable = product.shoppable{
@@ -172,6 +177,9 @@ class Analytics {
         if let product = cartItem.product{
             propertiesFor(product).forEach { properties[$0] = $1 }
         }
+        if let cart = cartItem.cart{
+            propertiesFor(cart).forEach { properties[$0] = $1 }
+        }
         
         properties["product-quantity"] = NSNumber(value:cartItem.quantity)
         if let color = cartItem.color {
@@ -185,6 +193,8 @@ class Analytics {
         if let sku = cartItem.sku {
             properties["product-sku"] = sku
         }
+        
+        
 
         return properties
 

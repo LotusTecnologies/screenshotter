@@ -1,8 +1,8 @@
 // STOP!  DO not edit the file below
 // only create by auto generting
 // created by: Jonathan Rose(rose@screenshopit.com) on computer -jonathanrose
-// created on: Thu May 10 13:21:02 IDT 2018
-// created from: master -  - 18a7ecc 
+// created on: Wed May 16 08:25:38 IDT 2018
+// created from: master -  - 77cc1ea 
 //  Copyright © 2018 crazeapp. All rights reserved.
 
 
@@ -3000,6 +3000,7 @@ extension AnalyticsMatchsticksFlagged {
   enum AnalyticsMatchsticksFlaggedWhy : String{
     case `inappropriate` = "Inappropriate"
     case `copyright` = "Copyright"
+    case `badresults` = "Badresults"
     }
     
   static func trackMatchsticksFlagged(matchstick:Matchstick?,  why:AnalyticsMatchsticksFlaggedWhy ) {
