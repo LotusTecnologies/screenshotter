@@ -21,7 +21,6 @@ enum ScreenshotsSection : Int {
 
 protocol ScreenshotsViewControllerDelegate : NSObjectProtocol{
     func screenshotsViewController(_  viewController:ScreenshotsViewController, didSelectItemAt:IndexPath)
-    func screenshotsViewControllerDeletedLastScreenshot(_  viewController:ScreenshotsViewController)
     func screenshotsViewControllerWantsToPresentPicker(_  viewController:ScreenshotsViewController, openScreenshots:Bool)
 }
 

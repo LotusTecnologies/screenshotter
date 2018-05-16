@@ -111,34 +111,69 @@ extension ScreenshotsNavigationController :ScreenshotsViewControllerDelegate{
         }
     }
     
-    func screenshotsViewControllerDeletedLastScreenshot(_  viewController:ScreenshotsViewController){
-        
-    }
-    
     func screenshotsViewControllerWantsToPresentPicker(_  viewController:ScreenshotsViewController, openScreenshots:Bool){
         self.presentPickerViewController(openScreenshots:openScreenshots)
     }
 }
 
 extension ScreenshotsNavigationController: GiftCardCampaignViewControllerDelegate {
-    func presentGiftCardCampaign() {
-        let viewController = GiftCardCampaignViewController()
-        viewController.delegate = self
-        present(viewController, animated: true, completion: nil)
+    fileprivate var giftCardActiveViewController: UIViewController {
+        if let presentedViewController = presentedViewController, !presentedViewController.isBeingDismissed {
+            return presentedViewController
+        }
         
-        UserDefaults.standard.set(true, forKey: UserDefaultsKeys.onboardingPresentedGiftCard)
+        return self
+    }
+    
+    func presentGiftCardCampaignIfNeeded() {
+        if !UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingPresentedGiftCard) {
+            UserDefaults.standard.set(true, forKey: UserDefaultsKeys.onboardingPresentedGiftCard)
+            UserDefaults.standard.synchronize()
+            
+            let viewController = GiftCardCampaignViewController()
+            viewController.delegate = self
+        
+            giftCardActiveViewController.present(viewController, animated: true, completion: nil)
+        }
     }
     
     func giftCardCampaignViewControllerDidSkip(_ viewController: GiftCardCampaignViewController) {
         Analytics.trackOnboardingCampainCreditCardSkip()
         
-        dismiss(animated: true, completion: nil)
+        giftCardActiveViewController.dismiss(animated: true, completion: nil)
     }
     
     func giftCardCampaignViewControllerDidContinue(_ viewController: GiftCardCampaignViewController) {
         Analytics.trackOnboardingCampainCreditCardLetsGo()
         
-        MainTabBarController.resetViewControllerHierarchy(viewController, select: .cart)
+        giftCardActiveViewController.dismiss(animated: true, completion: nil)
+        
+        let viewController = CheckoutPaymentFormViewController(withCard: nil, isEditLayout: true, confirmBeforeSave: false, autoSaveBillAddressAsShippingAddress:true)
+        viewController.title = "2018_05_01_campaign.payment".localized
+        viewController.delegate = self
+        
+        let modalNavigationController = ModalNavigationController(rootViewController: viewController)
+        giftCardActiveViewController.present(modalNavigationController, animated: true, completion: nil)
+    }
+}
+
+extension ScreenshotsNavigationController: GiftCardDoneViewControllerDelegate {
+    func giftCardDoneViewControllerDidPressDone(_ viewController: GiftCardDoneViewController) {
+        let frc = DataModel.sharedInstance.cardFrc(delegate: nil).fetchedObjects.first
+        Analytics.trackOnboardingCampainCreditCardDone(email: frc?.email, phone: frc?.phone)
+        
+        giftCardActiveViewController.dismiss(animated: true, completion: nil)
+    }
+}
+
+extension ScreenshotsNavigationController: CheckoutFormViewControllerDelegate {
+    func checkoutFormViewControllerDidAdd(_ viewController: CheckoutFormViewController) {
+        Analytics.trackOnboardingCampainCreditCardEnteredCard()
+        
+        let doneViewController = GiftCardDoneViewController()
+        doneViewController.delegate = self
+        doneViewController.navigationItem.hidesBackButton = true
+        viewController.navigationController?.pushViewController(doneViewController, animated: true)
     }
 }
 
@@ -163,17 +198,17 @@ extension ScreenshotsNavigationControllerProducts {
 typealias ScreenshotsNavigationControllerPushPermission = ScreenshotsNavigationController
 extension ScreenshotsNavigationControllerPushPermission {
     fileprivate var needsToPresentPushPrompt: Bool {
-        
         return !UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingPresentedPushAlert) && PermissionsManager.shared.hasPermission(for: .photo) && !PermissionsManager.shared.hasPermission(for: .push)
     }
     
-    fileprivate func presentPushPrompt(){
+    fileprivate func presentPushPrompt() {
         let viewController = NotificationPromptViewController()
         viewController.notificationButton.addTarget(self, action: #selector(notificationPromptContinueAction), for: .touchUpInside)
         viewController.cancelButton.addTarget(self, action: #selector(notificationPromptCancelAction), for: .touchUpInside)
         present(viewController, animated: true, completion: nil)
         
         UserDefaults.standard.set(true, forKey: UserDefaultsKeys.onboardingPresentedPushAlert)
+        UserDefaults.standard.synchronize()
     }
     
     @objc fileprivate func notificationPromptContinueAction() {
