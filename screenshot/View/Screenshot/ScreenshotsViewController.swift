@@ -93,8 +93,11 @@ class ScreenshotsViewController: BaseViewController {
         super.viewDidAppear(animated)
         
         // !!!: DEBUG
-        let v = CheckoutConfirmPaymentViewController()
-        present(v, animated: true, completion: nil)
+        let cartItemFrc = DataModel.sharedInstance.cartItemFrc(delegate: nil)
+        if let cartItem = cartItemFrc.fetchedObjects.first, let product = cartItem.product {
+            let v = ProductVariantsSelectorViewController(product: product)
+            present(v, animated: true, completion: nil)
+        }
     }
     
     override func viewDidDisappear(_ animated: Bool) {

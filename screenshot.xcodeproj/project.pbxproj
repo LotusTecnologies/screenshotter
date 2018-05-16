@@ -139,6 +139,8 @@
 		C572C0DB20AAE602004B0A17 /* BlankHeaderConfettiContentTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C572C0DA20AAE602004B0A17 /* BlankHeaderConfettiContentTemplate.swift */; };
 		C572C0DD20AC1AEA004B0A17 /* HelperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C572C0DC20AC1AEA004B0A17 /* HelperView.swift */; };
 		C572C0DF20AC1B61004B0A17 /* AlertTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C572C0DE20AC1B61004B0A17 /* AlertTemplate.swift */; };
+		C572C0E120AC2CFA004B0A17 /* ProductVariantsSelectorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C572C0E020AC2CFA004B0A17 /* ProductVariantsSelectorViewController.swift */; };
+		C572C0E320AC48C1004B0A17 /* ProductStructures.swift in Sources */ = {isa = PBXBuildFile; fileRef = C572C0E220AC48C1004B0A17 /* ProductStructures.swift */; };
 		C572FEFE205C00070046BFEB /* Hind-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C572FEF9205C00050046BFEB /* Hind-Light.ttf */; };
 		C572FEFF205C00070046BFEB /* Hind-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C572FEFA205C00050046BFEB /* Hind-Bold.ttf */; };
 		C572FF00205C00070046BFEB /* Hind-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C572FEFB205C00060046BFEB /* Hind-Regular.ttf */; };
@@ -386,6 +388,8 @@
 		C572C0DA20AAE602004B0A17 /* BlankHeaderConfettiContentTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlankHeaderConfettiContentTemplate.swift; sourceTree = "<group>"; };
 		C572C0DC20AC1AEA004B0A17 /* HelperView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HelperView.swift; sourceTree = "<group>"; };
 		C572C0DE20AC1B61004B0A17 /* AlertTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertTemplate.swift; sourceTree = "<group>"; };
+		C572C0E020AC2CFA004B0A17 /* ProductVariantsSelectorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductVariantsSelectorViewController.swift; sourceTree = "<group>"; };
+		C572C0E220AC48C1004B0A17 /* ProductStructures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductStructures.swift; sourceTree = "<group>"; };
 		C572FEF9205C00050046BFEB /* Hind-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Hind-Light.ttf"; sourceTree = "<group>"; };
 		C572FEFA205C00050046BFEB /* Hind-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Hind-Bold.ttf"; sourceTree = "<group>"; };
 		C572FEFB205C00060046BFEB /* Hind-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Hind-Regular.ttf"; sourceTree = "<group>"; };
@@ -785,6 +789,8 @@
 			children = (
 				C54369632046B4E800599134 /* ProductCartBarButtonItem.swift */,
 				C5F37CA920555E1F0072FE1D /* ProductNextStepViewController.swift */,
+				C572C0E220AC48C1004B0A17 /* ProductStructures.swift */,
+				C572C0E020AC2CFA004B0A17 /* ProductVariantsSelectorViewController.swift */,
 				C543694F20453CDF00599134 /* ProductView.swift */,
 				C565333A2019D81C00F022D4 /* ProductViewController.swift */,
 			);
@@ -1458,6 +1464,7 @@
 				C540881F1FE90C8E00198955 /* PickerCollectionViewCell.swift in Sources */,
 				31CE1111203BF055000156EE /* ProductsBarCollectionViewCell.swift in Sources */,
 				C51ED5BC1FF39BD800AABD68 /* FavoriteProductsViewController.swift in Sources */,
+				C572C0E120AC2CFA004B0A17 /* ProductVariantsSelectorViewController.swift in Sources */,
 				C5D2E30A204DC97800B5BD92 /* BorderView.swift in Sources */,
 				31A0781E20830D9A00D70DC3 /* UserFeedback.swift in Sources */,
 				C53B462A1FB1A50F00A8C886 /* Intercom.swift in Sources */,
@@ -1567,6 +1574,7 @@
 				31C0C81A20A2CD14002EE95B /* SectionBackgroundCollectionViewFlowLayout.swift in Sources */,
 				C58FA0F220A95FC300072966 /* VideoDisplayingViewControllerDelegate.swift in Sources */,
 				C537F39E2004A20E00287360 /* DiscoverScreenshotCollectionViewCell.swift in Sources */,
+				C572C0E320AC48C1004B0A17 /* ProductStructures.swift in Sources */,
 				C5014110205E7BF200ABFB5C /* Label.swift in Sources */,
 				C501410B205E702C00ABFB5C /* Font.swift in Sources */,
 				C5A1922E2057AD520046303C /* DimmedPresentationController.swift in Sources */,
