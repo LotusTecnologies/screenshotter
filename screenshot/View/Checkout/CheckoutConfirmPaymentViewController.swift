@@ -8,49 +8,18 @@
 
 import UIKit
 
-class CheckoutConfirmPaymentViewController: UIViewController {
+class CheckoutConfirmPaymentViewController: AlertTemplateViewController {
     fileprivate let cvvTextFieldController = TextFieldFormatter(with: .cvv)
     fileprivate let cvvBorderColor: UIColor = .gray3
     
-    fileprivate let transitioning = ViewControllerTransitioningDelegate(presentation: .intrinsicContentSize, transition: .modal)
-    
-    // MARK: View
-    
     let cvvTextField = UITextField()
     
-    var orderButton: MainButton {
-        return _view.continueButton
-    }
-    
-    var cancelButton: UIButton {
-        return _view.cancelButton
-    }
-    
-    fileprivate var _view: AlertTemplate {
-        return view as! AlertTemplate
-    }
-    
-    override func loadView() {
-        view = AlertTemplate()
-    }
-    
     // MARK: Life Cycle
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-        
-        transitioningDelegate = transitioning
-        modalPresentationStyle = .custom
-    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        _view.titleLabel.text = "checkout.confirm.payment.enter_cvv".localized
+        titleLabel.text = "checkout.confirm.payment.enter_cvv".localized
         
         cvvTextField.translatesAutoresizingMaskIntoConstraints = false
         cvvTextField.placeholder = "checkout.confirm.payment.cvv".localized
@@ -64,12 +33,10 @@ class CheckoutConfirmPaymentViewController: UIViewController {
         cvvTextField.layer.cornerRadius = .defaultCornerRadius
         cvvTextField.layer.masksToBounds = true
         view.addSubview(cvvTextField)
-//        cvvTextField.setContentCompressionResistancePriority(.required, for: .vertical)
-//        cvvTextField.setContentHuggingPriority(.required, for: .vertical)
-        cvvTextField.topAnchor.constraint(equalTo: _view.contentLayoutGuide.topAnchor).isActive = true
-        cvvTextField.leadingAnchor.constraint(equalTo: _view.contentLayoutGuide.leadingAnchor).isActive = true
-        cvvTextField.bottomAnchor.constraint(equalTo: _view.contentLayoutGuide.bottomAnchor).isActive = true
-        cvvTextField.trailingAnchor.constraint(equalTo: _view.contentLayoutGuide.centerXAnchor).isActive = true
+        cvvTextField.topAnchor.constraint(equalTo: contentLayoutGuide.topAnchor).isActive = true
+        cvvTextField.leadingAnchor.constraint(equalTo: contentLayoutGuide.leadingAnchor).isActive = true
+        cvvTextField.bottomAnchor.constraint(equalTo: contentLayoutGuide.bottomAnchor).isActive = true
+        cvvTextField.trailingAnchor.constraint(equalTo: contentLayoutGuide.centerXAnchor).isActive = true
         cvvTextField.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
         let whatButton = UIButton()
@@ -96,8 +63,8 @@ class CheckoutConfirmPaymentViewController: UIViewController {
         whatButton.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         whatButton.centerYAnchor.constraint(equalTo: cvvTextField.centerYAnchor).isActive = true
         
-        _view.continueButton.setTitle("checkout.order.title".localized, for: .normal)
-        _view.cancelButton.setTitle("generic.cancel".localized, for: .normal)
+        continueButton.setTitle("checkout.order.title".localized, for: .normal)
+        cancelButton.setTitle("generic.cancel".localized, for: .normal)
     }
     
     override func viewWillDisappear(_ animated: Bool) {

@@ -8,7 +8,7 @@
 
 import UIKit
 
-class AlertTemplate: UIView {
+class AlertTemplateView: UIView {
     let titleLabel = UILabel()
     let contentLayoutGuide = UILayoutGuide()
     let continueButton = MainButton()
@@ -65,5 +65,48 @@ class AlertTemplate: UIView {
         cancelButton.leadingAnchor.constraint(equalTo: paddingLayoutGuide.leadingAnchor).isActive = true
         cancelButton.bottomAnchor.constraint(equalTo: paddingLayoutGuide.bottomAnchor).isActive = true
         cancelButton.trailingAnchor.constraint(equalTo: paddingLayoutGuide.trailingAnchor).isActive = true
+    }
+}
+
+class AlertTemplateViewController: UIViewController {
+    fileprivate let transitioning = ViewControllerTransitioningDelegate(presentation: .intrinsicContentSize, transition: .modal)
+    
+    // MARK: View
+    
+    fileprivate var _view: AlertTemplateView {
+        return view as! AlertTemplateView
+    }
+    
+    var titleLabel: UILabel {
+        return _view.titleLabel
+    }
+    
+    var contentLayoutGuide: UILayoutGuide {
+        return _view.contentLayoutGuide
+    }
+    
+    var continueButton: MainButton {
+        return _view.continueButton
+    }
+    
+    var cancelButton: UIButton {
+        return _view.cancelButton
+    }
+    
+    override func loadView() {
+        view = AlertTemplateView()
+    }
+    
+    // MARK: Life Cycle
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        
+        transitioningDelegate = transitioning
+        modalPresentationStyle = .custom
     }
 }
