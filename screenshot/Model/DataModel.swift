@@ -20,6 +20,7 @@ enum ScreenshotSource : String {
     case shuffle
     case share
     case tutorial
+    case nativeShare = "native-share" //Andriod only - here for completment of analytics
 }
 
 class DataModel: NSObject {
