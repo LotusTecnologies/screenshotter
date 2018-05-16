@@ -89,6 +89,14 @@ class ScreenshotsViewController: BaseViewController {
         self.updateHasNewScreenshot()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        // !!!: DEBUG
+        let v = CheckoutConfirmPaymentViewController()
+        present(v, animated: true, completion: nil)
+    }
+    
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         self.removeScreenshotHelperView()
