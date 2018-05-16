@@ -1497,6 +1497,7 @@ extension Shoppable {
         guard let screenshotId = self.screenshot?.objectID else {
             return
         }
+        let assetId = self.screenshot?.assetId
         let optionsMask = ProductsOptionsMask(productsOptions.category, productsOptions.gender, productsOptions.size)
         let optionsMaskInt = optionsMask.rawValue
         DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
@@ -1536,7 +1537,7 @@ extension Shoppable {
                         actualFilteredProductCount > 0 {
                         continue
                     }
-                    AssetSyncModel.sharedInstance.reExtractProducts( shoppableId: shoppable.objectID, optionsMask: optionsMask, offersURL: offersURL)
+                    AssetSyncModel.sharedInstance.reExtractProducts(assetId:assetId, shoppableId: shoppable.objectID, optionsMask: optionsMask, offersURL: offersURL)
                 }
                 try managedObjectContext.save()
                 DispatchQueue.main.async(execute: callback)

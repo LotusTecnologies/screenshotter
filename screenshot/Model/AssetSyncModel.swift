@@ -210,15 +210,15 @@ extension AssetSyncModel {
     
     
     func uploadPhoto(asset: PHAsset, source:ScreenshotSource) {
-        let localIdentifier = asset.localIdentifier
-        self.userInitiatedQueue.addOperation(AsyncOperation.init(timeout: 5.0,  assetId: localIdentifier, shoppableId: nil, completion: { (completeOperation) in
-            AccumulatorModel.screenshot.removeAssetId(localIdentifier)
+        let assetLocalIdentifier = asset.localIdentifier
+        self.userInitiatedQueue.addOperation(AsyncOperation.init(timeout: 5.0,  assetId: assetLocalIdentifier, shoppableId: nil, completion: { (completeOperation) in
+                AccumulatorModel.screenshot.removeAssetId(assetLocalIdentifier)
                 asset.image(allowFromICloud: true).then(on: self.processingQ) { image -> Promise<(ClarifaiModel.ImageClassification, Data?)> in
                 Analytics.trackBypassedClarifai()
                 let imageData: Data? = self.data(for: image)
                 return Promise { fulfill, reject in
-                    self.performBackgroundTask(assetId: localIdentifier, shoppableId: nil) { (managedObjectContext) in
-                        if let screenshot = managedObjectContext.screenshotWith(assetId: localIdentifier) {
+                    self.performBackgroundTask(assetId: assetLocalIdentifier, shoppableId: nil) { (managedObjectContext) in
+                        if let screenshot = managedObjectContext.screenshotWith(assetId: assetLocalIdentifier) {
                             //this is retry screenshot
                             var imageClassification: ClarifaiModel.ImageClassification
                             if let classification = screenshot.syteJson,
@@ -256,7 +256,7 @@ extension AssetSyncModel {
                             fulfill((imageClassification, imageData))
                         }else{
                             let screenshot = Screenshot(context: managedObjectContext)
-                            screenshot.assetId = asset.localIdentifier
+                            screenshot.assetId = assetLocalIdentifier
                             let now = Date()
                             if let date =  asset.creationDate  {
                                 screenshot.createdAt = date
@@ -278,7 +278,7 @@ extension AssetSyncModel {
                     }
                 }
             }.then (on: self.processingQ) { imageClassification, imageData -> Promise<Bool> in
-                self.syteProcessing(imageClassification: imageClassification, imageData: imageData, orImageUrlString:nil, assetId: asset.localIdentifier)
+                self.syteProcessing(imageClassification: imageClassification, imageData: imageData, orImageUrlString:nil, assetId: assetLocalIdentifier)
                 return Promise.init(value: true)
             }.catch { error in
                 print("uploadPhoto outer catch error:\(error)")
@@ -313,7 +313,7 @@ extension AssetSyncModel {
                 return when(fulfilled:  NetworkingPromise.sharedInstance.downloadImageData(urlString: imageURLString), Promise.init(value: screenshotDict))
             }.then(on: self.processingQ) { (imageData, screenshotDict) -> Promise< [String : Any]> in
                 return Promise(resolvers: { (fulfil, reject) in
-                    self.performBackgroundTask(assetId: nil, shoppableId: nil) { (context) in
+                    self.performBackgroundTask(assetId: shareId, shoppableId: nil) { (context) in
                         let _ = DataModel.sharedInstance.saveScreenshot(managedObjectContext: context,
                                                                 assetId: shareId,
                                                                 createdAt: Date(),
@@ -462,7 +462,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                     
                     Analytics.trackReceivedResponseFromClarifai(isFashion:  imageClassification == .human, isFurniture: imageClassification == .furniture)
                     return Promise { fulfill, reject in
-                        self.performBackgroundTask(assetId: nil, shoppableId: nil) { (managedObjectContext) in
+                        self.performBackgroundTask(assetId: asset.localIdentifier, shoppableId: nil) { (managedObjectContext) in
                             if let _ = managedObjectContext.screenshotWith(assetId: asset.localIdentifier) {
                                 //do nothing if already exsists
                                 let error = NSError.init(domain: "Craze", code: -90, userInfo: [NSLocalizedDescriptionKey:"already have screenshot in database"])
@@ -851,7 +851,7 @@ extension AssetSyncModel {
         let dataModel = DataModel.sharedInstance
         
         func embeddedSaveShoppableWithProducts(productsArray: [[String : Any]]) {
-            self.performBackgroundTask(assetId: nil, shoppableId: nil) { (managedObjectContext) in
+            self.performBackgroundTask(assetId: assetId, shoppableId: offersURL) { (managedObjectContext) in
                 guard let screenshot = dataModel.retrieveScreenshot(managedObjectContext: managedObjectContext, assetId: assetId) else {
                     print("AssetSyncModel extractProducts error retreiving screenshot:\(assetId) to which to add shoppable and products")
                     return
@@ -916,12 +916,13 @@ extension AssetSyncModel {
         }))
     }
     
-    func updateShoppableWithProducts(shoppableOfferURL:String,
+    func updateShoppableWithProducts(assetId:String?,
+                                     shoppableOfferURL:String,
                                      shoppableId: NSManagedObjectID,
                                      optionsMask32: Int32,
                                      productsArray: [[String : Any]]) {
         let dataModel = DataModel.sharedInstance
-        self.performBackgroundTask(assetId: nil, shoppableId: shoppableOfferURL) { (managedObjectContext) in
+        self.performBackgroundTask(assetId: assetId, shoppableId: shoppableOfferURL) { (managedObjectContext) in
             guard let shoppable = dataModel.retrieveShoppable(managedObjectContext: managedObjectContext, objectId: shoppableId) else {
                 print("AssetSyncModel reExtractProducts error retreiving shoppable:\(shoppableId) to which to add products")
                 return
@@ -958,27 +959,28 @@ extension AssetSyncModel {
         }
     }
 
-    func reExtractProducts(shoppableId: NSManagedObjectID,
+    func reExtractProducts(assetId:String?,
+                            shoppableId: NSManagedObjectID,
                            optionsMask: ProductsOptionsMask,
                            offersURL: String) {
         let optionsMask32 = Int32(optionsMask.rawValue)
         guard let url = augmentedUrl(offersURL: offersURL, optionsMask: optionsMask) else {
             print("AssetSyncModel reExtractProducts no url from offersURL:\(offersURL)")
-            updateShoppableWithProducts(shoppableOfferURL:offersURL, shoppableId: shoppableId, optionsMask32: optionsMask32, productsArray: [])
+            updateShoppableWithProducts(assetId:assetId, shoppableOfferURL:offersURL, shoppableId: shoppableId, optionsMask32: optionsMask32, productsArray: [])
             return
         }
         self.downloadProductQueue.addOperation(AsyncOperation.init(timeout: 90, assetId: nil, shoppableId: offersURL, completion: { (completion) in
             NetworkingPromise.sharedInstance.downloadProductsWithRetry(url: url)
             .then(on: self.processingQ) { productsDict -> Void in
                 if let productsArray = productsDict["ads"] as? [[String : Any]], productsArray.count > 0 {
-                    self.updateShoppableWithProducts(shoppableOfferURL:offersURL, shoppableId: shoppableId, optionsMask32: optionsMask32, productsArray: productsArray)
+                    self.updateShoppableWithProducts(assetId:assetId,shoppableOfferURL:offersURL, shoppableId: shoppableId, optionsMask32: optionsMask32, productsArray: productsArray)
                 } else {
                     print("AssetSyncModel reExtractProducts no products in ads. productsDict:\(productsDict)")
-                    self.updateShoppableWithProducts(shoppableOfferURL:offersURL, shoppableId: shoppableId, optionsMask32: optionsMask32, productsArray: [])
+                    self.updateShoppableWithProducts(assetId:assetId, shoppableOfferURL:offersURL, shoppableId: shoppableId, optionsMask32: optionsMask32, productsArray: [])
                 }
             }.catch { error in
                 print("AssetSyncModel reExtractProducts error parsing product:\(error)")
-                self.updateShoppableWithProducts(shoppableOfferURL:offersURL, shoppableId: shoppableId, optionsMask32: optionsMask32, productsArray: [])
+                self.updateShoppableWithProducts(assetId:assetId, shoppableOfferURL:offersURL, shoppableId: shoppableId, optionsMask32: optionsMask32, productsArray: [])
             }.always {
                 completion()
             }

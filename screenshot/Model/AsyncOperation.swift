@@ -92,6 +92,7 @@ class AsyncOperationMonitorCenter {
             count = count + 1
             
             self.runningTags[tag.type]?[tag.value] = count
+            print("started \(tag.type.rawValue):\(tag.value)")
         }
         
         self.tagStarted(startedTags)
@@ -110,6 +111,7 @@ class AsyncOperationMonitorCenter {
             if count == 0 {
                 endedTags.append(tag)
             }
+            print("stopped \(tag.type.rawValue):\(tag.value)")
             
         }
         self.tagsEnded(endedTags)
@@ -199,6 +201,7 @@ class AsyncOperation: Operation {
         self.tags = tags
         self.executionBlock = completion
         self.timeout = timeout
+        AsyncOperationMonitorCenter.shared.registerStarted(tags: self.tags)
         super.init()
     }
     
@@ -210,12 +213,12 @@ class AsyncOperation: Operation {
     override func main() {
         guard isCancelled == false else {
             finish(true)
+            AsyncOperationMonitorCenter.shared.registerStopped(tags: self.tags)
             return
         }
         
         executing(true)
         //        let date = Date()
-        AsyncOperationMonitorCenter.shared.registerStarted(tags: self.tags)
         if let timeout = timeout {
             DispatchQueue.global(qos: .background).asyncAfter(deadline: .now() + timeout, execute: {
                 if !self.isFinished {
