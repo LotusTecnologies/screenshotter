@@ -14,14 +14,14 @@ class ProductVariantsSelectorViewController: AlertTemplateViewController {
         case color
         case size
         
-        var localized: String { // TODO: localize
+        var localized: String {
             switch self {
             case .quantity:
-                return "Quantity"
+                return "product.variants.quantity".localized
             case .color:
-                return "Color"
+                return "product.variants.color".localized
             case .size:
-                return "Size"
+                return "product.variants.size".localized
             }
         }
     }
@@ -38,17 +38,29 @@ class ProductVariantsSelectorViewController: AlertTemplateViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
-    init(product: Product) {
+    init(product: Product, selectedVariant: Variant? = nil, selectedQuantity: Int = 1) {
         structuredProduct = StructuredProduct(product)
         super.init(nibName: nil, bundle: nil)
         
+        if let color = selectedVariant?.color, let colorIndex = structuredProduct.colors?.index(of: color) {
+            selectedRows[.color] = colorIndex
+        }
         
+        if let size = selectedVariant?.size, let sizeIndex = structuredProduct.sizes?.index(of: size) {
+            selectedRows[.size] = sizeIndex
+        }
+        
+        let indexFromZero = selectedQuantity - 1
+        
+        if quantityDataSource.count > indexFromZero {
+            selectedRows[.quantity] = indexFromZero
+        }
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        titleLabel.text = "Edit Item" // TODO: localize
+        titleLabel.text = "product.variants.edit".localized
         continueButton.setTitle("generic.done".localized, for: .normal)
         cancelButton.setTitle("generic.cancel".localized, for: .normal)
         
@@ -82,6 +94,11 @@ class ProductVariantsSelectorViewController: AlertTemplateViewController {
         pickerView.heightAnchor.constraint(equalToConstant: 150).isActive = true
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        selectCurrentRow()
+    }
+    
     // MARK: Interaction
     
     @objc fileprivate func segmentChanged(_ segmentedControl: UISegmentedControl) {
@@ -91,10 +108,12 @@ class ProductVariantsSelectorViewController: AlertTemplateViewController {
         
         currentOption = option
         pickerView.reloadAllComponents()
+        selectCurrentRow()
     }
     
     // MARK: Datasource
     
+    fileprivate var selectedRows: [Options: Int] = [:]
     fileprivate let quantityDataSource = (1...Constants.cartItemMaxQuantity).map { "\($0)" }
     
     fileprivate var currentDataSource: [String]? {
@@ -107,9 +126,38 @@ class ProductVariantsSelectorViewController: AlertTemplateViewController {
             return structuredProduct.sizes
         }
     }
+    
+    var selectedVariant: Variant? {
+        guard let colors = structuredProduct.colors,
+            let colorIndex = selectedRows[.color],
+            colors.count > colorIndex,
+            let sizes = structuredProduct.sizes,
+            let sizeIndex = selectedRows[.size],
+            sizes.count > sizeIndex
+            else {
+                return nil
+        }
+        
+        return structuredProduct.variant(color: colors[colorIndex], size: sizes[sizeIndex])
+    }
+    
+    var selectedQuantity: Int {
+        let quantityIndex = selectedRows[.quantity] ?? 0
+        
+        if quantityDataSource.count > quantityIndex, let quantity = Int(quantityDataSource[quantityIndex]) {
+            return quantity
+        }
+        
+        return 1
+    }
 }
 
 extension ProductVariantsSelectorViewController: UIPickerViewDataSource {
+    fileprivate func selectCurrentRow() {
+        let selectedRow = selectedRows[currentOption] ?? 0
+        pickerView.selectRow(selectedRow, inComponent: 0, animated: false)
+    }
+    
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1
     }
@@ -126,5 +174,9 @@ extension ProductVariantsSelectorViewController: UIPickerViewDelegate {
         }
         
         return nil
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        selectedRows[currentOption] = row
     }
 }

@@ -391,7 +391,6 @@ fileprivate extension ProductViewControllerStructuredProduct {
             setOriginalPrice(product.originalPrice)
         }
         
-        // TODO: how to handle variants with sizes and no color?
         if let colors = structuredProduct.colors {
             let selectedColor = product.color ?? (colors.count == 1 ? colors.first : nil)
             let colorItem = SegmentedDropDownItem(pickerItems: colors, selectedPickerItem: selectedColor)
@@ -411,12 +410,16 @@ fileprivate extension ProductViewControllerStructuredProduct {
             
             productView.setSelection(colorItem: colorItem, sizeItem: sizeItem)
         }
+        else {
+            // TODO: test this
+//            productView.setUnavailableImageViewAlpha(1)
+        }
     }
     
     func selectedVariant() -> Variant? {
         let color = productView.selectionColorItem?.selectedPickerItem
         let size = productView.selectionSizeItem?.selectedPickerItem
-        return structuredProduct?.variant(forColor: color, size: size)
+        return structuredProduct?.variant(color: color, size: size)
     }
 }
 

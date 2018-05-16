@@ -89,17 +89,6 @@ class ScreenshotsViewController: BaseViewController {
         self.updateHasNewScreenshot()
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        
-        // !!!: DEBUG
-        let cartItemFrc = DataModel.sharedInstance.cartItemFrc(delegate: nil)
-        if let cartItem = cartItemFrc.fetchedObjects.first, let product = cartItem.product {
-            let v = ProductVariantsSelectorViewController(product: product)
-            present(v, animated: true, completion: nil)
-        }
-    }
-    
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         self.removeScreenshotHelperView()

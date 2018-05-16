@@ -118,7 +118,7 @@ class StructuredProduct: NSObject {
         }
     }
     
-    func variant(forColor color: String?, size: String?) -> Variant? {
+    func variant(color: String?, size: String?) -> Variant? {
         return structuredColorVariant(forColor: color)?.variant(forSize: size)
     }
     
