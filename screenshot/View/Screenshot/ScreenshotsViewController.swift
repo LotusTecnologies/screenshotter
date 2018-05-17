@@ -587,14 +587,12 @@ extension ScreenshotsViewController : ScreenshotCollectionViewCellDelegate{
         
     func screenshotCollectionViewCellDidTapShare(_ cell: ScreenshotCollectionViewCell) {
         if let indexPath = self.collectionView?.indexPath(for: cell),  let screenshot = self.screenshot(at: indexPath.item) {
-            let source = screenshot.source
-            let submittedDate = screenshot.submittedDate
             let screenshotObjectId = screenshot.objectID
             let alert = UIAlertController.init(title: "share_to_discover.action_sheet.title".localized, message: "share_to_discover.action_sheet.message".localized, preferredStyle: .actionSheet)
             
             alert.addAction(UIAlertAction.init(title: "share_to_discover.action_sheet.discover".localized, style: .default, handler: { (a) in
                 if let screenshot = DataModel.sharedInstance.mainMoc().screenshotWith(objectId: screenshotObjectId) {
-                    if !(source == .gallery || source == .share || source == .unknown || source == .camera || source == .screenshot) || submittedDate != nil {
+                    if !screenshot.canSubmitToDiscover {
                         let alert = UIAlertController.init(title: nil, message: "share_to_discover.action_sheet.error.alread_shared".localized, preferredStyle: .alert)
                         
                         alert.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .cancel, handler: { (a) in
@@ -606,7 +604,7 @@ extension ScreenshotsViewController : ScreenshotCollectionViewCellDelegate{
                         let thankYou = ThankYouForSharingViewController()
                         thankYou.closeButton.addTarget(self, action: #selector(self.thankYouForSharingViewDidClose(_:)), for: .touchUpInside)
                         self.present(thankYou, animated: true, completion: nil)
-                        Analytics.trackShareDiscover(screenshot: screenshot)
+                        Analytics.trackShareDiscover(screenshot: screenshot, page: .screenshotList)
                     }
                 }
                 

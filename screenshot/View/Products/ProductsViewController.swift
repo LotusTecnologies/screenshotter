@@ -791,7 +791,7 @@ extension ProductsViewControllerRatings: UITextFieldDelegate {
                 sharePrompt.translatesAutoresizingMaskIntoConstraints = false
                 sharePrompt.alpha = 0
                 self.view.addSubview(sharePrompt)
-                sharePrompt.addButton.addTarget(self, action: #selector(submitToDiscoverAndPresentThankYouForSharingView), for: .touchUpInside)
+                sharePrompt.addButton.addTarget(self, action: #selector(submitToDiscoverAndPresentThankYouForSharingView(_:)), for: .touchUpInside)
                 sharePrompt.closeButton.addTarget(self, action: #selector(hideShareToDiscoverPrompt), for: .touchUpInside)
                 sharePrompt.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
                 sharePrompt.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier:0.9).isActive = true
@@ -883,9 +883,13 @@ extension ProductsViewControllerShareToDiscoverPrompt {
         }
     }
     
-    @objc func submitToDiscoverAndPresentThankYouForSharingView() {
+    @objc func submitToDiscoverAndPresentThankYouForSharingView(_ sender:Any) {
+        if let button = sender as? UIButton {
+            button.isUserInteractionEnabled = false
+        }
         self.hideShareToDiscoverPrompt()
-        
+        Analytics.trackShareDiscover(screenshot: self.screenshot, page: .productList)
+
         self.screenshot.submitToDiscover()
         
         let thankYou = ThankYouForSharingViewController()

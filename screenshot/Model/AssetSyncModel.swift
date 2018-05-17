@@ -1091,27 +1091,44 @@ extension Screenshot {
         let now = Date()
         if let image = screenshot.uploadedImageURL {
             let objectId = screenshot.objectID
-            let promise = NetworkingPromise.sharedInstance.submitToDiscover(image: image, userName: AnalyticsUser.current.name, intercomUserId: AnalyticsUser.current.identifier, email: AnalyticsUser.current.email)
-            
-            promise.then { (dictionary) -> Void in
-                DataModel.sharedInstance.performBackgroundTask { (context) in
-                    if let screenshot = context.screenshotWith(objectId:objectId) {
-                        if let sucess = dictionary["success"] as? Bool, sucess, let matchstick =  dictionary["matchstick"] as? NSDictionary, let screenshotId = matchstick["screenshotId"] as? String {
-                            screenshot.screenshotId = screenshotId
-                            screenshot.submittedDate = now
-                            screenshot.submittedFeedbackCountDate = now
-                            context.saveIfNeeded()
-                            
+            DataModel.sharedInstance.performBackgroundTask { (context) in
+                if let screenshot = context.screenshotWith(objectId:objectId), screenshot.submittedDate == nil {
+                    screenshot.submittedDate = now
+                    context.saveIfNeeded()
+                    
+                    let promise = NetworkingPromise.sharedInstance.submitToDiscover(image: image, userName: AnalyticsUser.current.name, intercomUserId: AnalyticsUser.current.identifier, email: AnalyticsUser.current.email)
+                    
+                    promise.then { (dictionary) -> Void in
+                        DataModel.sharedInstance.performBackgroundTask { (context) in
+                            if let screenshot = context.screenshotWith(objectId:objectId) {
+                                if let sucess = dictionary["success"] as? Bool, sucess, let matchstick =  dictionary["matchstick"] as? NSDictionary, let screenshotId = matchstick["screenshotId"] as? String {
+                                    screenshot.screenshotId = screenshotId
+                                    screenshot.submittedDate = now
+                                    screenshot.submittedFeedbackCountDate = now
+                                    context.saveIfNeeded()
+                                    
+                                }else{
+                                    screenshot.submittedDate = nil
+                                }
+                            }
+                        }
+                    }.catch { (error) in
+                        DataModel.sharedInstance.performBackgroundTask { (context) in
+                            if let screenshot = context.screenshotWith(objectId:objectId) {
+                                screenshot.submittedDate = nil
+                            }
                         }
                     }
+                    
                 }
             }
+            
         }
     }
     
     var canSubmitToDiscover:Bool {
         get{
-            return (source == .gallery || source == .share || source == .unknown) && submittedDate == nil
+            return (source.isUserGenerated && submittedDate == nil)
         }
     }
     
