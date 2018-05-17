@@ -16,7 +16,7 @@ enum AppSettingKeys : String {
 
 class AppSettings  {
     var appSettingsDict:[String:Any]?  //DO NOT change AppSettingKeys.  future json may have more values than are listed in the appsetting keys
-    private let currentVersion = Bundle.displayVersion
+    let currentVersion = Bundle.displayVersion
 
     var updateVersion: String? {
         return self.appSettingsDict?[AppSettingKeys.updateVersion.rawValue] as? String
