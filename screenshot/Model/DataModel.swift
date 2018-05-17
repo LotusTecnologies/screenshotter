@@ -21,6 +21,10 @@ enum ScreenshotSource : String {
     case share
     case tutorial
     case nativeShare = "native-share" //Andriod only - here for completment of analytics
+    
+    var isUserGenerated:Bool {
+        return (self == .nativeShare || self == .gallery || self == .share || self == .unknown || self == .screenshot || self == .camera)
+    }
 }
 
 class DataModel: NSObject {
