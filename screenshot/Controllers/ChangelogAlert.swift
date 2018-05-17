@@ -29,6 +29,7 @@ public class ChangelogAlertController  {
                 print(error)
             }
             .then(on: .main) { response in
+                appSettings.previousVersion = appSettings.currentVersion
                 let title = response.title ?? "changelog.title".localized
                 let controller = UIAlertController(title: title, message: response.body, preferredStyle: .alert)
                 controller.addAction(UIAlertAction(title: "generic.ok".localized, style: .default, handler: nil))
