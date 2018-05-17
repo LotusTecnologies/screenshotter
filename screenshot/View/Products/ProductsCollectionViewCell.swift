@@ -17,7 +17,7 @@ class ProductsCollectionViewCell : UICollectionViewCell {
         var localized: String? {
             switch self {
             case .none:
-                return nil
+                return ""
             case .buy:
                 return "product.buy".localized
             case .outStock:
