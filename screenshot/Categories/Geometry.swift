@@ -15,6 +15,10 @@ extension CGFloat {
     static let halfPoint: CGFloat = UIScreen.main.scale > 1 ? 0.5 : 1
     
     static let defaultCornerRadius: CGFloat = 6
+    
+    var isValid:Bool {
+        return !self.isNaN && self.isFinite
+    }
 }
 
 extension Double {
@@ -52,7 +56,7 @@ extension CGRect {
         return CGPoint.init(x: self.midX, y: self.midY)
     }
     var isValid:Bool {
-        return !(self.width.isNaN || self.height.isNaN || self.origin.x.isNaN || self.origin.y.isNaN)
+        return (self.width.isValid && self.height.isValid && self.origin.x.isValid && self.origin.y.isValid)
     }
     func scaleToAspectFit(in rtarget: CGRect) -> CGFloat {
         // first try to match width
