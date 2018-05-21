@@ -208,6 +208,32 @@ extension AssetSyncModel {
         assets.forEach{ self.uploadPhoto(asset: $0, source: source) }
     }
     
+    public func importImageFromCamera(image:UIImage) {
+        let uuid = NSUUID.init().uuidString
+        let assetId = "camera|\(uuid)"
+        let largeImageData = UIImageJPEGRepresentation(image, 0.9)
+        let smallImageData = self.data(for: image)
+        self.userInitiatedQueue.addOperation(AsyncOperation.init(timeout: 15.0,  assetId: assetId, shoppableId: nil, completion: { (completeOperation) in
+            self.performBackgroundTask(assetId: assetId, shoppableId: nil) { (managedObjectContext) in
+                let screenshot = Screenshot(context: managedObjectContext)
+                screenshot.assetId = assetId
+                let now = Date()
+                screenshot.createdAt = now
+                screenshot.isHidden = true
+                screenshot.isNew = true
+                screenshot.lastModified = now
+                screenshot.isRecognized = true
+                screenshot.isHidden = false
+                screenshot.imageData = largeImageData
+                screenshot.source = .camera
+                
+                managedObjectContext.saveIfNeeded()
+                self.syteProcessing(imageClassification: ClarifaiModel.ImageClassification.human, imageData: smallImageData, orImageUrlString:nil, assetId: assetId)
+
+            }
+        }))
+
+    }
     
     func uploadPhoto(asset: PHAsset, source:ScreenshotSource) {
         let assetLocalIdentifier = asset.localIdentifier
