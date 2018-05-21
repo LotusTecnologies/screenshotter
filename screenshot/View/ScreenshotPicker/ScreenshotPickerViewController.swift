@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Corey Werner on 9/18/17.
-//  Copyright Â© 2017 crazeapp. All rights reserved.
+//  Copyright © 2017 crazeapp. All rights reserved.
 //
 
 import Foundation
@@ -49,7 +49,7 @@ class ScreenshotPickerNavigationController : UINavigationController {
     @objc func doneAction(_ sender:Any) {
         let assets = screenshotPickerViewController.selectedAssets()
         if let _ = sender as? ScreenshotPickerViewController {
-            //In the case that the user selected multiple images - some from camera and some no this is wrong and they are all marked as from camera.
+            //In the case that the user selected multiple images - some from camera and some not this is wrong and they are all marked as from camera.
             //don't have a solution
             AssetSyncModel.sharedInstance.importPhotosToScreenshot(assets: assets, source: .camera)
         }else{
