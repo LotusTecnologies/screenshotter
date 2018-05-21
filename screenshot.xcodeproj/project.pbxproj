@@ -110,7 +110,6 @@
 		C540881D1FE90C8E00198955 /* CurrencyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087DB1FE90C8D00198955 /* CurrencyViewController.swift */; };
 		C540881F1FE90C8E00198955 /* PickerCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087DF1FE90C8D00198955 /* PickerCollectionViewCell.swift */; };
 		C54088201FE90C8E00198955 /* ScreenshotPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087E01FE90C8D00198955 /* ScreenshotPickerViewController.swift */; };
-		C54088291FE90C8E00198955 /* FavoritesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54087F41FE90C8E00198955 /* FavoritesViewController.swift */; };
 		C54088361FE90C8E00198955 /* ScreenshotCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54088081FE90C8E00198955 /* ScreenshotCollectionViewCell.swift */; };
 		C54088371FE90C8E00198955 /* ScreenshotNotificationCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54088091FE90C8E00198955 /* ScreenshotNotificationCollectionViewCell.swift */; };
 		C540883A1FE90C8E00198955 /* ScreenshotsHelperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C540880C1FE90C8E00198955 /* ScreenshotsHelperView.swift */; };
@@ -356,7 +355,6 @@
 		C54087DB1FE90C8D00198955 /* CurrencyViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CurrencyViewController.swift; sourceTree = "<group>"; };
 		C54087DF1FE90C8D00198955 /* PickerCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PickerCollectionViewCell.swift; sourceTree = "<group>"; };
 		C54087E01FE90C8D00198955 /* ScreenshotPickerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenshotPickerViewController.swift; sourceTree = "<group>"; };
-		C54087F41FE90C8E00198955 /* FavoritesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FavoritesViewController.swift; sourceTree = "<group>"; };
 		C54088081FE90C8E00198955 /* ScreenshotCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenshotCollectionViewCell.swift; sourceTree = "<group>"; };
 		C54088091FE90C8E00198955 /* ScreenshotNotificationCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenshotNotificationCollectionViewCell.swift; sourceTree = "<group>"; };
 		C540880C1FE90C8E00198955 /* ScreenshotsHelperView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenshotsHelperView.swift; sourceTree = "<group>"; };
@@ -797,7 +795,6 @@
 				C51ED5BB1FF39BD800AABD68 /* FavoriteProductsViewController.swift */,
 				C51ED5B91FF39A0700AABD68 /* FavoritesNavigationController.swift */,
 				C51ED5BD1FF3A2AD00AABD68 /* FavoritesTableViewCell.swift */,
-				C54087F41FE90C8E00198955 /* FavoritesViewController.swift */,
 				C50141292061080700ABFB5C /* FavoriteProductsView.swift */,
 			);
 			path = Favorite;
@@ -1522,7 +1519,6 @@
 				C54088541FE90E2200198955 /* TextFieldTableViewCell.swift in Sources */,
 				C528005D2051342B004DD7A3 /* BorderButton.swift in Sources */,
 				C5FF413E200B817400342DEC /* DiscoverScreenshotCollectionViewLayout.swift in Sources */,
-				C54088291FE90C8E00198955 /* FavoritesViewController.swift in Sources */,
 				C572C0DB20AAE602004B0A17 /* BlankHeaderConfettiContentTemplate.swift in Sources */,
 				3125448F209871B4009410D5 /* Analytics+api.swift in Sources */,
 				C5336D1D203ACE7B00A7B4B0 /* CartNavigationController.swift in Sources */,

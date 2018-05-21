@@ -1079,6 +1079,11 @@ extension DataModel {
     
     public func unfavorite(favoriteArray: [Product]) {
         let moiArray = favoriteArray.map { $0.objectID }
+        self.unfavorite(favoriteArray: moiArray)
+    }
+    
+    public func unfavorite(favoriteArray: [NSManagedObjectID]) {
+        let moiArray = favoriteArray
         self.performBackgroundTask { (managedObjectContext) in
             let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
             fetchRequest.predicate = NSPredicate(format: "SELF IN %@", moiArray)

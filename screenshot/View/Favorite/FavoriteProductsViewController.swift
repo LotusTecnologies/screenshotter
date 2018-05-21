@@ -7,11 +7,15 @@
 //
 
 import UIKit
+import CoreData
 
 class FavoriteProductsViewController : BaseViewController {
-    var products: [Product]?
     
-    fileprivate var unfavoriteProducts: [Product] = []
+    var productsFRC:FetchedResultsControllerManager<Product>?
+    
+    fileprivate var unfavoriteProductsIds: Set<NSManagedObjectID> = []
+    
+    
     
     override var title: String? {
         set {}
@@ -48,6 +52,7 @@ class FavoriteProductsViewController : BaseViewController {
         
         let pinchZoom = UIPinchGestureRecognizer.init(target: self, action: #selector(pinch(gesture:)))
         self.view.addGestureRecognizer(pinchZoom)
+        self.productsFRC = DataModel.sharedInstance.favoritedProductsFrc(delegate: self)
 
     }
     @objc func pinch( gesture:UIPinchGestureRecognizer) {
@@ -63,7 +68,7 @@ class FavoriteProductsViewController : BaseViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        removeUnfavorited()
+        DataModel.sharedInstance.unfavorite(favoriteArray: Array(self.unfavoriteProductsIds))
     }
     
     deinit {
@@ -73,29 +78,20 @@ class FavoriteProductsViewController : BaseViewController {
     
     // MARK: Favorites
     
-    fileprivate func removeUnfavorited() {
-        guard unfavoriteProducts.count > 0 else {
-            return
-        }
-        
-        DataModel.sharedInstance.unfavorite(favoriteArray: unfavoriteProducts)
-        unfavoriteProducts.removeAll()
-    }
     
     @objc fileprivate func favoriteProductAction(_ favoriteControl: FavoriteControl, event: UIEvent) {
-        guard let indexPath = tableView.indexPath(for: event), let product = products?[indexPath.item] else {
+        guard let indexPath = tableView.indexPath(for: event),let product = self.productsFRC?.object(at: indexPath) else {
             return
         }
         
         let isFavorited = favoriteControl.isSelected
         
         if isFavorited {
-            if let index = unfavoriteProducts.index(of: product) {
-                unfavoriteProducts.remove(at: index)
-            }
+            self.unfavoriteProductsIds.remove(product.objectID)
+            
         }
         else {
-            unfavoriteProducts.append(product)
+            self.unfavoriteProductsIds.insert(product.objectID)
         }
         if isFavorited {
             Analytics.trackProductFavorited(product: product, page: .favorites)
@@ -109,7 +105,7 @@ class FavoriteProductsViewController : BaseViewController {
     @objc fileprivate func trackProductAction(_ button: LoadingButton, event: UIEvent) {
         if PermissionsManager.shared.hasPermission(for: .push) {
             guard let indexPath = tableView.indexPath(for: event),
-                let product = products?[indexPath.item],
+                let product = self.productsFRC?.object(at: indexPath),
                 !button.isLoading
                 else {
                     return
@@ -155,7 +151,7 @@ class FavoriteProductsViewController : BaseViewController {
     // MARK: Navigation
     
     fileprivate func presentProduct(at indexPath: IndexPath) {
-        guard let product = products?[indexPath.item] else {
+        guard let product = self.productsFRC?.object(at: indexPath) else {
             return
         }
         
@@ -173,20 +169,20 @@ class FavoriteProductsViewController : BaseViewController {
 
 extension FavoriteProductsViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return products?.count ?? 0
+        return self.productsFRC?.fetchedObjectsCount ?? 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         
-        if let cell = cell as? FavoriteProductsTableViewCell, let product = products?[indexPath.item] {
+        if let cell = cell as? FavoriteProductsTableViewCell, let product = self.productsFRC?.object(at: indexPath) {
             cell.selectionStyle = .none
             cell.contentView.backgroundColor = .cellBackground
             cell.productImageView.setImage(withURLString: product.imageURL)
             cell.titleLabel.text = product.productTitle()
             cell.priceLabel.text = product.price
             cell.merchantLabel.text = product.merchant
-            cell.favoriteControl.isSelected = product.isFavorite
+            cell.favoriteControl.isSelected = !self.unfavoriteProductsIds.contains(product.objectID)
             cell.favoriteControl.addTarget(self, action: #selector(favoriteProductAction(_:event:)), for: .touchUpInside)
             cell.priceAlertButton.isSelected = product.hasPriceAlerts // ???: what happens if this is true and the user disables notifications from settings
             cell.priceAlertButton.addTarget(self, action: #selector(trackProductAction(_:event:)), for: .touchUpInside)
@@ -196,10 +192,32 @@ extension FavoriteProductsViewController: UITableViewDataSource {
         
         return cell
     }
+    
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        return UIView.init()
+    }
+    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        return UIView.init()
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 0.0
+    }
+    
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        return 0.0
+    }
 }
 
 extension FavoriteProductsViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         presentProduct(at: indexPath)
     }
+}
+
+extension FavoriteProductsViewController: FetchedResultsControllerManagerDelegate {
+    func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange){
+        change.applyChanges(tableView: self.tableView)
+    }
+
 }
