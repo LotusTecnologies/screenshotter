@@ -427,15 +427,17 @@ class AnalyticsTrackers : NSObject {
     
     class KochavaAnalyticsTracker : NSObject, AnalyticsTracker {
         func track(_ event: String, properties: [AnyHashable : Any]? = nil, sendEvenIfAdvertisingTrackingIsOptOut:Bool? = false ){
-            if  ASIdentifierManager.shared().isAdvertisingTrackingEnabled || sendEvenIfAdvertisingTrackingIsOptOut == true {
-                if let kEvent = KochavaEvent(eventTypeEnum: .custom) {
-                    kEvent.nameString = event
-                    kEvent.customEventNameString = event
-                    //Do not track properties - there is an bug in ios 10 that will cause freezing.
-                    kEvent.userIdString = AnalyticsUser.current.identifier
-                    kEvent.userNameString = AnalyticsUser.current.name
-                    KochavaTracker.shared.send(kEvent)
-                    
+            DispatchQueue.mainAsyncIfNeeded {
+                if  ASIdentifierManager.shared().isAdvertisingTrackingEnabled || sendEvenIfAdvertisingTrackingIsOptOut == true {
+                    if let kEvent = KochavaEvent(eventTypeEnum: .custom) {
+                        kEvent.nameString = event
+                        kEvent.customEventNameString = event
+                        //Do not track properties - there is an bug in ios 10 that will cause freezing.
+                        kEvent.userIdString = AnalyticsUser.current.identifier
+                        kEvent.userNameString = AnalyticsUser.current.name
+                        KochavaTracker.shared.send(kEvent)
+                        
+                    }
                 }
             }
         }

@@ -88,9 +88,13 @@ class CrazeImageZoom: NSObject {
                     x: locationInWindow.x - newFrameSize.absolutePositionOf(relativePoint: relativePositionOfTouchInView).x,
                     y: locationInWindow.y - newFrameSize.absolutePositionOf(relativePoint: relativePositionOfTouchInView).y)
                 
-                currentImageView.frame = CGRect.init(origin: origin, size: newSize)
-                // Reset gesture scale
-                gesture.scale = 1;
+                let frame = CGRect.init(origin: origin, size: newSize)
+                if frame.isValid {
+                    currentImageView.frame = frame
+                    // Reset gesture scale
+                    gesture.scale = 1;
+                }
+                
             }
         }
     }

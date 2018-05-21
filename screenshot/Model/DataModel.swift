@@ -21,6 +21,10 @@ enum ScreenshotSource : String {
     case share
     case tutorial
     case nativeShare = "native-share" //Andriod only - here for completment of analytics
+    
+    var isUserGenerated:Bool {
+        return (self == .nativeShare || self == .gallery || self == .share || self == .unknown || self == .screenshot || self == .camera)
+    }
 }
 
 class DataModel: NSObject {
@@ -195,6 +199,15 @@ extension DataModel {
         request.predicate = NSPredicate(format: "favoritesCount != 0")
         let context = self.mainMoc()
         let fetchedResultsController:FetchedResultsControllerManager<Screenshot> = FetchedResultsControllerManager<Screenshot>.init(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
+        return fetchedResultsController
+    }
+    
+    func favoritedProductsFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<Product> {
+        let request: NSFetchRequest = Product.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(key: "dateFavorited", ascending: false)]
+        request.predicate = NSPredicate(format: "isFavorite == true")
+        let context = self.mainMoc()
+        let fetchedResultsController:FetchedResultsControllerManager<Product> = FetchedResultsControllerManager<Product>.init(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
         return fetchedResultsController
     }
     

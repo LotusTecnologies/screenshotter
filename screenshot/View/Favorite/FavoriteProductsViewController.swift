@@ -188,8 +188,14 @@ extension FavoriteProductsViewController: UITableViewDataSource {
             cell.merchantLabel.text = product.merchant
             cell.favoriteControl.isSelected = product.isFavorite
             cell.favoriteControl.addTarget(self, action: #selector(favoriteProductAction(_:event:)), for: .touchUpInside)
-            cell.priceAlertButton.isSelected = product.hasPriceAlerts // ???: what happens if this is true and the user disables notifications from settings
-            cell.priceAlertButton.addTarget(self, action: #selector(trackProductAction(_:event:)), for: .touchUpInside)
+            if let partNumber = product.partNumber,
+              !partNumber.isEmpty {
+                cell.priceAlertButton.isHidden = false
+                cell.priceAlertButton.isSelected = product.hasPriceAlerts // ???: what happens if this is true and the user disables notifications from settings
+                cell.priceAlertButton.addTarget(self, action: #selector(trackProductAction(_:event:)), for: .touchUpInside)
+            } else {
+                cell.priceAlertButton.isHidden = true
+            }
             cell.cartButton.addTarget(self, action: #selector(presentProductAction(_:event:)), for: .touchUpInside)
             cell.isCartButtonHidden = (product.partNumber == nil)
         }
