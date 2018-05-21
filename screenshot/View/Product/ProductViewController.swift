@@ -69,6 +69,9 @@ class ProductViewController : BaseViewController {
                 if didSaveVariants {
                     self?.setup(with: product)
                 }
+                else {
+                    self?.productView.setUnavailableImageViewAlpha(product.hasVariants ? 0 : 1)
+                }
             }
             .catch { [weak self] error in
                 self?.productView.setUnavailableImageViewAlpha(1)
