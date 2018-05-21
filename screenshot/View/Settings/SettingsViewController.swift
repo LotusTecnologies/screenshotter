@@ -580,10 +580,14 @@ extension SettingsViewController : UITableViewDelegate {
             
             alert.addAction(UIAlertAction(title: "settings.region.us".localized, style: .default, handler: { (alertAction) in
                 UserDefaults.standard.set(true, forKey: UserDefaultsKeys.isUSC)
+                UserDefaults.standard.synchronize()
+                NotificationCenter.default.post(name: .isUSCUpdated, object: nil)
                 tableView.reloadRows(at: [indexPath], with: .none)
             }))
             alert.addAction(UIAlertAction(title: "settings.region.other".localized, style: .default, handler: { (alertAction) in
                 UserDefaults.standard.set(false, forKey: UserDefaultsKeys.isUSC)
+                UserDefaults.standard.synchronize()
+                NotificationCenter.default.post(name: .isUSCUpdated, object: nil)
                 tableView.reloadRows(at: [indexPath], with: .none)
             }))
 
