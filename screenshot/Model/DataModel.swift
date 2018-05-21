@@ -202,6 +202,15 @@ extension DataModel {
         return fetchedResultsController
     }
     
+    func favoritedProductsFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<Product> {
+        let request: NSFetchRequest = Product.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(key: "dateFavorited", ascending: false)]
+        request.predicate = NSPredicate(format: "isFavorite == true")
+        let context = self.mainMoc()
+        let fetchedResultsController:FetchedResultsControllerManager<Product> = FetchedResultsControllerManager<Product>.init(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
+        return fetchedResultsController
+    }
+    
     func productFrc(delegate:FetchedResultsControllerManagerDelegate?, shoppableOID: NSManagedObjectID) -> FetchedResultsControllerManager<Product> {
         let request: NSFetchRequest = Product.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(key: "dateFavorited", ascending: false)]
