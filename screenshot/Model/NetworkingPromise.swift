@@ -576,6 +576,8 @@ class NetworkingPromise : NSObject {
                 isUsc = true
             }
             UserDefaults.standard.set(isUsc, forKey: UserDefaultsKeys.isUSC)
+            UserDefaults.standard.synchronize()
+            NotificationCenter.default.post(name: .isUSCUpdated, object: nil)
             return Promise(value: isUsc)
         }
     }
