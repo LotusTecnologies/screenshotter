@@ -45,6 +45,7 @@ class ProductViewController : BaseViewController {
         productView.cartButton.addTarget(self, action: #selector(cartButtonAction), for: .touchUpInside)
 //            productView.buyButton.addTarget(self, action: #selector(buyButtonAction), for: .touchUpInside)
         productView.favoriteButton.addTarget(self, action: #selector(favoriteAction), for: .touchUpInside)
+        productView.stockButton.addTarget(self, action: #selector(stockAction), for: .touchUpInside)
         productView.websiteButton.addTarget(self, action: #selector(pushWebsiteURL), for: .touchUpInside)
         
         let pinchZoom = UIPinchGestureRecognizer.init(target: self, action: #selector(pinch(gesture:)))
@@ -70,11 +71,11 @@ class ProductViewController : BaseViewController {
                     self?.setup(with: product)
                 }
                 else {
-                    self?.productView.setUnavailableImageViewAlpha(product.hasVariants ? 0 : 1)
+                    self?.productView.setIsUnavailable(!product.hasVariants)
                 }
             }
             .catch { [weak self] error in
-                self?.productView.setUnavailableImageViewAlpha(1)
+                self?.productView.setIsUnavailable(true)
         }
         
         cartItemFrc = DataModel.sharedInstance.cartItemFrc(delegate: self)
@@ -277,7 +278,7 @@ fileprivate extension ProductViewControllerProductView {
         }
     }
     
-    // MARK: Favorite
+    // MARK: Favorite / Stock
     
     @objc func favoriteAction() {
         guard let product = structuredProduct?.product else {
@@ -292,6 +293,16 @@ fileprivate extension ProductViewControllerProductView {
         }else{
             Analytics.trackProductUnfavorited(product: product, page: .product)
         }
+    }
+    
+    @objc fileprivate func stockAction() {
+        guard let product = structuredProduct?.product else {
+            return
+        }
+        
+        // TODO: do notifying when in stock
+        
+        // TODO: do analytics
     }
     
     // MARK: Web
@@ -380,7 +391,7 @@ fileprivate extension ProductViewControllerStructuredProduct {
         
         if didSaveVariants {
             // Prevent a jarring UX by showing this only once we have confirmed data
-            productView.setUnavailableImageViewAlpha(structuredProduct.isAvailable ? 0 : 1)
+            productView.setIsUnavailable(!structuredProduct.isAvailable)
         }
         
         productView.titleLabel.text = product.productTitle()

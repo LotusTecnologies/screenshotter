@@ -57,6 +57,7 @@
 "cart.item.error.quantity" = "Quantity has changed";
 "cart.item.error.unavailable" = "Out of stock";
 "cart.remove" = "Remove";
+"cart.stock.add" = "NOTIFY ME WHEN IN STOCK";
 "cart.title" = "Cart";
 "cart.variant.color" = "Color:";
 "cart.variant.quantity" = "Quantity:";

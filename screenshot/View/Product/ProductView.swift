@@ -22,6 +22,7 @@ class ProductView: UIView {
     let originalPriceLabel = UILabel()
     let contentTextView = UITextView()
     let favoriteButton = FavoriteButton()
+    let stockButton = BorderButton()
     let websiteButton = UIButton()
     
     let selectionControl = SegmentedDropDownControl()
@@ -170,6 +171,21 @@ class ProductView: UIView {
         favoriteButton.leadingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.leadingAnchor).isActive = true
         favoriteButton.trailingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.trailingAnchor).isActive = true
         favoriteButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        
+        let stockImage = UIImage(named: "FavoriteBell")?.withRenderingMode(.alwaysTemplate)
+        
+        stockButton.translatesAutoresizingMaskIntoConstraints = false
+        stockButton.setTitle("cart.stock.add".localized, for: .normal)
+        stockButton.setTitleColor(.crazeRed, for: .normal)
+        stockButton.setImage(stockImage, for: .normal)
+        stockButton.adjustInsetsForImage(withPadding: 6)
+        stockButton.tintColor = .crazeRed
+        stockButton.alpha = 0
+        scrollView.addSubview(stockButton)
+        stockButton.topAnchor.constraint(equalTo: favoriteButton.topAnchor).isActive = true
+        stockButton.leadingAnchor.constraint(equalTo: favoriteButton.leadingAnchor).isActive = true
+        stockButton.bottomAnchor.constraint(equalTo: favoriteButton.bottomAnchor).isActive = true
+        stockButton.trailingAnchor.constraint(equalTo: favoriteButton.trailingAnchor).isActive = true
         
         contentTextView.translatesAutoresizingMaskIntoConstraints = false
         contentTextView.backgroundColor = .clear
@@ -362,9 +378,11 @@ class ProductView: UIView {
         scrollGalleryImages(toPage: pageControl.currentPage)
     }
     
-    func setUnavailableImageViewAlpha(_ alpha: CGFloat) {
+    func setIsUnavailable(_ isUnavailable: Bool) {
         UIView.animate(withDuration: .defaultAnimationDuration) {
-            self.unavailableImageView.alpha = alpha
+            self.unavailableImageView.alpha = isUnavailable ? 1 : 0
+            self.favoriteButton.alpha = isUnavailable ? 0 : 1
+            self.stockButton.alpha = isUnavailable ? 1 : 0
         }
     }
     
