@@ -14,7 +14,8 @@ class FavoriteProductsViewController : BaseViewController {
     var productsFRC:FetchedResultsControllerManager<Product>?
     
     fileprivate var unfavoriteProductsIds: Set<NSManagedObjectID> = []
-    
+    private let emptyListView = HelperView()
+
     
     
     override var title: String? {
@@ -25,12 +26,23 @@ class FavoriteProductsViewController : BaseViewController {
     }
     
     // MARK: Views
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
+    
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        
+        restorationIdentifier = String(describing: type(of: self))
+        
+        addNavigationItemLogo()
+    }
     
     fileprivate var favoriteProductsView: FavoriteProductsView {
         return view as! FavoriteProductsView
     }
     
-    var tableView: UITableView {
+    var tableView: TableView {
         return favoriteProductsView.tableView
     }
     
@@ -49,6 +61,15 @@ class FavoriteProductsViewController : BaseViewController {
         tableView.register(FavoriteProductsTableViewCell.self, forCellReuseIdentifier: "cell")
         tableView.rowHeight = UITableViewAutomaticDimension
         tableView.estimatedRowHeight = 200
+        tableView.layoutMargins = UIEdgeInsets(top: .extendedPadding, left: 0, bottom: .extendedPadding, right: 0) // Needed for emptyListView
+
+        
+        
+        emptyListView.titleLabel.text = "favorites.empty.title".localized
+        emptyListView.subtitleLabel.text = "favorites.empty.detail".localized
+        emptyListView.contentImage = UIImage(named: "FavoriteEmptyListGraphic")
+        tableView.emptyView = emptyListView
+
         
         let pinchZoom = UIPinchGestureRecognizer.init(target: self, action: #selector(pinch(gesture:)))
         self.view.addGestureRecognizer(pinchZoom)
@@ -217,7 +238,10 @@ extension FavoriteProductsViewController: UITableViewDelegate {
 
 extension FavoriteProductsViewController: FetchedResultsControllerManagerDelegate {
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange){
-        change.applyChanges(tableView: self.tableView)
+        if self.isViewLoaded {
+
+            change.applyChanges(tableView: self.tableView)
+        }
     }
 
 }
