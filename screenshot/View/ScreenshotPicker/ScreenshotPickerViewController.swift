@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Corey Werner on 9/18/17.
-//  Copyright Â© 2017 crazeapp. All rights reserved.
+//  Copyright © 2017 crazeapp. All rights reserved.
 //
 
 import Foundation
@@ -49,6 +49,8 @@ class ScreenshotPickerNavigationController : UINavigationController {
     @objc func doneAction(_ sender:Any) {
         let assets = screenshotPickerViewController.selectedAssets()
         if let _ = sender as? ScreenshotPickerViewController {
+            //In the case that the user selected multiple images - some from camera and some not this is wrong and they are all marked as from camera.
+            //don't have a solution
             AssetSyncModel.sharedInstance.importPhotosToScreenshot(assets: assets, source: .camera)
         }else{
             AssetSyncModel.sharedInstance.importPhotosToScreenshot(assets: assets, source: .gallery)
@@ -312,7 +314,23 @@ class ScreenshotPickerViewController : BaseViewController {
 extension ScreenshotPickerViewController : UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         if let pickedImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
-            UIImageWriteToSavedPhotosAlbum(pickedImage, self, #selector(image(_:didFinishSavingWithError:contextInfo:)), nil)
+            let selectedIndexPaths = collectionView.indexPathsForSelectedItems
+            if let selectedIndexPaths = selectedIndexPaths, selectedIndexPaths.count > 0  {
+                UIImageWriteToSavedPhotosAlbum(pickedImage, self, #selector(image(_:didFinishSavingWithError:contextInfo:)), nil)
+            }else{
+                dismiss(animated: true, completion: nil)
+                if selectedIndexPaths?.count == 0,
+                    let doneButton = navigationItem.rightBarButtonItem,
+                    let action = doneButton.action
+                {
+                    UIApplication.shared.sendAction(action, to: doneButton.target, from: self, for: nil)
+                }
+                DispatchQueue.global(qos: .userInitiated).async {
+                    AssetSyncModel.sharedInstance.importImageFromCamera(image: pickedImage.fixOrientation())
+                }
+                
+            }
+            
             Analytics.trackCreatedPhoto()
         }else{
             self.image(nil, didFinishSavingWithError: nil, contextInfo: nil)
@@ -353,12 +371,7 @@ extension ScreenshotPickerViewController : UIImagePickerControllerDelegate, UINa
             selectItem(at: 0)
             dismiss(animated: true, completion: nil)
             
-            if selectedIndexPaths?.count == 0,
-                let doneButton = navigationItem.rightBarButtonItem,
-                let action = doneButton.action
-            {
-                UIApplication.shared.sendAction(action, to: doneButton.target, from: self, for: nil)
-            }
+           
         }
     }
     
