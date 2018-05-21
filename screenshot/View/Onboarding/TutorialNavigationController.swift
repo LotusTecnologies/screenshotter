@@ -56,9 +56,13 @@ extension TutorialNavigationController: OnboardingWelcomeViewControllerDelegate 
     func onboardingWelcomeViewControllerDidComplete(_ viewController: OnboardingWelcomeViewController) {
         Analytics.trackOnboardingWelcome()
         
-        let signup = TutorialEmailSlideViewController()
-        signup.delegate = self
-        self.pushViewController(signup, animated: true)
+        let signup = RegisterViewController()
+        pushViewController(signup, animated: true)
+        
+        // !!!: DEBUG
+//        let signup = TutorialEmailSlideViewController()
+//        signup.delegate = self
+//        self.pushViewController(signup, animated: true)
     }
 }
 

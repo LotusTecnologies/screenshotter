@@ -126,6 +126,8 @@ struct Shadow {
     static let basic = Shadow(radius: 1, offset: CGSize(width: 0, height: 1), color: UIColor.black.withAlphaComponent(0.3))
     
     static let presentation = Shadow(radius: 3, offset: CGSize(width: 0, height: 4), color: UIColor.black.withAlphaComponent(0.4))
+    
+    static let content = Shadow(radius: 3, offset: .zero, color: UIColor.black.withAlphaComponent(0.15))
 }
 
 extension UIApplication {
