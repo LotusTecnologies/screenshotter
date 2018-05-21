@@ -680,10 +680,14 @@ extension ProductsViewControllerProducts{
             if self.productsOptions.sale == .sale {
                 products = products.filter { $0.floatPrice < $0.floatOriginalPrice }
             }
-            let productArray: [Product]
+            var productArray: [Product]
             switch self.productsOptions.sort {
             case .similar :
                 productArray = products.sorted { stockOrder(a: $0, b: $1) ?? ($0.order < $1.order) }
+                if let mostSimilarUnder50BucksIndex = productArray.index(where: { $0.fallbackPrice < 50 }),
+                  mostSimilarUnder50BucksIndex > 0 {
+                    productArray.insert(productArray.remove(at: mostSimilarUnder50BucksIndex), at: 0)
+                }
             case .priceAsc :
                 productArray = products.sorted { stockOrder(a: $0, b: $1) ?? ($0.floatPrice < $1.floatPrice) }
             case .priceDes :
