@@ -147,6 +147,17 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         
         self.presentUpdatePromptIfNeeded()
         self.presentChangelogAlertIfNeeded()
+        
+        
+        if let viewcontroller = self.selectedViewController {
+            if viewcontroller == screenshotsNavigationController {
+                AccumulatorModel.screenshotUninformed.resetUninformedCount()
+            }
+            if viewcontroller == favoritesNavigationController {
+                AccumulatorModel.favorite.resetUninformedCount()
+            }
+        }
+
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -216,6 +227,14 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         if self.selectedViewController == self.settingsNavigationController {
             self.settingsNavigationController.popToRootViewController(animated: false)
         }
+        
+        if viewController == screenshotsNavigationController {
+            AccumulatorModel.screenshotUninformed.resetUninformedCount()
+        }
+        if viewController == favoritesNavigationController {
+            AccumulatorModel.favorite.resetUninformedCount()
+        }
+        
 
         return true
     }
