@@ -73,13 +73,16 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         self.delegate = self
         self.restorationIdentifier = String(describing: type(of: self))
     
-        viewControllers = [
+        var viewControllerList =  [
             favoritesNavigationController,
             discoverNavigationController,
             screenshotsNavigationController,
-            settingsNavigationController,
-            cartNavigationController
+            settingsNavigationController
         ]
+        if UserDefaults.standard.bool(forKey: UserDefaultsKeys.isUSC) {
+            viewControllerList.append(cartNavigationController)
+        }
+        viewControllers = viewControllerList
         selectedIndex = viewControllers?.index(of: screenshotsNavigationController) ?? 0
         
         let notificationCenter = NotificationCenter.default
@@ -88,6 +91,9 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         notificationCenter.addObserver(self, selector: #selector(applicationFetchedAppSettings(_:)), name: .fetchedAppSettings, object: nil)
         
         notificationCenter.addObserver(self, selector: #selector(syncFavoriteTabBadgeCount), name: .FavoriteAccumulatorModelDidChange, object: nil)
+        
+        notificationCenter.addObserver(self, selector: #selector(syncShowingCart), name: .isUSCUpdated, object: nil)
+
         notificationCenter.addObserver(self, selector: #selector(syncScreenshotTabBadgeCount), name: .ScreenshotUninformedAccumulatorModelDidChange, object: nil)
 
 
@@ -95,6 +101,27 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         
         cartItemFrc = DataModel.sharedInstance.cartItemFrc(delegate: self)
         syncCartTabBadgeCount()
+    }
+    
+    @objc public func syncShowingCart(){
+        DispatchQueue.mainAsyncIfNeeded {
+            let index = self.selectedIndex
+            var viewControllerList =  [
+                self.favoritesNavigationController,
+                self.discoverNavigationController,
+                self.screenshotsNavigationController,
+                self.settingsNavigationController
+            ]
+            if UserDefaults.standard.bool(forKey: UserDefaultsKeys.isUSC) {
+                viewControllerList.append(self.cartNavigationController)
+            }
+            self.viewControllers = viewControllerList
+            if viewControllerList.count > index {
+                self.selectedIndex = index
+            }else{
+                self.selectedIndex = self.viewControllers?.index(of: self.screenshotsNavigationController) ?? 0
+            }
+        }
     }
     
     override func viewDidLoad() {
@@ -120,6 +147,17 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         
         self.presentUpdatePromptIfNeeded()
         self.presentChangelogAlertIfNeeded()
+        
+        
+        if let viewcontroller = self.selectedViewController {
+            if viewcontroller == screenshotsNavigationController {
+                AccumulatorModel.screenshotUninformed.resetUninformedCount()
+            }
+            if viewcontroller == favoritesNavigationController {
+                AccumulatorModel.favorite.resetUninformedCount()
+            }
+        }
+
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -189,6 +227,14 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         if self.selectedViewController == self.settingsNavigationController {
             self.settingsNavigationController.popToRootViewController(animated: false)
         }
+        
+        if viewController == screenshotsNavigationController {
+            AccumulatorModel.screenshotUninformed.resetUninformedCount()
+        }
+        if viewController == favoritesNavigationController {
+            AccumulatorModel.favorite.resetUninformedCount()
+        }
+        
 
         return true
     }

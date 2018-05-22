@@ -160,6 +160,33 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
             paramsToSend["sharedScreenshots"] = screenshots.joined(separator: ",")
         }
+        if urlAbsoluteString.contains("watchedProductInfo") {
+            var arrayOfDictionaries:[[String:Any]] = []
+            let favoritesFRC = DataModel.sharedInstance.favoritedProductsFrc(delegate: nil)
+            favoritesFRC.fetchedObjects.forEach { (p) in
+                //                        if let partNumber = productInfo["partNumber"] as? String, let price = productInfo["price"] as? Double, let title = productInfo["title"] as? String, let inStock = productInfo["inStock"] as? Bool {
+
+                if p.hasPriceAlerts, let partNumber = p.partNumber, let title = p.productTitle() {
+                    let inStock = p.hasVariants
+                    let price = p.fallbackPrice
+                    
+                    
+                    arrayOfDictionaries.append(["partNumber":partNumber,
+                                                "price":price,
+                                                "title":title,
+                                                "inStock":inStock])
+                }
+            }
+            do {
+                let jsonData = try JSONSerialization.data(withJSONObject: arrayOfDictionaries, options: [])
+                if let jsonString = String.init(data: jsonData, encoding: .utf8) {
+                    paramsToSend["watchedProductInfo"] = jsonString
+                }
+
+            }catch{
+                print("error making json - \(error)")
+            }
+        }
         if let url = URL.urlWith(string: "crazeDebugApp://sendDebugInfo", queryParameters: paramsToSend) {
         
             if UIApplication.shared.canOpenURL(url) {
@@ -316,7 +343,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             
             viewController = tabBarController.favoritesNavigationController
             
-        case s(FavoritesViewController.self):
+        case s(FavoriteProductsViewController.self):
             guard let navigationController = restorationViewControllers[s(FavoritesNavigationController.self)] as? FavoritesNavigationController else {
                 return nil
             }
