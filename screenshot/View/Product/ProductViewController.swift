@@ -407,7 +407,7 @@ fileprivate extension ProductViewControllerStructuredProduct {
                     let simplifiedOnlySize = onlySize.lowercased().components(separatedBy: removeSet).joined()
                     
                     // oneus == "One (US)"
-                    if ["onesize","nosize","na","oneus"].contains(simplifiedOnlySize) {
+                    if ["onesize","nosize","na","oneus", "1size"].contains(simplifiedOnlySize) {
                         selectedSize = onlySize
                     }
                 }
