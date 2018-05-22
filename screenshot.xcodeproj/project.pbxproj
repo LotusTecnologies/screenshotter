@@ -71,12 +71,12 @@
 		C50E25EC207DEAFC003C8D24 /* CheckoutShippingListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50E25EB207DEAFC003C8D24 /* CheckoutShippingListViewController.swift */; };
 		C50E25EE207DEC49003C8D24 /* CheckoutShippingTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50E25ED207DEC49003C8D24 /* CheckoutShippingTableViewCell.swift */; };
 		C50E25F0207DFF83003C8D24 /* CheckoutConfirmPaymentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50E25EF207DFF83003C8D24 /* CheckoutConfirmPaymentViewController.swift */; };
-		C50E2614207F4B71003C8D24 /* Button.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50E2613207F4B71003C8D24 /* Button.swift */; };
 		C50E2617207F6703003C8D24 /* TextFieldFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50E2616207F6703003C8D24 /* TextFieldFormatter.swift */; };
 		C51ED5BA1FF39A0700AABD68 /* FavoritesNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51ED5B91FF39A0700AABD68 /* FavoritesNavigationController.swift */; };
 		C51ED5BC1FF39BD800AABD68 /* FavoriteProductsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51ED5BB1FF39BD800AABD68 /* FavoriteProductsViewController.swift */; };
 		C5233F0B1F6FF05800F25C7C /* LifeCycleProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5233F0A1F6FF05800F25C7C /* LifeCycleProtocol.swift */; };
 		C527312320B3F49300A0E2EB /* AuthorizeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C527312220B3F49300A0E2EB /* AuthorizeViewController.swift */; };
+		C527312520B4435400A0E2EB /* UIButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C527312420B4435300A0E2EB /* UIButton.swift */; };
 		C5278FEB1F3C38510090E422 /* AssetSyncModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5278FB91F3C38510090E422 /* AssetSyncModel.swift */; };
 		C5278FEC1F3C38510090E422 /* DataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5278FBA1F3C38510090E422 /* DataModel.swift */; };
 		C5278FEE1F3C38510090E422 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = C5278FBD1F3C38510090E422 /* Model.xcdatamodeld */; };
@@ -324,12 +324,12 @@
 		C50E25EB207DEAFC003C8D24 /* CheckoutShippingListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutShippingListViewController.swift; sourceTree = "<group>"; };
 		C50E25ED207DEC49003C8D24 /* CheckoutShippingTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutShippingTableViewCell.swift; sourceTree = "<group>"; };
 		C50E25EF207DFF83003C8D24 /* CheckoutConfirmPaymentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutConfirmPaymentViewController.swift; sourceTree = "<group>"; };
-		C50E2613207F4B71003C8D24 /* Button.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Button.swift; sourceTree = "<group>"; };
 		C50E2616207F6703003C8D24 /* TextFieldFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldFormatter.swift; sourceTree = "<group>"; };
 		C51ED5B91FF39A0700AABD68 /* FavoritesNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesNavigationController.swift; sourceTree = "<group>"; };
 		C51ED5BB1FF39BD800AABD68 /* FavoriteProductsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteProductsViewController.swift; sourceTree = "<group>"; };
 		C5233F0A1F6FF05800F25C7C /* LifeCycleProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifeCycleProtocol.swift; sourceTree = "<group>"; };
 		C527312220B3F49300A0E2EB /* AuthorizeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorizeViewController.swift; sourceTree = "<group>"; };
+		C527312420B4435300A0E2EB /* UIButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIButton.swift; sourceTree = "<group>"; };
 		C5278FB91F3C38510090E422 /* AssetSyncModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssetSyncModel.swift; sourceTree = "<group>"; };
 		C5278FBA1F3C38510090E422 /* DataModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataModel.swift; sourceTree = "<group>"; };
 		C5278FBE1F3C38510090E422 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
@@ -973,10 +973,10 @@
 			children = (
 				C5DDC0DB2015C6D900B009BF /* AttributedString.swift */,
 				C5336D22203D553400A7B4B0 /* BarItem.swift */,
-				C50E2613207F4B71003C8D24 /* Button.swift */,
 				C501410A205E702B00ABFB5C /* Font.swift */,
 				C5A6F1D71FF3C973001DCDD0 /* Screenshot.swift */,
 				C5406A82206B6858002977CE /* UIApplication.swift */,
+				C527312420B4435300A0E2EB /* UIButton.swift */,
 				C501412D20623DFD00ABFB5C /* UICollectionView.swift */,
 				C5AB87EC208382EF00E2CB98 /* UIResponder.swift */,
 				C501412B2061101100ABFB5C /* UITableView.swift */,
@@ -1559,6 +1559,7 @@
 				317BFBB2207DFCD300E61D7C /* Random.swift in Sources */,
 				E4351D702031957800193657 /* MainTabBarController.swift in Sources */,
 				C548D4EB20022E26003364E9 /* DiscoverScreenshotViewController.swift in Sources */,
+				C527312520B4435400A0E2EB /* UIButton.swift in Sources */,
 				C5AAE78B1FEA38AA00BCFF78 /* WebViewController.swift in Sources */,
 				C54088541FE90E2200198955 /* TextFieldTableViewCell.swift in Sources */,
 				C528005D2051342B004DD7A3 /* BorderButton.swift in Sources */,
@@ -1569,7 +1570,6 @@
 				C50E25EE207DEC49003C8D24 /* CheckoutShippingTableViewCell.swift in Sources */,
 				C5BE7C1F20186309000DB8A0 /* DiscoverNavigationController.swift in Sources */,
 				C540881A1FE90C8E00198955 /* WebView.swift in Sources */,
-				C50E2614207F4B71003C8D24 /* Button.swift in Sources */,
 				C5CF974E20861B17004F5F41 /* CheckoutFormViewController.swift in Sources */,
 				C5AC7E671FFA363700F491C0 /* EmbossedView.swift in Sources */,
 				C54088511FE90E2200198955 /* NotifyChangeView.swift in Sources */,

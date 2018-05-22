@@ -98,10 +98,18 @@ class RegisterView: UIView {
         vertical2LayoutGuide.topAnchor.constraint(equalTo: contentView.bottomAnchor, constant: .padding).isActive = true
         vertical2LayoutGuide.heightAnchor.constraint(equalTo: vertical1LayoutGuide.heightAnchor).isActive = true
         
+        let skipImage = UIImage(named: "OnboardingArrow")
+        
         skipButton.translatesAutoresizingMaskIntoConstraints = false
+        skipButton.contentEdgeInsets = UIEdgeInsets(top: 6, left: .padding, bottom: 6, right: .padding)
         skipButton.setTitle("Skip", for: .normal)
         skipButton.setTitleColor(.gray3, for: .normal)
         skipButton.setTitleColor(.gray5, for: .highlighted)
+        skipButton.setImage(skipImage, for: .normal)
+        skipButton.setImage(skipImage?.withRenderingMode(.alwaysTemplate), for: .highlighted)
+        skipButton.tintColor = skipButton.titleColor(for: .highlighted)
+        skipButton.alignImageRight()
+        skipButton.adjustInsetsForImage(withPadding: 6)
         addSubview(skipButton)
         skipButton.topAnchor.constraint(greaterThanOrEqualTo: vertical2LayoutGuide.topAnchor).isActive = true
         skipButton.bottomAnchor.constraint(lessThanOrEqualTo: vertical2LayoutGuide.bottomAnchor).isActive = true
