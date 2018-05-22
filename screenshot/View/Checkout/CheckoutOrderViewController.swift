@@ -316,7 +316,7 @@ extension CheckoutOrderViewControllerOrder {
             Analytics.trackCartPressedPlaceOrder(cart: cart, result: .needsCvv)
 
             let confirmPaymentViewController = CheckoutConfirmPaymentViewController()
-            confirmPaymentViewController.orderButton.addTarget(self, action: #selector(confirmOrderAction), for: .touchUpInside)
+            confirmPaymentViewController.continueButton.addTarget(self, action: #selector(confirmOrderAction), for: .touchUpInside)
             confirmPaymentViewController.cancelButton.addTarget(self, action: #selector(confirmCancelAction), for: .touchUpInside)
             present(confirmPaymentViewController, animated: true, completion: nil)
             self.confirmPaymentViewController = confirmPaymentViewController
@@ -347,11 +347,11 @@ extension CheckoutOrderViewControllerOrder {
         }
         
         Analytics.trackCartCvvEntered(cart: cart, result: .continue)
-        performCheckout(with: card, cvv: cvv, shippingAddress: shippingAddress, orderButton: confirmPaymentViewController?.orderButton)
+        performCheckout(with: card, cvv: cvv, shippingAddress: shippingAddress, orderButton: confirmPaymentViewController?.continueButton)
     }
     
     @objc fileprivate func confirmCancelAction() {
-        guard confirmPaymentViewController?.orderButton.isLoading == false else {
+        guard confirmPaymentViewController?.continueButton.isLoading == false else {
             return
         }
         
