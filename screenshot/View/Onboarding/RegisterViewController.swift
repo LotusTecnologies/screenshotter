@@ -11,14 +11,19 @@ import FacebookCore
 import FacebookLogin
 import Appsee
 
-class RegisterView: UIView {
+class RegisterView: UIScrollView {
     let facebookLoginButton = FacebookButton()
+    private let horizontalLinesView = HorizontalLinesView()
     let emailTextField = UnderlineTextField()
     let passwordTextField = UnderlineTextField()
     let dealsSwitch = UISwitch()
     let continueButton = MainButton()
     let skipButton = UIButton()
     let legalTextView = TappableTextView()
+    
+    var activeTextFieldTopOffset: CGFloat {
+        return horizontalLinesView.frame.maxY
+    }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -32,11 +37,13 @@ class RegisterView: UIView {
         let backgroundImageView = UIImageView(image: UIImage(named: "BrandConfettiFullBackground"))
         backgroundImageView.translatesAutoresizingMaskIntoConstraints = false
         backgroundImageView.contentMode = .scaleAspectFill
+        backgroundImageView.backgroundColor = .background
+        backgroundImageView.clipsToBounds = true
         addSubview(backgroundImageView)
         backgroundImageView.topAnchor.constraint(equalTo: topAnchor).isActive = true
         backgroundImageView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-        backgroundImageView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
-        backgroundImageView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        backgroundImageView.widthAnchor.constraint(equalTo: widthAnchor).isActive = true
+        backgroundImageView.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
         
         facebookLoginButton.translatesAutoresizingMaskIntoConstraints = false
         addSubview(facebookLoginButton)
@@ -48,7 +55,6 @@ class RegisterView: UIView {
         addLayoutGuide(vertical1LayoutGuide)
         vertical1LayoutGuide.topAnchor.constraint(equalTo: facebookLoginButton.bottomAnchor, constant: .padding).isActive = true
         
-        let horizontalLinesView = HorizontalLinesView()
         horizontalLinesView.translatesAutoresizingMaskIntoConstraints = false
         horizontalLinesView.label.text = "or"
         horizontalLinesView.leftLine.backgroundColor = .gray6
@@ -215,11 +221,28 @@ class RegisterViewController: UIViewController {
     
     // MARK: Life Cycle
     
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShowNotification(_:)), name: .UIKeyboardWillShow, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHideNotification(_:)), name: .UIKeyboardWillHide, object: nil)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         _view.facebookLoginButton.addTarget(self, action: #selector(facebookLoginAction), for: .touchUpInside)
+        _view.emailTextField.delegate = self
+        _view.passwordTextField.delegate = self
         _view.legalTextView.delegate = self
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     // MARK: Facebook
@@ -243,6 +266,25 @@ class RegisterViewController: UIViewController {
             }
         }
     }
+    
+    // MARK: Keyboard
+    
+    @objc private func keyboardWillShowNotification(_ notification: Notification) {
+        // TODO: test
+        var contentInset = _view.contentInset
+        contentInset.bottom = _view.activeTextFieldTopOffset
+        _view.contentInset = contentInset
+    }
+    
+    @objc private func keyboardWillHideNotification(_ notification: Notification) {
+        var contentInset = _view.contentInset
+        contentInset.bottom = 0
+        _view.contentInset = contentInset
+    }
+}
+
+extension RegisterViewController: UITextFieldDelegate {
+    
 }
 
 extension RegisterViewController: UITextViewDelegate {
