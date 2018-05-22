@@ -9,7 +9,7 @@
 import UIKit
 
 class FavoriteProductsView: UIView {
-    let tableView = UITableView(frame: .zero, style: .grouped)
+    let tableView = TableView(frame: .zero, style: .grouped)
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)

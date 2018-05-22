@@ -343,7 +343,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             
             viewController = tabBarController.favoritesNavigationController
             
-        case s(FavoritesViewController.self):
+        case s(FavoriteProductsViewController.self):
             guard let navigationController = restorationViewControllers[s(FavoritesNavigationController.self)] as? FavoritesNavigationController else {
                 return nil
             }
