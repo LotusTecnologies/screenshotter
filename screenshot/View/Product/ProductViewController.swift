@@ -403,7 +403,7 @@ fileprivate extension ProductViewControllerStructuredProduct {
 
                 var selectedSize:String?
                 if sizes.count == 1, let onlySize = sizes.first {
-                    let removeSet = CharacterSet.whitespacesAndNewlines.union(CharacterSet.punctuationCharacters).union(CharacterSet.controlCharacters).union(CharacterSet.symbols)
+                    let removeSet = CharacterSet.alphanumerics.inverted
                     let simplifiedOnlySize = onlySize.lowercased().components(separatedBy: removeSet).joined()
                     
                     // oneus == "One (US)"
