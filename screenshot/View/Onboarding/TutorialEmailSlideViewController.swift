@@ -151,12 +151,12 @@ public class TutorialEmailSlideViewController : UIViewController {
             
             func attributes(_ link: String? = nil) -> [NSAttributedStringKey : Any] {
                 var attributes: [NSAttributedStringKey : Any] = [
-                    NSAttributedStringKey.font: textViewFont,
-                    NSAttributedStringKey.paragraphStyle: paragraph
+                    .font: textViewFont,
+                    .paragraphStyle: paragraph
                 ]
                 
                 if let link = link {
-                    attributes[NSAttributedStringKey.link] = link
+                    attributes[.link] = link
                 }
                 
                 return attributes
@@ -178,6 +178,19 @@ public class TutorialEmailSlideViewController : UIViewController {
         textView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         
         helperView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(resignTextField)))
+    }
+    
+    public override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        Appsee.startScreen("Tutorial Email")
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(_:)), name: .UIKeyboardWillShow, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(_:)), name: .UIKeyboardWillHide, object: nil)
+    }
+    
+    public override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        NotificationCenter.default.removeObserver(self)
     }
     
     deinit {
@@ -260,20 +273,6 @@ public class TutorialEmailSlideViewController : UIViewController {
         } else {
             self.helperView.scrollInset = .zero
         }
-    }
-    
-    public override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        Appsee.startScreen("Tutorial Email")
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(_:)), name: .UIKeyboardWillShow, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(_:)), name: .UIKeyboardWillHide, object: nil)
-
-    }
-    public override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        NotificationCenter.default.removeObserver(self)
-      
     }
 }
 

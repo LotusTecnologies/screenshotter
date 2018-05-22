@@ -15,8 +15,10 @@ class RegisterView: UIView {
     let facebookLoginButton = FacebookButton()
     let emailTextField = UnderlineTextField()
     let passwordTextField = UnderlineTextField()
+    let dealsSwitch = UISwitch()
     let continueButton = MainButton()
     let skipButton = UIButton()
+    let legalTextView = TappableTextView()
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -42,27 +44,35 @@ class RegisterView: UIView {
         facebookLoginButton.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
         facebookLoginButton.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
         
+        let vertical1LayoutGuide = UILayoutGuide()
+        addLayoutGuide(vertical1LayoutGuide)
+        vertical1LayoutGuide.topAnchor.constraint(equalTo: facebookLoginButton.bottomAnchor, constant: .padding).isActive = true
+        
         let horizontalLinesView = HorizontalLinesView()
         horizontalLinesView.translatesAutoresizingMaskIntoConstraints = false
         horizontalLinesView.label.text = "or"
         horizontalLinesView.leftLine.backgroundColor = .gray6
         horizontalLinesView.rightLine.backgroundColor = .gray6
         addSubview(horizontalLinesView)
-        horizontalLinesView.topAnchor.constraint(equalTo: facebookLoginButton.bottomAnchor, constant: .padding).isActive = true
+        horizontalLinesView.topAnchor.constraint(greaterThanOrEqualTo: vertical1LayoutGuide.topAnchor).isActive = true
+        horizontalLinesView.bottomAnchor.constraint(lessThanOrEqualTo: vertical1LayoutGuide.bottomAnchor).isActive = true
         horizontalLinesView.centerXAnchor.constraint(equalTo: layoutMarginsGuide.centerXAnchor).isActive = true
+        horizontalLinesView.centerYAnchor.constraint(equalTo: vertical1LayoutGuide.centerYAnchor).isActive = true
         horizontalLinesView.widthAnchor.constraint(equalToConstant: 170).isActive = true
         
         let contentView = ContentContainerView()
         contentView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(contentView)
-        contentView.topAnchor.constraint(equalTo: horizontalLinesView.bottomAnchor, constant: .padding).isActive = true
+        contentView.topAnchor.constraint(equalTo: vertical1LayoutGuide.bottomAnchor, constant: .padding).isActive = true
         contentView.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
         contentView.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
+        
+        let textFieldTopMargin: CGFloat = contentView.layoutMargins.top * 0.4
         
         emailTextField.translatesAutoresizingMaskIntoConstraints = false
         emailTextField.placeholder = "Email Address"
         contentView.addSubview(emailTextField)
-        emailTextField.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor, constant: -.padding).isActive = true
+        emailTextField.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor, constant: textFieldTopMargin - contentView.layoutMargins.top).isActive = true
         emailTextField.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
         emailTextField.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
         
@@ -70,7 +80,7 @@ class RegisterView: UIView {
         passwordTextField.placeholder = "Password"
         passwordTextField.isSecureTextEntry = true
         contentView.addSubview(passwordTextField)
-        passwordTextField.topAnchor.constraint(equalTo: emailTextField.bottomAnchor, constant: .padding).isActive = true
+        passwordTextField.topAnchor.constraint(equalTo: emailTextField.bottomAnchor, constant: textFieldTopMargin).isActive = true
         passwordTextField.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
         passwordTextField.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
         Appsee.markView(asSensitive: passwordTextField)
@@ -78,18 +88,30 @@ class RegisterView: UIView {
         continueButton.translatesAutoresizingMaskIntoConstraints = false
         continueButton.setTitle("Sign Up", for: .normal)
         contentView.addSubview(continueButton)
-        continueButton.topAnchor.constraint(equalTo: passwordTextField.bottomAnchor, constant: .padding * 2).isActive = true
+        continueButton.topAnchor.constraint(equalTo: passwordTextField.bottomAnchor, constant: contentView.layoutMargins.bottom).isActive = true
         continueButton.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
         continueButton.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor).isActive = true
         continueButton.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
+        
+        let vertical2LayoutGuide = UILayoutGuide()
+        addLayoutGuide(vertical2LayoutGuide)
+        vertical2LayoutGuide.topAnchor.constraint(equalTo: contentView.bottomAnchor, constant: .padding).isActive = true
+        vertical2LayoutGuide.heightAnchor.constraint(equalTo: vertical1LayoutGuide.heightAnchor).isActive = true
         
         skipButton.translatesAutoresizingMaskIntoConstraints = false
         skipButton.setTitle("Skip", for: .normal)
         skipButton.setTitleColor(.gray3, for: .normal)
         skipButton.setTitleColor(.gray5, for: .highlighted)
         addSubview(skipButton)
-        skipButton.topAnchor.constraint(equalTo: contentView.bottomAnchor, constant: .padding).isActive = true
+        skipButton.topAnchor.constraint(greaterThanOrEqualTo: vertical2LayoutGuide.topAnchor).isActive = true
+        skipButton.bottomAnchor.constraint(lessThanOrEqualTo: vertical2LayoutGuide.bottomAnchor).isActive = true
         skipButton.centerXAnchor.constraint(equalTo: layoutMarginsGuide.centerXAnchor).isActive = true
+        skipButton.centerYAnchor.constraint(equalTo: vertical2LayoutGuide.centerYAnchor).isActive = true
+        
+        let dealsLayoutGuide = UILayoutGuide()
+        addLayoutGuide(dealsLayoutGuide)
+        dealsLayoutGuide.centerXAnchor.constraint(equalTo: contentView.layoutMarginsGuide.centerXAnchor).isActive = true
+        dealsLayoutGuide.widthAnchor.constraint(lessThanOrEqualToConstant: 320 - (.padding * 2)).isActive = true
         
         let dealsLabel = UILabel()
         dealsLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -99,17 +121,62 @@ class RegisterView: UIView {
         dealsLabel.font = .screenshopFont(.hindLight, size: 16)
         addSubview(dealsLabel)
         dealsLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
-        dealsLabel.topAnchor.constraint(equalTo: skipButton.firstBaselineAnchor, constant: .padding).isActive = true
-        dealsLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
+        dealsLabel.topAnchor.constraint(equalTo: vertical2LayoutGuide.bottomAnchor, constant: .padding).isActive = true
+        dealsLabel.leadingAnchor.constraint(equalTo: dealsLayoutGuide.leadingAnchor).isActive = true
         
-        let dealsSwitch = UISwitch()
         dealsSwitch.translatesAutoresizingMaskIntoConstraints = false
         dealsSwitch.isOn = true
         dealsSwitch.onTintColor = .crazeGreen
         addSubview(dealsSwitch)
         dealsSwitch.leadingAnchor.constraint(equalTo: dealsLabel.trailingAnchor, constant: .padding).isActive = true
-        dealsSwitch.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
+        dealsSwitch.trailingAnchor.constraint(equalTo: dealsLayoutGuide.trailingAnchor).isActive = true
         dealsSwitch.centerYAnchor.constraint(equalTo: dealsLabel.centerYAnchor).isActive = true
+        
+        legalTextView.translatesAutoresizingMaskIntoConstraints = false
+        legalTextView.backgroundColor = .clear
+        legalTextView.adjustsFontForContentSizeCategory = true
+        legalTextView.isEditable = false
+        legalTextView.isScrollEnabled = false
+        legalTextView.scrollsToTop = false
+        legalTextView.linkTextAttributes = [
+            NSAttributedStringKey.foregroundColor.rawValue: UIColor.crazeGreen,
+            NSAttributedStringKey.underlineStyle.rawValue: NSUnderlineStyle.styleSingle.rawValue,
+            NSAttributedStringKey.underlineColor.rawValue: UIColor.crazeGreen
+        ]
+        legalTextView.attributedText = {
+            let textViewFont: UIFont = .screenshopFont(.hindLight, size: 14)
+            
+            let paragraph = NSMutableParagraphStyle()
+            paragraph.alignment = .center
+            
+            func attributes(_ link: String? = nil) -> [NSAttributedStringKey : Any] {
+                var attributes: [NSAttributedStringKey : Any] = [
+                    .font: textViewFont,
+                    .paragraphStyle: paragraph,
+                    .foregroundColor: UIColor.gray6
+                ]
+                
+                if let link = link {
+                    attributes[.link] = link
+                }
+                
+                return attributes
+            }
+            
+            return NSMutableAttributedString(segmentedString: "tutorial.email.legal", attributes: [
+                attributes(),
+                attributes(legalLinkTOS),
+                attributes(),
+                attributes(legalLinkPP),
+                attributes()
+                ])
+        }()
+        addSubview(legalTextView)
+        legalTextView.setContentCompressionResistancePriority(.required, for: .vertical)
+        legalTextView.topAnchor.constraint(equalTo: dealsLabel.lastBaselineAnchor, constant: .padding).isActive = true
+        legalTextView.leadingAnchor.constraint(equalTo: dealsLayoutGuide.leadingAnchor).isActive = true
+        legalTextView.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor).isActive = true
+        legalTextView.trailingAnchor.constraint(equalTo: dealsLayoutGuide.trailingAnchor).isActive = true
     }
     
     override func layoutSubviews() {
@@ -117,6 +184,11 @@ class RegisterView: UIView {
         
         layoutMargins = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
     }
+    
+    // MARK: Legal
+    
+    fileprivate let legalLinkTOS = "TOS"
+    fileprivate let legalLinkPP = "PP"
 }
 
 class RegisterViewController: UIViewController {
@@ -139,6 +211,7 @@ class RegisterViewController: UIViewController {
         super.viewDidLoad()
         
         _view.facebookLoginButton.addTarget(self, action: #selector(facebookLoginAction), for: .touchUpInside)
+        _view.legalTextView.delegate = self
     }
     
     // MARK: Facebook
@@ -148,7 +221,7 @@ class RegisterViewController: UIViewController {
 //        AccessToken.current
         
         let loginManager = LoginManager()
-        
+        UIFont.preferredFont(forTextStyle: .title1)
         loginManager.logIn(readPermissions: [.publicProfile, .email], viewController: self) { loginResult in
             switch loginResult {
             case .failed(let error):
@@ -160,6 +233,36 @@ class RegisterViewController: UIViewController {
             case .success(let grantedPermissions, let declinedPermissions, let accessToken):
                 print("Logged in!")
             }
+        }
+    }
+}
+
+extension RegisterViewController: UITextViewDelegate {
+    public func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
+        switch URL.absoluteString {
+        case _view.legalLinkTOS:
+            presentTermsOfService()
+        case _view.legalLinkPP:
+            presentPrivacyPolicy()
+        default:
+            break
+        }
+        return false
+    }
+    
+    fileprivate func presentTermsOfService() {
+        Analytics.trackOnboardingSubmittedEmailTOS()
+        
+        if let viewController = LegalViewControllerFactory.termsOfServiceViewController() {
+            present(viewController, animated: true, completion: nil)
+        }
+    }
+    
+    fileprivate func presentPrivacyPolicy() {
+        Analytics.trackOnboardingSubmittedEmailPrivacy()
+        
+        if let viewController = LegalViewControllerFactory.privacyPolicyViewController() {
+            present(viewController, animated: true, completion: nil)
         }
     }
 }

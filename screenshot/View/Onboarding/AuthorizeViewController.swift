@@ -31,7 +31,7 @@ class AuthorizeView: UIView {
         headerView.topAnchor.constraint(equalTo: topAnchor).isActive = true
         headerView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
         headerView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
-        headerView.heightAnchor.constraint(equalToConstant: 100).isActive = true
+        headerView.heightAnchor.constraint(equalToConstant: 70).isActive = true
         
         registerButton.translatesAutoresizingMaskIntoConstraints = false
         registerButton.setTitle("Sign Up", for: .normal)

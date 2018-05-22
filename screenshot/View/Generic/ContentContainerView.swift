@@ -19,7 +19,7 @@ class ContentContainerView: UIView {
         let insets: UIEdgeInsets
         
         if UIDevice.is320w {
-            insets = UIEdgeInsets(top: .padding * 1.5, left: .padding, bottom: .padding * 1.5, right: .padding)
+            insets = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
         }
         else {
             insets = UIEdgeInsets(top: .padding * 2, left: .padding * 1.5, bottom: .padding * 2, right: .padding * 1.5)
