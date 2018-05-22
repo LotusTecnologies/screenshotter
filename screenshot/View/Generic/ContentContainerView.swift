@@ -16,10 +16,17 @@ class ContentContainerView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        let inset: CGFloat = UIDevice.is320w ? .padding * 2 : .padding
+        let insets: UIEdgeInsets
+        
+        if UIDevice.is320w {
+            insets = UIEdgeInsets(top: .padding * 1.5, left: .padding, bottom: .padding * 1.5, right: .padding)
+        }
+        else {
+            insets = UIEdgeInsets(top: .padding * 2, left: .padding * 1.5, bottom: .padding * 2, right: .padding * 1.5)
+        }
         
         backgroundColor = .white
-        layoutMargins = UIEdgeInsets(top: inset, left: inset, bottom: inset, right: inset)
+        layoutMargins = insets
         layer.shadowOpacity = 1
         layer.cornerRadius = .defaultCornerRadius
         layer.shadowRadius = Shadow.content.radius

@@ -56,13 +56,25 @@ extension TutorialNavigationController: OnboardingWelcomeViewControllerDelegate 
     func onboardingWelcomeViewControllerDidComplete(_ viewController: OnboardingWelcomeViewController) {
         Analytics.trackOnboardingWelcome()
         
-        let signup = RegisterViewController()
-        pushViewController(signup, animated: true)
+        let authorizeViewController = AuthorizeViewController()
+        authorizeViewController.delegate = self
+        pushViewController(authorizeViewController, animated: true)
+        
+//        let signup = RegisterViewController()
+//        pushViewController(signup, animated: true)
         
         // !!!: DEBUG
 //        let signup = TutorialEmailSlideViewController()
 //        signup.delegate = self
 //        self.pushViewController(signup, animated: true)
+    }
+}
+
+extension TutorialNavigationController: AuthorizeViewControllerDelegate {
+    func authorizeViewControllerDidSkip(_ viewController: AuthorizeViewController) {
+        let tryItOut = TutorialTrySlideViewController()
+        tryItOut.delegate = self
+        pushViewController(tryItOut, animated: true)
     }
 }
 
@@ -72,6 +84,7 @@ extension TutorialNavigationController: TutorialEmailSlideViewControllerDelegate
         tryItOut.delegate = self
         self.pushViewController(tryItOut, animated: true)
     }
+    
     func tutorialEmailSlideViewDidTapTermsOfService(_ slideView: TutorialEmailSlideViewController){
         Analytics.trackOnboardingSubmittedEmailTOS()
         if let viewController = LegalViewControllerFactory.termsOfServiceViewController() {

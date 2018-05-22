@@ -13,6 +13,10 @@ import Appsee
 
 class RegisterView: UIView {
     let facebookLoginButton = FacebookButton()
+    let emailTextField = UnderlineTextField()
+    let passwordTextField = UnderlineTextField()
+    let continueButton = MainButton()
+    let skipButton = UIButton()
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -55,15 +59,13 @@ class RegisterView: UIView {
         contentView.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
         contentView.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
         
-        let emailTextField = UnderlineTextField()
         emailTextField.translatesAutoresizingMaskIntoConstraints = false
         emailTextField.placeholder = "Email Address"
         contentView.addSubview(emailTextField)
-        emailTextField.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor).isActive = true
+        emailTextField.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor, constant: -.padding).isActive = true
         emailTextField.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
         emailTextField.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
         
-        let passwordTextField = UnderlineTextField()
         passwordTextField.translatesAutoresizingMaskIntoConstraints = false
         passwordTextField.placeholder = "Password"
         passwordTextField.isSecureTextEntry = true
@@ -73,14 +75,41 @@ class RegisterView: UIView {
         passwordTextField.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
         Appsee.markView(asSensitive: passwordTextField)
         
-        let continueButton = MainButton()
         continueButton.translatesAutoresizingMaskIntoConstraints = false
         continueButton.setTitle("Sign Up", for: .normal)
         contentView.addSubview(continueButton)
         continueButton.topAnchor.constraint(equalTo: passwordTextField.bottomAnchor, constant: .padding * 2).isActive = true
         continueButton.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
-        continueButton.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor, constant: -.padding).isActive = true
+        continueButton.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor).isActive = true
         continueButton.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
+        
+        skipButton.translatesAutoresizingMaskIntoConstraints = false
+        skipButton.setTitle("Skip", for: .normal)
+        skipButton.setTitleColor(.gray3, for: .normal)
+        skipButton.setTitleColor(.gray5, for: .highlighted)
+        addSubview(skipButton)
+        skipButton.topAnchor.constraint(equalTo: contentView.bottomAnchor, constant: .padding).isActive = true
+        skipButton.centerXAnchor.constraint(equalTo: layoutMarginsGuide.centerXAnchor).isActive = true
+        
+        let dealsLabel = UILabel()
+        dealsLabel.translatesAutoresizingMaskIntoConstraints = false
+        dealsLabel.text = "Send me emails about exclusive offers, sales and new features."
+        dealsLabel.textColor = .gray3
+        dealsLabel.numberOfLines = 0
+        dealsLabel.font = .screenshopFont(.hindLight, size: 16)
+        addSubview(dealsLabel)
+        dealsLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        dealsLabel.topAnchor.constraint(equalTo: skipButton.firstBaselineAnchor, constant: .padding).isActive = true
+        dealsLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
+        
+        let dealsSwitch = UISwitch()
+        dealsSwitch.translatesAutoresizingMaskIntoConstraints = false
+        dealsSwitch.isOn = true
+        dealsSwitch.onTintColor = .crazeGreen
+        addSubview(dealsSwitch)
+        dealsSwitch.leadingAnchor.constraint(equalTo: dealsLabel.trailingAnchor, constant: .padding).isActive = true
+        dealsSwitch.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
+        dealsSwitch.centerYAnchor.constraint(equalTo: dealsLabel.centerYAnchor).isActive = true
     }
     
     override func layoutSubviews() {
@@ -94,12 +123,14 @@ class RegisterViewController: UIViewController {
     
     // MARK: View
     
-    fileprivate var _view: RegisterView {
-        return view as! RegisterView
+    private let _view = RegisterView()
+    
+    var skipButton: UIButton {
+        return _view.skipButton
     }
     
     override func loadView() {
-        view = RegisterView()
+        view = _view
     }
     
     // MARK: Life Cycle
