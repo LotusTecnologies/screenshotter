@@ -600,7 +600,7 @@ extension ProductsViewControllerShoppables: FetchedResultsControllerManagerDeleg
             }
         }
         else if controller == productsFRC {
-            if view.window == nil, let collectionView = collectionView {
+            if view.window != nil, let collectionView = collectionView {
                 collectionView.reloadItems(at: collectionView.indexPathsForVisibleItems)
             }
         }

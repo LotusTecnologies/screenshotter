@@ -30,6 +30,12 @@ class FavoritesNavigationController : UINavigationController {
         viewControllers = [favoritesViewController]
     }
     
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        favoritesViewController.clearMarkedAsUnfavorite()
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         

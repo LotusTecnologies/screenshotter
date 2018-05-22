@@ -87,9 +87,9 @@ class FavoriteProductsViewController : BaseViewController {
         }
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
+    public func clearMarkedAsUnfavorite(){
         DataModel.sharedInstance.unfavorite(favoriteArray: Array(self.unfavoriteProductsIds))
+        self.unfavoriteProductsIds.removeAll()
     }
     
     deinit {
