@@ -74,6 +74,7 @@ class FavoriteProductsViewController : BaseViewController {
         let pinchZoom = UIPinchGestureRecognizer.init(target: self, action: #selector(pinch(gesture:)))
         self.view.addGestureRecognizer(pinchZoom)
         self.productsFRC = DataModel.sharedInstance.favoritedProductsFrc(delegate: self)
+        self.tableView.reloadData()
 
     }
     @objc func pinch( gesture:UIPinchGestureRecognizer) {
@@ -239,8 +240,7 @@ extension FavoriteProductsViewController: UITableViewDelegate {
 extension FavoriteProductsViewController: FetchedResultsControllerManagerDelegate {
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange){
         if self.isViewLoaded {
-
-            change.applyChanges(tableView: self.tableView)
+            change.applyChanges(tableView: tableView)
         }
     }
 
