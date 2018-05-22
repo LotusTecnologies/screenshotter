@@ -22,7 +22,7 @@ class ProductView: UIView {
     let originalPriceLabel = UILabel()
     let contentTextView = UITextView()
     let favoriteButton = FavoriteButton()
-    let stockButton = BorderButton()
+    let stockButton = LoadingBorderButton()
     let websiteButton = UIButton()
     
     let selectionControl = SegmentedDropDownControl()
@@ -176,8 +176,13 @@ class ProductView: UIView {
         
         stockButton.translatesAutoresizingMaskIntoConstraints = false
         stockButton.setTitle("cart.stock.add".localized, for: .normal)
+        stockButton.setTitle("favorites.product.price_alert_on".localized, for: .selected)
+        stockButton.setTitle("favorites.product.price_alert_on".localized, for: [.selected, .highlighted])
         stockButton.setTitleColor(.crazeRed, for: .normal)
         stockButton.setImage(stockImage, for: .normal)
+        stockButton.setImage(stockImage, for: .selected)
+        stockButton.setImage(stockImage, for: [.selected, .highlighted])
+
         stockButton.adjustInsetsForImage(withPadding: 6)
         stockButton.tintColor = .crazeRed
         stockButton.alpha = 0

@@ -299,10 +299,20 @@ fileprivate extension ProductViewControllerProductView {
         guard let product = structuredProduct?.product else {
             return
         }
-        
-        // TODO: do notifying when in stock
-        
-        // TODO: do analytics
+        if !self.productView.stockButton.isSelected { // cannot unnotify
+            product.setFavorited(toFavorited: true)
+            Analytics.trackProductFavorited(product: product, page: .product)
+            Analytics.trackProductPriceAlertSubscribed(product: product)
+            self.productView.stockButton.isLoading = true
+            product.track().then {isTracking -> Void in
+                self.productView.stockButton.isLoading = false
+                self.productView.stockButton.isSelected = true
+            }.catch { error in
+                self.productView.stockButton.isLoading = false
+                let e = error as NSError
+                Analytics.trackProductPriceAlertSubscribedError(product: product, domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
+            }
+        }
     }
     
     // MARK: Web
@@ -398,7 +408,8 @@ fileprivate extension ProductViewControllerStructuredProduct {
         productView.priceLabel.text = product.price
         productView.contentTextView.text = product.detailedDescription
         productView.favoriteButton.isSelected = structuredProduct.product.isFavorite
-        
+        productView.stockButton.isSelected = structuredProduct.product.hasPriceAlerts
+
         setWebsiteMerchant(product.merchant)
         
         if product.isSale() {
