@@ -400,10 +400,21 @@ fileprivate extension ProductViewControllerStructuredProduct {
             var sizeItem: SegmentedDropDownItem?
             
             if let sizes = structuredProduct.sizes {
-                sizeItem = SegmentedDropDownItem(pickerItems: sizes)
+
+                var selectedSize:String?
+                if sizes.count == 1, let onlySize = sizes.first {
+                    let removeSet = CharacterSet.whitespacesAndNewlines.union(CharacterSet.punctuationCharacters).union(CharacterSet.controlCharacters).union(CharacterSet.symbols)
+                    let simplifiedOnlySize = onlySize.lowercased().components(separatedBy: removeSet).joined()
+                    
+                    // oneus == "One (US)"
+                    if ["onesize","nosize","na","oneus"].contains(simplifiedOnlySize) {
+                        selectedSize = onlySize
+                    }
+                }
+                sizeItem = SegmentedDropDownItem(pickerItems: sizes, selectedPickerItem:selectedSize)
                 
-                if colorItem.selectedPickerItem == nil {
-                    // Disabled until color is selected
+                if colorItem.selectedPickerItem == nil && selectedSize == nil{
+                    // Disabled until color is selected, but not if there is only one possible size
                     sizeItem?.disabledPickerItems = structuredProduct.sizes
                 }
                 else if let structuredColorVariant = structuredProduct.structuredColorVariant(forColor: selectedColor) {
