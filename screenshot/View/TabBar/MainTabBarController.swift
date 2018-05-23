@@ -79,7 +79,7 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
             screenshotsNavigationController,
             settingsNavigationController
         ]
-        if UserDefaults.standard.bool(forKey: UserDefaultsKeys.isUSC) {
+        if UIApplication.isUSC {
             viewControllerList.append(cartNavigationController)
         }
         viewControllers = viewControllerList
@@ -112,10 +112,13 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
                 self.screenshotsNavigationController,
                 self.settingsNavigationController
             ]
-            if UserDefaults.standard.bool(forKey: UserDefaultsKeys.isUSC) {
+            
+            if UIApplication.isUSC {
                 viewControllerList.append(self.cartNavigationController)
             }
+            
             self.viewControllers = viewControllerList
+            
             if viewControllerList.count > index {
                 self.selectedIndex = index
             }else{

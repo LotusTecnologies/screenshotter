@@ -1746,6 +1746,10 @@ extension Product {
         return productDescription?.productTitle()
     }
     
+    var isSupportingUSC: Bool {
+        return UIApplication.isUSC && partNumber != nil
+    }
+    
 }
 
 extension Variant {

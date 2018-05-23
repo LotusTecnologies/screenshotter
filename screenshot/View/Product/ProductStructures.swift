@@ -61,7 +61,7 @@ class StructuredProduct: NSObject {
         }
         
         if !colors.isEmpty {
-            self.colors = colors.sorted()
+            self.colors = colors.sorted().map({$0.decodingHTMLEntities()})
         }
         
         if let color = product.color, let colors =  self.colors, colors.contains(color) {
@@ -82,7 +82,7 @@ class StructuredProduct: NSObject {
                 }
                 
                 return aIndex < bIndex
-            })
+            }).map({$0.decodingHTMLEntities()})
         }
         
         if sizes.count == 1, let onlySize = sizes.first {

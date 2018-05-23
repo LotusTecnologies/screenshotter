@@ -213,9 +213,6 @@
 "negative_feedback.title" = "Sorry To Hear That!";
 
 "notification.message" = "Check out the products in your screenshot";
-"notification.prompt.detail" = "We'll let you know when your screenshots are shoppable";
-"notification.prompt.title" = "Ready To Find Your New Look?";
-"notification.prompt.continue" = "Turn on Notifications";
 "notification.screenshot.latest" = "Tap to import your latest screenshot";
 "notification.screenshot.recent" = "Tap to import your new screenshots";
 "notification.screenshot.shoppable" = "Your screenshot is shoppable in the screenshot tab";
@@ -312,6 +309,8 @@
 "screenshot.permission.photo.allow" = "Allow Access";
 "screenshot.permission.photo.detail" = "Allow Screenshop to access your screenshots to start shopping!";
 "screenshot.permission.photo.title" = "Shop With Screenshop";
+"screenshot.permission.push.message" = "Open your favorite apps and take screenshots of photos with clothes, then come back here to shop them!";
+"screenshot.permission.push.title" = "Start Screenshotting";
 
 "screenshots.delete.placeholder" = "Delete Items";
 "screenshots.delete.plural" = "Delete %d Items";
