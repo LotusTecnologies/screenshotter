@@ -32,7 +32,8 @@ extension ProductViewController {
         
         if let product = dataModel.retrieveProduct(managedObjectContext: dataModel.mainMoc(), partNumber: partNumber) {
             Analytics.trackProductPriceAlertOpened(product: product)
-            if UserDefaults.standard.bool(forKey: UserDefaultsKeys.isUSC) {
+            
+            if UIApplication.isUSC {
                 let productViewController = ProductViewController(product: product)
                 let navigationController = ModalNavigationController(rootViewController: productViewController)
                 AppDelegate.shared.window?.rootViewController?.present(navigationController, animated: true, completion: nil)
