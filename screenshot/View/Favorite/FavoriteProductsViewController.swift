@@ -206,26 +206,10 @@ class FavoriteProductsViewController : BaseViewController {
         }
         if let _ = product.partNumber {
             if product.hasVariants {
-                let structored = StructuredProduct.init(product)
-                if let size = structored.onlyOneSize, let color = structored.defaultColor , let oneVariant = product.availableVariants?.first(where: { (v) -> Bool in
-                    if let v = v as? Variant {
-                        return v.color == color && v.size == size
-                    }
-                    return false
-                }) as? Variant {
-                    if let tabBarController = self.tabBarController as? MainTabBarController {
-                        tabBarController.cartTabPulseAnimation()
-                    }
-                    ShoppingCartModel.shared.update(variant: oneVariant, quantity: Int16(1))
-                    self.presentNextStep()
-                    
-                }else{
-                    let productVariantsSelectorViewController = ProductVariantsSelectorViewController.init(product: product)
-                    
-                    productVariantsSelectorViewController.delegate = self
-                    
-                    self.present(productVariantsSelectorViewController, animated: true, completion: nil)
-                }
+                let productVariantsSelectorViewController = ProductVariantsSelectorViewController.init(product: product)
+                productVariantsSelectorViewController.delegate = self
+                self.present(productVariantsSelectorViewController, animated: true, completion: nil)
+                
             }else{
                 //out of stock
                 let alert = UIAlertController.init(title: nil, message: "cart.item.error.unavailable".localized, preferredStyle: .alert)
