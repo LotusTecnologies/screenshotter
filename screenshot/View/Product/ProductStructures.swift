@@ -59,7 +59,7 @@ class StructuredProduct: NSObject {
         }
         
         if !colors.isEmpty {
-            self.colors = colors.sorted()
+            self.colors = colors.sorted().map({$0.decodingHTMLEntities()})
         }
         
         if !sizes.isEmpty {
@@ -74,7 +74,7 @@ class StructuredProduct: NSObject {
                 }
                 
                 return aIndex < bIndex
-            })
+            }).map({$0.decodingHTMLEntities()})
         }
         
         if !imageURLDict.isEmpty {
