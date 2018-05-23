@@ -8,69 +8,53 @@
 
 import UIKit
 
-class BorderButonController {
-    weak var button:UIButton?
-    func setup(button:UIButton) {
-        self.button = button
-        button.setTitleColor(.crazeRed, for: .normal)
-        button.contentEdgeInsets = UIEdgeInsets(top: .padding / 1.8, left: .padding, bottom: .padding / 1.8, right: .padding)
-        button.adjustsImageWhenHighlighted = false
-        button.titleLabel?.font = UIFont(screenshopName: .hindMedium, size: UIFont.buttonFontSize)
-        button.layer.borderWidth = 1
-        button.layer.cornerRadius = .defaultCornerRadius
-    }
-    func syncBorderColor() {
-        if let button = self.button, let cgColor = button.titleColor(for: button.state)?.cgColor {
-            self.button?.layer.borderColor = cgColor
-        }
-    }
-    func setTitleColor(_ color: UIColor?, for state: UIControlState) {
-        self.syncBorderColor()
-
-        if state == .normal {
-            let darkerColor = color?.darker(by: 14)
-            
-            self.button?.setTitleColor(darkerColor, for: .highlighted)
-            self.button?.setTitleColor(darkerColor, for: [.highlighted, .selected])
-        }
-    }
-
-}
-
-class BorderButton: UIButton {
-    let borderButonController = BorderButonController()
-
+class BorderButton: LoadingButton {
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        self.borderButonController.setup(button: self)
     }
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
-        self.borderButonController.setup(button: self)
+        
+        setTitleColor(.crazeRed, for: .normal)
+        contentEdgeInsets = UIEdgeInsets(top: .padding / 1.8, left: .padding, bottom: .padding / 1.8, right: .padding)
+        adjustsImageWhenHighlighted = false
+        titleLabel?.font = UIFont(screenshopName: .hindMedium, size: UIFont.buttonFontSize)
+        layer.borderWidth = 1
+        layer.cornerRadius = .defaultCornerRadius
     }
     
     override func setTitleColor(_ color: UIColor?, for state: UIControlState) {
         super.setTitleColor(color, for: state)
-       self.borderButonController.setTitleColor(color, for: state)
+        syncBorderColor()
+        
+        if state == .normal {
+            let darkerColor = color?.darker(by: 14)
+            
+            super.setTitleColor(darkerColor, for: .highlighted)
+            super.setTitleColor(darkerColor, for: [.highlighted, .selected])
+        }
     }
     
     override var isHighlighted: Bool {
         didSet {
-            self.borderButonController.syncBorderColor()
+            syncBorderColor()
         }
     }
     
     override var isSelected: Bool {
         didSet {
-            self.borderButonController.syncBorderColor()
+            syncBorderColor()
         }
     }
     
     override var isEnabled: Bool {
         didSet {
-            self.borderButonController.syncBorderColor()
+            syncBorderColor()
         }
     }
     
-    
+    fileprivate func syncBorderColor() {
+        layer.borderColor = titleColor(for: state)?.cgColor
+    }
 }

@@ -32,7 +32,6 @@
 		31C0C81F20A2CD14002EE95B /* ProductsOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C0C81620A2CD14002EE95B /* ProductsOptions.swift */; };
 		31C0C82020A2CD14002EE95B /* ProductsCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C0C81720A2CD14002EE95B /* ProductsCollectionView.swift */; };
 		31C0C82220A30369002EE95B /* ErrorCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C0C82120A30369002EE95B /* ErrorCollectionViewCell.swift */; };
-		31C536AA20B40DA5005810CA /* LoadingBorderButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C536A920B40DA5005810CA /* LoadingBorderButton.swift */; };
 		31CE11002035AC44000156EE /* UIApplication+openInChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE10FF2035AC44000156EE /* UIApplication+openInChrome.swift */; };
 		31CE11022039570B000156EE /* FetchedResultsControllerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE11012039570B000156EE /* FetchedResultsControllerManager.swift */; };
 		31CE110420396194000156EE /* ScreenshotsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE110320396194000156EE /* ScreenshotsViewController.swift */; };
@@ -275,7 +274,6 @@
 		31C0C81720A2CD14002EE95B /* ProductsCollectionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductsCollectionView.swift; sourceTree = "<group>"; };
 		31C0C82120A30369002EE95B /* ErrorCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorCollectionViewCell.swift; sourceTree = "<group>"; };
 		31C0C82620A30A02002EE95B /* Model 17.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 17.xcdatamodel"; sourceTree = "<group>"; };
-		31C536A920B40DA5005810CA /* LoadingBorderButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingBorderButton.swift; sourceTree = "<group>"; };
 		31CE10FF2035AC44000156EE /* UIApplication+openInChrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplication+openInChrome.swift"; sourceTree = "<group>"; };
 		31CE11012039570B000156EE /* FetchedResultsControllerManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FetchedResultsControllerManager.swift; sourceTree = "<group>"; };
 		31CE110320396194000156EE /* ScreenshotsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotsViewController.swift; sourceTree = "<group>"; };
@@ -896,7 +894,6 @@
 				C528005A205133BA004DD7A3 /* FavoriteButton.swift */,
 				C540884F1FE90E2200198955 /* FloatingActionButton.swift */,
 				C501412F206283A200ABFB5C /* LoadingButton.swift */,
-				31C536A920B40DA5005810CA /* LoadingBorderButton.swift */,
 				C540884E1FE90E2200198955 /* MainButton.swift */,
 			);
 			path = Button;
@@ -1559,7 +1556,6 @@
 				31CE1107203BEF36000156EE /* SaleView.swift in Sources */,
 				31EF9B0720299D15006D3B35 /* InAppPurchaseManager.swift in Sources */,
 				C5233F0B1F6FF05800F25C7C /* LifeCycleProtocol.swift in Sources */,
-				31C536AA20B40DA5005810CA /* LoadingBorderButton.swift in Sources */,
 				C501412E20623DFD00ABFB5C /* UICollectionView.swift in Sources */,
 				C5E6C316208F22C0006E9C54 /* CheckoutSupportedLocationModel.swift in Sources */,
 				C50D200E1FEBE6CD005CFA4F /* ScrollRevealController.swift in Sources */,

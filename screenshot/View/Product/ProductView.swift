@@ -22,7 +22,7 @@ class ProductView: UIView {
     let originalPriceLabel = UILabel()
     let contentTextView = UITextView()
     let favoriteButton = FavoriteButton()
-    let stockButton = LoadingBorderButton()
+    let stockButton = BorderButton()
     let websiteButton = UIButton()
     
     let selectionControl = SegmentedDropDownControl()
