@@ -1088,6 +1088,8 @@ extension DataModel {
     
     public func unfavorite(favoriteArray: [NSManagedObjectID]) {
         let moiArray = favoriteArray
+        
+        
         self.performBackgroundTask { (managedObjectContext) in
             let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
             fetchRequest.predicate = NSPredicate(format: "SELF IN %@", moiArray)
@@ -1103,6 +1105,7 @@ extension DataModel {
                     product.isFavorite = false
                     product.dateFavorited = nil
                     AccumulatorModel.favorite.decrementUninformedCount(by:results.count)
+                    product.untrack()
                 }
                 try managedObjectContext.save()
                 
@@ -1677,6 +1680,11 @@ extension Product {
                 let results = try managedObjectContext.fetch(fetchRequest)
                 for product in results {
                     product.isFavorite = toFavorited
+                    if toFavorited {
+                        product.track()
+                    }else{
+                        product.untrack()
+                    }
                     if toFavorited == false {
                         product.dateViewed  = nil
                     }

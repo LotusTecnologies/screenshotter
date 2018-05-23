@@ -413,7 +413,7 @@ extension CartItem {
 extension Product {
     
     // Returns the new value of hasPriceAlerts as determined by the network.
-    func track() -> Promise<Bool> {
+    @discardableResult func track() -> Promise<Bool> {
         guard PermissionsManager.shared.hasPermission(for: .push) else {
             let error = NSError(domain: "Craze", code: 70, userInfo: [NSLocalizedDescriptionKey : "Product.track No push permissions"])
             print("error:\(error)")
@@ -438,7 +438,7 @@ extension Product {
     }
     
     // Returns the new value of hasPriceAlerts as determined by the network.
-    func untrack() -> Promise<Bool> {
+    @discardableResult func untrack() -> Promise<Bool> {
         guard let pushTokenData = UserDefaults.standard.object(forKey: UserDefaultsKeys.deviceToken) as? NSData else {
             let error = NSError(domain: "Craze", code: 73, userInfo: [NSLocalizedDescriptionKey : "Product.untrack No pushToken"])
             print("error:\(error)")
