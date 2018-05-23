@@ -1747,12 +1747,7 @@ extension Product {
     }
     
     var isSupportingUSC: Bool {
-        if UIApplication.isDev {
-            return partNumber != nil
-        }
-        else {
-            return UserDefaults.standard.bool(forKey: UserDefaultsKeys.isUSC) && partNumber != nil
-        }
+        return UIApplication.isUSC && partNumber != nil
     }
     
 }
