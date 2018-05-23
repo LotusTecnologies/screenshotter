@@ -202,7 +202,7 @@ class Analytics {
 
     
     static func trackTappedOnProduct(_ product: Product, atLocation location: Analytics.AnalyticsProductOpenedFromPage) {
-        let willShowShoppingCartPage = (product.partNumber != nil )
+        let willShowShoppingCartPage = product.isSupportingUSC
         let displayAs:Analytics.AnalyticsProductOpenedDisplayAs = {
             if willShowShoppingCartPage {
                 return .productPage

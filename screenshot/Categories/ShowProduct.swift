@@ -11,7 +11,8 @@ import UIKit
 extension UIViewController {
     @discardableResult func presentProduct(_ product: Product, atLocation location: Analytics.AnalyticsProductOpenedFromPage) -> ProductViewController? {
         Analytics.trackTappedOnProduct(product, atLocation: location)
-        if UserDefaults.standard.bool(forKey: UserDefaultsKeys.isUSC) && product.partNumber != nil {
+        
+        if product.isSupportingUSC {
             let productViewController = ProductViewController(product: product)
             navigationController?.pushViewController(productViewController, animated: true)
             return productViewController
