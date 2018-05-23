@@ -251,6 +251,9 @@ extension FavoriteProductsViewController: ProductVariantsSelectorViewControllerD
                 self.presentNextStep()
             }
             
+        }else{
+            self.dismiss(animated: true, completion: nil)
+            //error?
         }
     }
     

@@ -51,13 +51,13 @@ class ProductVariantsSelectorViewController: AlertTemplateViewController {
         
         if let color = selectedVariant?.color, let colorIndex = structuredProduct.colors?.index(of: color) {
             selectedRows[.color] = colorIndex
-        }else if structuredProduct.colors?.count == 1 {
+        }else if structuredProduct.colors?.count ?? 0 > 0 {
             selectedRows[.color] = 0
         }
         
         if let size = selectedVariant?.size, let sizeIndex = structuredProduct.sizes?.index(of: size) {
             selectedRows[.size] = sizeIndex
-        }else if structuredProduct.sizes?.count == 1 {
+        }else if structuredProduct.sizes?.count ?? 0 > 0 {
             selectedRows[.size] = 0
         }
         
