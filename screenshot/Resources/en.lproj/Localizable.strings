@@ -263,6 +263,10 @@
 "product.out_of_stock" = "OUT OF STOCK";
 "product.similar_items" = "Related Items";
 "product.size.default" = "Size";
+"product.variants.color" = "Color";
+"product.variants.edit" = "Edit Item";
+"product.variants.quantity" = "Quantity";
+"product.variants.size" = "Size";
 "product.website" = "Go To %@";
 
 "products.helper.message" = "No visually similar products were detected";

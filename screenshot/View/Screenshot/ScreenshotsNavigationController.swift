@@ -126,7 +126,7 @@ extension ScreenshotsNavigationController: GiftCardCampaignViewControllerDelegat
     }
     
     func presentGiftCardCampaignIfNeeded() {
-        if !UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingPresentedGiftCard) {
+        if UserDefaults.standard.bool(forKey: UserDefaultsKeys.isUSC) && !UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingPresentedGiftCard) {
             UserDefaults.standard.set(true, forKey: UserDefaultsKeys.onboardingPresentedGiftCard)
             UserDefaults.standard.synchronize()
             

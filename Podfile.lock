@@ -1,5 +1,5 @@
 PODS:
-  - Amplitude-iOS (4.2.0)
+  - Amplitude-iOS (4.2.1)
   - Analytics (3.6.9)
   - Appsee (2.4.1)
   - Bolts (1.9.0):
@@ -94,7 +94,7 @@ SPEC REPOS:
     - Whisper
 
 SPEC CHECKSUMS:
-  Amplitude-iOS: 45f10ac763db6f9ddfa06f2e4d63ed5f8d3c7bf6
+  Amplitude-iOS: 84da24ca8557fa3741888502c30c0b8b365acd7d
   Analytics: 6541ce337e99d9f7a2240a8b3953940a7be5f998
   Appsee: ab8b0317b0a5217d08637f61dbddaba2c9748f2a
   Bolts: ac6567323eac61e203f6a9763667d0f711be34c8

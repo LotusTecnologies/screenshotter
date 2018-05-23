@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 
 class FavoritesNavigationController : UINavigationController {
-    let favoritesViewController = FavoritesViewController()
+    let favoritesViewController = FavoriteProductsViewController()
     
     // MARK: Life Cycle
     
@@ -27,9 +27,14 @@ class FavoritesNavigationController : UINavigationController {
         
         restorationIdentifier = "FavoritesNavigationController"
         
-        favoritesViewController.delegate = self
-        
         viewControllers = [favoritesViewController]
+    }
+    
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        favoritesViewController.clearMarkedAsUnfavorite()
+        self.popToRootViewController(animated: false)
     }
     
     override func viewDidLoad() {
@@ -39,15 +44,3 @@ class FavoritesNavigationController : UINavigationController {
     }
 }
 
-extension FavoritesNavigationController : FavoritesViewControllerDelegate {
-    func favoritesViewController(_ viewController: FavoritesViewController, didSelectItemAt indexPath: IndexPath) {
-        guard let screenshot = viewController.screenshot(at: indexPath) else {
-            return
-        }
-        
-        let favoriteProductsViewController = FavoriteProductsViewController()
-        favoriteProductsViewController.products = screenshot.favoritedProducts
-        favoriteProductsViewController.hidesBottomBarWhenPushed = true
-        pushViewController(favoriteProductsViewController, animated: true)
-    }
-}

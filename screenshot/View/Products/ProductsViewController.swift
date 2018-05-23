@@ -24,7 +24,7 @@ enum ProductsViewControllerState : Int {
     case loading
     case products
     case retry
-    case empty
+    case unknown
 }
 
 class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToolbarDelegate, ShoppablesToolbarDelegate {
@@ -46,7 +46,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
     var productsRateNegativeFeedbackTextField:UITextField?
     var shamrockButton : FloatingActionButton?
     var productsUnfilteredCount:Int = 0
-    var state:ProductsViewControllerState = .loading {
+    var state:ProductsViewControllerState = .unknown {
         didSet {
             self.syncViewsAfterStateChange()
         }
@@ -54,11 +54,13 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
     var shareToDiscoverPrompt:UIView?
     fileprivate let filterView = CustomInputtableView()
     
+    var loadingMonitor:AsyncOperationMonitor?
     init(screenshot: Screenshot) {
         self.screenshot = screenshot
-    
         super.init(nibName: nil, bundle: nil)
         
+        self.loadingMonitor = AsyncOperationMonitor.init(assetId: screenshot.assetId, shoppableId: nil, delegate: self)
+
         self.title = "products.title".localized
         self.restorationIdentifier = "ProductsViewController"
         
@@ -207,10 +209,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
-        if !self.hasShoppables() && self.noItemsHelperView == nil {
-            self.state = .loading
-        }
+        self.updateLoadingState()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -267,7 +266,6 @@ extension ProductsViewController {
         self.products = []
         self.relatedLooks = nil
         self.productsUnfilteredCount = 0
-        self.state = .loading
         self.collectionView?.reloadData()
     }
     func productsOptionsDidComplete(_ productsOptions: ProductsOptions, withChange changed: Bool) {
@@ -589,18 +587,11 @@ private typealias ProductsViewControllerShoppables = ProductsViewController
 extension ProductsViewControllerShoppables: FetchedResultsControllerManagerDelegate {
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
         if controller == self.screenshotController {
-            if let screenShot = self.screenshotController?.first {
-                if screenShot.shoppablesCount == 0 {
-                    
-                }else if screenShot.shoppablesCount == -1 {
-                    if self.noItemsHelperView == nil {
-                        self.state = .retry
-                    }
-                }
-            }
+            self.updateLoadingState()
+
         }
         else if controller == productsFRC {
-            if view.window == nil, let collectionView = collectionView {
+            if view.window != nil, let collectionView = collectionView {
                 collectionView.reloadItems(at: collectionView.indexPathsForVisibleItems)
             }
         }
@@ -631,12 +622,6 @@ extension ProductsViewControllerProducts{
             self.state = .retry
         } else {
             self.products = self.productsForShoppable(shoppable)
-            
-            if shoppable.productFilterCount == 0 && self.productsUnfilteredCount == 0 {
-                self.state = .loading
-            } else {
-                self.state = (self.products.count == 0) ? .empty : .products
-            }
         }
         
         self.collectionView?.reloadData()
@@ -680,10 +665,14 @@ extension ProductsViewControllerProducts{
             if self.productsOptions.sale == .sale {
                 products = products.filter { $0.floatPrice < $0.floatOriginalPrice }
             }
-            let productArray: [Product]
+            var productArray: [Product]
             switch self.productsOptions.sort {
             case .similar :
                 productArray = products.sorted { stockOrder(a: $0, b: $1) ?? ($0.order < $1.order) }
+                if let mostSimilarUnder50BucksIndex = productArray.index(where: { $0.fallbackPrice < 50 }),
+                  mostSimilarUnder50BucksIndex > 0 {
+                    productArray.insert(productArray.remove(at: mostSimilarUnder50BucksIndex), at: 0)
+                }
             case .priceAsc :
                 productArray = products.sorted { stockOrder(a: $0, b: $1) ?? ($0.floatPrice < $1.floatPrice) }
             case .priceDes :
@@ -907,7 +896,7 @@ extension ProductsViewController {
         self.shoppablesToolbar?.isHidden = self.shouldHideToolbar()
         
         switch (state) {
-        case .loading:
+        case .loading, .unknown:
             self.hideNoItemsHelperView()
             self.rateView.isHidden = true
             self.startAndAddLoader()
@@ -932,7 +921,7 @@ extension ProductsViewController {
             self.hideNoItemsHelperView()
             self.rateView.isHidden = false
             
-        case .retry, .empty:
+        case .retry:
             if #available(iOS 11.0, *) {} else {
                 self.automaticallyAdjustsScrollViewInsets = false
             }
@@ -995,11 +984,9 @@ extension ProductsViewControllerNoItemsHelperView{
         let alert = UIAlertController(title: "products.helper.retry.title".localized, message: nil, preferredStyle: .actionSheet)
         alert.addAction(UIAlertAction(title: "products.helper.retry.fashion".localized, style: .default, handler: { (a) in
             AssetSyncModel.sharedInstance.refetchShoppables(screenshot: self.screenshot, classificationString: "h")
-            self.state = .loading
         }))
         alert.addAction(UIAlertAction(title: "products.helper.retry.furniture".localized, style: .default, handler: { (a) in
             AssetSyncModel.sharedInstance.refetchShoppables(screenshot: self.screenshot, classificationString: "f")
-            self.state = .loading
         }))
         alert.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
         self.present(alert, animated: true, completion: nil)
@@ -1179,4 +1166,34 @@ extension ProductsViewController {
             return true
         }
     }
+}
+
+extension ProductsViewController : AsyncOperationMonitorDelegate {
+    func updateLoadingState(){
+        DispatchQueue.main.async {
+            let isLoading = self.loadingMonitor?.didStart ?? false
+            let state:ProductsViewControllerState = {
+                if self.hasShoppables() {
+                    return .products
+                }else{
+                    if isLoading {
+                        return .loading
+                    }else{
+                        return .retry
+                    }
+                }
+            }()
+            if state != self.state {
+                self.state = state
+            }
+        }
+    }
+    
+    func asyncOperationMonitorDidStart(_ monitor:AsyncOperationMonitor){
+        self.updateLoadingState()
+    }
+    func asyncOperationMonitorDidStop(_ monitor:AsyncOperationMonitor){
+        self.updateLoadingState()
+    }
+
 }

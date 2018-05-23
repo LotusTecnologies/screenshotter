@@ -202,6 +202,15 @@ extension DataModel {
         return fetchedResultsController
     }
     
+    func favoritedProductsFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<Product> {
+        let request: NSFetchRequest = Product.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(key: "dateFavorited", ascending: false)]
+        request.predicate = NSPredicate(format: "isFavorite == true")
+        let context = self.mainMoc()
+        let fetchedResultsController:FetchedResultsControllerManager<Product> = FetchedResultsControllerManager<Product>.init(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
+        return fetchedResultsController
+    }
+    
     func productFrc(delegate:FetchedResultsControllerManagerDelegate?, shoppableOID: NSManagedObjectID) -> FetchedResultsControllerManager<Product> {
         let request: NSFetchRequest = Product.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(key: "dateFavorited", ascending: false)]
@@ -1074,6 +1083,11 @@ extension DataModel {
     
     public func unfavorite(favoriteArray: [Product]) {
         let moiArray = favoriteArray.map { $0.objectID }
+        self.unfavorite(favoriteArray: moiArray)
+    }
+    
+    public func unfavorite(favoriteArray: [NSManagedObjectID]) {
+        let moiArray = favoriteArray
         self.performBackgroundTask { (managedObjectContext) in
             let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
             fetchRequest.predicate = NSPredicate(format: "SELF IN %@", moiArray)
@@ -1502,6 +1516,7 @@ extension Shoppable {
         guard let screenshotId = self.screenshot?.objectID else {
             return
         }
+        let assetId = self.screenshot?.assetId
         let optionsMask = ProductsOptionsMask(productsOptions.category, productsOptions.gender, productsOptions.size)
         let optionsMaskInt = optionsMask.rawValue
         DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
@@ -1541,7 +1556,7 @@ extension Shoppable {
                         actualFilteredProductCount > 0 {
                         continue
                     }
-                    AssetSyncModel.sharedInstance.reExtractProducts(shoppableId: shoppable.objectID, optionsMask: optionsMask, offersURL: offersURL)
+                    AssetSyncModel.sharedInstance.reExtractProducts(assetId:assetId, shoppableId: shoppable.objectID, optionsMask: optionsMask, offersURL: offersURL)
                 }
                 try managedObjectContext.save()
                 DispatchQueue.main.async(execute: callback)
