@@ -24,9 +24,9 @@ class AsyncOperationMonitor {
     init(tags:[AsyncOperationTag], queues:[AsyncOperationQueue], delegate:AsyncOperationMonitorDelegate) {
         self.tags = tags
         self.delegate = delegate
-        self.didStart = self.calculateDidStart()
         self.queueUUIDs = queues.map{ $0.uuid }
-        
+        self.didStart = self.calculateDidStart()
+
         NotificationCenter.default.addObserver(self, selector: #selector(asyncOperationDidChange(_:)), name: .AsyncOperationTagMonitorCenterDidChange, object: nil)
     }
     
@@ -144,6 +144,7 @@ class AsyncOperationQueue : OperationQueue {
     override func addOperation(_ op: Operation) {
         if let op = op as? AsyncOperation {
             op.queueUuid = self.uuid
+            AsyncOperationMonitorCenter.shared.registerStarted(op)
         }
         super.addOperation(op)
     }
@@ -201,7 +202,6 @@ class AsyncOperation: Operation {
         self.tags = tags
         self.executionBlock = completion
         self.timeout = timeout
-        AsyncOperationMonitorCenter.shared.registerStarted(self)
         super.init()
     }
     

@@ -59,7 +59,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
         self.screenshot = screenshot
         super.init(nibName: nil, bundle: nil)
         
-        self.loadingMonitor = AsyncOperationMonitor.init(assetId: screenshot.assetId, shoppableId: nil, delegate: self)
+        self.loadingMonitor = AsyncOperationMonitor.init(assetId: screenshot.assetId, shoppableId:nil, queues: AssetSyncModel.sharedInstance.queues, delegate: self)
 
         self.title = "products.title".localized
         self.restorationIdentifier = "ProductsViewController"

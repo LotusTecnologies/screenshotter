@@ -39,8 +39,8 @@ class AssetSyncModel: NSObject {
     var backgroundProcessFetchedResults:PHFetchResult<PHAsset>?
     var lastDidBecomeActiveDate:Date?
     
-    let uploadScreenshotWithClarifaiQueue:OperationQueue = {
-        var queue = OperationQueue()
+    let uploadScreenshotWithClarifaiQueue:AsyncOperationQueue = {
+        var queue = AsyncOperationQueue()
         queue.name = "upload Screenshot With Clarifai Queue"
         queue.maxConcurrentOperationCount = 1
         queue.isSuspended = true
@@ -52,8 +52,8 @@ class AssetSyncModel: NSObject {
         return queue
     }()
     
-    let uploadScreenshotWithClarifaiQueueFromUserScreenshot:OperationQueue = {
-        var queue = OperationQueue()
+    let uploadScreenshotWithClarifaiQueueFromUserScreenshot:AsyncOperationQueue = {
+        var queue = AsyncOperationQueue()
         queue.name = "upload Screenshot With Clarifai Queue from user screenshot"
         queue.maxConcurrentOperationCount = 1
         queue.isSuspended = true
@@ -65,39 +65,41 @@ class AssetSyncModel: NSObject {
         return queue
     }()
     
-    let syteProcessingQueue:OperationQueue = {
-        var queue = OperationQueue()
+    let syteProcessingQueue:AsyncOperationQueue = {
+        var queue = AsyncOperationQueue()
         queue.name = "Syte processing Queue"
         queue.maxConcurrentOperationCount = 5
         queue.qualityOfService = .userInteractive
         return queue
     }()
     
-    let downloadProductQueue:OperationQueue = {
-        var queue = OperationQueue()
+    let downloadProductQueue:AsyncOperationQueue = {
+        var queue = AsyncOperationQueue()
         queue.name = "download products Queue"
         queue.maxConcurrentOperationCount = 2
         queue.qualityOfService = .userInteractive
         return queue
     }()
     
-    let coreDataProcessingQueue:OperationQueue = {
-        var queue = OperationQueue()
+    let coreDataProcessingQueue:AsyncOperationQueue = {
+        var queue = AsyncOperationQueue()
         queue.name = "core data processing Queue"
         queue.maxConcurrentOperationCount = 1
         queue.qualityOfService = .userInteractive
         return queue
     }()
     
-    var userInitiatedQueue:OperationQueue = {
-        var queue = OperationQueue()
+    var userInitiatedQueue:AsyncOperationQueue = {
+        var queue = AsyncOperationQueue()
         queue.name = "retry Screenshot image processing Queue"
         queue.maxConcurrentOperationCount = 2
         queue.qualityOfService = .userInteractive
         return queue
     }()
 
+    let queues:[AsyncOperationQueue]
     override init() {
+        queues = [userInitiatedQueue,coreDataProcessingQueue, downloadProductQueue, syteProcessingQueue, uploadScreenshotWithClarifaiQueueFromUserScreenshot, uploadScreenshotWithClarifaiQueue ]
         super.init()
         registerForPhotoChanges()
         NotificationCenter.default.addObserver(self, selector: #selector(applicationUserDidTakeScreenshot), name: .UIApplicationUserDidTakeScreenshot, object: nil)
