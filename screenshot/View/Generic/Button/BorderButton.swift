@@ -8,7 +8,7 @@
 
 import UIKit
 
-class BorderButton: UIButton {
+class BorderButton: LoadingButton {
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }

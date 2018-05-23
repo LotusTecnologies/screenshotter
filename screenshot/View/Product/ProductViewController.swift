@@ -45,6 +45,7 @@ class ProductViewController : BaseViewController {
         productView.cartButton.addTarget(self, action: #selector(cartButtonAction), for: .touchUpInside)
 //            productView.buyButton.addTarget(self, action: #selector(buyButtonAction), for: .touchUpInside)
         productView.favoriteButton.addTarget(self, action: #selector(favoriteAction), for: .touchUpInside)
+        productView.stockButton.addTarget(self, action: #selector(stockAction), for: .touchUpInside)
         productView.websiteButton.addTarget(self, action: #selector(pushWebsiteURL), for: .touchUpInside)
         
         let pinchZoom = UIPinchGestureRecognizer.init(target: self, action: #selector(pinch(gesture:)))
@@ -70,11 +71,11 @@ class ProductViewController : BaseViewController {
                     self?.setup(with: product)
                 }
                 else {
-                    self?.productView.setUnavailableImageViewAlpha(product.hasVariants ? 0 : 1)
+                    self?.productView.setIsUnavailable(!product.hasVariants)
                 }
             }
             .catch { [weak self] error in
-                self?.productView.setUnavailableImageViewAlpha(1)
+                self?.productView.setIsUnavailable(true)
         }
         
         cartItemFrc = DataModel.sharedInstance.cartItemFrc(delegate: self)
@@ -277,7 +278,7 @@ fileprivate extension ProductViewControllerProductView {
         }
     }
     
-    // MARK: Favorite
+    // MARK: Favorite / Stock
     
     @objc func favoriteAction() {
         guard let product = structuredProduct?.product else {
@@ -291,6 +292,36 @@ fileprivate extension ProductViewControllerProductView {
             Analytics.trackProductFavorited(product: product, page: .product)
         }else{
             Analytics.trackProductUnfavorited(product: product, page: .product)
+        }
+    }
+    
+    @objc fileprivate func stockAction() {
+        guard let product = structuredProduct?.product else {
+            return
+        }
+        
+        if self.productView.stockButton.isSelected {
+            Analytics.trackProductPriceAlertUnsubscribed(product: product)
+            self.productView.stockButton.isLoading = true
+            product.untrack().then {isTracking -> Void in
+                self.productView.stockButton.isLoading = false
+                self.productView.stockButton.isSelected = false
+            }.catch { error in
+                self.productView.stockButton.isLoading = false
+                let e = error as NSError
+                Analytics.trackProductPriceAlertUnsubscribedError(product: product,  domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
+            }
+        }else{
+            Analytics.trackProductPriceAlertSubscribed(product: product)
+            self.productView.stockButton.isLoading = true
+            product.track().then {isTracking -> Void in
+                self.productView.stockButton.isLoading = false
+                self.productView.stockButton.isSelected = true
+            }.catch { error in
+                self.productView.stockButton.isLoading = false
+                let e = error as NSError
+                Analytics.trackProductPriceAlertSubscribedError(product: product, domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
+            }
         }
     }
     
@@ -380,14 +411,15 @@ fileprivate extension ProductViewControllerStructuredProduct {
         
         if didSaveVariants {
             // Prevent a jarring UX by showing this only once we have confirmed data
-            productView.setUnavailableImageViewAlpha(structuredProduct.isAvailable ? 0 : 1)
+            productView.setIsUnavailable(!structuredProduct.isAvailable)
         }
         
         productView.titleLabel.text = product.productTitle()
         productView.priceLabel.text = product.price
         productView.contentTextView.text = product.detailedDescription
         productView.favoriteButton.isSelected = structuredProduct.product.isFavorite
-        
+        productView.stockButton.isSelected = structuredProduct.product.hasPriceAlerts
+
         setWebsiteMerchant(product.merchant)
         
         if product.isSale() {
