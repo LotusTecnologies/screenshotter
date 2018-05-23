@@ -57,7 +57,6 @@
 "cart.item.error.quantity" = "Quantity has changed";
 "cart.item.error.unavailable" = "Out of stock";
 "cart.remove" = "Remove";
-"cart.stock.add" = "NOTIFY ME WHEN IN STOCK";
 "cart.title" = "Cart";
 "cart.variant.color" = "Color:";
 "cart.variant.quantity" = "Quantity:";
@@ -261,7 +260,7 @@
 "product.next_step.continue" = "Go to Cart";
 "product.next_step.added" = "Product was added to your cart!";
 "product.out_of_stock" = "OUT OF STOCK";
-"product.price_alert_on" = "GET PRICE ALERTS";
+"product.price_alert_on" = "NOTIFY ME WHEN IN STOCK";
 "product.price_alert_off" = "IN-STOCK ALERT ON";
 "product.similar_items" = "Related Items";
 "product.size.default" = "Size";
