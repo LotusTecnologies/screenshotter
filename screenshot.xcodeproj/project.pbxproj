@@ -149,7 +149,6 @@
 		C57E93A9204BEE4E0069C378 /* OpenWebPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C57E93A8204BEE4E0069C378 /* OpenWebPage.swift */; };
 		C5847EF81F7A53F60024DCAB /* CredentialHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */; };
 		C58FA0ED20A95FC300072966 /* TutorialVideoOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0E120A95FC200072966 /* TutorialVideoOverlayView.swift */; };
-		C58FA0EE20A95FC300072966 /* NotificationPromptViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0E220A95FC200072966 /* NotificationPromptViewController.swift */; };
 		C58FA0EF20A95FC300072966 /* CampaignPromotionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0E320A95FC200072966 /* CampaignPromotionViewController.swift */; };
 		C58FA0F120A95FC300072966 /* TutorialTrySlideViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0E520A95FC200072966 /* TutorialTrySlideViewController.swift */; };
 		C58FA0F220A95FC300072966 /* VideoDisplayingViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0E620A95FC200072966 /* VideoDisplayingViewControllerDelegate.swift */; };
@@ -403,7 +402,6 @@
 		C57E93A8204BEE4E0069C378 /* OpenWebPage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpenWebPage.swift; sourceTree = "<group>"; };
 		C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialHelper.swift; sourceTree = "<group>"; };
 		C58FA0E120A95FC200072966 /* TutorialVideoOverlayView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialVideoOverlayView.swift; sourceTree = "<group>"; };
-		C58FA0E220A95FC200072966 /* NotificationPromptViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotificationPromptViewController.swift; sourceTree = "<group>"; };
 		C58FA0E320A95FC200072966 /* CampaignPromotionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CampaignPromotionViewController.swift; sourceTree = "<group>"; };
 		C58FA0E520A95FC200072966 /* TutorialTrySlideViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialTrySlideViewController.swift; sourceTree = "<group>"; };
 		C58FA0E620A95FC200072966 /* VideoDisplayingViewControllerDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoDisplayingViewControllerDelegate.swift; sourceTree = "<group>"; };
@@ -1004,7 +1002,6 @@
 				C58FA0E320A95FC200072966 /* CampaignPromotionViewController.swift */,
 				C58FA0E920A95FC300072966 /* GiftCardCampaignViewController.swift */,
 				C58FA0EC20A95FC300072966 /* GiftCardDoneViewController.swift */,
-				C58FA0E220A95FC200072966 /* NotificationPromptViewController.swift */,
 				C572C0D720AADA98004B0A17 /* OnboardingWelcomeViewController.swift */,
 				C5F8D80F20B2C001004A32FD /* RegisterViewController.swift */,
 				C58FA0EA20A95FC300072966 /* TutorialEmailSlideViewController.swift */,
@@ -1614,7 +1611,6 @@
 				C5E9241820690B6100D44FF9 /* Form.swift in Sources */,
 				31C0C80620A15EAA002EE95B /* CrazeImageZoom.swift in Sources */,
 				C58FA0F820A95FC300072966 /* GiftCardDoneViewController.swift in Sources */,
-				C58FA0EE20A95FC300072966 /* NotificationPromptViewController.swift in Sources */,
 				31C0C81E20A2CD14002EE95B /* ProductsRateView.swift in Sources */,
 				3125446B2091C3A0009410D5 /* (null) in Sources */,
 				C5336D1B203AC9CE00A7B4B0 /* CartViewController.swift in Sources */,
