@@ -299,9 +299,19 @@ fileprivate extension ProductViewControllerProductView {
         guard let product = structuredProduct?.product else {
             return
         }
-        if !self.productView.stockButton.isSelected { // cannot unnotify
-            product.setFavorited(toFavorited: true)
-            Analytics.trackProductFavorited(product: product, page: .product)
+        
+        if self.productView.stockButton.isSelected {
+            Analytics.trackProductPriceAlertUnsubscribed(product: product)
+            self.productView.stockButton.isLoading = true
+            product.untrack().then {isTracking -> Void in
+                self.productView.stockButton.isLoading = false
+                self.productView.stockButton.isSelected = false
+            }.catch { error in
+                self.productView.stockButton.isLoading = false
+                let e = error as NSError
+                Analytics.trackProductPriceAlertUnsubscribedError(product: product,  domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
+            }
+        }else{
             Analytics.trackProductPriceAlertSubscribed(product: product)
             self.productView.stockButton.isLoading = true
             product.track().then {isTracking -> Void in

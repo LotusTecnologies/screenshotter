@@ -172,16 +172,20 @@ class ProductView: UIView {
         favoriteButton.trailingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.trailingAnchor).isActive = true
         favoriteButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
-        let stockImage = UIImage(named: "FavoriteBell")?.withRenderingMode(.alwaysTemplate)
+        let stockImageRed = UIImage(named: "FavoriteBell")?.withRenderingMode(.alwaysTemplate).tint(tintColor: .crazeRed)
+        let stockImageGreen = UIImage(named: "FavoriteBell")?.withRenderingMode(.alwaysTemplate).tint(tintColor: .crazeGreen)
         
         stockButton.translatesAutoresizingMaskIntoConstraints = false
-        stockButton.setTitle("cart.stock.add".localized, for: .normal)
-        stockButton.setTitle("favorites.product.price_alert_on".localized, for: .selected)
-        stockButton.setTitle("favorites.product.price_alert_on".localized, for: [.selected, .highlighted])
+        stockButton.setTitle("product.price_alert_on".localized, for: .normal)
+        stockButton.setTitle("product.price_alert_off".localized, for: .selected)
+        stockButton.setTitle("product.price_alert_off".localized, for: [.selected, .highlighted])
         stockButton.setTitleColor(.crazeRed, for: .normal)
-        stockButton.setImage(stockImage, for: .normal)
-        stockButton.setImage(stockImage, for: .selected)
-        stockButton.setImage(stockImage, for: [.selected, .highlighted])
+        stockButton.setTitleColor(.crazeGreen, for: .selected)
+        stockButton.setTitleColor(.crazeGreen, for: [.selected, .highlighted])
+        
+        stockButton.setImage(stockImageRed, for: .normal)
+        stockButton.setImage(stockImageGreen, for: .selected)
+        stockButton.setImage(stockImageGreen, for: [.selected, .highlighted])
 
         stockButton.adjustInsetsForImage(withPadding: 6)
         stockButton.tintColor = .crazeRed
