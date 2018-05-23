@@ -66,6 +66,7 @@ class ProductVariantsSelectorViewController: AlertTemplateViewController {
         if quantityDataSource.count > indexFromZero {
             selectedRows[.quantity] = indexFromZero
         }
+        
     }
     
     override func viewDidLoad() {

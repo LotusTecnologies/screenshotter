@@ -208,6 +208,8 @@ class FavoriteProductsViewController : BaseViewController {
             if product.hasVariants {
                 let productVariantsSelectorViewController = ProductVariantsSelectorViewController.init(product: product)
                 productVariantsSelectorViewController.delegate = self
+                productVariantsSelectorViewController.titleLabel.text = "favorites.product.cart".localized
+                
                 self.present(productVariantsSelectorViewController, animated: true, completion: nil)
                 
             }else{
