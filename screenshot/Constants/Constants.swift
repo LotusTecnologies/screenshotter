@@ -18,7 +18,6 @@ class Constants {
     static let openingScreenValueScreenshot = "openingScreenValueScreenshot"
     static let openingAssetIdKey = "openingAssetIdKey"
     static let tutorialScreenshotAssetId = "tutorialScreenshotAssetId"
-    static let uploadedURLStringKey = "uploadedURLStringKey"
     
     // DB
     static let currentMomVersion = 17
