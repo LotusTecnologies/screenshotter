@@ -21,9 +21,13 @@ class RegisterView: UIScrollView {
     let skipButton = UIButton()
     let legalTextView = TappableTextView()
     
-    var activeTextFieldTopOffset: CGFloat {
+    fileprivate var activeTextFieldTopOffset: CGFloat {
         return horizontalLinesView.frame.maxY
     }
+    
+    private let _layoutMargins = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
+    
+    // MARK: Life Cycle
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -32,22 +36,13 @@ class RegisterView: UIScrollView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        backgroundColor = .white
-        
-        let backgroundImageView = UIImageView(image: UIImage(named: "BrandConfettiFullBackground"))
-        backgroundImageView.translatesAutoresizingMaskIntoConstraints = false
-        backgroundImageView.contentMode = .scaleAspectFill
-        backgroundImageView.backgroundColor = .background
-        backgroundImageView.clipsToBounds = true
-        addSubview(backgroundImageView)
-        backgroundImageView.topAnchor.constraint(equalTo: topAnchor).isActive = true
-        backgroundImageView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-        backgroundImageView.widthAnchor.constraint(equalTo: widthAnchor).isActive = true
-        backgroundImageView.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
+        if let backgroundImage = UIImage(named: "BrandConfettiFullBackground") {
+            backgroundColor = UIColor(patternImage: backgroundImage)
+        }
         
         facebookLoginButton.translatesAutoresizingMaskIntoConstraints = false
         addSubview(facebookLoginButton)
-        facebookLoginButton.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor).isActive = true
+        facebookLoginButton.topAnchor.constraint(equalTo: topAnchor, constant: _layoutMargins.top).isActive = true
         facebookLoginButton.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
         facebookLoginButton.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
         
@@ -77,6 +72,11 @@ class RegisterView: UIScrollView {
         
         emailTextField.translatesAutoresizingMaskIntoConstraints = false
         emailTextField.placeholder = "Email Address"
+        emailTextField.returnKeyType = .next
+        emailTextField.keyboardType = .emailAddress
+        emailTextField.autocapitalizationType = .none
+        emailTextField.autocorrectionType = .no
+        emailTextField.spellCheckingType = .no
         contentView.addSubview(emailTextField)
         emailTextField.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor, constant: textFieldTopMargin - contentView.layoutMargins.top).isActive = true
         emailTextField.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
@@ -85,6 +85,10 @@ class RegisterView: UIScrollView {
         passwordTextField.translatesAutoresizingMaskIntoConstraints = false
         passwordTextField.placeholder = "Password"
         passwordTextField.isSecureTextEntry = true
+        passwordTextField.returnKeyType = .done
+        passwordTextField.autocapitalizationType = .none
+        passwordTextField.autocorrectionType = .no
+        passwordTextField.spellCheckingType = .no
         contentView.addSubview(passwordTextField)
         passwordTextField.topAnchor.constraint(equalTo: emailTextField.bottomAnchor, constant: textFieldTopMargin).isActive = true
         passwordTextField.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
@@ -157,52 +161,54 @@ class RegisterView: UIScrollView {
             NSAttributedStringKey.underlineStyle.rawValue: NSUnderlineStyle.styleSingle.rawValue,
             NSAttributedStringKey.underlineColor.rawValue: UIColor.crazeGreen
         ]
-        legalTextView.attributedText = {
-            let textViewFont: UIFont = .screenshopFont(.hindLight, size: 14)
-            
-            let paragraph = NSMutableParagraphStyle()
-            paragraph.alignment = .center
-            
-            func attributes(_ link: String? = nil) -> [NSAttributedStringKey : Any] {
-                var attributes: [NSAttributedStringKey : Any] = [
-                    .font: textViewFont,
-                    .paragraphStyle: paragraph,
-                    .foregroundColor: UIColor.gray6
-                ]
-                
-                if let link = link {
-                    attributes[.link] = link
-                }
-                
-                return attributes
-            }
-            
-            return NSMutableAttributedString(segmentedString: "tutorial.email.legal", attributes: [
-                attributes(),
-                attributes(legalLinkTOS),
-                attributes(),
-                attributes(legalLinkPP),
-                attributes()
-                ])
-        }()
+        legalTextView.attributedText = legalAttributedText()
         addSubview(legalTextView)
         legalTextView.setContentCompressionResistancePriority(.required, for: .vertical)
         legalTextView.topAnchor.constraint(equalTo: dealsLabel.lastBaselineAnchor, constant: .padding).isActive = true
         legalTextView.leadingAnchor.constraint(equalTo: dealsLayoutGuide.leadingAnchor).isActive = true
-        legalTextView.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor).isActive = true
+        legalTextView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -_layoutMargins.bottom).isActive = true
         legalTextView.trailingAnchor.constraint(equalTo: dealsLayoutGuide.trailingAnchor).isActive = true
     }
     
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        layoutMargins = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
+        layoutMargins = _layoutMargins
     }
     
     // MARK: Legal
     
     fileprivate let legalLinkTOS = "TOS"
     fileprivate let legalLinkPP = "PP"
+    
+    private func legalAttributedText() -> NSAttributedString {
+        let textViewFont: UIFont = .screenshopFont(.hindLight, size: 14)
+        
+        let paragraph = NSMutableParagraphStyle()
+        paragraph.alignment = .center
+        
+        func attributes(_ link: String? = nil) -> [NSAttributedStringKey : Any] {
+            var attributes: [NSAttributedStringKey : Any] = [
+                .font: textViewFont,
+                .paragraphStyle: paragraph,
+                .foregroundColor: UIColor.gray6
+            ]
+            
+            if let link = link {
+                attributes[.link] = link
+            }
+            
+            return attributes
+        }
+        
+        return NSMutableAttributedString(segmentedString: "tutorial.email.legal", attributes: [
+            attributes(),
+            attributes(legalLinkTOS),
+            attributes(),
+            attributes(legalLinkPP),
+            attributes()
+            ])
+    }
 }
 
 class RegisterViewController: UIViewController {
@@ -239,6 +245,9 @@ class RegisterViewController: UIViewController {
         _view.emailTextField.delegate = self
         _view.passwordTextField.delegate = self
         _view.legalTextView.delegate = self
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        _view.addGestureRecognizer(tapGesture)
     }
     
     deinit {
@@ -272,14 +281,19 @@ class RegisterViewController: UIViewController {
     @objc private func keyboardWillShowNotification(_ notification: Notification) {
         // TODO: test
         var contentInset = _view.contentInset
-        contentInset.bottom = _view.activeTextFieldTopOffset
+        contentInset.top = -_view.activeTextFieldTopOffset
         _view.contentInset = contentInset
+        
     }
     
     @objc private func keyboardWillHideNotification(_ notification: Notification) {
         var contentInset = _view.contentInset
-        contentInset.bottom = 0
+        contentInset.top = 0
         _view.contentInset = contentInset
+    }
+    
+    @objc fileprivate func dismissKeyboard() {
+        view.endEditing(true)
     }
 }
 
