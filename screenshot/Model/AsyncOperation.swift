@@ -12,8 +12,7 @@ extension Notification.Name {
     static let AsyncOperationTagMonitorCenterDidChange = Notification.Name(rawValue: "io.crazeapp.screenshot.AsyncOperationTagMonitorCenterDidChange")
 }
 protocol AsyncOperationMonitorDelegate : class {
-    func asyncOperationMonitorDidStart(_ monitor:AsyncOperationMonitor)
-    func asyncOperationMonitorDidStop(_ monitor:AsyncOperationMonitor)
+    func asyncOperationMonitorDidChange(_ monitor:AsyncOperationMonitor)
 }
 
 class AsyncOperationMonitor {
@@ -54,11 +53,7 @@ class AsyncOperationMonitor {
                     if oldValue != newValue {
                         DispatchQueue.main.async {
                             self.didStart = newValue
-                            if newValue {
-                                self.delegate?.asyncOperationMonitorDidStart(self)
-                            }else{
-                                self.delegate?.asyncOperationMonitorDidStop(self)
-                            }
+                            self.delegate?.asyncOperationMonitorDidChange(self)
                         }
                     }
                 }
@@ -123,6 +118,7 @@ class AsyncOperationTag: Equatable {
     enum TagType : String {
         case assetId
         case shoppableId
+        case productNumber
     }
     var type:TagType
     var value:String
@@ -262,6 +258,14 @@ extension AsyncOperation {
         }
         self.init(timeout: timeout, tags: tags, completion: completion)
     }
+    
+    convenience init(timeout:TimeInterval?, partNumbers:[String], completion:@escaping ((@escaping() -> ()) -> ())) {
+        var tags:[AsyncOperationTag] = []
+        partNumbers.forEach { tags.append(AsyncOperationTag.init(type: .productNumber, value: $0)) }
+
+        self.init(timeout: timeout, tags: tags, completion: completion)
+    }
+
 }
 
 extension AsyncOperationMonitor {
@@ -276,5 +280,13 @@ extension AsyncOperationMonitor {
         self.init(tags: tags, queues:queues, delegate: delegate)
     }
     
+    convenience init(tracking partNumbers:[String], delegate:AsyncOperationMonitorDelegate) {
+        var tags:[AsyncOperationTag] = []
+        partNumbers.forEach { tags.append(AsyncOperationTag.init(type: .productNumber, value: $0)) }
+        
+        self.init(tags: tags, queues:[NetworkingPromise.sharedInstance.priceAlertQueue], delegate: delegate)
+
+    }
+
 }
 

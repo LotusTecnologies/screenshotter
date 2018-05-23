@@ -38,6 +38,13 @@ class NetworkingPromise : NSObject {
         // do stuff
         super.init()
     }
+    let priceAlertQueue:AsyncOperationQueue = {
+        var queue = AsyncOperationQueue()
+        queue.name = "price Alert Queue"
+        queue.maxConcurrentOperationCount = 4
+        queue.qualityOfService = .utility
+        return queue
+    }()
 
     func changelog(forAppVersion appVersion: String, localeIdentifier: String) -> Promise<ChangelogResponse> {
         let urlString = [Constants.whatsNewDomain, appVersion, "\(localeIdentifier).json"].joined(separator: "/")
@@ -656,13 +663,15 @@ class NetworkingPromise : NSObject {
             print(error)
             return Promise(error: error)
         }
+        
+        
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.addValue("application/json", forHTTPHeaderField: "Accept")
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = parameterData
         
-        return URLSession.shared.dataTask(with: request).asDataAndResponse().then { data, response -> Promise<Bool> in
+        let promise = URLSession.shared.dataTask(with: request).asDataAndResponse().then { data, response -> Promise<Bool> in
             guard let response = response as? HTTPURLResponse, response.statusCode >= 200 && response.statusCode < 300 else {
                 let error = NSError(domain: "Craze", code: 62, userInfo: [NSLocalizedDescriptionKey: "Invalid status code received from \(actionName) url:\(url)"])
                 print(error)
@@ -670,6 +679,15 @@ class NetworkingPromise : NSObject {
             }
             return Promise(value: true)
         }
+        if let partNumber = parameterDict["partNumber"] as? String{
+            priceAlertQueue.addOperation(AsyncOperation.init(timeout: nil, partNumbers: [partNumber], completion: { (completion) in
+                promise.always {
+                    completion()
+                }
+            }))
+            
+        }
+        return promise
     }
 
     func submitToDiscover(image: String, userName: String?,  intercomUserId: String?, email: String?) -> Promise<NSDictionary>{

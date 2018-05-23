@@ -15,6 +15,7 @@ class FavoriteProductsViewController : BaseViewController {
     
     fileprivate var unfavoriteProductsIds: Set<NSManagedObjectID> = []
     private let emptyListView = HelperView()
+    var  trackingProgressMonitors:[IndexPath:AsyncOperationMonitor] = [:]
 
     
     
@@ -133,29 +134,19 @@ class FavoriteProductsViewController : BaseViewController {
                     return
             }
             
-            button.isLoading = true
             let hasPriceAlerts =  product.hasPriceAlerts
             if hasPriceAlerts {
                 Analytics.trackProductPriceAlertUnsubscribed(product: product)
+                product.untrack().catch { (error) in
+                    let e = error as NSError
+                    Analytics.trackProductPriceAlertUnsubscribedError(product: product, domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
+                }
             }else{
                 Analytics.trackProductPriceAlertSubscribed(product: product)
-            }
-            
-            (product.hasPriceAlerts ? product.untrack() : product.track())
-                .then { [weak button] isTracking -> Void in
-                    button?.isLoading = false
-                    button?.isSelected = isTracking
-                    
-                }.catch { [weak button] error in
-                    button?.isLoading = false
+                product.track().catch { (error) in
                     let e = error as NSError
-                    if hasPriceAlerts {
-                        Analytics.trackProductPriceAlertUnsubscribedError(product: product, domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
-                    }else{
-                        Analytics.trackProductPriceAlertSubscribedError(product: product, domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
-                        
-                    }
-                    
+                    Analytics.trackProductPriceAlertSubscribedError(product: product, domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
+                }
             }
         }
         else {
@@ -189,11 +180,33 @@ class FavoriteProductsViewController : BaseViewController {
     }
 }
 
-extension FavoriteProductsViewController: UITableViewDataSource {
+extension FavoriteProductsViewController: UITableViewDataSource, AsyncOperationMonitorDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.productsFRC?.fetchedObjectsCount ?? 0
     }
     
+    func update(cell:FavoriteProductsTableViewCell, monitor:AsyncOperationMonitor, product:Product){
+        cell.priceAlertButton.isLoading = monitor.didStart
+        cell.isSelected = product.hasPriceAlerts  // ???: what happens if this is true and the user disables notifications from settings
+    }
+    
+    func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        if let monitor = self.trackingProgressMonitors[indexPath] {
+//            monitor.delegate = nil
+//            self.trackingProgressMonitors[indexPath] = nil
+        }
+    }
+    
+    func asyncOperationMonitorDidChange(_ monitor: AsyncOperationMonitor) {
+        self.tableView.indexPathsForVisibleRows?.forEach({ (indexPath) in
+            if let monitor = self.trackingProgressMonitors[indexPath], let cell = self.tableView.cellForRow(at: indexPath) as? FavoriteProductsTableViewCell, let product = self.productsFRC?.object(at: indexPath) {
+                self.update(cell: cell, monitor: monitor, product: product)
+            }else{
+                print("error updating from monitor Change")
+            }
+        })
+    }
+
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         
@@ -209,7 +222,13 @@ extension FavoriteProductsViewController: UITableViewDataSource {
             
             if product.isSupportingUSC, let partNumber = product.partNumber, !partNumber.isEmpty {
                 cell.priceAlertButton.isHidden = false
-                cell.priceAlertButton.isSelected = product.hasPriceAlerts // ???: what happens if this is true and the user disables notifications from settings
+                if let oldMonitor = self.trackingProgressMonitors[indexPath] {
+                    oldMonitor.delegate = nil
+                }
+                let monitor = AsyncOperationMonitor.init(tracking: [partNumber], delegate: self)
+                self.trackingProgressMonitors[indexPath] = monitor
+                self.update(cell: cell, monitor: monitor, product: product)
+                
                 cell.priceAlertButton.addTarget(self, action: #selector(trackProductAction(_:event:)), for: .touchUpInside)
             } else {
                 cell.priceAlertButton.isHidden = true

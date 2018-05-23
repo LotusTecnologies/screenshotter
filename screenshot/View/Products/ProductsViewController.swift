@@ -1185,10 +1185,7 @@ extension ProductsViewController : AsyncOperationMonitorDelegate {
         }
     }
     
-    func asyncOperationMonitorDidStart(_ monitor:AsyncOperationMonitor){
-        self.updateLoadingState()
-    }
-    func asyncOperationMonitorDidStop(_ monitor:AsyncOperationMonitor){
+    func asyncOperationMonitorDidChange(_ monitor: AsyncOperationMonitor) {
         self.updateLoadingState()
     }
 
