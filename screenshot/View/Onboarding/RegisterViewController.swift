@@ -40,6 +40,15 @@ class RegisterView: UIScrollView {
             backgroundColor = UIColor(patternImage: backgroundImage)
         }
         
+        // Force the height to be at least that of the scroll view
+        let verticalLayoutView = UIView()
+        verticalLayoutView.translatesAutoresizingMaskIntoConstraints = false
+        verticalLayoutView.isHidden = true
+        addSubview(verticalLayoutView)
+        verticalLayoutView.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        verticalLayoutView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        verticalLayoutView.heightAnchor.constraint(greaterThanOrEqualTo: heightAnchor).isActive = true
+        
         facebookLoginButton.translatesAutoresizingMaskIntoConstraints = false
         addSubview(facebookLoginButton)
         facebookLoginButton.topAnchor.constraint(equalTo: topAnchor, constant: _layoutMargins.top).isActive = true
@@ -201,6 +210,7 @@ class RegisterView: UIScrollView {
             return attributes
         }
         
+        // TODO: localized copy needs to say 'Sign up' not 'Submit'
         return NSMutableAttributedString(segmentedString: "tutorial.email.legal", attributes: [
             attributes(),
             attributes(legalLinkTOS),
@@ -279,17 +289,29 @@ class RegisterViewController: UIViewController {
     // MARK: Keyboard
     
     @objc private func keyboardWillShowNotification(_ notification: Notification) {
-        // TODO: test
         var contentInset = _view.contentInset
-        contentInset.top = -_view.activeTextFieldTopOffset
-        _view.contentInset = contentInset
+        var scrollIndicatorInsets = _view.scrollIndicatorInsets
         
+        contentInset.top = -_view.activeTextFieldTopOffset
+        
+        if let keyboardRect = (notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
+            contentInset.bottom = keyboardRect.height
+            scrollIndicatorInsets.bottom = keyboardRect.height
+        }
+        
+        _view.contentInset = contentInset
+        _view.scrollIndicatorInsets = scrollIndicatorInsets
     }
     
     @objc private func keyboardWillHideNotification(_ notification: Notification) {
         var contentInset = _view.contentInset
         contentInset.top = 0
+        contentInset.bottom = 0
         _view.contentInset = contentInset
+        
+        var scrollIndicatorInsets = _view.scrollIndicatorInsets
+        scrollIndicatorInsets.bottom = 0
+        _view.scrollIndicatorInsets = scrollIndicatorInsets
     }
     
     @objc fileprivate func dismissKeyboard() {
@@ -298,7 +320,12 @@ class RegisterViewController: UIViewController {
 }
 
 extension RegisterViewController: UITextFieldDelegate {
-    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        if textField.returnKeyType == .done {
+            textField.resignFirstResponder()
+        }
+        return true
+    }
 }
 
 extension RegisterViewController: UITextViewDelegate {
