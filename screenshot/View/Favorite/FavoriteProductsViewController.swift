@@ -36,6 +36,8 @@ class FavoriteProductsViewController : BaseViewController {
         restorationIdentifier = String(describing: type(of: self))
         
         addNavigationItemLogo()
+        NotificationCenter.default.addObserver(self, selector: #selector(reloadTableView), name: .isUSCUpdated, object: nil)
+
     }
     
     fileprivate var favoriteProductsView: FavoriteProductsView {
@@ -96,6 +98,7 @@ class FavoriteProductsViewController : BaseViewController {
     deinit {
         tableView.dataSource = nil
         tableView.delegate = nil
+        NotificationCenter.default.removeObserver(self)
     }
     
     // MARK: Favorites
@@ -123,11 +126,25 @@ class FavoriteProductsViewController : BaseViewController {
     }
     
     // MARK: Tracking
-    
+    fileprivate func trackProduct(product:Product) {
+        if let indexPath = self.productsFRC?.indexPath(forObject: product), let cell = self.tableView.cellForRow(at: indexPath){
+            if let cell = cell as? FavoriteProductsTableViewCell {
+                let button = cell.priceAlertButton
+                self.trackProductAction(button, product: product)
+            }
+        }
+    }
     @objc fileprivate func trackProductAction(_ button: LoadingButton, event: UIEvent) {
+        if let indexPath = tableView.indexPath(for: event),
+            let product = self.productsFRC?.object(at: indexPath) {
+            self.trackProductAction(button, product: product)
+        }
+    }
+    
+    func trackProductAction(_ button: LoadingButton, product: Product) {
+
         if PermissionsManager.shared.hasPermission(for: .push) {
-            guard let indexPath = tableView.indexPath(for: event),
-                let product = self.productsFRC?.object(at: indexPath),
+            guard
                 !button.isLoading
                 else {
                     return
@@ -184,10 +201,95 @@ class FavoriteProductsViewController : BaseViewController {
         guard let indexPath = tableView.indexPath(for: event) else {
             return
         }
+        guard let product = self.productsFRC?.object(at: indexPath) else {
+            return
+        }
+        if let _ = product.partNumber {
+            if product.hasVariants {
+                let structored = StructuredProduct.init(product)
+                if let size = structored.onlyOneSize, let color = structored.defaultColor , let oneVariant = product.availableVariants?.first(where: { (v) -> Bool in
+                    if let v = v as? Variant {
+                        return v.color == color && v.size == size
+                    }
+                    return false
+                }) as? Variant {
+                    if let tabBarController = self.tabBarController as? MainTabBarController {
+                        tabBarController.cartTabPulseAnimation()
+                    }
+                    ShoppingCartModel.shared.update(variant: oneVariant, quantity: Int16(1))
+                    self.presentNextStep()
+                    
+                }else{
+                    let productVariantsSelectorViewController = ProductVariantsSelectorViewController.init(product: product)
+                    
+                    productVariantsSelectorViewController.delegate = self
+                    
+                    self.present(productVariantsSelectorViewController, animated: true, completion: nil)
+                }
+            }else{
+                //out of stock
+                let alert = UIAlertController.init(title: nil, message: "cart.item.error.unavailable".localized, preferredStyle: .alert)
+                if !product.hasPriceAlerts {
+                    alert.addAction(UIAlertAction.init(title: "favorites.product.price_alert_off".localized(), style: .default, handler: { (a) in
+                        self.trackProduct(product: product)
+                    }))
+                }
+                alert.addAction(UIAlertAction.init(title: "generic.ok".localized(), style: .cancel, handler: { (a) in
+                    
+                }))
+                self.present(alert, animated: true, completion: nil)
+             
+            }
+        }else{
+            //This will open in browser since there is no part Number
+            presentProduct(product, atLocation: .favorite)
+        }
         
-        presentProduct(at: indexPath)
+        
     }
 }
+
+extension FavoriteProductsViewController: ProductVariantsSelectorViewControllerDelegate {
+    func productVariantsSelectorViewControllerDidPressCancel(_ productVariantsSelectorViewController: ProductVariantsSelectorViewController) {
+        self.dismiss(animated: true, completion: nil)
+    }
+    
+    func productVariantsSelectorViewControllerDidPressContinue(_ productVariantsSelectorViewController: ProductVariantsSelectorViewController) {
+        
+        if let variant = productVariantsSelectorViewController.selectedVariant {
+            ShoppingCartModel.shared.update(variant: variant, quantity: Int16(productVariantsSelectorViewController.selectedQuantity))
+            if let tabBarController = self.tabBarController as? MainTabBarController {
+                tabBarController.cartTabPulseAnimation()
+            }
+            self.dismiss(animated: true) {
+                self.presentNextStep()
+            }
+            
+        }
+    }
+    
+    fileprivate func presentNextStep() {
+        let nextStepViewController = ProductNextStepViewController()
+        nextStepViewController.continueButton.addTarget(self, action: #selector(nextStepContinueAction), for: .touchUpInside)
+        nextStepViewController.cancelButton.addTarget(self, action: #selector(nextStepCancelAction), for: .touchUpInside)
+        present(nextStepViewController, animated: true, completion: nil)
+    }
+    
+    @objc fileprivate func nextStepContinueAction() {
+        if presentedViewController != nil {
+            dismiss(animated: true, completion: nil)
+        }
+        if let tabBarController = self.tabBarController as? MainTabBarController {
+            tabBarController.goToCart()
+        }
+        
+    }
+    
+    @objc fileprivate func nextStepCancelAction() {
+        dismiss(animated: true, completion: nil)
+    }
+}
+
 
 extension FavoriteProductsViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -215,7 +317,7 @@ extension FavoriteProductsViewController: UITableViewDataSource {
                 cell.priceAlertButton.isHidden = true
             }
             cell.cartButton.addTarget(self, action: #selector(presentProductAction(_:event:)), for: .touchUpInside)
-            cell.isCartButtonHidden = (product.partNumber == nil)
+            cell.isCartButtonHidden = (!UserDefaults.standard.bool(forKey: UserDefaultsKeys.isUSC))
         }
         
         return cell
@@ -234,6 +336,11 @@ extension FavoriteProductsViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         return 0.0
+    }
+    @objc func reloadTableView(){
+        if self.isViewLoaded {
+            self.tableView.reloadData()
+        }
     }
 }
 

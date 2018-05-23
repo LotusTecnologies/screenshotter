@@ -401,19 +401,10 @@ fileprivate extension ProductViewControllerStructuredProduct {
             
             if let sizes = structuredProduct.sizes {
 
-                var selectedSize:String?
-                if sizes.count == 1, let onlySize = sizes.first {
-                    let removeSet = CharacterSet.alphanumerics.inverted
-                    let simplifiedOnlySize = onlySize.lowercased().components(separatedBy: removeSet).joined()
-                    
-                    // oneus == "One (US)"
-                    if ["onesize","nosize","na","oneus", "1size"].contains(simplifiedOnlySize) {
-                        selectedSize = onlySize
-                    }
-                }
-                sizeItem = SegmentedDropDownItem(pickerItems: sizes, selectedPickerItem:selectedSize)
                 
-                if colorItem.selectedPickerItem == nil && selectedSize == nil{
+                sizeItem = SegmentedDropDownItem(pickerItems: sizes, selectedPickerItem:structuredProduct.onlyOneSize)
+                
+                if colorItem.selectedPickerItem == nil && structuredProduct.onlyOneSize == nil{
                     // Disabled until color is selected, but not if there is only one possible size
                     sizeItem?.disabledPickerItems = structuredProduct.sizes
                 }

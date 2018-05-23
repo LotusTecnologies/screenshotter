@@ -222,7 +222,11 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
     }
 
     // MARK: - Tab Bar
-    
+    func goToCart(){
+        if let index = self.viewControllers?.index(of: cartNavigationController){
+            self.selectedIndex = index
+        }
+    }
     func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
         if self.selectedViewController == self.settingsNavigationController {
             self.settingsNavigationController.popToRootViewController(animated: false)
@@ -286,11 +290,10 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         }
     }
     
-    func screenshotsTabPulseAnimation() {
-        guard let tabView = screenshotsNavigationController.tabBarItem.targetView else {
+    func pulse(tabBarItem:UITabBarItem){
+        guard let tabView = tabBarItem.targetView else {
             return
         }
-        
         UIView.animateKeyframes(withDuration: 0.8, delay: 0, options: .allowUserInteraction, animations: {
             UIView.addKeyframe(withRelativeStartTime: 0, relativeDuration: 0.2, animations: {
                 tabView.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
@@ -309,6 +312,19 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
             })
         })
     }
+    func screenshotsTabPulseAnimation() {
+        guard let tabView = screenshotsNavigationController.tabBarItem else {
+            return
+        }
+        self.pulse(tabBarItem: tabView)
+    }
+    func cartTabPulseAnimation() {
+        guard let tabView = cartNavigationController.tabBarItem else {
+            return
+        }
+        self.pulse(tabBarItem: tabView)
+    }
+
     
     fileprivate func syncCartTabBadgeCount() {
         let count = cartItemFrc?.fetchedObjectsCount ?? 0

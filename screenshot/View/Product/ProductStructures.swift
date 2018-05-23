@@ -12,7 +12,9 @@ class StructuredProduct: NSObject {
     let product: Product
     private(set) var structuredColorVariants: [StructuredColorVariant]?
     private(set) var colors: [String]?
+    private(set) var defaultColor: String?
     private(set) var sizes: [String]?
+    private(set) var onlyOneSize: String?
     private(set) var isAvailable = false
     
     init(_ product: Product) {
@@ -62,6 +64,12 @@ class StructuredProduct: NSObject {
             self.colors = colors.sorted()
         }
         
+        if let color = product.color, let colors =  self.colors, colors.contains(color) {
+            self.defaultColor = color
+        }else if self.colors?.count == 1{
+            self.defaultColor = self.colors?.first            
+        }
+        
         if !sizes.isEmpty {
             let sortedSizes = ["X-Small", "Small", "Medium", "Large", "X-Large"]
             
@@ -75,6 +83,16 @@ class StructuredProduct: NSObject {
                 
                 return aIndex < bIndex
             })
+        }
+        
+        if sizes.count == 1, let onlySize = sizes.first {
+            let removeSet = CharacterSet.alphanumerics.inverted
+            let simplifiedOnlySize = onlySize.lowercased().components(separatedBy: removeSet).joined()
+            
+            // oneus == "One (US)"
+            if ["onesize","nosize","na","oneus", "1size"].contains(simplifiedOnlySize) {
+                self.onlyOneSize = onlySize
+            }
         }
         
         if !imageURLDict.isEmpty {

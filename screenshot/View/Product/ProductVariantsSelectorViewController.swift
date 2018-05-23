@@ -8,7 +8,13 @@
 
 import UIKit
 
+protocol ProductVariantsSelectorViewControllerDelegate : class {
+    func productVariantsSelectorViewControllerDidPressCancel(_ productVariantsSelectorViewController:ProductVariantsSelectorViewController)
+    func productVariantsSelectorViewControllerDidPressContinue(_ productVariantsSelectorViewController:ProductVariantsSelectorViewController)
+}
+
 class ProductVariantsSelectorViewController: AlertTemplateViewController {
+    
     enum Options: Int {
         case quantity
         case color
@@ -26,6 +32,7 @@ class ProductVariantsSelectorViewController: AlertTemplateViewController {
         }
     }
     
+    weak var delegate:ProductVariantsSelectorViewControllerDelegate?
     fileprivate var currentOption: Options = .quantity
     
     fileprivate let pickerView = UIPickerView()
@@ -44,10 +51,14 @@ class ProductVariantsSelectorViewController: AlertTemplateViewController {
         
         if let color = selectedVariant?.color, let colorIndex = structuredProduct.colors?.index(of: color) {
             selectedRows[.color] = colorIndex
+        }else if structuredProduct.colors?.count == 1 {
+            selectedRows[.color] = 0
         }
         
         if let size = selectedVariant?.size, let sizeIndex = structuredProduct.sizes?.index(of: size) {
             selectedRows[.size] = sizeIndex
+        }else if structuredProduct.sizes?.count == 1 {
+            selectedRows[.size] = 0
         }
         
         let indexFromZero = selectedQuantity - 1
@@ -62,7 +73,9 @@ class ProductVariantsSelectorViewController: AlertTemplateViewController {
         
         titleLabel.text = "product.variants.edit".localized
         continueButton.setTitle("generic.done".localized, for: .normal)
+        continueButton.addTarget(self, action: #selector(continueButtonPressed(_:)), for: .touchUpInside)
         cancelButton.setTitle("generic.cancel".localized, for: .normal)
+        cancelButton.addTarget(self, action: #selector(cancelButtonPress(_:)), for: .touchUpInside)
         
         var items = [Options.quantity.localized]
         
@@ -178,5 +191,14 @@ extension ProductVariantsSelectorViewController: UIPickerViewDelegate {
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         selectedRows[currentOption] = row
+    }
+}
+
+extension ProductVariantsSelectorViewController {
+    @IBAction func continueButtonPressed(_ sender:Any){
+        self.delegate?.productVariantsSelectorViewControllerDidPressContinue(self)
+    }
+    @IBAction func cancelButtonPress(_ sender:Any){
+        self.delegate?.productVariantsSelectorViewControllerDidPressCancel(self)
     }
 }
