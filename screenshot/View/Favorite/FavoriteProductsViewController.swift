@@ -308,7 +308,7 @@ extension FavoriteProductsViewController: UITableViewDataSource {
             
             cell.cartButton.addTarget(self, action: #selector(presentProductAction(_:event:)), for: .touchUpInside)
 
-            cell.isCartButtonHidden = UIApplication.isUSC
+            cell.isCartButtonHidden = !UIApplication.isUSC
         }
         
         return cell
