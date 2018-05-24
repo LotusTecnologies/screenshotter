@@ -8,8 +8,6 @@
 
 import UIKit
 import Appsee
-import FacebookCore
-import FacebookLogin
 
 class AuthorizeContentScrollView: UIScrollView {
     let facebookLoginButton = FacebookButton()
@@ -114,6 +112,10 @@ class AuthorizeContentViewController: UIViewController {
         return view as! AuthorizeContentScrollView
     }
     
+    var facebookLoginButton: FacebookButton {
+        return _view.facebookLoginButton
+    }
+    
     override func loadView() {
         view = classForView.self.init()
     }
@@ -134,7 +136,6 @@ class AuthorizeContentViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        _view.facebookLoginButton.addTarget(self, action: #selector(facebookLoginAction), for: .touchUpInside)
         _view.emailTextField.delegate = self
         _view.passwordTextField.delegate = self
         
@@ -144,28 +145,6 @@ class AuthorizeContentViewController: UIViewController {
     
     deinit {
         NotificationCenter.default.removeObserver(self)
-    }
-    
-    // MARK: Facebook
-    
-    @objc func facebookLoginAction() {
-        // TODO: use AccessToken to see if user already logged in
-        //        AccessToken.current
-        
-        let loginManager = LoginManager()
-        UIFont.preferredFont(forTextStyle: .title1)
-        loginManager.logIn(readPermissions: [.publicProfile, .email], viewController: self) { loginResult in
-            switch loginResult {
-            case .failed(let error):
-                print(error)
-                
-            case .cancelled:
-                print("User cancelled login.")
-                
-            case .success(let grantedPermissions, let declinedPermissions, let accessToken):
-                print("Logged in!")
-            }
-        }
     }
     
     // MARK: Keyboard

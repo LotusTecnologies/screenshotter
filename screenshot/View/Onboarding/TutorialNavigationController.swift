@@ -37,6 +37,11 @@ class TutorialNavigationController : UINavigationController {
         super.viewDidAppear(animated)
         Analytics.trackStartedTutorial()
     }
+    
+    private func tutorialCompleted() {
+        UserDefaults.standard.set(true, forKey: UserDefaultsKeys.onboardingCompleted)
+        tutorialDelegate?.tutorialNavigationControllerDidComplete(self)
+    }
 }
 
 extension TutorialNavigationController : UINavigationControllerDelegate {
@@ -60,9 +65,6 @@ extension TutorialNavigationController: OnboardingWelcomeViewControllerDelegate 
         authorizeViewController.delegate = self
         pushViewController(authorizeViewController, animated: true)
         
-//        let signup = RegisterViewController()
-//        pushViewController(signup, animated: true)
-        
         // !!!: DEBUG
 //        let signup = TutorialEmailSlideViewController()
 //        signup.delegate = self
@@ -75,6 +77,22 @@ extension TutorialNavigationController: AuthorizeViewControllerDelegate {
         let tryItOut = TutorialTrySlideViewController()
         tryItOut.delegate = self
         pushViewController(tryItOut, animated: true)
+    }
+    
+    func authorizeViewControllerDidLogin(_ viewController: AuthorizeViewController) {
+        tutorialCompleted()
+    }
+    
+    func authorizeViewControllerDidSignup(_ viewController: AuthorizeViewController) {
+        
+    }
+    
+    func authorizeViewControllerDidFacebookLogin(_ viewController: AuthorizeViewController) {
+        tutorialCompleted()
+    }
+    
+    func authorizeViewControllerDidFacebookSignup(_ viewController: AuthorizeViewController) {
+        
     }
 }
 
@@ -106,16 +124,11 @@ extension TutorialNavigationController : TutorialTrySlideViewControllerDelegate 
         Analytics.trackOnboardingTryItOutSkipped()
         tutorialTrySlideViewDidComplete(slideView)
         AppDelegate.shared.shouldLoadDiscoverNextLoad = true
-
     }
+    
     func tutorialTrySlideViewDidComplete(_ slideView: TutorialTrySlideViewController){
         Analytics.trackOnboardingTryItOutScreenshot()
-
         slideView.delegate = nil
-        
-        UserDefaults.standard.set(true, forKey: UserDefaultsKeys.onboardingCompleted)
-        
-        self.tutorialDelegate?.tutorialNavigationControllerDidComplete(self)
+        tutorialCompleted()
     }
 }
-

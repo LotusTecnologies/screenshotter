@@ -7,9 +7,15 @@
 //
 
 import UIKit
+import FacebookCore
+import FacebookLogin
 
 protocol AuthorizeViewControllerDelegate: NSObjectProtocol {
     func authorizeViewControllerDidSkip(_ viewController: AuthorizeViewController)
+    func authorizeViewControllerDidLogin(_ viewController: AuthorizeViewController)
+    func authorizeViewControllerDidSignup(_ viewController: AuthorizeViewController)
+    func authorizeViewControllerDidFacebookLogin(_ viewController: AuthorizeViewController)
+    func authorizeViewControllerDidFacebookSignup(_ viewController: AuthorizeViewController)
 }
 
 class AuthorizeView: UIView {
@@ -81,7 +87,10 @@ class AuthorizeViewController: UIViewController {
         _view.registerButton.addTarget(self, action: #selector(displayRegisterTab), for: .touchUpInside)
         _view.loginButton.addTarget(self, action: #selector(displayLoginTab), for: .touchUpInside)
         
+        registerViewController.facebookLoginButton.addTarget(self, action: #selector(facebookLoginAction), for: .touchUpInside)
         registerViewController.skipButton.addTarget(self, action: #selector(skipRegistration), for: .touchUpInside)
+        
+        loginViewController.facebookLoginButton.addTarget(self, action: #selector(facebookLoginAction), for: .touchUpInside)
         
         displayRegisterTab()
     }
@@ -107,7 +116,7 @@ class AuthorizeViewController: UIViewController {
         childViewController.removeFromParentViewController()
     }
     
-    // MARK: Registration / Login
+    // MARK: Registration / Login / Facebook
     
     @objc fileprivate func displayRegisterTab() {
         guard !_view.registerButton.isSelected else {
@@ -141,5 +150,34 @@ class AuthorizeViewController: UIViewController {
     
     @objc fileprivate func skipRegistration() {
         delegate?.authorizeViewControllerDidSkip(self)
+    }
+    
+    @objc fileprivate func facebookLoginAction() {
+        // TODO: use AccessToken to see if user already logged in
+        //        AccessToken.current
+        
+        let loginManager = LoginManager()
+        
+        loginManager.logIn(readPermissions: [.publicProfile, .email], viewController: self) { loginResult in
+            switch loginResult {
+            case .failed(let error):
+                print(error)
+                
+            case .cancelled:
+                print("User cancelled login.")
+                
+            case .success(let grantedPermissions, let declinedPermissions, let accessToken):
+                // TODO: set up user 
+                
+                let isExistingUser = false
+                
+                if isExistingUser {
+                    self.delegate?.authorizeViewControllerDidFacebookLogin(self)
+                }
+                else {
+                    self.delegate?.authorizeViewControllerDidFacebookSignup(self)
+                }
+            }
+        }
     }
 }

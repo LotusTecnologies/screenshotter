@@ -34,11 +34,15 @@ class LoginView: AuthorizeContentScrollView {
 
 class LoginViewController: AuthorizeContentViewController {
     override var classForView: AuthorizeContentScrollView.Type {
-        return AuthorizeContentScrollView.self
+        return LoginView.self
     }
     
-    override var _view: AuthorizeContentScrollView {
-        return view as! AuthorizeContentScrollView
+    override var _view: LoginView {
+        return view as! LoginView
+    }
+    
+    var forgotPasswordButton: UIButton {
+        return _view.forgotPasswordButton
     }
     
     override func viewDidLoad() {
