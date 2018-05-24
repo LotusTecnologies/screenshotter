@@ -25,4 +25,18 @@ extension UIApplication {
             return false
         #endif
     }
+    
+    static var isUSC: Bool {
+        return UserDefaults.standard.bool(forKey: UserDefaultsKeys.isUSC)
+    }
+}
+
+extension DispatchQueue {
+    static func mainAsyncIfNeeded(_ work:@escaping ()->Void ){
+        if Thread.isMainThread {
+            work()
+        }else{
+            DispatchQueue.main.async(execute: work)
+        }
+    }
 }

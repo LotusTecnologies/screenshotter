@@ -9,6 +9,7 @@
 import Foundation
 import MessageUI
 import PromiseKit
+import Whisper
 
 @objc protocol SettingsViewControllerDelegate : NSObjectProtocol {
     func settingsViewControllerDidGrantPermission(_ viewController: SettingsViewController)
@@ -45,13 +46,13 @@ class SettingsViewController : BaseViewController {
         case talkToStylist
         case openIn
         case region
+        case payment
+        case address
     }
     
     weak var delegate: SettingsViewControllerDelegate?
     
     fileprivate let tableView = UITableView(frame: .zero, style: .grouped)
-    fileprivate let tableHeaderContentView = UIView()
-    fileprivate let screenshotsCountLabel = UILabel()
     fileprivate let tableFooterTextView = UITextView()
     
     fileprivate var nameTextField: UITextField?
@@ -95,55 +96,6 @@ class SettingsViewController : BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let tableHeaderView: UIView = {
-            let view = UIView()
-            view.layoutMargins = UIEdgeInsets(top: .padding, left: .padding, bottom: 0, right: .padding)
-
-            tableHeaderContentView.translatesAutoresizingMaskIntoConstraints = false
-            tableHeaderContentView.backgroundColor = .white
-            tableHeaderContentView.layoutMargins = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
-            tableHeaderContentView.layer.cornerRadius = .defaultCornerRadius
-            tableHeaderContentView.layer.shadowColor = Shadow.basic.color.cgColor
-            tableHeaderContentView.layer.shadowOffset = Shadow.basic.offset
-            tableHeaderContentView.layer.shadowRadius = Shadow.basic.radius
-            tableHeaderContentView.layer.shadowOpacity = 1
-            view.addSubview(tableHeaderContentView)
-            tableHeaderContentView.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor).isActive = true
-            tableHeaderContentView.bottomAnchor.constraint(equalTo: view.layoutMarginsGuide.bottomAnchor).isActive = true
-            tableHeaderContentView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-            tableHeaderContentView.leftAnchor.constraint(greaterThanOrEqualTo: view.layoutMarginsGuide.leftAnchor).isActive = true
-            tableHeaderContentView.rightAnchor.constraint(lessThanOrEqualTo: view.layoutMarginsGuide.rightAnchor).isActive = true
-
-            let imageView = UIImageView(image: UIImage(named: "SettingsAddPhotos"))
-            imageView.translatesAutoresizingMaskIntoConstraints = false
-            imageView.contentMode = .scaleAspectFit
-            imageView.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: -.padding)
-            tableHeaderContentView.addSubview(imageView)
-            imageView.setContentHuggingPriority(UILayoutPriority.required, for: .horizontal)
-            imageView.topAnchor.constraint(equalTo: tableHeaderContentView.layoutMarginsGuide.topAnchor).isActive = true
-            imageView.leftAnchor.constraint(equalTo: tableHeaderContentView.layoutMarginsGuide.leftAnchor).isActive = true
-            imageView.bottomAnchor.constraint(equalTo: tableHeaderContentView.layoutMarginsGuide.bottomAnchor).isActive = true
-            
-            screenshotsCountLabel.translatesAutoresizingMaskIntoConstraints = false
-            screenshotsCountLabel.textAlignment = .center
-            screenshotsCountLabel.font = .screenshopFont(.hindLight, size: 20)
-            screenshotsCountLabel.adjustsFontSizeToFitWidth = true
-            screenshotsCountLabel.minimumScaleFactor = 0.7
-            screenshotsCountLabel.baselineAdjustment = .alignCenters
-            tableHeaderContentView.addSubview(screenshotsCountLabel)
-            screenshotsCountLabel.setContentCompressionResistancePriority(UILayoutPriority.defaultLow, for: .horizontal)
-            screenshotsCountLabel.topAnchor.constraint(equalTo: tableHeaderContentView.layoutMarginsGuide.topAnchor).isActive = true
-            screenshotsCountLabel.leftAnchor.constraint(equalTo: imageView.layoutMarginsGuide.rightAnchor).isActive = true
-            screenshotsCountLabel.bottomAnchor.constraint(equalTo: tableHeaderContentView.layoutMarginsGuide.bottomAnchor).isActive = true
-            screenshotsCountLabel.rightAnchor.constraint(equalTo: tableHeaderContentView.layoutMarginsGuide.rightAnchor).isActive = true
-            
-            var rect = view.frame
-            rect.size.height = view.layoutMargins.top + view.layoutMargins.bottom + tableHeaderContentView.layoutMargins.top + tableHeaderContentView.layoutMargins.bottom + (imageView.image?.size.height ?? 0)
-            view.frame = rect
-            
-            return view
-        }()
-        
         tableFooterTextView.backgroundColor = .clear
         tableFooterTextView.isEditable = false
         tableFooterTextView.scrollsToTop = false
@@ -165,7 +117,6 @@ class SettingsViewController : BaseViewController {
         tableView.dataSource = self
         tableView.backgroundView = nil
         tableView.backgroundColor = .clear
-        tableView.tableHeaderView = tableHeaderView
         tableView.tableFooterView = tableFooterTextView
         tableView.keyboardDismissMode = .onDrag
         view.addSubview(tableView)
@@ -173,6 +124,34 @@ class SettingsViewController : BaseViewController {
         tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        
+        let tapper = UITapGestureRecognizer.init(target: self, action: #selector(didTripleTapTableView(_:)))
+        tapper.numberOfTapsRequired = 3
+        tapper.numberOfTouchesRequired = 2
+        tableView.addGestureRecognizer(tapper)
+    }
+    
+    @objc func didTripleTapTableView(_ tapper:UITapGestureRecognizer){
+        if tapper.state == .recognized {
+            if let index = self.indexPath(for: .version, in: .about), let cell = self.tableView.cellForRow(at: index) {
+                let point = tapper.location(in: cell)
+                if cell.bounds.contains(point) {
+                    let enabled = UserDefaults.standard.bool(forKey: UserDefaultsKeys.showsDebugAnalyticsUI)
+                    if enabled {
+                        UserDefaults.standard.set(false, forKey: UserDefaultsKeys.showsDebugAnalyticsUI)
+                    }else{
+                        UserDefaults.standard.set(true, forKey: UserDefaultsKeys.showsDebugAnalyticsUI)
+                    }
+                    if let viewController = AppDelegate.shared.window?.rootViewController {
+                        let announcement = Announcement(title: "Analytics debug UI", subtitle: (enabled ? "Disabled":"Enabled"), image: nil, duration:10.0, action:{
+                        })
+                        Whisper.show(shout: announcement, to: viewController, completion: {
+                        })
+                    }
+                }
+                
+            }
+        }
     }
     
     override func viewDidLayoutSubviews() {
@@ -189,7 +168,6 @@ class SettingsViewController : BaseViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        updateScreenshotsCount()
         reloadChangeableIndexPaths()
     }
     
@@ -218,7 +196,6 @@ class SettingsViewController : BaseViewController {
     
     @objc private func applicationWillEnterForeground(_ notification: Notification) {
         if view?.window != nil {
-            updateScreenshotsCount()
             reloadChangeableIndexPaths()
         }
     }
@@ -240,6 +217,8 @@ class SettingsViewController : BaseViewController {
         .info: [
             .name,
             .email,
+            .payment,
+            .address,
             .currency
         ],
         .about: [
@@ -277,29 +256,6 @@ class SettingsViewController : BaseViewController {
             return nil
         }
         return IndexPath(row: rowValue, section: section.rawValue)
-    }
-    
-    // MARK: Screenshots
-    
-    var screenshotsCountText: String {
-        let screenshotCount = DataModel.sharedInstance.countTotalScreenshots()
-        
-        if screenshotCount == 1 {
-            return "settings.screenshot.single".localized(withFormat: screenshotCount)
-            
-        } else {
-            return "settings.screenshot.plural".localized(withFormat: screenshotCount)
-        }
-    }
-    
-    private func layoutScreenshotsCountShadow() {
-        tableHeaderContentView.layoutIfNeeded()
-        tableHeaderContentView.layer.shadowPath = UIBezierPath(roundedRect: tableHeaderContentView.bounds, cornerRadius: tableHeaderContentView.layer.cornerRadius).cgPath
-    }
-    
-    private func updateScreenshotsCount() {
-        screenshotsCountLabel.text = screenshotsCountText
-        layoutScreenshotsCountShadow()
     }
     
     // MARK: Product Options
@@ -436,8 +392,17 @@ extension SettingsViewController : UITableViewDataSource {
             cell.textLabel?.textColor = .black
         }
         
-        cell.detailTextLabel?.text = cellDetailedText(for: row)
         cell.detailTextLabel?.font = .screenshopFont(.hindSemibold, textStyle: .body)
+        cell.detailTextLabel?.text = nil
+        cell.detailTextLabel?.attributedText = nil
+        
+        if let text = cellDetailedText(for: row) {
+            cell.detailTextLabel?.text = text
+        }
+        else if let attributedText = cellDetailedAttributedText(for: row) {
+            cell.detailTextLabel?.attributedText = attributedText
+        }
+        
         return cell
     }
 }
@@ -615,16 +580,30 @@ extension SettingsViewController : UITableViewDelegate {
             
             alert.addAction(UIAlertAction(title: "settings.region.us".localized, style: .default, handler: { (alertAction) in
                 UserDefaults.standard.set(true, forKey: UserDefaultsKeys.isUSC)
+                UserDefaults.standard.synchronize()
+                NotificationCenter.default.post(name: .isUSCUpdated, object: nil)
                 tableView.reloadRows(at: [indexPath], with: .none)
             }))
             alert.addAction(UIAlertAction(title: "settings.region.other".localized, style: .default, handler: { (alertAction) in
                 UserDefaults.standard.set(false, forKey: UserDefaultsKeys.isUSC)
+                UserDefaults.standard.synchronize()
+                NotificationCenter.default.post(name: .isUSCUpdated, object: nil)
                 tableView.reloadRows(at: [indexPath], with: .none)
             }))
 
             alert.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
             
             present(alert, animated: true, completion: nil)
+            
+        case .address:
+            let viewController = CheckoutShippingListViewController()
+            viewController.hidesBottomBarWhenPushed = true
+            navigationController?.pushViewController(viewController, animated: true)
+            
+        case .payment:
+            let viewController = CheckoutPaymentListViewController()
+            viewController.hidesBottomBarWhenPushed = true
+            navigationController?.pushViewController(viewController, animated: true)
             
         default:
             break
@@ -703,6 +682,10 @@ fileprivate extension SettingsViewController {
             return "settings.row.talk_to_stylist.title".localized
         case .region:
             return "settings.row.region.title".localized
+        case .payment:
+            return "settings.row.payment.title".localized
+        case .address:
+            return "settings.row.address.title".localized
         }
     }
     
@@ -741,12 +724,30 @@ fileprivate extension SettingsViewController {
             if UserDefaults.standard.object(forKey: UserDefaultsKeys.isUSC) == nil {
                 return "settings.region.unknown".localized
             } else {
-                if UserDefaults.standard.bool(forKey: UserDefaultsKeys.isUSC) {
+                if UIApplication.isUSC {
                     return "settings.region.us".localized
                 } else {
                     return "settings.region.other".localized
                 }
             }
+            
+        default:
+            return nil
+        }
+    }
+    
+    func cellDetailedAttributedText(for row: Row) -> NSAttributedString? {
+        switch (row) {
+        case .address:
+            let textAttachment = NSTextAttachment()
+            textAttachment.image = UIImage(named: "SettingsTruck")
+            return NSAttributedString(attachment: textAttachment)
+            
+        case .payment:
+            let textAttachment = NSTextAttachment()
+            textAttachment.image = UIImage(named: "SettingsCreditCard")
+            return NSAttributedString(attachment: textAttachment)
+            
         default:
             return nil
         }
@@ -767,7 +768,7 @@ fileprivate extension SettingsViewController {
     
     func cellAccessoryType(for row: Row) -> UITableViewCellAccessoryType {
         switch row {
-        case .currency, .partners:
+        case .currency, .partners, .address, .payment:
             return .disclosureIndicator
         default:
             return .none

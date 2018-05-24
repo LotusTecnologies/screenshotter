@@ -55,7 +55,7 @@ class LoadingButton: UIButton {
     fileprivate func syncActivityIndicatorColor() {
         guard hasActivityIndicator &&
             state != .disabled else {
-            return
+                return
         }
         
         activityIndicator.color = titleColor(for: state)

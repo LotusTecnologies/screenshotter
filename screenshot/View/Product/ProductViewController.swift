@@ -14,6 +14,7 @@ class ProductViewController : BaseViewController {
     fileprivate var cartItemFrc: FetchedResultsControllerManager<CartItem>?
     fileprivate var structuredProduct: StructuredProduct?
     fileprivate var didSaveVariants = false
+    private let priceAlertController = ProductPriceAlertController()
     
     var similarProducts: [Product]? {
         didSet {
@@ -38,6 +39,9 @@ class ProductViewController : BaseViewController {
         return view as! ProductView
     }
     
+    private var loadingTrackingMonitor:AsyncOperationMonitor?
+    private var productFRC:FetchedResultsControllerManager<Product>?
+
     override func loadView() {
         let productView = ProductView()
         productView.selectionControl.addTarget(self, action: #selector(selectionButtonTouchUpInside), for: .touchUpInside)
@@ -45,7 +49,12 @@ class ProductViewController : BaseViewController {
         productView.cartButton.addTarget(self, action: #selector(cartButtonAction), for: .touchUpInside)
 //            productView.buyButton.addTarget(self, action: #selector(buyButtonAction), for: .touchUpInside)
         productView.favoriteButton.addTarget(self, action: #selector(favoriteAction), for: .touchUpInside)
+        productView.stockButton.addTarget(self, action: #selector(stockAction), for: .touchUpInside)
         productView.websiteButton.addTarget(self, action: #selector(pushWebsiteURL), for: .touchUpInside)
+        
+        let pinchZoom = UIPinchGestureRecognizer.init(target: self, action: #selector(pinch(gesture:)))
+        productView.addGestureRecognizer(pinchZoom)
+        
         view = productView
     }
     
@@ -65,9 +74,12 @@ class ProductViewController : BaseViewController {
                 if didSaveVariants {
                     self?.setup(with: product)
                 }
+                else {
+                    self?.productView.setIsUnavailable(!product.hasVariants)
+                }
             }
             .catch { [weak self] error in
-                self?.productView.setUnavailableImageViewAlpha(1)
+                self?.productView.setIsUnavailable(true)
         }
         
         cartItemFrc = DataModel.sharedInstance.cartItemFrc(delegate: self)
@@ -89,9 +101,73 @@ class ProductViewController : BaseViewController {
         syncCartItemCount()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        if #available(iOS 11.0, *) {} else {
+            if !hidesBottomBarWhenPushed, let height = tabBarController?.tabBar.bounds.height {
+                productView.controlContainerBottomConstraint?.constant = -height
+                
+                var contentInsets = productView.scrollView.contentInset
+                contentInsets.bottom = -height
+                productView.scrollView.contentInset = contentInsets
+                
+                var scrollIndicatorInsets = productView.scrollView.scrollIndicatorInsets
+                scrollIndicatorInsets.bottom = -height
+                productView.scrollView.scrollIndicatorInsets = scrollIndicatorInsets
+            }
+        }
+    }
+    
     func setup(with product: Product) {
         structuredProduct = StructuredProduct(product)
         applyStructuredProductIfPossible()
+        
+        
+        if let _  = self.productFRC {
+            self.productFRC?.delegate = nil
+        }
+        
+        self.productFRC = DataModel.sharedInstance.productFrc(delegate: self, productObjectID: product.objectID)
+        
+        if let _ = self.loadingTrackingMonitor {
+            self.loadingTrackingMonitor?.delegate = nil
+        }
+        if let partNumber = product.partNumber {
+            let monitor = AsyncOperationMonitor.init(tracking: [partNumber], delegate: self)
+            self.loadingTrackingMonitor = monitor
+            self.updateTrackingButton()
+        }
+    }
+    
+    // MARK:
+    
+    @objc func pinch( gesture:UIPinchGestureRecognizer) {
+        if CrazeImageZoom.shared.isHandlingGesture, let imageView = CrazeImageZoom.shared.hostedImageView  {
+            CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: imageView)
+            return
+        }
+        var imageViewToZoom:UIImageView?
+        for v in productView.galleryScrollContentView.subviews {
+            if let imageView = v as? UIImageView {
+                let point = gesture.location(in: imageView)
+                if imageView.bounds.contains(point) {
+                    imageViewToZoom = imageView
+                }
+            }
+        }
+        
+        if imageViewToZoom == nil, let collectionView = productView.similarProductsCollectionView {
+            let point = gesture.location(in: collectionView)
+            if let indexPath = collectionView.indexPathForItem(at: point), let cell = collectionView.cellForItem(at: indexPath) as? ProductsCollectionViewCell{
+                imageViewToZoom = cell.productView?.imageView
+                
+            }
+        }
+        
+        if let i = imageViewToZoom {
+            CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: i)
+        }
     }
 }
 
@@ -155,9 +231,7 @@ fileprivate extension ProductViewControllerProductView {
                 return
             }
             
-            
             let quantity = max(1, Int(productView.selectionQuantityItem?.selectedPickerItem ?? "") ?? 1)
-            
             ShoppingCartModel.shared.update(variant: variant, quantity: Int16(quantity))
             
             presentNextStep()
@@ -203,16 +277,28 @@ fileprivate extension ProductViewControllerProductView {
     
     fileprivate func presentNextStep() {
         let nextStepViewController = ProductNextStepViewController()
-        nextStepViewController.cartButton.addTarget(self, action: #selector(presentCart), for: .touchUpInside)
-        nextStepViewController.continueButton.addTarget(self, action: #selector(dismissNextStep), for: .touchUpInside)
+        nextStepViewController.continueButton.addTarget(self, action: #selector(nextStepContinueAction), for: .touchUpInside)
+        nextStepViewController.cancelButton.addTarget(self, action: #selector(nextStepCancelAction), for: .touchUpInside)
         present(nextStepViewController, animated: true, completion: nil)
     }
     
-    @objc fileprivate func dismissNextStep() {
-        dismiss(animated: true, completion: nil)
+    @objc fileprivate func nextStepContinueAction() {
+        presentCart { [weak self] in
+            if let navigationController = self?.navigationController as? ScreenshotsNavigationController {
+                navigationController.presentGiftCardCampaignIfNeeded()
+            }
+        }
     }
     
-    // MARK: Favorite
+    @objc fileprivate func nextStepCancelAction() {
+        dismiss(animated: true, completion: nil)
+        
+        if let navigationController = navigationController as? ScreenshotsNavigationController {
+            navigationController.presentGiftCardCampaignIfNeeded()
+        }
+    }
+    
+    // MARK: Favorite / Stock
     
     @objc func favoriteAction() {
         guard let product = structuredProduct?.product else {
@@ -221,13 +307,22 @@ fileprivate extension ProductViewControllerProductView {
         
         let isFavorited = productView.favoriteButton.isSelected
         product.setFavorited(toFavorited: isFavorited)
-
+        
         if isFavorited {
             Analytics.trackProductFavorited(product: product, page: .product)
         }else{
             Analytics.trackProductUnfavorited(product: product, page: .product)
         }
-
+    }
+    
+    @objc fileprivate func stockAction() {
+        guard let product = structuredProduct?.product else {
+            return
+        }
+        
+        if let deniedAlertController = priceAlertController.priceAlertAction(productView.stockButton, on: product) {
+            present(deniedAlertController, animated: true, completion: nil)
+        }
     }
     
     // MARK: Web
@@ -316,14 +411,15 @@ fileprivate extension ProductViewControllerStructuredProduct {
         
         if didSaveVariants {
             // Prevent a jarring UX by showing this only once we have confirmed data
-            productView.setUnavailableImageViewAlpha(structuredProduct.isAvailable ? 0 : 1)
+            productView.setIsUnavailable(!structuredProduct.isAvailable)
         }
         
         productView.titleLabel.text = product.productTitle()
         productView.priceLabel.text = product.price
         productView.contentTextView.text = product.detailedDescription
         productView.favoriteButton.isSelected = structuredProduct.product.isFavorite
-        
+        productView.stockButton.isSelected = structuredProduct.product.hasPriceAlerts
+
         setWebsiteMerchant(product.merchant)
         
         if product.isSale() {
@@ -336,10 +432,12 @@ fileprivate extension ProductViewControllerStructuredProduct {
             var sizeItem: SegmentedDropDownItem?
             
             if let sizes = structuredProduct.sizes {
-                sizeItem = SegmentedDropDownItem(pickerItems: sizes)
+
                 
-                if colorItem.selectedPickerItem == nil {
-                    // Disabled until color is selected
+                sizeItem = SegmentedDropDownItem(pickerItems: sizes, selectedPickerItem:structuredProduct.onlyOneSize)
+                
+                if colorItem.selectedPickerItem == nil && structuredProduct.onlyOneSize == nil{
+                    // Disabled until color is selected, but not if there is only one possible size
                     sizeItem?.disabledPickerItems = structuredProduct.sizes
                 }
                 else if let structuredColorVariant = structuredProduct.structuredColorVariant(forColor: selectedColor) {
@@ -349,23 +447,27 @@ fileprivate extension ProductViewControllerStructuredProduct {
             
             productView.setSelection(colorItem: colorItem, sizeItem: sizeItem)
         }
+        else {
+            // TODO: test this
+//            productView.setUnavailableImageViewAlpha(1)
+        }
     }
     
     func selectedVariant() -> Variant? {
         let color = productView.selectionColorItem?.selectedPickerItem
         let size = productView.selectionSizeItem?.selectedPickerItem
-        return structuredProduct?.variant(forColor: color, size: size)
+        return structuredProduct?.variant(color: color, size: size)
     }
 }
 
 typealias ProductViewControllerCart = ProductViewController
 fileprivate extension ProductViewControllerCart {
-    @objc func presentCart() {
+    @objc func presentCart(completion: (()->())? = nil) {
         if presentedViewController != nil {
             dismiss(animated: true, completion: nil)
         }
         
-        present(CartNavigationController(), animated: true, completion: nil)
+        present(CartNavigationController(), animated: true, completion: completion)
     }
     
     func syncCartItemCount() {
@@ -376,6 +478,7 @@ fileprivate extension ProductViewControllerCart {
 extension ProductViewController: FetchedResultsControllerManagerDelegate {
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
         syncCartItemCount()
+        updateTrackingButton()
     }
 }
 
@@ -401,158 +504,14 @@ extension ProductViewControllerNavigation {
     }
 }
 
-fileprivate class StructuredProduct: NSObject {
-    let product: Product
-    private(set) var structuredColorVariants: [StructuredColorVariant]?
-    private(set) var colors: [String]?
-    private(set) var sizes: [String]?
-    private(set) var isAvailable = false
-    
-    init(_ product: Product) {
-        self.product = product
-        super.init()
-        
-        guard let variants = product.availableVariants?.allObjects as? [Variant], !variants.isEmpty else {
-            return
-        }
-        
-        isAvailable = true
-        
-        var structuredColorVariantsDict: [String : StructuredColorVariant] = [:]
-        var colors: Set<String> = Set()
-        var sizes: Set<String> = Set()
-        var imageURLDict: [String: URL] = [:]
-        
-        for variant in variants {
-            guard let color = variant.color,
-                !hasDuplicateVariantAsNA(variants: variants, currentVariant: variant)
-                else {
-                    continue
-            }
-            
-            colors.insert(color)
-            let structuredColorVariant = structuredColorVariantsDict[color] ?? StructuredColorVariant(color: color)
-            
-            structuredColorVariant.variantSet.insert(variant)
-            
-            if let size = variant.size {
-                sizes.insert(size)
-                structuredColorVariant.sizeSet.insert(size)
-            }
-            
-            structuredColorVariantsDict[color] = structuredColorVariant
-            
-            if imageURLDict[color] == nil, let imageURL = variant.parsedImageURLs().first {
-                imageURLDict[color] = imageURL
-            }
-        }
-        
-        if !structuredColorVariantsDict.isEmpty {
-            structuredColorVariants = Array(structuredColorVariantsDict.values)
-        }
-        
-        if !colors.isEmpty {
-            self.colors = colors.sorted()
-        }
-        
-        if !sizes.isEmpty {
-            let sortedSizes = ["X-Small", "Small", "Medium", "Large", "X-Large"]
-            
-            self.sizes = sizes.sorted(by: { (a, b) -> Bool in
-                let aIndex = (sortedSizes.index(of: a) ?? Int.max)
-                let bIndex = (sortedSizes.index(of: b) ?? Int.max)
-                
-                if aIndex == Int.max && bIndex == Int.max {
-                    return a.localizedStandardCompare(b) == .orderedAscending
-                }
-                
-                return aIndex < bIndex
-            })
-        }
-        
-        if !imageURLDict.isEmpty {
-            self.imageURLDict = imageURLDict
-        }
+extension ProductViewController : AsyncOperationMonitorDelegate {
+    func asyncOperationMonitorDidChange(_ monitor: AsyncOperationMonitor) {
+        self.updateTrackingButton()
     }
     
-    // MARK: Variant
-    
-    /// If a variant color is NA, check if it's image exists in another variant
-    private func hasDuplicateVariantAsNA(variants: [Variant], currentVariant: Variant) -> Bool {
-        guard let currentColor = currentVariant.color else {
-            return false
-        }
-        
-        var hasDuplicateVariantAsNA = false
-        
-        func isColorNA(_ color: String) -> Bool {
-            return ["N/A", "NA"].contains(color.uppercased())
-        }
-        
-        if isColorNA(currentColor), let imageURL = currentVariant.parsedImageURLs().first {
-            for variant in variants {
-                guard let color2 = variant.color, !isColorNA(color2) else {
-                    continue
-                }
-                
-                if variant.parsedImageURLs().first == imageURL {
-                    hasDuplicateVariantAsNA = true
-                    break
-                }
-            }
-        }
-        
-        return hasDuplicateVariantAsNA
+    func updateTrackingButton(){
+        self.productView.stockButton.isLoading = self.loadingTrackingMonitor?.didStart ?? false
+        self.productView.stockButton.isSelected = self.productFRC?.first?.hasPriceAlerts ?? false
     }
     
-    func structuredColorVariant(forColor color: String?) -> StructuredColorVariant? {
-        return structuredColorVariants?.first { structuredColorVariant -> Bool in
-            return structuredColorVariant.color == color
-        }
-    }
-    
-    func variant(forColor color: String?, size: String?) -> Variant? {
-        return structuredColorVariant(forColor: color)?.variant(forSize: size)
-    }
-    
-    func subtractingSizes(of structuredColorVariant: StructuredColorVariant) -> [String] {
-        return Array(Set(sizes ?? []).subtracting(structuredColorVariant.sizes))
-    }
-    
-    // MARK: Image
-    
-    private var imageURLDict: [String: URL]?
-    
-    func imageURL(forColor color: String?) -> URL? {
-        return imageURLDict?[color ?? ""]
-    }
-    
-    var imageURLs: [URL]? {
-        return imageURLDict?.sorted { $0.key < $1.key }.map { $0.value }
-    }
-}
-
-fileprivate class StructuredColorVariant: NSObject {
-    let color: String?
-    
-    fileprivate var sizeSet: Set<String> = Set()
-    var sizes: [String] {
-        return Array(sizeSet)
-    }
-    
-    fileprivate var variantSet: Set<Variant> = Set()
-    var variants: [Variant] {
-        return Array(variantSet)
-    }
-    
-    init(color: String?) {
-        self.color = color
-        super.init()
-    }
-    
-    func variant(forSize size: String?) -> Variant? {
-        return variants.first { variant -> Bool in
-            return variant.size == size
-        }
-    }
 }

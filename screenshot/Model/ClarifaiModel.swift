@@ -24,6 +24,16 @@ class ClarifaiModel: NSObject {
                 return nil
             }
         }
+        static func from(shortString:String) ->ImageClassification{
+            switch shortString {
+            case "h":
+                return .human
+            case "f":
+                return .furniture
+            default:
+                return .human
+            }
+        }
     }
     
     public static let sharedInstance = ClarifaiModel()

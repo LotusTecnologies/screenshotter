@@ -9,6 +9,10 @@
 import Foundation
 import UIKit
 
+extension Notification.Name {
+    static let isUSCUpdated = Notification.Name(rawValue: "io.crazeapp.screenshot.isUSCUpdated")
+}
+
 class UserDefaultsKeys  {
     // User
     static let email = "Email"
@@ -23,9 +27,12 @@ class UserDefaultsKeys  {
     // Screenshot
     static let newScreenshotsCount = "NewScreenshotsCount"
     static let newScreenshotsAssetIds = "NewScreenshotsAssetIds"
+    static let uninformedScreenshotsCount = "UninformedScreenshotsCount"
+    
+    // Favorites
+    static let uninformedFavoritesCount = "UninformedFavoritesCount"
 
     // Product
-    static let productCompletedTooltip = "ProductCompletedTooltip"
     static let productGender = "ProductGender"
     static let productSize = "ProductSize"
     static let productSale = "ProductSale"
@@ -38,8 +45,9 @@ class UserDefaultsKeys  {
     // Onboarding
     static let onboardingCompleted = "OnboardingCompleted"
     static let onboardingPresentedScreenshotHelper = "OnboardingPresentedScreenshotHelper"
-    static let onboardingPresentedScreenshotPicker = "OnboardingShouldPresentedScreenshotPicker"
     static let onboardingPresentedPushAlert = "OnboardingPresentedPushAlert"
+    static let onboardingPresentedGiftCard = "OnboardingPresentedGiftCard"
+    static let completedCheckout = "CompletedCheckout"
     static let lastCampaignCompleted = "LastCampaignCompleted"  //in here is stored CampaignCompleted.rawValue
     enum CampaignCompleted : String {
         case campaign_2018_04_20 // Kim video to push users to do purchases
@@ -78,6 +86,10 @@ class UserDefaultsKeys  {
     
     //In app Purchase
     static let purchasedProductIdentifier = "PurchasedProductIdentifier"
+    
+    //Debug
+    static let showsDebugAnalyticsUI = "ShowsDebugAnalyticsUI"
+
 }
 
 extension UIApplication {

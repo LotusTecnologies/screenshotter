@@ -15,9 +15,16 @@ enum ScreenshotSource : String {
     case unknown
     case discover
     case gallery
+    case camera
+    case screenshot
     case shuffle
     case share
     case tutorial
+    case nativeShare = "native-share" //Andriod only - here for completment of analytics
+    
+    var isUserGenerated:Bool {
+        return (self == .nativeShare || self == .gallery || self == .share || self == .unknown || self == .screenshot || self == .camera)
+    }
 }
 
 class DataModel: NSObject {
@@ -145,7 +152,7 @@ extension DataModel {
     func screenshotFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<Screenshot>  {
         let request: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(key: "lastModified", ascending: false), NSSortDescriptor(key: "createdAt", ascending: false)]
-        request.predicate = NSPredicate(format: "isHidden == FALSE AND isRecognized == TRUE")
+        request.predicate = NSPredicate(format: "isHidden == FALSE AND isRecognized == TRUE AND sourceString != %@", ScreenshotSource.shuffle.rawValue)
         let context = self.mainMoc()
         let fetchedResultsController = FetchedResultsControllerManager<Screenshot>.init(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
         return fetchedResultsController
@@ -195,6 +202,15 @@ extension DataModel {
         return fetchedResultsController
     }
     
+    func favoritedProductsFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<Product> {
+        let request: NSFetchRequest = Product.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(key: "dateFavorited", ascending: false)]
+        request.predicate = NSPredicate(format: "isFavorite == true")
+        let context = self.mainMoc()
+        let fetchedResultsController:FetchedResultsControllerManager<Product> = FetchedResultsControllerManager<Product>.init(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
+        return fetchedResultsController
+    }
+    
     func productFrc(delegate:FetchedResultsControllerManagerDelegate?, shoppableOID: NSManagedObjectID) -> FetchedResultsControllerManager<Product> {
         let request: NSFetchRequest = Product.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(key: "dateFavorited", ascending: false)]
@@ -204,6 +220,17 @@ extension DataModel {
         let fetchedResultsController:FetchedResultsControllerManager<Product> = FetchedResultsControllerManager<Product>.init(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
         return fetchedResultsController
     }
+    
+    func productFrc(delegate:FetchedResultsControllerManagerDelegate?, productObjectID: NSManagedObjectID) -> FetchedResultsControllerManager<Product> {
+        let request: NSFetchRequest = Product.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(key: "dateFavorited", ascending: false)]
+        request.predicate = NSPredicate(format: "SELF == %@", productObjectID)
+        
+        let context = self.mainMoc()
+        let fetchedResultsController:FetchedResultsControllerManager<Product> = FetchedResultsControllerManager<Product>.init(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
+        return fetchedResultsController
+    }
+
     
     func productBarFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<Product> {
         let request: NSFetchRequest = Product.fetchRequest()
@@ -398,6 +425,7 @@ extension DataModel {
                        screenshot: Screenshot,
                        label: String?,
                        offersURL: String?,
+                       relatedImagesURL: String?,
                        b0x: Double,
                        b0y: Double,
                        b1x: Double,
@@ -439,6 +467,7 @@ extension DataModel {
         } else {
             shoppableToSave.order = shoppableToSave.label
         }
+        shoppableToSave.relatedImagesURLString = relatedImagesURL
         shoppableToSave.offersURL = offersURL
         shoppableToSave.b0x = b0x
         shoppableToSave.b0y = b0y
@@ -521,6 +550,84 @@ extension DataModel {
         return nil
     }
     
+    func deleteVariants(managedObjectContext: NSManagedObjectContext, product: Product, shouldUpdateDateChecked: Bool = true) {
+        if shouldUpdateDateChecked {
+            product.dateCheckedStock = Date()
+        }
+        if product.hasVariants {
+            let variants = product.availableVariants as? Set<Variant>
+            variants?.forEach { managedObjectContext.delete($0) }
+            product.hasVariants = false
+        }
+    }
+    
+    func partNumbers(screenshotOID: NSManagedObjectID) -> Promise<[String]> {
+        return Promise { fulfill, reject in
+            self.performBackgroundTask { managedObjectContext in
+                let fetchRequest: NSFetchRequest<NSDictionary> = NSFetchRequest(entityName: "Product")
+                fetchRequest.resultType = .dictionaryResultType
+                fetchRequest.returnsObjectsAsFaults = false
+                fetchRequest.includesSubentities = false
+                fetchRequest.returnsDistinctResults = true
+                fetchRequest.propertiesToFetch = ["partNumber"]
+                fetchRequest.fetchLimit = 600
+                let optionsMaskInt = ProductsOptionsMask.global.rawValue
+                let anHourAgo = NSDate(timeIntervalSinceNow: -60 * 60)
+                fetchRequest.predicate = NSPredicate(format: "shoppable.screenshot == %@ AND (optionsMask & %d) == %d AND ( dateCheckedStock == nil || dateCheckedStock < %@ )", screenshotOID, optionsMaskInt, optionsMaskInt, anHourAgo)
+                fetchRequest.sortDescriptors = nil
+                
+                do {
+                    let results = try managedObjectContext.fetch(fetchRequest)
+                    let partNumbers = results.compactMap { $0["partNumber"] as? String }
+                    if partNumbers.count > 0 {
+                        fulfill(partNumbers)
+                        return
+                    }
+                } catch {
+                    self.receivedCoreDataError(error: error)
+                    print("partNumbers results with error:\(error)")
+                }
+                let error = NSError(domain: "Craze", code: 78, userInfo: [NSLocalizedDescriptionKey : "No partNumbers to check."])
+                reject(error)
+            }
+        }
+    }
+    
+    func markOutOfStock(managedObjectContext: NSManagedObjectContext, partNumbers: [String]) {
+        guard partNumbers.count > 0 else {
+            return
+        }
+        
+        let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "partNumber IN %@", partNumbers)
+        
+        do {
+            let results = try managedObjectContext.fetch(fetchRequest)
+            results.forEach { deleteVariants(managedObjectContext: managedObjectContext, product: $0) }
+            managedObjectContext.saveIfNeeded()
+        } catch {
+            self.receivedCoreDataError(error: error)
+            print("markOutOfStock results with error:\(error)")
+        }
+    }
+    
+    func parseFloat(_ anyValueOptional: Any?) -> Float? {
+        if anyValueOptional == nil {
+            return nil
+        } else if let floatVal = anyValueOptional as? Float {
+            return floatVal
+        } else if let intVal = anyValueOptional as? Int {
+            return Float(intVal)
+        } else if let stringVal = anyValueOptional as? String {
+            return Float(stringVal)
+        } else if let nsNumber = anyValueOptional as? NSNumber {
+            return nsNumber.floatValue
+        } else if let anyValue = anyValueOptional {
+            print("parseFloat received anyValueOptional:\(String(describing: anyValueOptional))  anyValue:\(anyValue) type:\(type(of: anyValueOptional))")
+        }
+        return nil
+    }
+
     // Save a new Variant to Core Data.
     func saveVariant(managedObjectContext: NSManagedObjectContext,
                      product: Product,
@@ -538,8 +645,55 @@ extension DataModel {
         variantToSave.sku = sku
         variantToSave.url = url
         variantToSave.imageURLs = imageURLs
-        variantToSave.dateModified = Date()
         return variantToSave
+    }
+    
+    func saveVariantsFromDictionary(managedObjectContext: NSManagedObjectContext, rootProduct: Product, dict: NSDictionary, shouldSave: Bool = true) -> Bool {
+        rootProduct.altImageURLs = (dict["alt_images"] as? [String])?.joined(separator: ",")
+        rootProduct.detailedDescription = dict["description"] as? String
+        rootProduct.name = dict["name"] as? String
+        rootProduct.url = dict["url"] as? String
+        if let dictPrice = self.parseFloat(dict["price"]) ?? self.parseFloat(dict["discount_price"]) ?? self.parseFloat(dict["retail_price"]) {
+            rootProduct.fallbackPrice = dictPrice
+        }
+        
+        var hasVariants = false
+        let colors = dict["colors"] as? [[String : Any]]
+        colors?.forEach { color in
+            let colorString = color["color"] as? String
+            let colorPrice = self.parseFloat(color["sale_price"]) ?? self.parseFloat(color["retail_price"]) ?? rootProduct.fallbackPrice
+            let colorImageURLs = (color["images"] as? [String])?.joined(separator: ",")
+            let sizes = color["sizes"] as? [[String : Any]]
+            sizes?.forEach { size in
+                if let sku = size["id"] as? String,
+                    !sku.isEmpty {
+                    let _ = self.saveVariant(managedObjectContext: managedObjectContext,
+                                             product: rootProduct,
+                                             color: colorString,
+                                             size: size["size"] as? String,
+                                             price: self.parseFloat(size["price"])
+                                                ?? self.parseFloat(size["discount_price"])
+                                                ?? self.parseFloat(size["retail_price"])
+                                                ?? colorPrice,
+                                             sku: sku,
+                                             url: size["url"] as? String,
+                                             imageURLs: colorImageURLs)
+                    hasVariants = true
+                    if rootProduct.sku == sku,
+                        let updatedColor = colorString,
+                        !updatedColor.isEmpty,
+                        rootProduct.color != updatedColor {
+                        rootProduct.color = updatedColor
+                    }
+                }
+            }
+        }
+        rootProduct.hasVariants = hasVariants
+        rootProduct.dateCheckedStock = Date()
+        if shouldSave {
+            managedObjectContext.saveIfNeeded()
+        }
+        return hasVariants
     }
     
     func retrieveAddableCart(managedObjectContext: NSManagedObjectContext) -> Cart? {
@@ -928,16 +1082,25 @@ extension DataModel {
     // But it only runs against a private queue, and each call may have its own private queue running in parallel.
     // Thanks for still getting it wrong, Apple. So here is what I thought Apple would be doing.
     func performBackgroundTask(_ block: @escaping (NSManagedObjectContext) -> Void) {
-        self.dbQ.addOperation {
+        self.dbQ.addOperation(AsyncOperation.init(timeout: nil, completion: { (completion) in
             let managedObjectContext = self.persistentContainer.newBackgroundContext()
-            managedObjectContext.performAndWait {
+            managedObjectContext.perform {
                 block(managedObjectContext)
+                completion()
             }
-        }
+            
+        }))
     }
     
     public func unfavorite(favoriteArray: [Product]) {
         let moiArray = favoriteArray.map { $0.objectID }
+        self.unfavorite(favoriteArray: moiArray)
+    }
+    
+    public func unfavorite(favoriteArray: [NSManagedObjectID]) {
+        let moiArray = favoriteArray
+        
+        
         self.performBackgroundTask { (managedObjectContext) in
             let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
             fetchRequest.predicate = NSPredicate(format: "SELF IN %@", moiArray)
@@ -952,8 +1115,11 @@ extension DataModel {
                     }
                     product.isFavorite = false
                     product.dateFavorited = nil
+                    AccumulatorModel.favorite.decrementUninformedCount(by:results.count)
+                    product.untrack()
                 }
                 try managedObjectContext.save()
+                
             } catch {
                 self.receivedCoreDataError(error: error)
                 print("unfavorite objectIDs:\(moiArray) results with error:\(error)")
@@ -1298,26 +1464,26 @@ extension Screenshot {
 }
 
 extension Shoppable {
+    public func relatedImagesUrl() -> URL? {
+        if let urlString = self.relatedImagesURLString {
+            return URL.urlWith(string: urlString, queryParameters: ["feed":"craze_ctl"])
+        }
+        return nil
+    }
+    
+    public func relativeRect() -> CGRect{
+        let topLeft = CGPoint.init(x: self.b0x, y: self.b0y)
+        let bottomRight = CGPoint.init(x: self.b1x, y: self.b1y)
+        return CGRect.rectWith(topLeft: topLeft, bottomRight: bottomRight)
+    }
     
     public func frame(size: CGSize) -> CGRect {
-        let viewWidth = Double(size.width)
-        let viewHeight = Double(size.height)
-        let frame = CGRect(x: b0x * viewWidth, y: b0y * viewHeight, width: (b1x - b0x) * viewWidth, height: (b1y - b0y) * viewHeight)
-        return frame
+        let relativeRect = self.relativeRect()
+        return size.rectFrom(relativeSizeRect: relativeRect)
     }
     
     public func cropped(image: UIImage, thumbSize:CGSize) -> UIImage? {
-        let cropFrame = self.frame(size: image.size)
-        let imageFrame = CGRect.init(origin: .zero, size: image.size)
-        let thumbFrame = CGRect.init(origin: .zero, size: thumbSize)
-        let cropFrameWithoutWhiteBars = thumbFrame.aspectFit(around:cropFrame).intersection(imageFrame)
-        
-        if let imageRef = image.cgImage?.cropping(to: cropFrameWithoutWhiteBars) {
-            let croppedImage = UIImage(cgImage: imageRef, scale: UIScreen.main.scale, orientation: .up)
-            return croppedImage
-        }else{
-            return nil
-        }
+        return UIImage.cropped(image: image, thumbSize: thumbSize, relativeSizeCropRect: self.relativeRect())
     }
     
     private func productFilter(managedObjectContext: NSManagedObjectContext, optionsMask: Int) -> ProductFilter? {
@@ -1364,6 +1530,7 @@ extension Shoppable {
         guard let screenshotId = self.screenshot?.objectID else {
             return
         }
+        let assetId = self.screenshot?.assetId
         let optionsMask = ProductsOptionsMask(productsOptions.category, productsOptions.gender, productsOptions.size)
         let optionsMaskInt = optionsMask.rawValue
         DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
@@ -1403,7 +1570,7 @@ extension Shoppable {
                         actualFilteredProductCount > 0 {
                         continue
                     }
-                    AssetSyncModel.sharedInstance.reExtractProducts(shoppableId: shoppable.objectID, optionsMask: optionsMask, offersURL: offersURL)
+                    AssetSyncModel.sharedInstance.reExtractProducts(assetId:assetId, shoppableId: shoppable.objectID, optionsMask: optionsMask, offersURL: offersURL)
                 }
                 try managedObjectContext.save()
                 DispatchQueue.main.async(execute: callback)
@@ -1524,6 +1691,11 @@ extension Product {
                 let results = try managedObjectContext.fetch(fetchRequest)
                 for product in results {
                     product.isFavorite = toFavorited
+                    if toFavorited {
+                        product.track()
+                    }else{
+                        product.untrack()
+                    }
                     if toFavorited == false {
                         product.dateViewed  = nil
                     }
@@ -1559,6 +1731,9 @@ extension Product {
                 if toFavorited {
                     let score = UserDefaults.standard.integer(forKey: UserDefaultsKeys.gameScore)
                     UserDefaults.standard.set(score + 1, forKey: UserDefaultsKeys.gameScore)
+                    AccumulatorModel.favorite.incrementUninformedCount()
+                }else{
+                    AccumulatorModel.favorite.decrementUninformedCount(by:1)
                 }
             } catch {
                 DataModel.sharedInstance.receivedCoreDataError(error: error)
@@ -1588,6 +1763,10 @@ extension Product {
     
     func productTitle() -> String? {
         return productDescription?.productTitle()
+    }
+    
+    var isSupportingUSC: Bool {
+        return UIApplication.isUSC && partNumber != nil
     }
     
 }
@@ -1630,6 +1809,10 @@ extension Matchstick {
                     AssetSyncModel.sharedInstance.processingQ.async {
                         AssetSyncModel.sharedInstance.saveShoppables(assetId: assetId, uploadedURLString: uploadedImageURL, segments: segments)
                     }
+                    DispatchQueue.main.async {
+                        AccumulatorModel.screenshotUninformed.incrementUninformedCount()
+                    }
+                    
                     if let callback = callback {
                         let addedScreenshotOID = addedScreenshot.objectID
                         DispatchQueue.main.async {
@@ -1681,6 +1864,19 @@ extension CartItem {
         return productDescription?.productTitle()
     }
     
+}
+
+extension Cart {
+    var estimatedTax:Float {
+        get{
+            return 0.06 * ( self.subtotal + self.shippingTotal )
+        }
+    }
+    var estimatedTotalOrder:Float {
+        get{
+            return self.subtotal + self.shippingTotal + self.estimatedTax
+        }
+    }
 }
 
 extension Card {
@@ -1869,6 +2065,19 @@ extension NSManagedObjectContext {
     
     func objectId(for objectIdUrl:URL) -> NSManagedObjectID? {
         return self.persistentStoreCoordinator?.managedObjectID(forURIRepresentation: objectIdUrl)
+    }
+    
+    func productWith(objectId:NSManagedObjectID) -> Product? {
+        if let card = self.object(with: objectId) as? Product {
+            do{
+                try card.validateForUpdate()
+                return card
+            }catch{
+                DataModel.sharedInstance.receivedCoreDataError(error: error)
+                
+            }
+        }
+        return nil
     }
     
     func screenshotWith(objectId:NSManagedObjectID) -> Screenshot? {

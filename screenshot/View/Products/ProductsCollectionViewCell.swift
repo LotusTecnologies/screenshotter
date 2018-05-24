@@ -9,6 +9,23 @@
 import UIKit
 
 class ProductsCollectionViewCell : UICollectionViewCell {
+    enum ActionType: String {
+        case none
+        case buy
+        case outStock
+        
+        var localized: String? {
+            switch self {
+            case .none:
+                return ""
+            case .buy:
+                return "product.buy".localized
+            case .outStock:
+                return "product.out_of_stock".localized
+            }
+        }
+    }
+    
     var title:String? {
         get {
             return self.titleLabel.text
@@ -17,6 +34,7 @@ class ProductsCollectionViewCell : UICollectionViewCell {
             self.titleLabel.text = newTitle
         }
     }
+
     var price:String? {
         get {
             return self.priceLabel?.text
@@ -82,7 +100,7 @@ class ProductsCollectionViewCell : UICollectionViewCell {
     }()
     
     static func cellHeight(for cellWidth: CGFloat, withBottomLabel: Bool = false) -> CGFloat {
-        return cellWidth + ProductsCollectionViewCell.titleLabelHeight + ProductsCollectionViewCell.priceLabelHeight + buyLabelHeight(withBottomLabel)
+        return cellWidth + ProductsCollectionViewCell.titleLabelHeight + ProductsCollectionViewCell.priceLabelHeight + actionLabelHeight(withBottomLabel)
     }
     
     override init(frame: CGRect) {
@@ -212,7 +230,7 @@ class ProductsCollectionViewCell : UICollectionViewCell {
         favoriteControl.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
         favoriteControl.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         
-        let buyLabel: UILabel = {
+        let actionLabel: UILabel = {
             let label = UILabel()
             productView.contentView.addSubview(label)
             
@@ -221,17 +239,16 @@ class ProductsCollectionViewCell : UICollectionViewCell {
             label.trailingAnchor.constraint(equalTo: productView.trailingAnchor).isActive = true
             label.bottomAnchor.constraint(equalTo: productView.bottomAnchor).isActive = true
             
-            let constant = ProductsCollectionViewCell.buyLabelHeight(hasBuyLabel)
-            buyLabelHeightConstraint = label.heightAnchor.constraint(equalToConstant: constant)
-            buyLabelHeightConstraint?.isActive = true
+            let constant = ProductsCollectionViewCell.actionLabelHeight(hasActionLabel)
+            actionLabelHeightConstraint = label.heightAnchor.constraint(equalToConstant: constant)
+            actionLabelHeightConstraint?.isActive = true
             
             label.backgroundColor = .white
-            label.text = "generic.buy".localized
-            label.textColor = .crazeGreen
             label.textAlignment = .center
             label.font = UIFont.systemFont(ofSize: UIFont.buttonFontSize, weight: UIFont.Weight.medium)
             return label
         }()
+        self.actionLabel = actionLabel
         
         let saleView: SaleView = {
             let view = SaleView()
@@ -239,25 +256,33 @@ class ProductsCollectionViewCell : UICollectionViewCell {
             view.isHidden = true
             productView.addSubview(view)
             view.leadingAnchor.constraint(equalTo: productView.leadingAnchor).isActive = true
-            view.bottomAnchor.constraint(equalTo: buyLabel.topAnchor, constant: -6).isActive = true
+            view.bottomAnchor.constraint(equalTo: actionLabel.topAnchor, constant: -6).isActive = true
             return view
         }()
         self.saleView = saleView
     }
     
-    // MARK: Buy Label
+    // MARK: Action Label
     
-    fileprivate static func buyLabelHeight(_ hasBuyLabel: Bool) -> CGFloat {
-        return hasBuyLabel ? 40 : 0
-    }
-    
-    fileprivate var buyLabelHeightConstraint: NSLayoutConstraint?
-    
-    var hasBuyLabel: Bool = false {
+    var actionType: ActionType = .none {
         didSet {
-            buyLabelHeightConstraint?.constant = ProductsCollectionViewCell.buyLabelHeight(hasBuyLabel)
+            actionLabelHeightConstraint?.constant = ProductsCollectionViewCell.actionLabelHeight(hasActionLabel)
+            actionLabel?.text = actionType.localized
+            actionLabel?.textColor = actionType == .buy ? .crazeGreen : .gray8
         }
     }
+    
+    var hasActionLabel: Bool {
+        return actionType != .none
+    }
+    
+    fileprivate var actionLabel:UILabel?
+    
+    fileprivate static func actionLabelHeight(_ hasActionLabel: Bool) -> CGFloat {
+        return hasActionLabel ? 40 : 0
+    }
+    
+    fileprivate var actionLabelHeightConstraint: NSLayoutConstraint?
     
     // MARK: External Indicator
     
@@ -276,5 +301,8 @@ class ProductsCollectionViewCell : UICollectionViewCell {
                 externalPreviewImageViewWidthConstraint?.isActive = true
             }
         }
+    }
+    var productImageView: UIImageView? {
+        return self.productView?.imageView
     }
 }

@@ -26,7 +26,7 @@ enum CheckoutPaymentFormKeys: Int {
     case phoneNumber
 }
 
-class CheckoutPaymentFormViewController: CheckoutFormViewController {
+class CheckoutPaymentFormViewController: CheckoutFormViewController  {
     fileprivate var card: Card?
     fileprivate var supportedCountriesMap: CheckoutSupportedCountriesMap?
     fileprivate var supportedStatesMap: CheckoutSupportedStatesMap?
@@ -210,15 +210,25 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
                         DataModel.sharedInstance.selectedCardURL = card.objectID.uriRepresentation()
                         
                         self.delegate?.checkoutFormViewControllerDidAdd(self)
+                        
+                        let numberOfCards = DataModel.sharedInstance.cardFrc(delegate: nil).fetchedObjectsCount
+                        
+                        let cart = DataModel.sharedInstance.retrieveAddableCart(managedObjectContext: DataModel.sharedInstance.mainMoc())
+                        if self.autoSaveBillAddressAsShippingAddress {
+                            Analytics.trackCartCreditCardAdded(cart: cart, source: .manual, numberOfCards: numberOfCards, isSave: saveCard)
+                        }else{
+                            Analytics.trackCartCreditCardAdded(cart: cart, source: .onboarding, numberOfCards: numberOfCards, isSave: saveCard)
+                        }
                     }
             }
             
             if isShipToSameAddressChecked || self.autoSaveBillAddressAsShippingAddress {
                 let cart = DataModel.sharedInstance.retrieveAddableCart(managedObjectContext: DataModel.sharedInstance.mainMoc())
+                let addressesCount = DataModel.sharedInstance.shippingAddressFrc(delegate: nil).fetchedObjectsCount
                 if self.autoSaveBillAddressAsShippingAddress {
-                    Analytics.trackCartShippingAdded(cart: cart, source: .onboarding)
+                    Analytics.trackCartShippingAdded(cart: cart, source: .onboarding, numberOfAddresses: addressesCount)
                 }else{
-                    Analytics.trackCartShippingAdded(cart: cart, source: .sameAsBilling)
+                    Analytics.trackCartShippingAdded(cart: cart, source: .sameAsBilling, numberOfAddresses: addressesCount)
                 }
                 DataModel.sharedInstance.saveShippingAddress(fullName: cardName, street: addressStreet, city: addressCity, country: addressCountry, zipCode: addressZip, state: addressState, phone: phone)
                     .then { shippingAddress -> Void in
@@ -268,7 +278,7 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         var newSecureNumber: String?
         var newBrand: String?
         
-        if cardNumber != CreditCardValidator.shared.secureNumber(card.retrieveCardNumber()) {
+        if !cardNumber.isEmpty && cardNumber != CreditCardValidator.shared.secureNumber(card.retrieveCardNumber()) {
             newCardNumber = CreditCardValidator.shared.unformatNumber(cardNumber)
             newSecureNumber = CreditCardValidator.shared.secureNumber(cardNumber)
             newBrand = CreditCardValidator.shared.brand(forNumber: cardNumber).rawValue
@@ -297,5 +307,45 @@ class CheckoutPaymentFormViewController: CheckoutFormViewController {
         card.delete()
         
         delegate?.checkoutFormViewControllerDidRemove(self)
+    }
+    
+    override func presentViewfinder() {
+        presentCardIOPayment()
+    }
+}
+
+extension CheckoutPaymentFormViewController: CardIOPaymentViewControllerDelegate {
+    fileprivate func presentCardIOPayment() {
+        if let scanner = CardIOPaymentViewController.init(paymentDelegate: self) {
+            scanner.suppressScanConfirmation = true
+            scanner.guideColor = .crazeGreen
+            scanner.suppressScannedCardImage = true
+            scanner.hideCardIOLogo = true
+            scanner.collectCardholderName = true
+            scanner.disableManualEntryButtons = true
+            scanner.navigationBarStyle = .black
+            scanner.view.backgroundColor = .clear
+            self.present(scanner, animated: true, completion: nil)
+        }
+    }
+    
+    func userDidProvide(_ cardInfo: CardIOCreditCardInfo!, in paymentViewController: CardIOPaymentViewController!) {
+        self.dismiss(animated: true, completion: nil)
+        formRow(.cardName)?.value = cardInfo.cardholderName
+        if !cardInfo.cardNumber.isEmpty {
+            formRow(.cardNumber)?.value = CreditCardValidator.shared.formatNumber(cardInfo.cardNumber)
+        }
+        if cardInfo.expiryMonth != 0 && cardInfo.expiryYear != 0 {
+            let date = FormRow.Expiration.Date(month: Int(cardInfo.expiryMonth), year: Int(cardInfo.expiryYear))
+            formRow(.cardExp)?.value = FormRow.Expiration.value(for: date)
+        }
+        self.tableView.delegate = nil
+        self.tableView.reloadData()
+        self.tableView.delegate = self
+    }
+    
+    func userDidCancel(_ paymentViewController: CardIOPaymentViewController!) {
+        self.dismiss(animated: true, completion: nil)
+        self.tableView.reloadData()
     }
 }

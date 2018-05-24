@@ -99,7 +99,8 @@ class SegmentedDropDownControl : UIControl {
     fileprivate let borderWidth: CGFloat = 1
     static fileprivate let borderColor: UIColor = .gray8
     static fileprivate let borderErrorColor: UIColor = .crazeRed
-    
+    var changeValueOnRowChange = false
+
     // MARK: Life Cycle
     
     var items: [SegmentedDropDownItem] = [] {
@@ -268,6 +269,7 @@ class SegmentedDropDownControl : UIControl {
 }
 
 extension SegmentedDropDownControl : UIPickerViewDataSource, UIPickerViewDelegate {
+    
     private func itemIndex(pickerView: UIPickerView) -> Int {
         return items.index { item -> Bool in
             guard let segment = item.segment else {
@@ -316,7 +318,19 @@ extension SegmentedDropDownControl : UIPickerViewDataSource, UIPickerViewDelegat
         
         return NSAttributedString(string: title, attributes: attributes)
     }
-    
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        if changeValueOnRowChange {
+            let item = items[itemIndex(pickerView: pickerView)]
+            let title = item.pickerItems[row]
+            
+            if !isItemDisabled(item, withTitle: title) {
+                item.title = title
+                
+                sendActions(for: .valueChanged)
+            }
+        }
+    }
+
     @objc fileprivate func pickerDoneButtonAction(_ button: UIButton) {
         func `where`(_ view: UIView) -> Bool {
             return type(of: view) == UIPickerView.self

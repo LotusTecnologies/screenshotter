@@ -16,10 +16,7 @@ protocol ScreenshotsNavigationControllerDelegate: NSObjectProtocol {
 class ScreenshotsNavigationController: UINavigationController {
     weak var screenshotsNavigationControllerDelegate:ScreenshotsNavigationControllerDelegate?
     var screenshotsViewController:ScreenshotsViewController = ScreenshotsViewController()
-    var pickerNavigationController:ScreenshotPickerNavigationController?
-    var clipView:ClipView?
     var activityBarButtonItem:UIBarButtonItem?
-    var previousDidAppearViewControllerWasProductViewController = false
     
     fileprivate var restoredProductsViewController: ProductsViewController?
     
@@ -27,9 +24,8 @@ class ScreenshotsNavigationController: UINavigationController {
         super.init(nibName: nil, bundle: nil)
         screenshotsViewController.navigationItem.leftBarButtonItem = screenshotsViewController.editButtonItem
         screenshotsViewController.navigationItem.rightBarButtonItem?.tintColor = .crazeRed
-        screenshotsViewController.navigationItem.rightBarButtonItem = UIBarButtonItem.init(image: UIImage.init(named: "NavigationBarAddPhotos"), style: .plain, target: self, action: #selector(presentPickerViewController))
+        screenshotsViewController.navigationItem.rightBarButtonItem = UIBarButtonItem.init(image: UIImage.init(named: "NavigationBarAddPhotos"), style: .plain, target: self, action: #selector(pickerButtonPresses(_:)))
         screenshotsViewController.delegate = self
-        screenshotsViewController.lifeCycleDelegate = self
         
         self.restorationIdentifier = "ScreenshotsNavigationController"
         
@@ -63,69 +59,43 @@ extension ScreenshotsNavigationController {
         return navigationController
     }
     
-    func needsToPresentPickerViewController() -> Bool {
-        return !UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingPresentedScreenshotPicker)
-    }
-    
-    @objc func presentPickerViewController() {
-        self.dismissPickerClipView()
-        
+    func presentPickerViewController(openScreenshots:Bool) {
         let picker = self.createScreenshotPickerNavigationController()
-        self.pickerNavigationController = picker // ???: is this needed?
+        picker.screenshotPickerViewController.openScreenshots = openScreenshots
         self.present(picker, animated: true, completion: nil)
         
-        UserDefaults.standard.setValue(true, forKey: UserDefaultsKeys.onboardingPresentedScreenshotPicker)
-        
         Analytics.trackOpenedPicker()
+    }
+    @objc func pickerButtonPresses(_ sender:Any) {
+        self.presentPickerViewController(openScreenshots: false)
     }
     
     @objc func pickerViewControllerDidCancel() {
         self.dismiss(animated: true) {
-            if self.needsToPresentPushAlert() {
+            if self.needsToPresentPushAlert {
                 self.presentPushAlert()
             }
         }
     }
+    
     @objc func pickerViewControllerDidFinish(){
-        self.pickerNavigationController = nil
         self.dismiss(animated: true, completion: nil)
-    }
-}
-
-extension ScreenshotsNavigationController : ViewControllerLifeCycle {
-    func viewController(_ viewController: UIViewController, didAppear animated: Bool){
-        if (viewController == self.screenshotsViewController &&
-            self.previousDidAppearViewControllerWasProductViewController)
-        {
-            if self.needsToPresentPickerViewController() {
-                // Allow the view controller transition view to cleanup
-                DispatchQueue.main.async {
-                    self.presentPickerClipView()
-                }
-                
-                // Go back into Products before presenting the next view
-                self.previousDidAppearViewControllerWasProductViewController = false
-                
-            } else if (self.needsToPresentPushAlert()) {
-                self.presentPushAlert()
-            }
-        }
-        
-        if let _ = viewController as? ProductsViewController {
-            self.previousDidAppearViewControllerWasProductViewController = true
-        }else{
-            self.previousDidAppearViewControllerWasProductViewController = false
-        }
     }
 }
 
 extension ScreenshotsNavigationController :ScreenshotsViewControllerDelegate{
     func screenshotsViewController(_ viewController:ScreenshotsViewController, didSelectItemAt:IndexPath) {
         if let screenshot = viewController.screenshot(at: didSelectItemAt.item) {
+            let screenshotOID = screenshot.objectID
+            let _ = ShoppingCartModel.shared.checkStock(screenshotOID: screenshotOID)
+            
             let productsViewController = createProductsViewController(screenshot: screenshot)
             self.pushViewController(productsViewController, animated: true)
             
             if (screenshot.isNew) {
+                if screenshot.source == .discover {
+                    AccumulatorModel.screenshotUninformed.decrementUninformedCount(by:1)
+                }
                 screenshot.setViewed()
             }
             
@@ -133,13 +103,69 @@ extension ScreenshotsNavigationController :ScreenshotsViewControllerDelegate{
         }
     }
     
-    func screenshotsViewControllerDeletedLastScreenshot(_  viewController:ScreenshotsViewController){
-        if (self.needsToPresentPickerViewController()) {
-            self.presentPickerClipView()
+    func screenshotsViewControllerWantsToPresentPicker(_  viewController:ScreenshotsViewController, openScreenshots:Bool){
+        self.presentPickerViewController(openScreenshots:openScreenshots)
+    }
+}
+
+extension ScreenshotsNavigationController: GiftCardCampaignViewControllerDelegate {
+    fileprivate var giftCardActiveViewController: UIViewController {
+        if let presentedViewController = presentedViewController, !presentedViewController.isBeingDismissed {
+            return presentedViewController
+        }
+        
+        return self
+    }
+    
+    func presentGiftCardCampaignIfNeeded() {
+        if UIApplication.isUSC && !UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingPresentedGiftCard) {
+            UserDefaults.standard.set(true, forKey: UserDefaultsKeys.onboardingPresentedGiftCard)
+            UserDefaults.standard.synchronize()
+            
+            let viewController = GiftCardCampaignViewController()
+            viewController.delegate = self
+        
+            giftCardActiveViewController.present(viewController, animated: true, completion: nil)
         }
     }
-    func screenshotsViewControllerWantsToPresentPicker(_  viewController:ScreenshotsViewController){
-        self.presentPickerViewController()
+    
+    func giftCardCampaignViewControllerDidSkip(_ viewController: GiftCardCampaignViewController) {
+        Analytics.trackOnboardingCampainCreditCardSkip()
+        
+        giftCardActiveViewController.dismiss(animated: true, completion: nil)
+    }
+    
+    func giftCardCampaignViewControllerDidContinue(_ viewController: GiftCardCampaignViewController) {
+        Analytics.trackOnboardingCampainCreditCardLetsGo()
+        
+        giftCardActiveViewController.dismiss(animated: true, completion: nil)
+        
+        let viewController = CheckoutPaymentFormViewController(withCard: nil, isEditLayout: true, confirmBeforeSave: false, autoSaveBillAddressAsShippingAddress:true)
+        viewController.title = "2018_05_01_campaign.payment".localized
+        viewController.delegate = self
+        
+        let modalNavigationController = ModalNavigationController(rootViewController: viewController)
+        giftCardActiveViewController.present(modalNavigationController, animated: true, completion: nil)
+    }
+}
+
+extension ScreenshotsNavigationController: GiftCardDoneViewControllerDelegate {
+    func giftCardDoneViewControllerDidPressDone(_ viewController: GiftCardDoneViewController) {
+        let frc = DataModel.sharedInstance.cardFrc(delegate: nil).fetchedObjects.first
+        Analytics.trackOnboardingCampainCreditCardDone(email: frc?.email, phone: frc?.phone)
+        
+        giftCardActiveViewController.dismiss(animated: true, completion: nil)
+    }
+}
+
+extension ScreenshotsNavigationController: CheckoutFormViewControllerDelegate {
+    func checkoutFormViewControllerDidAdd(_ viewController: CheckoutFormViewController) {
+        Analytics.trackOnboardingCampainCreditCardEnteredCard()
+        
+        let doneViewController = GiftCardDoneViewController()
+        doneViewController.delegate = self
+        doneViewController.navigationItem.hidesBackButton = true
+        viewController.navigationController?.pushViewController(doneViewController, animated: true)
     }
 }
 
@@ -147,8 +173,6 @@ typealias ScreenshotsNavigationControllerProducts = ScreenshotsNavigationControl
 extension ScreenshotsNavigationControllerProducts {
     func createProductsViewController(screenshot: Screenshot) -> ProductsViewController {
         let productsViewController = ProductsViewController(screenshot: screenshot)
-        productsViewController.lifeCycleDelegate = self
-        productsViewController.hidesBottomBarWhenPushed = true
         return productsViewController
     }
     
@@ -162,25 +186,29 @@ extension ScreenshotsNavigationControllerProducts {
     }
 }
 
-extension ScreenshotsNavigationController { //push permission
-    func needsToPresentPushAlert() -> Bool {
-        return !UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingPresentedPushAlert) && PermissionsManager.shared.hasPermission(for: .photo)
+typealias ScreenshotsNavigationControllerPushPermission = ScreenshotsNavigationController
+extension ScreenshotsNavigationControllerPushPermission {
+    fileprivate var needsToPresentPushAlert: Bool {
+        return !UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingPresentedPushAlert) && PermissionsManager.shared.hasPermission(for: .photo) && !PermissionsManager.shared.hasPermission(for: .push)
     }
     
-    func presentPushAlert(){
+    fileprivate func presentPushAlert() {
         let alertController = UIAlertController.init(title: "screenshot.permission.push.title".localized, message: "screenshot.permission.push.message".localized, preferredStyle: .alert)
-        alertController.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .default, handler: { (a) in
-            PermissionsManager.shared.requestPermission(for: .push, response: { (granted) in
-                if (granted) {
+        alertController.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .default, handler: { action in
+            PermissionsManager.shared.requestPermission(for: .push, response: { granted in
+                if granted {
                     self.screenshotsNavigationControllerDelegate?.screenshotsNavigationControllerDidGrantPushPermissions(self)
                     Analytics.trackAcceptedPushPermissions()
-                } else {
+                }
+                else {
                     Analytics.trackDeniedPushPermissions()
                 }
             })
         }))
-        self.present(alertController, animated: true, completion: nil)
+        present(alertController, animated: true, completion: nil)
+        
         UserDefaults.standard.set(true, forKey: UserDefaultsKeys.onboardingPresentedPushAlert)
+        UserDefaults.standard.synchronize()
     }
 }
 
@@ -214,49 +242,6 @@ extension ScreenshotsNavigationController : NetworkingIndicatorProtocol {
     }
 }
 
-typealias ScreenshotsNavigationControllerClipView = ScreenshotsNavigationController
-extension ScreenshotsNavigationControllerClipView {
-    func presentPickerClipView() {
-        if (self.clipView == nil && !self.screenshotsViewController.isEditing) {
-            if let tabBarView = self.tabBarController?.view {
-                if let rightBarButtonView = self.screenshotsViewController.navigationItem.rightBarButtonItem?.targetView, let rightBarButtonViewSuperview = rightBarButtonView.superview {
-                    
-                    let rightBarButtonItemFrame = rightBarButtonView.frame
-                    let rect = rightBarButtonViewSuperview.convert(rightBarButtonItemFrame, to:self.view)
-                    let radius = min(rect.size.height / 2.0, rect.size.width / 2.0)
-                    let croppedPath = UIBezierPath.init(roundedRect: rect, cornerRadius: radius)
-                    
-                    let clipView = ClipView()
-                    clipView.translatesAutoresizingMaskIntoConstraints = false
-                    clipView.clippings = [croppedPath]
-                    clipView.alpha = 0.0
-                    tabBarView.addSubview(clipView)
-                    clipView.topAnchor.constraint(equalTo: tabBarView.topAnchor).isActive = true
-                    clipView.leadingAnchor.constraint(equalTo: tabBarView.leadingAnchor).isActive = true
-                    clipView.bottomAnchor.constraint(equalTo: tabBarView.bottomAnchor).isActive = true
-                    clipView.trailingAnchor.constraint(equalTo: tabBarView.trailingAnchor).isActive = true
-                    self.clipView = clipView
-                    UIView.animate(withDuration: .defaultAnimationDuration, animations: {
-                        self.clipView?.alpha = 1.0
-                    })
-                }
-            }
-        }
-    }
-    
-    func dismissPickerClipView() {
-        if let _ = self.clipView {
-            UIView.animate(withDuration: .defaultAnimationDuration, animations: {
-                self.clipView?.alpha = 0.0
-                
-            }, completion: { (finished) in
-                self.clipView?.removeFromSuperview()
-                self.clipView = nil
-            })
-        }
-    }
-}
-
 typealias ScreenshotsNavigationControllerStateRestoration = ScreenshotsNavigationController
 extension ScreenshotsNavigationControllerStateRestoration {
     private var screenshotKey: String {
@@ -279,7 +264,7 @@ extension ScreenshotsNavigationControllerStateRestoration {
             return
         }
         
-        guard let persistentStoreCoordinator = DataModel.sharedInstance.mainMoc().persistentStoreCoordinator else {
+        guard let _ = DataModel.sharedInstance.mainMoc().persistentStoreCoordinator else {
             return
         }
         

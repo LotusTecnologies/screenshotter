@@ -74,6 +74,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return true
     }
     
+    func applicationDidReceiveMemoryWarning(_ application: UIApplication) {
+        Analytics.trackDevMemoryWarning()
+    }
+    
     func asyncLoadStore(){
         DataModel.sharedInstance.loadStore(multipleAttempts: 5).then(execute: { (success) -> Void in
             DispatchQueue.main.async {
@@ -94,11 +98,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         ApplicationStateModel.sharedInstance.applicationState = application.applicationState
-        application.applicationIconBadgeNumber = 0
         
         frameworkSetup(application, didFinishLaunchingWithOptions: launchOptions)
         
         SilentPushSubscriptionManager.sharedInstance.updateSubscriptionsIfNeeded()
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(badgeNumberDidChange(_:)), name: .ScreenshotUninformedAccumulatorModelDidChange, object: nil)
         
         if application.applicationState == .background,
             let remoteNotification = launchOptions?[.remoteNotification] as? [String: AnyObject],
@@ -111,7 +116,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             Analytics.trackSessionStarted() // Roi Tal from AppSee suggested
         }
         
-        
         if let launchOptions = launchOptions, let url = launchOptions[UIApplicationLaunchOptionsKey.url] as? URL {
             
             if self.isSendToDebugURL(url) {
@@ -122,6 +126,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         
         return true
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
 
     func isSendToDebugURL(_ url:URL) -> Bool{
@@ -151,6 +159,33 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 }
             }
             paramsToSend["sharedScreenshots"] = screenshots.joined(separator: ",")
+        }
+        if urlAbsoluteString.contains("watchedProductInfo") {
+            var arrayOfDictionaries:[[String:Any]] = []
+            let favoritesFRC = DataModel.sharedInstance.favoritedProductsFrc(delegate: nil)
+            favoritesFRC.fetchedObjects.forEach { (p) in
+                //                        if let partNumber = productInfo["partNumber"] as? String, let price = productInfo["price"] as? Double, let title = productInfo["title"] as? String, let inStock = productInfo["inStock"] as? Bool {
+
+                if p.hasPriceAlerts, let partNumber = p.partNumber, let title = p.productTitle() {
+                    let inStock = p.hasVariants
+                    let price = p.fallbackPrice
+                    
+                    
+                    arrayOfDictionaries.append(["partNumber":partNumber,
+                                                "price":price,
+                                                "title":title,
+                                                "inStock":inStock])
+                }
+            }
+            do {
+                let jsonData = try JSONSerialization.data(withJSONObject: arrayOfDictionaries, options: [])
+                if let jsonString = String.init(data: jsonData, encoding: .utf8) {
+                    paramsToSend["watchedProductInfo"] = jsonString
+                }
+
+            }catch{
+                print("error making json - \(error)")
+            }
         }
         if let url = URL.urlWith(string: "crazeDebugApp://sendDebugInfo", queryParameters: paramsToSend) {
         
@@ -308,7 +343,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             
             viewController = tabBarController.favoritesNavigationController
             
-        case s(FavoritesViewController.self):
+        case s(FavoriteProductsViewController.self):
             guard let navigationController = restorationViewControllers[s(FavoritesNavigationController.self)] as? FavoritesNavigationController else {
                 return nil
             }
@@ -503,6 +538,8 @@ extension AppDelegate {
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         IntercomHelper.sharedInstance.deviceToken = deviceToken
         SilentPushSubscriptionManager.sharedInstance.updateSubscriptionsIfNeeded()
+        
+        NotificationCenter.default.post(name: .applicationDidRegisterForRemoteNotifications, object: deviceToken)
     }
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
@@ -587,6 +624,10 @@ extension AppDelegate {
         }
     }
     
+    @objc fileprivate func badgeNumberDidChange(_ notification: Notification) {
+        let count = AccumulatorModel.screenshotUninformed.uninformedCount
+        UIApplication.shared.applicationIconBadgeNumber = count
+    }
 }
 
 // MARK: - Settings
@@ -607,7 +648,7 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
             if let openingScreen = userInfo[Constants.openingScreenKey] as? String,
                 openingScreen == Constants.openingScreenValueScreenshot,
                 let openingAssetId = userInfo[Constants.openingAssetIdKey] as? String {
-                AssetSyncModel.sharedInstance.importPhotosToScreenshot(assetIds: [openingAssetId])
+                AssetSyncModel.sharedInstance.importPhotosToScreenshot(assetIds: [openingAssetId], source: .screenshot)
                 showScreenshotListTop()
             } else if let aps = userInfo["aps"] as? [String : Any],
                 let category = aps["category"] as? String,

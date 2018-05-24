@@ -11,6 +11,7 @@ import UIKit
 class CartNavigationController: UINavigationController {
     let cartViewController = CartViewController()
     fileprivate var cvvMap: (url: URL, cvv: String)?
+    fileprivate var isGiftCardRedeemable = false
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -85,6 +86,7 @@ class CartNavigationController: UINavigationController {
     fileprivate func navigateToCheckoutOrder() {
         let checkoutOrderViewController = CheckoutOrderViewController()
         checkoutOrderViewController.cvvMap = cvvMap
+        checkoutOrderViewController.isGiftCardRedeemable = isGiftCardRedeemable
         checkoutOrderViewController.hidesBottomBarWhenPushed = true
         pushViewController(checkoutOrderViewController, animated: true)
         
@@ -95,9 +97,7 @@ class CartNavigationController: UINavigationController {
 extension CartNavigationController: CheckoutFormViewControllerDelegate {
     func checkoutFormViewControllerDidAdd(_ viewController: CheckoutFormViewController) {
         if let checkout = viewController as? CheckoutPaymentFormViewController {
-            let cart = DataModel.sharedInstance.retrieveAddableCart(managedObjectContext: DataModel.sharedInstance.mainMoc())
-            Analytics.trackCartCreditCardAdded(cart: cart, source: .manual)
-            
+           
             let addressShip = checkout.formRow(.addressShip)?.value
             let isShipToSameAddressChecked = FormRow.Checkbox.bool(for: addressShip)
             
@@ -116,7 +116,8 @@ extension CartNavigationController: CheckoutFormViewControllerDelegate {
         }
         else if let _ = viewController as? CheckoutShippingFormViewController {
             let cart = DataModel.sharedInstance.retrieveAddableCart(managedObjectContext: DataModel.sharedInstance.mainMoc())
-            Analytics.trackCartShippingAdded(cart: cart, source: .manual)
+            let addressesCount = DataModel.sharedInstance.shippingAddressFrc(delegate: nil).fetchedObjectsCount
+            Analytics.trackCartShippingAdded(cart: cart, source: .manual, numberOfAddresses: addressesCount)
 
             navigateToCheckoutOrder()
         }
@@ -181,15 +182,15 @@ extension CartNavigationController: CartViewControllerDelegate {
     func cartViewControllerDidValidateCart(_ viewController: CartViewController) {
         let hasCard = DataModel.sharedInstance.hasSavedCards()
         let hasAddress = DataModel.sharedInstance.hasShippingAddresses()
-        
         let cart = DataModel.sharedInstance.retrieveAddableCart(managedObjectContext: DataModel.sharedInstance.mainMoc())
+        isGiftCardRedeemable = viewController.isGiftCardRedeemable
+        
         if hasCard && hasAddress {
             Analytics.trackCartPressedCheckoutValidated(cart: cart, result: .continue)
             navigateToCheckoutOrder()
         }
         else if hasCard {
             Analytics.trackCartPressedCheckoutValidated(cart: cart, result: .needsShippingAddress)
-
             navigateToCheckoutShippingForm()
         }
         else {

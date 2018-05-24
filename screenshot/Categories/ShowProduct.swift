@@ -11,7 +11,8 @@ import UIKit
 extension UIViewController {
     @discardableResult func presentProduct(_ product: Product, atLocation location: Analytics.AnalyticsProductOpenedFromPage) -> ProductViewController? {
         Analytics.trackTappedOnProduct(product, atLocation: location)
-        if product.partNumber != nil {
+        
+        if product.isSupportingUSC {
             let productViewController = ProductViewController(product: product)
             navigationController?.pushViewController(productViewController, animated: true)
             return productViewController
@@ -31,9 +32,16 @@ extension ProductViewController {
         
         if let product = dataModel.retrieveProduct(managedObjectContext: dataModel.mainMoc(), partNumber: partNumber) {
             Analytics.trackProductPriceAlertOpened(product: product)
-            let productViewController = ProductViewController(product: product)
-            let navigationController = ModalNavigationController(rootViewController: productViewController)
-            AppDelegate.shared.window?.rootViewController?.present(navigationController, animated: true, completion: nil)
+            
+            if UIApplication.isUSC {
+                let productViewController = ProductViewController(product: product)
+                let navigationController = ModalNavigationController(rootViewController: productViewController)
+                AppDelegate.shared.window?.rootViewController?.present(navigationController, animated: true, completion: nil)
+            }else{
+                if let vc = AppDelegate.shared.window?.rootViewController {
+                    OpenWebPage.presentProduct(product, fromViewController: vc)
+                }
+            }
         }
     }
 }
