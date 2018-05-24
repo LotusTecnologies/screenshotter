@@ -201,7 +201,11 @@ extension FavoriteProductsViewController: UITableViewDataSource, AsyncOperationM
             return !visiblePartNumbers.contains( $0.key )
         }
         
-        unusedMonitors.forEach { self.trackingProgressMonitors.removeValue(forKey: $0.key) }
+        unusedMonitors.forEach {
+            if let monitor = self.trackingProgressMonitors[$0.key] {
+                monitor.delegate = nil
+            }
+            self.trackingProgressMonitors.removeValue(forKey: $0.key) }
     }
     
     func asyncOperationMonitorDidChange(_ monitor: AsyncOperationMonitor) {
