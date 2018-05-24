@@ -25,6 +25,15 @@ extension UIApplication {
             return false
         #endif
     }
+    
+    static var isUSC: Bool {
+        if isDev {
+            return true
+        }
+        else {
+            return UserDefaults.standard.bool(forKey: UserDefaultsKeys.isUSC)
+        }
+    }
 }
 
 extension DispatchQueue {
