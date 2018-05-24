@@ -73,20 +73,9 @@ class FavoriteProductsViewController : BaseViewController {
         self.tableView.reloadData()
     }
     
-    @objc private func applicationDidRegisterForRemoteNotifications(_ notification: Notification) {
-        if let trackProductValues = trackProductValues {
-            trackProductAction(trackProductValues.button, event: trackProductValues.event)
-        }
-        
-        trackProductValues = nil
-        NotificationCenter.default.removeObserver(self, name: .applicationDidRegisterForRemoteNotifications, object: nil)
-    }
-    
     deinit {
         tableView.dataSource = nil
         tableView.delegate = nil
-        
-        NotificationCenter.default.removeObserver(self)
     }
     
     // MARK:
@@ -130,58 +119,19 @@ class FavoriteProductsViewController : BaseViewController {
         }
     }
     
-    // MARK: Tracking
+    // MARK: Price Alerts
     
-    private var trackProductValues: (button: LoadingButton, event: UIEvent)?
+    private let priceAlertController = ProductPriceAlertController()
     
     @objc fileprivate func trackProductAction(_ button: LoadingButton, event: UIEvent) {
-        if PermissionsManager.shared.hasPermission(for: .push) {
-            guard let indexPath = tableView.indexPath(for: event),
-                let product = self.productsFRC?.object(at: indexPath),
-                !button.isLoading
-                else {
-                    return
-            }
-            
-            button.isLoading = true
-            let hasPriceAlerts =  product.hasPriceAlerts
-            
-            if hasPriceAlerts {
-                Analytics.trackProductPriceAlertUnsubscribed(product: product)
-            }else{
-                Analytics.trackProductPriceAlertSubscribed(product: product)
-            }
-            
-            (product.hasPriceAlerts ? product.untrack() : product.track())
-                .then { [weak button] isTracking -> Void in
-                    button?.isLoading = false
-                    button?.isSelected = isTracking
-                    
-                }.catch { [weak button] error in
-                    button?.isLoading = false
-                    let e = error as NSError
-                    if hasPriceAlerts {
-                        Analytics.trackProductPriceAlertUnsubscribedError(product: product, domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
-                    }else{
-                        Analytics.trackProductPriceAlertSubscribedError(product: product, domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
-                    }
-            }
-        }
-        else {
-            if PermissionsManager.shared.permissionStatus(for: .push) == .undetermined {
-                PermissionsManager.shared.requestPermission(for: .push) { [weak self] granted in
-                    if granted, let strongSelf = self {
-                        strongSelf.trackProductValues = (button: button, event: event)
-                        
-                        NotificationCenter.default.addObserver(strongSelf, selector: #selector(strongSelf.applicationDidRegisterForRemoteNotifications(_:)), name: .applicationDidRegisterForRemoteNotifications, object: nil)
-                    }
-                }
-            }
+        guard let indexPath = tableView.indexPath(for: event),
+            let product = self.productsFRC?.object(at: indexPath)
             else {
-                if let alertController = PermissionsManager.shared.deniedAlertController(for: .push) {
-                    present(alertController, animated: true, completion: nil)
-                }
-            }
+                return
+        }
+        
+        if let deniedAlertController = priceAlertController.priceAlertAction(button, on: product) {
+            present(deniedAlertController, animated: true, completion: nil)
         }
     }
     
