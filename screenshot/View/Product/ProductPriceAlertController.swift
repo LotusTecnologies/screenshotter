@@ -12,19 +12,19 @@ import CoreData
 class ProductPriceAlertController {
     private var productObjectId:NSManagedObjectID?
     
-    func priceAlertAction(_ button: UIButton, on product: Product) -> UIAlertController? {
-        if let button = button as? LoadingButton {
+    func priceAlertAction(_ button: LoadingButton?, on product: Product) -> UIAlertController? {
+        if let button = button {
             if button.isLoading {
                 return nil
             }
         }
-        
+        self.productObjectId = product.objectID
+
         switch PermissionsManager.shared.permissionStatus(for: .push) {
         case .authorized:
             togglePriceAlert(product: product)
             
         case .undetermined:
-            self.productObjectId = product.objectID
             requestPermission()
             
         default:

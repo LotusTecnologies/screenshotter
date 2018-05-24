@@ -27,12 +27,7 @@ extension UIApplication {
     }
     
     static var isUSC: Bool {
-        if isDev {
-            return true
-        }
-        else {
-            return UserDefaults.standard.bool(forKey: UserDefaultsKeys.isUSC)
-        }
+        return UserDefaults.standard.bool(forKey: UserDefaultsKeys.isUSC)
     }
 }
 
