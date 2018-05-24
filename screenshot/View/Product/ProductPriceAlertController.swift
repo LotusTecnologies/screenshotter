@@ -34,23 +34,11 @@ class ProductPriceAlertController {
         return nil
     }
     
-    private func togglePriceAlert(product:Product) {
-        
-        let hasPriceAlerts =  product.hasPriceAlerts
-        if hasPriceAlerts {
-            Analytics.trackProductPriceAlertUnsubscribed(product: product)
-            product.untrack().catch { (error) in
-                let e = error as NSError
-                Analytics.trackProductPriceAlertUnsubscribedError(product: product, domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
-            }
-        }
-        else {
-            Analytics.trackProductPriceAlertSubscribed(product: product)
-            product.track().catch { (error) in
-                let e = error as NSError
-                Analytics.trackProductPriceAlertSubscribedError(product: product, domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
-
-            }
+    private func togglePriceAlert(product:Product) {        
+        if product.hasPriceAlerts {
+            product.untrack()
+        } else {
+            product.track()
         }
     }
     
