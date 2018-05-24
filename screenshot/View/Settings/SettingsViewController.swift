@@ -724,7 +724,7 @@ fileprivate extension SettingsViewController {
             if UserDefaults.standard.object(forKey: UserDefaultsKeys.isUSC) == nil {
                 return "settings.region.unknown".localized
             } else {
-                if UserDefaults.standard.bool(forKey: UserDefaultsKeys.isUSC) {
+                if UIApplication.isUSC {
                     return "settings.region.us".localized
                 } else {
                     return "settings.region.other".localized

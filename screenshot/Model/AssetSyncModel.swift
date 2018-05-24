@@ -760,11 +760,17 @@ extension AssetSyncModel {
                             break
                         }
                     }
-                    let uploadedURLString = nsError.userInfo[Constants.uploadedURLStringKey] as? String
+                    let uploadedURLString = nsError.userInfo[NSURLErrorFailingURLStringErrorKey] as? String
                     let imageUrl: String = uploadedURLString ?? ""
                     DataModel.sharedInstance.setNoShoppables(assetId: assetId, uploadedURLString: uploadedURLString)
                     Analytics.trackReceivedResponseFromSyte(imageUrl: imageUrl, segmentCount: 0, categories: nil)
-                    Analytics.trackError(type: nil, domain: nsError.domain, code: nsError.code, localizedDescription: nsError.localizedDescription)
+                    if let e = error as? PMKURLError {
+                        Analytics.trackError(type: nil, domain: nsError.domain, code: nsError.code, localizedDescription: e.errorDescription)
+                    }else{
+                        Analytics.trackError(type: nil, domain: nsError.domain, code: nsError.code, localizedDescription: nsError.localizedDescription)
+                    }
+
+                    
                     print("uploadScreenshot inner uploadToSyte catch error:\(error)")
                 }.always {
                     self.networkingIndicatorDelegate?.networkingIndicatorDidComplete(type: .Product)

@@ -26,7 +26,7 @@ class BorderButton: LoadingButton {
     
     override func setTitleColor(_ color: UIColor?, for state: UIControlState) {
         super.setTitleColor(color, for: state)
-        syncBorderColor()
+        syncColors()
         
         if state == .normal {
             let darkerColor = color?.darker(by: 14)
@@ -38,23 +38,25 @@ class BorderButton: LoadingButton {
     
     override var isHighlighted: Bool {
         didSet {
-            syncBorderColor()
+            syncColors()
         }
     }
     
     override var isSelected: Bool {
         didSet {
-            syncBorderColor()
+            syncColors()
         }
     }
     
     override var isEnabled: Bool {
         didSet {
-            syncBorderColor()
+            syncColors()
         }
     }
     
-    fileprivate func syncBorderColor() {
-        layer.borderColor = titleColor(for: state)?.cgColor
+    fileprivate func syncColors() {
+        let color = titleColor(for: state)
+        tintColor = color
+        layer.borderColor = color?.cgColor
     }
 }

@@ -7,9 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3125446B2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
-		3125446C2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
-		3125446D2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
+		3125446B2091C3A0009410D5 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
+		3125446C2091C3A0009410D5 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
+		3125446D2091C3A0009410D5 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
 		3125448F209871B4009410D5 /* Analytics+api.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3125448E209871B4009410D5 /* Analytics+api.swift */; };
 		314C488A205E86E700B8381D /* PHAsset+craze.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314C4889205E86E700B8381D /* PHAsset+craze.swift */; };
 		315186412033FC81001BD8D6 /* ShoppablesToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3151863F2033FC81001BD8D6 /* ShoppablesToolbar.swift */; };
@@ -77,6 +77,7 @@
 		C51ED5BA1FF39A0700AABD68 /* FavoritesNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51ED5B91FF39A0700AABD68 /* FavoritesNavigationController.swift */; };
 		C51ED5BC1FF39BD800AABD68 /* FavoriteProductsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C51ED5BB1FF39BD800AABD68 /* FavoriteProductsViewController.swift */; };
 		C5233F0B1F6FF05800F25C7C /* LifeCycleProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5233F0A1F6FF05800F25C7C /* LifeCycleProtocol.swift */; };
+		C527312720B67C2700A0E2EB /* ProductPriceAlertController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C527312620B67C2700A0E2EB /* ProductPriceAlertController.swift */; };
 		C5278FEB1F3C38510090E422 /* AssetSyncModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5278FB91F3C38510090E422 /* AssetSyncModel.swift */; };
 		C5278FEC1F3C38510090E422 /* DataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5278FBA1F3C38510090E422 /* DataModel.swift */; };
 		C5278FEE1F3C38510090E422 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = C5278FBD1F3C38510090E422 /* Model.xcdatamodeld */; };
@@ -148,7 +149,6 @@
 		C57E93A9204BEE4E0069C378 /* OpenWebPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C57E93A8204BEE4E0069C378 /* OpenWebPage.swift */; };
 		C5847EF81F7A53F60024DCAB /* CredentialHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */; };
 		C58FA0ED20A95FC300072966 /* TutorialVideoOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0E120A95FC200072966 /* TutorialVideoOverlayView.swift */; };
-		C58FA0EE20A95FC300072966 /* NotificationPromptViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0E220A95FC200072966 /* NotificationPromptViewController.swift */; };
 		C58FA0EF20A95FC300072966 /* CampaignPromotionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0E320A95FC200072966 /* CampaignPromotionViewController.swift */; };
 		C58FA0F120A95FC300072966 /* TutorialTrySlideViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0E520A95FC200072966 /* TutorialTrySlideViewController.swift */; };
 		C58FA0F220A95FC300072966 /* VideoDisplayingViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0E620A95FC200072966 /* VideoDisplayingViewControllerDelegate.swift */; };
@@ -325,6 +325,7 @@
 		C51ED5B91FF39A0700AABD68 /* FavoritesNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesNavigationController.swift; sourceTree = "<group>"; };
 		C51ED5BB1FF39BD800AABD68 /* FavoriteProductsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteProductsViewController.swift; sourceTree = "<group>"; };
 		C5233F0A1F6FF05800F25C7C /* LifeCycleProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifeCycleProtocol.swift; sourceTree = "<group>"; };
+		C527312620B67C2700A0E2EB /* ProductPriceAlertController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductPriceAlertController.swift; sourceTree = "<group>"; };
 		C5278FB91F3C38510090E422 /* AssetSyncModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssetSyncModel.swift; sourceTree = "<group>"; };
 		C5278FBA1F3C38510090E422 /* DataModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataModel.swift; sourceTree = "<group>"; };
 		C5278FBE1F3C38510090E422 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
@@ -396,7 +397,6 @@
 		C57E93A8204BEE4E0069C378 /* OpenWebPage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpenWebPage.swift; sourceTree = "<group>"; };
 		C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialHelper.swift; sourceTree = "<group>"; };
 		C58FA0E120A95FC200072966 /* TutorialVideoOverlayView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialVideoOverlayView.swift; sourceTree = "<group>"; };
-		C58FA0E220A95FC200072966 /* NotificationPromptViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotificationPromptViewController.swift; sourceTree = "<group>"; };
 		C58FA0E320A95FC200072966 /* CampaignPromotionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CampaignPromotionViewController.swift; sourceTree = "<group>"; };
 		C58FA0E520A95FC200072966 /* TutorialTrySlideViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialTrySlideViewController.swift; sourceTree = "<group>"; };
 		C58FA0E620A95FC200072966 /* VideoDisplayingViewControllerDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoDisplayingViewControllerDelegate.swift; sourceTree = "<group>"; };
@@ -787,6 +787,7 @@
 			children = (
 				C54369632046B4E800599134 /* ProductCartBarButtonItem.swift */,
 				C5F37CA920555E1F0072FE1D /* ProductNextStepViewController.swift */,
+				C527312620B67C2700A0E2EB /* ProductPriceAlertController.swift */,
 				C572C0E220AC48C1004B0A17 /* ProductStructures.swift */,
 				C572C0E020AC2CFA004B0A17 /* ProductVariantsSelectorViewController.swift */,
 				C543694F20453CDF00599134 /* ProductView.swift */,
@@ -987,7 +988,6 @@
 				C58FA0E320A95FC200072966 /* CampaignPromotionViewController.swift */,
 				C58FA0E920A95FC300072966 /* GiftCardCampaignViewController.swift */,
 				C58FA0EC20A95FC300072966 /* GiftCardDoneViewController.swift */,
-				C58FA0E220A95FC200072966 /* NotificationPromptViewController.swift */,
 				C572C0D720AADA98004B0A17 /* OnboardingWelcomeViewController.swift */,
 				C58FA0EA20A95FC300072966 /* TutorialEmailSlideViewController.swift */,
 				C58FA0E820A95FC300072966 /* TutorialNavigationController.swift */,
@@ -1338,6 +1338,9 @@
 				"${BUILT_PRODUCTS_DIR}/FBSDKCoreKit/FBSDKCoreKit.framework",
 				"${BUILT_PRODUCTS_DIR}/FBSDKLoginKit/FBSDKLoginKit.framework",
 				"${BUILT_PRODUCTS_DIR}/FBSDKShareKit/FBSDKShareKit.framework",
+				"${BUILT_PRODUCTS_DIR}/FacebookCore/FacebookCore.framework",
+				"${BUILT_PRODUCTS_DIR}/FacebookLogin/FacebookLogin.framework",
+				"${BUILT_PRODUCTS_DIR}/FacebookShare/FacebookShare.framework",
 				"${BUILT_PRODUCTS_DIR}/PhoneNumberKit/PhoneNumberKit.framework",
 				"${BUILT_PRODUCTS_DIR}/PromiseKit/PromiseKit.framework",
 				"${BUILT_PRODUCTS_DIR}/RateView/RateView.framework",
@@ -1359,6 +1362,9 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKCoreKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKLoginKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKShareKit.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FacebookCore.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FacebookLogin.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FacebookShare.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PhoneNumberKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PromiseKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RateView.framework",
@@ -1437,7 +1443,7 @@
 				525691881FD5DD51008D728D /* UsageStreak.swift in Sources */,
 				C54124C220A8308600CA03DB /* AccumulatorModel.swift in Sources */,
 				C53B46581FBC3DFA00A8C886 /* NotificationCenterKeys.swift in Sources */,
-				3125446C2091C3A0009410D5 /* (null) in Sources */,
+				3125446C2091C3A0009410D5 /* BuildFile in Sources */,
 				52E547441FE2487B00627D6D /* ScreenshotHelper.swift in Sources */,
 				C50E2617207F6703003C8D24 /* TextFieldFormatter.swift in Sources */,
 				C501412A2061080700ABFB5C /* FavoriteProductsView.swift in Sources */,
@@ -1543,7 +1549,7 @@
 				319B030F2057AFCC00446054 /* ShareToDiscoverPrompt.swift in Sources */,
 				C540883A1FE90C8E00198955 /* ScreenshotsHelperView.swift in Sources */,
 				C5C43A54209599D8000AF22A /* ActionFeedbackGenerator.swift in Sources */,
-				3125446D2091C3A0009410D5 /* (null) in Sources */,
+				3125446D2091C3A0009410D5 /* BuildFile in Sources */,
 				C5336D25203D9AC800A7B4B0 /* GameViewController.swift in Sources */,
 				C52800622052B78B004DD7A3 /* CheckoutConfirmationViewController.swift in Sources */,
 				C5336D21203C511300A7B4B0 /* ActivityBadgeView.swift in Sources */,
@@ -1578,13 +1584,13 @@
 				C5E9241820690B6100D44FF9 /* Form.swift in Sources */,
 				31C0C80620A15EAA002EE95B /* CrazeImageZoom.swift in Sources */,
 				C58FA0F820A95FC300072966 /* GiftCardDoneViewController.swift in Sources */,
-				C58FA0EE20A95FC300072966 /* NotificationPromptViewController.swift in Sources */,
 				31C0C81E20A2CD14002EE95B /* ProductsRateView.swift in Sources */,
-				3125446B2091C3A0009410D5 /* (null) in Sources */,
+				3125446B2091C3A0009410D5 /* BuildFile in Sources */,
 				C5336D1B203AC9CE00A7B4B0 /* CartViewController.swift in Sources */,
 				C5FF4140200BA23900342DEC /* DiscoverScreenshotHelperView.swift in Sources */,
 				C58FA0F520A95FC300072966 /* GiftCardCampaignViewController.swift in Sources */,
 				523C11391F5C195D001BD969 /* RatingFlow.swift in Sources */,
+				C527312720B67C2700A0E2EB /* ProductPriceAlertController.swift in Sources */,
 				31CE1112203BF055000156EE /* ProductsBarCollectionView.swift in Sources */,
 				C58FA0F720A95FC300072966 /* CampaignPromotionExplanationViewController.swift in Sources */,
 				31C0C81920A2CD14002EE95B /* RelatedLooksCollectionViewCell.swift in Sources */,
@@ -1783,7 +1789,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 141;
+				CURRENT_PROJECT_VERSION = 142;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/dev/;
 				INFOPLIST_FILE = screenshot/dev/Info.plist;
@@ -1813,7 +1819,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 141;
+				CURRENT_PROJECT_VERSION = 142;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/dev/;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -1901,7 +1907,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 141;
+				CURRENT_PROJECT_VERSION = 142;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/prd/;
 				INFOPLIST_FILE = screenshot/prd/Info.plist;
@@ -1984,7 +1990,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 141;
+				CURRENT_PROJECT_VERSION = 142;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/prd/;
 				INFOPLIST_FILE = screenshot/prd/Info.plist;

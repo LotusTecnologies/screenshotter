@@ -538,6 +538,8 @@ extension AppDelegate {
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         IntercomHelper.sharedInstance.deviceToken = deviceToken
         SilentPushSubscriptionManager.sharedInstance.updateSubscriptionsIfNeeded()
+        
+        NotificationCenter.default.post(name: .applicationDidRegisterForRemoteNotifications, object: deviceToken)
     }
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {

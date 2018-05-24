@@ -10,14 +10,11 @@ import UIKit
 import CoreData
 
 class FavoriteProductsViewController : BaseViewController {
-    
     var productsFRC:FetchedResultsControllerManager<Product>?
     
     fileprivate var unfavoriteProductsIds: Set<NSManagedObjectID> = []
     private let emptyListView = HelperView()
     var  trackingProgressMonitors:[String:AsyncOperationMonitor] = [:]
-
-    
     
     override var title: String? {
         set {}
@@ -27,17 +24,6 @@ class FavoriteProductsViewController : BaseViewController {
     }
     
     // MARK: Views
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-    }
-    
-    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-        
-        restorationIdentifier = String(describing: type(of: self))
-        
-        addNavigationItemLogo()
-    }
     
     fileprivate var favoriteProductsView: FavoriteProductsView {
         return view as! FavoriteProductsView
@@ -53,6 +39,18 @@ class FavoriteProductsViewController : BaseViewController {
     
     // MARK: Life Cycle
     
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        
+        restorationIdentifier = String(describing: type(of: self))
+        
+        addNavigationItemLogo()
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -63,8 +61,6 @@ class FavoriteProductsViewController : BaseViewController {
         tableView.rowHeight = UITableViewAutomaticDimension
         tableView.estimatedRowHeight = 200
         tableView.layoutMargins = UIEdgeInsets(top: .extendedPadding, left: 0, bottom: .extendedPadding, right: 0) // Needed for emptyListView
-
-        
         
         emptyListView.titleLabel.text = "favorites.empty.title".localized
         emptyListView.subtitleLabel.text = "favorites.empty.detail".localized
@@ -76,8 +72,15 @@ class FavoriteProductsViewController : BaseViewController {
         self.view.addGestureRecognizer(pinchZoom)
         self.productsFRC = DataModel.sharedInstance.favoritedProductsFrc(delegate: self)
         self.tableView.reloadData()
-
     }
+    
+    deinit {
+        tableView.dataSource = nil
+        tableView.delegate = nil
+    }
+    
+    // MARK:
+    
     @objc func pinch( gesture:UIPinchGestureRecognizer) {
         if CrazeImageZoom.shared.isHandlingGesture, let imageView = CrazeImageZoom.shared.hostedImageView  {
             CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: imageView)
@@ -94,13 +97,7 @@ class FavoriteProductsViewController : BaseViewController {
         self.unfavoriteProductsIds.removeAll()
     }
     
-    deinit {
-        tableView.dataSource = nil
-        tableView.delegate = nil
-    }
-    
     // MARK: Favorites
-    
     
     @objc fileprivate func favoriteProductAction(_ favoriteControl: FavoriteControl, event: UIEvent) {
         guard let indexPath = tableView.indexPath(for: event),let product = self.productsFRC?.object(at: indexPath) else {
@@ -123,41 +120,19 @@ class FavoriteProductsViewController : BaseViewController {
         }
     }
     
-    // MARK: Tracking
+    // MARK: Price Alerts
+    
+    private let priceAlertController = ProductPriceAlertController()
     
     @objc fileprivate func trackProductAction(_ button: LoadingButton, event: UIEvent) {
-        if PermissionsManager.shared.hasPermission(for: .push) {
-            guard let indexPath = tableView.indexPath(for: event),
-                let product = self.productsFRC?.object(at: indexPath),
-                !button.isLoading
-                else {
-                    return
-            }
-            
-            let hasPriceAlerts =  product.hasPriceAlerts
-            if hasPriceAlerts {
-                Analytics.trackProductPriceAlertUnsubscribed(product: product)
-                product.untrack().catch { (error) in
-                    let e = error as NSError
-                    Analytics.trackProductPriceAlertUnsubscribedError(product: product, domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
-                }
-            }else{
-                Analytics.trackProductPriceAlertSubscribed(product: product)
-                product.track().catch { (error) in
-                    let e = error as NSError
-                    Analytics.trackProductPriceAlertSubscribedError(product: product, domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
-                }
-            }
-        }
-        else {
-            if PermissionsManager.shared.permissionStatus(for: .push) == .undetermined {
-                PermissionsManager.shared.requestPermission(for: .push)
-            }
+        guard let indexPath = tableView.indexPath(for: event),
+            let product = self.productsFRC?.object(at: indexPath)
             else {
-                if let alertController = PermissionsManager.shared.deniedAlertController(for: .push) {
-                    present(alertController, animated: true, completion: nil)
-                }
-            }
+                return
+        }
+        
+        if let deniedAlertController = priceAlertController.priceAlertAction(button, on: product) {
+            present(deniedAlertController, animated: true, completion: nil)
         }
     }
     

@@ -14,6 +14,7 @@ class ProductViewController : BaseViewController {
     fileprivate var cartItemFrc: FetchedResultsControllerManager<CartItem>?
     fileprivate var structuredProduct: StructuredProduct?
     fileprivate var didSaveVariants = false
+    private let priceAlertController = ProductPriceAlertController()
     
     var similarProducts: [Product]? {
         didSet {
@@ -319,20 +320,8 @@ fileprivate extension ProductViewControllerProductView {
             return
         }
         
-        if self.productView.stockButton.isSelected {
-            Analytics.trackProductPriceAlertUnsubscribed(product: product)
-            self.productView.stockButton.isLoading = true
-            product.untrack().catch { error in
-                let e = error as NSError
-                Analytics.trackProductPriceAlertUnsubscribedError(product: product,  domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
-            }
-        }else{
-            Analytics.trackProductPriceAlertSubscribed(product: product)
-            self.productView.stockButton.isLoading = true
-            product.track().catch { error in
-                let e = error as NSError
-                Analytics.trackProductPriceAlertSubscribedError(product: product, domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
-            }
+        if let deniedAlertController = priceAlertController.priceAlertAction(productView.stockButton, on: product) {
+            present(deniedAlertController, animated: true, completion: nil)
         }
     }
     

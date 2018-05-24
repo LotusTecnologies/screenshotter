@@ -1766,12 +1766,7 @@ extension Product {
     }
     
     var isSupportingUSC: Bool {
-        if UIApplication.isDev {
-            return partNumber != nil
-        }
-        else {
-            return UserDefaults.standard.bool(forKey: UserDefaultsKeys.isUSC) && partNumber != nil
-        }
+        return UIApplication.isUSC && partNumber != nil
     }
     
 }
@@ -2070,6 +2065,19 @@ extension NSManagedObjectContext {
     
     func objectId(for objectIdUrl:URL) -> NSManagedObjectID? {
         return self.persistentStoreCoordinator?.managedObjectID(forURIRepresentation: objectIdUrl)
+    }
+    
+    func productWith(objectId:NSManagedObjectID) -> Product? {
+        if let card = self.object(with: objectId) as? Product {
+            do{
+                try card.validateForUpdate()
+                return card
+            }catch{
+                DataModel.sharedInstance.receivedCoreDataError(error: error)
+                
+            }
+        }
+        return nil
     }
     
     func screenshotWith(objectId:NSManagedObjectID) -> Screenshot? {
