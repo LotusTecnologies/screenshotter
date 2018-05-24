@@ -59,7 +59,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
         self.screenshot = screenshot
         super.init(nibName: nil, bundle: nil)
         
-        self.loadingMonitor = AsyncOperationMonitor.init(assetId: screenshot.assetId, shoppableId: nil, delegate: self)
+        self.loadingMonitor = AsyncOperationMonitor.init(assetId: screenshot.assetId, shoppableId:nil, queues: AssetSyncModel.sharedInstance.queues, delegate: self)
 
         self.title = "products.title".localized
         self.restorationIdentifier = "ProductsViewController"
@@ -1185,10 +1185,7 @@ extension ProductsViewController : AsyncOperationMonitorDelegate {
         }
     }
     
-    func asyncOperationMonitorDidStart(_ monitor:AsyncOperationMonitor){
-        self.updateLoadingState()
-    }
-    func asyncOperationMonitorDidStop(_ monitor:AsyncOperationMonitor){
+    func asyncOperationMonitorDidChange(_ monitor: AsyncOperationMonitor) {
         self.updateLoadingState()
     }
 

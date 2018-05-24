@@ -7,23 +7,24 @@
 //
 
 import UIKit
+import CoreData
 
 class ProductPriceAlertController {
-    weak private var product: Product?
-    weak private var button: UIButton?
-    private var loadingButton: LoadingButton? {
-        return button as? LoadingButton
-    }
+    private var productObjectId:NSManagedObjectID?
     
     func priceAlertAction(_ button: UIButton, on product: Product) -> UIAlertController? {
-        self.button = button
-        self.product = product
+        if let button = button as? LoadingButton {
+            if button.isLoading {
+                return nil
+            }
+        }
         
         switch PermissionsManager.shared.permissionStatus(for: .push) {
         case .authorized:
-            togglePriceAlert()
+            togglePriceAlert(product: product)
             
         case .undetermined:
+            self.productObjectId = product.objectID
             requestPermission()
             
         default:
@@ -33,41 +34,23 @@ class ProductPriceAlertController {
         return nil
     }
     
-    private func togglePriceAlert() {
-        guard let product = product else {
-            return
-        }
-        
-        if loadingButton?.isLoading ?? false {
-            return
-        }
-        
-        loadingButton?.isLoading = true
+    private func togglePriceAlert(product:Product) {
         
         let hasPriceAlerts =  product.hasPriceAlerts
         if hasPriceAlerts {
             Analytics.trackProductPriceAlertUnsubscribed(product: product)
+            product.untrack().catch { (error) in
+                let e = error as NSError
+                Analytics.trackProductPriceAlertUnsubscribedError(product: product, domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
+            }
         }
         else {
             Analytics.trackProductPriceAlertSubscribed(product: product)
-        }
-        
-        (product.hasPriceAlerts ? product.untrack() : product.track())
-            .then { [weak button] isTracking -> Void in
-                button?.isSelected = isTracking
-            }
-            .catch { error in
+            product.track().catch { (error) in
                 let e = error as NSError
-            
-                if hasPriceAlerts {
-                    Analytics.trackProductPriceAlertUnsubscribedError(product: product, domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
-                }
-                else {
-                    Analytics.trackProductPriceAlertSubscribedError(product: product, domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
-                }
+                Analytics.trackProductPriceAlertSubscribedError(product: product, domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
+
             }
-            .always { [weak self] in
-                self?.loadingButton?.isLoading = false
         }
     }
     
@@ -81,7 +64,10 @@ class ProductPriceAlertController {
     
     @objc private func applicationDidRegisterForRemoteNotifications(_ notification: Notification) {
         NotificationCenter.default.removeObserver(self, name: .applicationDidRegisterForRemoteNotifications, object: nil)
-        togglePriceAlert()
+        if let objectId = self.productObjectId, let product = DataModel.sharedInstance.mainMoc().productWith(objectId: objectId){
+            togglePriceAlert(product: product)
+        }
+        
     }
     
     deinit {
