@@ -13,6 +13,8 @@ class FavoriteProductsTableViewCell: UITableViewCell, DynamicTypeAccessibilityLa
     let favoriteControl = FavoriteControl()
     let titleLabel = UILabel()
     let priceLabel = UILabel()
+    let outOfStockLabel = UILabel()
+
     let merchantLabel = UILabel()
     let priceAlertButton = LoadingButton()
     let cartButton = BorderButton()
@@ -59,12 +61,27 @@ class FavoriteProductsTableViewCell: UITableViewCell, DynamicTypeAccessibilityLa
             titleLabel.trailingAnchor.constraint(equalTo: labelsContainerView.trailingAnchor)
         ]
         
+        outOfStockLabel.translatesAutoresizingMaskIntoConstraints = false
+        outOfStockLabel.numberOfLines = 1
+        outOfStockLabel.font = .screenshopFont(.hindBold, textStyle: .footnote)
+        outOfStockLabel.textColor = .red
+        outOfStockLabel.text = "cart.item.error.unavailable".localized
+        outOfStockLabel.adjustsFontForContentSizeCategory = true
+        outOfStockLabel.layoutMargins = UIEdgeInsets(top: 5, left: 0, bottom: -halfPadding, right: 0)
+        contentView.addSubview(outOfStockLabel)
+        outOfStockLabel.topAnchor.constraint(equalTo: labelsContainerView.bottomAnchor).isActive = true
+        outOfStockLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor).isActive = true
+        self.outOfStockLabelHiddenConstraints = outOfStockLabel.heightAnchor.constraint(equalToConstant: 0)
+        self.outOfStockLabelHiddenConstraints?.isActive = true
+        
         priceLabel.translatesAutoresizingMaskIntoConstraints = false
         priceLabel.textColor = .crazeGreen
         priceLabel.font = .screenshopFont(.hindMedium, textStyle: .body)
         priceLabel.adjustsFontForContentSizeCategory = true
         labelsContainerView.addSubview(priceLabel)
-        priceLabel.setContentCompressionResistancePriority(UILayoutPriority.required, for: .horizontal)
+        priceLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
+        priceLabel.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+
         priceLabel.trailingAnchor.constraint(equalTo: labelsContainerView.trailingAnchor).isActive = true
         
         fontSizeStandardRangeConstraints += [
@@ -135,10 +152,11 @@ class FavoriteProductsTableViewCell: UITableViewCell, DynamicTypeAccessibilityLa
             }
         }()
         contentView.addSubview(priceAlertButton)
-        priceAlertButton.topAnchor.constraint(equalTo: labelsContainerView.bottomAnchor, constant: halfPadding).isActive = true
+        priceAlertButton.topAnchor.constraint(equalTo: outOfStockLabel.bottomAnchor, constant: halfPadding).isActive = true
         priceAlertButton.leadingAnchor.constraint(equalTo: productImageView.layoutMarginsGuide.trailingAnchor).isActive = true
         priceAlertButton.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
-        cartButtonHideConstraints = priceAlertButton.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -halfPadding)
+        priceAlertButton.setContentHuggingPriority(.defaultLow, for: .vertical)
+        priceAlertButtonHiddenConstraints = priceAlertButton.heightAnchor.constraint(equalToConstant: 0.0)
         
         cartButton.translatesAutoresizingMaskIntoConstraints = false
         cartButton.setTitle("favorites.product.cart".localized, for: .normal)
@@ -147,8 +165,8 @@ class FavoriteProductsTableViewCell: UITableViewCell, DynamicTypeAccessibilityLa
         cartButton.leadingAnchor.constraint(equalTo: productImageView.layoutMarginsGuide.trailingAnchor).isActive = true
         cartButton.bottomAnchor.constraint(lessThanOrEqualTo: contentView.layoutMarginsGuide.bottomAnchor).isActive = true
         cartButton.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
-        cartButtonShowConstraints = cartButton.topAnchor.constraint(equalTo: priceAlertButton.bottomAnchor, constant: halfPadding)
-        cartButtonShowConstraints?.isActive = true
+        cartButton.topAnchor.constraint(equalTo: priceAlertButton.bottomAnchor, constant: halfPadding).isActive = true
+        cartButtonHideConstraints = cartButton.heightAnchor.constraint(equalToConstant: 0)
         
         adjustDynamicTypeLayout(traitCollection: traitCollection)
     }
@@ -168,18 +186,46 @@ class FavoriteProductsTableViewCell: UITableViewCell, DynamicTypeAccessibilityLa
         didSet {
             cartButton.isHidden = isCartButtonHidden
             
-            if isCartButtonHidden {
-                if cartButtonHideConstraints?.isActive == false {
-                    cartButtonShowConstraints?.isActive = false
-                    cartButtonHideConstraints?.isActive = true
-                }
+            if cartButtonHideConstraints?.isActive != isCartButtonHidden {
+                cartButtonHideConstraints?.isActive = isCartButtonHidden
             }
-            else {
-                if cartButtonShowConstraints?.isActive == false {
-                    cartButtonHideConstraints?.isActive = false
-                    cartButtonShowConstraints?.isActive = true
-                }
+            if cartButtonShowConstraints?.isActive == isCartButtonHidden {
+                cartButtonShowConstraints?.isActive = !isCartButtonHidden
             }
+        }
+    }
+    
+    private var outOfStockLabelShowConstraints: NSLayoutConstraint?
+    private var outOfStockLabelHiddenConstraints: NSLayoutConstraint?
+
+    var isOutOfStockLabelHidden = true {
+        didSet {
+            outOfStockLabel.isHidden = isOutOfStockLabelHidden
+            
+            if outOfStockLabelHiddenConstraints?.isActive != isOutOfStockLabelHidden {
+                outOfStockLabelHiddenConstraints?.isActive = isOutOfStockLabelHidden
+            }
+            if outOfStockLabelShowConstraints?.isActive == isOutOfStockLabelHidden {
+                outOfStockLabelShowConstraints?.isActive = !isOutOfStockLabelHidden
+            }
+            
+        }
+    }
+    
+    private var priceAlertButtonShowConstraints: NSLayoutConstraint?
+    private var priceAlertButtonHiddenConstraints: NSLayoutConstraint?
+    
+    var isPriceAlertButtonHidden = true {
+        didSet {
+            priceAlertButton.isHidden = isPriceAlertButtonHidden
+            
+            if priceAlertButtonHiddenConstraints?.isActive != isPriceAlertButtonHidden {
+                priceAlertButtonHiddenConstraints?.isActive = isPriceAlertButtonHidden
+            }
+            if priceAlertButtonShowConstraints?.isActive == isPriceAlertButtonHidden {
+                priceAlertButtonShowConstraints?.isActive = !isPriceAlertButtonHidden
+            }
+            
         }
     }
 }

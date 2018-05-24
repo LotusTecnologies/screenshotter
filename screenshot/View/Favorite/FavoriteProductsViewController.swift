@@ -243,6 +243,11 @@ extension FavoriteProductsViewController: UITableViewDataSource, AsyncOperationM
     func update(cell:FavoriteProductsTableViewCell, monitor:AsyncOperationMonitor, product:Product){
         cell.priceAlertButton.isLoading = monitor.didStart
         cell.priceAlertButton.isSelected = product.hasPriceAlerts  // ???: what happens if this is true and the user disables notifications from settings
+        if product.hasVariants {
+            cell.priceAlertButton.setTitle("favorites.product.price_alert_off".localized, for: .normal)
+        }else{
+            cell.priceAlertButton.setTitle("product.price_alert_on".localized, for: .normal)
+        }
     }
     
     func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
@@ -285,25 +290,44 @@ extension FavoriteProductsViewController: UITableViewDataSource, AsyncOperationM
             cell.merchantLabel.text = product.merchant
             cell.favoriteControl.isSelected = !self.unfavoriteProductsIds.contains(product.objectID)
             cell.favoriteControl.addTarget(self, action: #selector(favoriteProductAction(_:event:)), for: .touchUpInside)
+                        
             
-            if product.isSupportingUSC, let partNumber = product.partNumber, !partNumber.isEmpty {
-                cell.priceAlertButton.isHidden = false
-                if let oldMonitor = self.trackingProgressMonitors[partNumber] {
-                    self.update(cell: cell, monitor: oldMonitor, product: product)
+            if UIApplication.isUSC {
+                if let partNumber = product.partNumber, !partNumber.isEmpty {
+                    if product.hasVariants {
+                        cell.cartButton.setTitle("favorites.product.cart".localized, for: .normal)
+                        cell.isCartButtonHidden = false
+                        cell.isOutOfStockLabelHidden = true
+                    }else{
+                        cell.isOutOfStockLabelHidden = false
+                        cell.isCartButtonHidden = true
+                    }
+                    
+                    cell.isPriceAlertButtonHidden = false
+                    
+                    if let oldMonitor = self.trackingProgressMonitors[partNumber] {
+                        self.update(cell: cell, monitor: oldMonitor, product: product)
+                    }else{
+                        let monitor = AsyncOperationMonitor.init(tracking: [partNumber], delegate: self)
+                        self.trackingProgressMonitors[partNumber] = monitor
+                        self.update(cell: cell, monitor: monitor, product: product)
+                    }
+                    
                 }else{
-                    let monitor = AsyncOperationMonitor.init(tracking: [partNumber], delegate: self)
-                    self.trackingProgressMonitors[partNumber] = monitor
-                    self.update(cell: cell, monitor: monitor, product: product)
+                    cell.isOutOfStockLabelHidden = true
+                    cell.isPriceAlertButtonHidden = true
+                    cell.isCartButtonHidden = false
+                    cell.cartButton.setTitle("product.buy_now".localized, for: .normal)
                 }
-                
-                cell.priceAlertButton.addTarget(self, action: #selector(trackProductAction(_:event:)), for: .touchUpInside)
-            } else {
-                cell.priceAlertButton.isHidden = true
+            }else{
+                cell.isOutOfStockLabelHidden = true
+                cell.isPriceAlertButtonHidden = true
+                cell.isCartButtonHidden = false
+                cell.cartButton.setTitle("product.buy_now".localized, for: .normal)
             }
             
+            cell.priceAlertButton.addTarget(self, action: #selector(trackProductAction(_:event:)), for: .touchUpInside)
             cell.cartButton.addTarget(self, action: #selector(presentProductAction(_:event:)), for: .touchUpInside)
-
-            cell.isCartButtonHidden = !UIApplication.isUSC
         }
         
         return cell
