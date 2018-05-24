@@ -61,7 +61,7 @@ class AuthorizeView: UIView {
 
 class AuthorizeViewController: UIViewController {
     fileprivate let registerViewController = RegisterViewController()
-    fileprivate let loginViewController = UIViewController()
+    fileprivate let loginViewController = LoginViewController()
     
     weak var delegate: AuthorizeViewControllerDelegate?
     
