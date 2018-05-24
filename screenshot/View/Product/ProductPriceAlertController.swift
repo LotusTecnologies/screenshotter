@@ -39,14 +39,14 @@ class ProductPriceAlertController {
         let hasPriceAlerts =  product.hasPriceAlerts
         if hasPriceAlerts {
             Analytics.trackProductPriceAlertUnsubscribed(product: product)
-            product.track().catch { (error) in
+            product.untrack().catch { (error) in
                 let e = error as NSError
                 Analytics.trackProductPriceAlertUnsubscribedError(product: product, domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
             }
         }
         else {
             Analytics.trackProductPriceAlertSubscribed(product: product)
-            product.untrack().catch { (error) in
+            product.track().catch { (error) in
                 let e = error as NSError
                 Analytics.trackProductPriceAlertSubscribedError(product: product, domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
 
