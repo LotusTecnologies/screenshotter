@@ -21,6 +21,10 @@ class AuthorizeContentScrollView: UIScrollView {
         return horizontalLinesView.frame.maxY
     }
     
+    var verticalNegativeMargin: CGFloat {
+        return contentView.layoutMargins.top * 0.4
+    }
+    
     let _layoutMargins = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
     
     // MARK: Life Cycle
@@ -58,8 +62,6 @@ class AuthorizeContentScrollView: UIScrollView {
         contentView.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor, constant: -_layoutMargins.bottom).isActive = true
         contentView.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
         
-        let textFieldTopMargin: CGFloat = contentView.layoutMargins.top * 0.4
-        
         emailTextField.translatesAutoresizingMaskIntoConstraints = false
         emailTextField.placeholder = "Email Address"
         emailTextField.returnKeyType = .next
@@ -68,7 +70,7 @@ class AuthorizeContentScrollView: UIScrollView {
         emailTextField.autocorrectionType = .no
         emailTextField.spellCheckingType = .no
         contentView.addSubview(emailTextField)
-        emailTextField.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor, constant: textFieldTopMargin - contentView.layoutMargins.top).isActive = true
+        emailTextField.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor, constant: verticalNegativeMargin - contentView.layoutMargins.top).isActive = true
         emailTextField.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
         emailTextField.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
         
@@ -80,7 +82,7 @@ class AuthorizeContentScrollView: UIScrollView {
         passwordTextField.autocorrectionType = .no
         passwordTextField.spellCheckingType = .no
         contentView.addSubview(passwordTextField)
-        passwordTextField.topAnchor.constraint(equalTo: emailTextField.bottomAnchor, constant: textFieldTopMargin).isActive = true
+        passwordTextField.topAnchor.constraint(equalTo: emailTextField.bottomAnchor, constant: verticalNegativeMargin).isActive = true
         passwordTextField.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
         passwordTextField.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
         Appsee.markView(asSensitive: passwordTextField)

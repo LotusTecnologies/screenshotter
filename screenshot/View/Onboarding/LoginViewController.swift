@@ -20,13 +20,18 @@ class LoginView: AuthorizeContentScrollView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
+        let color: UIColor = .crazeRed
+        
+        // TODO: underline
         forgotPasswordButton.translatesAutoresizingMaskIntoConstraints = false
         forgotPasswordButton.setTitle("Forgot Password?", for: .normal)
-        forgotPasswordButton.setTitleColor(.crazeRed, for: .normal)
+        forgotPasswordButton.setTitleColor(color, for: .normal)
+        forgotPasswordButton.setTitleColor(color.darker(), for: .highlighted)
+        forgotPasswordButton.contentEdgeInsets = UIEdgeInsets(top: 6, left: .padding, bottom: 6, right: .padding)
         contentView.addSubview(forgotPasswordButton)
         forgotPasswordButton.topAnchor.constraint(equalTo: continueButton.bottomAnchor, constant: .padding).isActive = true
         forgotPasswordButton.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
-        forgotPasswordButton.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor, constant: -.padding).isActive = true
+        forgotPasswordButton.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor, constant: verticalNegativeMargin).isActive = true
         forgotPasswordButton.trailingAnchor.constraint(lessThanOrEqualTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
         forgotPasswordButton.centerXAnchor.constraint(equalTo: contentView.layoutMarginsGuide.centerXAnchor).isActive = true
     }

@@ -87,6 +87,7 @@
 		C52800622052B78B004DD7A3 /* CheckoutConfirmationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C52800612052B78B004DD7A3 /* CheckoutConfirmationViewController.swift */; };
 		C53154D020B6A8A60050EB76 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53154CF20B6A8A60050EB76 /* LoginViewController.swift */; };
 		C53154D420B6B9550050EB76 /* AuthorizeContentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53154D320B6B9550050EB76 /* AuthorizeContentViewController.swift */; };
+		C53154D620B6E3A90050EB76 /* OnboardingDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53154D520B6E3A90050EB76 /* OnboardingDetailsViewController.swift */; };
 		C5336D1B203AC9CE00A7B4B0 /* CartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5336D1A203AC9CE00A7B4B0 /* CartViewController.swift */; };
 		C5336D1D203ACE7B00A7B4B0 /* CartNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5336D1C203ACE7B00A7B4B0 /* CartNavigationController.swift */; };
 		C5336D21203C511300A7B4B0 /* ActivityBadgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5336D20203C511200A7B4B0 /* ActivityBadgeView.swift */; };
@@ -343,6 +344,7 @@
 		C52800612052B78B004DD7A3 /* CheckoutConfirmationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutConfirmationViewController.swift; sourceTree = "<group>"; };
 		C53154CF20B6A8A60050EB76 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		C53154D320B6B9550050EB76 /* AuthorizeContentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorizeContentViewController.swift; sourceTree = "<group>"; };
+		C53154D520B6E3A90050EB76 /* OnboardingDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingDetailsViewController.swift; sourceTree = "<group>"; };
 		C5336D1A203AC9CE00A7B4B0 /* CartViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartViewController.swift; sourceTree = "<group>"; };
 		C5336D1C203ACE7B00A7B4B0 /* CartNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartNavigationController.swift; sourceTree = "<group>"; };
 		C5336D20203C511200A7B4B0 /* ActivityBadgeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActivityBadgeView.swift; sourceTree = "<group>"; };
@@ -1019,6 +1021,7 @@
 				C58FA0E120A95FC200072966 /* TutorialVideoOverlayView.swift */,
 				C58FA0E720A95FC200072966 /* TutorialVideoViewController.swift */,
 				C58FA0E620A95FC200072966 /* VideoDisplayingViewControllerDelegate.swift */,
+				C53154D520B6E3A90050EB76 /* OnboardingDetailsViewController.swift */,
 			);
 			path = Onboarding;
 			sourceTree = "<group>";
@@ -1534,6 +1537,7 @@
 				C5AB87ED208382EF00E2CB98 /* UIResponder.swift in Sources */,
 				C5D2E308204D682B00B5BD92 /* CartCheckoutView.swift in Sources */,
 				C528005B205133BA004DD7A3 /* FavoriteButton.swift in Sources */,
+				C53154D620B6E3A90050EB76 /* OnboardingDetailsViewController.swift in Sources */,
 				C5CC3E391F94A85900DA3425 /* NetworkingIndicatorProtocol.swift in Sources */,
 				C5D98CD71FFCAF2700CC1A97 /* ScreenshotDisplayNavigationController.swift in Sources */,
 				C5E21D8E2091A88900807395 /* CheckoutListViewController.swift in Sources */,

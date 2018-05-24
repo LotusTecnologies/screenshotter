@@ -91,6 +91,7 @@ class AuthorizeViewController: UIViewController {
         registerViewController.skipButton.addTarget(self, action: #selector(skipRegistration), for: .touchUpInside)
         
         loginViewController.facebookLoginButton.addTarget(self, action: #selector(facebookLoginAction), for: .touchUpInside)
+        loginViewController.forgotPasswordButton.addTarget(self, action: #selector(forgotPasswordAction), for: .touchUpInside)
         
         displayRegisterTab()
     }
@@ -116,7 +117,7 @@ class AuthorizeViewController: UIViewController {
         childViewController.removeFromParentViewController()
     }
     
-    // MARK: Registration / Login / Facebook
+    // MARK: Registration
     
     @objc fileprivate func displayRegisterTab() {
         guard !_view.registerButton.isSelected else {
@@ -133,6 +134,12 @@ class AuthorizeViewController: UIViewController {
         addContentController(registerViewController)
     }
     
+    @objc fileprivate func skipRegistration() {
+        delegate?.authorizeViewControllerDidSkip(self)
+    }
+    
+    // MARK: Login
+    
     @objc fileprivate func displayLoginTab() {
         guard !_view.loginButton.isSelected else {
             return
@@ -148,9 +155,14 @@ class AuthorizeViewController: UIViewController {
         addContentController(loginViewController)
     }
     
-    @objc fileprivate func skipRegistration() {
-        delegate?.authorizeViewControllerDidSkip(self)
+    @objc private func forgotPasswordAction() {
+        // TODO: present reset password page. this vc should prob be pushed up to the tutorial nav controller
+        
+        let resetPasswordViewController = UIViewController()
+        navigationController?.pushViewController(resetPasswordViewController, animated: true)
     }
+    
+    // MARK: Facebook
     
     @objc fileprivate func facebookLoginAction() {
         // TODO: use AccessToken to see if user already logged in
@@ -167,7 +179,7 @@ class AuthorizeViewController: UIViewController {
                 print("User cancelled login.")
                 
             case .success(let grantedPermissions, let declinedPermissions, let accessToken):
-                // TODO: set up user 
+                // TODO: set up user
                 
                 let isExistingUser = false
                 
