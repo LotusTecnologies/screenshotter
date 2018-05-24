@@ -172,21 +172,15 @@ class ProductView: UIView {
         favoriteButton.trailingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.trailingAnchor).isActive = true
         favoriteButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
-        let stockImage = UIImage(named: "FavoriteBell")
-        let stockTintImage = stockImage?.withRenderingMode(.alwaysTemplate)
-        
         stockButton.translatesAutoresizingMaskIntoConstraints = false
         stockButton.setTitle("product.price_alert_on".localized, for: .normal)
         stockButton.setTitle("product.price_alert_off".localized, for: .selected)
         stockButton.setTitle("product.price_alert_off".localized, for: [.selected, .highlighted])
         stockButton.setTitleColor(.crazeRed, for: .normal)
         stockButton.setTitleColor(.crazeGreen, for: .selected)
-        stockButton.setTitleColor(.crazeGreen, for: [.selected, .highlighted])
-        stockButton.setImage(stockImage, for: .normal)
-        stockButton.setImage(stockTintImage, for: .selected)
-        stockButton.setImage(stockTintImage, for: [.selected, .highlighted])
+        stockButton.setTitleColor(UIColor.crazeGreen.darker(), for: [.selected, .highlighted])
+        stockButton.setImage(UIImage(named: "FavoriteBell")?.withRenderingMode(.alwaysTemplate), for: .normal)
         stockButton.adjustInsetsForImage(withPadding: 6)
-        stockButton.tintColor = .crazeRed
         stockButton.alpha = 0
         scrollView.addSubview(stockButton)
         stockButton.topAnchor.constraint(equalTo: favoriteButton.topAnchor).isActive = true
