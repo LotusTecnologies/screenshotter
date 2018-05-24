@@ -86,7 +86,7 @@
 		C528005D2051342B004DD7A3 /* BorderButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C528005C2051342B004DD7A3 /* BorderButton.swift */; };
 		C52800622052B78B004DD7A3 /* CheckoutConfirmationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C52800612052B78B004DD7A3 /* CheckoutConfirmationViewController.swift */; };
 		C53154D020B6A8A60050EB76 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53154CF20B6A8A60050EB76 /* LoginViewController.swift */; };
-		C53154D220B6ACAC0050EB76 /* AuthorizeContentScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53154D120B6ACAC0050EB76 /* AuthorizeContentScrollView.swift */; };
+		C53154D420B6B9550050EB76 /* AuthorizeContentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53154D320B6B9550050EB76 /* AuthorizeContentViewController.swift */; };
 		C5336D1B203AC9CE00A7B4B0 /* CartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5336D1A203AC9CE00A7B4B0 /* CartViewController.swift */; };
 		C5336D1D203ACE7B00A7B4B0 /* CartNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5336D1C203ACE7B00A7B4B0 /* CartNavigationController.swift */; };
 		C5336D21203C511300A7B4B0 /* ActivityBadgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5336D20203C511200A7B4B0 /* ActivityBadgeView.swift */; };
@@ -342,7 +342,7 @@
 		C528005C2051342B004DD7A3 /* BorderButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BorderButton.swift; sourceTree = "<group>"; };
 		C52800612052B78B004DD7A3 /* CheckoutConfirmationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutConfirmationViewController.swift; sourceTree = "<group>"; };
 		C53154CF20B6A8A60050EB76 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
-		C53154D120B6ACAC0050EB76 /* AuthorizeContentScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorizeContentScrollView.swift; sourceTree = "<group>"; };
+		C53154D320B6B9550050EB76 /* AuthorizeContentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorizeContentViewController.swift; sourceTree = "<group>"; };
 		C5336D1A203AC9CE00A7B4B0 /* CartViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartViewController.swift; sourceTree = "<group>"; };
 		C5336D1C203ACE7B00A7B4B0 /* CartNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartNavigationController.swift; sourceTree = "<group>"; };
 		C5336D20203C511200A7B4B0 /* ActivityBadgeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActivityBadgeView.swift; sourceTree = "<group>"; };
@@ -1004,7 +1004,7 @@
 		C58FA0C820A95FB000072966 /* Onboarding */ = {
 			isa = PBXGroup;
 			children = (
-				C53154D120B6ACAC0050EB76 /* AuthorizeContentScrollView.swift */,
+				C53154D320B6B9550050EB76 /* AuthorizeContentViewController.swift */,
 				C527312220B3F49300A0E2EB /* AuthorizeViewController.swift */,
 				C58FA0EB20A95FC300072966 /* CampaignPromotionExplanationViewController.swift */,
 				C58FA0E320A95FC200072966 /* CampaignPromotionViewController.swift */,
@@ -1648,7 +1648,6 @@
 				E44CA6FC1F41E608001CB493 /* NetworkingPromise.swift in Sources */,
 				C53B465E1FBC685D00A8C886 /* EnvironmentHelper.swift in Sources */,
 				31CE110420396194000156EE /* ScreenshotsViewController.swift in Sources */,
-				C53154D220B6ACAC0050EB76 /* AuthorizeContentScrollView.swift in Sources */,
 				31C0C81D20A2CD14002EE95B /* ProductsViewController.swift in Sources */,
 				C5278FEB1F3C38510090E422 /* AssetSyncModel.swift in Sources */,
 				C5406A85206B7D85002977CE /* CheckoutShippingFormViewController.swift in Sources */,
@@ -1670,6 +1669,7 @@
 				C540880E1FE90C8E00198955 /* LoadingViewController.swift in Sources */,
 				31C0C81F20A2CD14002EE95B /* ProductsOptions.swift in Sources */,
 				E4859E19203044E100A26985 /* ScreenshotDisplayViewController.swift in Sources */,
+				C53154D420B6B9550050EB76 /* AuthorizeContentViewController.swift in Sources */,
 				C572C0D820AADA98004B0A17 /* OnboardingWelcomeViewController.swift in Sources */,
 				C50DBB7D207B398100BB206E /* CheckoutOrderViewController.swift in Sources */,
 				5273E3811F7ACE0300C832F8 /* Analytics.swift in Sources */,

@@ -150,7 +150,8 @@
 "error.database_cant_load.button.reset_app.message" = "Are you sure? You'll lose all your screenshots.";
 "error.database_cant_load.button.reset_app.button.reset" = "Reset";
 
-"facebook.login" = "Continue With Facebook";
+"facebook.login" = "Log In With Facebook";
+"facebook.register" = "Continue With Facebook";
 
 "favorites.empty.detail" = "Tap the heart icon on products to add them to your favorites";
 "favorites.empty.title" = "No Favorites";

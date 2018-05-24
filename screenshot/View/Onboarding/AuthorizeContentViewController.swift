@@ -1,5 +1,5 @@
 //
-//  AuthorizeContentScrollView.swift
+//  AuthorizeContentViewController.swift
 //  screenshot
 //
 //  Created by Corey Werner on 5/24/18.
@@ -8,10 +8,11 @@
 
 import UIKit
 import Appsee
+import FacebookCore
+import FacebookLogin
 
 class AuthorizeContentScrollView: UIScrollView {
     let facebookLoginButton = FacebookButton()
-    let vertical1LayoutGuide = UILayoutGuide()
     private let horizontalLinesView = HorizontalLinesView()
     let contentView = ContentContainerView()
     let emailTextField = UnderlineTextField()
@@ -43,23 +44,18 @@ class AuthorizeContentScrollView: UIScrollView {
         facebookLoginButton.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
         facebookLoginButton.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
         
-        addLayoutGuide(vertical1LayoutGuide)
-        vertical1LayoutGuide.topAnchor.constraint(equalTo: facebookLoginButton.bottomAnchor, constant: .padding).isActive = true
-        
         horizontalLinesView.translatesAutoresizingMaskIntoConstraints = false
         horizontalLinesView.label.text = "or"
         horizontalLinesView.leftLine.backgroundColor = .gray6
         horizontalLinesView.rightLine.backgroundColor = .gray6
         addSubview(horizontalLinesView)
-        horizontalLinesView.topAnchor.constraint(greaterThanOrEqualTo: vertical1LayoutGuide.topAnchor).isActive = true
-        horizontalLinesView.bottomAnchor.constraint(lessThanOrEqualTo: vertical1LayoutGuide.bottomAnchor).isActive = true
+        horizontalLinesView.topAnchor.constraint(equalTo: facebookLoginButton.bottomAnchor, constant: .padding).isActive = true
         horizontalLinesView.centerXAnchor.constraint(equalTo: layoutMarginsGuide.centerXAnchor).isActive = true
-        horizontalLinesView.centerYAnchor.constraint(equalTo: vertical1LayoutGuide.centerYAnchor).isActive = true
         horizontalLinesView.widthAnchor.constraint(equalToConstant: 170).isActive = true
         
         contentView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(contentView)
-        contentView.topAnchor.constraint(equalTo: vertical1LayoutGuide.bottomAnchor, constant: .padding).isActive = true
+        contentView.topAnchor.constraint(equalTo: horizontalLinesView.bottomAnchor, constant: .padding).isActive = true
         contentView.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
         contentView.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor, constant: -_layoutMargins.bottom).isActive = true
         contentView.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
@@ -92,7 +88,6 @@ class AuthorizeContentScrollView: UIScrollView {
         Appsee.markView(asSensitive: passwordTextField)
         
         continueButton.translatesAutoresizingMaskIntoConstraints = false
-        continueButton.setTitle("Sign Up", for: .normal)
         contentView.addSubview(continueButton)
         continueButton.topAnchor.constraint(equalTo: passwordTextField.bottomAnchor, constant: contentView.layoutMargins.bottom).isActive = true
         continueButton.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
@@ -106,3 +101,112 @@ class AuthorizeContentScrollView: UIScrollView {
         layoutMargins = _layoutMargins
     }
 }
+
+class AuthorizeContentViewController: UIViewController {
+    
+    // MARK: View
+    
+    var classForView: AuthorizeContentScrollView.Type {
+        return AuthorizeContentScrollView.self
+    }
+    
+    var _view: AuthorizeContentScrollView {
+        return view as! AuthorizeContentScrollView
+    }
+    
+    override func loadView() {
+        view = classForView.self.init()
+    }
+    
+    // MARK: Life Cycle
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShowNotification(_:)), name: .UIKeyboardWillShow, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHideNotification(_:)), name: .UIKeyboardWillHide, object: nil)
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        _view.facebookLoginButton.addTarget(self, action: #selector(facebookLoginAction), for: .touchUpInside)
+        _view.emailTextField.delegate = self
+        _view.passwordTextField.delegate = self
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        _view.addGestureRecognizer(tapGesture)
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    // MARK: Facebook
+    
+    @objc func facebookLoginAction() {
+        // TODO: use AccessToken to see if user already logged in
+        //        AccessToken.current
+        
+        let loginManager = LoginManager()
+        UIFont.preferredFont(forTextStyle: .title1)
+        loginManager.logIn(readPermissions: [.publicProfile, .email], viewController: self) { loginResult in
+            switch loginResult {
+            case .failed(let error):
+                print(error)
+                
+            case .cancelled:
+                print("User cancelled login.")
+                
+            case .success(let grantedPermissions, let declinedPermissions, let accessToken):
+                print("Logged in!")
+            }
+        }
+    }
+    
+    // MARK: Keyboard
+    
+    @objc private func keyboardWillShowNotification(_ notification: Notification) {
+        var contentInset = _view.contentInset
+        var scrollIndicatorInsets = _view.scrollIndicatorInsets
+        
+        contentInset.top = -_view.activeTextFieldTopOffset
+        
+        if let keyboardRect = (notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
+            contentInset.bottom = keyboardRect.height
+            scrollIndicatorInsets.bottom = keyboardRect.height
+        }
+        
+        _view.contentInset = contentInset
+        _view.scrollIndicatorInsets = scrollIndicatorInsets
+    }
+    
+    @objc private func keyboardWillHideNotification(_ notification: Notification) {
+        var contentInset = _view.contentInset
+        contentInset.top = 0
+        contentInset.bottom = 0
+        _view.contentInset = contentInset
+        
+        var scrollIndicatorInsets = _view.scrollIndicatorInsets
+        scrollIndicatorInsets.bottom = 0
+        _view.scrollIndicatorInsets = scrollIndicatorInsets
+    }
+    
+    @objc fileprivate func dismissKeyboard() {
+        view.endEditing(true)
+    }
+}
+
+extension AuthorizeContentViewController: UITextFieldDelegate {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        if textField.returnKeyType == .done {
+            textField.resignFirstResponder()
+        }
+        return true
+    }
+}
+

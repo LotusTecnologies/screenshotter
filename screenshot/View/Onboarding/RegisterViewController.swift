@@ -7,8 +7,6 @@
 //
 
 import UIKit
-import FacebookCore
-import FacebookLogin
 
 class RegisterView: AuthorizeContentScrollView {
     let dealsSwitch = UISwitch()
@@ -24,10 +22,6 @@ class RegisterView: AuthorizeContentScrollView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        if let backgroundImage = UIImage(named: "BrandConfettiFullBackground") {
-            backgroundColor = UIColor(patternImage: backgroundImage)
-        }
-        
         // Force the height to be at least that of the scroll view
         let verticalLayoutView = UIView()
         verticalLayoutView.translatesAutoresizingMaskIntoConstraints = false
@@ -37,10 +31,9 @@ class RegisterView: AuthorizeContentScrollView {
         verticalLayoutView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
         verticalLayoutView.heightAnchor.constraint(greaterThanOrEqualTo: heightAnchor).isActive = true
         
-        let vertical2LayoutGuide = UILayoutGuide()
-        addLayoutGuide(vertical2LayoutGuide)
-        vertical2LayoutGuide.topAnchor.constraint(equalTo: contentView.bottomAnchor, constant: .padding).isActive = true
-        vertical2LayoutGuide.heightAnchor.constraint(equalTo: vertical1LayoutGuide.heightAnchor).isActive = true
+        let skipLayoutGuide = UILayoutGuide()
+        addLayoutGuide(skipLayoutGuide)
+        skipLayoutGuide.topAnchor.constraint(equalTo: contentView.bottomAnchor, constant: .padding).isActive = true
         
         let skipImage = UIImage(named: "OnboardingArrow")
         
@@ -55,10 +48,10 @@ class RegisterView: AuthorizeContentScrollView {
         skipButton.alignImageRight()
         skipButton.adjustInsetsForImage(withPadding: 6)
         addSubview(skipButton)
-        skipButton.topAnchor.constraint(greaterThanOrEqualTo: vertical2LayoutGuide.topAnchor).isActive = true
-        skipButton.bottomAnchor.constraint(lessThanOrEqualTo: vertical2LayoutGuide.bottomAnchor).isActive = true
+        skipButton.topAnchor.constraint(greaterThanOrEqualTo: skipLayoutGuide.topAnchor).isActive = true
+        skipButton.bottomAnchor.constraint(lessThanOrEqualTo: skipLayoutGuide.bottomAnchor).isActive = true
         skipButton.centerXAnchor.constraint(equalTo: layoutMarginsGuide.centerXAnchor).isActive = true
-        skipButton.centerYAnchor.constraint(equalTo: vertical2LayoutGuide.centerYAnchor).isActive = true
+        skipButton.centerYAnchor.constraint(equalTo: skipLayoutGuide.centerYAnchor).isActive = true
         
         let dealsLayoutGuide = UILayoutGuide()
         addLayoutGuide(dealsLayoutGuide)
@@ -73,7 +66,7 @@ class RegisterView: AuthorizeContentScrollView {
         dealsLabel.font = .screenshopFont(.hindLight, size: 16)
         addSubview(dealsLabel)
         dealsLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
-        dealsLabel.topAnchor.constraint(equalTo: vertical2LayoutGuide.bottomAnchor, constant: .padding).isActive = true
+        dealsLabel.topAnchor.constraint(equalTo: skipLayoutGuide.bottomAnchor, constant: .padding).isActive = true
         dealsLabel.leadingAnchor.constraint(equalTo: dealsLayoutGuide.leadingAnchor).isActive = true
         
         dealsSwitch.translatesAutoresizingMaskIntoConstraints = false
@@ -140,110 +133,25 @@ class RegisterView: AuthorizeContentScrollView {
     }
 }
 
-class RegisterViewController: UIViewController {
+class RegisterViewController: AuthorizeContentViewController {
+    override var classForView: AuthorizeContentScrollView.Type {
+        return RegisterView.self
+    }
     
-    // MARK: View
-    
-    private let _view = RegisterView()
+    override var _view: RegisterView {
+        return view as! RegisterView
+    }
     
     var skipButton: UIButton {
         return _view.skipButton
     }
     
-    override func loadView() {
-        view = _view
-    }
-    
-    // MARK: Life Cycle
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShowNotification(_:)), name: .UIKeyboardWillShow, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHideNotification(_:)), name: .UIKeyboardWillHide, object: nil)
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        _view.facebookLoginButton.addTarget(self, action: #selector(facebookLoginAction), for: .touchUpInside)
-        _view.emailTextField.delegate = self
-        _view.passwordTextField.delegate = self
+        _view.facebookLoginButton.textCopy = .register
+        _view.continueButton.setTitle("Sign Up", for: .normal)
         _view.legalTextView.delegate = self
-        
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
-        _view.addGestureRecognizer(tapGesture)
-    }
-    
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
-    
-    // MARK: Facebook
-    
-    @objc func facebookLoginAction() {
-        // TODO: use AccessToken to see if user already logged in
-//        AccessToken.current
-        
-        let loginManager = LoginManager()
-        UIFont.preferredFont(forTextStyle: .title1)
-        loginManager.logIn(readPermissions: [.publicProfile, .email], viewController: self) { loginResult in
-            switch loginResult {
-            case .failed(let error):
-                print(error)
-                
-            case .cancelled:
-                print("User cancelled login.")
-                
-            case .success(let grantedPermissions, let declinedPermissions, let accessToken):
-                print("Logged in!")
-            }
-        }
-    }
-    
-    // MARK: Keyboard
-    
-    @objc private func keyboardWillShowNotification(_ notification: Notification) {
-        var contentInset = _view.contentInset
-        var scrollIndicatorInsets = _view.scrollIndicatorInsets
-        
-        contentInset.top = -_view.activeTextFieldTopOffset
-        
-        if let keyboardRect = (notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
-            contentInset.bottom = keyboardRect.height
-            scrollIndicatorInsets.bottom = keyboardRect.height
-        }
-        
-        _view.contentInset = contentInset
-        _view.scrollIndicatorInsets = scrollIndicatorInsets
-    }
-    
-    @objc private func keyboardWillHideNotification(_ notification: Notification) {
-        var contentInset = _view.contentInset
-        contentInset.top = 0
-        contentInset.bottom = 0
-        _view.contentInset = contentInset
-        
-        var scrollIndicatorInsets = _view.scrollIndicatorInsets
-        scrollIndicatorInsets.bottom = 0
-        _view.scrollIndicatorInsets = scrollIndicatorInsets
-    }
-    
-    @objc fileprivate func dismissKeyboard() {
-        view.endEditing(true)
-    }
-}
-
-extension RegisterViewController: UITextFieldDelegate {
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        if textField.returnKeyType == .done {
-            textField.resignFirstResponder()
-        }
-        return true
     }
 }
 
