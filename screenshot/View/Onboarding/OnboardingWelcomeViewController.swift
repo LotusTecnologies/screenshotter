@@ -122,6 +122,7 @@ class OnboardingWelcomeViewController: UIViewController {
     }
     
     @objc fileprivate func continueAction() {
+        let _ = NetworkingPromise.sharedInstance.geoLocateIsUSC()
         delegate?.onboardingWelcomeViewControllerDidComplete(self)
     }
 }
