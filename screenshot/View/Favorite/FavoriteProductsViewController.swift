@@ -161,23 +161,13 @@ class FavoriteProductsViewController : BaseViewController {
                 let productVariantsSelectorViewController = ProductVariantsSelectorViewController.init(product: product)
                 productVariantsSelectorViewController.delegate = self
                 productVariantsSelectorViewController.titleLabel.text = "favorites.product.cart".localized
-                
+                productVariantsSelectorViewController.continueButton.setTitle("favorites.product.cart".localized, for: .normal)
+
                 self.present(productVariantsSelectorViewController, animated: true, completion: nil)
                 
             }else{
-                //out of stock
-                let alert = UIAlertController.init(title: nil, message: "cart.item.error.unavailable".localized, preferredStyle: .alert)
-                if !product.hasPriceAlerts {
-                    alert.addAction(UIAlertAction.init(title: "favorites.product.price_alert_off".localized(), style: .default, handler: { (a) in
-                        if let deniedAlertController = self.priceAlertController.priceAlertAction(nil, on: product) {
-                            self.present(deniedAlertController, animated: true, completion: nil)
-                        }
-                    }))
-                }
-                alert.addAction(UIAlertAction.init(title: "generic.ok".localized(), style: .cancel, handler: { (a) in
-                    
-                }))
-                self.present(alert, animated: true, completion: nil)
+                //out of stock shouldn't happen
+               
              
             }
         }else{
@@ -197,6 +187,7 @@ extension FavoriteProductsViewController: ProductVariantsSelectorViewControllerD
     func productVariantsSelectorViewControllerDidPressContinue(_ productVariantsSelectorViewController: ProductVariantsSelectorViewController) {
         
         if let variant = productVariantsSelectorViewController.selectedVariant {
+            variant.product?.setFavorited(toFavorited: false)
             ShoppingCartModel.shared.update(variant: variant, quantity: Int16(productVariantsSelectorViewController.selectedQuantity))
             if let tabBarController = self.tabBarController as? MainTabBarController {
                 tabBarController.cartTabPulseAnimation()
