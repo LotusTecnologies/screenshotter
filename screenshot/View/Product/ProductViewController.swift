@@ -39,6 +39,9 @@ class ProductViewController : BaseViewController {
         return view as! ProductView
     }
     
+    private var loadingTrackingMonitor:AsyncOperationMonitor?
+    private var productFRC:FetchedResultsControllerManager<Product>?
+
     override func loadView() {
         let productView = ProductView()
         productView.selectionControl.addTarget(self, action: #selector(selectionButtonTouchUpInside), for: .touchUpInside)
@@ -119,6 +122,22 @@ class ProductViewController : BaseViewController {
     func setup(with product: Product) {
         structuredProduct = StructuredProduct(product)
         applyStructuredProductIfPossible()
+        
+        
+        if let _  = self.productFRC {
+            self.productFRC?.delegate = nil
+        }
+        
+        self.productFRC = DataModel.sharedInstance.productFrc(delegate: self, productObjectID: product.objectID)
+        
+        if let _ = self.loadingTrackingMonitor {
+            self.loadingTrackingMonitor?.delegate = nil
+        }
+        if let partNumber = product.partNumber {
+            let monitor = AsyncOperationMonitor.init(tracking: [partNumber], delegate: self)
+            self.loadingTrackingMonitor = monitor
+            self.updateTrackingButton()
+        }
     }
     
     // MARK:
@@ -468,6 +487,7 @@ fileprivate extension ProductViewControllerCart {
 extension ProductViewController: FetchedResultsControllerManagerDelegate {
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
         syncCartItemCount()
+        updateTrackingButton()
     }
 }
 
@@ -491,4 +511,16 @@ extension ProductViewControllerNavigation {
         
         navigationController.popToRootViewController(animated: true)
     }
+}
+
+extension ProductViewController : AsyncOperationMonitorDelegate {
+    func asyncOperationMonitorDidChange(_ monitor: AsyncOperationMonitor) {
+        self.updateTrackingButton()
+    }
+    
+    func updateTrackingButton(){
+        self.productView.stockButton.isLoading = self.loadingTrackingMonitor?.didStart ?? false
+        self.productView.stockButton.isSelected = self.productFRC?.first?.hasPriceAlerts ?? false
+    }
+    
 }

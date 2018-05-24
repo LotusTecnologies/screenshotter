@@ -14,6 +14,7 @@ class FavoriteProductsViewController : BaseViewController {
     
     fileprivate var unfavoriteProductsIds: Set<NSManagedObjectID> = []
     private let emptyListView = HelperView()
+    var  trackingProgressMonitors:[String:AsyncOperationMonitor] = [:]
     
     override var title: String? {
         set {}
@@ -154,11 +155,44 @@ class FavoriteProductsViewController : BaseViewController {
     }
 }
 
-extension FavoriteProductsViewController: UITableViewDataSource {
+extension FavoriteProductsViewController: UITableViewDataSource, AsyncOperationMonitorDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.productsFRC?.fetchedObjectsCount ?? 0
     }
     
+    func update(cell:FavoriteProductsTableViewCell, monitor:AsyncOperationMonitor, product:Product){
+        cell.priceAlertButton.isLoading = monitor.didStart
+        cell.priceAlertButton.isSelected = product.hasPriceAlerts  // ???: what happens if this is true and the user disables notifications from settings
+    }
+    
+    func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        var visiblePartNumbers:Set<String> = []
+        self.tableView.indexPathsForVisibleRows?.forEach({ (indexPath) in
+            if  let product = self.productsFRC?.object(at: indexPath), let productId = product.partNumber {
+                visiblePartNumbers.insert(productId)
+            }
+        })
+        let unusedMonitors = self.trackingProgressMonitors.filter {
+            return !visiblePartNumbers.contains( $0.key )
+        }
+        
+        unusedMonitors.forEach {
+            if let monitor = self.trackingProgressMonitors[$0.key] {
+                monitor.delegate = nil
+            }
+            self.trackingProgressMonitors.removeValue(forKey: $0.key) }
+    }
+    
+    func asyncOperationMonitorDidChange(_ monitor: AsyncOperationMonitor) {
+        self.tableView.indexPathsForVisibleRows?.forEach({ (indexPath) in
+            if  let cell = self.tableView.cellForRow(at: indexPath) as? FavoriteProductsTableViewCell, let product = self.productsFRC?.object(at: indexPath), let productId = product.partNumber, let monitor = self.trackingProgressMonitors[productId] {
+                self.update(cell: cell, monitor: monitor, product: product)
+            }else{
+                print("error updating from monitor Change")
+            }
+        })
+    }
+
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         
@@ -174,7 +208,14 @@ extension FavoriteProductsViewController: UITableViewDataSource {
             
             if product.isSupportingUSC, let partNumber = product.partNumber, !partNumber.isEmpty {
                 cell.priceAlertButton.isHidden = false
-                cell.priceAlertButton.isSelected = product.hasPriceAlerts // ???: what happens if this is true and the user disables notifications from settings
+                if let oldMonitor = self.trackingProgressMonitors[partNumber] {
+                    self.update(cell: cell, monitor: oldMonitor, product: product)
+                }else{
+                    let monitor = AsyncOperationMonitor.init(tracking: [partNumber], delegate: self)
+                    self.trackingProgressMonitors[partNumber] = monitor
+                    self.update(cell: cell, monitor: monitor, product: product)
+                }
+                
                 cell.priceAlertButton.addTarget(self, action: #selector(trackProductAction(_:event:)), for: .touchUpInside)
             } else {
                 cell.priceAlertButton.isHidden = true
