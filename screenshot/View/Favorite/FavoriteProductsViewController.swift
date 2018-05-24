@@ -10,13 +10,11 @@ import UIKit
 import CoreData
 
 class FavoriteProductsViewController : BaseViewController {
-    
     var productsFRC:FetchedResultsControllerManager<Product>?
     
     fileprivate var unfavoriteProductsIds: Set<NSManagedObjectID> = []
     private let emptyListView = HelperView()
-
-    
+    var  trackingProgressMonitors:[String:AsyncOperationMonitor] = [:]
     
     override var title: String? {
         set {}
@@ -26,19 +24,6 @@ class FavoriteProductsViewController : BaseViewController {
     }
     
     // MARK: Views
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-    }
-    
-    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-        
-        restorationIdentifier = String(describing: type(of: self))
-        
-        addNavigationItemLogo()
-        NotificationCenter.default.addObserver(self, selector: #selector(reloadTableView), name: .isUSCUpdated, object: nil)
-
-    }
     
     fileprivate var favoriteProductsView: FavoriteProductsView {
         return view as! FavoriteProductsView
@@ -54,6 +39,20 @@ class FavoriteProductsViewController : BaseViewController {
     
     // MARK: Life Cycle
     
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        
+        restorationIdentifier = String(describing: type(of: self))
+        
+        addNavigationItemLogo()
+        NotificationCenter.default.addObserver(self, selector: #selector(reloadTableView), name: .isUSCUpdated, object: nil)
+
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -64,8 +63,6 @@ class FavoriteProductsViewController : BaseViewController {
         tableView.rowHeight = UITableViewAutomaticDimension
         tableView.estimatedRowHeight = 200
         tableView.layoutMargins = UIEdgeInsets(top: .extendedPadding, left: 0, bottom: .extendedPadding, right: 0) // Needed for emptyListView
-
-        
         
         emptyListView.titleLabel.text = "favorites.empty.title".localized
         emptyListView.subtitleLabel.text = "favorites.empty.detail".localized
@@ -77,8 +74,16 @@ class FavoriteProductsViewController : BaseViewController {
         self.view.addGestureRecognizer(pinchZoom)
         self.productsFRC = DataModel.sharedInstance.favoritedProductsFrc(delegate: self)
         self.tableView.reloadData()
-
     }
+    
+    deinit {
+        tableView.dataSource = nil
+        tableView.delegate = nil
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    // MARK:
+    
     @objc func pinch( gesture:UIPinchGestureRecognizer) {
         if CrazeImageZoom.shared.isHandlingGesture, let imageView = CrazeImageZoom.shared.hostedImageView  {
             CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: imageView)
@@ -95,14 +100,7 @@ class FavoriteProductsViewController : BaseViewController {
         self.unfavoriteProductsIds.removeAll()
     }
     
-    deinit {
-        tableView.dataSource = nil
-        tableView.delegate = nil
-        NotificationCenter.default.removeObserver(self)
-    }
-    
     // MARK: Favorites
-    
     
     @objc fileprivate func favoriteProductAction(_ favoriteControl: FavoriteControl, event: UIEvent) {
         guard let indexPath = tableView.indexPath(for: event),let product = self.productsFRC?.object(at: indexPath) else {
@@ -125,65 +123,19 @@ class FavoriteProductsViewController : BaseViewController {
         }
     }
     
-    // MARK: Tracking
-    fileprivate func trackProduct(product:Product) {
-        if let indexPath = self.productsFRC?.indexPath(forObject: product), let cell = self.tableView.cellForRow(at: indexPath){
-            if let cell = cell as? FavoriteProductsTableViewCell {
-                let button = cell.priceAlertButton
-                self.trackProductAction(button, product: product)
-            }
-        }
-    }
-    @objc fileprivate func trackProductAction(_ button: LoadingButton, event: UIEvent) {
-        if let indexPath = tableView.indexPath(for: event),
-            let product = self.productsFRC?.object(at: indexPath) {
-            self.trackProductAction(button, product: product)
-        }
-    }
+    // MARK: Price Alerts
     
-    func trackProductAction(_ button: LoadingButton, product: Product) {
-
-        if PermissionsManager.shared.hasPermission(for: .push) {
-            guard
-                !button.isLoading
-                else {
-                    return
-            }
-            
-            button.isLoading = true
-            let hasPriceAlerts =  product.hasPriceAlerts
-            if hasPriceAlerts {
-                Analytics.trackProductPriceAlertUnsubscribed(product: product)
-            }else{
-                Analytics.trackProductPriceAlertSubscribed(product: product)
-            }
-            
-            (product.hasPriceAlerts ? product.untrack() : product.track())
-                .then { [weak button] isTracking -> Void in
-                    button?.isLoading = false
-                    button?.isSelected = isTracking
-                    
-                }.catch { [weak button] error in
-                    button?.isLoading = false
-                    let e = error as NSError
-                    if hasPriceAlerts {
-                        Analytics.trackProductPriceAlertUnsubscribedError(product: product, domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
-                    }else{
-                        Analytics.trackProductPriceAlertSubscribedError(product: product, domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
-                        
-                    }
-                    
-            }
-        }
-        else {
-            if PermissionsManager.shared.permissionStatus(for: .push) == .undetermined {
-                PermissionsManager.shared.requestPermission(for: .push)
-            }
+    private let priceAlertController = ProductPriceAlertController()
+    
+    @objc fileprivate func trackProductAction(_ button: LoadingButton, event: UIEvent) {
+        guard let indexPath = tableView.indexPath(for: event),
+            let product = self.productsFRC?.object(at: indexPath)
             else {
-                if let alertController = PermissionsManager.shared.deniedAlertController(for: .push) {
-                    present(alertController, animated: true, completion: nil)
-                }
-            }
+                return
+        }
+        
+        if let deniedAlertController = priceAlertController.priceAlertAction(button, on: product) {
+            present(deniedAlertController, animated: true, completion: nil)
         }
     }
     
@@ -217,7 +169,9 @@ class FavoriteProductsViewController : BaseViewController {
                 let alert = UIAlertController.init(title: nil, message: "cart.item.error.unavailable".localized, preferredStyle: .alert)
                 if !product.hasPriceAlerts {
                     alert.addAction(UIAlertAction.init(title: "favorites.product.price_alert_off".localized(), style: .default, handler: { (a) in
-                        self.trackProduct(product: product)
+                        if let deniedAlertController = self.priceAlertController.priceAlertAction(nil, on: product) {
+                            self.present(deniedAlertController, animated: true, completion: nil)
+                        }
                     }))
                 }
                 alert.addAction(UIAlertAction.init(title: "generic.ok".localized(), style: .cancel, handler: { (a) in
@@ -280,11 +234,45 @@ extension FavoriteProductsViewController: ProductVariantsSelectorViewControllerD
 }
 
 
-extension FavoriteProductsViewController: UITableViewDataSource {
+extension FavoriteProductsViewController: UITableViewDataSource, AsyncOperationMonitorDelegate {
+
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.productsFRC?.fetchedObjectsCount ?? 0
     }
     
+    func update(cell:FavoriteProductsTableViewCell, monitor:AsyncOperationMonitor, product:Product){
+        cell.priceAlertButton.isLoading = monitor.didStart
+        cell.priceAlertButton.isSelected = product.hasPriceAlerts  // ???: what happens if this is true and the user disables notifications from settings
+    }
+    
+    func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        var visiblePartNumbers:Set<String> = []
+        self.tableView.indexPathsForVisibleRows?.forEach({ (indexPath) in
+            if  let product = self.productsFRC?.object(at: indexPath), let productId = product.partNumber {
+                visiblePartNumbers.insert(productId)
+            }
+        })
+        let unusedMonitors = self.trackingProgressMonitors.filter {
+            return !visiblePartNumbers.contains( $0.key )
+        }
+        
+        unusedMonitors.forEach {
+            if let monitor = self.trackingProgressMonitors[$0.key] {
+                monitor.delegate = nil
+            }
+            self.trackingProgressMonitors.removeValue(forKey: $0.key) }
+    }
+    
+    func asyncOperationMonitorDidChange(_ monitor: AsyncOperationMonitor) {
+        self.tableView.indexPathsForVisibleRows?.forEach({ (indexPath) in
+            if  let cell = self.tableView.cellForRow(at: indexPath) as? FavoriteProductsTableViewCell, let product = self.productsFRC?.object(at: indexPath), let productId = product.partNumber, let monitor = self.trackingProgressMonitors[productId] {
+                self.update(cell: cell, monitor: monitor, product: product)
+            }else{
+                print("error updating from monitor Change")
+            }
+        })
+    }
+
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         
@@ -300,7 +288,14 @@ extension FavoriteProductsViewController: UITableViewDataSource {
             
             if product.isSupportingUSC, let partNumber = product.partNumber, !partNumber.isEmpty {
                 cell.priceAlertButton.isHidden = false
-                cell.priceAlertButton.isSelected = product.hasPriceAlerts // ???: what happens if this is true and the user disables notifications from settings
+                if let oldMonitor = self.trackingProgressMonitors[partNumber] {
+                    self.update(cell: cell, monitor: oldMonitor, product: product)
+                }else{
+                    let monitor = AsyncOperationMonitor.init(tracking: [partNumber], delegate: self)
+                    self.trackingProgressMonitors[partNumber] = monitor
+                    self.update(cell: cell, monitor: monitor, product: product)
+                }
+                
                 cell.priceAlertButton.addTarget(self, action: #selector(trackProductAction(_:event:)), for: .touchUpInside)
             } else {
                 cell.priceAlertButton.isHidden = true

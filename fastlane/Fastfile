@@ -19,7 +19,7 @@ platform :ios do
 
     gym(scheme: "prdScreenshot") # Build your app - more options available
     testflight(skip_waiting_for_build_processing: true) # to only upload the build
-    version = get_version_number
+    version = get_version_number(xcodeproj: "screenshot.xcodeproj", target: "screenshot", configuration: "prdRelease")
     add_git_tag(tag: "#{version}/#{lane_context[SharedValues::BUILD_NUMBER]}")
     push_to_git_remote
   end

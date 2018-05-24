@@ -656,6 +656,8 @@ class NetworkingPromise : NSObject {
             print(error)
             return Promise(error: error)
         }
+        
+        
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.addValue("application/json", forHTTPHeaderField: "Accept")
@@ -669,6 +671,8 @@ class NetworkingPromise : NSObject {
                 return Promise(error: error)
             }
             return Promise(value: true)
+        }.catch { (error) in
+                print("error from tracking price alert: \(error)")
         }
     }
 

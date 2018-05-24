@@ -221,6 +221,17 @@ extension DataModel {
         return fetchedResultsController
     }
     
+    func productFrc(delegate:FetchedResultsControllerManagerDelegate?, productObjectID: NSManagedObjectID) -> FetchedResultsControllerManager<Product> {
+        let request: NSFetchRequest = Product.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(key: "dateFavorited", ascending: false)]
+        request.predicate = NSPredicate(format: "SELF == %@", productObjectID)
+        
+        let context = self.mainMoc()
+        let fetchedResultsController:FetchedResultsControllerManager<Product> = FetchedResultsControllerManager<Product>.init(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
+        return fetchedResultsController
+    }
+
+    
     func productBarFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<Product> {
         let request: NSFetchRequest = Product.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(key: "dateSortProductBar", ascending: false)]
@@ -1088,6 +1099,8 @@ extension DataModel {
     
     public func unfavorite(favoriteArray: [NSManagedObjectID]) {
         let moiArray = favoriteArray
+        
+        
         self.performBackgroundTask { (managedObjectContext) in
             let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
             fetchRequest.predicate = NSPredicate(format: "SELF IN %@", moiArray)
@@ -1103,6 +1116,7 @@ extension DataModel {
                     product.isFavorite = false
                     product.dateFavorited = nil
                     AccumulatorModel.favorite.decrementUninformedCount(by:results.count)
+                    product.untrack()
                 }
                 try managedObjectContext.save()
                 
@@ -1677,6 +1691,11 @@ extension Product {
                 let results = try managedObjectContext.fetch(fetchRequest)
                 for product in results {
                     product.isFavorite = toFavorited
+                    if toFavorited {
+                        product.track()
+                    }else{
+                        product.untrack()
+                    }
                     if toFavorited == false {
                         product.dateViewed  = nil
                     }
@@ -2046,6 +2065,19 @@ extension NSManagedObjectContext {
     
     func objectId(for objectIdUrl:URL) -> NSManagedObjectID? {
         return self.persistentStoreCoordinator?.managedObjectID(forURIRepresentation: objectIdUrl)
+    }
+    
+    func productWith(objectId:NSManagedObjectID) -> Product? {
+        if let card = self.object(with: objectId) as? Product {
+            do{
+                try card.validateForUpdate()
+                return card
+            }catch{
+                DataModel.sharedInstance.receivedCoreDataError(error: error)
+                
+            }
+        }
+        return nil
     }
     
     func screenshotWith(objectId:NSManagedObjectID) -> Screenshot? {
