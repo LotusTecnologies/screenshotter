@@ -14,6 +14,14 @@ class ShoppingCartModel {
     
     static let shared = ShoppingCartModel()
     
+    let priceAlertQueue:AsyncOperationQueue = {
+        var queue = AsyncOperationQueue()
+        queue.name = "price Alert Queue"
+        queue.maxConcurrentOperationCount = 4
+        queue.qualityOfService = .utility
+        return queue
+    }()
+    
     func populateVariants(productOID: NSManagedObjectID) -> Promise<(Product, Bool)> {
         let dataModel = DataModel.sharedInstance
         return firstly {
@@ -431,10 +439,16 @@ extension Product {
             return Promise(error: error)
         }
         let productOID = objectID
-        return NetworkingPromise.sharedInstance.registerPriceAlert(partNumber: partNumber, lastPrice: self.fallbackPrice, pushToken: pushTokenData.description, outOfStock: !self.hasVariants)
+        let promise = NetworkingPromise.sharedInstance.registerPriceAlert(partNumber: partNumber, lastPrice: self.fallbackPrice, pushToken: pushTokenData.description, outOfStock: !self.hasVariants)
             .then { networkSucceeded -> Promise<Bool> in
                 return self.priceAlertDB(productOID: productOID, networkSucceeded: networkSucceeded, successValue: true)
         }
+        ShoppingCartModel.shared.priceAlertQueue.addOperation(AsyncOperation.init(timeout: nil, partNumbers: [partNumber], completion: { (completion) in
+            promise.always {
+                completion()
+            }
+        }))
+        return promise
     }
     
     // Returns the new value of hasPriceAlerts as determined by the network.
@@ -451,10 +465,16 @@ extension Product {
                 return Promise(error: error)
         }
         let productOID = objectID
-        return NetworkingPromise.sharedInstance.deregisterPriceAlert(partNumber: partNumber, pushToken: pushTokenData.description)
+        let promise = NetworkingPromise.sharedInstance.deregisterPriceAlert(partNumber: partNumber, pushToken: pushTokenData.description)
             .then { networkSucceeded -> Promise<Bool> in
                 return self.priceAlertDB(productOID: productOID, networkSucceeded: networkSucceeded, successValue: false)
         }
+        ShoppingCartModel.shared.priceAlertQueue.addOperation(AsyncOperation.init(timeout: nil, partNumbers: [partNumber], completion: { (completion) in
+            promise.always {
+                completion()
+            }
+        }))
+        return promise
     }
     
     fileprivate func priceAlertDB(productOID: NSManagedObjectID, networkSucceeded: Bool, successValue: Bool) -> Promise<Bool> {

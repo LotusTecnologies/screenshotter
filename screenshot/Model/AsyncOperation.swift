@@ -284,7 +284,7 @@ extension AsyncOperationMonitor {
         var tags:[AsyncOperationTag] = []
         partNumbers.forEach { tags.append(AsyncOperationTag.init(type: .productNumber, value: $0)) }
         
-        self.init(tags: tags, queues:[NetworkingPromise.sharedInstance.priceAlertQueue], delegate: delegate)
+        self.init(tags: tags, queues:[ShoppingCartModel.shared.priceAlertQueue], delegate: delegate)
 
     }
 
