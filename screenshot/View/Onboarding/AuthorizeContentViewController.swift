@@ -77,7 +77,6 @@ class AuthorizeContentScrollView: UIScrollView {
         passwordTextField.translatesAutoresizingMaskIntoConstraints = false
         passwordTextField.placeholder = "Password"
         passwordTextField.isSecureTextEntry = true
-        passwordTextField.returnKeyType = .done
         passwordTextField.autocapitalizationType = .none
         passwordTextField.autocorrectionType = .no
         passwordTextField.spellCheckingType = .no
@@ -184,7 +183,10 @@ class AuthorizeContentViewController: UIViewController {
 
 extension AuthorizeContentViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        if textField.returnKeyType == .done {
+        if textField == _view.emailTextField {
+            _view.passwordTextField.becomeFirstResponder()
+        }
+        else if textField == _view.passwordTextField {
             textField.resignFirstResponder()
         }
         return true

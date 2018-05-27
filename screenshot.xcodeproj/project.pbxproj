@@ -88,6 +88,7 @@
 		C53154D020B6A8A60050EB76 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53154CF20B6A8A60050EB76 /* LoginViewController.swift */; };
 		C53154D420B6B9550050EB76 /* AuthorizeContentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53154D320B6B9550050EB76 /* AuthorizeContentViewController.swift */; };
 		C53154D620B6E3A90050EB76 /* OnboardingDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53154D520B6E3A90050EB76 /* OnboardingDetailsViewController.swift */; };
+		C53154D820BA868D0050EB76 /* RoundButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53154D720BA868D0050EB76 /* RoundButton.swift */; };
 		C5336D1B203AC9CE00A7B4B0 /* CartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5336D1A203AC9CE00A7B4B0 /* CartViewController.swift */; };
 		C5336D1D203ACE7B00A7B4B0 /* CartNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5336D1C203ACE7B00A7B4B0 /* CartNavigationController.swift */; };
 		C5336D21203C511300A7B4B0 /* ActivityBadgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5336D20203C511200A7B4B0 /* ActivityBadgeView.swift */; };
@@ -345,6 +346,7 @@
 		C53154CF20B6A8A60050EB76 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		C53154D320B6B9550050EB76 /* AuthorizeContentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorizeContentViewController.swift; sourceTree = "<group>"; };
 		C53154D520B6E3A90050EB76 /* OnboardingDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingDetailsViewController.swift; sourceTree = "<group>"; };
+		C53154D720BA868D0050EB76 /* RoundButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundButton.swift; sourceTree = "<group>"; };
 		C5336D1A203AC9CE00A7B4B0 /* CartViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartViewController.swift; sourceTree = "<group>"; };
 		C5336D1C203ACE7B00A7B4B0 /* CartNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartNavigationController.swift; sourceTree = "<group>"; };
 		C5336D20203C511200A7B4B0 /* ActivityBadgeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActivityBadgeView.swift; sourceTree = "<group>"; };
@@ -916,11 +918,12 @@
 			isa = PBXGroup;
 			children = (
 				C528005C2051342B004DD7A3 /* BorderButton.swift */,
-				C528005A205133BA004DD7A3 /* FavoriteButton.swift */,
+				C5F8D81320B2E877004A32FD /* FacebookButton.swift */,
 				C540884F1FE90E2200198955 /* FloatingActionButton.swift */,
+				C528005A205133BA004DD7A3 /* FavoriteButton.swift */,
 				C501412F206283A200ABFB5C /* LoadingButton.swift */,
 				C540884E1FE90E2200198955 /* MainButton.swift */,
-				C5F8D81320B2E877004A32FD /* FacebookButton.swift */,
+				C53154D720BA868D0050EB76 /* RoundButton.swift */,
 			);
 			path = Button;
 			sourceTree = "<group>";
@@ -1574,6 +1577,7 @@
 				C548D4EB20022E26003364E9 /* DiscoverScreenshotViewController.swift in Sources */,
 				C527312520B4435400A0E2EB /* UIButton.swift in Sources */,
 				C5AAE78B1FEA38AA00BCFF78 /* WebViewController.swift in Sources */,
+				C53154D820BA868D0050EB76 /* RoundButton.swift in Sources */,
 				C54088541FE90E2200198955 /* TextFieldTableViewCell.swift in Sources */,
 				C528005D2051342B004DD7A3 /* BorderButton.swift in Sources */,
 				C5FF413E200B817400342DEC /* DiscoverScreenshotCollectionViewLayout.swift in Sources */,
