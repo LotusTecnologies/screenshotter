@@ -2105,6 +2105,19 @@ extension NSManagedObjectContext {
         return nil
     }
     
+    func cartItemWith(objectId: NSManagedObjectID) -> CartItem? {
+        if let cartItem = object(with: objectId) as? CartItem {
+            do {
+                try cartItem.validateForUpdate()
+                return cartItem
+            }
+            catch {
+                DataModel.sharedInstance.receivedCoreDataError(error: error)
+            }
+        }
+        return nil
+    }
+    
     func cardWith(objectId:NSManagedObjectID) -> Card? {
         if let card = self.object(with: objectId) as? Card {
             do{
