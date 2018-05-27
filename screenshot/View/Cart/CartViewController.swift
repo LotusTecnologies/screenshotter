@@ -345,15 +345,10 @@ extension CartViewController: FetchedResultsControllerManagerDelegate {
 
 typealias CartViewControllerCartItem = CartViewController
 fileprivate extension CartViewControllerCartItem {
+    
     func variant(forColor color: String?, size: String?, in product: Product) -> Variant? {
-        if let variants = product.availableVariants?.allObjects as? [Variant] {
-            for variant in variants {
-                if variant.color == color && variant.size == size {
-                    return variant
-                }
-            }
-        }
-        return nil
+        let variants = product.availableVariants as? Set<Variant>
+        return variants?.first { $0.color == color && $0.size == size }
     }
     
     @objc func cartItemEditAction(_ button: UIButton) {
