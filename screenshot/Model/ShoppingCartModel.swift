@@ -422,6 +422,7 @@ extension Product {
     
     // Returns the new value of hasPriceAlerts as determined by the network.
     @discardableResult func track() -> Promise<Bool> {
+        Analytics.trackProductPriceAlertSubscribed(product: self)
         guard PermissionsManager.shared.hasPermission(for: .push) else {
             let error = NSError(domain: "Craze", code: 70, userInfo: [NSLocalizedDescriptionKey : "Product.track No push permissions"])
             print("error:\(error)")
@@ -442,6 +443,13 @@ extension Product {
         let promise = NetworkingPromise.sharedInstance.registerPriceAlert(partNumber: partNumber, lastPrice: self.fallbackPrice, pushToken: pushTokenData.description, outOfStock: !self.hasVariants)
             .then { networkSucceeded -> Promise<Bool> in
                 return self.priceAlertDB(productOID: productOID, networkSucceeded: networkSucceeded, successValue: true)
+            }.catch { (error) in
+                let e = error as NSError
+                DataModel.sharedInstance.performBackgroundTask { managedObjectContext in
+                    let product = managedObjectContext.object(with: productOID) as? Product
+                    Analytics.trackProductPriceAlertSubscribedError(product: product, domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
+                    
+                }
         }
         ShoppingCartModel.shared.priceAlertQueue.addOperation(AsyncOperation.init(timeout: nil, partNumbers: [partNumber], completion: { (completion) in
             promise.always {
@@ -453,6 +461,7 @@ extension Product {
     
     // Returns the new value of hasPriceAlerts as determined by the network.
     @discardableResult func untrack() -> Promise<Bool> {
+        Analytics.trackProductPriceAlertUnsubscribed(product: self)
         guard let pushTokenData = UserDefaults.standard.object(forKey: UserDefaultsKeys.deviceToken) as? NSData else {
             let error = NSError(domain: "Craze", code: 73, userInfo: [NSLocalizedDescriptionKey : "Product.untrack No pushToken"])
             print("error:\(error)")
@@ -464,10 +473,17 @@ extension Product {
                 print("error:\(error)")
                 return Promise(error: error)
         }
+        
         let productOID = objectID
         let promise = NetworkingPromise.sharedInstance.deregisterPriceAlert(partNumber: partNumber, pushToken: pushTokenData.description)
             .then { networkSucceeded -> Promise<Bool> in
                 return self.priceAlertDB(productOID: productOID, networkSucceeded: networkSucceeded, successValue: false)
+            }.catch { (error) in
+                let e = error as NSError
+                DataModel.sharedInstance.performBackgroundTask { managedObjectContext in
+                    let product = managedObjectContext.object(with: productOID) as? Product
+                    Analytics.trackProductPriceAlertUnsubscribedError(product: product, domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
+                }
         }
         ShoppingCartModel.shared.priceAlertQueue.addOperation(AsyncOperation.init(timeout: nil, partNumbers: [partNumber], completion: { (completion) in
             promise.always {

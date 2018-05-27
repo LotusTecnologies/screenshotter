@@ -554,6 +554,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         product.setFavorited(toFavorited: isFavorited)
         
         if isFavorited {
+            let _ = ShoppingCartModel.shared.populateVariants(productOID: product.objectID)
             Analytics.trackProductFavorited(product: product, page: .productList)
         }else{
             Analytics.trackProductUnfavorited(product: product, page: .productList)
