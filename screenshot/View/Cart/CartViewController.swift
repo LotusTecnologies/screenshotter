@@ -398,6 +398,7 @@ fileprivate extension CartViewControllerCartItem {
 
 extension CartViewController: ProductVariantsSelectorViewControllerDelegate {
     func productVariantsSelectorViewControllerDidPressCancel(_ productVariantsSelectorViewController: ProductVariantsSelectorViewController) {
+        editingCartItemId = nil
         dismiss(animated: true, completion: nil)
     }
     
@@ -406,15 +407,16 @@ extension CartViewController: ProductVariantsSelectorViewControllerDelegate {
             if let cartItemId = editingCartItemId,
                 let cartItem = DataModel.sharedInstance.mainMoc().cartItemWith(objectId: cartItemId)
             {
+                let quantity = Int16(productVariantsSelectorViewController.selectedQuantity)
+                let isQuantityDifferent = cartItem.quantity != quantity
                 let isColorDifferent = cartItem.color != variant.color
                 let isSizeDifferent = cartItem.size != variant.size
-                let isQuantityDifferent = Int(cartItem.quantity) != productVariantsSelectorViewController.selectedQuantity
                 
                 if isColorDifferent || isSizeDifferent {
                     ShoppingCartModel.shared.remove(item: cartItem)
                 }
                 if isColorDifferent || isSizeDifferent || isQuantityDifferent {
-                    ShoppingCartModel.shared.update(variant: variant, quantity: Int16(productVariantsSelectorViewController.selectedQuantity))
+                    ShoppingCartModel.shared.update(variant: variant, quantity: quantity)
                 }
             }
             else {
@@ -423,6 +425,7 @@ extension CartViewController: ProductVariantsSelectorViewControllerDelegate {
             }
         }
         
+        editingCartItemId = nil
         dismiss(animated: true, completion: nil)
     }
 }

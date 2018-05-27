@@ -141,9 +141,6 @@ class CartTableViewCell: UITableViewCell, DynamicTypeAccessibilityLayout {
             label.setContentHuggingPriority(UILayoutPriority.defaultHigh, for: .horizontal)
             label.setContentCompressionResistancePriority(UILayoutPriority.required, for: .horizontal)
             label.widthAnchor.constraint(lessThanOrEqualTo: variantDataPositionGuide.widthAnchor, multiplier: 0.4).isActive = true
-            let heightConstraint = label.heightAnchor.constraint(greaterThanOrEqualToConstant: editButton.intrinsicContentSize.height)
-            heightConstraint.priority = .defaultHigh
-            heightConstraint.isActive = true
             return label
         }
         
@@ -173,17 +170,17 @@ class CartTableViewCell: UITableViewCell, DynamicTypeAccessibilityLayout {
         self.quantityValueLabel = quantityValueLabel
         
         editButton.translatesAutoresizingMaskIntoConstraints = false
-        editButton.setTitle("Edit", for: .normal) // TODO: localize
+        editButton.setTitle("generic.edit".localized, for: .normal)
         editButton.setTitleColor(.crazeGreen, for: .normal)
-        editButton.contentEdgeInsets = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
-        variantDataContainerView.addSubview(editButton)
-        editButton.leadingAnchor.constraint(equalTo: quantityValueLabel.trailingAnchor).isActive = true
-        editButton.trailingAnchor.constraint(equalTo: variantDataPositionGuide.trailingAnchor).isActive = true
+        editButton.contentEdgeInsets = UIEdgeInsets(top: 10, left: contentView.layoutMargins.right, bottom: 10, right: contentView.layoutMargins.right)
+        mainView.addSubview(editButton)
+        editButton.leadingAnchor.constraint(greaterThanOrEqualTo: quantityValueLabel.trailingAnchor).isActive = true
+        editButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         editButton.centerYAnchor.constraint(equalTo: quantityTitleLabel.centerYAnchor).isActive = true
         
         let colorTitleLabel = createTitleLabel()
         colorTitleLabel.text = "cart.variant.color".localized
-        colorTitleLabel.topAnchor.constraint(equalTo: quantityTitleLabel.bottomAnchor).isActive = true
+        colorTitleLabel.topAnchor.constraint(equalTo: quantityTitleLabel.bottomAnchor, constant: 6).isActive = true
         colorTitleLabel.leadingAnchor.constraint(equalTo: variantDataPositionGuide.leadingAnchor).isActive = true
         colorTitleLabel.trailingAnchor.constraint(equalTo: variantDataVerticalGuide.leadingAnchor).isActive = true
         hideColorLabelConstraint = colorTitleLabel.heightAnchor.constraint(equalToConstant: 0)
@@ -196,7 +193,7 @@ class CartTableViewCell: UITableViewCell, DynamicTypeAccessibilityLayout {
         
         let sizeTitleLabel = createTitleLabel()
         sizeTitleLabel.text = "cart.variant.size".localized
-        sizeTitleLabel.topAnchor.constraint(equalTo: colorTitleLabel.bottomAnchor).isActive = true
+        sizeTitleLabel.topAnchor.constraint(equalTo: colorTitleLabel.bottomAnchor, constant: 6).isActive = true
         sizeTitleLabel.leadingAnchor.constraint(equalTo: variantDataPositionGuide.leadingAnchor).isActive = true
         sizeTitleLabel.bottomAnchor.constraint(equalTo: variantDataPositionGuide.bottomAnchor).isActive = true
         sizeTitleLabel.trailingAnchor.constraint(equalTo: variantDataVerticalGuide.leadingAnchor).isActive = true
