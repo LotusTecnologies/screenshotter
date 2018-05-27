@@ -149,7 +149,15 @@ class FavoriteProductsViewController : BaseViewController {
         presentProduct(product, atLocation: .favorite)
     }
     
-    @objc fileprivate func presentProductAction(_ control: UIControl, event: UIEvent) {
+    @objc fileprivate func shareProductAction(_ control: UIControl, event: UIEvent) {
+        guard let indexPath = tableView.indexPath(for: event), let product = self.productsFRC?.object(at: indexPath) else {
+            return
+        }
+
+        ScreenshotShareManager.share(product: product, in: self)
+    }
+    
+    @objc fileprivate func addToCartOrBuyNowProductAction(_ control: UIControl, event: UIEvent) {
         guard let indexPath = tableView.indexPath(for: event) else {
             return
         }
@@ -289,9 +297,11 @@ extension FavoriteProductsViewController: UITableViewDataSource, AsyncOperationM
                         cell.cartButton.setTitle("favorites.product.cart".localized, for: .normal)
                         cell.isCartButtonHidden = false
                         cell.isOutOfStockLabelHidden = true
+                        cell.isShareButtonHidden = product.offer != nil
                     }else{
                         cell.isOutOfStockLabelHidden = false
                         cell.isCartButtonHidden = true
+                        cell.isShareButtonHidden = true
                     }
                     
                     cell.isPriceAlertButtonHidden = false
@@ -307,6 +317,7 @@ extension FavoriteProductsViewController: UITableViewDataSource, AsyncOperationM
                 }else{
                     cell.isOutOfStockLabelHidden = true
                     cell.isPriceAlertButtonHidden = true
+                    cell.isShareButtonHidden = true
                     cell.isCartButtonHidden = false
                     cell.cartButton.setTitle("product.buy_now".localized, for: .normal)
                 }
@@ -314,11 +325,14 @@ extension FavoriteProductsViewController: UITableViewDataSource, AsyncOperationM
                 cell.isOutOfStockLabelHidden = true
                 cell.isPriceAlertButtonHidden = true
                 cell.isCartButtonHidden = false
+                cell.isShareButtonHidden = true
                 cell.cartButton.setTitle("product.buy_now".localized, for: .normal)
             }
             
             cell.priceAlertButton.addTarget(self, action: #selector(trackProductAction(_:event:)), for: .touchUpInside)
-            cell.cartButton.addTarget(self, action: #selector(presentProductAction(_:event:)), for: .touchUpInside)
+            cell.cartButton.addTarget(self, action: #selector(addToCartOrBuyNowProductAction(_:event:)), for: .touchUpInside)
+            cell.shareButton.addTarget(self, action: #selector(shareProductAction(_:event:)), for: .touchUpInside)
+
         }
         
         return cell

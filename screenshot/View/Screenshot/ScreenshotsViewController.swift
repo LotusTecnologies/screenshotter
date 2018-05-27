@@ -554,7 +554,7 @@ extension ScreenshotsViewController {
 extension ScreenshotsViewController : ScreenshotCollectionViewCellDelegate{
     func screenshotCollectionViewCellDidTapShare(_ cell: ScreenshotCollectionViewCell) {
         if let indexPath = self.collectionView?.indexPath(for: cell),  let screenshot = self.screenshot(at: indexPath.item) {
-            ScreenshotShareManager.share(screenshot: screenshot, in: self, page: .screenshotList)
+            ScreenshotShareManager.share(screenshot: screenshot, in: self)
         }
     }
         

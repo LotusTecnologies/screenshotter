@@ -19,9 +19,34 @@ fileprivate extension UIViewController {
 
 class ScreenshotShareManager {
     
+    static func share(product:Product, in viewController:UIViewController){
     
+        guard let o = product.offer, let offersURL = URL.init(string: o) else {
+            return
+        }
+        
+        let introductoryText = "screenshots.share.title".localized
+        
+        let productObjectId = product.objectID
+        
+        // iOS 11.1 has a bug where copying to clipboard while sharing doesn't put a space between activity items.
+        let space = " "
+
+        let items:[Any] = [introductoryText, space, offersURL]
+        let activityViewController = UIActivityViewController.init(activityItems: items, applicationActivities: [])
+        activityViewController.excludedActivityTypes = [UIActivityType.addToReadingList, UIActivityType.airDrop, UIActivityType.init("com.apple.reminders.RemindersEditorExtension"), UIActivityType.init("com.apple.mobilenotes.SharingExtension")]
+        activityViewController.completionWithItemsHandler = { (activityType, completed, returnedItems, activityError) in
+            let product = DataModel.sharedInstance.mainMoc().productWith(objectId: productObjectId)
+            if (completed) {
+                Analytics.trackProductShareSocial(product: product)
+            }
+        }
+        activityViewController.popoverPresentationController?.sourceView = viewController.view
+        viewController.present(activityViewController, animated: true, completion: nil)
+    }
+
     
-    static func share(screenshot:Screenshot, in viewController:UIViewController, page:Analytics.AnalyticsSharedScreenshotStartedPage){
+    static func share(screenshot:Screenshot, in viewController:UIViewController){
         
         let screenshotObjectId = screenshot.objectID
         let alert = UIAlertController.init(title: "share_to_discover.action_sheet.title".localized, message: "share_to_discover.action_sheet.message".localized, preferredStyle: .actionSheet)
@@ -35,14 +60,14 @@ class ScreenshotShareManager {
                         
                     }))
                     viewController.present(alert, animated: true, completion: nil)
-                    Analytics.trackShareError(screenshot: screenshot, page: page.toErrorEnum(), errorTpye: .alreadyShared)
+                    Analytics.trackShareError(screenshot: screenshot, errorTpye: .alreadyShared)
                 }else {
                     screenshot.submitToDiscover()
                     let thankYou = ThankYouForSharingViewController()
                     thankYou.closeButton.addTarget(viewController, action: #selector(UIViewController.dismissWithSender(_:)), for: .touchUpInside)
                     viewController.present(thankYou, animated: true, completion: nil)
                     
-                    Analytics.trackShareDiscover(screenshot: screenshot, page: page.toDiscoverEnum())
+                    Analytics.trackShareDiscover(screenshot: screenshot, page: .screenshotList)
                     
                 }
             }
@@ -73,7 +98,7 @@ class ScreenshotShareManager {
                     activityViewController.completionWithItemsHandler = { (activityType, completed, returnedItems, activityError) in
                         let screenshot = DataModel.sharedInstance.mainMoc().screenshotWith(objectId: screenshotObjectId)
                         if (completed) {
-                            Analytics.trackShareSocial(screenshot: screenshot, page: page.toSocialEnum())
+                            Analytics.trackShareSocial(screenshot: screenshot)
                         }
                     }
                     activityViewController.popoverPresentationController?.sourceView = viewController.view
@@ -87,39 +112,8 @@ class ScreenshotShareManager {
         alert.popoverPresentationController?.sourceView = viewController.view
         viewController.present(alert, animated: true, completion: nil)
         
-        Analytics.trackSharedScreenshotStarted(screenshot: screenshot, page: page)
+        Analytics.trackSharedScreenshotStarted(screenshot: screenshot)
     }
     
 }
 
-
-
-fileprivate extension Analytics.AnalyticsSharedScreenshotStartedPage {
-    func toErrorEnum() -> Analytics.AnalyticsShareErrorPage{
-        switch self {
-        case .screenshotList:
-            return .screenshotList
-        case .favorite:
-            return .favorite
-        }
-    }
-    
-    func toDiscoverEnum() -> Analytics.AnalyticsShareDiscoverPage{
-        switch self {
-        case .screenshotList:
-            return .screenshotList
-        case .favorite:
-            return .favorite
-        }
-    }
-    
-    func toSocialEnum() -> Analytics.AnalyticsShareSocialPage{
-        switch self {
-        case .screenshotList:
-            return .screenshotList
-        case .favorite:
-            return .favorite
-        }
-    }
-    
-}
