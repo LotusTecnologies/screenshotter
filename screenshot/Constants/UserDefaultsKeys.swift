@@ -23,7 +23,8 @@ class UserDefaultsKeys  {
 
     // USC
     static let isUSC = "IsUSC"
-    
+    static let abUSC = "AbUSC"
+
     // Screenshot
     static let newScreenshotsCount = "NewScreenshotsCount"
     static let newScreenshotsAssetIds = "NewScreenshotsAssetIds"

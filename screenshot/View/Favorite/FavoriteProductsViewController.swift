@@ -156,7 +156,8 @@ class FavoriteProductsViewController : BaseViewController {
         guard let product = self.productsFRC?.object(at: indexPath) else {
             return
         }
-        if let _ = product.partNumber {
+        if UIApplication.isUSC,
+          let _ = product.partNumber {
             if product.hasVariants {
                 let productVariantsSelectorViewController = ProductVariantsSelectorViewController.init(product: product)
                 productVariantsSelectorViewController.delegate = self
