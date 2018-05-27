@@ -179,7 +179,7 @@ class CartViewController: BaseViewController {
     private var isPriceAtLeast50 = false
     
     var isGiftCardRedeemable: Bool {
-        return isPriceAtLeast50 && !UserDefaults.standard.bool(forKey: UserDefaultsKeys.completedCheckout)
+        return isPriceAtLeast50 && !UserDefaults.standard.bool(forKey: UserDefaultsKeys.isGiftCardHidden)
     }
     
     fileprivate func syncTotalPrice() {
@@ -250,7 +250,7 @@ extension CartViewController: UITableViewDataSource {
     }
     
     fileprivate var expectedNotificationSectionCount: Int {
-        return (!UserDefaults.standard.bool(forKey: UserDefaultsKeys.completedCheckout) && numberOfItems > 0) ? 1 : 0
+        return (!UserDefaults.standard.bool(forKey: UserDefaultsKeys.isGiftCardHidden) && numberOfItems > 0) ? 1 : 0
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
