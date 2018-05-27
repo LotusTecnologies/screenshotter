@@ -86,7 +86,7 @@ class ProductViewController : BaseViewController {
         
         navigationItem.backBarButtonItem = UIBarButtonItem(title: nil, style: .plain, target: nil, action: nil)
         
-        cartBarButtonItem = ProductCartBarButtonItem(target: self, action: #selector(presentCart))
+        cartBarButtonItem = ProductCartBarButtonItem(target: self, action: #selector(presentCartAction))
         navigationItem.rightBarButtonItem = cartBarButtonItem
     }
     
@@ -462,7 +462,11 @@ fileprivate extension ProductViewControllerStructuredProduct {
 
 typealias ProductViewControllerCart = ProductViewController
 fileprivate extension ProductViewControllerCart {
-    @objc func presentCart(completion: (()->())? = nil) {
+    @objc func presentCartAction() {
+        presentCart(completion: nil)
+    }
+    
+    func presentCart(completion: (()->())?) {
         if presentedViewController != nil {
             dismiss(animated: true, completion: nil)
         }
