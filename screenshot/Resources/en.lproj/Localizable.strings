@@ -330,7 +330,7 @@
 "share_to_discover.after_share.text" = "Thanks for sharing! Add your screenshot to discover so other users can shop it, too!";
 "share_to_discover.thank_you_popup.title" = "Your screenshot was added to Discover!";
 "share_to_discover.thank_you_popup.message" = "Thanks for making the world a trendier place.";
-"share_to_discover.action_sheet.social" = "Post on Social";
+"share_to_discover.action_sheet.social" = "Share With Friends";
 "share_to_discover.action_sheet.discover" = "Post on Discover";
 "share_to_discover.action_sheet.title" = "Share";
 "share_to_discover.action_sheet.message" = "Add this to Discover so other users can shop your screenshot!";
