@@ -554,10 +554,7 @@ extension ScreenshotsViewController {
 extension ScreenshotsViewController : ScreenshotCollectionViewCellDelegate{
     func screenshotCollectionViewCellDidTapShare(_ cell: ScreenshotCollectionViewCell) {
         if let indexPath = self.collectionView?.indexPath(for: cell),  let screenshot = self.screenshot(at: indexPath.item) {
-            ScreenshotShareManager.share(screenshot: screenshot, presentViewController: { (vc) in
-                vc.popoverPresentationController?.sourceView = self.view // so iPads don't crash
-                self.present(vc, animated: true, completion: nil)
-            }, dismissTarget: self, dismissAction: #selector(thankYouForSharingViewDidClose(_:)))
+            ScreenshotShareManager.share(screenshot: screenshot, in: self, page: .screenshotList)
         }
     }
         
