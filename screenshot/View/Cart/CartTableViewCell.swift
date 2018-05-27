@@ -13,7 +13,7 @@ class CartTableViewCell: UITableViewCell, DynamicTypeAccessibilityLayout {
     let titleLabel = UILabel()
     let priceLabel = UILabel()
     let removeButton = BorderButton()
-    let quantityStepper = UIStepper()
+    let editButton = UIButton()
     fileprivate let errorLabel = UILabel()
     fileprivate var quantityValueLabel: UILabel?
     fileprivate var colorValueLabel: UILabel?
@@ -141,8 +141,8 @@ class CartTableViewCell: UITableViewCell, DynamicTypeAccessibilityLayout {
             label.setContentHuggingPriority(UILayoutPriority.defaultHigh, for: .horizontal)
             label.setContentCompressionResistancePriority(UILayoutPriority.required, for: .horizontal)
             label.widthAnchor.constraint(lessThanOrEqualTo: variantDataPositionGuide.widthAnchor, multiplier: 0.4).isActive = true
-            let heightConstraint = label.heightAnchor.constraint(greaterThanOrEqualToConstant: quantityStepper.intrinsicContentSize.height)
-            heightConstraint.priority = UILayoutPriority.defaultHigh
+            let heightConstraint = label.heightAnchor.constraint(greaterThanOrEqualToConstant: editButton.intrinsicContentSize.height)
+            heightConstraint.priority = .defaultHigh
             heightConstraint.isActive = true
             return label
         }
@@ -172,15 +172,14 @@ class CartTableViewCell: UITableViewCell, DynamicTypeAccessibilityLayout {
         quantityValueLabel.leadingAnchor.constraint(equalTo: variantDataVerticalGuide.trailingAnchor).isActive = true
         self.quantityValueLabel = quantityValueLabel
         
-        quantityStepper.translatesAutoresizingMaskIntoConstraints = false
-        quantityStepper.minimumValue = 1
-        quantityStepper.maximumValue = Double(Constants.cartItemMaxQuantity)
-        quantityStepper.autorepeat = false
-        quantityStepper.tintColor = .crazeGreen
-        variantDataContainerView.addSubview(quantityStepper)
-        quantityStepper.leadingAnchor.constraint(equalTo: quantityValueLabel.trailingAnchor).isActive = true
-        quantityStepper.trailingAnchor.constraint(equalTo: variantDataPositionGuide.trailingAnchor).isActive = true
-        quantityStepper.centerYAnchor.constraint(equalTo: quantityTitleLabel.centerYAnchor).isActive = true
+        editButton.translatesAutoresizingMaskIntoConstraints = false
+        editButton.setTitle("Edit", for: .normal) // TODO: localize
+        editButton.setTitleColor(.crazeGreen, for: .normal)
+        editButton.contentEdgeInsets = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
+        variantDataContainerView.addSubview(editButton)
+        editButton.leadingAnchor.constraint(equalTo: quantityValueLabel.trailingAnchor).isActive = true
+        editButton.trailingAnchor.constraint(equalTo: variantDataPositionGuide.trailingAnchor).isActive = true
+        editButton.centerYAnchor.constraint(equalTo: quantityTitleLabel.centerYAnchor).isActive = true
         
         let colorTitleLabel = createTitleLabel()
         colorTitleLabel.text = "cart.variant.color".localized
@@ -266,7 +265,6 @@ class CartTableViewCell: UITableViewCell, DynamicTypeAccessibilityLayout {
     
     var quantity: Double = 1.0 {
         didSet {
-            quantityStepper.value = quantity
             quantityValueLabel?.text = "\(Int(quantity))"
         }
     }
@@ -303,8 +301,6 @@ class CartTableViewCell: UITableViewCell, DynamicTypeAccessibilityLayout {
         didSet {
             removeButton.isSelected = false
             priceLabel.textColor = .gray3
-            quantityStepper.isEnabled = true
-            quantityStepper.tintColor = .crazeGreen
             
             var layoutMargins = errorLabel.layoutMargins
             layoutMargins.top = -.padding
@@ -316,8 +312,6 @@ class CartTableViewCell: UITableViewCell, DynamicTypeAccessibilityLayout {
             else if errorMask.contains(.unavailable) {
                 errorLabel.text = "cart.item.error.unavailable".localized
                 removeButton.isSelected = true
-                quantityStepper.isEnabled = false
-                quantityStepper.tintColor = .gray8
             }
             else {
                 var texts: [String] = []
@@ -328,7 +322,6 @@ class CartTableViewCell: UITableViewCell, DynamicTypeAccessibilityLayout {
                 }
                 if errorMask.contains(.quantity) {
                     texts.append("cart.item.error.quantity".localized)
-                    quantityStepper.tintColor = .crazeRed
                 }
                 
                 errorLabel.text = texts.joined(separator: "; ")

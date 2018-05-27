@@ -8,9 +8,9 @@
 
 import UIKit
 
-protocol ProductVariantsSelectorViewControllerDelegate : class {
-    func productVariantsSelectorViewControllerDidPressCancel(_ productVariantsSelectorViewController:ProductVariantsSelectorViewController)
-    func productVariantsSelectorViewControllerDidPressContinue(_ productVariantsSelectorViewController:ProductVariantsSelectorViewController)
+protocol ProductVariantsSelectorViewControllerDelegate: NSObjectProtocol {
+    func productVariantsSelectorViewControllerDidPressCancel(_ productVariantsSelectorViewController: ProductVariantsSelectorViewController)
+    func productVariantsSelectorViewControllerDidPressContinue(_ productVariantsSelectorViewController: ProductVariantsSelectorViewController)
 }
 
 class ProductVariantsSelectorViewController: AlertTemplateViewController {
@@ -33,30 +33,32 @@ class ProductVariantsSelectorViewController: AlertTemplateViewController {
     }
     
     weak var delegate:ProductVariantsSelectorViewControllerDelegate?
-
     
     var colorControl:SegmentedDropDownControl?
     var sizeControl:SegmentedDropDownControl?
     var quantityControl:SegmentedDropDownControl?
     
     fileprivate let structuredProduct: StructuredProduct
-
+    fileprivate let initialColor: String?
+    fileprivate let initialSize: String?
+    fileprivate let initialQuantity: Int
+    
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    init(product: Product, selectedVariant: Variant? = nil, selectedQuantity: Int = 1) {
+    init(product: Product, initialVariant: Variant? = nil, initialQuantity: Int = 1) {
         structuredProduct = StructuredProduct(product)
+        initialColor = initialVariant?.color
+        initialSize = initialVariant?.size
+        self.initialQuantity = initialQuantity
         super.init(nibName: nil, bundle: nil)
-        
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         titleLabel.text = "product.variants.edit".localized
-        //maybe a background behind the title?
-        
         
         let container = UIView()
         container.translatesAutoresizingMaskIntoConstraints = false
@@ -86,7 +88,7 @@ class ProductVariantsSelectorViewController: AlertTemplateViewController {
         let quantityControl = SegmentedDropDownControl()
         quantityControl.translatesAutoresizingMaskIntoConstraints = false
         let quantityRange = (1...Constants.cartItemMaxQuantity)
-        quantityControl.items = [SegmentedDropDownItem(pickerItems: quantityRange.map { "\($0)" }, selectedPickerItem: "1")]
+        quantityControl.items = [SegmentedDropDownItem(pickerItems: quantityRange.map { "\($0)" }, selectedPickerItem: "\(initialQuantity)")]
         quantityContainer.addSubview(quantityControl)
         quantityControl.heightAnchor.constraint(equalToConstant: 50)
         quantityControl.leadingAnchor.constraint(equalTo: quantityLabel.trailingAnchor, constant:.extendedPadding).isActive = true
@@ -113,7 +115,7 @@ class ProductVariantsSelectorViewController: AlertTemplateViewController {
         let colorControl = SegmentedDropDownControl()
         colorControl.translatesAutoresizingMaskIntoConstraints = false
         if let items = structuredProduct.colors {
-            colorControl.items = [SegmentedDropDownItem(pickerItems: items, selectedPickerItem: structuredProduct.defaultColor)]
+            colorControl.items = [SegmentedDropDownItem(pickerItems: items, selectedPickerItem: initialColor ?? structuredProduct.defaultColor)]
         }
         colorContainer.addSubview(colorControl)
         colorControl.heightAnchor.constraint(equalToConstant: 50)
@@ -141,7 +143,7 @@ class ProductVariantsSelectorViewController: AlertTemplateViewController {
         let sizeControl = SegmentedDropDownControl()
         sizeControl.translatesAutoresizingMaskIntoConstraints = false
         if let items = structuredProduct.sizes {
-            sizeControl.items = [SegmentedDropDownItem(pickerItems: items, selectedPickerItem: items.first)]
+            sizeControl.items = [SegmentedDropDownItem(pickerItems: items, selectedPickerItem: initialSize ?? items.first)]
         }
         sizeContainer.addSubview(sizeControl)
         sizeControl.heightAnchor.constraint(equalToConstant: 50)
@@ -158,9 +160,6 @@ class ProductVariantsSelectorViewController: AlertTemplateViewController {
 
         
         sizeContainer.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -.extendedPadding).isActive = true
-        
-        
-        
         
         continueButton.setTitle("generic.done".localized, for: .normal)
         continueButton.addTarget(self, action: #selector(continueButtonPressed(_:)), for: .touchUpInside)
@@ -180,8 +179,8 @@ class ProductVariantsSelectorViewController: AlertTemplateViewController {
         quantityControl.changeValueOnRowChange = true
         
         updateDisabledItems()
-        
     }
+    
     func updateDisabledItems() {
         if let colorControl = self.colorControl {
             let structuredProduct = self.structuredProduct
@@ -190,9 +189,11 @@ class ProductVariantsSelectorViewController: AlertTemplateViewController {
             }
         }
     }
+    
     @objc func sizeControlValueChanged() {
         
     }
+    
     @objc func quantityValueChanged() {
         
     }
@@ -205,8 +206,8 @@ class ProductVariantsSelectorViewController: AlertTemplateViewController {
             }
         }
     }
+    
     var selectedVariant: Variant? {
-
         if let color = self.colorControl?.items.first?.selectedPickerItem, let size = self.sizeControl?.items.first?.selectedPickerItem {
             return structuredProduct.variant(color: color, size: size)
         }
@@ -215,7 +216,6 @@ class ProductVariantsSelectorViewController: AlertTemplateViewController {
     }
     
     var selectedQuantity: Int {
-        
         if let item = self.quantityControl?.items.first?.selectedPickerItem, let quantity = Int(item) {
             return quantity
         }
@@ -224,12 +224,11 @@ class ProductVariantsSelectorViewController: AlertTemplateViewController {
     }
 }
 
-
-
 extension ProductVariantsSelectorViewController {
     @IBAction func continueButtonPressed(_ sender:Any){
         self.delegate?.productVariantsSelectorViewControllerDidPressContinue(self)
     }
+    
     @IBAction func cancelButtonPress(_ sender:Any){
         self.delegate?.productVariantsSelectorViewControllerDidPressCancel(self)
     }
