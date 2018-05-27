@@ -35,7 +35,6 @@ PODS:
     - FBSDKCoreKit
   - FBSDKShareKit (4.33.0):
     - FBSDKCoreKit (~> 4.33.0)
-  - Intercom (5.0.2)
   - KochavaTrackeriOS (3.5.0)
   - lottie-ios (2.5.0)
   - PhoneNumberKit (2.1.0):
@@ -53,13 +52,11 @@ PODS:
   - SDWebImage (4.3.3):
     - SDWebImage/Core (= 4.3.3)
   - SDWebImage/Core (4.3.3)
-  - Segment-Amplitude (2.0.0):
-    - Amplitude-iOS (~> 4.0)
-    - Analytics (~> 3.6)
   - SwiftKeychainWrapper (3.0.1)
   - Whisper (6.0.2)
 
 DEPENDENCIES:
+  - Amplitude-iOS (~> 4.2.1)
   - Analytics (~> 3.0)
   - Appsee
   - Branch
@@ -70,14 +67,12 @@ DEPENDENCIES:
   - FacebookCore
   - FacebookLogin
   - FacebookShare
-  - Intercom
   - KochavaTrackeriOS
   - lottie-ios
   - PhoneNumberKit
   - PromiseKit/Foundation (= 4.5.2)
   - PromiseKit/StoreKit (~> 4.0)
   - SDWebImage (~> 4.0)
-  - Segment-Amplitude
   - SwiftKeychainWrapper
   - Whisper
 
@@ -98,14 +93,12 @@ SPEC REPOS:
     - FBSDKCoreKit
     - FBSDKLoginKit
     - FBSDKShareKit
-    - Intercom
     - KochavaTrackeriOS
     - lottie-ios
     - PhoneNumberKit
     - PromiseKit
     - RateView
     - SDWebImage
-    - Segment-Amplitude
     - SwiftKeychainWrapper
     - Whisper
 
@@ -125,17 +118,15 @@ SPEC CHECKSUMS:
   FBSDKCoreKit: 572b047a7e029bc44542bcf8a59414e7ff2b543e
   FBSDKLoginKit: 88cb456349cfb3b554427ce4f8b43729d85dfb40
   FBSDKShareKit: b7b5002833a4104fbecad75e8e4e082e91c7a08a
-  Intercom: 0fcb000a9eea9a8fe889ac1466972771ef8919f2
   KochavaTrackeriOS: b612efe2ddaead7e9aa8faf54e0ed96fb027a0ee
   lottie-ios: d699fdee68d7b63e721d949388b015fef1aaa4ac
   PhoneNumberKit: 62003f40ff75315fd3738286558bc365365ac222
   PromiseKit: 743e497a5f505a470d3bbbf4ce0663c1268af0a4
   RateView: d4d12e9bb76dc23a77a56f4e5c5fb530a3f3f998
   SDWebImage: de4d90b5bff3571eae7bd16202b1f43135409fa5
-  Segment-Amplitude: bef43d0ec5c2986fe50c1e534e3d4db0171867f4
   SwiftKeychainWrapper: 38952a3636320ae61bad3513cadd870929de7a4a
   Whisper: 169760fc4bab0abf24d5529f9276f95c25cf1025
 
-PODFILE CHECKSUM: c0d8a884bf5971a80ee6a42ce36e43ee6a53bccf
+PODFILE CHECKSUM: 0eb215306ff0c2c54995c07f1c636bbfb4a6a708
 
 COCOAPODS: 1.5.3

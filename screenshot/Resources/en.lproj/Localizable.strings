@@ -293,7 +293,6 @@
 "products.rate.negative.popup.message" =  "What were you expecting to see and what did you see instead?";
 "products.rate.negative.popup.title" =  "What’s Wrong Here?";
 "products.rate.rated" = "Thanks for your feedback!";
-"products.rate.talk_to_stylist" = "Talk to your stylist";
 "products.rate.unrated" = "Are these results relevant?";
 "products.title" = "Shop Photo";
 "products.related_looks.headline" = "Similar Looks";
@@ -363,7 +362,6 @@
 "settings.row.region.title" = "Region";
 "settings.row.restore_in_app_purchase.title" = "Restore Purchases";
 "settings.row.size.title" = "Size";
-"settings.row.talk_to_stylist.title" = "Talk to Your Stylist";
 "settings.row.tutorial.title" = "Replay Tutorial";
 "settings.row.usage_streak.detail.plural" = "%d days";
 "settings.row.usage_streak.detail.single" = "%d day";

@@ -32,7 +32,6 @@ class SettingsViewController : BaseViewController {
         case name
         case tutorialVideo
         case usageStreak
-        case contactUs
         case bug
         case version
         case coins
@@ -43,7 +42,6 @@ class SettingsViewController : BaseViewController {
         case followInstagram
         case partners
         case restoreInAppPurchase
-        case talkToStylist
         case openIn
         case region
         case payment
@@ -223,10 +221,8 @@ class SettingsViewController : BaseViewController {
         ],
         .about: [
             .tutorialVideo,
-            .contactUs,
             .bug,
             .restoreInAppPurchase,
-            .talkToStylist,
             .usageStreak,
             .coins,
             .region,
@@ -384,8 +380,7 @@ extension SettingsViewController : UITableViewDataSource {
         cell.textLabel?.text = cellText(for: row)
         cell.textLabel?.font = .screenshopFont(.hindLight, textStyle: .body)
         
-        if (row == .restoreInAppPurchase && self.isRestoring) ||
-            (row == .talkToStylist && InAppPurchaseManager.sharedInstance.isInProcessOfBuying()) {
+        if (row == .restoreInAppPurchase && self.isRestoring) {
             cell.textLabel?.textColor = .gray
         }
         else {
@@ -446,9 +441,6 @@ extension SettingsViewController : UITableViewDelegate {
             viewController.modalTransitionStyle = .crossDissolve
             present(viewController, animated: true, completion: nil)
         
-        case .contactUs:
-            IntercomHelper.sharedInstance.presentMessagingUI()
-            
         case .coins:
             let navigationController = ModalNavigationController(rootViewController: GameViewController())
             present(navigationController, animated: true, completion: nil)
@@ -529,51 +521,7 @@ extension SettingsViewController : UITableViewDelegate {
                 })
             }
             
-        case .talkToStylist:
-            if InAppPurchaseManager.sharedInstance.isInProcessOfBuying() {
-                // do nothing
-            } else if InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist) {
-                IntercomHelper.sharedInstance.presentMessagingUI()
-            } else {
-                if InAppPurchaseManager.sharedInstance.canPurchase() {
-                    let alertController = UIAlertController.init(title: nil, message: "personal_stylist.loading".localized, preferredStyle: .alert)
-                    
-                    let action = UIAlertAction.init(title: "generic.continue".localized, style: .default, handler: { (action) in
-                        if let product = InAppPurchaseManager.sharedInstance.productIfAvailable(product: .personalStylist) {
-                            InAppPurchaseManager.sharedInstance.buy(product: product, success: {
-//                                IntercomHelper.sharedInstance.presentMessagingUI()
-                                //If on the page the user will see cell change to 'talk to your stylist' with the lock.  If not on the page it can be jarring
-                            }, failure: { (error) in
-                                //no reason to present alert - Apple does it for us
-                            })
-                        }
-                    })
-                    
-                    if let product = InAppPurchaseManager.sharedInstance.productIfAvailable(product: .personalStylist) {
-                        action.isEnabled = true
-                        alertController.message = String.init(format: "personal_stylist.unlock".localized, product.localizedPriceString())
-                    } else {
-                        action.isEnabled = false
-                        InAppPurchaseManager.sharedInstance.load(product: .personalStylist, success: { (product) in
-                            action.isEnabled = true
-                            alertController.message = String.init(format: "personal_stylist.unlock".localized, product.localizedPriceString())
-                        }, failure: { (error) in
-                            alertController.message = String.init(format: "personal_stylist.error".localized, error.localizedDescription)
-                        })
-                    }
-                    
-                    alertController.addAction(action)
-                    alertController.addAction(UIAlertAction.init(title: "generic.cancel".localized, style: .cancel, handler: nil))
-                    alertController.preferredAction = action
-                    self.present(alertController, animated: true, completion: nil)
-                    
-                }else{
-                    let errorMessage = "personal_stylist.error.invalid_device".localized
-                    let alertController = UIAlertController.init(title: nil, message: errorMessage, preferredStyle: .alert)
-                    alertController.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .cancel, handler: nil))
-                    self.present(alertController, animated: true, completion: nil)
-                }
-            }
+       
  
         case .region:
             let alert = UIAlertController.init(title: nil, message: nil, preferredStyle: .actionSheet)
@@ -646,8 +594,6 @@ fileprivate extension SettingsViewController {
             return "settings.row.usage_streak.title".localized
         case .bug:
             return "settings.row.bug.title".localized
-        case .contactUs:
-            return "settings.row.contact.title".localized
         case .tutorialVideo:
             return "settings.row.tutorial.title".localized
         case .name:
@@ -678,8 +624,6 @@ fileprivate extension SettingsViewController {
             return "settings.row.partners.title".localized
         case .restoreInAppPurchase:
             return "settings.row.restore_in_app_purchase.title".localized
-        case .talkToStylist:
-            return "settings.row.talk_to_stylist.title".localized
         case .region:
             return "settings.row.region.title".localized
         case .payment:
@@ -713,13 +657,6 @@ fileprivate extension SettingsViewController {
             return "\(UserDefaults.standard.integer(forKey: UserDefaultsKeys.gameScore))"
         case .currency:
             return CurrencyViewController.currentCurrency
-        case .talkToStylist:
-            if InAppPurchaseManager.sharedInstance.isInProcessOfBuying() || InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist) {
-                return nil
-            }
-            else {
-                return "🔒"
-            }
         case .region:
             if UserDefaults.standard.object(forKey: UserDefaultsKeys.isUSC) == nil {
                 return "settings.region.unknown".localized
@@ -842,16 +779,6 @@ fileprivate extension SettingsViewController {
                 return nil
             }
             
-        case .talkToStylist:
-            if InAppPurchaseManager.sharedInstance.isInProcessOfBuying() {
-                let activityView = UIActivityIndicatorView(activityIndicatorStyle: .gray)
-                activityView.startAnimating()
-                return activityView
-            }
-            else {
-                return nil
-            }
-            
         default:
             return nil
         }
@@ -886,7 +813,6 @@ fileprivate extension SettingsViewController {
         var indexPaths = sectionIndexPaths(.permission)
         append(section: .about, row: .usageStreak, to: &indexPaths)
         append(section: .about, row: .coins, to: &indexPaths)
-        append(section: .about, row: .talkToStylist, to: &indexPaths)
         append(section: .about, row: .restoreInAppPurchase, to: &indexPaths)
 
         tableView.reloadRows(at: indexPaths, with: .none)
