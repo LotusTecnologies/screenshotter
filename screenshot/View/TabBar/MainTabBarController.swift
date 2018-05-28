@@ -7,8 +7,11 @@
 //
 
 import UIKit
+<<<<<<< HEAD
 import Intercom
 import PushwooshInboxUI
+=======
+>>>>>>> removeIntercomAndSegment
 
 class MainTabBarController: UITabBarController, UITabBarControllerDelegate, ScreenshotsNavigationControllerDelegate, SettingsViewControllerDelegate, ScreenshotDetectionProtocol, ViewControllerLifeCycle {
     enum TabIndex: Int {
@@ -201,20 +204,7 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
     
     @objc private func applicationUserDidTakeScreenshot(_ notification: Notification) {
         if self.view.window != nil {
-            var foundIntercomWindow = false
-            
-            findWindowLoop: for window in UIApplication.shared.windows {
-                if String(describing: type(of: window)).hasPrefix("ICMWindow") {
-                    foundIntercomWindow = true
-                    break findWindowLoop
-                }
-            }
-            
-            if foundIntercomWindow {
-                Analytics.trackTookScreenshotWhileShowingIntercomWindow()
-            } else {
-                Analytics.trackTookScreenshot()
-            }
+            Analytics.trackTookScreenshot()
         }
     }
     

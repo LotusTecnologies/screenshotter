@@ -13,7 +13,7 @@ import Appsee
 import FBSDKLoginKit
 import Branch
 import PromiseKit
-import Segment_Amplitude
+import Amplitude_iOS
 import AdSupport
 import Pushwoosh
 
@@ -111,7 +111,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let aps = remoteNotification["aps"] as? [String : AnyObject],
             let contentAvailable = aps["content-available"] as? NSNumber,
             contentAvailable.intValue == 1 {
-            //TODO: why is this only segment
             Analytics.trackWokeFromSilentPush()
         } else {
             Analytics.trackSessionStarted() // Roi Tal from AppSee suggested
@@ -413,13 +412,7 @@ extension AppDelegate : KochavaTrackerDelegate {
         Appsee.start(Constants.appSeeApiKey)
         Appsee.addEvent("App Launched", withProperties: ["version": Bundle.displayVersionBuild])
         
-        let configuration = SEGAnalyticsConfiguration(writeKey: Constants.segmentWriteKey)
-        configuration.trackApplicationLifecycleEvents = true
-        configuration.recordScreenViews = true
-        configuration.trackDeepLinks = true
-        configuration.trackPushNotifications = true
-        configuration.use(SEGAmplitudeIntegrationFactory.instance())
-        SEGAnalytics.setup(with: configuration)
+        Amplitude.instance().initializeApiKey(Constants.amplitudeApiKey)
         
         var trackerParametersDictionary: [AnyHashable: Any] = [:]
         trackerParametersDictionary[kKVAParamAppGUIDStringKey] = Constants.kocchavaGUIDKey
@@ -469,7 +462,6 @@ extension AppDelegate : KochavaTrackerDelegate {
     fileprivate func frameworkSetupMainViewDidLoad() {
         RatingFlow.sharedInstance.start()
         
-        IntercomHelper.sharedInstance.start(withLaunchOptions: frameworkSetupLaunchOptions ?? [:])
         
         frameworkSetupLaunchOptions = nil
     }
@@ -554,8 +546,15 @@ extension AppDelegate: PushNotificationDelegate {
     }
     
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+<<<<<<< HEAD
         PushNotificationManager.push().handlePushRegistration(deviceToken)
         IntercomHelper.sharedInstance.deviceToken = deviceToken
+=======
+        
+        UserDefaults.standard.set(deviceToken, forKey: UserDefaultsKeys.deviceToken)
+        UserDefaults.standard.synchronize()
+        Analytics.trackUserProperties(analyticsUser: AnalyticsUser.current)
+>>>>>>> removeIntercomAndSegment
         SilentPushSubscriptionManager.sharedInstance.updateSubscriptionsIfNeeded()
         
         NotificationCenter.default.post(name: .applicationDidRegisterForRemoteNotifications, object: deviceToken)
@@ -642,7 +641,6 @@ extension AppDelegate: PushNotificationDelegate {
                 completionHandler(.noData)
             }
             
-            IntercomHelper.sharedInstance.handleRemoteNotification(userInfo, opened: false)
             Branch.getInstance().handlePushNotification(userInfo)
         }
     }
