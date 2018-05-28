@@ -13,6 +13,7 @@ import Branch
 import FBSDKCoreKit
 import Whisper
 import AdSupport
+import Pushwoosh
 
 extension Bool {
     func toStringLiteral() -> String {
@@ -427,6 +428,25 @@ class AnalyticsTrackers : NSObject {
                 return
             }
             IntercomHelper.sharedInstance.register(user: user)
+        }
+    }
+    
+    class pushwooshAnalyticsTracker : NSObject, AnalyticsTracker {
+        func track(_ event: String, properties: [AnyHashable : Any]? = nil, sendEvenIfAdvertisingTrackingIsOptOut:Bool? = false ){
+
+            if  ASIdentifierManager.shared().isAdvertisingTrackingEnabled || sendEvenIfAdvertisingTrackingIsOptOut == true {
+                PWInAppManager.shared().postEvent(event, withAttributes: properties)
+            }
+        }
+        
+        func identify(_ user: AnalyticsUser) {
+            guard ASIdentifierManager.shared().isAdvertisingTrackingEnabled else {
+                return
+            }
+            
+            PWInAppManager.shared().setUserId(user.identifier)
+            PWInAppManager.shared().setUserId(user.identifier)
+
         }
     }
     
