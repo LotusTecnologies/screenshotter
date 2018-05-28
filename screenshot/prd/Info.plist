@@ -92,6 +92,9 @@
 		<string>Hind-Medium.ttf</string>
 		<string>Hind-Regular.ttf</string>
 		<string>Hind-SemiBold.ttf</string>
+		<string>Quicksand-Bold.otf</string>
+		<string>Quicksand-Light.otf</string>
+		<string>Quicksand-Regular.otf</string>
 	</array>
 	<key>UIBackgroundModes</key>
 	<array>

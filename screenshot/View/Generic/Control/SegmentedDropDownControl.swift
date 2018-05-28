@@ -119,7 +119,8 @@ class SegmentedDropDownControl : UIControl {
                 segment.pickerDataSource = self
                 segment.pickerDelegate = self
                 segment.titleLabel.text = item.title
-                segment.titleLabel.textColor = .gray6
+                segment.titleLabel.textColor = .gray3
+                segment.imageView.tintColor = segment.titleLabel.textColor
                 segment.isEnabled = !item.pickerItems.isEmpty
                 segment.addTarget(self, action: #selector(touchUpInside(_:)), for: .touchUpInside)
                 segment.pickerInputView.doneButton.addTarget(self, action: #selector(pickerDoneButtonAction(_:)), for: .touchUpInside)
@@ -310,9 +311,9 @@ extension SegmentedDropDownControl : UIPickerViewDataSource, UIPickerViewDelegat
             let color: UIColor = .gray5
             
             attributes = [
-                NSAttributedStringKey.foregroundColor: color,
-                NSAttributedStringKey.strikethroughColor: color,
-                NSAttributedStringKey.strikethroughStyle: NSUnderlineStyle.styleSingle.rawValue
+                .foregroundColor: color,
+                .strikethroughColor: color,
+                .strikethroughStyle: NSUnderlineStyle.styleSingle.rawValue
             ]
         }
         
@@ -368,7 +369,7 @@ fileprivate class DropDownControl : UIControl {
     
     let titleLabel = UILabel()
     let imageView = UIImageView()
-    let image = UIImage(named: "DropDownArrow")
+    let image = UIImage(named: "DropDownArrow")?.withRenderingMode(.alwaysTemplate)
     let pickerInputView = PickerInputView(frame: .zero, inputViewStyle: .default)
     
     // MARK: Life Cycle
@@ -379,6 +380,17 @@ fileprivate class DropDownControl : UIControl {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        
+        backgroundColor = .white
+        
+        backgroundImageView.translatesAutoresizingMaskIntoConstraints = false
+        backgroundImageView.image = backgroundImage
+        backgroundImageView.contentMode = .scaleToFill
+        addSubview(backgroundImageView)
+        backgroundImageView.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        backgroundImageView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        backgroundImageView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        backgroundImageView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
         
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.image = image
@@ -414,15 +426,46 @@ fileprivate class DropDownControl : UIControl {
         let imageWidth = image?.size.width ?? 0
         
         size.width = layoutMargins.left + ceil(labelSize.width) + layoutMargins.right + imageWidth + layoutMargins.right
-        size.height = layoutMargins.top + ceil(labelSize.height) + layoutMargins.bottom
+        size.height = min(44, layoutMargins.top + ceil(labelSize.height) + layoutMargins.bottom)
         return size
+    }
+    
+    // MARK: Background
+    
+    private let backgroundImageView = UIImageView()
+    private let backgroundImage = UIImage(named: "DropDownBackground")
+    private let backgroundSelectedImage = UIImage(named: "DropDownSelectedBackground")
+    
+    private func syncBackgroundImage() {
+        switch state {
+        case .normal:
+            backgroundImageView.image = backgroundImage
+            backgroundImageView.alpha = 1
+            
+        case .highlighted:
+            backgroundImageView.image = backgroundSelectedImage
+            backgroundImageView.alpha = 1
+            
+        case .selected:
+            backgroundImageView.image = backgroundSelectedImage
+            backgroundImageView.alpha = 0.7
+            
+        default:
+            break
+        }
     }
     
     // MARK: States
     
+    override var isHighlighted: Bool {
+        didSet {
+            syncBackgroundImage()
+        }
+    }
+    
     override var isSelected: Bool {
         didSet {
-            backgroundColor = isSelected ? .gray9 : nil
+            syncBackgroundImage()
         }
     }
     

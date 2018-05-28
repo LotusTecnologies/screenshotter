@@ -141,6 +141,7 @@ class AuthorizeContentViewController: UIViewController {
         _view.passwordTextField.delegate = self
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        tapGesture.cancelsTouchesInView = false
         _view.addGestureRecognizer(tapGesture)
     }
     
