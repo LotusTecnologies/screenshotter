@@ -8,9 +8,9 @@
 
 import UIKit
 
-protocol ProductVariantsSelectorViewControllerDelegate : class {
-    func productVariantsSelectorViewControllerDidPressCancel(_ productVariantsSelectorViewController:ProductVariantsSelectorViewController)
-    func productVariantsSelectorViewControllerDidPressContinue(_ productVariantsSelectorViewController:ProductVariantsSelectorViewController)
+protocol ProductVariantsSelectorViewControllerDelegate: NSObjectProtocol {
+    func productVariantsSelectorViewControllerDidPressCancel(_ productVariantsSelectorViewController: ProductVariantsSelectorViewController)
+    func productVariantsSelectorViewControllerDidPressContinue(_ productVariantsSelectorViewController: ProductVariantsSelectorViewController)
 }
 
 class ProductVariantsSelectorViewController: AlertTemplateViewController {
@@ -33,121 +33,92 @@ class ProductVariantsSelectorViewController: AlertTemplateViewController {
     }
     
     weak var delegate:ProductVariantsSelectorViewControllerDelegate?
-
     
     var colorControl:SegmentedDropDownControl?
     var sizeControl:SegmentedDropDownControl?
     var quantityControl:SegmentedDropDownControl?
     
     fileprivate let structuredProduct: StructuredProduct
-
+    fileprivate let initialColor: String?
+    fileprivate let initialSize: String?
+    fileprivate let initialQuantity: Int
+    
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    init(product: Product, selectedVariant: Variant? = nil, selectedQuantity: Int = 1) {
+    init(product: Product, initialVariant: Variant? = nil, initialQuantity: Int = 1) {
         structuredProduct = StructuredProduct(product)
+        initialColor = initialVariant?.color
+        initialSize = initialVariant?.size
+        self.initialQuantity = initialQuantity
         super.init(nibName: nil, bundle: nil)
-        
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         titleLabel.text = "product.variants.edit".localized
-        //maybe a background behind the title?
-        
-        
-        let container = UIView()
-        container.translatesAutoresizingMaskIntoConstraints = false
-        self.view.addSubview(container)
-        container.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant:.padding).isActive = true
-        container.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant:.extendedPadding).isActive = true
-        container.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant:-.extendedPadding).isActive = true
-        container.bottomAnchor.constraint(equalTo: self.continueButton.topAnchor).isActive = true
-        
-        let quantityContainer = UIView()
-        quantityContainer.translatesAutoresizingMaskIntoConstraints = false
-        container.addSubview(quantityContainer)
-        quantityContainer.topAnchor.constraint(equalTo: container.topAnchor).isActive = true
-        quantityContainer.leadingAnchor.constraint(equalTo: container.leadingAnchor).isActive = true
-        quantityContainer.trailingAnchor.constraint(equalTo: container.trailingAnchor).isActive = true
-        quantityContainer.heightAnchor.constraint(equalToConstant: 50).isActive = true
-
-        let quantityLabel = UILabel()
-        quantityLabel.translatesAutoresizingMaskIntoConstraints = false
-        quantityLabel.text = Options.quantity.localized
-        quantityContainer.addSubview(quantityLabel)
-        quantityLabel.leadingAnchor.constraint(equalTo: quantityContainer.leadingAnchor).isActive = true
-        quantityLabel.centerYAnchor.constraint(equalTo: quantityContainer.centerYAnchor).isActive = true
-        quantityLabel.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-        quantityLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
         
         let quantityControl = SegmentedDropDownControl()
         quantityControl.translatesAutoresizingMaskIntoConstraints = false
         let quantityRange = (1...Constants.cartItemMaxQuantity)
-        quantityControl.items = [SegmentedDropDownItem(pickerItems: quantityRange.map { "\($0)" }, selectedPickerItem: "1")]
-        quantityContainer.addSubview(quantityControl)
+        quantityControl.items = [SegmentedDropDownItem(pickerItems: quantityRange.map { "\($0)" }, selectedPickerItem: "\(initialQuantity)")]
+        view.addSubview(quantityControl)
+        quantityControl.topAnchor.constraint(equalTo: contentLayoutGuide.topAnchor).isActive = true
+        quantityControl.trailingAnchor.constraint(equalTo: contentLayoutGuide.trailingAnchor).isActive = true
         quantityControl.heightAnchor.constraint(equalToConstant: 50)
-        quantityControl.leadingAnchor.constraint(equalTo: quantityLabel.trailingAnchor, constant:.extendedPadding).isActive = true
-        quantityControl.trailingAnchor.constraint(equalTo:quantityContainer.trailingAnchor).isActive = true
-        quantityControl.centerYAnchor.constraint(equalTo: quantityContainer.centerYAnchor).isActive = true
         
-        let colorContainer = UIView()
-        colorContainer.translatesAutoresizingMaskIntoConstraints = false
-        container.addSubview(colorContainer)
-        colorContainer.topAnchor.constraint(equalTo: quantityContainer.bottomAnchor, constant:.padding).isActive = true
-        colorContainer.leadingAnchor.constraint(equalTo: container.leadingAnchor).isActive = true
-        colorContainer.trailingAnchor.constraint(equalTo: container.trailingAnchor).isActive = true
-        colorContainer.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        
-        let colorLabel = UILabel()
-        colorLabel.translatesAutoresizingMaskIntoConstraints = false
-        colorLabel.text = Options.color.localized
-        colorContainer.addSubview(colorLabel)
-        colorLabel.leadingAnchor.constraint(equalTo: colorContainer.leadingAnchor).isActive = true
-        colorLabel.centerYAnchor.constraint(equalTo: colorContainer.centerYAnchor).isActive = true
-        colorLabel.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-        colorLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
+        let quantityLabel = UILabel()
+        quantityLabel.translatesAutoresizingMaskIntoConstraints = false
+        quantityLabel.text = Options.quantity.localized
+        view.addSubview(quantityLabel)
+        quantityLabel.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        quantityLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
+        quantityLabel.leadingAnchor.constraint(equalTo: contentLayoutGuide.leadingAnchor).isActive = true
+        quantityLabel.centerYAnchor.constraint(equalTo: quantityControl.centerYAnchor).isActive = true
+        quantityLabel.trailingAnchor.constraint(equalTo: quantityControl.leadingAnchor, constant: -.extendedPadding).isActive = true
         
         let colorControl = SegmentedDropDownControl()
         colorControl.translatesAutoresizingMaskIntoConstraints = false
         if let items = structuredProduct.colors {
-            colorControl.items = [SegmentedDropDownItem(pickerItems: items, selectedPickerItem: structuredProduct.defaultColor)]
+            colorControl.items = [SegmentedDropDownItem(pickerItems: items, selectedPickerItem: initialColor ?? structuredProduct.defaultColor)]
         }
-        colorContainer.addSubview(colorControl)
+        view.addSubview(colorControl)
+        colorControl.topAnchor.constraint(equalTo: quantityControl.bottomAnchor, constant: .padding).isActive = true
+        colorControl.trailingAnchor.constraint(equalTo: contentLayoutGuide.trailingAnchor).isActive = true
         colorControl.heightAnchor.constraint(equalToConstant: 50)
-        colorControl.leadingAnchor.constraint(equalTo: colorLabel.trailingAnchor, constant:.extendedPadding).isActive = true
-        colorControl.trailingAnchor.constraint(equalTo:colorContainer.trailingAnchor).isActive = true
-        colorControl.centerYAnchor.constraint(equalTo: colorContainer.centerYAnchor).isActive = true
         
-        let sizeContainer = UIView()
-        sizeContainer.translatesAutoresizingMaskIntoConstraints = false
-        container.addSubview(sizeContainer)
-        sizeContainer.topAnchor.constraint(equalTo: colorContainer.bottomAnchor, constant:.padding).isActive = true
-        sizeContainer.leadingAnchor.constraint(equalTo: container.leadingAnchor).isActive = true
-        sizeContainer.trailingAnchor.constraint(equalTo: container.trailingAnchor).isActive = true
-        sizeContainer.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        
-        let sizeLabel = UILabel()
-        sizeLabel.translatesAutoresizingMaskIntoConstraints = false
-        sizeLabel.text = Options.size.localized
-        sizeContainer.addSubview(sizeLabel)
-        sizeLabel.leadingAnchor.constraint(equalTo: sizeContainer.leadingAnchor).isActive = true
-        sizeLabel.centerYAnchor.constraint(equalTo: sizeContainer.centerYAnchor).isActive = true
-        sizeLabel.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-        sizeLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
+        let colorLabel = UILabel()
+        colorLabel.translatesAutoresizingMaskIntoConstraints = false
+        colorLabel.text = Options.color.localized
+        view.addSubview(colorLabel)
+        colorLabel.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        colorLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
+        colorLabel.leadingAnchor.constraint(equalTo: contentLayoutGuide.leadingAnchor).isActive = true
+        colorLabel.trailingAnchor.constraint(equalTo: colorControl.leadingAnchor, constant: -.extendedPadding).isActive = true
+        colorLabel.centerYAnchor.constraint(equalTo: colorControl.centerYAnchor).isActive = true
         
         let sizeControl = SegmentedDropDownControl()
         sizeControl.translatesAutoresizingMaskIntoConstraints = false
         if let items = structuredProduct.sizes {
-            sizeControl.items = [SegmentedDropDownItem(pickerItems: items, selectedPickerItem: items.first)]
+            sizeControl.items = [SegmentedDropDownItem(pickerItems: items, selectedPickerItem: initialSize ?? items.first)]
         }
-        sizeContainer.addSubview(sizeControl)
+        view.addSubview(sizeControl)
+        sizeControl.topAnchor.constraint(equalTo: colorControl.bottomAnchor, constant: .padding).isActive = true
+        sizeControl.trailingAnchor.constraint(equalTo: contentLayoutGuide.trailingAnchor).isActive = true
+        sizeControl.bottomAnchor.constraint(equalTo: contentLayoutGuide.bottomAnchor).isActive = true
         sizeControl.heightAnchor.constraint(equalToConstant: 50)
-        sizeControl.leadingAnchor.constraint(equalTo: sizeLabel.trailingAnchor, constant:.extendedPadding).isActive = true
-        sizeControl.trailingAnchor.constraint(equalTo:sizeContainer.trailingAnchor).isActive = true
-        sizeControl.centerYAnchor.constraint(equalTo: sizeContainer.centerYAnchor).isActive = true
+        
+        let sizeLabel = UILabel()
+        sizeLabel.translatesAutoresizingMaskIntoConstraints = false
+        sizeLabel.text = Options.size.localized
+        view.addSubview(sizeLabel)
+        sizeLabel.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        sizeLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
+        sizeLabel.leadingAnchor.constraint(equalTo: contentLayoutGuide.leadingAnchor).isActive = true
+        sizeLabel.trailingAnchor.constraint(equalTo: sizeControl.leadingAnchor, constant: -.extendedPadding).isActive = true
+        sizeLabel.centerYAnchor.constraint(equalTo: sizeControl.centerYAnchor).isActive = true
         
         quantityLabel.trailingAnchor.constraint(greaterThanOrEqualTo: colorLabel.trailingAnchor).isActive = true
         quantityLabel.trailingAnchor.constraint(greaterThanOrEqualTo: sizeLabel.trailingAnchor).isActive = true
@@ -155,18 +126,11 @@ class ProductVariantsSelectorViewController: AlertTemplateViewController {
         colorLabel.trailingAnchor.constraint(greaterThanOrEqualTo: sizeLabel.trailingAnchor).isActive = true
         sizeLabel.trailingAnchor.constraint(greaterThanOrEqualTo: quantityLabel.trailingAnchor).isActive = true
         sizeLabel.trailingAnchor.constraint(greaterThanOrEqualTo: colorLabel.trailingAnchor).isActive = true
-
-        
-        sizeContainer.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -.extendedPadding).isActive = true
-        
-        
-        
         
         continueButton.setTitle("generic.done".localized, for: .normal)
         continueButton.addTarget(self, action: #selector(continueButtonPressed(_:)), for: .touchUpInside)
         cancelButton.setTitle("generic.cancel".localized, for: .normal)
         cancelButton.addTarget(self, action: #selector(cancelButtonPress(_:)), for: .touchUpInside)
-        
         
         colorControl.addTarget(self, action: #selector(colorControlValueChanged), for: .valueChanged)
         self.colorControl = colorControl
@@ -180,8 +144,8 @@ class ProductVariantsSelectorViewController: AlertTemplateViewController {
         quantityControl.changeValueOnRowChange = true
         
         updateDisabledItems()
-        
     }
+    
     func updateDisabledItems() {
         if let colorControl = self.colorControl {
             let structuredProduct = self.structuredProduct
@@ -190,9 +154,11 @@ class ProductVariantsSelectorViewController: AlertTemplateViewController {
             }
         }
     }
+    
     @objc func sizeControlValueChanged() {
         
     }
+    
     @objc func quantityValueChanged() {
         
     }
@@ -205,8 +171,8 @@ class ProductVariantsSelectorViewController: AlertTemplateViewController {
             }
         }
     }
+    
     var selectedVariant: Variant? {
-
         if let color = self.colorControl?.items.first?.selectedPickerItem, let size = self.sizeControl?.items.first?.selectedPickerItem {
             return structuredProduct.variant(color: color, size: size)
         }
@@ -215,7 +181,6 @@ class ProductVariantsSelectorViewController: AlertTemplateViewController {
     }
     
     var selectedQuantity: Int {
-        
         if let item = self.quantityControl?.items.first?.selectedPickerItem, let quantity = Int(item) {
             return quantity
         }
@@ -224,12 +189,11 @@ class ProductVariantsSelectorViewController: AlertTemplateViewController {
     }
 }
 
-
-
 extension ProductVariantsSelectorViewController {
     @IBAction func continueButtonPressed(_ sender:Any){
         self.delegate?.productVariantsSelectorViewControllerDidPressContinue(self)
     }
+    
     @IBAction func cancelButtonPress(_ sender:Any){
         self.delegate?.productVariantsSelectorViewControllerDidPressCancel(self)
     }
