@@ -11,6 +11,7 @@ import AVFoundation
 import CoreLocation
 import Photos
 import UserNotifications
+import Pushwoosh
 
 enum PermissionType {
     case camera
@@ -202,7 +203,8 @@ final class PermissionsManager : NSObject, CLLocationManagerDelegate {
             
             if granted {
                 DispatchQueue.main.async {
-                    UIApplication.shared.registerForRemoteNotifications()
+                    PushNotificationManager.push().registerForPushNotifications()
+
                 }
             }
             

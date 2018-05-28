@@ -59,6 +59,8 @@
 	<string>1960379067541863</string>
 	<key>FacebookDisplayName</key>
 	<string>Screenshop</string>
+	<key>Pushwoosh_APPID</key>
+	<string>3D767-313B8</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>instagram</string>

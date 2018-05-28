@@ -8,6 +8,7 @@
 
 import UIKit
 import Intercom
+import PushwooshInboxUI
 
 class MainTabBarController: UITabBarController, UITabBarControllerDelegate, ScreenshotsNavigationControllerDelegate, SettingsViewControllerDelegate, ScreenshotDetectionProtocol, ViewControllerLifeCycle {
     enum TabIndex: Int {
@@ -16,6 +17,8 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         case screenshots = 2
         case settings    = 3
         case cart        = 4
+        case inbox        = 5
+
     }
     
     weak var lifeCycleDelegate: ViewControllerLifeCycle?
@@ -25,7 +28,20 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
     let discoverNavigationController = DiscoverNavigationController()
     let settingsNavigationController = SettingsNavigationController()
     let cartNavigationController = CartNavigationController()
-    
+    let notificationNavigationController:UINavigationController = {
+        let inboxStyle = PWIInboxStyle.customStyle(withDefaultImageIcon: UIImage.init(named: "BrandIcon110"),
+                                                   textColor: UIColor.darkText,
+                                                   accentColor: UIColor.crazeGreen,
+                                                   font: UIFont.screenshopFont(.hind, size: 17))
+        
+        inboxStyle?.backgroundColor = UIColor.init(white: 1, alpha: 1)
+        inboxStyle?.listErrorMessage = NSLocalizedString("Oh no! Something went wrong on the Internet. This is the worst thing that has ever happened! ", comment: "Custom error message")
+        inboxStyle?.listEmptyMessage = NSLocalizedString("You have no messages.  But we still love you.", comment: "Custom empty message")
+        if let vc = PWIInboxUI.createInboxController(with: inboxStyle){
+            return UINavigationController.init(rootViewController: vc)
+        }
+        return UINavigationController()
+    }()
     fileprivate var settingsTabBarItem: UITabBarItem?
     var updatePromptHandler: UpdatePromptHandler?
     
@@ -70,18 +86,22 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         cartNavigationController.title = cartNavigationController.cartViewController.title
         cartNavigationController.tabBarItem = createTabBarItem(title: cartNavigationController.title, imageNamed: "TabBarCart", tag: .cart)
         
+        notificationNavigationController.title = "Inbox"
+        notificationNavigationController.tabBarItem = createTabBarItem(title: notificationNavigationController.title, imageNamed: "TabBarBell", tag: .inbox)
+
         self.delegate = self
         self.restorationIdentifier = String(describing: type(of: self))
     
-        var viewControllerList =  [
+        let viewControllerList =  [
             favoritesNavigationController,
             discoverNavigationController,
             screenshotsNavigationController,
-            settingsNavigationController
+            settingsNavigationController,
+            notificationNavigationController
         ]
-        if UIApplication.isUSC {
-            viewControllerList.append(cartNavigationController)
-        }
+//        if UIApplication.isUSC {
+//            viewControllerList.append(cartNavigationController)
+//        }
         viewControllers = viewControllerList
         selectedIndex = viewControllers?.index(of: screenshotsNavigationController) ?? 0
         
@@ -106,16 +126,14 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
     @objc public func syncShowingCart(){
         DispatchQueue.mainAsyncIfNeeded {
             let index = self.selectedIndex
-            var viewControllerList =  [
+            let viewControllerList =  [
                 self.favoritesNavigationController,
                 self.discoverNavigationController,
                 self.screenshotsNavigationController,
-                self.settingsNavigationController
+                self.settingsNavigationController,
+                self.notificationNavigationController
             ]
             
-            if UIApplication.isUSC {
-                viewControllerList.append(self.cartNavigationController)
-            }
             
             self.viewControllers = viewControllerList
             

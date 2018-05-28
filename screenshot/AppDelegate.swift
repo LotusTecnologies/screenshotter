@@ -15,6 +15,7 @@ import Branch
 import PromiseKit
 import Segment_Amplitude
 import AdSupport
+import Pushwoosh
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -124,6 +125,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         }
 
+        PushNotificationManager.push().delegate = self
+        PushNotificationManager.push().sendAppOpen()
+        if PermissionsManager.shared.permissionStatus(for: .push) == .authorized {
+            PermissionsManager.shared.requestPermission(for: .push)
+        }
         
         return true
     }
@@ -534,8 +540,21 @@ extension AppDelegate : TutorialNavigationControllerDelegate {
 
 // MARK: - Push Notifications
 
-extension AppDelegate {
+extension AppDelegate: PushNotificationDelegate {
+    
+    //this event is fired when the push gets received
+    func onPushReceived(_ pushManager: PushNotificationManager!, withNotification pushNotification: [AnyHashable : Any]!, onStart: Bool) {
+        print("Push notification received: \(pushNotification)")
+        // shows a push is received. Implement passive reaction to a push here, such as UI update or data download.
+    }
+    //this event is fired when user taps the notification
+    func onPushAccepted(_ pushManager: PushNotificationManager!, withNotification pushNotification: [AnyHashable : Any]!, onStart: Bool) {
+        print("Push notification accepted: \(pushNotification)")
+        // shows a user tapped the notification. Implement user interaction, such as showing push details
+    }
+    
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        PushNotificationManager.push().handlePushRegistration(deviceToken)
         IntercomHelper.sharedInstance.deviceToken = deviceToken
         SilentPushSubscriptionManager.sharedInstance.updateSubscriptionsIfNeeded()
         
@@ -543,12 +562,16 @@ extension AppDelegate {
     }
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        PushNotificationManager.push().handlePushRegistrationFailure(error)
+
          let e = error as NSError
         Analytics.trackError(type: nil, domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
     }
 
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         ApplicationStateModel.sharedInstance.applicationState = application.applicationState
+        
+        PushNotificationManager.push().handlePushReceived(userInfo)
 
         if let aps = userInfo["aps"] as? NSDictionary, let category = aps["category"] as? String, category == "MATCHSTICK_LIKES", let likeUpdates = userInfo["likeUpdates"] as? [[String:Any]]{
             DataModel.sharedInstance.performBackgroundTask { (context) in

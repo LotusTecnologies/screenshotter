@@ -25,6 +25,8 @@ target 'screenshot' do
     pod 'Whisper'
     pod 'PhoneNumberKit'
     pod 'CardIO'
+    pod 'PushwooshInboxUI', '~> 5.5'
+    pod 'Pushwoosh', '~> 5.5'
 end
 
 post_install do |installer|
