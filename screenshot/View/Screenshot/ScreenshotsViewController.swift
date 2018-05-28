@@ -552,82 +552,10 @@ extension ScreenshotsViewController {
 
 //Screenshot cell
 extension ScreenshotsViewController : ScreenshotCollectionViewCellDelegate{
-    func presentSocailShare(screenshot:Screenshot){
-        let introductoryText = "screenshots.share.title".localized
-
-        let screenshotObjectId = screenshot.objectID
-        var items:[Any]? = nil
-        
-        // iOS 11.1 has a bug where copying to clipboard while sharing doesn't put a space between activity items.
-        let space = " "
-        
-        if let shareLink = screenshot.shareLink, let shareURL = URL.init(string: shareLink) {
-            items = [introductoryText, space, shareURL]
-        }else{
-            if let url = URL.init(string: "https://getscreenshop.com/") {
-                let screenshotActivityItemProvider = ScreenshotActivityItemProvider.init(screenshot: screenshot, placeholderURL:url)
-                items = [introductoryText, space, screenshotActivityItemProvider]
-            }
-        }
-        if let items =  items {
-            let activityViewController = UIActivityViewController.init(activityItems: items, applicationActivities: [])
-            activityViewController.excludedActivityTypes = [UIActivityType.addToReadingList, UIActivityType.airDrop, UIActivityType.init("com.apple.reminders.RemindersEditorExtension"), UIActivityType.init("com.apple.mobilenotes.SharingExtension")]
-            activityViewController.completionWithItemsHandler = { (activityType, completed, returnedItems, activityError) in
-                let screenshot = DataModel.sharedInstance.mainMoc().screenshotWith(objectId: screenshotObjectId)
-                if (completed) {
-                    Analytics.trackShareSocial(screenshot: screenshot)
-                } else {
-                    Analytics.trackShareIncomplete(screenshot: screenshot)
-                }
-            }
-            activityViewController.popoverPresentationController?.sourceView = self.view // so iPads don't crash
-            self.present(activityViewController, animated: true, completion: nil)
-        }
-    }
-        
     func screenshotCollectionViewCellDidTapShare(_ cell: ScreenshotCollectionViewCell) {
         if let indexPath = self.collectionView?.indexPath(for: cell),  let screenshot = self.screenshot(at: indexPath.item) {
-            let screenshotObjectId = screenshot.objectID
-            let alert = UIAlertController.init(title: "share_to_discover.action_sheet.title".localized, message: "share_to_discover.action_sheet.message".localized, preferredStyle: .actionSheet)
-            
-            alert.addAction(UIAlertAction.init(title: "share_to_discover.action_sheet.discover".localized, style: .default, handler: { (a) in
-                if let screenshot = DataModel.sharedInstance.mainMoc().screenshotWith(objectId: screenshotObjectId) {
-                    if !screenshot.canSubmitToDiscover {
-                        let alert = UIAlertController.init(title: nil, message: "share_to_discover.action_sheet.error.alread_shared".localized, preferredStyle: .alert)
-                        
-                        alert.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .cancel, handler: { (a) in
-                            Analytics.trackShareIncomplete(screenshot: screenshot)
-                        }))
-                        self.present(alert, animated: true, completion: nil)
-                    }else {
-                        screenshot.submitToDiscover()
-                        let thankYou = ThankYouForSharingViewController()
-                        thankYou.closeButton.addTarget(self, action: #selector(self.thankYouForSharingViewDidClose(_:)), for: .touchUpInside)
-                        self.present(thankYou, animated: true, completion: nil)
-                        Analytics.trackShareDiscover(screenshot: screenshot, page: .screenshotList)
-                    }
-                }
-                
-            }))
-            alert.addAction(UIAlertAction.init(title: "share_to_discover.action_sheet.social".localized, style: .default, handler: { (a) in
-                if let screenshot = DataModel.sharedInstance.mainMoc().screenshotWith(objectId: screenshotObjectId) {
-                    self.presentSocailShare(screenshot: screenshot)
-                }
-            }))
-            alert.addAction(UIAlertAction.init(title: "generic.cancel".localized, style: .cancel, handler: { (a) in
-                let screenshot = DataModel.sharedInstance.mainMoc().screenshotWith(objectId: screenshotObjectId)
-                Analytics.trackShareIncomplete(screenshot: screenshot)
-
-            }))
-            alert.popoverPresentationController?.sourceView = self.view
-            
-            self.present(alert, animated: true, completion: nil)
-            
-            
-            Analytics.trackSharedScreenshotStarted(screenshot: screenshot)
-    
+            ScreenshotShareManager.share(screenshot: screenshot, in: self)
         }
-        
     }
         
     @objc func thankYouForSharingViewDidClose(_ sender: Any) {

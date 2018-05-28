@@ -44,6 +44,8 @@ class CartViewController: BaseViewController {
         return formatter
     }()
     
+    fileprivate var editingCartItemId: NSManagedObjectID?
+    
     // MARK: Life Cycle
     
     required init?(coder aDecoder: NSCoder) {
@@ -179,7 +181,7 @@ class CartViewController: BaseViewController {
     private var isPriceAtLeast50 = false
     
     var isGiftCardRedeemable: Bool {
-        return isPriceAtLeast50 && !UserDefaults.standard.bool(forKey: UserDefaultsKeys.completedCheckout)
+        return isPriceAtLeast50 && !UserDefaults.standard.bool(forKey: UserDefaultsKeys.isGiftCardHidden)
     }
     
     fileprivate func syncTotalPrice() {
@@ -250,7 +252,7 @@ extension CartViewController: UITableViewDataSource {
     }
     
     fileprivate var expectedNotificationSectionCount: Int {
-        return (!UserDefaults.standard.bool(forKey: UserDefaultsKeys.completedCheckout) && numberOfItems > 0) ? 1 : 0
+        return (!UserDefaults.standard.bool(forKey: UserDefaultsKeys.isGiftCardHidden) && numberOfItems > 0) ? 1 : 0
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -298,7 +300,7 @@ extension CartViewController: UITableViewDataSource {
             cell.size = cartItem.size
             cell.errorMask = CartItem.ErrorMaskOptions(rawValue: cartItem.errorMask)
             cell.removeButton.addTarget(self, action: #selector(cartItemRemoveAction(_:)), for: .touchUpInside)
-            cell.quantityStepper.addTarget(self, action: #selector(cartItemQuantityChanged(_:)), for: .valueChanged)
+            cell.editButton.addTarget(self, action: #selector(cartItemEditAction(_:)), for: .touchUpInside)
         }
         
         return cell
@@ -343,22 +345,37 @@ extension CartViewController: FetchedResultsControllerManagerDelegate {
 
 typealias CartViewControllerCartItem = CartViewController
 fileprivate extension CartViewControllerCartItem {
-    @objc func cartItemQuantityChanged(_ stepper: UIStepper) {
-        let position: CGPoint = stepper.convert(.zero, to: tableView)
+    
+    func variant(forColor color: String?, size: String?, in product: Product) -> Variant? {
+        let variants = product.availableVariants as? Set<Variant>
+        return variants?.first { $0.color == color && $0.size == size }
+    }
+    
+    @objc func cartItemEditAction(_ button: UIButton) {
+        let position: CGPoint = button.convert(.zero, to: tableView)
         
         guard let indexPath = tableView.indexPathForRow(at: position),
-            let cartItem = cartItem(at: indexPath.row) else {
-            return
+            let cartItem = cartItem(at: indexPath.row),
+            let product = cartItem.product,
+            let carItemVariant = variant(forColor: cartItem.color, size: cartItem.size, in: product)
+            else {
+                return
         }
         
-        let quantity = Int16(stepper.value)
-        if quantity > cartItem.quantity {
-            Analytics.trackProductCartQuanityStepUp(cartItem: cartItem)
-        }else{
-            Analytics.trackProductCartQuanityStepDown(cartItem: cartItem)
-        }
+        editingCartItemId = cartItem.objectID
+        let quantity = Int(cartItem.quantity)
         
-        ShoppingCartModel.shared.update(cartItem: cartItem, quantity: quantity)
+        let productVariantsSelectorViewController = ProductVariantsSelectorViewController(product: product, initialVariant: carItemVariant, initialQuantity: quantity)
+        productVariantsSelectorViewController.delegate = self
+        present(productVariantsSelectorViewController, animated: true, completion: nil)
+        
+        
+        // TODO: remove these analytics
+//        if quantity > cartItem.quantity {
+//            Analytics.trackProductCartQuanityStepUp(cartItem: cartItem)
+//        }else{
+//            Analytics.trackProductCartQuanityStepDown(cartItem: cartItem)
+//        }
     }
     
     @objc func cartItemRemoveAction(_ button: UIButton) {
@@ -371,6 +388,40 @@ fileprivate extension CartViewControllerCartItem {
             
             tableView(removeCellForRowAt: indexPath)
         }
+    }
+}
+
+extension CartViewController: ProductVariantsSelectorViewControllerDelegate {
+    func productVariantsSelectorViewControllerDidPressCancel(_ productVariantsSelectorViewController: ProductVariantsSelectorViewController) {
+        editingCartItemId = nil
+        dismiss(animated: true, completion: nil)
+    }
+    
+    func productVariantsSelectorViewControllerDidPressContinue(_ productVariantsSelectorViewController: ProductVariantsSelectorViewController) {
+        if let variant = productVariantsSelectorViewController.selectedVariant {
+            if let cartItemId = editingCartItemId,
+                let cartItem = DataModel.sharedInstance.mainMoc().cartItemWith(objectId: cartItemId)
+            {
+                let quantity = Int16(productVariantsSelectorViewController.selectedQuantity)
+                let isQuantityDifferent = cartItem.quantity != quantity
+                let isColorDifferent = cartItem.color != variant.color
+                let isSizeDifferent = cartItem.size != variant.size
+                
+                if isColorDifferent || isSizeDifferent {
+                    ShoppingCartModel.shared.remove(item: cartItem)
+                }
+                if isColorDifferent || isSizeDifferent || isQuantityDifferent {
+                    ShoppingCartModel.shared.update(variant: variant, quantity: quantity)
+                }
+            }
+            else {
+                // Just in case of an issue, update without logic
+                ShoppingCartModel.shared.update(variant: variant, quantity: Int16(productVariantsSelectorViewController.selectedQuantity))
+            }
+        }
+        
+        editingCartItemId = nil
+        dismiss(animated: true, completion: nil)
     }
 }
 
