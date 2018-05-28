@@ -21,6 +21,33 @@ extension UIDevice {
         return window.safeAreaInsets.bottom > 0
     }
     
+    func pushString(data:Data) -> String{
+        let token = data.map { String(format: "%02.2hhx", $0) }.joined()
+        if isDevelopmentEnvironment() {
+            return "dev|\(token)"
+        }else{
+            return "prod|\(token)"
+        }
+    }
+    
+    
+    func isDevelopmentEnvironment() -> Bool {
+        guard let filePath = Bundle.main.path(forResource: "embedded", ofType:"mobileprovision") else {
+            return false
+        }
+        do {
+            let url = URL(fileURLWithPath: filePath)
+            let data = try Data(contentsOf: url)
+            guard let string = String(data: data, encoding: .ascii) else {
+                return false
+            }
+            if string.contains("<key>aps-environment</key>\n\t\t<string>development</string>") {
+                return true
+            }
+        } catch {}
+        return false
+    }
+    
     fileprivate var modelIdentifier: String {
         var systemInfo = utsname()
         uname(&systemInfo)
