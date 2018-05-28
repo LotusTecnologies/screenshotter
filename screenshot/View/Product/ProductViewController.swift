@@ -87,6 +87,7 @@ class ProductViewController : BaseViewController {
         navigationItem.backBarButtonItem = UIBarButtonItem(title: nil, style: .plain, target: nil, action: nil)
         
         cartBarButtonItem = ProductCartBarButtonItem(target: self, action: #selector(presentCartAction))
+
         navigationItem.rightBarButtonItem = cartBarButtonItem
     }
     

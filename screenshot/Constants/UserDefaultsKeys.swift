@@ -47,11 +47,13 @@ class UserDefaultsKeys  {
     static let onboardingPresentedScreenshotHelper = "OnboardingPresentedScreenshotHelper"
     static let onboardingPresentedPushAlert = "OnboardingPresentedPushAlert"
     static let onboardingPresentedGiftCard = "OnboardingPresentedGiftCard"
-    static let completedCheckout = "CompletedCheckout"
     static let lastCampaignCompleted = "LastCampaignCompleted"  //in here is stored CampaignCompleted.rawValue
     enum CampaignCompleted : String {
         case campaign_2018_04_20 // Kim video to push users to do purchases
     }
+    
+    // Gift Card
+    static let isGiftCardHidden = "IsGiftCardHidden"
     
     // Device / Version
     static let dateInstalled = "DateInstalled"
@@ -94,6 +96,11 @@ class UserDefaultsKeys  {
 
 extension UIApplication {
     static func migrateUserDefaultsKeys() {
+        // Version 4.2 keys
+        if UserDefaults.standard.bool(forKey: "CompletedCheckout") {
+            UserDefaults.standard.set(true, forKey: UserDefaultsKeys.isGiftCardHidden)
+        }
+        
         // Version 1.3 keys
         if UserDefaults.standard.bool(forKey: "TutorialCompleted") {
             UserDefaults.standard.set(true, forKey: UserDefaultsKeys.onboardingCompleted)
