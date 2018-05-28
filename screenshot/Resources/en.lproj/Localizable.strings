@@ -229,11 +229,6 @@
 "permission.photo.denied.message" = "We need access to your photos in order to show you shoppable items.";
 "permission.push.denied.message" = "Turn on notifications to get updates from Screenshop";
 
-"personal_stylist.error" = "Unlocking a personal stylist requires a one time in-app purchase.\nUnable to connect to the appstore at this time:\n%@";
-"personal_stylist.error.invalid_device" = "Unlocking a personal stylist requires an in app purchase. This device is not able or allowed to make in app purchases.";
-"personal_stylist.loading" = "Unlocking a personal stylist requires a one time in-app purchase.\nConnecting to appstore....";
-"personal_stylist.unlock" = "Unlocking a personal stylist requires a one time in-app purchase for %@";
-
 "picker.empty.detail" = "Start taking screenshots of fashion items to fill up your gallery!";
 "picker.empty.title" = "No Photos!";
 "picker.limit.alert.title" = "Limit Exceeded";
