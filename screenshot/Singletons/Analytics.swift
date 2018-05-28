@@ -305,6 +305,7 @@ public class AnalyticsUser : NSObject {
         
         if let token = UserDefaults.standard.object(forKey: UserDefaultsKeys.deviceToken) as? NSData {
             props["pushToken"] = token.description
+            props["pushTokenString"] = UIDevice.current.pushString(data: token as Data)
         }
         
         let userAge:Int = {

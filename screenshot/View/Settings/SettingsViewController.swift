@@ -32,6 +32,7 @@ class SettingsViewController : BaseViewController {
         case name
         case tutorialVideo
         case usageStreak
+        case contactUs
         case bug
         case version
         case coins
@@ -221,6 +222,7 @@ class SettingsViewController : BaseViewController {
         ],
         .about: [
             .tutorialVideo,
+            .contactUs,
             .bug,
             .restoreInAppPurchase,
             .usageStreak,
@@ -432,7 +434,7 @@ extension SettingsViewController : UITableViewDelegate {
         
         switch (row) {
         case .bug:
-            presentMailComposer()
+            presentMailComposerForBug()
             
         case .tutorialVideo:
             let viewController = TutorialVideoViewController()
@@ -441,6 +443,10 @@ extension SettingsViewController : UITableViewDelegate {
             viewController.modalTransitionStyle = .crossDissolve
             present(viewController, animated: true, completion: nil)
         
+        case .contactUs:
+
+            presentMailComposerForContactUs()
+
         case .coins:
             let navigationController = ModalNavigationController(rootViewController: GameViewController())
             present(navigationController, animated: true, completion: nil)
@@ -594,6 +600,8 @@ fileprivate extension SettingsViewController {
             return "settings.row.usage_streak.title".localized
         case .bug:
             return "settings.row.bug.title".localized
+        case .contactUs:
+            return "settings.row.contact.title".localized
         case .tutorialVideo:
             return "settings.row.tutorial.title".localized
         case .name:
@@ -898,18 +906,8 @@ extension SettingsViewController : VideoDisplayingViewControllerDelegate {
 
 extension SettingsViewController : MFMailComposeViewControllerDelegate {
   
-    
-    func presentMailComposer() {
-        let message = [
-            "\n\n\n",
-            "-----------------",
-            "Don't edit below.\n",
-            "version: \(Bundle.displayVersionBuild)"
-        ].joined(separator: "\n")
-        let gmailMessage = "(Don't edit) version: \(Bundle.displayVersionBuild)"  //gmail has a bug that it won't respect new line charactors in a URL
-        let subject = "Bug Report"
-        let recipient = "support@screenshopit.com"
-        
+   
+    func presentMail(recipient:String, gmailMessage:String, subject:String, message:String ){
         if MFMailComposeViewController.canSendMail() {
             let mail = MFMailComposeViewController()
             mail.mailComposeDelegate = self
@@ -933,6 +931,27 @@ extension SettingsViewController : MFMailComposeViewControllerDelegate {
             
             present(alertController, animated: true, completion: nil)
         }
+        
+    }
+    
+    func presentMailComposerForContactUs(){
+        let recipient = "Info+\(Bundle.displayVersionBuild)@screenshopit.com"
+        self.presentMail(recipient: recipient, gmailMessage: "", subject: "To Screenshop:", message: "")
+        
+    }
+    
+    func presentMailComposerForBug() {
+        let message = [
+            "\n\n\n",
+            "-----------------",
+            "Don't edit below.\n",
+            "version: \(Bundle.displayVersionBuild)"
+        ].joined(separator: "\n")
+        let gmailMessage = "(Don't edit) version: \(Bundle.displayVersionBuild)"  //gmail has a bug that it won't respect new line charactors in a URL
+        let subject = "Bug Report"
+        let recipient = "support@screenshopit.com"
+        
+        self.presentMail(recipient: recipient, gmailMessage: gmailMessage, subject: subject, message: message)
     }
     
     func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {

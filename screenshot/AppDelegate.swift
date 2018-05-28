@@ -528,8 +528,10 @@ extension AppDelegate : TutorialNavigationControllerDelegate {
 
 extension AppDelegate {
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        //TODO: send token to server
         
+        UserDefaults.standard.set(deviceToken, forKey: UserDefaultsKeys.deviceToken)
+        UserDefaults.standard.synchronize()
+        Analytics.trackUserProperties(analyticsUser: AnalyticsUser.current)
         SilentPushSubscriptionManager.sharedInstance.updateSubscriptionsIfNeeded()
         
         NotificationCenter.default.post(name: .applicationDidRegisterForRemoteNotifications, object: deviceToken)
