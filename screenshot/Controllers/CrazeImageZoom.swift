@@ -56,8 +56,8 @@ class CrazeImageZoom: NSObject {
             let transform:((UIImageView)->UIView) = popViewTransform ?? { imageView in
                 let newImageView = UIImageView.init(image: imageView.image)
                 newImageView.contentMode = imageView.contentMode
-                let point = imageView.convert(imageView.frame.origin, to: nil)
-                let imageViewStartingRect = CGRect.init(origin: point, size: imageView.frame.size)
+                let point = imageView.convert(imageView.bounds.origin, to: currentWindow)
+                let imageViewStartingRect = CGRect.init(origin: point, size: imageView.bounds.size)
                 newImageView.frame = imageViewStartingRect
                 return newImageView
             }

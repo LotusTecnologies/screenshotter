@@ -62,6 +62,11 @@ class Analytics {
             properties["screenshot-id"] = screenshotId
         }
         
+        if let submittedDate = screenshot.submittedDate {
+            properties["screenshot-submittedToDiscoverDate"] = submittedDate
+        }
+
+        
 
         self.addScreenshotProperitesFrom(trackingData: screenshot.trackingInfo, toProperties: &properties)
         
