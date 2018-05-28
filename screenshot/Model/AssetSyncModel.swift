@@ -565,10 +565,12 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
             }.then(on: self.processingQ) { success -> Promise<UIImage> in
                 return asset.image(allowFromICloud: false)
             }.then (on: self.processingQ) { image -> Promise<(ClarifaiModel.ImageClassification, UIImage)> in
-                Analytics.trackSentImageToClarifai()
-                return ClarifaiModel.sharedInstance.classify(image: image).then(execute: { (c) -> Promise<(ClarifaiModel.ImageClassification, UIImage)>  in
-                    return Promise.init(value: (c, image))
-                })
+//                Analytics.trackSentImageToClarifai()
+//                return ClarifaiModel.sharedInstance.classify(image: image).then(execute: { (c) -> Promise<(ClarifaiModel.ImageClassification, UIImage)>  in
+//                    return Promise.init(value: (c, image))
+//                })
+                // Upload to Syte. Parse json, store it and classification to DB.
+                return self.syteAsClarifaiReplacement(image: image)
             }.then(on: self.processingQ) { (imageClassification, image) -> Void in
                 if imageClassification != .unrecognized {
                     self.performBackgroundTask(assetId: nil, shoppableId: nil) { (managedObjectContext) in
@@ -603,6 +605,14 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
         }))
     }
     
+    func syteAsClarifaiReplacement(image: UIImage) -> Promise<(ClarifaiModel.ImageClassification, UIImage)> {
+        let isUsc = UserDefaults.standard.bool(forKey: UserDefaultsKeys.isUSC)
+        let imageData = self.data(for: image)
+        return NetworkingPromise.sharedInstance.uploadToSyte(imageData: imageData, orImageUrlString: nil, isUsc: isUsc)
+            .then { uploadedURLString, segments -> Promise<(ClarifaiModel.ImageClassification, UIImage)> in
+            return Promise(value: (ClarifaiModel.ImageClassification.human, image))
+        }
+    }
     
     func sendScreenshotAddedLocalNotification(backgroundScreenshotData: [BackgroundScreenshotData]) {
         guard PermissionsManager.shared.hasPermission(for: .push) else {
@@ -740,7 +750,7 @@ extension AssetSyncModel {
                         return Promise(value: isUSC)
                     }
                 }.then(on: self.processingQ) { isUsc -> Promise<(String, [[String : Any]])> in
-                    return NetworkingPromise.sharedInstance.uploadToSyte(imageData: localImageData, orImageUrlString:orImageUrlString, imageClassification: imageClassification, isUsc: isUsc)
+                    return NetworkingPromise.sharedInstance.uploadToSyte(imageData: localImageData, orImageUrlString:orImageUrlString, isUsc: isUsc)
                 }.then(on: self.processingQ) { uploadedURLString, segments -> Void in
                     let categories = segments.map({ (segment: [String : Any]) -> String? in segment["label"] as? String}).compactMap({$0}).joined(separator: ",")
                     Analytics.trackReceivedResponseFromSyte(imageUrl: uploadedURLString, segmentCount: segments.count, categories: categories)
