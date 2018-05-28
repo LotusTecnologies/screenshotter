@@ -10,7 +10,17 @@ import UIKit
 
 extension CGFloat {
     static let padding: CGFloat = 16
-    static let extendedPadding: CGFloat = UIDevice.is480h ? 20 : 40
+    static let extendedPadding: CGFloat = {
+        if UIDevice.is480h {
+            return 20
+        }
+        else if UIDevice.is568h {
+            return 30
+        }
+        else {
+            return 40
+        }
+    }()
     
     static let halfPoint: CGFloat = UIScreen.main.scale > 1 ? 0.5 : 1
     

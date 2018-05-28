@@ -39,7 +39,7 @@ class RegisterView: AuthorizeContentScrollView {
         
         skipButton.translatesAutoresizingMaskIntoConstraints = false
         skipButton.contentEdgeInsets = UIEdgeInsets(top: 6, left: .padding, bottom: 6, right: .padding)
-        skipButton.setTitle("Skip", for: .normal)
+        skipButton.setTitle("generic.skip".localized, for: .normal)
         skipButton.setTitleColor(.gray3, for: .normal)
         skipButton.setTitleColor(.gray5, for: .highlighted)
         skipButton.setImage(skipImage, for: .normal)
