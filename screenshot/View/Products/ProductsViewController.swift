@@ -592,8 +592,13 @@ extension ProductsViewControllerShoppables: FetchedResultsControllerManagerDeleg
 
         }
         else if controller == productsFRC {
+            
             if view.window != nil, let collectionView = collectionView {
-                collectionView.reloadItems(at: collectionView.indexPathsForVisibleItems)
+                if change.updatedRows.count > 0 && change.deletedRows.count == 0 && change.insertedRows.count == 0 {
+                    collectionView.reloadItems(at: collectionView.indexPathsForVisibleItems)
+                }else{
+                    collectionView.reloadData()
+                }
             }
         }
     }
