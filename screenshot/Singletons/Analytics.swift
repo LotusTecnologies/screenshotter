@@ -39,6 +39,21 @@ class Analytics {
             
         }
     }
+    
+    static func uscExperience() -> String {
+        let uscExperience: String
+        if UserDefaults.standard.object(forKey: UserDefaultsKeys.isUSC) == nil {
+            uscExperience = "unset"
+        } else if UserDefaults.standard.bool(forKey: UserDefaultsKeys.isUSC) {
+            uscExperience = "full-usc"
+        } else if UserDefaults.standard.bool(forKey: UserDefaultsKeys.abUSC) {
+            uscExperience = "usc-feed-external-ui"
+        } else {
+            uscExperience = "non-usc"
+        }
+        return uscExperience
+    }
+    
     static func propertiesFor(_ matchstick:Matchstick) -> [String:Any] {
         var properties:[String:Any] = [:]
         
@@ -66,8 +81,8 @@ class Analytics {
         if let submittedDate = screenshot.submittedDate {
             properties["screenshot-submittedToDiscoverDate"] = submittedDate
         }
-
         
+        properties["usc-experience"] = uscExperience()
 
         self.addScreenshotProperitesFrom(trackingData: screenshot.trackingInfo, toProperties: &properties)
         
@@ -111,6 +126,8 @@ class Analytics {
         if let orderNumber = cart.orderNumber {
             properties["cart-orderNumber"] = orderNumber
         }
+        
+        properties["usc-experience"] = uscExperience()
 
         return properties
     }
