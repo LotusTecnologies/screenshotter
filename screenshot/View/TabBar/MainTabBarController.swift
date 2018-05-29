@@ -28,15 +28,16 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
     let settingsNavigationController = SettingsNavigationController()
     let cartNavigationController = CartNavigationController()
     let notificationNavigationController:UINavigationController = {
-        let inboxStyle = PWIInboxStyle.customStyle(withDefaultImageIcon: UIImage.init(named: "BrandIcon110"),
-                                                   textColor: UIColor.darkText,
-                                                   accentColor: UIColor.crazeGreen,
-                                                   font: UIFont.screenshopFont(.hind, size: 17))
-        
-        inboxStyle?.backgroundColor = UIColor.init(white: 1, alpha: 1)
-        inboxStyle?.listErrorMessage = NSLocalizedString("Oh no! Something went wrong on the Internet. This is the worst thing that has ever happened! ", comment: "Custom error message")
-        inboxStyle?.listEmptyMessage = NSLocalizedString("You have no messages.  But we still love you.", comment: "Custom empty message")
-        if let vc = PWIInboxUI.createInboxController(with: inboxStyle){
+//        let inboxStyle = PWIInboxStyle.customStyle(withDefaultImageIcon: UIImage.init(named: "BrandIcon110"),
+//                                                   textColor: UIColor.darkText,
+//                                                   accentColor: UIColor.crazeGreen,
+//                                                   font: UIFont.screenshopFont(.hind, size: 17))
+//
+//        inboxStyle?.backgroundColor = UIColor.init(white: 1, alpha: 1)
+//        inboxStyle?.listErrorMessage = NSLocalizedString("Oh no! Something went wrong on the Internet. This is the worst thing that has ever happened! ", comment: "Custom error message")
+//        inboxStyle?.listEmptyMessage = NSLocalizedString("You have no messages.  But we still love you.", comment: "Custom empty message")
+//        inboxStyle.
+        if let vc = PWIInboxUI.createInboxController(with: PWIInboxStyle.default()){
             return UINavigationController.init(rootViewController: vc)
         }
         return UINavigationController()
@@ -244,6 +245,11 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         }
         if viewController == favoritesNavigationController {
             AccumulatorModel.favorite.resetUninformedCount()
+        }
+        if viewController == notificationNavigationController {
+            if let vc = notificationNavigationController.topViewController as? PWIInboxViewController {
+                vc.reloadData()
+            }
         }
         
 

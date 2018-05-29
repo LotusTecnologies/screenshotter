@@ -27,6 +27,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var shouldLoadDiscoverNextLoad = false
     let appSettings: AppSettings = AppSettings()
     
+    let pushWoosh:PushNotificationManager = {
+        PushNotificationManager.initialize(withAppCode: Constants.pushWooshAppCode, appName: Constants.pushWooshAppName)
+
+        let pushwoosh = PushNotificationManager.push()
+        return pushwoosh!
+    }()
     fileprivate var frameworkSetupLaunchOptions: [UIApplicationLaunchOptionsKey : Any]?
     
     fileprivate lazy var mainTabBarController: MainTabBarController = {
@@ -71,7 +77,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UIApplication.migrateUserDefaultsKeys()
         UIApplication.appearanceSetup()
         UserFeedback.shared.applicationDidFinishLaunching() // only setups notificationCenter observing. does nothing now
-        PushNotificationManager.push().sendAppOpen()
+        pushWoosh.sendAppOpen()
         PWInAppManager.shared().setUserId(AnalyticsUser.current.identifier)
         return true
     }
@@ -125,8 +131,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         }
 
-        PushNotificationManager.push().delegate = self
-        PushNotificationManager.push().sendAppOpen()
+        pushWoosh.delegate = self
+        pushWoosh.sendAppOpen()
         if PermissionsManager.shared.permissionStatus(for: .push) == .authorized {
             PermissionsManager.shared.requestPermission(for: .push)
         }
@@ -270,6 +276,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if !handled {
             handled = FBSDKApplicationDelegate.sharedInstance().application(app, open: url, options: options)
         }
+        
+        
         
         return handled
     }
@@ -547,7 +555,7 @@ extension AppDelegate: PushNotificationDelegate {
     }
     
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        PushNotificationManager.push().handlePushRegistration(deviceToken)
+        pushWoosh.handlePushRegistration(deviceToken)
         
         UserDefaults.standard.set(deviceToken, forKey: UserDefaultsKeys.deviceToken)
         UserDefaults.standard.synchronize()
@@ -558,7 +566,7 @@ extension AppDelegate: PushNotificationDelegate {
     }
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
-        PushNotificationManager.push().handlePushRegistrationFailure(error)
+        pushWoosh.handlePushRegistrationFailure(error)
 
          let e = error as NSError
         Analytics.trackError(type: nil, domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
@@ -567,7 +575,7 @@ extension AppDelegate: PushNotificationDelegate {
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         ApplicationStateModel.sharedInstance.applicationState = application.applicationState
         
-        PushNotificationManager.push().handlePushReceived(userInfo)
+        pushWoosh.handlePushReceived(userInfo)
 
         if let aps = userInfo["aps"] as? NSDictionary, let category = aps["category"] as? String, category == "MATCHSTICK_LIKES", let likeUpdates = userInfo["likeUpdates"] as? [[String:Any]]{
             DataModel.sharedInstance.performBackgroundTask { (context) in
