@@ -13,7 +13,6 @@ class ProductsRateView : UIView {
     fileprivate let contentView = UIView()
     let voteUpButton = UIButton()
     let voteDownButton = UIButton()
-    let talkToYourStylistButton = UIButton()
 
     fileprivate let label = UILabel()
     fileprivate var labelTrailingConstraint: NSLayoutConstraint!
@@ -60,15 +59,7 @@ class ProductsRateView : UIView {
         labelTrailingConstraint = label.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -.padding)
         
         addSubview(BorderView(edge: .top))
-        
-        contentView.addSubview(talkToYourStylistButton)
-        talkToYourStylistButton.translatesAutoresizingMaskIntoConstraints = false
-        talkToYourStylistButton.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
-        talkToYourStylistButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
-        talkToYourStylistButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
-        talkToYourStylistButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
-        talkToYourStylistButton.backgroundColor = .clear
-        talkToYourStylistButton.isUserInteractionEnabled = false
+
         
         weak var weakSelf = self
         NotificationCenter.default.addObserver(forName: Notification.Name.InAppPurchaseManagerDidUpdate, object: nil, queue: .main) { (notification) in
@@ -112,31 +103,22 @@ class ProductsRateView : UIView {
     }
     
     private func syncLabel() {
-        if InAppPurchaseManager.sharedInstance.isInProcessOfBuying() {
-            label.textColor = .white
-            label.text = "Connecting to Appstore..."
-            label.textAlignment = .center
-            talkToYourStylistButton.isUserInteractionEnabled = false
-            
-        }else if hasRating {
+       if hasRating {
             if InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist){
                 label.textColor = .white
                 label.text = "products.rate.talk_to_stylist".localized
                 label.textAlignment = .center
-                talkToYourStylistButton.isUserInteractionEnabled = true
                 
             }else{
                 label.textColor = .white
                 label.text = "products.rate.rated".localized
                 label.textAlignment = .center
-                talkToYourStylistButton.isUserInteractionEnabled = false
             }
             
         } else {
             label.textColor = .gray3
             label.text = "products.rate.unrated".localized
             label.textAlignment = .natural
-            talkToYourStylistButton.isUserInteractionEnabled = false
         }
     }
     

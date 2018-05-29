@@ -74,8 +74,9 @@ class NetworkingPromise : NSObject {
             return Promise(error: emptyError)
         }
         
+        let isUSCFeed = isUsc || UserDefaults.standard.bool(forKey: UserDefaultsKeys.abUSC)
         let urlString = imageClassification == .human
-            ? "https://syteapi.com/v1.1/offers/bb?account_id=\(Constants.syteAccountId)&sig=\(Constants.syteAccountSignature)&features=related_looks,validate&feed=\(isUsc ? Constants.syteUscFeed : Constants.syteNonUscFeed)\(payloadType)"
+            ? "https://syteapi.com/v1.1/offers/bb?account_id=\(Constants.syteAccountId)&sig=\(Constants.syteAccountSignature)&features=related_looks,validate&feed=\(isUSCFeed ? Constants.syteUscFeed : Constants.syteNonUscFeed)\(payloadType)"
             : "https://homedecor.syteapi.com/v1.1/offers/bb?account_id=\(Constants.furnitureAccountId)&sig=\(Constants.furnitureAccountSignature)&features=related_looks,validate&feed=craze_home\(payloadType)"
 
         guard let url = URL(string: urlString) else {
@@ -573,7 +574,12 @@ class NetworkingPromise : NSObject {
             var isUsc = false
             if let countryCode = dict["geoplugin_countryCode"] as? String,
               countryCode == "US" || countryCode == "IL" {
-                isUsc = true
+                // Set half of the USC audience to non-USC UI, but continue to give USC feed.
+                if arc4random_uniform(2) == 1 {
+                    UserDefaults.standard.set(true, forKey: UserDefaultsKeys.abUSC)
+                } else {
+                    isUsc = true
+                }
             }
             UserDefaults.standard.set(isUsc, forKey: UserDefaultsKeys.isUSC)
             UserDefaults.standard.synchronize()

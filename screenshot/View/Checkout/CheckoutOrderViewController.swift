@@ -384,7 +384,7 @@ extension CheckoutOrderViewControllerOrder {
                 confirmationViewController.orderNumber = orderNumber
                 
                 if self.isGiftCardRedeemable {
-                    UserDefaults.standard.set(true, forKey: UserDefaultsKeys.completedCheckout)
+                    UserDefaults.standard.set(true, forKey: UserDefaultsKeys.isGiftCardHidden)
                     confirmationViewController.shouldPresentGiftCardModal = true
                 }
                 

@@ -131,6 +131,8 @@ extension ScreenshotsNavigationController: GiftCardCampaignViewControllerDelegat
     
     func giftCardCampaignViewControllerDidSkip(_ viewController: GiftCardCampaignViewController) {
         Analytics.trackOnboardingCampainCreditCardSkip()
+        UserDefaults.standard.set(true, forKey: UserDefaultsKeys.isGiftCardHidden)
+        UserDefaults.standard.synchronize()
         
         giftCardActiveViewController.dismiss(animated: true, completion: nil)
     }
