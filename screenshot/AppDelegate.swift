@@ -71,7 +71,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UIApplication.migrateUserDefaultsKeys()
         UIApplication.appearanceSetup()
         UserFeedback.shared.applicationDidFinishLaunching() // only setups notificationCenter observing. does nothing now
-
+        PushNotificationManager.push().sendAppOpen()
+        PWInAppManager.shared().setUserId(AnalyticsUser.current.identifier)
         return true
     }
     
@@ -546,15 +547,11 @@ extension AppDelegate: PushNotificationDelegate {
     }
     
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-<<<<<<< HEAD
         PushNotificationManager.push().handlePushRegistration(deviceToken)
-        IntercomHelper.sharedInstance.deviceToken = deviceToken
-=======
         
         UserDefaults.standard.set(deviceToken, forKey: UserDefaultsKeys.deviceToken)
         UserDefaults.standard.synchronize()
         Analytics.trackUserProperties(analyticsUser: AnalyticsUser.current)
->>>>>>> removeIntercomAndSegment
         SilentPushSubscriptionManager.sharedInstance.updateSubscriptionsIfNeeded()
         
         NotificationCenter.default.post(name: .applicationDidRegisterForRemoteNotifications, object: deviceToken)

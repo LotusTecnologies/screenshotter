@@ -7,11 +7,7 @@
 //
 
 import UIKit
-<<<<<<< HEAD
-import Intercom
 import PushwooshInboxUI
-=======
->>>>>>> removeIntercomAndSegment
 
 class MainTabBarController: UITabBarController, UITabBarControllerDelegate, ScreenshotsNavigationControllerDelegate, SettingsViewControllerDelegate, ScreenshotDetectionProtocol, ViewControllerLifeCycle {
     enum TabIndex: Int {

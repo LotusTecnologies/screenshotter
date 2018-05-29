@@ -13,11 +13,8 @@ import Branch
 import FBSDKCoreKit
 import Whisper
 import AdSupport
-<<<<<<< HEAD
 import Pushwoosh
-=======
 import Amplitude_iOS
->>>>>>> removeIntercomAndSegment
 
 extension Bool {
     func toStringLiteral() -> String {
@@ -349,8 +346,9 @@ class AnalyticsTrackers : NSObject {
 
     let appsee = AppseeAnalyticsTracker()
     let kochava = KochavaAnalyticsTracker()
-    let amplitude = AmplitudeAnalyticsTracker()
     let branch = BranchAnalyticsTracker()
+    let pushwoosh = PushwooshAnalyticsTracker()
+    let amplitude = AmplitudeAnalyticsTracker()
 
     
     class AppseeAnalyticsTracker : NSObject, AnalyticsTracker {
@@ -419,15 +417,13 @@ class AnalyticsTrackers : NSObject {
             Amplitude.instance().setUserId(user.identifier)
             Amplitude.instance().setUserProperties(user.analyticsProperties)
         }
-        
-        
     }
     
-    class pushwooshAnalyticsTracker : NSObject, AnalyticsTracker {
+    class PushwooshAnalyticsTracker : NSObject, AnalyticsTracker {
         func track(_ event: String, properties: [AnyHashable : Any]? = nil, sendEvenIfAdvertisingTrackingIsOptOut:Bool? = false ){
 
             if  ASIdentifierManager.shared().isAdvertisingTrackingEnabled || sendEvenIfAdvertisingTrackingIsOptOut == true {
-                PWInAppManager.shared().postEvent(event, withAttributes: properties)
+                PWInAppManager.shared().postEvent(event)
             }
         }
         
@@ -436,7 +432,6 @@ class AnalyticsTrackers : NSObject {
                 return
             }
             
-            PWInAppManager.shared().setUserId(user.identifier)
             PWInAppManager.shared().setUserId(user.identifier)
 
         }

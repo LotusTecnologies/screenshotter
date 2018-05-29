@@ -1203,6 +1203,7 @@
 				E4D495D31F4987B100312614 /* Upload Symbols To AppSee */,
 				062DDE6A3EEF8844E9956F39 /* [CP] Embed Pods Frameworks */,
 				E4F124CE205FBA670026D91B /* Embed App Extensions */,
+				9E72A363EFE000ECABD6F6DD /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -1374,6 +1375,24 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-screenshot/Pods-screenshot-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		9E72A363EFE000ECABD6F6DD /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-screenshot/Pods-screenshot-resources.sh",
+				"${PODS_ROOT}/PushwooshInboxUI/Framework/PushwooshInboxBundle.bundle",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/PushwooshInboxBundle.bundle",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-screenshot/Pods-screenshot-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		AE7846E2803BA1055B53CB98 /* [CP] Check Pods Manifest.lock */ = {
