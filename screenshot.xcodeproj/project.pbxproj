@@ -1028,6 +1028,7 @@
 				C58FA0E920A95FC300072966 /* GiftCardCampaignViewController.swift */,
 				C58FA0EC20A95FC300072966 /* GiftCardDoneViewController.swift */,
 				C53154CF20B6A8A60050EB76 /* LoginViewController.swift */,
+				C53154D520B6E3A90050EB76 /* OnboardingDetailsViewController.swift */,
 				C572C0D720AADA98004B0A17 /* OnboardingWelcomeViewController.swift */,
 				C5F8D80F20B2C001004A32FD /* RegisterViewController.swift */,
 				C58FA0EA20A95FC300072966 /* TutorialEmailSlideViewController.swift */,
@@ -1036,7 +1037,6 @@
 				C58FA0E120A95FC200072966 /* TutorialVideoOverlayView.swift */,
 				C58FA0E720A95FC200072966 /* TutorialVideoViewController.swift */,
 				C58FA0E620A95FC200072966 /* VideoDisplayingViewControllerDelegate.swift */,
-				C53154D520B6E3A90050EB76 /* OnboardingDetailsViewController.swift */,
 			);
 			path = Onboarding;
 			sourceTree = "<group>";

@@ -8,25 +8,63 @@
 
 import UIKit
 
+protocol OnboardingDetailsViewControllerDelegate: NSObjectProtocol {
+    func onboardingDetailsViewControllerDidSkip(_ viewController: OnboardingDetailsViewController)
+    func onboardingDetailsViewControllerDidContinue(_ viewController: OnboardingDetailsViewController)
+}
+
 class OnboardingDetailsView: UIView {
-    enum Gender: String {
-        case female = "Female"
-        case male   = "Male"
+    enum Gender: Int {
+        case female
+        case male
+        
+        var localized: String {
+            switch self {
+            case .female:
+                return "products.options.gender.female".localized
+            case .male:
+                return "products.options.gender.male".localized
+            }
+        }
     }
     
-    enum Size: String {
-        case adult = "Adult"
-        case child = "Child"
-        case plus  = "Plus"
+    enum Size: Int {
+        case adult
+        case child
+        case plus
+        
+        var localized: String {
+            switch self {
+            case .adult:
+                return "products.options.size.adult".localized
+            case .child:
+                return "products.options.size.child".localized
+            case .plus:
+                return "products.options.size.plus".localized
+            }
+        }
     }
     
     let scrollView = UIScrollView()
     let userButton = RoundButton()
     let nameTextField = UnderlineTextField()
+    private let preferenceLabel = UILabel()
     let genderControl = SegmentedDropDownControl()
     let sizeControl = SegmentedDropDownControl()
     let continueButton = MainButton()
     let skipButton = UIButton()
+    
+    var activePreferenceTopOffset: CGFloat {
+        let rect = preferenceLabel.superview?.convert(preferenceLabel.frame, to: scrollView)
+        let topOffset = (rect?.origin.y ?? 0) - .padding
+        
+        if #available(iOS 11.0, *) {
+            return topOffset - scrollView.adjustedContentInset.top
+        }
+        else {
+            return topOffset - scrollView.contentInset.top
+        }
+    }
     
     // MARK: Life Cycle
     
@@ -81,7 +119,6 @@ class OnboardingDetailsView: UIView {
         nameTextField.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
         nameTextField.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
         
-        let preferenceLabel = UILabel()
         preferenceLabel.translatesAutoresizingMaskIntoConstraints = false
         preferenceLabel.text = "PREFERENCES"
         preferenceLabel.font = .screenshopFont(.quicksandBold, size: 16)
@@ -97,8 +134,8 @@ class OnboardingDetailsView: UIView {
         preferenceLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
         
         let genderItem = SegmentedDropDownItem(pickerItems: [
-            Gender.female.rawValue,
-            Gender.male.rawValue
+            Gender.female.localized,
+            Gender.male.localized
             ])
         genderItem.placeholderTitle = "Gender"
         
@@ -110,9 +147,9 @@ class OnboardingDetailsView: UIView {
         genderControl.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
         
         let sizeItem = SegmentedDropDownItem(pickerItems: [
-            Size.child.rawValue,
-            Size.adult.rawValue,
-            Size.plus.rawValue
+            Size.child.localized,
+            Size.adult.localized,
+            Size.plus.localized
             ])
         sizeItem.placeholderTitle = "Size"
         
@@ -155,6 +192,22 @@ class OnboardingDetailsView: UIView {
 }
 
 class OnboardingDetailsViewController: UIViewController {
+    weak var delegate: OnboardingDetailsViewControllerDelegate?
+    
+    var name: String? {
+        return _view.nameTextField.text
+    }
+    
+    var gender: String? {
+        return _view.genderControl.items.first?.selectedPickerItem
+    }
+    
+    var size: String? {
+        return _view.sizeControl.items.first?.selectedPickerItem
+    }
+    
+    // MARK: View
+    
     private let navigationBar = UINavigationBar()
     
     var classForView: OnboardingDetailsView.Type {
@@ -203,7 +256,12 @@ class OnboardingDetailsViewController: UIViewController {
         navigationBar.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         navigationBar.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
         
+        _view.userButton.addTarget(self, action: #selector(userAction), for: .touchUpInside)
+        
         _view.nameTextField.delegate = self
+        
+        _view.continueButton.addTarget(self, action: #selector(continueAction), for: .touchUpInside)
+        _view.skipButton.addTarget(self, action: #selector(skipAction), for: .touchUpInside)
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         tapGesture.cancelsTouchesInView = false
@@ -233,6 +291,20 @@ class OnboardingDetailsViewController: UIViewController {
         NotificationCenter.default.removeObserver(self)
     }
     
+    // MARK: Actions
+    
+    @objc private func userAction() {
+        
+    }
+    
+    @objc private func continueAction() {
+        delegate?.onboardingDetailsViewControllerDidContinue(self)
+    }
+    
+    @objc private func skipAction() {
+        delegate?.onboardingDetailsViewControllerDidSkip(self)
+    }
+    
     // MARK: Keyboard
     
     @objc private func keyboardWillShowNotification(_ notification: Notification) {
@@ -246,6 +318,12 @@ class OnboardingDetailsViewController: UIViewController {
         
         _view.scrollView.contentInset = contentInset
         _view.scrollView.scrollIndicatorInsets = scrollIndicatorInsets
+        
+        if _view.genderControl.isFirstResponder || _view.sizeControl.isFirstResponder {
+            var contentOffset = _view.scrollView.contentOffset
+            contentOffset.y = _view.activePreferenceTopOffset
+            _view.scrollView.contentOffset = contentOffset
+        }
     }
     
     @objc private func keyboardWillHideNotification(_ notification: Notification) {
