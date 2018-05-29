@@ -139,12 +139,19 @@ class OnboardingDetailsView: UIView {
             ])
         genderItem.placeholderTitle = "Gender"
         
+        let genderItem2 = SegmentedDropDownItem(pickerItems: [
+            Gender.female.localized,
+            Gender.male.localized
+            ])
+        genderItem2.placeholderTitle = "Gender 2"
+        
         genderControl.translatesAutoresizingMaskIntoConstraints = false
-        genderControl.items = [genderItem]
+        genderControl.items = [genderItem, genderItem2]
         contentView.addSubview(genderControl)
         genderControl.topAnchor.constraint(equalTo: preferenceLabel.bottomAnchor, constant: .padding).isActive = true
         genderControl.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
         genderControl.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
+        genderControl.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
         let sizeItem = SegmentedDropDownItem(pickerItems: [
             Size.child.localized,
@@ -264,7 +271,6 @@ class OnboardingDetailsViewController: UIViewController {
         _view.skipButton.addTarget(self, action: #selector(skipAction), for: .touchUpInside)
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
-        tapGesture.cancelsTouchesInView = false
         _view.addGestureRecognizer(tapGesture)
     }
     

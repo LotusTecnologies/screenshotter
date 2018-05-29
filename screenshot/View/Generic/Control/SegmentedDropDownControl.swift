@@ -95,13 +95,23 @@ class SegmentedDropDownItem : NSObject {
     }
 }
 
-class SegmentedDropDownControl : UIControl {
+class SegmentedDropDownControl : UIButton {
     fileprivate let borderWidth: CGFloat = 1
     static fileprivate let borderColor: UIColor = .gray8
     static fileprivate let borderErrorColor: UIColor = .crazeRed
     var changeValueOnRowChange = false
 
     // MARK: Life Cycle
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        
+        addTarget(self, action: #selector(touchUpInside(_:event:)), for: .touchUpInside)
+    }
     
     var items: [SegmentedDropDownItem] = [] {
         willSet {
@@ -116,6 +126,7 @@ class SegmentedDropDownControl : UIControl {
                 
                 let segment = DropDownControl()
                 segment.translatesAutoresizingMaskIntoConstraints = false
+                segment.isUserInteractionEnabled = false // !!!: DEBUG
                 segment.pickerDataSource = self
                 segment.pickerDelegate = self
                 segment.titleLabel.text = item.title
@@ -178,33 +189,33 @@ class SegmentedDropDownControl : UIControl {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        
+
         if #available(iOS 11.0, *) {} else if items.count > 1 {
             items.enumerated().forEach { (index, item) in
                 guard let segment = item.segment else {
                     return
                 }
-                
+
                 let isFirst = index == 0
                 let isLast = index == items.count - 1
                 let maskPath: CGPath
-                
+
                 if isFirst || isLast {
                     let corners: UIRectCorner = isFirst ? [.topLeft, .bottomLeft] : [.topRight, .bottomRight]
                     let radii = CGSize(width: .defaultCornerRadius, height: .defaultCornerRadius)
-                    
+
                     maskPath = UIBezierPath(roundedRect: segment.bounds, byRoundingCorners: corners, cornerRadii: radii).cgPath
                 }
                 else {
                     maskPath = UIBezierPath(rect: segment.bounds).cgPath
                 }
-                
+
                 let maskLayer = CAShapeLayer()
                 maskLayer.path = maskPath
                 segment.layer.mask = maskLayer
-                
+
                 item.frameLayer?.removeFromSuperlayer()
-                
+
                 let frameLayer = CAShapeLayer()
                 frameLayer.path = maskPath
                 frameLayer.strokeColor = item.frameLayer?.strokeColor ?? type(of: self).borderColor.cgColor
@@ -217,6 +228,22 @@ class SegmentedDropDownControl : UIControl {
     }
     
     // MARK: Interaction
+    
+    @objc fileprivate func touchUpInside(_ control: SegmentedDropDownControl, event: UIEvent) {
+        guard let location = event.allTouches?.first?.location(in: control),
+            let dropDownControl = subviews.first(where: { $0.frame.contains(location) }) as? DropDownControl,
+            let item = items.first(where: { $0.segment == dropDownControl }), !item.pickerItems.isEmpty
+            else {
+                return
+        }
+        
+        if dropDownControl.isFirstResponder {
+            dropDownControl.resignFirstResponder()
+        }
+        else {
+            dropDownControl.becomeFirstResponder()
+        }
+    }
     
     @objc fileprivate func touchUpInside(_ control: DropDownControl) {
         guard let item = items.first(where: { $0.segment == control }), !item.pickerItems.isEmpty else {
@@ -249,28 +276,27 @@ class SegmentedDropDownControl : UIControl {
     
     override var isFirstResponder: Bool {
         var isFirstResponder = false
-        
+
         for item in items {
             if item.segment?.isFirstResponder ?? false {
                 isFirstResponder = true
                 break
             }
         }
-        
+
         return isFirstResponder
     }
-    
+
     @discardableResult override func resignFirstResponder() -> Bool {
         items.forEach { item in
             item.segment?.resignFirstResponder()
         }
-        
+
         return super.resignFirstResponder()
     }
 }
 
 extension SegmentedDropDownControl : UIPickerViewDataSource, UIPickerViewDelegate {
-    
     private func itemIndex(pickerView: UIPickerView) -> Int {
         return items.index { item -> Bool in
             guard let segment = item.segment else {
@@ -319,6 +345,7 @@ extension SegmentedDropDownControl : UIPickerViewDataSource, UIPickerViewDelegat
         
         return NSAttributedString(string: title, attributes: attributes)
     }
+    
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         if changeValueOnRowChange {
             let item = items[itemIndex(pickerView: pickerView)]
