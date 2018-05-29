@@ -122,6 +122,14 @@ class ScreenshotsViewController: BaseViewController {
 }
 
 extension ScreenshotsViewController{
+    
+    func sectionFor(index:Int) -> ScreenshotsSection? {
+        return ScreenshotsSection.init(rawValue: index)
+    }
+    func indexFor(section:ScreenshotsSection) -> Int {
+        return section.rawValue
+    }
+    
     public func screenshot(at index:Int) -> Screenshot?{
         return self.screenshotFrcManager?.object(at: IndexPath.init(item: index, section: 0))
     }
@@ -132,7 +140,7 @@ extension ScreenshotsViewController{
     func scrollToTop(){
         if let collectionView = self.collectionView {
             if self.isViewLoaded {
-                if collectionView.numberOfItems(inSection: ScreenshotsSection.image.rawValue) > 0 {
+                if collectionView.numberOfItems(inSection: self.indexFor(section: .image) ) > 0 {
                     collectionView.contentOffset = CGPoint.init(x: collectionView.contentInset.left, y: -collectionView.contentInset.top)
                 }
             }
@@ -147,8 +155,10 @@ extension ScreenshotsViewController: VideoDisplayingViewControllerDelegate {
     
     @objc func contentSizeCategoryDidChange(_ notification:Notification) {
         if self.isViewLoaded && self.view.window != nil {
-            if self.collectionView.numberOfItems(inSection: ScreenshotsSection.notification.rawValue) > 0 {
-                self.collectionView.reloadItems(at: [IndexPath.init(item: 0, section: ScreenshotsSection.notification.rawValue)])
+            let notificationSection = self.indexFor(section: .notification )
+            if self.collectionView.numberOfItems(inSection: notificationSection ) > 0 {
+                self.collectionView.reloadItems(at: [IndexPath(item: 0, section: notificationSection )])
+                
             }
         }
     }
@@ -320,15 +330,18 @@ extension ScreenshotsViewController : ProductsBarControllerDelegate {
     }
     
     func syncProductShowOrHide(){
+        let productSection = self.indexFor(section: .product)
         if self.hasProductBar {
-            if self.collectionView.numberOfItems(inSection: ScreenshotsSection.product.rawValue) == 0{
-                self.collectionView.insertItems(at: [IndexPath.init(row: 0, section: ScreenshotsSection.product.rawValue)])
+            if self.collectionView.numberOfItems(inSection: productSection) == 0{
+                self.collectionView.insertItems(at: [IndexPath.init(row: 0, section: productSection)])
             }
         }else{
-            if self.collectionView.numberOfItems(inSection: ScreenshotsSection.product.rawValue) == 1{
-                self.collectionView.deleteItems(at: [IndexPath.init(row: 0, section: ScreenshotsSection.product.rawValue)])
+            if self.collectionView.numberOfItems(inSection: productSection) == 1{
+                self.collectionView.deleteItems(at: [IndexPath.init(row: 0, section: productSection)])
+                
             }
         }
+       
     }
     
     func productBarContentChanged(_ controller:ProductsBarController) {
@@ -365,7 +378,7 @@ extension ScreenshotsViewController {
     func insertScreenshotHelperView() {
         
         let hasPresented = UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingPresentedScreenshotHelper)
-        if !hasPresented && self.collectionView.numberOfItems(inSection: ScreenshotsSection.image.rawValue) == 1 && !self.hasNewScreenshotSection {
+        if !hasPresented && self.collectionView.numberOfItems(inSection: self.indexFor(section: .image )) == 1 && !self.hasNewScreenshotSection {
             UserDefaults.standard.set(true, forKey: UserDefaultsKeys.onboardingPresentedScreenshotHelper)
             if let layout = self.collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
                 let backgroundView = UIView()
@@ -487,7 +500,7 @@ extension ScreenshotsViewController {
             }
             
             if (self.hasNewScreenshotSection) {
-                self.collectionView.reloadSections(IndexSet.init(integer: ScreenshotsSection.notification.rawValue))
+                self.collectionView.reloadSections(IndexSet(integer: self.indexFor(section: .notification )))
             }
             
             self.deleteButton?.alpha = editing ? 1.0: 0.0
@@ -590,7 +603,7 @@ extension ScreenshotsViewController {
             }
         }
         
-        let hasScreenshots = collectionView.numberOfItems(inSection: ScreenshotsSection.image.rawValue) > 0
+        let hasScreenshots = collectionView.numberOfItems(inSection: self.indexFor(section: .image )) > 0
         
         editButtonItem.isEnabled = hasScreenshots || self.hasProductBar
     }
@@ -645,15 +658,15 @@ extension ScreenshotsViewController:ScreenshotNotificationCollectionViewCellDele
         let hadSection = self.hasNewScreenshotSection
         self.hasNewScreenshotSection = (AccumulatorModel.screenshot.newCount > 0) && !self.isEditing
         if hadSection != self.hasNewScreenshotSection {
-            let indexPath = IndexPath.init(row: 0, section: ScreenshotsSection.notification.rawValue)
+            let indexPath = IndexPath.init(row: 0, section: self.indexFor(section: .notification ))
             if self.hasNewScreenshotSection {
-                if self.collectionView.numberOfItems(inSection: ScreenshotsSection.notification.rawValue) == 0{
+                if self.collectionView.numberOfItems(inSection: self.indexFor(section: .notification )) == 0{
                     self.collectionView.insertItems(at: [indexPath])
                     self.collectionView.scrollToItem(at: indexPath, at: .top, animated: true)
                     self.removeScreenshotHelperView()
                 }
             }else{
-                if self.collectionView.numberOfItems(inSection: ScreenshotsSection.notification.rawValue) == 1{
+                if self.collectionView.numberOfItems(inSection: self.indexFor(section: .notification )) == 1{
                     self.collectionView.deleteItems(at: [indexPath])
                     self.insertScreenshotHelperView()
                 }
@@ -664,8 +677,8 @@ extension ScreenshotsViewController:ScreenshotNotificationCollectionViewCellDele
     
     @objc func accumulatorModelNumberDidChange( _ notification: Notification) {
         if self.hasNewScreenshotSection  && AccumulatorModel.screenshot.newCount > 0 {  //Already has a new screenshot section -  just do an update
-            let indexPath = IndexPath.init(row: 0, section: ScreenshotsSection.notification.rawValue)
-            if self.collectionView.numberOfItems(inSection: ScreenshotsSection.notification.rawValue) == 1{
+            let indexPath = IndexPath.init(row: 0, section: self.indexFor(section: .notification ))
+            if self.collectionView.numberOfItems(inSection: self.indexFor(section: .notification )) == 1{
                 self.collectionView.reloadItems(at: [indexPath])
             }
         }else{
@@ -711,7 +724,7 @@ extension ScreenshotsViewController:UICollectionViewDelegateFlowLayout {
 
         let defaultInset = UIEdgeInsets.init(top: minimumSpacing.y, left: minimumSpacing.x, bottom: 0, right: minimumSpacing.x)
         
-        if let sectionType = ScreenshotsSection.init(rawValue: section) {
+        if let sectionType = self.sectionFor(index: section) {
             switch sectionType {
             case .product:
                 return .zero
@@ -733,7 +746,7 @@ extension ScreenshotsViewController:UICollectionViewDelegateFlowLayout {
             self.setupScreenshot(cell: cell, collectionView: collectionView, indexPath: indexPath)
         }
         
-        if let sectionType = ScreenshotsSection.init(rawValue: indexPath.section) {
+        if let sectionType = self.sectionFor(index:  indexPath.section) {
             switch sectionType {
             case .product:
                 break
@@ -750,69 +763,72 @@ extension ScreenshotsViewController:UICollectionViewDelegateFlowLayout {
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         var size = CGSize.zero
         
-        if let sectionType = ScreenshotsSection.init(rawValue: indexPath.section) {
+        if let sectionType =  self.sectionFor(index: indexPath.section) {
             switch sectionType {
             case .product:
                 size.width = collectionView.bounds.size.width - collectionView.contentInset.left - collectionView.contentInset.right
                 size.height = 138
                 
-            case .notification, .image:
+            case .notification:
+                let minimumSpacing = self.collectionViewInteritemOffset()
+                size.width = floor(collectionView.bounds.size.width - (minimumSpacing.x * 2))
+                size.height = ScreenshotNotificationCollectionViewCell.height(withCellWidth: size.width, contentText: self.notificationContentText(), contentType: .labelWithButtons)
+                
+            case .image :
                 let minimumSpacing = self.collectionViewInteritemOffset()
                 
-                if (indexPath.section == ScreenshotsSection.notification.rawValue) {
-                    size.width = floor(collectionView.bounds.size.width - (minimumSpacing.x * 2))
-                    size.height = ScreenshotNotificationCollectionViewCell.height(withCellWidth: size.width, contentText: self.notificationContentText(), contentType: .labelWithButtons)
-                } else if (indexPath.section == ScreenshotsSection.image.rawValue) {
-                    let columns = CGFloat(self.numberOfCollectionViewImageColumns())
-                    
-                    size.width = floor((collectionView.bounds.size.width - (minimumSpacing.x * (columns + 1))) / columns)
-                    size.height = ceil(size.width * Screenshot.ratio.height)
-                }
+                let columns = CGFloat(self.numberOfCollectionViewImageColumns())
+                size.width = floor((collectionView.bounds.size.width - (minimumSpacing.x * (columns + 1))) / columns)
+                size.height = ceil(size.width * Screenshot.ratio.height)
             }
         }
         return size
     }
     
     public func collectionView(_ collectionView: UICollectionView, shouldHighlightItemAt indexPath: IndexPath) -> Bool {
-        if (indexPath.section == ScreenshotsSection.notification.rawValue && self.isEditing) {
-            return false
+        if let sectionType = self.sectionFor(index: indexPath.section){
+            if sectionType == .notification &&   self.isEditing {
+                return false
+            }
         }
-        else {
-            return true
-        }
+        return true
+       
     }
     public func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
-        
-        if (indexPath.section == ScreenshotsSection.image.rawValue && self.isEditing) {
-            if let screenshot = self.screenshot(at: indexPath.item) {
-                if let index = self.deleteScreenshotObjectIDs.index(of: screenshot.objectID) {
-                    self.deleteScreenshotObjectIDs.remove(at: index)
-                    self.updateDeleteButtonCount()
+        if let sectionType =  self.sectionFor(index: indexPath.section){
+            if (sectionType == .image && self.isEditing) {
+                if let screenshot = self.screenshot(at: indexPath.item) {
+                    if let index = self.deleteScreenshotObjectIDs.index(of: screenshot.objectID) {
+                        self.deleteScreenshotObjectIDs.remove(at: index)
+                        self.updateDeleteButtonCount()
+                    }
                 }
             }
         }
+       
         
     }
     
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if indexPath.section == ScreenshotsSection.image.rawValue {
-            if let screenshot = self.screenshot(at: indexPath.item) {
-                if (self.isEditing) {
-                    if !self.deleteScreenshotObjectIDs.contains(screenshot.objectID) {
-                        self.deleteScreenshotObjectIDs.append(screenshot.objectID)
-                        self.updateDeleteButtonCount()
-                    }
-                } else {
-                    if (self.deleteScreenshotObjectIDs.count > 0 && self.deleteScreenshotObjectIDs.contains(screenshot.objectID)) {
-                        return
-                    }
-                    collectionView.deselectItem(at: indexPath, animated: false)
-                    self.delegate?.screenshotsViewController(self, didSelectItemAt: indexPath)
-                    
-                    Analytics.trackOpenedScreenshot(screenshot: screenshot, source: .list)
-                    
+        if let sectionType =  self.sectionFor(index: indexPath.section),
+            sectionType == .image,
+            let screenshot = self.screenshot(at: indexPath.item) {
+            if (self.isEditing) {
+                if !self.deleteScreenshotObjectIDs.contains(screenshot.objectID) {
+                    self.deleteScreenshotObjectIDs.append(screenshot.objectID)
+                    self.updateDeleteButtonCount()
                 }
+            } else {
+                if (self.deleteScreenshotObjectIDs.count > 0 && self.deleteScreenshotObjectIDs.contains(screenshot.objectID)) {
+                    return
+                }
+                collectionView.deselectItem(at: indexPath, animated: false)
+                self.delegate?.screenshotsViewController(self, didSelectItemAt: indexPath)
+                
+                Analytics.trackOpenedScreenshot(screenshot: screenshot, source: .list)
+                
             }
+            
         }
     }
  }
@@ -866,7 +882,7 @@ extension ScreenshotsViewController: UICollectionViewDataSource {
     }
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        if let sectionType = ScreenshotsSection.init(rawValue: indexPath.section) {
+        if let sectionType =  self.sectionFor(index: indexPath.section) {
             switch sectionType {
             case .product:
                 if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "product", for: indexPath) as? ScreenshotProductBarCollectionViewCell {
@@ -895,7 +911,7 @@ extension ScreenshotsViewController: UICollectionViewDataSource {
     }
     
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if let sectionType = ScreenshotsSection.init(rawValue: section) {
+        if let sectionType =  self.sectionFor(index: section) {
             switch sectionType {
             case .product:
                 if self.hasProductBar {
@@ -928,7 +944,8 @@ extension ScreenshotsViewController: UIViewControllerPreviewingDelegate {
     
     func previewingContext(_ previewingContext: UIViewControllerPreviewing, viewControllerForLocation location: CGPoint) -> UIViewController? {
         if let indexPath = collectionView.indexPathForItem(at: location),
-            indexPath.section == ScreenshotsSection.image.rawValue,
+            let sectionType =  self.sectionFor(index: indexPath.section),
+            sectionType == .image,
             let screenshot = screenshot(at: indexPath.item),
             let cell = collectionView.cellForItem(at: indexPath)
         {
