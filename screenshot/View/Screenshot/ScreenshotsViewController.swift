@@ -13,18 +13,20 @@ import FBSDKCoreKit
 import Photos
 import PromiseKit
 
-enum ScreenshotsSection : Int {
-    case product
-    case notification
-    case image
-}
-
 protocol ScreenshotsViewControllerDelegate : NSObjectProtocol{
     func screenshotsViewController(_  viewController:ScreenshotsViewController, didSelectItemAt:IndexPath)
     func screenshotsViewControllerWantsToPresentPicker(_  viewController:ScreenshotsViewController, openScreenshots:Bool)
 }
 
 class ScreenshotsViewController: BaseViewController {
+    
+    
+    enum Section : Int {
+        case product
+        case notification
+        case image
+    }
+
     weak var delegate:ScreenshotsViewControllerDelegate?
     
     var screenshotFrcManager:FetchedResultsControllerManager<Screenshot>?
@@ -123,10 +125,10 @@ class ScreenshotsViewController: BaseViewController {
 
 extension ScreenshotsViewController{
     
-    func sectionFor(index:Int) -> ScreenshotsSection? {
-        return ScreenshotsSection.init(rawValue: index)
+    func sectionFor(index:Int) -> Section? {
+        return Section.init(rawValue: index)
     }
-    func indexFor(section:ScreenshotsSection) -> Int {
+    func indexFor(section:Section) -> Int {
         return section.rawValue
     }
     
