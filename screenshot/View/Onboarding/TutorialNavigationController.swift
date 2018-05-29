@@ -62,8 +62,9 @@ extension TutorialNavigationController: OnboardingWelcomeViewControllerDelegate 
         Analytics.trackOnboardingWelcome()
         
         // !!!: DEBUG
-        let vc = OnboardingDetailsViewController()
-        pushViewController(vc, animated: true)
+        let onboardingDetailsViewController = OnboardingDetailsViewController()
+        onboardingDetailsViewController.delegate = self
+        pushViewController(onboardingDetailsViewController, animated: true)
         
         
 //        let authorizeViewController = AuthorizeViewController()
@@ -79,9 +80,7 @@ extension TutorialNavigationController: OnboardingWelcomeViewControllerDelegate 
 
 extension TutorialNavigationController: AuthorizeViewControllerDelegate {
     func authorizeViewControllerDidSkip(_ viewController: AuthorizeViewController) {
-        let tryItOut = TutorialTrySlideViewController()
-        tryItOut.delegate = self
-        pushViewController(tryItOut, animated: true)
+        presentTutorialTrySlide()
     }
     
     func authorizeViewControllerDidLogin(_ viewController: AuthorizeViewController) {
@@ -101,11 +100,41 @@ extension TutorialNavigationController: AuthorizeViewControllerDelegate {
     }
 }
 
+extension TutorialNavigationController: OnboardingDetailsViewControllerDelegate {
+    func onboardingDetailsViewControllerDidSkip(_ viewController: OnboardingDetailsViewController) {
+        presentTutorialTrySlide()
+    }
+    
+    func onboardingDetailsViewControllerDidContinue(_ viewController: OnboardingDetailsViewController) {
+        let name = viewController.name
+        let gender = viewController.gender
+        let size = viewController.size
+        
+        func saveData() {
+            // TODO: save info
+        }
+        
+        if name != nil && gender != nil && size != nil {
+            saveData()
+            presentTutorialTrySlide()
+        }
+        else {
+            let alertController = UIAlertController(title: "onboarding.details.save_alert.title".localized, message: "onboarding.details.save_alert.message".localized, preferredStyle: .alert)
+            let continueAction = UIAlertAction(title: "generic.continue".localized, style: .default, handler: { alertAction in
+                saveData()
+                self.presentTutorialTrySlide()
+            })
+            alertController.addAction(continueAction)
+            alertController.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
+            alertController.preferredAction = continueAction
+            present(alertController, animated: true)
+        }
+    }
+}
+
 extension TutorialNavigationController: TutorialEmailSlideViewControllerDelegate {
     func tutorialEmailSlideViewDidComplete(_ slideView: TutorialEmailSlideViewController){
-        let tryItOut = TutorialTrySlideViewController()
-        tryItOut.delegate = self
-        self.pushViewController(tryItOut, animated: true)
+        presentTutorialTrySlide()
     }
     
     func tutorialEmailSlideViewDidTapTermsOfService(_ slideView: TutorialEmailSlideViewController){
@@ -121,10 +150,15 @@ extension TutorialNavigationController: TutorialEmailSlideViewControllerDelegate
             present(viewController, animated: true, completion: nil)
         }
     }
-
 }
 
-extension TutorialNavigationController : TutorialTrySlideViewControllerDelegate {
+extension TutorialNavigationController: TutorialTrySlideViewControllerDelegate {
+    private func presentTutorialTrySlide() {
+        let tryItOut = TutorialTrySlideViewController()
+        tryItOut.delegate = self
+        pushViewController(tryItOut, animated: true)
+    }
+    
     func tutorialTrySlideViewDidSkip(_ slideView: TutorialTrySlideViewController){
         Analytics.trackOnboardingTryItOutSkipped()
         tutorialTrySlideViewDidComplete(slideView)

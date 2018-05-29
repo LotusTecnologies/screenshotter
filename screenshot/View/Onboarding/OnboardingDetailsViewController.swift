@@ -46,7 +46,7 @@ class OnboardingDetailsView: UIView {
     }
     
     let scrollView = UIScrollView()
-    let userButton = RoundButton()
+    let avatarButton = RoundButton()
     let nameTextField = UnderlineTextField()
     private let preferenceLabel = UILabel()
     let genderControl = SegmentedDropDownControl()
@@ -95,32 +95,32 @@ class OnboardingDetailsView: UIView {
         
         let defaultUserImage = UIImage(named: "DefaultUser")
         
-        userButton.translatesAutoresizingMaskIntoConstraints = false
-        userButton.setBackgroundImage(defaultUserImage, for: .selected)
-        userButton.setBackgroundImage(defaultUserImage, for: [.selected, .highlighted])
-        userButton.setImage(UIImage(named: "UserCamera"), for: .selected)
-        userButton.isSelected = true
-        userButton.layer.borderColor = UIColor.gray6.cgColor
-        userButton.layer.borderWidth = 2
-        scrollView.addSubview(userButton)
-        userButton.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: .extendedPadding).isActive = true
-        userButton.widthAnchor.constraint(equalToConstant: 90).isActive = true
-        userButton.heightAnchor.constraint(equalTo: userButton.widthAnchor).isActive = true
-        userButton.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
-        userButton.centerYAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
+        avatarButton.translatesAutoresizingMaskIntoConstraints = false
+        avatarButton.setBackgroundImage(defaultUserImage, for: .selected)
+        avatarButton.setBackgroundImage(defaultUserImage, for: [.selected, .highlighted])
+        avatarButton.setImage(UIImage(named: "UserCamera"), for: .selected)
+        avatarButton.isSelected = true
+        avatarButton.layer.borderColor = UIColor.gray6.cgColor
+        avatarButton.layer.borderWidth = 2
+        scrollView.addSubview(avatarButton)
+        avatarButton.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: .extendedPadding).isActive = true
+        avatarButton.widthAnchor.constraint(equalToConstant: 90).isActive = true
+        avatarButton.heightAnchor.constraint(equalTo: avatarButton.widthAnchor).isActive = true
+        avatarButton.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
+        avatarButton.centerYAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
         
         nameTextField.translatesAutoresizingMaskIntoConstraints = false
-        nameTextField.placeholder = "Your Name" // TODO: localize
+        nameTextField.placeholder = "onboarding.details.name".localized
         nameTextField.autocorrectionType = .no
         nameTextField.autocapitalizationType = .words
         nameTextField.spellCheckingType = .no
         contentView.addSubview(nameTextField)
-        nameTextField.topAnchor.constraint(equalTo: userButton.bottomAnchor, constant: UIDevice.is320w ? 0 : .padding).isActive = true
+        nameTextField.topAnchor.constraint(equalTo: avatarButton.bottomAnchor, constant: UIDevice.is320w ? 0 : .padding).isActive = true
         nameTextField.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
         nameTextField.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
         
         preferenceLabel.translatesAutoresizingMaskIntoConstraints = false
-        preferenceLabel.text = "PREFERENCES"
+        preferenceLabel.text = "onboarding.details.preferences".localized
         preferenceLabel.font = .screenshopFont(.quicksandBold, size: 16)
         preferenceLabel.textColor = .gray1
         preferenceLabel.textAlignment = .center
@@ -137,28 +137,21 @@ class OnboardingDetailsView: UIView {
             Gender.female.localized,
             Gender.male.localized
             ])
-        genderItem.placeholderTitle = "Gender"
-        
-        let genderItem2 = SegmentedDropDownItem(pickerItems: [
-            Gender.female.localized,
-            Gender.male.localized
-            ])
-        genderItem2.placeholderTitle = "Gender 2"
+        genderItem.placeholderTitle = "onboarding.details.gender".localized
         
         genderControl.translatesAutoresizingMaskIntoConstraints = false
-        genderControl.items = [genderItem, genderItem2]
+        genderControl.items = [genderItem]
         contentView.addSubview(genderControl)
         genderControl.topAnchor.constraint(equalTo: preferenceLabel.bottomAnchor, constant: .padding).isActive = true
         genderControl.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
         genderControl.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
-        genderControl.heightAnchor.constraint(equalToConstant: 50).isActive = true
         
         let sizeItem = SegmentedDropDownItem(pickerItems: [
             Size.child.localized,
             Size.adult.localized,
             Size.plus.localized
             ])
-        sizeItem.placeholderTitle = "Size"
+        sizeItem.placeholderTitle = "onboarding.details.size".localized
         
         sizeControl.translatesAutoresizingMaskIntoConstraints = false
         sizeControl.items = [sizeItem]
@@ -238,7 +231,7 @@ class OnboardingDetailsViewController: UIViewController {
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
-        title = "Your Details"
+        title = "onboarding.details.title".localized
         
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShowNotification(_:)), name: .UIKeyboardWillShow, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHideNotification(_:)), name: .UIKeyboardWillHide, object: nil)
@@ -263,7 +256,7 @@ class OnboardingDetailsViewController: UIViewController {
         navigationBar.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         navigationBar.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
         
-        _view.userButton.addTarget(self, action: #selector(userAction), for: .touchUpInside)
+        _view.avatarButton.addTarget(self, action: #selector(avatarAction), for: .touchUpInside)
         
         _view.nameTextField.delegate = self
         
@@ -299,8 +292,16 @@ class OnboardingDetailsViewController: UIViewController {
     
     // MARK: Actions
     
-    @objc private func userAction() {
-        
+    @objc private func avatarAction() {
+        let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        alertController.addAction(UIAlertAction(title: "onboarding.details.avatar.camera".localized, style: .default, handler: { alertAction in
+            self.presentImagePickerController(.camera)
+        }))
+        alertController.addAction(UIAlertAction(title: "onboarding.details.avatar.gallery".localized, style: .default, handler: { alertAction in
+            self.presentImagePickerController(.photoLibrary)
+        }))
+        alertController.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
+        present(alertController, animated: true)
     }
     
     @objc private func continueAction() {
@@ -344,6 +345,27 @@ class OnboardingDetailsViewController: UIViewController {
     
     @objc fileprivate func dismissKeyboard() {
         view.endEditing(true)
+    }
+}
+
+extension OnboardingDetailsViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    private func presentImagePickerController(_ sourceType: UIImagePickerControllerSourceType) {
+        let imagePicker = UIImagePickerController()
+        imagePicker.delegate = self
+        imagePicker.sourceType = sourceType
+        present(imagePicker, animated: true)
+    }
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+        if let pickedImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
+            // TODO: save image
+        }
+        
+        picker.presentingViewController?.dismiss(animated: true)
+    }
+    
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        picker.presentingViewController?.dismiss(animated: true)
     }
 }
 

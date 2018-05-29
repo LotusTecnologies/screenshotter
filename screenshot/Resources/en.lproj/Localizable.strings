@@ -221,6 +221,16 @@
 "notification.screenshot.shoppable" = "Your screenshot is shoppable in the screenshot tab";
 "notification.title" = "Ready to shop?";
 
+"onboarding.details.avatar.camera" = "Take a Photo";
+"onboarding.details.avatar.gallery" = "Upload From Gallery";
+"onboarding.details.save_alert.message" = "You haven’t filled out all your information. Do you want to continue anyway?";
+"onboarding.details.save_alert.title" = "Missing Info";
+"onboarding.details.gender" = "Gender";
+"onboarding.details.name" = "Your Name";
+"onboarding.details.preferences" = "PREFERENCES";
+"onboarding.details.size" = "Size";
+"onboarding.details.title" = "Your Details";
+
 "onboarding.welcome.content" = "Take a screenshot.\nShop it.";
 "onboarding.welcome.continue" = "Get Started";
 "onboarding.welcome.header" = "Welcome to";
