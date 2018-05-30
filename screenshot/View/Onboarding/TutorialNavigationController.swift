@@ -61,15 +61,9 @@ extension TutorialNavigationController: OnboardingWelcomeViewControllerDelegate 
     func onboardingWelcomeViewControllerDidComplete(_ viewController: OnboardingWelcomeViewController) {
         Analytics.trackOnboardingWelcome()
         
-        // !!!: DEBUG
-        let onboardingDetailsViewController = OnboardingDetailsViewController()
-        onboardingDetailsViewController.delegate = self
-        pushViewController(onboardingDetailsViewController, animated: true)
-        
-        
-//        let authorizeViewController = AuthorizeViewController()
-//        authorizeViewController.delegate = self
-//        pushViewController(authorizeViewController, animated: true)
+        let authorizeViewController = AuthorizeViewController()
+        authorizeViewController.delegate = self
+        pushViewController(authorizeViewController, animated: true)
         
         // !!!: DEBUG
 //        let signup = TutorialEmailSlideViewController()
@@ -80,7 +74,11 @@ extension TutorialNavigationController: OnboardingWelcomeViewControllerDelegate 
 
 extension TutorialNavigationController: AuthorizeViewControllerDelegate {
     func authorizeViewControllerDidSkip(_ viewController: AuthorizeViewController) {
-        presentTutorialTrySlide()
+//        pushTutorialTrySlide()
+        
+        // !!!: DEBUG
+        let vc = RegisterConfirmationViewController()
+        present(vc, animated: true)
     }
     
     func authorizeViewControllerDidLogin(_ viewController: AuthorizeViewController) {
@@ -88,6 +86,9 @@ extension TutorialNavigationController: AuthorizeViewControllerDelegate {
     }
     
     func authorizeViewControllerDidSignup(_ viewController: AuthorizeViewController) {
+        let onboardingDetailsViewController = OnboardingDetailsViewController()
+        onboardingDetailsViewController.delegate = self
+        pushViewController(onboardingDetailsViewController, animated: true)
         
     }
     
@@ -102,7 +103,7 @@ extension TutorialNavigationController: AuthorizeViewControllerDelegate {
 
 extension TutorialNavigationController: OnboardingDetailsViewControllerDelegate {
     func onboardingDetailsViewControllerDidSkip(_ viewController: OnboardingDetailsViewController) {
-        presentTutorialTrySlide()
+        pushTutorialTrySlide()
     }
     
     func onboardingDetailsViewControllerDidContinue(_ viewController: OnboardingDetailsViewController) {
@@ -116,13 +117,13 @@ extension TutorialNavigationController: OnboardingDetailsViewControllerDelegate 
         
         if name != nil && gender != nil && size != nil {
             saveData()
-            presentTutorialTrySlide()
+            pushTutorialTrySlide()
         }
         else {
             let alertController = UIAlertController(title: "onboarding.details.save_alert.title".localized, message: "onboarding.details.save_alert.message".localized, preferredStyle: .alert)
             let continueAction = UIAlertAction(title: "generic.continue".localized, style: .default, handler: { alertAction in
                 saveData()
-                self.presentTutorialTrySlide()
+                self.pushTutorialTrySlide()
             })
             alertController.addAction(continueAction)
             alertController.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
@@ -134,7 +135,7 @@ extension TutorialNavigationController: OnboardingDetailsViewControllerDelegate 
 
 extension TutorialNavigationController: TutorialEmailSlideViewControllerDelegate {
     func tutorialEmailSlideViewDidComplete(_ slideView: TutorialEmailSlideViewController){
-        presentTutorialTrySlide()
+        pushTutorialTrySlide()
     }
     
     func tutorialEmailSlideViewDidTapTermsOfService(_ slideView: TutorialEmailSlideViewController){
@@ -153,7 +154,7 @@ extension TutorialNavigationController: TutorialEmailSlideViewControllerDelegate
 }
 
 extension TutorialNavigationController: TutorialTrySlideViewControllerDelegate {
-    private func presentTutorialTrySlide() {
+    private func pushTutorialTrySlide() {
         let tryItOut = TutorialTrySlideViewController()
         tryItOut.delegate = self
         pushViewController(tryItOut, animated: true)

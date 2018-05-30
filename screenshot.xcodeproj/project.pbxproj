@@ -7,9 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3125446B2091C3A0009410D5 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
-		3125446C2091C3A0009410D5 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
-		3125446D2091C3A0009410D5 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
+		3125446B2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
+		3125446C2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
+		3125446D2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		3125448F209871B4009410D5 /* Analytics+api.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3125448E209871B4009410D5 /* Analytics+api.swift */; };
 		314C488A205E86E700B8381D /* PHAsset+craze.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314C4889205E86E700B8381D /* PHAsset+craze.swift */; };
 		315186412033FC81001BD8D6 /* ShoppablesToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3151863F2033FC81001BD8D6 /* ShoppablesToolbar.swift */; };
@@ -93,6 +93,7 @@
 		C53154DC20BBD22B0050EB76 /* Quicksand-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = C53154DB20BBD1B50050EB76 /* Quicksand-Bold.otf */; };
 		C53154DD20BBD22D0050EB76 /* Quicksand-Light.otf in Resources */ = {isa = PBXBuildFile; fileRef = C53154DA20BBD1B50050EB76 /* Quicksand-Light.otf */; };
 		C53154DE20BBD22F0050EB76 /* Quicksand-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = C53154D920BBD1B40050EB76 /* Quicksand-Regular.otf */; };
+		C53154E020BD89C80050EB76 /* RegisterConfirmationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53154DF20BD89C80050EB76 /* RegisterConfirmationViewController.swift */; };
 		C5336D1B203AC9CE00A7B4B0 /* CartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5336D1A203AC9CE00A7B4B0 /* CartViewController.swift */; };
 		C5336D1D203ACE7B00A7B4B0 /* CartNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5336D1C203ACE7B00A7B4B0 /* CartNavigationController.swift */; };
 		C5336D21203C511300A7B4B0 /* ActivityBadgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5336D20203C511200A7B4B0 /* ActivityBadgeView.swift */; };
@@ -354,6 +355,7 @@
 		C53154D920BBD1B40050EB76 /* Quicksand-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Regular.otf"; sourceTree = "<group>"; };
 		C53154DA20BBD1B50050EB76 /* Quicksand-Light.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Light.otf"; sourceTree = "<group>"; };
 		C53154DB20BBD1B50050EB76 /* Quicksand-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Bold.otf"; sourceTree = "<group>"; };
+		C53154DF20BD89C80050EB76 /* RegisterConfirmationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterConfirmationViewController.swift; sourceTree = "<group>"; };
 		C5336D1A203AC9CE00A7B4B0 /* CartViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartViewController.swift; sourceTree = "<group>"; };
 		C5336D1C203ACE7B00A7B4B0 /* CartNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartNavigationController.swift; sourceTree = "<group>"; };
 		C5336D20203C511200A7B4B0 /* ActivityBadgeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActivityBadgeView.swift; sourceTree = "<group>"; };
@@ -1027,6 +1029,7 @@
 				C53154CF20B6A8A60050EB76 /* LoginViewController.swift */,
 				C53154D520B6E3A90050EB76 /* OnboardingDetailsViewController.swift */,
 				C572C0D720AADA98004B0A17 /* OnboardingWelcomeViewController.swift */,
+				C53154DF20BD89C80050EB76 /* RegisterConfirmationViewController.swift */,
 				C5F8D80F20B2C001004A32FD /* RegisterViewController.swift */,
 				C58FA0EA20A95FC300072966 /* TutorialEmailSlideViewController.swift */,
 				C58FA0E820A95FC300072966 /* TutorialNavigationController.swift */,
@@ -1470,7 +1473,7 @@
 				525691881FD5DD51008D728D /* UsageStreak.swift in Sources */,
 				C54124C220A8308600CA03DB /* AccumulatorModel.swift in Sources */,
 				C53B46581FBC3DFA00A8C886 /* NotificationCenterKeys.swift in Sources */,
-				3125446C2091C3A0009410D5 /* BuildFile in Sources */,
+				3125446C2091C3A0009410D5 /* (null) in Sources */,
 				52E547441FE2487B00627D6D /* ScreenshotHelper.swift in Sources */,
 				C50E2617207F6703003C8D24 /* TextFieldFormatter.swift in Sources */,
 				C501412A2061080700ABFB5C /* FavoriteProductsView.swift in Sources */,
@@ -1503,6 +1506,7 @@
 				E4978C3C1F53610F0008B87F /* Constants.swift in Sources */,
 				C5D2E306204D29D100B5BD92 /* CartTableViewCell.swift in Sources */,
 				C5F37CA320555C8C0072FE1D /* ModalAnimatedTransitioning.swift in Sources */,
+				C53154E020BD89C80050EB76 /* RegisterConfirmationViewController.swift in Sources */,
 				C5A6F1D81FF3C973001DCDD0 /* Screenshot.swift in Sources */,
 				31C0C82020A2CD14002EE95B /* ProductsCollectionView.swift in Sources */,
 				C50E25E6207DDD82003C8D24 /* CheckoutCreditCardTableViewCell.swift in Sources */,
@@ -1581,7 +1585,7 @@
 				319B030F2057AFCC00446054 /* ShareToDiscoverPrompt.swift in Sources */,
 				C540883A1FE90C8E00198955 /* ScreenshotsHelperView.swift in Sources */,
 				C5C43A54209599D8000AF22A /* ActionFeedbackGenerator.swift in Sources */,
-				3125446D2091C3A0009410D5 /* BuildFile in Sources */,
+				3125446D2091C3A0009410D5 /* (null) in Sources */,
 				C5336D25203D9AC800A7B4B0 /* GameViewController.swift in Sources */,
 				C52800622052B78B004DD7A3 /* CheckoutConfirmationViewController.swift in Sources */,
 				C5336D21203C511300A7B4B0 /* ActivityBadgeView.swift in Sources */,
@@ -1618,7 +1622,7 @@
 				C58FA0F820A95FC300072966 /* GiftCardDoneViewController.swift in Sources */,
 				C53154D020B6A8A60050EB76 /* LoginViewController.swift in Sources */,
 				31C0C81E20A2CD14002EE95B /* ProductsRateView.swift in Sources */,
-				3125446B2091C3A0009410D5 /* BuildFile in Sources */,
+				3125446B2091C3A0009410D5 /* (null) in Sources */,
 				C5336D1B203AC9CE00A7B4B0 /* CartViewController.swift in Sources */,
 				C5FF4140200BA23900342DEC /* DiscoverScreenshotHelperView.swift in Sources */,
 				C5F8D81720B2EDD8004A32FD /* UnderlineTextField.swift in Sources */,
