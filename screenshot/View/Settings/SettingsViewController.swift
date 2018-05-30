@@ -42,7 +42,6 @@ class SettingsViewController : BaseViewController {
         case followFacebook
         case followInstagram
         case partners
-        case restoreInAppPurchase
         case openIn
         case region
         case payment
@@ -224,7 +223,6 @@ class SettingsViewController : BaseViewController {
             .tutorialVideo,
             .contactUs,
             .bug,
-            .restoreInAppPurchase,
             .usageStreak,
             .coins,
             .region,
@@ -381,13 +379,7 @@ extension SettingsViewController : UITableViewDataSource {
         cell.imageView?.image = cellImage(for: row)
         cell.textLabel?.text = cellText(for: row)
         cell.textLabel?.font = .screenshopFont(.hindLight, textStyle: .body)
-        
-        if (row == .restoreInAppPurchase && self.isRestoring) {
-            cell.textLabel?.textColor = .gray
-        }
-        else {
-            cell.textLabel?.textColor = .black
-        }
+        cell.textLabel?.textColor = .black
         
         cell.detailTextLabel?.font = .screenshopFont(.hindSemibold, textStyle: .body)
         cell.detailTextLabel?.text = nil
@@ -411,7 +403,12 @@ extension SettingsViewController : UITableViewDelegate {
         }
         
         switch (row) {
-        case .version, .name, .email, .productGender, .productSize, .usageStreak:
+        case .name, .email :
+            if let cell = tableView.cellForRow(at: indexPath) {
+                cell.becomeFirstResponder()
+            }
+            return false
+        case .version, .productGender, .productSize, .usageStreak:
             return false
             
         case .pushPermission, .photoPermission:
@@ -433,6 +430,8 @@ extension SettingsViewController : UITableViewDelegate {
         }
         
         switch (row) {
+        case .email, .name:
+            break;
         case .bug:
             presentMailComposerForBug()
             
@@ -498,37 +497,6 @@ extension SettingsViewController : UITableViewDelegate {
             let viewController = PartnersViewController()
             viewController.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(viewController, animated: true)
-            
-        case .restoreInAppPurchase:
-            if self.isRestoring == false {
-                self.isRestoring = true
-                tableView.reloadRows(at: [indexPath], with: .none)
-                
-                InAppPurchaseManager.sharedInstance.restoreInAppPurchases().then(on: .main, execute: { (array) -> Promise<Bool>  in
-                    self.isRestoring = false
-                    tableView.reloadRows(at: [indexPath], with: .none)
-                    var message = "settings.in_app_purchase.restore".localized
-                    
-                    if array.isEmpty {
-                        message = "settings.in_app_purchase.restore.none".localized
-                    }
-                    
-                    let alert = UIAlertController.init(title: nil, message: message, preferredStyle: .alert)
-                    alert.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .default, handler: nil))
-                    
-                    if (self.isViewLoaded && self.view.window != nil) {
-                        self.present(alert, animated: true, completion: nil)
-                    }
-                    return Promise(value: true)
-                    
-                }).catch(on: .main, execute: { (error) in
-                    self.isRestoring = false
-                    tableView.reloadRows(at: [indexPath], with: .none)
-                })
-            }
-            
-       
- 
         case .region:
             let alert = UIAlertController.init(title: nil, message: nil, preferredStyle: .actionSheet)
             
@@ -559,8 +527,14 @@ extension SettingsViewController : UITableViewDelegate {
             viewController.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(viewController, animated: true)
             
-        default:
-            break
+        case .usageStreak:
+            break;
+        case .version:
+            break;
+        case .productGender:
+            break;
+        case .productSize:
+            break;
         }
         
         tableView.deselectRow(at: indexPath, animated: true)
@@ -630,8 +604,6 @@ fileprivate extension SettingsViewController {
             return "settings.row.facebook.title".localized
         case .partners:
             return "settings.row.partners.title".localized
-        case .restoreInAppPurchase:
-            return "settings.row.restore_in_app_purchase.title".localized
         case .region:
             return "settings.row.region.title".localized
         case .payment:
@@ -777,16 +749,6 @@ fileprivate extension SettingsViewController {
             productsOptionsControls.sync()
             return control
             
-        case .restoreInAppPurchase:
-            if isRestoring {
-                let activityView = UIActivityIndicatorView(activityIndicatorStyle: .gray)
-                activityView.startAnimating()
-                return activityView
-            }
-            else {
-                return nil
-            }
-            
         default:
             return nil
         }
@@ -821,7 +783,6 @@ fileprivate extension SettingsViewController {
         var indexPaths = sectionIndexPaths(.permission)
         append(section: .about, row: .usageStreak, to: &indexPaths)
         append(section: .about, row: .coins, to: &indexPaths)
-        append(section: .about, row: .restoreInAppPurchase, to: &indexPaths)
 
         tableView.reloadRows(at: indexPaths, with: .none)
     }
