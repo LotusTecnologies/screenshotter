@@ -135,7 +135,11 @@ class Analytics {
     }
     static func propertiesFor(_ product:Product) -> [String:Any] {
         var properties:[String:Any] = [:]
+        if let title = product.productTitle() {
+            properties["product-title"] = title
+        }
         if let brand = product.brand {
+            
             properties["product-brand"] = brand
         }
         if let merchant = product.merchant {

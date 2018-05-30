@@ -10,6 +10,7 @@ import Foundation
 import MessageUI
 import PromiseKit
 import Whisper
+import PushwooshInboxUI
 
 @objc protocol SettingsViewControllerDelegate : NSObjectProtocol {
     func settingsViewControllerDidGrantPermission(_ viewController: SettingsViewController)
@@ -128,8 +129,30 @@ class SettingsViewController : BaseViewController {
         tapper.numberOfTapsRequired = 3
         tapper.numberOfTouchesRequired = 2
         tableView.addGestureRecognizer(tapper)
+        
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem.init(title: "inbox", style: .plain, target: self, action: #selector(inboxAction(_:)))
     }
-    
+    @objc func inboxAction(_ sender:Any){
+                    let inboxStyle = PWIInboxStyle.customStyle(withDefaultImageIcon: UIImage.init(named: "BrandIcon110"),
+                                                               textColor: UIColor.darkText,
+                                                               accentColor: UIColor.crazeGreen,
+                                                               font: UIFont.screenshopFont(.hind, size: 17))
+        
+//                    inboxStyle?.backgroundColor = UIColor.init(white: 1, alpha: 1)
+//                    inboxStyle?.listErrorMessage = NSLocalizedString("Oh no! Something went wrong on the Internet. This is the worst thing that has ever happened! ", comment: "Custom error message")
+//                    inboxStyle?.listEmptyMessage = NSLocalizedString("You have no messages.  But we still love you.", comment: "Custom empty message")
+            if let vc = PWIInboxUI.createInboxController(with: inboxStyle){
+                let nav =  UINavigationController.init(rootViewController: vc)
+                vc.navigationItem.leftBarButtonItem = UIBarButtonItem.init(barButtonSystemItem: .done, target: self, action: #selector(dismissInboxAction(_:)))
+                self.present(nav, animated: true, completion: nil)
+                
+            }
+        
+    }
+    @objc func dismissInboxAction(_ sender:Any){
+        self.dismiss(animated: true, completion: nil)
+    }
+
     @objc func didTripleTapTableView(_ tapper:UITapGestureRecognizer){
         if tapper.state == .recognized {
             if let index = self.indexPath(for: .version, in: .about), let cell = self.tableView.cellForRow(at: index) {
