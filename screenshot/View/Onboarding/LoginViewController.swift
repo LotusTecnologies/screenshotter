@@ -24,7 +24,7 @@ class LoginView: AuthorizeContentScrollView {
         
         // TODO: underline
         forgotPasswordButton.translatesAutoresizingMaskIntoConstraints = false
-        forgotPasswordButton.setTitle("Forgot Password?", for: .normal)
+        forgotPasswordButton.setTitle("onboarding.login.forgot".localized, for: .normal)
         forgotPasswordButton.setTitleColor(color, for: .normal)
         forgotPasswordButton.setTitleColor(color.darker(), for: .highlighted)
         forgotPasswordButton.contentEdgeInsets = UIEdgeInsets(top: 6, left: .padding, bottom: 6, right: .padding)
@@ -62,6 +62,6 @@ class LoginViewController: AuthorizeContentViewController {
         }
         
         _view.facebookLoginButton.textCopy = .login
-        _view.continueButton.setTitle("Log In", for: .normal)
+        _view.continueButton.setTitle("onboarding.login.continue".localized, for: .normal)
     }
 }

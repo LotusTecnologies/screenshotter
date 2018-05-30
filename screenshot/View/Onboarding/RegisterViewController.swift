@@ -153,7 +153,7 @@ class RegisterViewController: AuthorizeContentViewController {
         super.viewDidLoad()
         
         _view.facebookLoginButton.textCopy = .register
-        _view.continueButton.setTitle("onboarding.register.signup".localized, for: .normal)
+        _view.continueButton.setTitle("onboarding.register.continue".localized, for: .normal)
         _view.legalTextView.delegate = self
     }
 }

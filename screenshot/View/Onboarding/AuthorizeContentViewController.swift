@@ -47,7 +47,7 @@ class AuthorizeContentScrollView: UIScrollView {
         facebookLoginButton.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
         
         horizontalLinesView.translatesAutoresizingMaskIntoConstraints = false
-        horizontalLinesView.label.text = "or"
+        horizontalLinesView.label.text = "generic.or".localized
         horizontalLinesView.leftLine.backgroundColor = .gray6
         horizontalLinesView.rightLine.backgroundColor = .gray6
         addSubview(horizontalLinesView)
@@ -63,7 +63,7 @@ class AuthorizeContentScrollView: UIScrollView {
         contentView.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
         
         emailTextField.translatesAutoresizingMaskIntoConstraints = false
-        emailTextField.placeholder = "Email Address"
+        emailTextField.placeholder = "onboarding.authorize.email".localized
         emailTextField.returnKeyType = .next
         emailTextField.keyboardType = .emailAddress
         emailTextField.autocapitalizationType = .none
@@ -75,7 +75,7 @@ class AuthorizeContentScrollView: UIScrollView {
         emailTextField.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
         
         passwordTextField.translatesAutoresizingMaskIntoConstraints = false
-        passwordTextField.placeholder = "Password"
+        passwordTextField.placeholder = "onboarding.authorize.password".localized
         passwordTextField.isSecureTextEntry = true
         passwordTextField.autocapitalizationType = .none
         passwordTextField.autocorrectionType = .no
