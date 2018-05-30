@@ -74,11 +74,7 @@ extension TutorialNavigationController: OnboardingWelcomeViewControllerDelegate 
 
 extension TutorialNavigationController: AuthorizeViewControllerDelegate {
     func authorizeViewControllerDidSkip(_ viewController: AuthorizeViewController) {
-//        pushTutorialTrySlide()
-        
-        // !!!: DEBUG
-        let vc = RegisterConfirmationViewController()
-        present(vc, animated: true)
+        pushTutorialTrySlide()
     }
     
     func authorizeViewControllerDidLogin(_ viewController: AuthorizeViewController) {
@@ -86,10 +82,7 @@ extension TutorialNavigationController: AuthorizeViewControllerDelegate {
     }
     
     func authorizeViewControllerDidSignup(_ viewController: AuthorizeViewController) {
-        let onboardingDetailsViewController = OnboardingDetailsViewController()
-        onboardingDetailsViewController.delegate = self
-        pushViewController(onboardingDetailsViewController, animated: true)
-        
+        dismissRegisterConfirmationViewController()
     }
     
     func authorizeViewControllerDidFacebookLogin(_ viewController: AuthorizeViewController) {
@@ -97,7 +90,30 @@ extension TutorialNavigationController: AuthorizeViewControllerDelegate {
     }
     
     func authorizeViewControllerDidFacebookSignup(_ viewController: AuthorizeViewController) {
+        dismissRegisterConfirmationViewController()
+    }
+    
+    private func presentRegisterConfirmationViewController() {
+        let selector = #selector(dismissRegisterConfirmationViewController)
+        let tapGesture = UITapGestureRecognizer(target: self, action: selector)
         
+        let registerConfirmationViewController = RegisterConfirmationViewController()
+        registerConfirmationViewController.view.addGestureRecognizer(tapGesture)
+        present(registerConfirmationViewController, animated: true)
+        
+        Timer.scheduledTimer(timeInterval: 3, target: self, selector: selector, userInfo: nil, repeats: false)
+    }
+    
+    @objc private func dismissRegisterConfirmationViewController() {
+        if let viewController = presentedViewController as? RegisterConfirmationViewController,
+            !viewController.isBeingDismissed
+        {
+            dismiss(animated: true)
+            
+            let onboardingDetailsViewController = OnboardingDetailsViewController()
+            onboardingDetailsViewController.delegate = self
+            pushViewController(onboardingDetailsViewController, animated: true)
+        }
     }
 }
 

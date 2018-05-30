@@ -62,7 +62,7 @@ class RegisterConfirmationViewController: UIViewController {
         titleLable.text = "Welcome!"
         titleLable.textAlignment = .center
         titleLable.textColor = .gray2
-        titleLable.font = .screenshopFont(.quicksandBold, textStyle: .title1, staticSize: true)
+        titleLable.font = .screenshopFont(.quicksandMedium, textStyle: .title1, staticSize: true)
         titleLable.adjustsFontSizeToFitWidth = true
         titleLable.minimumScaleFactor = 0.7
         titleLable.baselineAdjustment = .alignCenters
@@ -78,7 +78,7 @@ class RegisterConfirmationViewController: UIViewController {
         messageLable.text = "You are now a\nScreenshop user."
         messageLable.textAlignment = .center
         messageLable.textColor = .gray2
-        messageLable.font = .screenshopFont(.quicksandBold, textStyle: .title3, staticSize: true)
+        messageLable.font = .screenshopFont(.quicksandMedium, textStyle: .title3, staticSize: true)
         messageLable.adjustsFontSizeToFitWidth = true
         messageLable.minimumScaleFactor = 0.7
         messageLable.baselineAdjustment = .alignCenters
