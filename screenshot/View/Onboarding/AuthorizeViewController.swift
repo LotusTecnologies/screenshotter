@@ -88,12 +88,19 @@ class AuthorizeViewController: UIViewController {
         _view.loginButton.addTarget(self, action: #selector(displayLoginTab), for: .touchUpInside)
         
         registerViewController.facebookLoginButton.addTarget(self, action: #selector(facebookLoginAction), for: .touchUpInside)
+        registerViewController.continueButton.addTarget(self, action: #selector(registerAction), for: .touchUpInside)
         registerViewController.skipButton.addTarget(self, action: #selector(skipRegistration), for: .touchUpInside)
         
         loginViewController.facebookLoginButton.addTarget(self, action: #selector(facebookLoginAction), for: .touchUpInside)
+        loginViewController.continueButton.addTarget(self, action: #selector(loginAction), for: .touchUpInside)
         loginViewController.forgotPasswordButton.addTarget(self, action: #selector(forgotPasswordAction), for: .touchUpInside)
         
-        displayRegisterTab()
+        if UserDefaults.standard.string(forKey: UserDefaultsKeys.email) != nil {
+            displayLoginTab()
+        }
+        else {
+            displayRegisterTab()
+        }
     }
     
     // MARK: Containment
@@ -134,6 +141,17 @@ class AuthorizeViewController: UIViewController {
         addContentController(registerViewController)
     }
     
+    @objc fileprivate func registerAction() {
+        let isValidRegistration = true
+        
+        if isValidRegistration {
+            delegate?.authorizeViewControllerDidSignup(self)
+        }
+        else {
+            // TODO: notify user there was an issue
+        }
+    }
+    
     @objc fileprivate func skipRegistration() {
         delegate?.authorizeViewControllerDidSkip(self)
     }
@@ -153,6 +171,17 @@ class AuthorizeViewController: UIViewController {
         }
         
         addContentController(loginViewController)
+    }
+    
+    @objc fileprivate func loginAction() {
+        let isValidLogin = true
+        
+        if isValidLogin {
+            delegate?.authorizeViewControllerDidLogin(self)
+        }
+        else {
+            // TODO: notify user there was an issue
+        }
     }
     
     @objc private func forgotPasswordAction() {

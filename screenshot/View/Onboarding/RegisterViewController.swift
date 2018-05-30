@@ -60,7 +60,7 @@ class RegisterView: AuthorizeContentScrollView {
         
         let dealsLabel = UILabel()
         dealsLabel.translatesAutoresizingMaskIntoConstraints = false
-        dealsLabel.text = "Send me emails about exclusive offers, sales and new features."
+        dealsLabel.text = "onboarding.register.offers".localized
         dealsLabel.textColor = .gray3
         dealsLabel.numberOfLines = 0
         dealsLabel.font = .screenshopFont(.hindLight, size: 16)
@@ -122,8 +122,7 @@ class RegisterView: AuthorizeContentScrollView {
             return attributes
         }
         
-        // TODO: localized copy needs to say 'Sign up' not 'Submit'
-        return NSMutableAttributedString(segmentedString: "tutorial.email.legal", attributes: [
+        return NSMutableAttributedString(segmentedString: "onboarding.register.legal", attributes: [
             attributes(),
             attributes(legalLinkTOS),
             attributes(),
@@ -142,6 +141,10 @@ class RegisterViewController: AuthorizeContentViewController {
         return view as! RegisterView
     }
     
+    var continueButton: UIButton {
+        return _view.continueButton
+    }
+    
     var skipButton: UIButton {
         return _view.skipButton
     }
@@ -150,7 +153,7 @@ class RegisterViewController: AuthorizeContentViewController {
         super.viewDidLoad()
         
         _view.facebookLoginButton.textCopy = .register
-        _view.continueButton.setTitle("Sign Up", for: .normal)
+        _view.continueButton.setTitle("onboarding.register.signup".localized, for: .normal)
         _view.legalTextView.delegate = self
     }
 }

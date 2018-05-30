@@ -46,12 +46,20 @@ class LoginViewController: AuthorizeContentViewController {
         return view as! LoginView
     }
     
+    var continueButton: UIButton {
+        return _view.continueButton
+    }
+    
     var forgotPasswordButton: UIButton {
         return _view.forgotPasswordButton
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        if let email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email) {
+            _view.emailTextField.text = email
+        }
         
         _view.facebookLoginButton.textCopy = .login
         _view.continueButton.setTitle("Log In", for: .normal)

@@ -231,6 +231,17 @@
 "onboarding.details.size" = "Size";
 "onboarding.details.title" = "Your Details";
 
+"onboarding.register.legal.0" = "By tapping \"Sign Up\" above, you agree to our ";
+"onboarding.register.legal.1" = "Terms of Service";
+"onboarding.register.legal.2" = " and ";
+"onboarding.register.legal.3" = "Privacy Policy";
+"onboarding.register.legal.4" = " ";
+"onboarding.register.offers" = "Send me emails about exclusive offers, sales and new features.";
+"onboarding.register.signup" = "Sign Up";
+
+"onboarding.register.confirmation.message" = "You are now a\nScreenshop user.";
+"onboarding.register.confirmation.title" = "Welcome!";
+
 "onboarding.welcome.content" = "Take a screenshot.\nShop it.";
 "onboarding.welcome.continue" = "Get Started";
 "onboarding.welcome.header" = "Welcome to";
@@ -382,15 +393,6 @@
 "settings.section.product" = "Product Options";
 "settings.title" = "Settings";
 
-"tutorial.email.detail" = "Fill out your info below";
-"tutorial.email.email" = "Email";
-"tutorial.email.legal.0" = "By tapping \"Submit\" above, you agree to our ";
-"tutorial.email.legal.1" = "Terms of Service";
-"tutorial.email.legal.2" = " and ";
-"tutorial.email.legal.3" = "Privacy Policy";
-"tutorial.email.legal.4" = " ";
-"tutorial.email.name" = "Name";
-"tutorial.email.title" = "Sign Up";
 "tutorial.try.detail.0" = "Press the home & power buttons";
 "tutorial.try.detail.1" = " on your phone";
 "tutorial.try.detail.2" = " to take a screenshot";
@@ -399,6 +401,7 @@
 "tutorial.try.detail.x.2" = " to take a screenshot";
 "tutorial.try.skip" = "Skip";
 "tutorial.try.title" = "Try It Out";
+
 "tutorial.video.mute.detail" = "In order to hear the sound in the video, please turn up the volume on your phone!";
 "tutorial.video.mute.title" = "Turn up the volume!";
 

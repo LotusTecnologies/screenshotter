@@ -11,8 +11,6 @@ import UIKit
 class RegisterConfirmationViewController: UIViewController {
     fileprivate let transitioning = ViewControllerTransitioningDelegate(presentation: .intrinsicContentSize, transition: .modal)
     
-    // MARK: Life Cycle
-    
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -59,7 +57,7 @@ class RegisterConfirmationViewController: UIViewController {
         
         let titleLable = UILabel()
         titleLable.translatesAutoresizingMaskIntoConstraints = false
-        titleLable.text = "Welcome!"
+        titleLable.text = "onboarding.register.confirmation.title".localized
         titleLable.textAlignment = .center
         titleLable.textColor = .gray2
         titleLable.font = .screenshopFont(.quicksandMedium, textStyle: .title1, staticSize: true)
@@ -75,7 +73,7 @@ class RegisterConfirmationViewController: UIViewController {
         
         let messageLable = UILabel()
         messageLable.translatesAutoresizingMaskIntoConstraints = false
-        messageLable.text = "You are now a\nScreenshop user."
+        messageLable.text = "onboarding.register.confirmation.message".localized
         messageLable.textAlignment = .center
         messageLable.textColor = .gray2
         messageLable.font = .screenshopFont(.quicksandMedium, textStyle: .title3, staticSize: true)
