@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Corey Werner on 12/7/17.
-//  Copyright Â© 2017 crazeapp. All rights reserved.
+//  Copyright © 2017 crazeapp. All rights reserved.
 //
 
 import Foundation
@@ -403,11 +403,6 @@ extension SettingsViewController : UITableViewDelegate {
         }
         
         switch (row) {
-        case .name, .email :
-            if let cell = tableView.cellForRow(at: indexPath) {
-                cell.becomeFirstResponder()
-            }
-            return false
         case .version, .productGender, .productSize, .usageStreak:
             return false
             
@@ -431,7 +426,10 @@ extension SettingsViewController : UITableViewDelegate {
         
         switch (row) {
         case .email, .name:
-            break;
+            if let cell = tableView.cellForRow(at: indexPath) {
+                cell.becomeFirstResponder()
+            }
+            
         case .bug:
             presentMailComposerForBug()
             
@@ -443,7 +441,6 @@ extension SettingsViewController : UITableViewDelegate {
             present(viewController, animated: true, completion: nil)
         
         case .contactUs:
-
             presentMailComposerForContactUs()
 
         case .coins:
