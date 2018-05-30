@@ -13,7 +13,7 @@ class UnderlineTextField: UITextField {
     
     var isInvalid: Bool = false {
         didSet {
-            syncUnderlineColor()
+            syncColors()
         }
     }
     
@@ -24,11 +24,11 @@ class UnderlineTextField: UITextField {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(syncUnderlineColor), name: .UITextFieldTextDidBeginEditing, object: self)
-        NotificationCenter.default.addObserver(self, selector: #selector(syncUnderlineColor), name: .UITextFieldTextDidEndEditing, object: self)
+        NotificationCenter.default.addObserver(self, selector: #selector(syncColors), name: .UITextFieldTextDidBeginEditing, object: self)
+        NotificationCenter.default.addObserver(self, selector: #selector(syncColors), name: .UITextFieldTextDidEndEditing, object: self)
         NotificationCenter.default.addObserver(self, selector: #selector(textDidChange), name: .UITextFieldTextDidChange, object: self)
         
-        syncUnderlineColor()
+        syncColors()
         addSubview(underlineView)
     }
     
@@ -42,16 +42,21 @@ class UnderlineTextField: UITextField {
         return size
     }
     
-    @objc fileprivate func syncUnderlineColor() {
+    @objc fileprivate func syncColors() {
+        let color: UIColor
+        
         if isInvalid {
-            underlineView.backgroundColor = .crazeRed
+            color = .crazeRed
         }
         else if isEditing {
-            underlineView.backgroundColor = .crazeGreen
+            color = .crazeGreen
         }
         else {
-            underlineView.backgroundColor = .gray8
+            color = .gray8
         }
+        
+        tintColor = color
+        underlineView.backgroundColor = color
     }
     
     @objc fileprivate func textDidChange() {
