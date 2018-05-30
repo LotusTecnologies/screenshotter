@@ -26,9 +26,10 @@ extension UIFont {
         case hindSemibold = "Hind-SemiBold"
         case hindBold     = "Hind-Bold"
         
-        case quicksandLight = "Quicksand-Light"
-        case quicksand      = "Quicksand-Regular"
-        case quicksandBold  = "Quicksand-Bold"
+        case quicksandLight  = "Quicksand-Light"
+        case quicksand       = "Quicksand-Regular"
+        case quicksandMedium = "Quicksand-Medium"
+        case quicksandBold   = "Quicksand-Bold"
         
         var symbolicTraits: UIFontDescriptorSymbolicTraits {
             switch self {
@@ -36,7 +37,7 @@ extension UIFont {
                 return [.traitBold, .traitCondensed]
             case .futuraMedium, .futuraBold,
                  .hindMedium, .hindSemibold, .hindBold,
-                 .quicksandBold:
+                 .quicksandMedium, .quicksandBold:
                 return [.traitBold]
             default:
                 return []
@@ -53,7 +54,8 @@ extension UIFont {
                  .quicksand:
                 return UIFont.Weight.regular
             case .futuraMedium,
-                 .hindMedium:
+                 .hindMedium,
+                 .quicksandMedium:
                 return UIFont.Weight.medium
             case .hindSemibold:
                 return UIFont.Weight.semibold
@@ -73,7 +75,7 @@ extension UIFont {
                 return 0.9
             case .hindLight, .hind, .hindMedium, .hindSemibold, .hindBold:
                 return 0.8
-            case .quicksandLight, .quicksand, .quicksandBold:
+            case .quicksandLight, .quicksand, .quicksandMedium, .quicksandBold:
                 return 0
             }
         }

@@ -90,10 +90,11 @@
 		C53154D420B6B9550050EB76 /* AuthorizeContentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53154D320B6B9550050EB76 /* AuthorizeContentViewController.swift */; };
 		C53154D620B6E3A90050EB76 /* OnboardingDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53154D520B6E3A90050EB76 /* OnboardingDetailsViewController.swift */; };
 		C53154D820BA868D0050EB76 /* RoundButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53154D720BA868D0050EB76 /* RoundButton.swift */; };
-		C53154DC20BBD22B0050EB76 /* Quicksand-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = C53154DB20BBD1B50050EB76 /* Quicksand-Bold.otf */; };
-		C53154DD20BBD22D0050EB76 /* Quicksand-Light.otf in Resources */ = {isa = PBXBuildFile; fileRef = C53154DA20BBD1B50050EB76 /* Quicksand-Light.otf */; };
-		C53154DE20BBD22F0050EB76 /* Quicksand-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = C53154D920BBD1B40050EB76 /* Quicksand-Regular.otf */; };
 		C53154E020BD89C80050EB76 /* RegisterConfirmationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53154DF20BD89C80050EB76 /* RegisterConfirmationViewController.swift */; };
+		C53154E520BE86370050EB76 /* Quicksand-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C53154E120BE86360050EB76 /* Quicksand-Medium.ttf */; };
+		C53154E620BE86370050EB76 /* Quicksand-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C53154E220BE86370050EB76 /* Quicksand-Light.ttf */; };
+		C53154E720BE86370050EB76 /* Quicksand-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C53154E320BE86370050EB76 /* Quicksand-Bold.ttf */; };
+		C53154E820BE86370050EB76 /* Quicksand-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C53154E420BE86370050EB76 /* Quicksand-Regular.ttf */; };
 		C5336D1B203AC9CE00A7B4B0 /* CartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5336D1A203AC9CE00A7B4B0 /* CartViewController.swift */; };
 		C5336D1D203ACE7B00A7B4B0 /* CartNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5336D1C203ACE7B00A7B4B0 /* CartNavigationController.swift */; };
 		C5336D21203C511300A7B4B0 /* ActivityBadgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5336D20203C511200A7B4B0 /* ActivityBadgeView.swift */; };
@@ -352,10 +353,11 @@
 		C53154D320B6B9550050EB76 /* AuthorizeContentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorizeContentViewController.swift; sourceTree = "<group>"; };
 		C53154D520B6E3A90050EB76 /* OnboardingDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingDetailsViewController.swift; sourceTree = "<group>"; };
 		C53154D720BA868D0050EB76 /* RoundButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundButton.swift; sourceTree = "<group>"; };
-		C53154D920BBD1B40050EB76 /* Quicksand-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Regular.otf"; sourceTree = "<group>"; };
-		C53154DA20BBD1B50050EB76 /* Quicksand-Light.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Light.otf"; sourceTree = "<group>"; };
-		C53154DB20BBD1B50050EB76 /* Quicksand-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Bold.otf"; sourceTree = "<group>"; };
 		C53154DF20BD89C80050EB76 /* RegisterConfirmationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterConfirmationViewController.swift; sourceTree = "<group>"; };
+		C53154E120BE86360050EB76 /* Quicksand-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Medium.ttf"; sourceTree = "<group>"; };
+		C53154E220BE86370050EB76 /* Quicksand-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Light.ttf"; sourceTree = "<group>"; };
+		C53154E320BE86370050EB76 /* Quicksand-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Bold.ttf"; sourceTree = "<group>"; };
+		C53154E420BE86370050EB76 /* Quicksand-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Regular.ttf"; sourceTree = "<group>"; };
 		C5336D1A203AC9CE00A7B4B0 /* CartViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartViewController.swift; sourceTree = "<group>"; };
 		C5336D1C203ACE7B00A7B4B0 /* CartNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartNavigationController.swift; sourceTree = "<group>"; };
 		C5336D20203C511200A7B4B0 /* ActivityBadgeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActivityBadgeView.swift; sourceTree = "<group>"; };
@@ -602,9 +604,10 @@
 				C572FEFD205C00070046BFEB /* Hind-Medium.ttf */,
 				C572FEFB205C00060046BFEB /* Hind-Regular.ttf */,
 				C572FEFC205C00060046BFEB /* Hind-SemiBold.ttf */,
-				C53154DB20BBD1B50050EB76 /* Quicksand-Bold.otf */,
-				C53154DA20BBD1B50050EB76 /* Quicksand-Light.otf */,
-				C53154D920BBD1B40050EB76 /* Quicksand-Regular.otf */,
+				C53154E320BE86370050EB76 /* Quicksand-Bold.ttf */,
+				C53154E220BE86370050EB76 /* Quicksand-Light.ttf */,
+				C53154E120BE86360050EB76 /* Quicksand-Medium.ttf */,
+				C53154E420BE86370050EB76 /* Quicksand-Regular.ttf */,
 			);
 			path = Fonts;
 			sourceTree = "<group>";
@@ -1344,19 +1347,20 @@
 				C53B15B11FDD1EF400658A78 /* FavoriteHeart.json in Resources */,
 				C572FF01205C00070046BFEB /* Hind-SemiBold.ttf in Resources */,
 				C5CAF27A1FCC0EFD006F37DC /* ISO4217.plist in Resources */,
+				C53154E620BE86370050EB76 /* Quicksand-Light.ttf in Resources */,
 				E4DBC77920921B3C0019DE6E /* campaign_video_2018_04_20.mp4 in Resources */,
+				C53154E720BE86370050EB76 /* Quicksand-Bold.ttf in Resources */,
 				C572FEFE205C00070046BFEB /* Hind-Light.ttf in Resources */,
 				C572FF02205C00070046BFEB /* Hind-Medium.ttf in Resources */,
-				C53154DD20BBD22D0050EB76 /* Quicksand-Light.otf in Resources */,
 				E4139D501F09083B00E8A53B /* Assets.xcassets in Resources */,
 				C572FF00205C00070046BFEB /* Hind-Regular.ttf in Resources */,
+				C53154E520BE86370050EB76 /* Quicksand-Medium.ttf in Resources */,
 				C572FEFF205C00070046BFEB /* Hind-Bold.ttf in Resources */,
 				E4DBC77A20921B3C0019DE6E /* campaign_thumb_2018_04_20.jpg in Resources */,
 				E4DB2B7C1F7E1D4600320BE5 /* LaunchScreen.storyboard in Resources */,
 				C53B15BA1FDD638C00658A78 /* Localizable.strings in Resources */,
-				C53154DE20BBD22F0050EB76 /* Quicksand-Regular.otf in Resources */,
+				C53154E820BE86370050EB76 /* Quicksand-Regular.ttf in Resources */,
 				C5E6C318208F23AA006E9C54 /* CheckoutSupportedStates.plist in Resources */,
-				C53154DC20BBD22B0050EB76 /* Quicksand-Bold.otf in Resources */,
 				527F174A1FA21CA6008082BC /* Craze_Video.mp4 in Resources */,
 				C5E6C31A208F2415006E9C54 /* CheckoutSupportedCountries.plist in Resources */,
 				C5D98CCC1FFA642300CC1A97 /* GameScene.sks in Resources */,
