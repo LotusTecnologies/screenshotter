@@ -53,7 +53,8 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
     }
     var shareToDiscoverPrompt:UIView?
     fileprivate let filterView = CustomInputtableView()
-    
+    var menuDisplayingIndexPath:IndexPath?
+
     var loadingMonitor:AsyncOperationMonitor?
     init(screenshot: Screenshot) {
         self.screenshot = screenshot
@@ -187,6 +188,12 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
         
         let pinchZoom = UIPinchGestureRecognizer.init(target: self, action: #selector(pinch(gesture:)))
         self.view.addGestureRecognizer(pinchZoom)
+        
+        
+        let longPress = UILongPressGestureRecognizer.init(target: self, action: #selector(longPress(gesture:)))
+        self.view.addGestureRecognizer(longPress)
+    
+
 
     }
     
@@ -514,6 +521,80 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         
     }
    
+    @objc func longPress( gesture:UIPinchGestureRecognizer) {
+        let point = gesture.location(in: self.collectionView)
+        if let collectionView = self.collectionView, let indexPath = collectionView.indexPathForItem(at: point),  let cell = collectionView.cellForItem(at: indexPath){
+            
+            
+            let editMenu = UIMenuController.shared
+            if !editMenu.isMenuVisible {
+                self.menuDisplayingIndexPath = indexPath
+                let moreLikeThis = UIMenuItem.init(title: "More Like This", action: #selector(moreLikeThis(_:)))
+                
+                editMenu.menuItems = [moreLikeThis]
+                editMenu.setTargetRect(cell.bounds, in: cell)
+                editMenu.setMenuVisible(true, animated: true)
+            }
+        }
+        
+        
+    }
+    override var canBecomeFirstResponder: Bool {
+        return true
+    }
+    override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
+        if action == #selector(ProductsViewController.moreLikeThis) {
+            return true
+        }
+        return false
+        
+    }
+    @objc func moreLikeThis(_ sender:Any) {
+        if let index = menuDisplayingIndexPath{
+            let product = self.productAtIndex(index.row)
+            if let productImageUrl = product.imageURL,
+                let shoppableObjectId = product.shoppable?.objectID,
+            let cat = product.categories?.lowercased() {
+                let optionMask = ProductsOptionsMask.global
+                
+                NetworkingPromise.sharedInstance.uploadToSyte(imageData: nil, orImageUrlString: productImageUrl, imageClassification: .human, isUsc: false).then { (uploadedURLString, segments) -> Void in
+                    if   let segment = segments.first(where: { (segDict) -> Bool in
+                        if let label = segDict["label"] as? String {
+                            return cat.contains(label.lowercased())
+                        }
+                        return false
+                    }), let offersURL = segment["offers"] as? String,
+                        let url = AssetSyncModel.sharedInstance.augmentedUrl(offersURL: offersURL, optionsMask:optionMask ) {
+                        NetworkingPromise.sharedInstance.downloadProductsWithRetry(url: url).then { productsDict -> Void in
+                            if let productsArray = productsDict["ads"] as? [[String : Any]],
+                                productsArray.count > 0 {
+                                DataModel.sharedInstance.performBackgroundTask({ (context) in
+                                    if let shopable = context.shoppableWith(objectId:shoppableObjectId) {
+                                        
+                                        shopable.products = NSSet.init()
+                                        var productOrder: Int16 = 0
+                                        for prod in productsArray {
+                                            AssetSyncModel.sharedInstance.saveProduct(managedObjectContext: context,
+                                                                                      shoppable: shopable,
+                                                                                      productOrder: productOrder,
+                                                                                      prod: prod,
+                                                                                      optionsMask: Int32(optionMask.rawValue))
+                                            productOrder += 1
+                                        }
+                                        
+                                        context.saveIfNeeded()
+                                    }
+                                    
+                                })
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+   
+
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let sectionType = productSectionType(forSection: indexPath.section)
 

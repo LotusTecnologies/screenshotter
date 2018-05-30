@@ -85,6 +85,7 @@ class ProductsCollectionViewCell : UICollectionViewCell {
     var priceLabel:UILabel?
     var originalPriceLabel:UILabel?
     var originalPriceLabelWidthConstraint:NSLayoutConstraint?
+    
     fileprivate var saleView: SaleView?
     fileprivate let externalPreviewImageView = UIImageView(image: UIImage(named: "ProductsArrowExitingBox"))
     
