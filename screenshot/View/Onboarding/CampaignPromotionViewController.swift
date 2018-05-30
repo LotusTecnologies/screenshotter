@@ -22,11 +22,11 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
         To re-use this viewController change the CampaignDescription
      */
     let campaign = CampaignDescription.init(
-            headline: "2018_04_20_campaign.headline".localized,
-            byline: "2018_04_20_campaign.body".localized,
-            buttonText: "2018_04_20_campaign.button".localized,
-            videoName: "campaign_video_2018_04_20",
-            thumbName: "campaign_thumb_2018_04_20.jpg",
+            headline: "",
+            byline: "",
+            buttonText: "",
+            videoName: "",
+            thumbName: "",
             videoRatio: 1280.0 / 720.0)
     
     var showsReplayButtonUponFinishing: Bool = true
