@@ -334,6 +334,7 @@
 "products.rate.negative.popup.title" =  "What’s Wrong Here?";
 "products.rate.rated" = "Thanks for your feedback!";
 "products.rate.unrated" = "Are these results relevant?";
+"products.share.title" = "Check out this product";
 "products.title" = "Shop Photo";
 "products.related_looks.headline" = "Similar Looks";
 "products.related_looks.error.connection" = "Please check your connection and try again.";
@@ -400,7 +401,6 @@
 "settings.row.photo_permission.title" = "Camera Roll";
 "settings.row.push_permission.title" = "Push Notifications";
 "settings.row.region.title" = "Region";
-"settings.row.restore_in_app_purchase.title" = "Restore Purchases";
 "settings.row.size.title" = "Size";
 "settings.row.tutorial.title" = "Replay Tutorial";
 "settings.row.usage_streak.detail.plural" = "%d days";

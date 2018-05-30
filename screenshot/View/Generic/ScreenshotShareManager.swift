@@ -25,7 +25,10 @@ class ScreenshotShareManager {
             return
         }
         
-        let introductoryText = "screenshots.share.title".localized
+        
+        
+        let introductoryText = "products.share.title".localized
+        
         
         let productObjectId = product.objectID
         
