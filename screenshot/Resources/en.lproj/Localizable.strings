@@ -48,6 +48,11 @@
 "authorize.generic.password" = "Password";
 "authorize.generic.signup" = "Sign Up";
 
+"authorize.initiate_reset_password.alert.message" = "Tap the link in the email we sent you to set a new password";
+"authorize.initiate_reset_password.alert.title" = "Emailed!";
+"authorize.initiate_reset_password.message" = "Enter the email you signed up with and we’ll send you a link to reset your password";
+"authorize.initiate_reset_password.title" = "Reset Password";
+
 "authorize.login.forgot" = "Forgot Password?";
 "authorize.login.continue" = "Log In";
 
@@ -62,10 +67,12 @@
 "authorize.register.confirmation.message" = "You are now a\nScreenshop user.";
 "authorize.register.confirmation.title" = "Welcome!";
 
-"authorize.reset_password.alert.message" = "Tap the link in the email we sent you to set a new password";
-"authorize.reset_password.alert.title" = "Emailed!";
-"authorize.reset_password.message" = "Enter the email you signed up with and we’ll send you a link to reset your password";
-"authorize.reset_password.title" = "Reset Password";
+"authorize.reset_password.enter" = "Enter new password";
+"authorize.reset_password.failed_alert.title" = "Passwords Don’t Match";
+"authorize.reset_password.reenter" = "Re-enter password";
+"authorize.reset_password.success_alert.message" = "Your password was changed. Now log in to your account with your new password";
+"authorize.reset_password.success_alert.title" = "Success!";
+"authorize.reset_password.title" = "Set New Password";
 
 "cart.checkout.button" = "Checkout";
 "cart.checkout.total" = "Total: %@";

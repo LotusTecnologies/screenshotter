@@ -98,6 +98,7 @@
 		C53154F620BE99AC0050EB76 /* RegisterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53154F020BE99AC0050EB76 /* RegisterViewController.swift */; };
 		C53154F720BE99AC0050EB76 /* InitiateResetPasswordViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53154F120BE99AC0050EB76 /* InitiateResetPasswordViewController.swift */; };
 		C53154F920BEBFED0050EB76 /* InputViewAdjustsScrollViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53154F820BEBFED0050EB76 /* InputViewAdjustsScrollViewController.swift */; };
+		C53154FB20BED3900050EB76 /* ResetPasswordViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53154FA20BED3900050EB76 /* ResetPasswordViewController.swift */; };
 		C5336D1B203AC9CE00A7B4B0 /* CartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5336D1A203AC9CE00A7B4B0 /* CartViewController.swift */; };
 		C5336D1D203ACE7B00A7B4B0 /* CartNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5336D1C203ACE7B00A7B4B0 /* CartNavigationController.swift */; };
 		C5336D21203C511300A7B4B0 /* ActivityBadgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5336D20203C511200A7B4B0 /* ActivityBadgeView.swift */; };
@@ -363,6 +364,7 @@
 		C53154F020BE99AC0050EB76 /* RegisterViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegisterViewController.swift; sourceTree = "<group>"; };
 		C53154F120BE99AC0050EB76 /* InitiateResetPasswordViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InitiateResetPasswordViewController.swift; sourceTree = "<group>"; };
 		C53154F820BEBFED0050EB76 /* InputViewAdjustsScrollViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputViewAdjustsScrollViewController.swift; sourceTree = "<group>"; };
+		C53154FA20BED3900050EB76 /* ResetPasswordViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetPasswordViewController.swift; sourceTree = "<group>"; };
 		C5336D1A203AC9CE00A7B4B0 /* CartViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartViewController.swift; sourceTree = "<group>"; };
 		C5336D1C203ACE7B00A7B4B0 /* CartNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartNavigationController.swift; sourceTree = "<group>"; };
 		C5336D20203C511200A7B4B0 /* ActivityBadgeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActivityBadgeView.swift; sourceTree = "<group>"; };
@@ -704,6 +706,7 @@
 				C53154EC20BE99AB0050EB76 /* LoginViewController.swift */,
 				C53154EF20BE99AC0050EB76 /* RegisterConfirmationViewController.swift */,
 				C53154F020BE99AC0050EB76 /* RegisterViewController.swift */,
+				C53154FA20BED3900050EB76 /* ResetPasswordViewController.swift */,
 			);
 			path = Authorize;
 			sourceTree = "<group>";
@@ -889,6 +892,7 @@
 				C5AC7E661FFA363500F491C0 /* EmbossedView.swift */,
 				C56F889D1FE949320006914C /* Extension */,
 				C5F8D81A20B2F8C5004A32FD /* HorizontalLinesView.swift */,
+				C53154F820BEBFED0050EB76 /* InputViewAdjustsScrollViewController.swift */,
 				C501410E205E7BEB00ABFB5C /* Label */,
 				C540883E1FE90E2100198955 /* NotifyChangeView.swift */,
 				C5A1922A2057AD510046303C /* PresentationController */,
@@ -901,7 +905,6 @@
 				C540884A1FE90E2200198955 /* TextView */,
 				C54369652046D6E500599134 /* ViewController */,
 				C5F37C9D20555C0C0072FE1D /* ViewControllerTransitioning */,
-				C53154F820BEBFED0050EB76 /* InputViewAdjustsScrollViewController.swift */,
 			);
 			path = Generic;
 			sourceTree = "<group>";
@@ -1632,6 +1635,7 @@
 				31C0C81A20A2CD14002EE95B /* SectionBackgroundCollectionViewFlowLayout.swift in Sources */,
 				C58FA0F220A95FC300072966 /* VideoDisplayingViewControllerDelegate.swift in Sources */,
 				C537F39E2004A20E00287360 /* DiscoverScreenshotCollectionViewCell.swift in Sources */,
+				C53154FB20BED3900050EB76 /* ResetPasswordViewController.swift in Sources */,
 				C572C0E320AC48C1004B0A17 /* ProductStructures.swift in Sources */,
 				C5014110205E7BF200ABFB5C /* Label.swift in Sources */,
 				C501410B205E702C00ABFB5C /* Font.swift in Sources */,

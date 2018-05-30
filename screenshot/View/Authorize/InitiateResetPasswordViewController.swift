@@ -35,7 +35,7 @@ class InitiateResetPasswordView: UIScrollView {
         
         let titleLabel = UILabel()
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.text = "authorize.reset_password.title".localized
+        titleLabel.text = "authorize.initiate_reset_password.title".localized
         titleLabel.textColor = .gray3
         titleLabel.font = .screenshopFont(.hindSemibold, textStyle: .title1, staticSize: true)
         titleLabel.adjustsFontSizeToFitWidth = true
@@ -61,7 +61,7 @@ class InitiateResetPasswordView: UIScrollView {
         
         let messageLabel = UILabel()
         messageLabel.translatesAutoresizingMaskIntoConstraints = false
-        messageLabel.text = "authorize.reset_password.message".localized
+        messageLabel.text = "authorize.initiate_reset_password.message".localized
         messageLabel.textColor = .gray2
         messageLabel.font = .screenshopFont(.hindLight, textStyle: .body, staticSize: true)
         messageLabel.numberOfLines = 0
@@ -73,6 +73,11 @@ class InitiateResetPasswordView: UIScrollView {
         emailTextField.translatesAutoresizingMaskIntoConstraints = false
         emailTextField.placeholder = "your.email@gmail.com"
         emailTextField.textColor = .gray2
+        emailTextField.autocapitalizationType = .none
+        emailTextField.autocorrectionType = .no
+        emailTextField.spellCheckingType = .no
+        emailTextField.returnKeyType = .send
+        emailTextField.keyboardType = .emailAddress
         contentView.addSubview(emailTextField)
         emailTextField.topAnchor.constraint(equalTo: messageLabel.lastBaselineAnchor, constant: .extendedPadding).isActive = true
         emailTextField.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
@@ -147,6 +152,8 @@ class InitiateResetPasswordViewController: UIViewController {
         
         inputViewAdjustsScrollViewController.scrollView = _view
         
+        _view.emailTextField.delegate = self
+        
         _view.continueButton.addTarget(self, action: #selector(continueAction), for: .touchUpInside)
         _view.backButton.addTarget(self, action: #selector(backAction), for: .touchUpInside)
         
@@ -154,13 +161,19 @@ class InitiateResetPasswordViewController: UIViewController {
         _view.addGestureRecognizer(tapGesture)
     }
     
+    deinit {
+        _view.emailTextField.delegate = nil
+    }
+    
     // MARK: Actions
     
     @objc private func continueAction() {
+        dismissKeyboard()
+        
         let isValidEmail = true
         
         if isValidEmail {
-            let alertController = UIAlertController(title: "authorize.reset_password.alert.title".localized, message: "authorize.reset_password.alert.message".localized, preferredStyle: .alert)
+            let alertController = UIAlertController(title: "authorize.initiate_reset_password.alert.title".localized, message: "authorize.initiate_reset_password.alert.message".localized, preferredStyle: .alert)
             alertController.addAction(UIAlertAction(title: "generic.ok".localized, style: .cancel, handler: { alertAction in
                 self.delegate?.initiateResetPasswordViewControllerDidReset(self)
             }))
@@ -179,5 +192,12 @@ class InitiateResetPasswordViewController: UIViewController {
     
     @objc fileprivate func dismissKeyboard() {
         view.endEditing(true)
+    }
+}
+
+extension InitiateResetPasswordViewController: UITextFieldDelegate {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        continueAction()
+        return true
     }
 }
