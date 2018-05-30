@@ -119,10 +119,6 @@ class InitiateResetPasswordViewController: UIViewController {
     
     private let inputViewAdjustsScrollViewController = InputViewAdjustsScrollViewController()
     
-    var email: String? {
-        return _view.emailTextField.text
-    }
-    
     // MARK: View
     
     var classForView: InitiateResetPasswordView.Type {
@@ -170,9 +166,9 @@ class InitiateResetPasswordViewController: UIViewController {
     @objc private func continueAction() {
         dismissKeyboard()
         
-        let isValidEmail = true
-        
-        if isValidEmail {
+        if let email = validateEmail(_view.emailTextField.text) {
+            sendEmail(email)
+            
             let alertController = UIAlertController(title: "authorize.initiate_reset_password.alert.title".localized, message: "authorize.initiate_reset_password.alert.message".localized, preferredStyle: .alert)
             alertController.addAction(UIAlertAction(title: "generic.ok".localized, style: .cancel, handler: { alertAction in
                 self.delegate?.initiateResetPasswordViewControllerDidReset(self)
@@ -180,12 +176,28 @@ class InitiateResetPasswordViewController: UIViewController {
             present(alertController, animated: true)
         }
         else {
-            // TODO:
+            _view.emailTextField.isInvalid = true
+            
+            ActionFeedbackGenerator().actionOccurred(.nope)
         }
     }
     
     @objc private func backAction() {
         delegate?.initiateResetPasswordViewControllerDidCancel(self)
+    }
+    
+    // MARK: Email
+    
+    private func validateEmail(_ email: String?) -> String? {
+        // TODO: email regex
+        if let email = email, !email.isEmpty {
+            return email
+        }
+        return nil
+    }
+    
+    private func sendEmail(_ email: String) {
+        // TODO:
     }
     
     // MARK: Keyboard
