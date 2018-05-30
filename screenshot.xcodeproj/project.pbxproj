@@ -97,6 +97,7 @@
 		C53154F520BE99AC0050EB76 /* RegisterConfirmationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53154EF20BE99AC0050EB76 /* RegisterConfirmationViewController.swift */; };
 		C53154F620BE99AC0050EB76 /* RegisterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53154F020BE99AC0050EB76 /* RegisterViewController.swift */; };
 		C53154F720BE99AC0050EB76 /* ResetPasswordViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53154F120BE99AC0050EB76 /* ResetPasswordViewController.swift */; };
+		C53154F920BEBFED0050EB76 /* InputViewAdjustsScrollViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53154F820BEBFED0050EB76 /* InputViewAdjustsScrollViewController.swift */; };
 		C5336D1B203AC9CE00A7B4B0 /* CartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5336D1A203AC9CE00A7B4B0 /* CartViewController.swift */; };
 		C5336D1D203ACE7B00A7B4B0 /* CartNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5336D1C203ACE7B00A7B4B0 /* CartNavigationController.swift */; };
 		C5336D21203C511300A7B4B0 /* ActivityBadgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5336D20203C511200A7B4B0 /* ActivityBadgeView.swift */; };
@@ -361,6 +362,7 @@
 		C53154EF20BE99AC0050EB76 /* RegisterConfirmationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegisterConfirmationViewController.swift; sourceTree = "<group>"; };
 		C53154F020BE99AC0050EB76 /* RegisterViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegisterViewController.swift; sourceTree = "<group>"; };
 		C53154F120BE99AC0050EB76 /* ResetPasswordViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResetPasswordViewController.swift; sourceTree = "<group>"; };
+		C53154F820BEBFED0050EB76 /* InputViewAdjustsScrollViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputViewAdjustsScrollViewController.swift; sourceTree = "<group>"; };
 		C5336D1A203AC9CE00A7B4B0 /* CartViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartViewController.swift; sourceTree = "<group>"; };
 		C5336D1C203ACE7B00A7B4B0 /* CartNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartNavigationController.swift; sourceTree = "<group>"; };
 		C5336D20203C511200A7B4B0 /* ActivityBadgeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActivityBadgeView.swift; sourceTree = "<group>"; };
@@ -899,6 +901,7 @@
 				C540884A1FE90E2200198955 /* TextView */,
 				C54369652046D6E500599134 /* ViewController */,
 				C5F37C9D20555C0C0072FE1D /* ViewControllerTransitioning */,
+				C53154F820BEBFED0050EB76 /* InputViewAdjustsScrollViewController.swift */,
 			);
 			path = Generic;
 			sourceTree = "<group>";
@@ -1591,6 +1594,7 @@
 				C572C0DB20AAE602004B0A17 /* BlankHeaderConfettiContentTemplate.swift in Sources */,
 				3125448F209871B4009410D5 /* Analytics+api.swift in Sources */,
 				C5336D1D203ACE7B00A7B4B0 /* CartNavigationController.swift in Sources */,
+				C53154F920BEBFED0050EB76 /* InputViewAdjustsScrollViewController.swift in Sources */,
 				C50E25EE207DEC49003C8D24 /* CheckoutShippingTableViewCell.swift in Sources */,
 				C5BE7C1F20186309000DB8A0 /* DiscoverNavigationController.swift in Sources */,
 				C540881A1FE90C8E00198955 /* WebView.swift in Sources */,

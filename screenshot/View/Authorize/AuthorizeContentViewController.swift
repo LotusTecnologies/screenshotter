@@ -102,6 +102,7 @@ class AuthorizeContentScrollView: UIScrollView {
 }
 
 class AuthorizeContentViewController: UIViewController {
+    private let inputViewAdjustsScrollViewController = InputViewAdjustsScrollViewController()
     
     // MARK: View
     
@@ -123,19 +124,11 @@ class AuthorizeContentViewController: UIViewController {
     
     // MARK: Life Cycle
     
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShowNotification(_:)), name: .UIKeyboardWillShow, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHideNotification(_:)), name: .UIKeyboardWillHide, object: nil)
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        inputViewAdjustsScrollViewController.scrollView = _view
+        inputViewAdjustsScrollViewController.delegate = self
         
         _view.emailTextField.delegate = self
         _view.passwordTextField.delegate = self
@@ -145,36 +138,12 @@ class AuthorizeContentViewController: UIViewController {
     }
     
     deinit {
-        NotificationCenter.default.removeObserver(self)
+        inputViewAdjustsScrollViewController.delegate = nil
+        _view.emailTextField.delegate = nil
+        _view.passwordTextField.delegate = nil
     }
     
     // MARK: Keyboard
-    
-    @objc private func keyboardWillShowNotification(_ notification: Notification) {
-        var contentInset = _view.contentInset
-        var scrollIndicatorInsets = _view.scrollIndicatorInsets
-        
-        contentInset.top = -_view.activeTextFieldTopOffset
-        
-        if let keyboardRect = (notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
-            contentInset.bottom = keyboardRect.height
-            scrollIndicatorInsets.bottom = keyboardRect.height
-        }
-        
-        _view.contentInset = contentInset
-        _view.scrollIndicatorInsets = scrollIndicatorInsets
-    }
-    
-    @objc private func keyboardWillHideNotification(_ notification: Notification) {
-        var contentInset = _view.contentInset
-        contentInset.top = 0
-        contentInset.bottom = 0
-        _view.contentInset = contentInset
-        
-        var scrollIndicatorInsets = _view.scrollIndicatorInsets
-        scrollIndicatorInsets.bottom = 0
-        _view.scrollIndicatorInsets = scrollIndicatorInsets
-    }
     
     @objc fileprivate func dismissKeyboard() {
         view.endEditing(true)
@@ -193,3 +162,16 @@ extension AuthorizeContentViewController: UITextFieldDelegate {
     }
 }
 
+extension AuthorizeContentViewController: InputViewAdjustsScrollViewControllerDelegate {
+    func inputViewAdjustsScrollViewControllerWillShow(_ controller: InputViewAdjustsScrollViewController) {
+        var contentInset = _view.contentInset
+        contentInset.top = -_view.activeTextFieldTopOffset
+        _view.contentInset = contentInset
+    }
+    
+    func inputViewAdjustsScrollViewControllerWillHide(_ controller: InputViewAdjustsScrollViewController) {
+        var contentInset = _view.contentInset
+        contentInset.top = 0
+        _view.contentInset = contentInset
+    }
+}

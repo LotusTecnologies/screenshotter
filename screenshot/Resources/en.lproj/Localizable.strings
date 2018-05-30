@@ -62,6 +62,8 @@
 "authorize.register.confirmation.message" = "You are now a\nScreenshop user.";
 "authorize.register.confirmation.title" = "Welcome!";
 
+"authorize.reset_password.title" = "Reset Password";
+
 "cart.checkout.button" = "Checkout";
 "cart.checkout.total" = "Total: %@";
 "cart.empty.button" = "Find your next outfit!";
@@ -207,6 +209,7 @@
 "game.score" = "My coins: %d";
 "game.start" = "Tap to get more coins";
 
+"generic.back" = "Back";
 "generic.buy" = "BUY";
 "generic.cancel" = "Cancel";
 "generic.close" = "Close";
@@ -226,6 +229,7 @@
 "generic.retry" = "Try Again";
 "generic.sale" = "SALE";
 "generic.save" = "Save";
+"generic.send" = "Send";
 "generic.setup" = "Setup";
 "generic.skip" = "Skip";
 "generic.submit" = "Submit";

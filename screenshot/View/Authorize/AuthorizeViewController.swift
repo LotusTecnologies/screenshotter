@@ -187,7 +187,7 @@ class AuthorizeViewController: UIViewController {
     @objc private func forgotPasswordAction() {
         // TODO: present reset password page. this vc should prob be pushed up to the tutorial nav controller
         
-        let resetPasswordViewController = UIViewController()
+        let resetPasswordViewController = ResetPasswordViewController()
         navigationController?.pushViewController(resetPasswordViewController, animated: true)
     }
     

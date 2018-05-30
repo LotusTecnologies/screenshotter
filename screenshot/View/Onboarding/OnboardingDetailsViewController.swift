@@ -194,6 +194,8 @@ class OnboardingDetailsView: UIView {
 class OnboardingDetailsViewController: UIViewController {
     weak var delegate: OnboardingDetailsViewControllerDelegate?
     
+    private let inputViewAdjustsScrollViewController = InputViewAdjustsScrollViewController()
+    
     var name: String? {
         return _view.nameTextField.text
     }
@@ -232,13 +234,13 @@ class OnboardingDetailsViewController: UIViewController {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
         title = "onboarding.details.title".localized
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShowNotification(_:)), name: .UIKeyboardWillShow, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHideNotification(_:)), name: .UIKeyboardWillHide, object: nil)
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        inputViewAdjustsScrollViewController.scrollView = _view.scrollView
+        inputViewAdjustsScrollViewController.delegate = self
         
         navigationBar.translatesAutoresizingMaskIntoConstraints = false
         navigationBar.delegate = self
@@ -287,7 +289,9 @@ class OnboardingDetailsViewController: UIViewController {
     }
     
     deinit {
-        NotificationCenter.default.removeObserver(self)
+        inputViewAdjustsScrollViewController.delegate = nil
+        navigationBar.delegate = nil
+        _view.nameTextField.delegate = nil
     }
     
     // MARK: Actions
@@ -313,35 +317,6 @@ class OnboardingDetailsViewController: UIViewController {
     }
     
     // MARK: Keyboard
-    
-    @objc private func keyboardWillShowNotification(_ notification: Notification) {
-        var contentInset = _view.scrollView.contentInset
-        var scrollIndicatorInsets = _view.scrollView.scrollIndicatorInsets
-        
-        if let keyboardRect = (notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
-            contentInset.bottom = keyboardRect.height
-            scrollIndicatorInsets.bottom = keyboardRect.height
-        }
-        
-        _view.scrollView.contentInset = contentInset
-        _view.scrollView.scrollIndicatorInsets = scrollIndicatorInsets
-        
-        if _view.genderControl.isFirstResponder || _view.sizeControl.isFirstResponder {
-            var contentOffset = _view.scrollView.contentOffset
-            contentOffset.y = _view.activePreferenceTopOffset
-            _view.scrollView.contentOffset = contentOffset
-        }
-    }
-    
-    @objc private func keyboardWillHideNotification(_ notification: Notification) {
-        var contentInset = _view.scrollView.contentInset
-        contentInset.bottom = 0
-        _view.scrollView.contentInset = contentInset
-        
-        var scrollIndicatorInsets = _view.scrollView.scrollIndicatorInsets
-        scrollIndicatorInsets.bottom = 0
-        _view.scrollView.scrollIndicatorInsets = scrollIndicatorInsets
-    }
     
     @objc fileprivate func dismissKeyboard() {
         view.endEditing(true)
@@ -379,5 +354,19 @@ extension OnboardingDetailsViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
+    }
+}
+
+extension OnboardingDetailsViewController: InputViewAdjustsScrollViewControllerDelegate {
+    func inputViewAdjustsScrollViewControllerWillShow(_ controller: InputViewAdjustsScrollViewController) {
+        if _view.genderControl.isFirstResponder || _view.sizeControl.isFirstResponder {
+            var contentOffset = _view.scrollView.contentOffset
+            contentOffset.y = _view.activePreferenceTopOffset
+            _view.scrollView.contentOffset = contentOffset
+        }
+    }
+    
+    func inputViewAdjustsScrollViewControllerWillHide(_ controller: InputViewAdjustsScrollViewController) {
+        
     }
 }
