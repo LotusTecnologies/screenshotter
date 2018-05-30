@@ -40,7 +40,7 @@ class AuthorizeView: UIView {
         headerView.heightAnchor.constraint(equalToConstant: 70).isActive = true
         
         registerButton.translatesAutoresizingMaskIntoConstraints = false
-        registerButton.setTitle("onboarding.authorize.signup".localized, for: .normal)
+        registerButton.setTitle("authorize.generic.signup".localized, for: .normal)
         registerButton.backgroundColor = UIColor.cyan.withAlphaComponent(0.3)
         headerView.addSubview(registerButton)
         registerButton.leadingAnchor.constraint(equalTo: headerView.layoutMarginsGuide.leadingAnchor).isActive = true
@@ -48,7 +48,7 @@ class AuthorizeView: UIView {
         registerButton.trailingAnchor.constraint(equalTo: headerView.layoutMarginsGuide.centerXAnchor).isActive = true
         
         loginButton.translatesAutoresizingMaskIntoConstraints = false
-        loginButton.setTitle("onboarding.authorize.login".localized, for: .normal)
+        loginButton.setTitle("authorize.generic.login".localized, for: .normal)
         loginButton.backgroundColor = UIColor.yellow.withAlphaComponent(0.3)
         headerView.addSubview(loginButton)
         loginButton.leadingAnchor.constraint(equalTo: headerView.layoutMarginsGuide.centerXAnchor).isActive = true

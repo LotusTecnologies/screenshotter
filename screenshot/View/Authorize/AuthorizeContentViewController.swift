@@ -63,7 +63,7 @@ class AuthorizeContentScrollView: UIScrollView {
         contentView.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
         
         emailTextField.translatesAutoresizingMaskIntoConstraints = false
-        emailTextField.placeholder = "onboarding.authorize.email".localized
+        emailTextField.placeholder = "authorize.generic.email".localized
         emailTextField.returnKeyType = .next
         emailTextField.keyboardType = .emailAddress
         emailTextField.autocapitalizationType = .none
@@ -75,7 +75,7 @@ class AuthorizeContentScrollView: UIScrollView {
         emailTextField.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
         
         passwordTextField.translatesAutoresizingMaskIntoConstraints = false
-        passwordTextField.placeholder = "onboarding.authorize.password".localized
+        passwordTextField.placeholder = "authorize.generic.password".localized
         passwordTextField.isSecureTextEntry = true
         passwordTextField.autocapitalizationType = .none
         passwordTextField.autocorrectionType = .no

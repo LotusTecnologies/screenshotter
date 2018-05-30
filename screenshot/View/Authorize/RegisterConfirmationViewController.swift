@@ -57,7 +57,7 @@ class RegisterConfirmationViewController: UIViewController {
         
         let titleLable = UILabel()
         titleLable.translatesAutoresizingMaskIntoConstraints = false
-        titleLable.text = "onboarding.register.confirmation.title".localized
+        titleLable.text = "authorize.register.confirmation.title".localized
         titleLable.textAlignment = .center
         titleLable.textColor = .gray2
         titleLable.font = .screenshopFont(.quicksandMedium, textStyle: .title1, staticSize: true)
@@ -73,7 +73,7 @@ class RegisterConfirmationViewController: UIViewController {
         
         let messageLable = UILabel()
         messageLable.translatesAutoresizingMaskIntoConstraints = false
-        messageLable.text = "onboarding.register.confirmation.message".localized
+        messageLable.text = "authorize.register.confirmation.message".localized
         messageLable.textAlignment = .center
         messageLable.textColor = .gray2
         messageLable.font = .screenshopFont(.quicksandMedium, textStyle: .title3, staticSize: true)
