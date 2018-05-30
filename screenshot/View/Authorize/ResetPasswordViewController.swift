@@ -10,9 +10,11 @@ import UIKit
 
 protocol ResetPasswordViewControllerDelegate: NSObjectProtocol {
     func resetPasswordViewControllerDidReset(_ viewController: ResetPasswordViewController)
+    func resetPasswordViewControllerDidCancel(_ viewController: ResetPasswordViewController)
 }
 
 class ResetPasswordView: UIScrollView {
+    let emailTextField = UnderlineTextField()
     let continueButton = MainButton()
     let backButton = UIButton()
     
@@ -50,7 +52,7 @@ class ResetPasswordView: UIScrollView {
         contentView.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
         contentView.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
         
-        let emailImageView = UIImageView(image: UIImage(named: ""))
+        let emailImageView = UIImageView(image: UIImage(named: "AuthorizeEmailSent"))
         emailImageView.translatesAutoresizingMaskIntoConstraints = false
         emailImageView.contentMode = .scaleAspectFit
         contentView.addSubview(emailImageView)
@@ -59,7 +61,7 @@ class ResetPasswordView: UIScrollView {
         
         let messageLabel = UILabel()
         messageLabel.translatesAutoresizingMaskIntoConstraints = false
-        messageLabel.text = "Enter the email you signed up with and we'll send you a link to reset your password"
+        messageLabel.text = "authorize.reset_password.message".localized
         messageLabel.textColor = .gray2
         messageLabel.font = .screenshopFont(.hindLight, textStyle: .body, staticSize: true)
         messageLabel.numberOfLines = 0
@@ -68,16 +70,16 @@ class ResetPasswordView: UIScrollView {
         messageLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
         messageLabel.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
         
-        let emailTextField = UnderlineTextField()
         emailTextField.translatesAutoresizingMaskIntoConstraints = false
-        emailTextField.placeholder = "Your Email"
+        emailTextField.placeholder = "your.email@gmail.com"
         emailTextField.textColor = .gray2
         contentView.addSubview(emailTextField)
-        emailTextField.topAnchor.constraint(equalTo: messageLabel.bottomAnchor, constant: .extendedPadding).isActive = true
+        emailTextField.topAnchor.constraint(equalTo: messageLabel.lastBaselineAnchor, constant: .extendedPadding).isActive = true
         emailTextField.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
         emailTextField.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
         
         continueButton.translatesAutoresizingMaskIntoConstraints = false
+        continueButton.backgroundColor = .crazeGreen
         continueButton.setTitle("generic.send".localized, for: .normal)
         contentView.addSubview(continueButton)
         continueButton.topAnchor.constraint(equalTo: emailTextField.bottomAnchor, constant: .extendedPadding).isActive = true
@@ -108,9 +110,13 @@ class ResetPasswordView: UIScrollView {
 }
 
 class ResetPasswordViewController: UIViewController {
-    weak var delegate: ResetPasswordViewController?
+    weak var delegate: ResetPasswordViewControllerDelegate?
     
     private let inputViewAdjustsScrollViewController = InputViewAdjustsScrollViewController()
+    
+    var email: String? {
+        return _view.emailTextField.text
+    }
     
     // MARK: View
     
@@ -120,6 +126,14 @@ class ResetPasswordViewController: UIViewController {
     
     var _view: ResetPasswordView {
         return view as! ResetPasswordView
+    }
+    
+    var continueButton: UIButton {
+        return _view.continueButton
+    }
+    
+    var backButton: UIButton {
+        return _view.backButton
     }
     
     override func loadView() {
@@ -133,8 +147,32 @@ class ResetPasswordViewController: UIViewController {
         
         inputViewAdjustsScrollViewController.scrollView = _view
         
+        _view.continueButton.addTarget(self, action: #selector(continueAction), for: .touchUpInside)
+        _view.backButton.addTarget(self, action: #selector(backAction), for: .touchUpInside)
+        
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         _view.addGestureRecognizer(tapGesture)
+    }
+    
+    // MARK: Actions
+    
+    @objc private func continueAction() {
+        let isValidEmail = true
+        
+        if isValidEmail {
+            let alertController = UIAlertController(title: "authorize.reset_password.alert.title".localized, message: "authorize.reset_password.alert.message".localized, preferredStyle: .alert)
+            alertController.addAction(UIAlertAction(title: "generic.ok".localized, style: .cancel, handler: { alertAction in
+                self.delegate?.resetPasswordViewControllerDidReset(self)
+            }))
+            present(alertController, animated: true)
+        }
+        else {
+            // TODO:
+        }
+    }
+    
+    @objc private func backAction() {
+        delegate?.resetPasswordViewControllerDidCancel(self)
     }
     
     // MARK: Keyboard

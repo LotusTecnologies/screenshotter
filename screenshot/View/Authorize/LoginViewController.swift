@@ -63,5 +63,23 @@ class LoginViewController: AuthorizeContentViewController {
         
         _view.facebookLoginButton.textCopy = .login
         _view.continueButton.setTitle("authorize.login.continue".localized, for: .normal)
+        
+        _view.forgotPasswordButton.addTarget(self, action: #selector(forgotPasswordAction), for: .touchUpInside)
+    }
+    
+    @objc private func forgotPasswordAction() {
+        let resetPasswordViewController = ResetPasswordViewController()
+        resetPasswordViewController.delegate = self
+        navigationController?.pushViewController(resetPasswordViewController, animated: true)
+    }
+}
+
+extension LoginViewController: ResetPasswordViewControllerDelegate {
+    func resetPasswordViewControllerDidReset(_ viewController: ResetPasswordViewController) {
+        navigationController?.popViewController(animated: true)
+    }
+    
+    func resetPasswordViewControllerDidCancel(_ viewController: ResetPasswordViewController) {
+        navigationController?.popViewController(animated: true)
     }
 }

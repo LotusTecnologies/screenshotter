@@ -93,7 +93,6 @@ class AuthorizeViewController: UIViewController {
         
         loginViewController.facebookLoginButton.addTarget(self, action: #selector(facebookLoginAction), for: .touchUpInside)
         loginViewController.continueButton.addTarget(self, action: #selector(loginAction), for: .touchUpInside)
-        loginViewController.forgotPasswordButton.addTarget(self, action: #selector(forgotPasswordAction), for: .touchUpInside)
         
         if UserDefaults.standard.string(forKey: UserDefaultsKeys.email) != nil {
             displayLoginTab()
@@ -182,13 +181,6 @@ class AuthorizeViewController: UIViewController {
         else {
             // TODO: notify user there was an issue
         }
-    }
-    
-    @objc private func forgotPasswordAction() {
-        // TODO: present reset password page. this vc should prob be pushed up to the tutorial nav controller
-        
-        let resetPasswordViewController = ResetPasswordViewController()
-        navigationController?.pushViewController(resetPasswordViewController, animated: true)
     }
     
     // MARK: Facebook
