@@ -1,5 +1,5 @@
 //
-//  ResetPasswordViewController.swift
+//  InitiateResetPasswordViewController.swift
 //  screenshot
 //
 //  Created by Corey Werner on 5/30/18.
@@ -8,12 +8,12 @@
 
 import UIKit
 
-protocol ResetPasswordViewControllerDelegate: NSObjectProtocol {
-    func resetPasswordViewControllerDidReset(_ viewController: ResetPasswordViewController)
-    func resetPasswordViewControllerDidCancel(_ viewController: ResetPasswordViewController)
+protocol InitiateResetPasswordViewControllerDelegate: NSObjectProtocol {
+    func initiateResetPasswordViewControllerDidReset(_ viewController: InitiateResetPasswordViewController)
+    func initiateResetPasswordViewControllerDidCancel(_ viewController: InitiateResetPasswordViewController)
 }
 
-class ResetPasswordView: UIScrollView {
+class InitiateResetPasswordView: UIScrollView {
     let emailTextField = UnderlineTextField()
     let continueButton = MainButton()
     let backButton = UIButton()
@@ -109,8 +109,8 @@ class ResetPasswordView: UIScrollView {
     }
 }
 
-class ResetPasswordViewController: UIViewController {
-    weak var delegate: ResetPasswordViewControllerDelegate?
+class InitiateResetPasswordViewController: UIViewController {
+    weak var delegate: InitiateResetPasswordViewControllerDelegate?
     
     private let inputViewAdjustsScrollViewController = InputViewAdjustsScrollViewController()
     
@@ -120,12 +120,12 @@ class ResetPasswordViewController: UIViewController {
     
     // MARK: View
     
-    var classForView: ResetPasswordView.Type {
-        return ResetPasswordView.self
+    var classForView: InitiateResetPasswordView.Type {
+        return InitiateResetPasswordView.self
     }
     
-    var _view: ResetPasswordView {
-        return view as! ResetPasswordView
+    var _view: InitiateResetPasswordView {
+        return view as! InitiateResetPasswordView
     }
     
     var continueButton: UIButton {
@@ -162,7 +162,7 @@ class ResetPasswordViewController: UIViewController {
         if isValidEmail {
             let alertController = UIAlertController(title: "authorize.reset_password.alert.title".localized, message: "authorize.reset_password.alert.message".localized, preferredStyle: .alert)
             alertController.addAction(UIAlertAction(title: "generic.ok".localized, style: .cancel, handler: { alertAction in
-                self.delegate?.resetPasswordViewControllerDidReset(self)
+                self.delegate?.initiateResetPasswordViewControllerDidReset(self)
             }))
             present(alertController, animated: true)
         }
@@ -172,7 +172,7 @@ class ResetPasswordViewController: UIViewController {
     }
     
     @objc private func backAction() {
-        delegate?.resetPasswordViewControllerDidCancel(self)
+        delegate?.initiateResetPasswordViewControllerDidCancel(self)
     }
     
     // MARK: Keyboard

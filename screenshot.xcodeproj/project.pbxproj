@@ -96,7 +96,7 @@
 		C53154F420BE99AC0050EB76 /* AuthorizeContentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53154EE20BE99AB0050EB76 /* AuthorizeContentViewController.swift */; };
 		C53154F520BE99AC0050EB76 /* RegisterConfirmationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53154EF20BE99AC0050EB76 /* RegisterConfirmationViewController.swift */; };
 		C53154F620BE99AC0050EB76 /* RegisterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53154F020BE99AC0050EB76 /* RegisterViewController.swift */; };
-		C53154F720BE99AC0050EB76 /* ResetPasswordViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53154F120BE99AC0050EB76 /* ResetPasswordViewController.swift */; };
+		C53154F720BE99AC0050EB76 /* InitiateResetPasswordViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53154F120BE99AC0050EB76 /* InitiateResetPasswordViewController.swift */; };
 		C53154F920BEBFED0050EB76 /* InputViewAdjustsScrollViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53154F820BEBFED0050EB76 /* InputViewAdjustsScrollViewController.swift */; };
 		C5336D1B203AC9CE00A7B4B0 /* CartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5336D1A203AC9CE00A7B4B0 /* CartViewController.swift */; };
 		C5336D1D203ACE7B00A7B4B0 /* CartNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5336D1C203ACE7B00A7B4B0 /* CartNavigationController.swift */; };
@@ -361,7 +361,7 @@
 		C53154EE20BE99AB0050EB76 /* AuthorizeContentViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthorizeContentViewController.swift; sourceTree = "<group>"; };
 		C53154EF20BE99AC0050EB76 /* RegisterConfirmationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegisterConfirmationViewController.swift; sourceTree = "<group>"; };
 		C53154F020BE99AC0050EB76 /* RegisterViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegisterViewController.swift; sourceTree = "<group>"; };
-		C53154F120BE99AC0050EB76 /* ResetPasswordViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResetPasswordViewController.swift; sourceTree = "<group>"; };
+		C53154F120BE99AC0050EB76 /* InitiateResetPasswordViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InitiateResetPasswordViewController.swift; sourceTree = "<group>"; };
 		C53154F820BEBFED0050EB76 /* InputViewAdjustsScrollViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputViewAdjustsScrollViewController.swift; sourceTree = "<group>"; };
 		C5336D1A203AC9CE00A7B4B0 /* CartViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartViewController.swift; sourceTree = "<group>"; };
 		C5336D1C203ACE7B00A7B4B0 /* CartNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartNavigationController.swift; sourceTree = "<group>"; };
@@ -700,10 +700,10 @@
 			children = (
 				C53154EE20BE99AB0050EB76 /* AuthorizeContentViewController.swift */,
 				C53154ED20BE99AB0050EB76 /* AuthorizeViewController.swift */,
+				C53154F120BE99AC0050EB76 /* InitiateResetPasswordViewController.swift */,
 				C53154EC20BE99AB0050EB76 /* LoginViewController.swift */,
 				C53154EF20BE99AC0050EB76 /* RegisterConfirmationViewController.swift */,
 				C53154F020BE99AC0050EB76 /* RegisterViewController.swift */,
-				C53154F120BE99AC0050EB76 /* ResetPasswordViewController.swift */,
 			);
 			path = Authorize;
 			sourceTree = "<group>";
@@ -1549,7 +1549,7 @@
 				C5AB87ED208382EF00E2CB98 /* UIResponder.swift in Sources */,
 				C5D2E308204D682B00B5BD92 /* CartCheckoutView.swift in Sources */,
 				C528005B205133BA004DD7A3 /* FavoriteButton.swift in Sources */,
-				C53154F720BE99AC0050EB76 /* ResetPasswordViewController.swift in Sources */,
+				C53154F720BE99AC0050EB76 /* InitiateResetPasswordViewController.swift in Sources */,
 				C53154D620B6E3A90050EB76 /* OnboardingDetailsViewController.swift in Sources */,
 				C5CC3E391F94A85900DA3425 /* NetworkingIndicatorProtocol.swift in Sources */,
 				C5D98CD71FFCAF2700CC1A97 /* ScreenshotDisplayNavigationController.swift in Sources */,

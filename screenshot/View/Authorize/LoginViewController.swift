@@ -68,18 +68,18 @@ class LoginViewController: AuthorizeContentViewController {
     }
     
     @objc private func forgotPasswordAction() {
-        let resetPasswordViewController = ResetPasswordViewController()
+        let resetPasswordViewController = InitiateResetPasswordViewController()
         resetPasswordViewController.delegate = self
         navigationController?.pushViewController(resetPasswordViewController, animated: true)
     }
 }
 
-extension LoginViewController: ResetPasswordViewControllerDelegate {
-    func resetPasswordViewControllerDidReset(_ viewController: ResetPasswordViewController) {
+extension LoginViewController: InitiateResetPasswordViewControllerDelegate {
+    func initiateResetPasswordViewControllerDidReset(_ viewController: InitiateResetPasswordViewController) {
         navigationController?.popViewController(animated: true)
     }
     
-    func resetPasswordViewControllerDidCancel(_ viewController: ResetPasswordViewController) {
+    func initiateResetPasswordViewControllerDidCancel(_ viewController: InitiateResetPasswordViewController) {
         navigationController?.popViewController(animated: true)
     }
 }
