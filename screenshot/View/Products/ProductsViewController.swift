@@ -27,6 +27,143 @@ enum ProductsViewControllerState : Int {
     case unknown
 }
 
+
+
+
+
+class ShoppablesContainerView: UIView {
+    enum VisibleToolbar: Int {
+        case top
+        case bottom
+        case both
+    }
+    
+    private let containerView = UIView()
+    let toolbar: ShoppablesToolbar
+    let subToolbar: ShoppablesToolbar
+    
+    var visibleToolbar: VisibleToolbar = .top {
+        didSet {
+            switch visibleToolbar {
+            case .top:
+                NSLayoutConstraint.deactivate(bottomConstraints)
+                NSLayoutConstraint.deactivate(bothConstraints)
+                NSLayoutConstraint.activate(topConstraints)
+                
+            case .bottom:
+                NSLayoutConstraint.deactivate(topConstraints)
+                NSLayoutConstraint.deactivate(bothConstraints)
+                NSLayoutConstraint.activate(bottomConstraints)
+//                self.containerView.layer.anchorPoint = CGPoint(x: 0.5, y: 1)
+            case .both:
+                // TODO: animate the curve of the layer to be the same as the constraint
+                self.containerView.layer.anchorPoint = CGPoint(x: 0.5, y: 1)
+                NSLayoutConstraint.deactivate(topConstraints)
+                NSLayoutConstraint.deactivate(bottomConstraints)
+                NSLayoutConstraint.activate(bothConstraints)
+            }
+            
+            UIView.animate(withDuration: 2) {
+                self.containerView.layer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+                self.containerView.layoutIfNeeded()
+            }
+        }
+    }
+    
+    private var topConstraints: [NSLayoutConstraint] = []
+    private var bottomConstraints: [NSLayoutConstraint] = []
+    private var bothConstraints: [NSLayoutConstraint] = []
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    init(screenshot: Screenshot) {
+        toolbar = ShoppablesToolbar(screenshot: screenshot)
+        subToolbar = ShoppablesToolbar(screenshot: screenshot)
+        super.init(frame: .zero)
+        
+        clipsToBounds = true
+        backgroundColor = .green
+        
+        containerView.translatesAutoresizingMaskIntoConstraints = false
+        containerView.backgroundColor = .red
+        addSubview(containerView)
+        containerView.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        containerView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        containerView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        containerView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        
+        toolbar.translatesAutoresizingMaskIntoConstraints = false
+        toolbar.barTintColor = .white
+        containerView.addSubview(toolbar)
+        toolbar.leadingAnchor.constraint(equalTo: containerView.leadingAnchor).isActive = true
+        toolbar.trailingAnchor.constraint(equalTo: containerView.trailingAnchor).isActive = true
+        
+        topConstraints += [
+            toolbar.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 2),
+            toolbar.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -2)
+        ]
+        bottomConstraints += [
+            toolbar.bottomAnchor.constraint(equalTo: containerView.topAnchor)
+        ]
+        bothConstraints += [
+            toolbar.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 2),
+        ]
+        
+        subToolbar.translatesAutoresizingMaskIntoConstraints = false
+        subToolbar.barTintColor = .red
+        containerView.insertSubview(subToolbar, belowSubview: toolbar)
+        subToolbar.leadingAnchor.constraint(equalTo: containerView.leadingAnchor).isActive = true
+        subToolbar.trailingAnchor.constraint(equalTo: containerView.trailingAnchor).isActive = true
+        
+        topConstraints += [
+            subToolbar.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 2)
+        ]
+        bottomConstraints += [
+            subToolbar.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 2),
+            subToolbar.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -2)
+        ]
+        bothConstraints += [
+            subToolbar.topAnchor.constraint(equalTo: toolbar.bottomAnchor, constant: 2),
+            subToolbar.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -2)
+        ]
+        
+        NSLayoutConstraint.activate(topConstraints)
+        
+        toolbar.isUserInteractionEnabled = false
+        subToolbar.isUserInteractionEnabled = false
+        
+        let tap = UITapGestureRecognizer(target: self, action: #selector(tapAction(_:)))
+        addGestureRecognizer(tap)
+    }
+    
+    override var intrinsicContentSize: CGSize {
+        var size = super.intrinsicContentSize
+        size.height = toolbar.intrinsicContentSize.height
+        return size
+    }
+    
+    @objc private func tapAction(_ tapGesture: UITapGestureRecognizer) {
+        switch visibleToolbar {
+        case .top:
+            visibleToolbar = .both
+        case .bottom:
+            visibleToolbar = .top
+        case .both:
+            visibleToolbar = .bottom
+        }
+    }
+    
+}
+
+
+
+
+
+
+
+
 class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
     var screenshot:Screenshot
     var screenshotController: FetchedResultsControllerManager<Screenshot>?
@@ -108,11 +245,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
         screenshotController = DataModel.sharedInstance.singleScreenshotFrc(delegate: self, screenshot: screenshot)
         
         let shoppablesToolbar:ShoppablesToolbar = {
-            let margin:CGFloat = 8.5 // Anything other then 8 will display horizontal margin
-            let shoppableHeight:CGFloat = 60
-            
             let toolbar = ShoppablesToolbar.init(screenshot: self.screenshot)
-            toolbar.frame = CGRect(x: 0, y: 0, width: 0, height: margin*2+shoppableHeight)
             toolbar.translatesAutoresizingMaskIntoConstraints = false
             toolbar.delegate = self
             toolbar.shoppableToolbarDelegate = self
@@ -123,7 +256,6 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
             toolbar.topAnchor.constraint(equalTo: self.topLayoutGuide.bottomAnchor).isActive = true
             toolbar.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
             toolbar.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
-            toolbar.heightAnchor.constraint(equalToConstant: toolbar.bounds.size.height).isActive = true
             return toolbar
         }()
         
@@ -154,7 +286,6 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
             bottomConstraint.priority = .defaultLow
             bottomConstraint.isActive = true
             toolbar.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
-            toolbar.heightAnchor.constraint(equalTo: shoppablesToolbar.heightAnchor).isActive = true
             return toolbar
         }()
         self.subShoppablesToolbar = subShoppablesToolbar
@@ -243,6 +374,22 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
         else {
             self.shoppablesToolbar?.selectFirstShoppable()
         }
+        
+        
+        
+        
+        
+        let a = ShoppablesContainerView(screenshot: screenshot)
+        a.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(a)
+        a.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor, constant: 200).isActive = true
+        a.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        a.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        
+        
+        
+        
+        
         
         let pinchZoom = UIPinchGestureRecognizer.init(target: self, action: #selector(pinch(gesture:)))
         self.view.addGestureRecognizer(pinchZoom)

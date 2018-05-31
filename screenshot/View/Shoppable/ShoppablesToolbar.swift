@@ -58,6 +58,12 @@ class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UIColle
         }
     }
     
+    override var intrinsicContentSize: CGSize {
+        var size = super.intrinsicContentSize
+        size.height = 74
+        return size
+    }
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return self.shoppables.count
     }
