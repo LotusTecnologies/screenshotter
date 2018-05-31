@@ -1053,7 +1053,7 @@ extension AssetSyncModel {
         }
         let rootShoppableObjectId = rootShoppable.objectID
         let productImageUrl = fromProduct.imageURL
-        let cat = fromProduct.categories?.lowercased()
+        let rootShoppableLabel = rootShoppable.label?.lowercased()
         let optionsMask = ProductsOptionsMask.init(rawValue: Int(fromProduct.optionsMask))
         return Promise.init(resolvers: { (fulfil, reject) in
             self.performBackgroundTask(assetId: nil, shoppableId: productImageUrl, { (context) in
@@ -1084,6 +1084,8 @@ extension AssetSyncModel {
                         shoppableToSave.screenshot = rootShoppable.screenshot
                         shoppableToSave.offersURL = nil
                         shoppableToSave.parentShoppable = rootShoppable
+                        shoppableToSave.addProductFilter(managedObjectContext: context, optionsMask: optionsMask)
+
                         return shoppableToSave
                     }()
                     if context.saveIfNeeded() {
@@ -1096,12 +1098,12 @@ extension AssetSyncModel {
                                 reject(error)
                             }
                         }
-                        if let cat = cat {
+                        if let rootShoppableLabel = rootShoppableLabel {
                         self.userInitiatedQueue.addOperation(AsyncOperation.init(timeout: 90, assetId: nil, shoppableId: productImageUrl, completion: { (completion) in
                             NetworkingPromise.sharedInstance.uploadToSyte(imageData: nil, orImageUrlString: productImageUrl, imageClassification: .human, isUsc: false).then(execute: { (uploadedURLString, segments) -> Void in
                                 if   let segment = segments.first(where: { (segDict) -> Bool in
                                     if let label = segDict["label"] as? String {
-                                        return cat.contains(label.lowercased())
+                                        return rootShoppableLabel.contains(label.lowercased())
                                     }
                                     return false
                                 }), let offersURL = segment["offers"] as? String,
