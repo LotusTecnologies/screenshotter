@@ -56,8 +56,10 @@ extension CGRect {
         return CGPoint.init(x: self.midX, y: self.midY)
     }
     var isValid:Bool {
+
         return (self.width.isValid && self.height.isValid && self.origin.x.isValid && self.origin.y.isValid)
     }
+
     func scaleToAspectFit(in rtarget: CGRect) -> CGFloat {
         // first try to match width
         let s = rtarget.width / self.width;

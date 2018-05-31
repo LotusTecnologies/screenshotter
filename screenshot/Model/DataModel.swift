@@ -1508,7 +1508,7 @@ extension Shoppable {
         return productFilter(managedObjectContext: managedObjectContext, optionsMask: optionsMask.rawValue) != nil
     }
     
-    fileprivate func addProductFilter(managedObjectContext: NSManagedObjectContext, optionsMask: ProductsOptionsMask, rating: Int16 = 0) {
+    func addProductFilter(managedObjectContext: NSManagedObjectContext, optionsMask: ProductsOptionsMask, rating: Int16 = 0) {
         let productFilterToSave = ProductFilter(context: managedObjectContext)
         productFilterToSave.optionsMask = Int32(optionsMask.rawValue)
         productFilterToSave.rating = rating
@@ -2053,13 +2053,17 @@ fileprivate extension String {
 }
 
 extension NSManagedObjectContext {
-    func saveIfNeeded(){
+    @discardableResult func saveIfNeeded() -> Bool{
         if self.hasChanges {
             do {
                 try self.save()
+                return true
             } catch {
                 DataModel.sharedInstance.receivedCoreDataError(error: error)
+                return false
             }
+        }else{
+            return true
         }
     }
     

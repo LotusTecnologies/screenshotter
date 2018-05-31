@@ -20,7 +20,7 @@ class AsyncOperationMonitor {
     private(set) var didStart = false
     let tags:[AsyncOperationTag]
     let queueUUIDs:[UUID]
-    init(tags:[AsyncOperationTag], queues:[AsyncOperationQueue], delegate:AsyncOperationMonitorDelegate) {
+    init(tags:[AsyncOperationTag], queues:[AsyncOperationQueue], delegate:AsyncOperationMonitorDelegate?) {
         self.tags = tags
         self.delegate = delegate
         self.queueUUIDs = queues.map{ $0.uuid }
@@ -269,7 +269,7 @@ extension AsyncOperation {
 }
 
 extension AsyncOperationMonitor {
-    convenience init(assetId:String?, shoppableId:String?, queues:[AsyncOperationQueue], delegate:AsyncOperationMonitorDelegate) {
+    convenience init(assetId:String?, shoppableId:String?, queues:[AsyncOperationQueue], delegate:AsyncOperationMonitorDelegate?) {
         var tags:[AsyncOperationTag] = []
         if let assetId = assetId {
             tags.append(AsyncOperationTag.init(type: .assetId, value: assetId))
@@ -280,7 +280,7 @@ extension AsyncOperationMonitor {
         self.init(tags: tags, queues:queues, delegate: delegate)
     }
     
-    convenience init(tracking partNumbers:[String], delegate:AsyncOperationMonitorDelegate) {
+    convenience init(tracking partNumbers:[String], delegate:AsyncOperationMonitorDelegate?) {
         var tags:[AsyncOperationTag] = []
         partNumbers.forEach { tags.append(AsyncOperationTag.init(type: .productNumber, value: $0)) }
         

@@ -21,7 +21,14 @@ class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UIColle
     var collectionView:UICollectionView?
     var screenshotImage:UIImage
     var shoppablesController:FetchedResultsControllerManager<Shoppable>
+    var rootShoppableObjectId:NSManagedObjectID? {
+        didSet {
+            shoppables = shoppablesController.fetchedObjects.filter { $0.parentShoppable?.objectID == rootShoppableObjectId }
+            self.collectionView?.reloadData()
+        }
+    }
     
+    var shoppables:[Shoppable] = []
     init(screenshot s:Screenshot) {
         if let data = s.imageData,
             let i = UIImage(data: data as Data) {
@@ -31,6 +38,8 @@ class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UIColle
         }
         
         shoppablesController = DataModel.sharedInstance.shoppableFrc(delegate: nil, screenshot: s)
+        shoppables = shoppablesController.fetchedObjects.filter { $0.parentShoppable == nil }
+        
         super.init(frame: CGRect.zero)
         shoppablesController.delegate = self
         
@@ -50,7 +59,7 @@ class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UIColle
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.shoppablesController.fetchedObjectsCount
+        return self.shoppables.count
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -75,14 +84,19 @@ class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UIColle
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as? ShoppableCollectionViewCell
-        cell?.image = self.shoppablesController.object(at: indexPath).cropped(image: screenshotImage, thumbSize: self.shoppableSize())
+        let shoppable = shoppables[indexPath.row]
+        if let imageUrl = shoppable.imageUrl {
+            cell?.imageUrl = imageUrl
+        }else {
+            cell?.image = shoppable.cropped(image: screenshotImage, thumbSize: self.shoppableSize())
+        }
         return cell ?? UICollectionViewCell.init()
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let shopable = self.shoppablesController.object(at: indexPath)
-        Analytics.trackTappedOnShoppable(shoppable: shopable)
-        self.shoppableToolbarDelegate?.shoppablesToolbarDidChangeSelectedShoppable(toolbar: self, shoppable: shopable)
+        let shoppable = shoppables[indexPath.row]
+        Analytics.trackTappedOnShoppable(shoppable: shoppable)
+        self.shoppableToolbarDelegate?.shoppablesToolbarDidChangeSelectedShoppable(toolbar: self, shoppable: shoppable)
 
     }
     
@@ -113,9 +127,18 @@ class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UIColle
     }
     
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
-        if let collectionView = self.collectionView {
-            change.applyChanges(collectionView: collectionView)
+        
+        var selected:Shoppable? = nil
+        if let index = self.collectionView?.indexPathsForSelectedItems?.first?.item {
+            selected = shoppables[index]
         }
+        shoppables = shoppablesController.fetchedObjects.filter { $0.parentShoppable?.objectID == rootShoppableObjectId }
+        self.collectionView?.reloadData()
+        if let selected = selected, let index = self.shoppables.index(of: selected) {
+            self.collectionView?.selectItem(at: IndexPath.init(row: index, section: 0), animated: false, scrollPosition: [])
+        }
+        
+        
         self.shoppableToolbarDelegate?.shoppablesToolbarDidChange(toolbar: self)
 
     }
@@ -140,13 +163,20 @@ class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UIColle
             }
         }
     }
+    func deselectShoppable() {
+        if let collectionView = self.collectionView, let indexPathsForSelectedItems = collectionView.indexPathsForSelectedItems {
+            for indexPath in indexPathsForSelectedItems {
+                collectionView.deselectItem(at: indexPath, animated: true)
+            }
+        }
+    }
     
     func selectedShoppable() -> Shoppable? {
         if let collectionView = self.collectionView {
             if let index = collectionView.indexPathsForSelectedItems?.first?.item {
-                return self.shoppablesController.object(at: IndexPath(item: index, section: 0))
+                return shoppables[index]
             }
-            if let firstShoppable = self.shoppablesController.first {
+            if let firstShoppable = self.shoppables.first {
                 if collectionView.numberOfSections > 0 && collectionView.numberOfItems(inSection: 0) > 0 {
                     collectionView.selectItem(at: IndexPath.init(item: 0, section: 0), animated: false, scrollPosition: [])
                     return firstShoppable
@@ -154,6 +184,15 @@ class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UIColle
             }
         }
         return nil
+    }
+    func selectShoppable(_ s:Shoppable){
+        if let collectionView = self.collectionView {
+            if let index = shoppables.index(of: s) {
+                collectionView.selectItem(at: IndexPath.init(row: index, section: 0), animated: false, scrollPosition: [])
+                self.shoppableToolbarDelegate?.shoppablesToolbarDidChangeSelectedShoppable(toolbar: self, shoppable: s)
+
+            }
+        }
     }
     
     static func preservedCollectionViewContentInset() -> UIEdgeInsets{
