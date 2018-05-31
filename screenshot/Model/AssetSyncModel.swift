@@ -1046,23 +1046,23 @@ extension AssetSyncModel {
     }
     
     //Return the subshoppable (on the main thread) BEFORE the network requests are made on
-    public func addSubShoppableTo(shoppable:Shoppable, fromProduct:Product) -> Promise<Shoppable> {
-        var rootShoppable = shoppable
-        if let parent = shoppable.parentShoppable {
+    public func addSubShoppable(fromProduct:Product) -> Promise<Shoppable> {
+        var rootShoppable = fromProduct.shoppable
+        if let parent = rootShoppable?.parentShoppable {
             rootShoppable = parent
         }
-        let rootShoppableObjectId = rootShoppable.objectID
+        let rootShoppableObjectId = rootShoppable?.objectID
         let productImageUrl = fromProduct.imageURL
-        let rootShoppableLabel = rootShoppable.label?.lowercased()
+        let rootShoppableLabel = rootShoppable?.label?.lowercased()
         let optionsMask = ProductsOptionsMask.init(rawValue: Int(fromProduct.optionsMask))
         return Promise.init(resolvers: { (fulfil, reject) in
             self.performBackgroundTask(assetId: nil, shoppableId: productImageUrl, { (context) in
-                if let rootShoppable = context.shoppableWith(objectId: rootShoppableObjectId)
+                if let rootShoppableObjectId = rootShoppableObjectId, let rootShoppable = context.shoppableWith(objectId: rootShoppableObjectId)
                 {
-                    var maxOrder = 1
+                    var minOrder = 999999
                     var alreadyExsistingSubShoppable:Shoppable? = nil
                     if let subShoppables = rootShoppable.subShoppables as? Set<Shoppable> {
-                        maxOrder = subShoppables.reduce(1, { max($0, Int($1.order ?? "0") ?? 0 ) })
+                        minOrder = subShoppables.reduce(999999, { min($0, Int($1.order ?? "999999") ?? 0 ) })
                         for s in subShoppables {
                             if s.imageUrl == productImageUrl {
                                 alreadyExsistingSubShoppable = s
@@ -1070,10 +1070,10 @@ extension AssetSyncModel {
                         }
                     }
                     
-                    alreadyExsistingSubShoppable?.order = String.init(format: "%03d", maxOrder + 1 )
+                    alreadyExsistingSubShoppable?.order = String.init(format: "%03d", minOrder - 1 )
                     let shoppableToDisplay = alreadyExsistingSubShoppable ?? {
                         let shoppableToSave = Shoppable(context: context)
-                        shoppableToSave.order = String.init(format: "%03d", maxOrder + 1 )
+                        shoppableToSave.order = String.init(format: "%03d", minOrder - 1 )
                         shoppableToSave.label = rootShoppable.label
                         shoppableToSave.imageUrl = productImageUrl
                         shoppableToSave.b0x = 0
@@ -1104,22 +1104,10 @@ extension AssetSyncModel {
                                 var segment:[String:Any]? = nil
                                 
                                 
-                                if segment == nil {
-                                    segment = segments.sorted(by: { (dict1, dict2) -> Bool in
-                                        if let rect1 = CGRect.rectFrom(syteDict: dict1),
-                                            let rect2 = CGRect.rectFrom(syteDict: dict2) {
-                                            return rect1.area > rect2.area
-                                        }
-                                        return false
-                                        
-                                    }).first
+                                if segments.count == 1 {
+                                    segment = segments.first
                                 }
                                 
-                                if segment == nil {
-                                    if segments.count == 1 {
-                                        segment = segments.first
-                                    }
-                                }
                                 if segment == nil {
                                     segment = segments.first(where: { (segDict) -> Bool in
                                         if let label = segDict["label"] as? String {
@@ -1129,6 +1117,16 @@ extension AssetSyncModel {
                                     })
                                 }
                                 
+                                if segment == nil {
+                                    segment = segments.sorted(by: { (dict1, dict2) -> Bool in
+                                        if let rect1 = CGRect.rectFrom(syteDict: dict1),
+                                            let rect2 = CGRect.rectFrom(syteDict: dict2) {
+                                            return rect1.size.area > rect2.size.area
+                                        }
+                                        return false
+                                        
+                                    }).first
+                                }
                                 
                                 if  let segment = segment , let offersURL = segment["offers"] as? String,
                                     let url = AssetSyncModel.sharedInstance.augmentedUrl(offersURL: offersURL, optionsMask:optionsMask ) {

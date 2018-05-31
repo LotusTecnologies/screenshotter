@@ -643,20 +643,24 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
     }
     
     @objc func productCollectionViewCellProductAction(_ control: UIControl, event: UIEvent) {
-        guard let indexPath = collectionView?.indexPath(for: event),
-            let shoppable = self.shoppablesToolbar?.selectedShoppable()
+        guard let indexPath = collectionView?.indexPath(for: event)
             else {
                 return
         }
         
         let product = self.productAtIndex(indexPath.row)
         
-        AssetSyncModel.sharedInstance.addSubShoppableTo(shoppable: shoppable, fromProduct: product).then { (shoppable) -> Void in
+        AssetSyncModel.sharedInstance.addSubShoppable(fromProduct: product).then { (shoppable) -> Void in
             
             self.isSubShoppablesToolbarDisplayed = true
             self.shoppablesToolbar?.deselectShoppable()
             self.subShoppablesToolbar?.selectShoppable(shoppable)
-            self.syncViewsAfterStateChange()
+            
+            if let p = self.productsLoadingMonitor {
+                p.delegate = nil
+            }
+            self.productsLoadingMonitor = AsyncOperationMonitor.init(assetId: nil, shoppableId: shoppable.imageUrl, queues: AssetSyncModel.sharedInstance.queues, delegate: self)
+            self.updateLoadingState()
             
         }
     }
@@ -725,11 +729,7 @@ extension ProductsViewControllerProducts{
         self.scrollRevealController?.resetViewOffset()
         
         self.productLoadingState = .unknown
-        if let p = self.productsLoadingMonitor {
-            p.delegate = nil
-        }
-        self.productsLoadingMonitor = AsyncOperationMonitor.init(assetId: nil, shoppableId: shoppable.imageUrl, queues: AssetSyncModel.sharedInstance.queues, delegate: self)
-        if shoppable.productFilterCount == -1 {
+          if shoppable.productFilterCount == -1 {
             self.screenshotLoadingState = .retry
         } else {
             self.products = self.productsForShoppable(shoppable)
@@ -1254,15 +1254,15 @@ extension ProductsViewController : AsyncOperationMonitorDelegate {
                 if self.products.count > 0 {
                     return .products
                 }else{
-                    if isLoading {
+                    if isProductLoading {
                         return .loading
                     }else{
                         return .retry
                     }
                 }
             }()
-            if state != self.productLoadingState {
-                self.productLoadingState = state
+            if productState != self.productLoadingState {
+                self.productLoadingState = productState
             }
             
         }
