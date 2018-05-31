@@ -1145,8 +1145,30 @@ extension AssetSyncModel {
                                     }).first
                                 }
                                 
+                                
                                 if  let segment = segment , let offersURL = segment["offers"] as? String,
                                     let url = AssetSyncModel.sharedInstance.augmentedUrl(offersURL: offersURL, optionsMask:optionsMask ) {
+                                    
+                                    //Save the updated data for the shoppable - eventhough it is not used.
+                                    self.performBackgroundTask(assetId: nil, shoppableId: productImageUrl, { (context) in
+                                        if let shopable = context.shoppableWith(objectId:createdSubShopableObjectId) {
+                                            shopable.offersURL = offersURL
+                                            if let b0 = segment["b0"] as? [Any],
+                                                b0.count >= 2,
+                                                let b1 = segment["b1"] as? [Any],
+                                                b1.count >= 2,
+                                                let b0x = b0[0] as? Double,
+                                                let b0y = b0[1] as? Double,
+                                                let b1x = b1[0] as? Double,
+                                                let b1y = b1[1] as? Double {
+                                                shopable.b0x = b0x
+                                                shopable.b0y = b0y
+                                                shopable.b1x = b1x
+                                                shopable.b1y = b1y
+                                            }
+                                            context.saveIfNeeded()
+                                        }
+                                    })
                                     NetworkingPromise.sharedInstance.downloadProductsWithRetry(url: url).then(execute:                                                                               { productsDict -> Void in
                                             if let productsArray = productsDict["ads"] as? [[String : Any]],
                                                 productsArray.count > 0 {
