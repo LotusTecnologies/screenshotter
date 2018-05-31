@@ -53,7 +53,6 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
     }
     var shareToDiscoverPrompt:UIView?
     fileprivate let filterView = CustomInputtableView()
-    var menuDisplayingIndexPath:IndexPath?
     
     fileprivate var subShoppablesToolbar:ShoppablesToolbar?
     fileprivate var subShoppablesToolbarTopConstraint: NSLayoutConstraint?
@@ -234,10 +233,6 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
         
         let pinchZoom = UIPinchGestureRecognizer.init(target: self, action: #selector(pinch(gesture:)))
         self.view.addGestureRecognizer(pinchZoom)
-        
-        
-        let longPress = UILongPressGestureRecognizer.init(target: self, action: #selector(longPress(gesture:)))
-        self.view.addGestureRecognizer(longPress)
     }
     
     @objc func pinch( gesture:UIPinchGestureRecognizer) {
@@ -579,45 +574,6 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         
     }
    
-    @objc func longPress( gesture:UIPinchGestureRecognizer) {
-        let point = gesture.location(in: self.collectionView)
-        if let collectionView = self.collectionView, let indexPath = collectionView.indexPathForItem(at: point),  let cell = collectionView.cellForItem(at: indexPath){
-            
-            
-            let editMenu = UIMenuController.shared
-            if !editMenu.isMenuVisible {
-                self.menuDisplayingIndexPath = indexPath
-                let moreLikeThis = UIMenuItem.init(title: "More Like This", action: #selector(moreLikeThis(_:)))
-                
-                editMenu.menuItems = [moreLikeThis]
-                editMenu.setTargetRect(cell.bounds, in: cell)
-                editMenu.setMenuVisible(true, animated: true)
-            }
-        }
-        
-        
-    }
-    override var canBecomeFirstResponder: Bool {
-        return true
-    }
-    override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
-        if action == #selector(ProductsViewController.moreLikeThis) {
-            return true
-        }
-        return false
-        
-    }
-    @objc func moreLikeThis(_ sender:Any) {
-        if let index = menuDisplayingIndexPath, let shoppable = self.shoppablesToolbar?.selectedShoppable(){
-            let product = self.productAtIndex(index.row)
-            AssetSyncModel.sharedInstance.addSubShoppableTo(shoppable: shoppable, fromProduct: product).then { (shoppable) -> Void in
-                // set this shoppable and the currently visible one (will be loading).  look for loading of the shoppable.imageUrl
-            }
-
-        }
-    }
-   
-
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let sectionType = productSectionType(forSection: indexPath.section)
 
@@ -665,11 +621,17 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
     }
     
     @objc func productCollectionViewCellProductAction(_ control: UIControl, event: UIEvent) {
-        guard let indexPath = collectionView?.indexPath(for: event) else {
-            return
+        guard let indexPath = collectionView?.indexPath(for: event),
+            let shoppable = self.shoppablesToolbar?.selectedShoppable()
+            else {
+                return
         }
         
+        let product = self.productAtIndex(indexPath.row)
         
+        AssetSyncModel.sharedInstance.addSubShoppableTo(shoppable: shoppable, fromProduct: product).then { (shoppable) -> Void in
+            // set this shoppable and the currently visible one (will be loading).  look for loading of the shoppable.imageUrl
+        }
     }
 }
 
