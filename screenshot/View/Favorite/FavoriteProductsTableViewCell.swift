@@ -17,6 +17,7 @@ class FavoriteProductsTableViewCell: UITableViewCell, DynamicTypeAccessibilityLa
 
     let merchantLabel = UILabel()
     let priceAlertButton = LoadingButton()
+    let shareButton = UIButton()
     let cartButton = BorderButton()
     
     var fontSizeStandardRangeConstraints: [NSLayoutConstraint] = []
@@ -158,6 +159,13 @@ class FavoriteProductsTableViewCell: UITableViewCell, DynamicTypeAccessibilityLa
         priceAlertButton.setContentHuggingPriority(.defaultLow, for: .vertical)
         priceAlertButtonHiddenConstraints = priceAlertButton.heightAnchor.constraint(equalToConstant: 0.0)
         
+        shareButton.translatesAutoresizingMaskIntoConstraints = false
+        shareButton.setImage(UIImage(named: "ScreenshotShare"), for: .normal)
+        shareButton.contentEdgeInsets = .init(top: 10, left: contentView.layoutMargins.right, bottom: 10, right: contentView.layoutMargins.right)
+        contentView.addSubview(shareButton)
+        shareButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
+        shareButton.centerYAnchor.constraint(equalTo: priceAlertButton.centerYAnchor).isActive = true
+        
         cartButton.translatesAutoresizingMaskIntoConstraints = false
         cartButton.setTitle("favorites.product.cart".localized, for: .normal)
         cartButton.setTitleColor(.crazeGreen, for: .normal)
@@ -226,6 +234,12 @@ class FavoriteProductsTableViewCell: UITableViewCell, DynamicTypeAccessibilityLa
                 priceAlertButtonShowConstraints?.isActive = !isPriceAlertButtonHidden
             }
             
+        }
+    }
+    
+    var isShareButtonHidden = false {
+        didSet {
+            shareButton.isHidden = isShareButtonHidden
         }
     }
 }

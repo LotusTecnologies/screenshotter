@@ -43,7 +43,6 @@ class SettingsViewController : BaseViewController {
         case followInstagram
         case partners
         case restoreInAppPurchase
-        case talkToStylist
         case openIn
         case region
         case payment
@@ -226,7 +225,6 @@ class SettingsViewController : BaseViewController {
             .contactUs,
             .bug,
             .restoreInAppPurchase,
-            .talkToStylist,
             .usageStreak,
             .coins,
             .region,
@@ -384,8 +382,7 @@ extension SettingsViewController : UITableViewDataSource {
         cell.textLabel?.text = cellText(for: row)
         cell.textLabel?.font = .screenshopFont(.hindLight, textStyle: .body)
         
-        if (row == .restoreInAppPurchase && self.isRestoring) ||
-            (row == .talkToStylist && InAppPurchaseManager.sharedInstance.isInProcessOfBuying()) {
+        if (row == .restoreInAppPurchase && self.isRestoring) {
             cell.textLabel?.textColor = .gray
         }
         else {
@@ -437,7 +434,7 @@ extension SettingsViewController : UITableViewDelegate {
         
         switch (row) {
         case .bug:
-            presentMailComposer()
+            presentMailComposerForBug()
             
         case .tutorialVideo:
             let viewController = TutorialVideoViewController()
@@ -447,8 +444,9 @@ extension SettingsViewController : UITableViewDelegate {
             present(viewController, animated: true, completion: nil)
         
         case .contactUs:
-            IntercomHelper.sharedInstance.presentMessagingUI()
-            
+
+            presentMailComposerForContactUs()
+
         case .coins:
             let navigationController = ModalNavigationController(rootViewController: GameViewController())
             present(navigationController, animated: true, completion: nil)
@@ -529,51 +527,7 @@ extension SettingsViewController : UITableViewDelegate {
                 })
             }
             
-        case .talkToStylist:
-            if InAppPurchaseManager.sharedInstance.isInProcessOfBuying() {
-                // do nothing
-            } else if InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist) {
-                IntercomHelper.sharedInstance.presentMessagingUI()
-            } else {
-                if InAppPurchaseManager.sharedInstance.canPurchase() {
-                    let alertController = UIAlertController.init(title: nil, message: "personal_stylist.loading".localized, preferredStyle: .alert)
-                    
-                    let action = UIAlertAction.init(title: "generic.continue".localized, style: .default, handler: { (action) in
-                        if let product = InAppPurchaseManager.sharedInstance.productIfAvailable(product: .personalStylist) {
-                            InAppPurchaseManager.sharedInstance.buy(product: product, success: {
-//                                IntercomHelper.sharedInstance.presentMessagingUI()
-                                //If on the page the user will see cell change to 'talk to your stylist' with the lock.  If not on the page it can be jarring
-                            }, failure: { (error) in
-                                //no reason to present alert - Apple does it for us
-                            })
-                        }
-                    })
-                    
-                    if let product = InAppPurchaseManager.sharedInstance.productIfAvailable(product: .personalStylist) {
-                        action.isEnabled = true
-                        alertController.message = String.init(format: "personal_stylist.unlock".localized, product.localizedPriceString())
-                    } else {
-                        action.isEnabled = false
-                        InAppPurchaseManager.sharedInstance.load(product: .personalStylist, success: { (product) in
-                            action.isEnabled = true
-                            alertController.message = String.init(format: "personal_stylist.unlock".localized, product.localizedPriceString())
-                        }, failure: { (error) in
-                            alertController.message = String.init(format: "personal_stylist.error".localized, error.localizedDescription)
-                        })
-                    }
-                    
-                    alertController.addAction(action)
-                    alertController.addAction(UIAlertAction.init(title: "generic.cancel".localized, style: .cancel, handler: nil))
-                    alertController.preferredAction = action
-                    self.present(alertController, animated: true, completion: nil)
-                    
-                }else{
-                    let errorMessage = "personal_stylist.error.invalid_device".localized
-                    let alertController = UIAlertController.init(title: nil, message: errorMessage, preferredStyle: .alert)
-                    alertController.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .cancel, handler: nil))
-                    self.present(alertController, animated: true, completion: nil)
-                }
-            }
+       
  
         case .region:
             let alert = UIAlertController.init(title: nil, message: nil, preferredStyle: .actionSheet)
@@ -678,8 +632,6 @@ fileprivate extension SettingsViewController {
             return "settings.row.partners.title".localized
         case .restoreInAppPurchase:
             return "settings.row.restore_in_app_purchase.title".localized
-        case .talkToStylist:
-            return "settings.row.talk_to_stylist.title".localized
         case .region:
             return "settings.row.region.title".localized
         case .payment:
@@ -713,13 +665,6 @@ fileprivate extension SettingsViewController {
             return "\(UserDefaults.standard.integer(forKey: UserDefaultsKeys.gameScore))"
         case .currency:
             return CurrencyViewController.currentCurrency
-        case .talkToStylist:
-            if InAppPurchaseManager.sharedInstance.isInProcessOfBuying() || InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist) {
-                return nil
-            }
-            else {
-                return "🔒"
-            }
         case .region:
             if UserDefaults.standard.object(forKey: UserDefaultsKeys.isUSC) == nil {
                 return "settings.region.unknown".localized
@@ -842,16 +787,6 @@ fileprivate extension SettingsViewController {
                 return nil
             }
             
-        case .talkToStylist:
-            if InAppPurchaseManager.sharedInstance.isInProcessOfBuying() {
-                let activityView = UIActivityIndicatorView(activityIndicatorStyle: .gray)
-                activityView.startAnimating()
-                return activityView
-            }
-            else {
-                return nil
-            }
-            
         default:
             return nil
         }
@@ -886,7 +821,6 @@ fileprivate extension SettingsViewController {
         var indexPaths = sectionIndexPaths(.permission)
         append(section: .about, row: .usageStreak, to: &indexPaths)
         append(section: .about, row: .coins, to: &indexPaths)
-        append(section: .about, row: .talkToStylist, to: &indexPaths)
         append(section: .about, row: .restoreInAppPurchase, to: &indexPaths)
 
         tableView.reloadRows(at: indexPaths, with: .none)
@@ -972,18 +906,8 @@ extension SettingsViewController : VideoDisplayingViewControllerDelegate {
 
 extension SettingsViewController : MFMailComposeViewControllerDelegate {
   
-    
-    func presentMailComposer() {
-        let message = [
-            "\n\n\n",
-            "-----------------",
-            "Don't edit below.\n",
-            "version: \(Bundle.displayVersionBuild)"
-        ].joined(separator: "\n")
-        let gmailMessage = "(Don't edit) version: \(Bundle.displayVersionBuild)"  //gmail has a bug that it won't respect new line charactors in a URL
-        let subject = "Bug Report"
-        let recipient = "support@screenshopit.com"
-        
+   
+    func presentMail(recipient:String, gmailMessage:String, subject:String, message:String ){
         if MFMailComposeViewController.canSendMail() {
             let mail = MFMailComposeViewController()
             mail.mailComposeDelegate = self
@@ -1007,6 +931,27 @@ extension SettingsViewController : MFMailComposeViewControllerDelegate {
             
             present(alertController, animated: true, completion: nil)
         }
+        
+    }
+    
+    func presentMailComposerForContactUs(){
+        let recipient = "Info+\(Bundle.displayVersionBuild)@screenshopit.com"
+        self.presentMail(recipient: recipient, gmailMessage: "", subject: "To Screenshop:", message: "")
+        
+    }
+    
+    func presentMailComposerForBug() {
+        let message = [
+            "\n\n\n",
+            "-----------------",
+            "Don't edit below.\n",
+            "version: \(Bundle.displayVersionBuild)"
+        ].joined(separator: "\n")
+        let gmailMessage = "(Don't edit) version: \(Bundle.displayVersionBuild)"  //gmail has a bug that it won't respect new line charactors in a URL
+        let subject = "Bug Report"
+        let recipient = "support@screenshopit.com"
+        
+        self.presentMail(recipient: recipient, gmailMessage: gmailMessage, subject: subject, message: message)
     }
     
     func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {

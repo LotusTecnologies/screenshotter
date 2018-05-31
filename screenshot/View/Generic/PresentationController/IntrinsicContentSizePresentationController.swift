@@ -44,7 +44,7 @@ class IntrinsicContentSizePresentationController: DimmedPresentationController {
         rect.origin.x = (rect.width / 2) - (intrinsicContentSize.width / 2)
         rect.origin.y = (rect.height / 2) - (intrinsicContentSize.height / 2)
         
-        if keyboardRect.height > 0 {
+        if keyboardRect.origin.y < UIScreen.main.bounds.height {
             rect.origin.y = max(statusBarHeight, rect.origin.y - (keyboardRect.height / 2))
         }
         

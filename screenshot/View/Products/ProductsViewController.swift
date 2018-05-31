@@ -140,7 +140,6 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, UIToo
             view.translatesAutoresizingMaskIntoConstraints = false
             view.voteUpButton.addTarget(self, action: #selector(productsRatePositiveAction), for: .touchUpInside)
             view.voteDownButton.addTarget(self, action: #selector(productsRateNegativeAction), for: .touchUpInside)
-            view.talkToYourStylistButton.addTarget(self, action: #selector(talkToYourStylistAction), for: .touchUpInside)
             return view
         }()
         self.rateView = rateView
@@ -592,8 +591,13 @@ extension ProductsViewControllerShoppables: FetchedResultsControllerManagerDeleg
 
         }
         else if controller == productsFRC {
+            
             if view.window != nil, let collectionView = collectionView {
-                collectionView.reloadItems(at: collectionView.indexPathsForVisibleItems)
+                if change.updatedRows.count > 0 && change.deletedRows.count == 0 && change.insertedRows.count == 0 {
+                    collectionView.reloadItems(at: collectionView.indexPathsForVisibleItems)
+                }else{
+                    collectionView.reloadData()
+                }
             }
         }
     }
@@ -716,53 +720,9 @@ private typealias ProductsViewControllerRatings = ProductsViewController
 extension ProductsViewControllerRatings: UITextFieldDelegate {
     
     func presentProductsRateNegativeAlert() {
-        if !InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist) {
-            InAppPurchaseManager.sharedInstance .loadProductInfoIfNeeded()
-        }
         let alertController = UIAlertController(title: "negative_feedback.title".localized, message: "negative_feedback.message".localized, preferredStyle: .alert)
         alertController.addAction(UIAlertAction(title: "negative_feedback.options.send".localized, style: .default, handler: { (a) in
             self.presentProductsRateNegativeFeedbackAlert()
-        }))
-        alertController.addAction(UIAlertAction(title: "negative_feedback.options.help".localized, style: .default, handler: { (a) in
-            if InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist) {
-                self.presentPersonalStylist()
-            } else {
-                if InAppPurchaseManager.sharedInstance.canPurchase() {
-                    let alertController = UIAlertController(title: nil, message: "personal_stylist.loading".localized, preferredStyle: .alert)
-                    let action = UIAlertAction(title: "generic.continue".localized, style: .default, handler: { (action) in
-                        if let product = InAppPurchaseManager.sharedInstance.productIfAvailable(product: .personalStylist) {
-                            InAppPurchaseManager.sharedInstance.buy(product: product, success: {
-                                //don't present anything -  if the user stayed on the same page the bottom bar changed to 'talk to your stylist' otherwise don't do anything
-                            }, failure: { (error) in
-                                //no reason to present alert - Apple does it for us
-                            })
-                        }
-                    })
-                    
-                    if let product = InAppPurchaseManager.sharedInstance.productIfAvailable(product: .personalStylist) {
-                        action.isEnabled = true
-                        alertController.message = String(format: "personal_stylist.unlock".localized, product.localizedPriceString())
-                    } else {
-                        action.isEnabled = false
-                        InAppPurchaseManager.sharedInstance.load(product: .personalStylist, success: { (product) in
-                            action.isEnabled = true
-                            alertController.message = String(format: "personal_stylist.unlock".localized, product.localizedPriceString())
-                        }, failure: { (error) in
-                            alertController.message = String(format: "personal_stylist.error".localized, error.localizedDescription)
-                        })
-                        
-                    }
-                    alertController.addAction(action)
-                    alertController.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
-                    self.present(alertController, animated: true, completion: nil)
-                }else{
-                    let errorMessage = "personal_stylist.error.invalid_device".localized
-                    let alertController = UIAlertController(title: nil, message: errorMessage, preferredStyle: .alert)
-                    alertController.addAction(UIAlertAction(title: "generic.ok".localized, style: .cancel, handler: nil))
-                    self.present(alertController, animated: true, completion: nil)
-                    
-                }
-            }
         }))
         alertController.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
         self.present(alertController, animated: true, completion: nil)
@@ -797,18 +757,6 @@ extension ProductsViewControllerRatings: UITextFieldDelegate {
             shoppable.setRating(positive: false)
             self.presentProductsRateNegativeAlert()
         }
-    }
-    
-    @objc func talkToYourStylistAction() {
-        IntercomHelper.sharedInstance.presentMessagingUI()
-    }
-    
-    func presentPersonalStylist() {
-        let shoppable = self.shoppablesToolbar?.selectedShoppable()
-        Analytics.trackRequestedCustomStylist(shoppable: shoppable)
-        let prefiledMessageTemplate = "products.rate.negative.help_finding_outfit".localized
-        let prefilledMessage = String(format: prefiledMessageTemplate, (self.screenshot.shortenedUploadedImageURL ?? "null"))
-        IntercomHelper.sharedInstance.presentMessageComposer(withInitialMessage: prefilledMessage)
     }
     
     func presentProductsRateNegativeFeedbackAlert() {
