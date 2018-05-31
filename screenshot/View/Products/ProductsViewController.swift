@@ -51,6 +51,19 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
             self.syncViewsAfterStateChange()
         }
     }
+    
+    var selectedShoppable:Shoppable?
+    
+    func getSelectedShoppable() -> Shoppable? {
+        if let s = selectedShoppable {
+            return s
+        }else if self.isSubShoppablesToolbarDisplayed, let s = self.subShoppablesToolbar?.selectedShoppable() {
+            return s
+        }else {
+            return self.shoppablesToolbar?.selectedShoppable()
+        }
+    }
+    
     var shareToDiscoverPrompt:UIView?
     fileprivate let filterView = CustomInputtableView()
     var menuDisplayingIndexPath:IndexPath?
@@ -326,7 +339,7 @@ extension ProductsViewControllerScrollViewDelegate: UIScrollViewDelegate {
 extension ProductsViewController: ShoppablesToolbarDelegate {
     func shoppablesToolbarDidChange(toolbar: ShoppablesToolbar) {
         if self.isViewLoaded  {
-            if  let selectedShoppable = self.shoppablesToolbar?.selectedShoppable(){
+            if let selectedShoppable = self.getSelectedShoppable(){
                 if let currentShoppable = self.products.first?.shoppable, currentShoppable == selectedShoppable {
                     //already synced
                 }else{
@@ -344,8 +357,8 @@ extension ProductsViewController: ShoppablesToolbarDelegate {
         }else if toolbar == shoppablesToolbar {
             self.subShoppablesToolbar?.rootShoppableObjectId = shoppable.objectID
             isSubShoppablesToolbarDisplayed =  (shoppable.subShoppables?.count ?? 0 > 0)
-            
         }
+        self.selectedShoppable = shoppable
         self.reloadProductsFor(shoppable: shoppable)
     }
 }
@@ -360,9 +373,9 @@ extension ProductsViewController {
     func productsOptionsDidComplete(_ productsOptions: ProductsOptions, withChange changed: Bool) {
         
         if changed {
-            if  let shoppable = self.shoppablesToolbar?.selectedShoppable(){
+            if  let shoppable = self.getSelectedShoppable(){
                 shoppable.set(productsOptions: productsOptions, callback:  {
-                    if  let shoppable = self.shoppablesToolbar?.selectedShoppable(){
+                    if  let shoppable = self.getSelectedShoppable(){
                         self.reloadProductsFor(shoppable: shoppable)
                     }else{
                         self.clearProductListAndStateLoading()
@@ -376,6 +389,7 @@ extension ProductsViewController {
     var shouldHideToolbar: Bool {
         return !self.hasShoppables
     }
+    
 }
 
 private typealias ProductsViewControllerCollectionView = ProductsViewController
@@ -610,10 +624,12 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         
     }
     @objc func moreLikeThis(_ sender:Any) {
-        if let index = menuDisplayingIndexPath, let shoppable = self.shoppablesToolbar?.selectedShoppable(){
+        if let index = menuDisplayingIndexPath, let shoppable = self.getSelectedShoppable() {
             let product = self.productAtIndex(index.row)
             AssetSyncModel.sharedInstance.addSubShoppableTo(shoppable: shoppable, fromProduct: product).then { (shoppable) -> Void in
-                // set this shoppable and the currently visible one (will be loading).  look for loading of the shoppable.imageUrl
+                self.isSubShoppablesToolbarDisplayed = true
+                self.shoppablesToolbar?.deselectShoppable()
+                self.subShoppablesToolbar?.selectShoppable(shoppable)
             }
 
         }
@@ -676,7 +692,7 @@ extension ProductsViewControllerOptionsView {
         else {
             Analytics.trackOpenedFiltersView()
             
-            if let shoppable = self.shoppablesToolbar?.selectedShoppable() {
+            if let shoppable = self.getSelectedShoppable() {
                 self.productsOptions.syncOptions(withMask: shoppable.getLast())
             }
             filterView.customInputView = self.productsOptions.view
@@ -835,7 +851,7 @@ extension ProductsViewControllerRatings: UITextFieldDelegate {
     }
     
     @objc func productsRatePositiveAction() {
-        if  let shoppable = self.shoppablesToolbar?.selectedShoppable(){
+        if  let shoppable = self.getSelectedShoppable(){
             shoppable.setRating(positive: true)
             
             if self.screenshot.canSubmitToDiscover {
@@ -859,7 +875,7 @@ extension ProductsViewControllerRatings: UITextFieldDelegate {
     }
     
     @objc func productsRateNegativeAction() {
-        if  let shoppable = self.shoppablesToolbar?.selectedShoppable(){
+        if  let shoppable = self.getSelectedShoppable(){
             shoppable.setRating(positive: false)
             self.presentProductsRateNegativeAlert()
         }
@@ -879,7 +895,7 @@ extension ProductsViewControllerRatings: UITextFieldDelegate {
             if let trimmedText = self.productsRateNegativeFeedbackTextField?.text?.trimmingCharacters(in: .whitespacesAndNewlines) {
                 
                 if trimmedText.lengthOfBytes(using: .utf8) > 0 {
-                    let shoppable = self.shoppablesToolbar?.selectedShoppable()
+                    let shoppable = self.getSelectedShoppable()
                     Analytics.trackShoppableFeedbackNegative(shoppable:shoppable , text: trimmedText)
                 }
             }

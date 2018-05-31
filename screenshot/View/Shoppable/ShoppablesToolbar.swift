@@ -128,12 +128,15 @@ class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UIColle
     
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
         
-//        let selected = self.selectedShoppable()
+        var selected:Shoppable? = nil
+        if let index = self.collectionView?.indexPathsForSelectedItems?.first?.item {
+            selected = shoppables[index]
+        }
         shoppables = shoppablesController.fetchedObjects.filter { $0.parentShoppable?.objectID == rootShoppableObjectId }
         self.collectionView?.reloadData()
-//        if let selected = selected, let index = self.shoppables.index(of: selected) {
-//            self.collectionView?.selectItem(at: IndexPath.init(row: index, section: 0), animated: false, scrollPosition: [])
-//        }
+        if let selected = selected, let index = self.shoppables.index(of: selected) {
+            self.collectionView?.selectItem(at: IndexPath.init(row: index, section: 0), animated: false, scrollPosition: [])
+        }
         
         
         self.shoppableToolbarDelegate?.shoppablesToolbarDidChange(toolbar: self)
@@ -181,6 +184,15 @@ class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UIColle
             }
         }
         return nil
+    }
+    func selectShoppable(_ s:Shoppable){
+        if let collectionView = self.collectionView {
+            if let index = shoppables.index(of: s) {
+                collectionView.selectItem(at: IndexPath.init(row: index, section: 0), animated: false, scrollPosition: [])
+                self.shoppableToolbarDelegate?.shoppablesToolbarDidChangeSelectedShoppable(toolbar: self, shoppable: s)
+
+            }
+        }
     }
     
     static func preservedCollectionViewContentInset() -> UIEdgeInsets{
