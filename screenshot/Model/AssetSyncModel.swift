@@ -732,13 +732,14 @@ extension AssetSyncModel {
             }
             self.syteProcessingQueue.addOperation(AsyncOperation.init(timeout: 90, assetId: assetId, shoppableId: nil, completion: { (completion) in
                 firstly { // _ -> Promise<Bool> in
-                    let userDefaults = UserDefaults.standard
-                    if userDefaults.object(forKey: UserDefaultsKeys.isUSC) == nil {
-                        return NetworkingPromise.sharedInstance.geoLocateIsUSC()
-                    } else {
-                        let isUSC: Bool = userDefaults.bool(forKey: UserDefaultsKeys.isUSC)
-                        return Promise(value: isUSC)
-                    }
+//                    let userDefaults = UserDefaults.standard
+//                    if userDefaults.object(forKey: UserDefaultsKeys.isUSC) == nil {
+//                        return NetworkingPromise.sharedInstance.geoLocateIsUSC()
+//                    } else {
+//                        let isUSC: Bool = userDefaults.bool(forKey: UserDefaultsKeys.isUSC)
+//                        return Promise(value: isUSC)
+//                    }
+                    return Promise(value: false) // Revert to never use USC.
                 }.then(on: self.processingQ) { isUsc -> Promise<(String, [[String : Any]])> in
                     return NetworkingPromise.sharedInstance.uploadToSyte(imageData: localImageData, orImageUrlString:orImageUrlString, imageClassification: imageClassification, isUsc: isUsc)
                 }.then(on: self.processingQ) { uploadedURLString, segments -> Void in
