@@ -550,47 +550,12 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         
     }
     @objc func moreLikeThis(_ sender:Any) {
-        if let index = menuDisplayingIndexPath{
+        if let index = menuDisplayingIndexPath, let shoppable = self.shoppablesToolbar?.selectedShoppable(){
             let product = self.productAtIndex(index.row)
-            if let productImageUrl = product.imageURL,
-                let shoppableObjectId = product.shoppable?.objectID,
-            let cat = product.categories?.lowercased() {
-                let optionMask = ProductsOptionsMask.global
-                
-                NetworkingPromise.sharedInstance.uploadToSyte(imageData: nil, orImageUrlString: productImageUrl, imageClassification: .human, isUsc: false).then { (uploadedURLString, segments) -> Void in
-                    if   let segment = segments.first(where: { (segDict) -> Bool in
-                        if let label = segDict["label"] as? String {
-                            return cat.contains(label.lowercased())
-                        }
-                        return false
-                    }), let offersURL = segment["offers"] as? String,
-                        let url = AssetSyncModel.sharedInstance.augmentedUrl(offersURL: offersURL, optionsMask:optionMask ) {
-                        NetworkingPromise.sharedInstance.downloadProductsWithRetry(url: url).then { productsDict -> Void in
-                            if let productsArray = productsDict["ads"] as? [[String : Any]],
-                                productsArray.count > 0 {
-                                DataModel.sharedInstance.performBackgroundTask({ (context) in
-                                    if let shopable = context.shoppableWith(objectId:shoppableObjectId) {
-                                        
-                                        shopable.products = NSSet.init()
-                                        var productOrder: Int16 = 0
-                                        for prod in productsArray {
-                                            AssetSyncModel.sharedInstance.saveProduct(managedObjectContext: context,
-                                                                                      shoppable: shopable,
-                                                                                      productOrder: productOrder,
-                                                                                      prod: prod,
-                                                                                      optionsMask: Int32(optionMask.rawValue))
-                                            productOrder += 1
-                                        }
-                                        
-                                        context.saveIfNeeded()
-                                    }
-                                    
-                                })
-                            }
-                        }
-                    }
-                }
+            AssetSyncModel.sharedInstance.addSubShoppableTo(shoppable: shoppable, fromProduct: product).then { (shoppable) -> Void in
+                // set this shoppable and the currently visible one (will be loading).  look for loading of the shoppable.imageUrl
             }
+
         }
     }
    

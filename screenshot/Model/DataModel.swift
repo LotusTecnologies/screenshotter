@@ -2053,13 +2053,17 @@ fileprivate extension String {
 }
 
 extension NSManagedObjectContext {
-    func saveIfNeeded(){
+    @discardableResult func saveIfNeeded() -> Bool{
         if self.hasChanges {
             do {
                 try self.save()
+                return true
             } catch {
                 DataModel.sharedInstance.receivedCoreDataError(error: error)
+                return false
             }
+        }else{
+            return true
         }
     }
     

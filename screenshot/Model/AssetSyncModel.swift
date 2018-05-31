@@ -1044,6 +1044,126 @@ extension AssetSyncModel {
             self.syteProcessing(imageClassification: ClarifaiModel.ImageClassification.from(shortString:classificationString), imageData: backgroundScreenshot?.imageData, orImageUrlString: backgroundScreenshot?.uploadedImageURL, assetId: assetId)
         }
     }
+    
+    //Return the subshoppable (on the main thread) BEFORE the network requests are made on
+    public func addSubShoppableTo(shoppable:Shoppable, fromProduct:Product) -> Promise<Shoppable> {
+        var rootShoppable = shoppable
+        if let parent = shoppable.parentShoppable {
+            rootShoppable = parent
+        }
+        let rootShoppableObjectId = rootShoppable.objectID
+        let productImageUrl = fromProduct.imageURL
+        let cat = fromProduct.categories?.lowercased()
+        let optionsMask = ProductsOptionsMask.init(rawValue: Int(fromProduct.optionsMask))
+        return Promise.init(resolvers: { (fulfil, reject) in
+            self.performBackgroundTask(assetId: nil, shoppableId: productImageUrl, { (context) in
+                if let rootShoppable = context.shoppableWith(objectId: rootShoppableObjectId)
+                {
+                    var maxOrder = 1
+                    var alreadyExsistingSubShoppable:Shoppable? = nil
+                    if let subShoppables = rootShoppable.subShoppables as? Set<Shoppable> {
+                        maxOrder = subShoppables.reduce(1, { max($0, Int($1.order ?? "0") ?? 0 ) })
+                        for s in subShoppables {
+                            if s.imageUrl == productImageUrl {
+                                alreadyExsistingSubShoppable = s
+                            }
+                        }
+                    }
+                    
+                    alreadyExsistingSubShoppable?.order = String.init(format: "%03d", maxOrder + 1 )
+                    let shoppableToDisplay = alreadyExsistingSubShoppable ?? {
+                        let shoppableToSave = Shoppable(context: context)
+                        shoppableToSave.order = String.init(format: "%03d", maxOrder + 1 )
+                        shoppableToSave.label = rootShoppable.label
+                        shoppableToSave.imageUrl = productImageUrl
+                        shoppableToSave.b0x = 0
+                        shoppableToSave.b0x = 0
+                        shoppableToSave.b1x = 1
+                        shoppableToSave.b1y = 1
+                        shoppableToSave.relatedImagesURLString = nil
+                        shoppableToSave.screenshot = rootShoppable.screenshot
+                        shoppableToSave.offersURL = nil
+                        shoppableToSave.parentShoppable = rootShoppable
+                        return shoppableToSave
+                    }()
+                    if context.saveIfNeeded() {
+                        let createdSubShopableObjectId = shoppableToDisplay.objectID
+                        DispatchQueue.main.async {
+                            if let shoppable = DataModel.sharedInstance.mainMoc().shoppableWith(objectId: createdSubShopableObjectId) {
+                                fulfil(shoppable)
+                            }else{
+                                let error = NSError.init(domain: "Craze-addSubShoppableTo", code: -91, userInfo: [NSLocalizedDescriptionKey:"cannot find sub shoppable after saving"])
+                                reject(error)
+                            }
+                        }
+                        if let cat = cat {
+                        self.userInitiatedQueue.addOperation(AsyncOperation.init(timeout: 90, assetId: nil, shoppableId: productImageUrl, completion: { (completion) in
+                            NetworkingPromise.sharedInstance.uploadToSyte(imageData: nil, orImageUrlString: productImageUrl, imageClassification: .human, isUsc: false).then(execute: { (uploadedURLString, segments) -> Void in
+                                if   let segment = segments.first(where: { (segDict) -> Bool in
+                                    if let label = segDict["label"] as? String {
+                                        return cat.contains(label.lowercased())
+                                    }
+                                    return false
+                                }), let offersURL = segment["offers"] as? String,
+                                    let url = AssetSyncModel.sharedInstance.augmentedUrl(offersURL: offersURL, optionsMask:optionsMask ) {
+                                    NetworkingPromise.sharedInstance.downloadProductsWithRetry(url: url).then(execute:                                                                               { productsDict -> Void in
+                                            if let productsArray = productsDict["ads"] as? [[String : Any]],
+                                                productsArray.count > 0 {
+                                                self.performBackgroundTask(assetId: nil, shoppableId: productImageUrl, { (context) in
+                                                    if let shopable = context.shoppableWith(objectId:createdSubShopableObjectId) {
+                                                        
+                                                        shopable.products = NSSet.init()
+                                                        var productOrder: Int16 = 0
+                                                        for prod in productsArray {
+                                                            AssetSyncModel.sharedInstance.saveProduct(managedObjectContext: context,
+                                                                                                      shoppable: shopable,
+                                                                                                      productOrder: productOrder,
+                                                                                                      prod: prod,
+                                                                                                      optionsMask: Int32(optionsMask.rawValue))
+                                                            productOrder += 1
+                                                        }
+                                                        
+                                                        context.saveIfNeeded()
+                                                    }
+                                                    completion()
+                                                })
+                                            } else{
+                                                completion()
+                                            }
+                                    }).catch { (error) in
+                                        completion()
+                                    }
+                                }else{
+                                    completion()
+                                }
+                            }).catch { (error) in
+                                completion()
+                            }
+
+                        }))
+                        }
+                        
+                        
+                    }else {
+                        let error = NSError.init(domain: "Craze-addSubShoppableTo", code: -90, userInfo: [NSLocalizedDescriptionKey:"cannot save sub shoppable to db"])
+                        reject(error)
+                    }
+                    
+                    
+                    }else{
+                    
+                    let error = NSError.init(domain: "Craze-addSubShoppableTo", code: -91, userInfo: [NSLocalizedDescriptionKey:"cannot find parent shoppable in performBackgroundTask"])
+                    reject(error)
+                }
+            })
+            
+            
+            
+        })
+        
+        
+        
+    }
 }
 
 //Image processing
