@@ -46,12 +46,18 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
     var productsRateNegativeFeedbackTextField:UITextField?
     var shamrockButton : FloatingActionButton?
     var productsUnfilteredCount:Int = 0
-    var state:ProductsViewControllerState = .unknown {
+    
+    var screenshotLoadingState:ProductsViewControllerState = .unknown {
         didSet {
             self.syncViewsAfterStateChange()
         }
     }
-    
+    var productLoadingState:ProductsViewControllerState = .unknown {
+        didSet {
+            self.syncViewsAfterStateChange()
+        }
+    }
+
     var selectedShoppable:Shoppable?
     
     func getSelectedShoppable() -> Shoppable? {
@@ -84,6 +90,8 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
     }
     
     var loadingMonitor:AsyncOperationMonitor?
+    var productsLoadingMonitor:AsyncOperationMonitor?
+
     init(screenshot: Screenshot) {
         self.screenshot = screenshot
         super.init(nibName: nil, bundle: nil)
@@ -237,7 +245,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
         }
         
         if self.screenshotController?.first?.shoppablesCount == -1 {
-            self.state = .retry
+            self.screenshotLoadingState = .retry
             Analytics.trackScreenshotOpenedWithoutShoppables(screenshot: screenshot)
         }
         else {
@@ -644,9 +652,11 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         let product = self.productAtIndex(indexPath.row)
         
         AssetSyncModel.sharedInstance.addSubShoppableTo(shoppable: shoppable, fromProduct: product).then { (shoppable) -> Void in
+            
             self.isSubShoppablesToolbarDisplayed = true
             self.shoppablesToolbar?.deselectShoppable()
             self.subShoppablesToolbar?.selectShoppable(shoppable)
+            self.syncViewsAfterStateChange()
             
         }
     }
@@ -714,8 +724,13 @@ extension ProductsViewControllerProducts{
         self.productsUnfilteredCount = 0
         self.scrollRevealController?.resetViewOffset()
         
+        self.productLoadingState = .unknown
+        if let p = self.productsLoadingMonitor {
+            p.delegate = nil
+        }
+        self.productsLoadingMonitor = AsyncOperationMonitor.init(assetId: nil, shoppableId: shoppable.imageUrl, queues: AssetSyncModel.sharedInstance.queues, delegate: self)
         if shoppable.productFilterCount == -1 {
-            self.state = .retry
+            self.screenshotLoadingState = .retry
         } else {
             self.products = self.productsForShoppable(shoppable)
         }
@@ -932,7 +947,7 @@ extension ProductsViewController {
         self.shoppablesToolbar?.isHidden = shouldHideToolbar
         self.subShoppablesToolbar?.isHidden = shouldHideToolbar
         
-        switch (state) {
+        switch (screenshotLoadingState) {
         case .loading, .unknown:
             self.hideNoItemsHelperView()
             self.rateView.isHidden = true
@@ -957,6 +972,15 @@ extension ProductsViewController {
             self.stopAndRemoveLoader()
             self.hideNoItemsHelperView()
             self.rateView.isHidden = false
+            
+            switch self.productLoadingState {
+            case .products, .unknown:
+                break;
+            case .loading:
+                self.startAndAddLoader()
+            case .retry:
+                self.showNoItemsHelperView()
+            }
             
         case .retry:
             if #available(iOS 11.0, *) {} else {
@@ -997,7 +1021,7 @@ extension ProductsViewControllerNoItemsHelperView{
         helperView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
         self.noItemsHelperView = helperView
         
-        if self.state == .retry {
+        if self.screenshotLoadingState == .retry {
             let retryButton = MainButton()
             retryButton.translatesAutoresizingMaskIntoConstraints = false
             retryButton.backgroundColor = .crazeGreen
@@ -1220,9 +1244,27 @@ extension ProductsViewController : AsyncOperationMonitorDelegate {
                     }
                 }
             }()
-            if state != self.state {
-                self.state = state
+            if state != self.screenshotLoadingState {
+                self.screenshotLoadingState = state
             }
+            
+            
+            let isProductLoading = self.productsLoadingMonitor?.didStart ?? false
+            let productState:ProductsViewControllerState = {
+                if self.products.count > 0 {
+                    return .products
+                }else{
+                    if isLoading {
+                        return .loading
+                    }else{
+                        return .retry
+                    }
+                }
+            }()
+            if state != self.productLoadingState {
+                self.productLoadingState = state
+            }
+            
         }
     }
     

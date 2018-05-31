@@ -1101,12 +1101,36 @@ extension AssetSyncModel {
                         if let rootShoppableLabel = rootShoppableLabel {
                         self.userInitiatedQueue.addOperation(AsyncOperation.init(timeout: 90, assetId: nil, shoppableId: productImageUrl, completion: { (completion) in
                             NetworkingPromise.sharedInstance.uploadToSyte(imageData: nil, orImageUrlString: productImageUrl, imageClassification: .human, isUsc: false).then(execute: { (uploadedURLString, segments) -> Void in
-                                if   let segment = segments.first(where: { (segDict) -> Bool in
-                                    if let label = segDict["label"] as? String {
-                                        return rootShoppableLabel.contains(label.lowercased())
+                                var segment:[String:Any]? = nil
+                                
+                                
+                                if segment == nil {
+                                    segment = segments.sorted(by: { (dict1, dict2) -> Bool in
+                                        if let rect1 = CGRect.rectFrom(syteDict: dict1),
+                                            let rect2 = CGRect.rectFrom(syteDict: dict2) {
+                                            return rect1.area > rect2.area
+                                        }
+                                        return false
+                                        
+                                    }).first
+                                }
+                                
+                                if segment == nil {
+                                    if segments.count == 1 {
+                                        segment = segments.first
                                     }
-                                    return false
-                                }), let offersURL = segment["offers"] as? String,
+                                }
+                                if segment == nil {
+                                    segment = segments.first(where: { (segDict) -> Bool in
+                                        if let label = segDict["label"] as? String {
+                                            return rootShoppableLabel.contains(label.lowercased())
+                                        }
+                                        return false
+                                    })
+                                }
+                                
+                                
+                                if  let segment = segment , let offersURL = segment["offers"] as? String,
                                     let url = AssetSyncModel.sharedInstance.augmentedUrl(offersURL: offersURL, optionsMask:optionsMask ) {
                                     NetworkingPromise.sharedInstance.downloadProductsWithRetry(url: url).then(execute:                                                                               { productsDict -> Void in
                                             if let productsArray = productsDict["ads"] as? [[String : Any]],
@@ -1136,6 +1160,7 @@ extension AssetSyncModel {
                                         completion()
                                     }
                                 }else{
+                                    print("can't find segment for label \(rootShoppableLabel) in \( segments.map{$0["label"] ?? ""} )")
                                     completion()
                                 }
                             }).catch { (error) in
