@@ -225,7 +225,7 @@ class SettingsViewController : BaseViewController {
             .bug,
             .usageStreak,
             .coins,
-            .region,
+//            .region,  // Revert to never use USC.
             .version,
             .partners
         ],
