@@ -80,6 +80,7 @@ class ProductsCollectionViewCell : UICollectionViewCell {
     }
     
     let favoriteControl = FavoriteControl()
+    let productViewControl = UIControl()
     var productView:EmbossedView?
     let titleLabel = UILabel()
     var priceLabel:UILabel?
@@ -110,8 +111,7 @@ class ProductsCollectionViewCell : UICollectionViewCell {
     }
     
     required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-        self.setupViews()
+        fatalError("init(coder:) has not been implemented")
     }
     
     func setupViews(){
@@ -226,11 +226,6 @@ class ProductsCollectionViewCell : UICollectionViewCell {
         }()
         self.originalPriceLabel = originalPriceLabel
         
-        favoriteControl.translatesAutoresizingMaskIntoConstraints = false
-        contentView.addSubview(favoriteControl)
-        favoriteControl.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
-        favoriteControl.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
-        
         let actionLabel: UILabel = {
             let label = UILabel()
             productView.contentView.addSubview(label)
@@ -250,6 +245,18 @@ class ProductsCollectionViewCell : UICollectionViewCell {
             return label
         }()
         self.actionLabel = actionLabel
+        
+        productViewControl.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(productViewControl)
+        productViewControl.topAnchor.constraint(equalTo: productView.topAnchor).isActive = true
+        productViewControl.leadingAnchor.constraint(equalTo: productView.leadingAnchor).isActive = true
+        productViewControl.bottomAnchor.constraint(equalTo: actionLabel.topAnchor).isActive = true
+        productViewControl.trailingAnchor.constraint(equalTo: productView.trailingAnchor).isActive = true
+        
+        favoriteControl.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(favoriteControl)
+        favoriteControl.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
+        favoriteControl.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         
         let saleView: SaleView = {
             let view = SaleView()

@@ -238,9 +238,6 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
         
         let longPress = UILongPressGestureRecognizer.init(target: self, action: #selector(longPress(gesture:)))
         self.view.addGestureRecognizer(longPress)
-    
-
-
     }
     
     @objc func pinch( gesture:UIPinchGestureRecognizer) {
@@ -504,6 +501,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
                 cell.isSale = product.isSale()
                 cell.favoriteControl.isSelected = product.isFavorite
                 cell.favoriteControl.addTarget(self, action: #selector(productCollectionViewCellFavoriteAction(_:event:)), for: .touchUpInside)
+                cell.productViewControl.addTarget(self, action: #selector(productCollectionViewCellProductAction(_:event:)), for: .touchUpInside)
                 cell.hasExternalPreview = !product.isSupportingUSC
                 cell.actionType = product.hasVariants || product.dateCheckedStock == nil ? .buy : .outStock
                 return cell
@@ -661,6 +659,14 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         }else{
             Analytics.trackProductUnfavorited(product: product, page: .productList)
         }
+    }
+    
+    @objc func productCollectionViewCellProductAction(_ control: UIControl, event: UIEvent) {
+        guard let indexPath = collectionView?.indexPath(for: event) else {
+            return
+        }
+        
+        
     }
 }
 
