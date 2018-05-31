@@ -354,6 +354,15 @@ extension ProductsViewController: ShoppablesToolbarDelegate {
     func shoppablesToolbarDidChangeSelectedShoppable(toolbar:ShoppablesToolbar, shoppable:Shoppable){
         if toolbar == subShoppablesToolbar {
             shoppablesToolbar?.deselectShoppable()
+            if shoppable.products?.count == 0 {
+                let m = AsyncOperationMonitor.init(assetId: nil, shoppableId: shoppable.imageUrl, queues: AssetSyncModel.sharedInstance.queues, delegate: nil)
+                if m.didStart == false {
+                    AssetSyncModel.sharedInstance.reloadSubShoppable(shoppable: shoppable).then { (shoppable) -> Void in
+                        self.addSubShoppableCompletion(shoppable: shoppable)
+                    }
+                }
+            }
+            
         }else if toolbar == shoppablesToolbar {
             self.subShoppablesToolbar?.rootShoppableObjectId = shoppable.objectID
             isSubShoppablesToolbarDisplayed =  (shoppable.subShoppables?.count ?? 0 > 0)
@@ -642,6 +651,19 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         }
     }
     
+    func addSubShoppableCompletion(shoppable:Shoppable) {
+        
+        self.isSubShoppablesToolbarDisplayed = true
+        self.shoppablesToolbar?.deselectShoppable()
+        self.subShoppablesToolbar?.selectShoppable(shoppable)
+        
+        if let p = self.productsLoadingMonitor {
+            p.delegate = nil
+        }
+        self.productsLoadingMonitor = AsyncOperationMonitor.init(assetId: nil, shoppableId: shoppable.imageUrl, queues: AssetSyncModel.sharedInstance.queues, delegate: self)
+        self.updateLoadingState()
+    }
+    
     @objc func productCollectionViewCellProductAction(_ control: UIControl, event: UIEvent) {
         guard let indexPath = collectionView?.indexPath(for: event)
             else {
@@ -651,17 +673,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         let product = self.productAtIndex(indexPath.row)
         
         AssetSyncModel.sharedInstance.addSubShoppable(fromProduct: product).then { (shoppable) -> Void in
-            
-            self.isSubShoppablesToolbarDisplayed = true
-            self.shoppablesToolbar?.deselectShoppable()
-            self.subShoppablesToolbar?.selectShoppable(shoppable)
-            
-            if let p = self.productsLoadingMonitor {
-                p.delegate = nil
-            }
-            self.productsLoadingMonitor = AsyncOperationMonitor.init(assetId: nil, shoppableId: shoppable.imageUrl, queues: AssetSyncModel.sharedInstance.queues, delegate: self)
-            self.updateLoadingState()
-            
+            self.addSubShoppableCompletion(shoppable: shoppable)
         }
     }
 }
@@ -979,7 +991,13 @@ extension ProductsViewController {
             case .loading:
                 self.startAndAddLoader()
             case .retry:
-                self.showNoItemsHelperView()
+                self.stopAndRemoveLoader()
+                
+                let alert = UIAlertController.init(title: nil, message: "Unable to find products.", preferredStyle: .alert)
+                alert.addAction(UIAlertAction.init(title: "OK", style: .default, handler: { (a) in
+                    //maybe delete the sub shoppable.
+                }))
+                self.present(alert, animated: true, completion: nil)
             }
             
         case .retry:

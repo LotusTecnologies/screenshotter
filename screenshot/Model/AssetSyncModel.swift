@@ -1046,15 +1046,33 @@ extension AssetSyncModel {
     }
     
     //Return the subshoppable (on the main thread) BEFORE the network requests are made on
+    public func reloadSubShoppable(shoppable:Shoppable) -> Promise<Shoppable> {
+        let productImageUrl = shoppable.imageUrl
+        let mask = (shoppable.productFilters?.anyObject() as? ProductFilter)?.optionsMask
+        let optionsMask:ProductsOptionsMask = {
+            if let mask = mask {
+                return ProductsOptionsMask.init(rawValue:Int(mask))
+            }else{
+                return ProductsOptionsMask.global
+            }
+        }()
+        return self.addSubShoppable(productImageUrl: productImageUrl, shoppable: shoppable, optionsMask: optionsMask)
+
+    }
     public func addSubShoppable(fromProduct:Product) -> Promise<Shoppable> {
-        var rootShoppable = fromProduct.shoppable
+        let productImageUrl = fromProduct.imageURL
+        let shoppable = fromProduct.shoppable
+        let optionsMask = ProductsOptionsMask.init(rawValue: Int(fromProduct.optionsMask))
+        return self.addSubShoppable(productImageUrl: productImageUrl, shoppable: shoppable, optionsMask: optionsMask)
+    }
+    
+    private func addSubShoppable(productImageUrl:String?, shoppable:Shoppable?, optionsMask:ProductsOptionsMask) -> Promise<Shoppable> {
+        var rootShoppable = shoppable
         if let parent = rootShoppable?.parentShoppable {
             rootShoppable = parent
         }
         let rootShoppableObjectId = rootShoppable?.objectID
-        let productImageUrl = fromProduct.imageURL
         let rootShoppableLabel = rootShoppable?.label?.lowercased()
-        let optionsMask = ProductsOptionsMask.init(rawValue: Int(fromProduct.optionsMask))
         return Promise.init(resolvers: { (fulfil, reject) in
             self.performBackgroundTask(assetId: nil, shoppableId: productImageUrl, { (context) in
                 if let rootShoppableObjectId = rootShoppableObjectId, let rootShoppable = context.shoppableWith(objectId: rootShoppableObjectId)
@@ -1069,8 +1087,6 @@ extension AssetSyncModel {
                             }
                         }
                     }
-                    
-                    alreadyExsistingSubShoppable?.order = String.init(format: "%03d", minOrder - 1 )
                     let shoppableToDisplay = alreadyExsistingSubShoppable ?? {
                         let shoppableToSave = Shoppable(context: context)
                         shoppableToSave.order = String.init(format: "%03d", minOrder - 1 )
@@ -1135,7 +1151,7 @@ extension AssetSyncModel {
                                                 productsArray.count > 0 {
                                                 self.performBackgroundTask(assetId: nil, shoppableId: productImageUrl, { (context) in
                                                     if let shopable = context.shoppableWith(objectId:createdSubShopableObjectId) {
-                                                        
+
                                                         shopable.products = NSSet.init()
                                                         var productOrder: Int16 = 0
                                                         for prod in productsArray {
@@ -1146,10 +1162,13 @@ extension AssetSyncModel {
                                                                                                       optionsMask: Int32(optionsMask.rawValue))
                                                             productOrder += 1
                                                         }
-                                                        
+
                                                         context.saveIfNeeded()
                                                     }
+
                                                     completion()
+
+                                                    
                                                 })
                                             } else{
                                                 completion()
