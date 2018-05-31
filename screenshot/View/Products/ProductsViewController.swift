@@ -339,11 +339,14 @@ extension ProductsViewController: ShoppablesToolbarDelegate {
     }
     
     func shoppablesToolbarDidChangeSelectedShoppable(toolbar:ShoppablesToolbar, shoppable:Shoppable){
-        self.reloadProductsFor(shoppable: shoppable)
-        
-        if view.window != nil {
-            isSubShoppablesToolbarDisplayed = true
+        if toolbar == subShoppablesToolbar {
+            shoppablesToolbar?.deselectShoppable()
+        }else if toolbar == shoppablesToolbar {
+            self.subShoppablesToolbar?.rootShoppableObjectId = shoppable.objectID
+            isSubShoppablesToolbarDisplayed =  (shoppable.subShoppables?.count ?? 0 > 0)
+            
         }
+        self.reloadProductsFor(shoppable: shoppable)
     }
 }
 
