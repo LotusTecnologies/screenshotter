@@ -1,8 +1,8 @@
 // STOP!  DO not edit the file below
 // only create by auto generting
 // created by: Jonathan Rose(rose@screenshopit.com) on computer -jonathanrose
-// created on: Sun Jun  3 09:02:54 IDT 2018
-// created from: burrowAnalytics -  - 58abb38 
+// created on: Sun Jun  3 09:08:34 IDT 2018
+// created from: master -  - ad4285a 
 //  Copyright © 2018 crazeapp. All rights reserved.
 
 
