@@ -195,7 +195,6 @@ extension Shoppable {
                                 toDelete.append(product)
                             }else{
                                 product.screenshot = shoppable.screenshot
-                                product.shoppable = shoppable.parentShoppable
                             }
                         }
                     }
