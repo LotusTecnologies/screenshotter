@@ -20,7 +20,7 @@ class Constants {
     static let tutorialScreenshotAssetId = "tutorialScreenshotAssetId"
     
     // DB
-    static let currentMomVersion = 17
+    static let currentMomVersion = 18
     
     // Cart
     static let cartItemMaxQuantity = 10
