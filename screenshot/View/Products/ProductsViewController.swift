@@ -256,12 +256,9 @@ extension ProductsViewController: UIToolbarDelegate {
 
 private typealias ProductsViewControllerScrollViewDelegate = ProductsViewController
 extension ProductsViewControllerScrollViewDelegate: UIScrollViewDelegate {
-    
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         self.dismissOptions()
         self.scrollRevealController?.scrollViewWillBeginDragging(scrollView)
-        
-        shoppablesToolbarContainer?.visibleToolbar = .bottom
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
@@ -277,6 +274,23 @@ extension ProductsViewControllerScrollViewDelegate: UIScrollViewDelegate {
             }
         }
         self.scrollRevealController?.scrollViewDidScroll(scrollView)
+        
+        if scrollView.isTracking {
+            let translation = scrollView.panGestureRecognizer.translation(in: scrollView.superview)
+            let subShoppablesCount = shoppablesToolbarContainer?.subToolbar.collectionView?.numberOfItems(inSection: 0) ?? 0
+            let visible: ShoppablesContainerView.VisibleToolbar = {
+                if subShoppablesCount > 0 {
+                    return translation.y > 0 ? .both : .bottom
+                }
+                else {
+                    return .top
+                }
+            }()
+            
+            if shoppablesToolbarContainer?.visibleToolbar != visible {
+                shoppablesToolbarContainer?.visibleToolbar = visible
+            }
+        }
     }
     
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
@@ -318,7 +332,18 @@ extension ProductsViewController: ShoppablesToolbarDelegate {
         }
         else if toolbar == shoppablesToolbarContainer?.toolbar {
             shoppablesToolbarContainer?.subToolbar.rootShoppableObjectId = shoppable.objectID
-            shoppablesToolbarContainer?.visibleToolbar = (shoppable.subShoppables?.count ?? 0 > 0) ? .bottom : .top
+            
+            let visible: ShoppablesContainerView.VisibleToolbar = (shoppable.subShoppables?.count ?? 0 > 0) ? .both
+                : .top
+            
+            if view.window == nil {
+                UIView.performWithoutAnimation {
+                    shoppablesToolbarContainer?.visibleToolbar = visible
+                }
+            }
+            else {
+                shoppablesToolbarContainer?.visibleToolbar = visible
+            }
         }
         
         self.selectedShoppable = shoppable
