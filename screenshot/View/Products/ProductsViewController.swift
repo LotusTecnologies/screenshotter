@@ -58,7 +58,8 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
     }
 
     var selectedShoppable:Shoppable?
-    
+    var menuDisplayingIndexPath:IndexPath?
+
     func getSelectedShoppable() -> Shoppable? {
         if let s = selectedShoppable {
             return s
@@ -208,6 +209,10 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
         
         let pinchZoom = UIPinchGestureRecognizer.init(target: self, action: #selector(pinch(gesture:)))
         self.view.addGestureRecognizer(pinchZoom)
+        
+        let longPress = UILongPressGestureRecognizer.init(target: self, action: #selector(longPress(gesture:)))
+        shoppablesToolbarContainer.addGestureRecognizer(longPress)
+
     }
     
     @objc func pinch( gesture:UIPinchGestureRecognizer) {
@@ -978,12 +983,7 @@ extension ProductsViewController {
                 self.startAndAddLoader()
             case .retry:
                 self.stopAndRemoveLoader()
-                
-                let alert = UIAlertController.init(title: nil, message: "Unable to find products.", preferredStyle: .alert)
-                alert.addAction(UIAlertAction.init(title: "OK", style: .default, handler: { (a) in
-                    //maybe delete the sub shoppable.
-                }))
-                self.present(alert, animated: true, completion: nil)
+                self.showNoItemsHelperView()
             }
             
         case .retry:
@@ -1005,11 +1005,6 @@ extension ProductsViewControllerNoItemsHelperView{
     func showNoItemsHelperView() {
         let verPadding: CGFloat = .extendedPadding
         let horPadding: CGFloat = .padding
-        var topOffset: CGFloat = 0
-        
-        if let shoppablesToolbar = self.shoppablesToolbarContainer?.toolbar, !shoppablesToolbar.isHidden {
-            topOffset = shoppablesToolbar.bounds.size.height
-        }
         
         let helperView = HelperView()
         helperView.translatesAutoresizingMaskIntoConstraints = false
@@ -1018,26 +1013,28 @@ extension ProductsViewControllerNoItemsHelperView{
         helperView.subtitleLabel.text = "products.helper.message".localized
         helperView.contentImage = UIImage(named: "ProductsEmptyListGraphic")
         self.view.addSubview(helperView)
-        
-        helperView.topAnchor.constraint(equalTo: self.topLayoutGuide.bottomAnchor, constant:topOffset).isActive = true
+        if let shoppablesToolbarContainer = self.shoppablesToolbarContainer{
+            helperView.topAnchor.constraint(equalTo: shoppablesToolbarContainer.bottomAnchor, constant:0).isActive = true
+        }else{
+            helperView.topAnchor.constraint(equalTo: self.topLayoutGuide.bottomAnchor).isActive = true
+        }
         helperView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
         helperView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
         helperView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
         self.noItemsHelperView = helperView
         
-        if self.screenshotLoadingState == .retry {
-            let retryButton = MainButton()
-            retryButton.translatesAutoresizingMaskIntoConstraints = false
-            retryButton.backgroundColor = .crazeGreen
-            retryButton.setTitle("products.helper.retry".localized, for: .normal)
-            retryButton.addTarget(self, action: #selector(noItemsRetryAction), for: .touchUpInside)
-            helperView.controlView.addSubview(retryButton)
-            retryButton.topAnchor.constraint(equalTo: helperView.controlView.topAnchor).isActive = true
-            retryButton.leadingAnchor.constraint(greaterThanOrEqualTo: helperView.controlView.layoutMarginsGuide.leadingAnchor).isActive = true
-            retryButton.bottomAnchor.constraint(equalTo: helperView.controlView.bottomAnchor).isActive = true
-            retryButton.trailingAnchor.constraint(greaterThanOrEqualTo: helperView.controlView.layoutMarginsGuide.trailingAnchor).isActive = true
-            retryButton.centerXAnchor.constraint(equalTo: helperView.contentView.centerXAnchor).isActive = true
-        }
+        let retryButton = MainButton()
+        retryButton.translatesAutoresizingMaskIntoConstraints = false
+        retryButton.backgroundColor = .crazeGreen
+        retryButton.setTitle("products.helper.retry".localized, for: .normal)
+        retryButton.addTarget(self, action: #selector(noItemsRetryAction), for: .touchUpInside)
+        helperView.controlView.addSubview(retryButton)
+        retryButton.topAnchor.constraint(equalTo: helperView.controlView.topAnchor).isActive = true
+        retryButton.leadingAnchor.constraint(greaterThanOrEqualTo: helperView.controlView.layoutMarginsGuide.leadingAnchor).isActive = true
+        retryButton.bottomAnchor.constraint(equalTo: helperView.controlView.bottomAnchor).isActive = true
+        retryButton.trailingAnchor.constraint(greaterThanOrEqualTo: helperView.controlView.layoutMarginsGuide.trailingAnchor).isActive = true
+        retryButton.centerXAnchor.constraint(equalTo: helperView.contentView.centerXAnchor).isActive = true
+        
     }
     
     func hideNoItemsHelperView() {
@@ -1046,15 +1043,22 @@ extension ProductsViewControllerNoItemsHelperView{
     }
     
     @objc func noItemsRetryAction() {
-        let alert = UIAlertController(title: "products.helper.retry.title".localized, message: nil, preferredStyle: .actionSheet)
-        alert.addAction(UIAlertAction(title: "products.helper.retry.fashion".localized, style: .default, handler: { (a) in
-            AssetSyncModel.sharedInstance.refetchShoppables(screenshot: self.screenshot, classificationString: "h")
-        }))
-        alert.addAction(UIAlertAction(title: "products.helper.retry.furniture".localized, style: .default, handler: { (a) in
-            AssetSyncModel.sharedInstance.refetchShoppables(screenshot: self.screenshot, classificationString: "f")
-        }))
-        alert.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
-        self.present(alert, animated: true, completion: nil)
+        if self.productLoadingState == .retry, let shoppable  = self.shoppablesToolbarContainer?.subToolbar.selectedShoppable() {
+            AssetSyncModel.sharedInstance.reloadSubShoppable(shoppable: shoppable).then { (shoppable) -> Void in
+                self.addSubShoppableCompletion(shoppable: shoppable)
+            }
+        }else{
+            let alert = UIAlertController(title: "products.helper.retry.title".localized, message: nil, preferredStyle: .actionSheet)
+            alert.addAction(UIAlertAction(title: "products.helper.retry.fashion".localized, style: .default, handler: { (a) in
+                AssetSyncModel.sharedInstance.refetchShoppables(screenshot: self.screenshot, classificationString: "h")
+            }))
+            alert.addAction(UIAlertAction(title: "products.helper.retry.furniture".localized, style: .default, handler: { (a) in
+                AssetSyncModel.sharedInstance.refetchShoppables(screenshot: self.screenshot, classificationString: "f")
+            }))
+            alert.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
+            self.present(alert, animated: true, completion: nil)
+        }
+      
     }
 }
 
@@ -1276,4 +1280,78 @@ extension ProductsViewController : AsyncOperationMonitorDelegate {
         self.updateLoadingState()
     }
 
+}
+
+//Sub shoppable poup menu
+extension ProductsViewController {
+    @objc func longPress( gesture:UIPinchGestureRecognizer) {
+        
+        if let shoppablesToolbarContainer = self.shoppablesToolbarContainer, let collectionView = shoppablesToolbarContainer.subToolbar.collectionView, let indexPath = collectionView.indexPathForItem(at:gesture.location(in: collectionView)), let cell = collectionView.cellForItem(at: indexPath) {
+            let editMenu = UIMenuController.shared
+            if !editMenu.isMenuVisible {
+                self.menuDisplayingIndexPath = indexPath
+                let createScreenshot = UIMenuItem.init(title: "Create Screenshot", action: #selector(createScreenshot(_:)))
+                let delete = UIMenuItem.init(title: "Delete", action: #selector(deleteSubShoppable(_:)))
+                
+                editMenu.menuItems = [createScreenshot, delete]
+                editMenu.setTargetRect(cell.bounds, in: cell)
+                editMenu.setMenuVisible(true, animated: true)
+            }
+            
+        }
+        
+        
+    }
+    override var canBecomeFirstResponder: Bool {
+        return true
+    }
+    override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
+        if action == #selector(ProductsViewController.deleteSubShoppable) ||  action == #selector(ProductsViewController.createScreenshot) {
+            return true
+        }
+        return false
+        
+    }
+    
+    @objc func createScreenshot(_ sender:Any) {
+        if let index = menuDisplayingIndexPath, let shoppablesToolbarContainer = self.shoppablesToolbarContainer{
+            menuDisplayingIndexPath = nil
+            
+            let shoppables = shoppablesToolbarContainer.subToolbar.shoppables
+            if shoppables.count > index.row {
+                let shoppable = shoppables[index.row]
+                
+                Screenshot.createWith(subShoppable: shoppable)
+                    
+                if let tabBarController = tabBarController as? MainTabBarController {
+                    AccumulatorModel.screenshotUninformed.incrementUninformedCount()
+                    tabBarController.screenshotsTabPulseAnimation()
+                }
+            }
+
+            
+        }
+        
+    }
+    
+    @objc func deleteSubShoppable(_ sender:Any) {
+    
+        if let index = menuDisplayingIndexPath, let shoppablesToolbarContainer = self.shoppablesToolbarContainer, let selected = shoppablesToolbarContainer.subToolbar.selectedShoppable() {
+            menuDisplayingIndexPath = nil
+            let shoppables = shoppablesToolbarContainer.subToolbar.shoppables
+            if shoppables.count > index.row {
+                let shoppable = shoppables[index.row]
+                if selected == shoppable {
+                    shoppablesToolbarContainer.subToolbar.deselectShoppable()
+                    if let objectId = shoppablesToolbarContainer.subToolbar.rootShoppableObjectId, let parentShoppable = DataModel.sharedInstance.mainMoc().shoppableWith(objectId: objectId){
+                        shoppablesToolbarContainer.toolbar.selectShoppable(parentShoppable)
+                        if parentShoppable.subShoppables?.count == 1 {
+                            shoppablesToolbarContainer.visibleToolbar = .top
+                        }
+                    }
+                }
+                shoppable.deleteSubshoppable()
+            }
+        }
+    }
 }
