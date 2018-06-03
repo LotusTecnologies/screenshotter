@@ -1205,6 +1205,8 @@ extension AssetSyncModel {
                                     completion()
                                 }
                             }).catch { (error) in
+                                let error = error as NSError
+                                Analytics.trackDevBurrowErrorGetShoppable(productImageUrl: productImageUrl, domain: <#T##String?#>, code: <#T##Int?#>, localizedDescription: <#T##String?#>)(product: <#T##Product?#>, domain: <#T##String?#>, code: <#T##Int?#>, localizedDescription: <#T##String?#>)
                                 completion()
                             }
 
