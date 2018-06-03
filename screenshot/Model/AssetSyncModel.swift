@@ -160,12 +160,14 @@ extension AssetSyncModel {
                 }else{
                     SDWebImageManager.shared().loadImage(with: URL.init(string: urlString), options: [SDWebImageOptions.fromCacheOnly], progress: nil, completed: { (image, data, error, cache, bool, url) in
                         
-                        var imageData =  data
-                        if imageData == nil {
-                            if let i = image {
-                                imageData = self.data(for: i)
+                        let imageData:Data? =  {
+                            if let data = data {
+                                return data
+                            }else if let i = image {
+                                return AssetSyncModel.sharedInstance.data(for: i)
                             }
-                        }
+                            return nil
+                        }()
                         if let imageData = imageData {
                             self.performBackgroundTask(assetId: urlString, shoppableId: nil, { (managedObjectContext) in
                                 

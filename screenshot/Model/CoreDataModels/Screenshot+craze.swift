@@ -144,12 +144,14 @@ extension Screenshot {
         if let imageUrl = subShoppable.imageUrl {
             SDWebImageManager.shared().loadImage(with: URL.init(string: imageUrl), options: [SDWebImageOptions.fromCacheOnly], progress: nil, completed: { (image, data, error, cache, bool, url) in
                 
-                var imageData =  data
-                if imageData == nil {
-                    if let i = image {
-                        imageData = AssetSyncModel.sharedInstance.data(for: i)
+                let imageData:Data? =  {
+                    if let data = data {
+                        return data
+                    }else if let i = image {
+                        return AssetSyncModel.sharedInstance.data(for: i)
                     }
-                }
+                    return nil
+                }()
                 if let imageData = imageData {
                     DataModel.sharedInstance.performBackgroundTask { (context) in
                         
