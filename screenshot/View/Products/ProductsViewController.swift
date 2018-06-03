@@ -978,12 +978,7 @@ extension ProductsViewController {
                 self.startAndAddLoader()
             case .retry:
                 self.stopAndRemoveLoader()
-                
-                let alert = UIAlertController.init(title: nil, message: "Unable to find products.", preferredStyle: .alert)
-                alert.addAction(UIAlertAction.init(title: "OK", style: .default, handler: { (a) in
-                    //maybe delete the sub shoppable.
-                }))
-                self.present(alert, animated: true, completion: nil)
+                self.showNoItemsHelperView()
             }
             
         case .retry:
@@ -1005,11 +1000,6 @@ extension ProductsViewControllerNoItemsHelperView{
     func showNoItemsHelperView() {
         let verPadding: CGFloat = .extendedPadding
         let horPadding: CGFloat = .padding
-        var topOffset: CGFloat = 0
-        
-        if let shoppablesToolbar = self.shoppablesToolbarContainer?.toolbar, !shoppablesToolbar.isHidden {
-            topOffset = shoppablesToolbar.bounds.size.height
-        }
         
         let helperView = HelperView()
         helperView.translatesAutoresizingMaskIntoConstraints = false
@@ -1018,26 +1008,28 @@ extension ProductsViewControllerNoItemsHelperView{
         helperView.subtitleLabel.text = "products.helper.message".localized
         helperView.contentImage = UIImage(named: "ProductsEmptyListGraphic")
         self.view.addSubview(helperView)
-        
-        helperView.topAnchor.constraint(equalTo: self.topLayoutGuide.bottomAnchor, constant:topOffset).isActive = true
+        if let shoppablesToolbarContainer = self.shoppablesToolbarContainer{
+            helperView.topAnchor.constraint(equalTo: shoppablesToolbarContainer.bottomAnchor, constant:0).isActive = true
+        }else{
+            helperView.topAnchor.constraint(equalTo: self.topLayoutGuide.bottomAnchor).isActive = true
+        }
         helperView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
         helperView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
         helperView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
         self.noItemsHelperView = helperView
         
-        if self.screenshotLoadingState == .retry {
-            let retryButton = MainButton()
-            retryButton.translatesAutoresizingMaskIntoConstraints = false
-            retryButton.backgroundColor = .crazeGreen
-            retryButton.setTitle("products.helper.retry".localized, for: .normal)
-            retryButton.addTarget(self, action: #selector(noItemsRetryAction), for: .touchUpInside)
-            helperView.controlView.addSubview(retryButton)
-            retryButton.topAnchor.constraint(equalTo: helperView.controlView.topAnchor).isActive = true
-            retryButton.leadingAnchor.constraint(greaterThanOrEqualTo: helperView.controlView.layoutMarginsGuide.leadingAnchor).isActive = true
-            retryButton.bottomAnchor.constraint(equalTo: helperView.controlView.bottomAnchor).isActive = true
-            retryButton.trailingAnchor.constraint(greaterThanOrEqualTo: helperView.controlView.layoutMarginsGuide.trailingAnchor).isActive = true
-            retryButton.centerXAnchor.constraint(equalTo: helperView.contentView.centerXAnchor).isActive = true
-        }
+        let retryButton = MainButton()
+        retryButton.translatesAutoresizingMaskIntoConstraints = false
+        retryButton.backgroundColor = .crazeGreen
+        retryButton.setTitle("products.helper.retry".localized, for: .normal)
+        retryButton.addTarget(self, action: #selector(noItemsRetryAction), for: .touchUpInside)
+        helperView.controlView.addSubview(retryButton)
+        retryButton.topAnchor.constraint(equalTo: helperView.controlView.topAnchor).isActive = true
+        retryButton.leadingAnchor.constraint(greaterThanOrEqualTo: helperView.controlView.layoutMarginsGuide.leadingAnchor).isActive = true
+        retryButton.bottomAnchor.constraint(equalTo: helperView.controlView.bottomAnchor).isActive = true
+        retryButton.trailingAnchor.constraint(greaterThanOrEqualTo: helperView.controlView.layoutMarginsGuide.trailingAnchor).isActive = true
+        retryButton.centerXAnchor.constraint(equalTo: helperView.contentView.centerXAnchor).isActive = true
+        
     }
     
     func hideNoItemsHelperView() {
@@ -1046,15 +1038,22 @@ extension ProductsViewControllerNoItemsHelperView{
     }
     
     @objc func noItemsRetryAction() {
-        let alert = UIAlertController(title: "products.helper.retry.title".localized, message: nil, preferredStyle: .actionSheet)
-        alert.addAction(UIAlertAction(title: "products.helper.retry.fashion".localized, style: .default, handler: { (a) in
-            AssetSyncModel.sharedInstance.refetchShoppables(screenshot: self.screenshot, classificationString: "h")
-        }))
-        alert.addAction(UIAlertAction(title: "products.helper.retry.furniture".localized, style: .default, handler: { (a) in
-            AssetSyncModel.sharedInstance.refetchShoppables(screenshot: self.screenshot, classificationString: "f")
-        }))
-        alert.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
-        self.present(alert, animated: true, completion: nil)
+        if self.productLoadingState == .retry, let shoppable  = self.shoppablesToolbarContainer?.subToolbar.selectedShoppable() {
+            AssetSyncModel.sharedInstance.reloadSubShoppable(shoppable: shoppable).then { (shoppable) -> Void in
+                self.addSubShoppableCompletion(shoppable: shoppable)
+            }
+        }else{
+            let alert = UIAlertController(title: "products.helper.retry.title".localized, message: nil, preferredStyle: .actionSheet)
+            alert.addAction(UIAlertAction(title: "products.helper.retry.fashion".localized, style: .default, handler: { (a) in
+                AssetSyncModel.sharedInstance.refetchShoppables(screenshot: self.screenshot, classificationString: "h")
+            }))
+            alert.addAction(UIAlertAction(title: "products.helper.retry.furniture".localized, style: .default, handler: { (a) in
+                AssetSyncModel.sharedInstance.refetchShoppables(screenshot: self.screenshot, classificationString: "f")
+            }))
+            alert.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
+            self.present(alert, animated: true, completion: nil)
+        }
+      
     }
 }
 
