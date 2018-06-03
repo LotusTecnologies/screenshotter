@@ -54,65 +54,7 @@ extension Product {
     
     
     public func setFavorited(toFavorited: Bool) {
-        let managedObjectID = self.objectID
-        DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
-            let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
-            fetchRequest.predicate = NSPredicate(format: "SELF == %@", managedObjectID)
-            fetchRequest.sortDescriptors = nil
-            
-            do {
-                let results = try managedObjectContext.fetch(fetchRequest)
-                for product in results {
-                    product.isFavorite = toFavorited
-                    if toFavorited {
-                        product.track()
-                    }else{
-                        product.untrack()
-                    }
-                    if toFavorited == false {
-                        product.dateViewed  = nil
-                    }
-                    if toFavorited {
-                        let now = Date()
-                        product.dateFavorited = now
-                        product.dateSortProductBar = product.getSortDateForProductBar()
-                        product.hideFromProductBar = false
-                        if let screenshot = product.shoppable?.screenshot {
-                            screenshot.addToFavorites(product)
-                            if let favoritesCount = screenshot.favorites?.count {
-                                screenshot.favoritesCount = Int16(favoritesCount)
-                            } else {
-                                screenshot.favoritesCount += 1
-                            }
-                            screenshot.lastFavorited = now
-                        }
-                    } else {
-                        product.dateFavorited = nil
-                        if let screenshot = product.shoppable?.screenshot {
-                            screenshot.removeFromFavorites(product)
-                            if let favorites = screenshot.favorites {
-                                screenshot.favoritesCount = Int16(favorites.count)
-                            } else {
-                                screenshot.favoritesCount = 0
-                                screenshot.lastFavorited = nil
-                            }
-                        }
-                    }
-                }
-                try managedObjectContext.save()
-                
-                if toFavorited {
-                    let score = UserDefaults.standard.integer(forKey: UserDefaultsKeys.gameScore)
-                    UserDefaults.standard.set(score + 1, forKey: UserDefaultsKeys.gameScore)
-                    AccumulatorModel.favorite.incrementUninformedCount()
-                }else{
-                    AccumulatorModel.favorite.decrementUninformedCount(by:1)
-                }
-            } catch {
-                DataModel.sharedInstance.receivedCoreDataError(error: error)
-                print("setFavorited objectID:\(managedObjectID) results with error:\(error)")
-            }
-        }
+        DataModel.sharedInstance.favorite(toFavorited: toFavorited, productOIDs: [self.objectID])
     }
     
     @objc dynamic var calculatedDisplayTitle:String? {
