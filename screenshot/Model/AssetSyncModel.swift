@@ -1237,7 +1237,6 @@ extension AssetSyncModel {
                                         completion()
                                     }
                                 }else{
-                                    Analytics.trackDevBurrowErrorNoShoppables(productImageUrl: productImageUrl)
                                     print("can't find segment for label \(rootShoppableLabel) in \( segments.map{$0["label"] ?? ""} )")
                                     completion()
                                 }
