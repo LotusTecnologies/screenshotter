@@ -27,7 +27,8 @@ extension UIApplication {
     }
     
     static var isUSC: Bool {
-        return UserDefaults.standard.bool(forKey: UserDefaultsKeys.isUSC)
+        // Revert to never use USC.
+        return false //UserDefaults.standard.bool(forKey: UserDefaultsKeys.isUSC)
     }
 }
 

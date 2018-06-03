@@ -215,8 +215,8 @@ class SettingsViewController : BaseViewController {
         .info: [
             .name,
             .email,
-            .payment,
-            .address,
+//            .payment,
+//            .address,
             .currency
         ],
         .about: [
@@ -225,7 +225,7 @@ class SettingsViewController : BaseViewController {
             .bug,
             .usageStreak,
             .coins,
-            .region,
+//            .region,  // Revert to never use USC.
             .version,
             .partners
         ],

@@ -122,7 +122,8 @@ class OnboardingWelcomeViewController: UIViewController {
     }
     
     @objc fileprivate func continueAction() {
-        let _ = NetworkingPromise.sharedInstance.geoLocateIsUSC()
+        // Revert to never use USC.
+//        let _ = NetworkingPromise.sharedInstance.geoLocateIsUSC()
         delegate?.onboardingWelcomeViewControllerDidComplete(self)
     }
 }

@@ -50,7 +50,7 @@ class UserDefaultsKeys  {
     static let onboardingPresentedGiftCard = "OnboardingPresentedGiftCard"
     static let lastCampaignCompleted = "LastCampaignCompleted"  //in here is stored CampaignCompleted.rawValue
     enum CampaignCompleted : String {
-        case campaign_2018_04_20 // Kim video to push users to do purchases
+        case campaign_2018_04_20 // A kim video to encourage users to submit to discover
     }
     
     // Gift Card

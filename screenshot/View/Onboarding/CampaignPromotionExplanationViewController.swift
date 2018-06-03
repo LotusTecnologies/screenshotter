@@ -19,16 +19,10 @@ class CampaignPromotionExplanationViewController: UIViewController{
     weak var delegate:CampaignPromotionExplanationViewControllerDelegate?
     
     var campaign = CampaignPromotionExplanation(
-        headline: "2018_04_20_campaign.instructions.headline".localized,
-        buttonText: "2018_04_20_campaign.instructions.button".localized,
-        secondButtonText: "2018_04_20_campaign.instructions.secondButton".localized,
-        instructions: ["2018_04_20_campaign.instructions.step_1".localized,
-                       "2018_04_20_campaign.instructions.step_2".localized,
-                       "2018_04_20_campaign.instructions.step_3".localized,
-                       "2018_04_20_campaign.instructions.step_4".localized,
-                       "2018_04_20_campaign.instructions.step_5".localized
-
-                       ])
+        headline: "",
+        buttonText: "",
+        secondButtonText: "",
+        instructions: [""])
     
     struct CampaignPromotionExplanation {
         var headline:String
