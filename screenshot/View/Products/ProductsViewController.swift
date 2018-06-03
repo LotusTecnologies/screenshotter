@@ -289,6 +289,7 @@ extension ProductsViewControllerScrollViewDelegate: UIScrollViewDelegate {
             
             if shoppablesToolbarContainer?.visibleToolbar != visible {
                 shoppablesToolbarContainer?.visibleToolbar = visible
+                syncContentInset()
             }
         }
     }
@@ -339,10 +340,12 @@ extension ProductsViewController: ShoppablesToolbarDelegate {
             if view.window == nil {
                 UIView.performWithoutAnimation {
                     shoppablesToolbarContainer?.visibleToolbar = visible
+                    syncContentInset()
                 }
             }
             else {
                 shoppablesToolbarContainer?.visibleToolbar = visible
+                syncContentInset()
             }
         }
         
@@ -634,6 +637,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         shoppablesToolbarContainer?.visibleToolbar = .both
         self.shoppablesToolbarContainer?.toolbar.deselectShoppable()
         self.shoppablesToolbarContainer?.subToolbar.selectShoppable(shoppable)
+        syncContentInset()
         
         if let p = self.productsLoadingMonitor {
             p.delegate = nil
@@ -932,6 +936,25 @@ extension ProductsViewControllerShareToDiscoverPrompt {
 }
 
 extension ProductsViewController {
+    func syncContentInset() {
+        guard let collectionView = collectionView, let shoppablesToolbar = self.shoppablesToolbarContainer else {
+            return
+        }
+        
+        var scrollInsets = collectionView.scrollIndicatorInsets
+        scrollInsets.top = shoppablesToolbar.bounds.size.height
+        
+        if #available(iOS 11.0, *) {} else {
+            scrollInsets.top += self.navigationController?.navigationBar.frame.maxY ?? 0
+        }
+        
+        collectionView.scrollIndicatorInsets = scrollInsets
+        
+        var insets = collectionView.contentInset
+        insets.top = scrollInsets.top
+        collectionView.contentInset = insets
+    }
+    
     func syncViewsAfterStateChange() {
         shoppablesToolbarContainer?.isHidden = shouldHideToolbar
         
@@ -942,23 +965,7 @@ extension ProductsViewController {
             self.startAndAddLoader()
             
         case .products:
-            if #available(iOS 11.0, *) {} else {
-                if !self.automaticallyAdjustsScrollViewInsets {
-                    // Setting back to YES doesn't update. Need to manually adjust.
-                    if let collectionView = collectionView,
-                        let shoppablesToolbar = self.shoppablesToolbarContainer?.toolbar
-                    {
-                        var scrollInsets = collectionView.scrollIndicatorInsets
-                        scrollInsets.top = (shoppablesToolbarContainer?.toolbar.bounds.size.height ?? 0) + (self.navigationController?.navigationBar.frame.maxY ?? 0)
-                        collectionView.scrollIndicatorInsets = scrollInsets
-                        
-                        var insets = collectionView.contentInset
-                        insets.top = scrollInsets.top
-                        collectionView.contentInset = insets
-                    }
-                }
-            }
-            
+            syncContentInset()
             self.stopAndRemoveLoader()
             self.hideNoItemsHelperView()
             self.rateView.isHidden = false
