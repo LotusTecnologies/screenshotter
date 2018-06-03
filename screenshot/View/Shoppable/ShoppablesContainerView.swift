@@ -59,7 +59,7 @@ class ShoppablesContainerView: UIView {
     private var topConstraints: [NSLayoutConstraint] = []
     private var bottomConstraints: [NSLayoutConstraint] = []
     private var bothConstraints: [NSLayoutConstraint] = []
-    
+
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -129,6 +129,7 @@ class ShoppablesContainerView: UIView {
         ]
         
         NSLayoutConstraint.activate(topConstraints)
+        
     }
     
     override var intrinsicContentSize: CGSize {
@@ -136,4 +137,8 @@ class ShoppablesContainerView: UIView {
         size.height = toolbar.intrinsicContentSize.height
         return size
     }
+    
+    
+    
+   
 }
