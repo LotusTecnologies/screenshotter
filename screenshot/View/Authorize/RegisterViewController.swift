@@ -38,7 +38,10 @@ class RegisterView: UIScrollView {
         return contentView.layoutMargins.top * 0.4
     }
     
-    let _layoutMargins = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
+    let _layoutMargins: UIEdgeInsets = {
+        let verticalInset: CGFloat = UIDevice.is320w ? .padding : .padding * 2
+        return UIEdgeInsets(top: verticalInset, left: .padding, bottom: verticalInset, right: .padding)
+    }()
     
     
     // MARK: Life Cycle
@@ -54,6 +57,17 @@ class RegisterView: UIScrollView {
             backgroundColor = UIColor(patternImage: backgroundImage)
         }
         
+        let verticalLayoutHeightConstant: CGFloat = {
+            let statusBarHeight = UIApplication.shared.statusBarFrame.height
+            
+            if #available(iOS 11.0, *) {
+                return statusBarHeight
+            }
+            else {
+                return -statusBarHeight
+            }
+        }()
+        
         // Force the height to be at least that of the scroll view
         let verticalLayoutView = UIView()
         verticalLayoutView.translatesAutoresizingMaskIntoConstraints = false
@@ -61,7 +75,7 @@ class RegisterView: UIScrollView {
         addSubview(verticalLayoutView)
         verticalLayoutView.topAnchor.constraint(equalTo: topAnchor).isActive = true
         verticalLayoutView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
-        verticalLayoutView.heightAnchor.constraint(greaterThanOrEqualTo: heightAnchor).isActive = true
+        verticalLayoutView.heightAnchor.constraint(greaterThanOrEqualTo: layoutMarginsGuide.heightAnchor, constant: verticalLayoutHeightConstant).isActive = true
         
         facebookLoginButton.translatesAutoresizingMaskIntoConstraints = false
         addSubview(facebookLoginButton)
@@ -69,18 +83,24 @@ class RegisterView: UIScrollView {
         facebookLoginButton.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
         facebookLoginButton.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
         
+        let horizontalLinesLayoutGuide = UILayoutGuide()
+        addLayoutGuide(horizontalLinesLayoutGuide)
+        horizontalLinesLayoutGuide.topAnchor.constraint(equalTo: facebookLoginButton.bottomAnchor, constant: .padding).isActive = true
+        
         horizontalLinesView.translatesAutoresizingMaskIntoConstraints = false
         horizontalLinesView.label.text = "generic.or".localized
         horizontalLinesView.leftLine.backgroundColor = .gray6
         horizontalLinesView.rightLine.backgroundColor = .gray6
         addSubview(horizontalLinesView)
-        horizontalLinesView.topAnchor.constraint(equalTo: facebookLoginButton.bottomAnchor, constant: .padding).isActive = true
+        horizontalLinesView.topAnchor.constraint(greaterThanOrEqualTo: horizontalLinesLayoutGuide.topAnchor).isActive = true
+        horizontalLinesView.bottomAnchor.constraint(lessThanOrEqualTo: horizontalLinesLayoutGuide.bottomAnchor).isActive = true
         horizontalLinesView.centerXAnchor.constraint(equalTo: layoutMarginsGuide.centerXAnchor).isActive = true
+        horizontalLinesView.centerYAnchor.constraint(equalTo: horizontalLinesLayoutGuide.centerYAnchor).isActive = true
         horizontalLinesView.widthAnchor.constraint(equalToConstant: 170).isActive = true
         
         contentView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(contentView)
-        contentView.topAnchor.constraint(equalTo: horizontalLinesView.bottomAnchor, constant: .padding).isActive = true
+        contentView.topAnchor.constraint(equalTo: horizontalLinesLayoutGuide.bottomAnchor, constant: .padding).isActive = true
         contentView.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
         contentView.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor, constant: -_layoutMargins.bottom).isActive = true
         contentView.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
@@ -119,6 +139,7 @@ class RegisterView: UIScrollView {
         let skipLayoutGuide = UILayoutGuide()
         addLayoutGuide(skipLayoutGuide)
         skipLayoutGuide.topAnchor.constraint(equalTo: contentView.bottomAnchor, constant: .padding).isActive = true
+        skipLayoutGuide.heightAnchor.constraint(equalTo: horizontalLinesLayoutGuide.heightAnchor).isActive = true
         
         let skipImage = UIImage(named: "OnboardingArrow")
         
@@ -178,7 +199,7 @@ class RegisterView: UIScrollView {
         legalTextView.setContentCompressionResistancePriority(.required, for: .vertical)
         legalTextView.topAnchor.constraint(equalTo: dealsLabel.lastBaselineAnchor, constant: .padding).isActive = true
         legalTextView.leadingAnchor.constraint(equalTo: dealsLayoutGuide.leadingAnchor).isActive = true
-        legalTextView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -_layoutMargins.bottom).isActive = true
+        legalTextView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
         legalTextView.trailingAnchor.constraint(equalTo: dealsLayoutGuide.trailingAnchor).isActive = true
     }
     
@@ -382,7 +403,7 @@ extension RegisterViewController: UITextViewDelegate {
         Analytics.trackOnboardingSubmittedEmailTOS()
         
         if let viewController = LegalViewControllerFactory.termsOfServiceViewController() {
-            present(viewController, animated: true, completion: nil)
+            present(viewController, animated: true)
         }
     }
     
@@ -390,7 +411,7 @@ extension RegisterViewController: UITextViewDelegate {
         Analytics.trackOnboardingSubmittedEmailPrivacy()
         
         if let viewController = LegalViewControllerFactory.privacyPolicyViewController() {
-            present(viewController, animated: true, completion: nil)
+            present(viewController, animated: true)
         }
     }
 }
