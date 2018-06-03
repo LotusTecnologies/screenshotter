@@ -215,8 +215,8 @@ class SettingsViewController : BaseViewController {
         .info: [
             .name,
             .email,
-            .payment,
-            .address,
+//            .payment,
+//            .address,
             .currency
         ],
         .about: [

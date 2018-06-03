@@ -343,7 +343,7 @@
 "settings.row.push_permission.title" = "Push Notifications";
 "settings.row.region.title" = "Region";
 "settings.row.size.title" = "Size";
-"settings.row.tutorial.title" = "Replay Tutorial";
+"settings.row.tutorial.title" = "Play Tutorial";
 "settings.row.usage_streak.detail.plural" = "%d days";
 "settings.row.usage_streak.detail.single" = "%d day";
 "settings.row.usage_streak.title" = "Daily Streak";

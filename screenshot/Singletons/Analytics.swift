@@ -143,6 +143,9 @@ class Analytics {
         if let category = shoppable.label {
             properties["shoppable-category"] = category
         }
+        if let parent = shoppable.parentShoppable, let offer = parent.offersURL {
+            properties["shoppable-parentOfferUrl"] = offer
+        }
         
         
         if let screenshot = shoppable.screenshot {
