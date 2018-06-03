@@ -118,6 +118,7 @@ class AssetSyncModel: NSObject {
         }
         
     }
+    
     func performBackgroundTask(assetId:String?, shoppableId:String?,  _ block: @escaping (NSManagedObjectContext) -> Void ) {
         self.coreDataProcessingQueue.addOperation(AsyncOperation.init(timeout: 10, assetId: assetId, shoppableId: shoppableId, completion: { (completion) in
             DataModel.sharedInstance.performBackgroundTask({ (context) in
@@ -478,17 +479,22 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
     func uploadScreenshotWithClarifaiFromUserScreenshotAction(asset: PHAsset) {
         let isForeground = self.foregroundScreenshotAssetIds.contains(asset.localIdentifier)
         self.foregroundScreenshotAssetIds.remove(asset.localIdentifier)
+        var imageData: Data?
         self.uploadScreenshotWithClarifaiQueueFromUserScreenshot.addOperation(AsyncOperation.init(timeout: 20.0,  assetId: asset.localIdentifier, shoppableId: nil, completion: { (completeOperation) in
-            asset.image(allowFromICloud: false).then (on: self.processingQ) { image -> Promise<(ClarifaiModel.ImageClassification, UIImage)> in
-                Analytics.trackSentImageToClarifai()
-                return ClarifaiModel.sharedInstance.classify(image: image).then(execute: { (c) -> Promise<(ClarifaiModel.ImageClassification, UIImage)>  in
-                    return Promise.init(value: (c, image))
-                })
-                }.then(on: self.processingQ) { imageClassification, image -> Promise<(ClarifaiModel.ImageClassification, Data?)> in
+            asset.image(allowFromICloud: false).then (on: self.processingQ) { image -> Promise<(String, [[String : Any]])> in
+//                Analytics.trackSentImageToClarifai()
+//                return ClarifaiModel.sharedInstance.classify(image: image).then(execute: { (c) -> Promise<(ClarifaiModel.ImageClassification, UIImage)>  in
+//                    return Promise.init(value: (c, image))
+//                })
+                imageData = self.data(for: image)
+                return NetworkingPromise.sharedInstance.uploadToSyte(imageData: imageData, orImageUrlString: nil)
+                }.then(on: self.processingQ) { uploadedImageURL, syteJson -> Promise<(ClarifaiModel.ImageClassification, Data?, String, [[String : Any]])> in
+                    let imageClassification = ClarifaiModel.ImageClassification.human
                     let isRecognized = (imageClassification != .unrecognized)
                     let classification = imageClassification.shortString()
                     
-                    Analytics.trackReceivedResponseFromClarifai(isFashion:  imageClassification == .human, isFurniture: imageClassification == .furniture)
+                    // TODO: GMK remove tracking imageClassification into human or furniture, DB
+//                    Analytics.trackReceivedResponseFromClarifai(isFashion:  imageClassification == .human, isFurniture: imageClassification == .furniture)
                     return Promise { fulfill, reject in
                         self.performBackgroundTask(assetId: asset.localIdentifier, shoppableId: nil) { (managedObjectContext) in
                             if let _ = managedObjectContext.screenshotWith(assetId: asset.localIdentifier) {
@@ -497,7 +503,6 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                                 reject(error)
                             }else{
                                 let isHidden = ( !isRecognized || !isForeground)
-                                let imageData:Data? = isRecognized ? self.data(for: image) : nil
                                 
                                 let _ = DataModel.sharedInstance.saveScreenshot(managedObjectContext: managedObjectContext,
                                                                                 assetId: asset.localIdentifier,
@@ -507,20 +512,21 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                                                                                 isHidden: isHidden,
                                                                                 imageData: imageData,
                                                                                 classification: classification)
-                                
-                                fulfill((imageClassification, imageData))
+
+                                fulfill((imageClassification, imageData, uploadedImageURL, syteJson))
                             }
                         }
                         
                     }
-                }.then (on: self.processingQ) { imageClassification, imageData -> Void in
+                }.then (on: self.processingQ) { imageClassification, imageData, gottenUploadedURLString, gottenSegments -> Void in
                     if imageClassification != .unrecognized {
                         if isForeground { // Screenshot taken while app in foregorund
                             DispatchQueue.main.async {
                                 self.screenshotDetectionDelegate?.foregroundScreenshotTaken(assetId: asset.localIdentifier)
                             }
-                            self.syteProcessing(imageClassification: imageClassification, imageData: imageData, orImageUrlString:nil, assetId: asset.localIdentifier)
+                            self.syteProcessing(imageClassification: imageClassification, imageData: imageData, orImageUrlString:nil, assetId: asset.localIdentifier, optionsMask: ProductsOptionsMask.global, gottenUploadedURLString: gottenUploadedURLString, gottenSegments: gottenSegments)
                         } else { // Screenshot taken while app in background (or killed)
+                            // TODO: GMK save gottenUploadedURLString, gottenSegments to DB
                             AccumulatorModel.screenshot.addAssetId(asset.localIdentifier)
                             AccumulatorModel.screenshotUninformed.incrementUninformedCount()
                             if  ApplicationStateModel.sharedInstance.isBackground() {
@@ -545,7 +551,8 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
         if isScreenshotUserJustTook {
             return // processed by other function
         }
-        self.uploadScreenshotWithClarifaiQueue.addOperation(AsyncOperation.init(timeout: 20.0, assetId: asset.localIdentifier, shoppableId: nil, completion: { (completeOperation) in
+        var imageData: Data?
+        self.uploadScreenshotWithClarifaiQueue.addOperation(AsyncOperation(timeout: 20.0, assetId: asset.localIdentifier, shoppableId: nil, completion: { (completeOperation) in
             firstly{ () -> Promise<Bool> in
                 if !isScreenshotUserJustTook {
                     if let date = asset.creationDate {
@@ -564,15 +571,38 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                 return Promise.init(value: true)
             }.then(on: self.processingQ) { success -> Promise<UIImage> in
                 return asset.image(allowFromICloud: false)
-            }.then (on: self.processingQ) { image -> Promise<(ClarifaiModel.ImageClassification, UIImage)> in
+            }.then (on: self.processingQ) { image -> Promise<(String, [[String : Any]])> in
 //                Analytics.trackSentImageToClarifai()
 //                return ClarifaiModel.sharedInstance.classify(image: image).then(execute: { (c) -> Promise<(ClarifaiModel.ImageClassification, UIImage)>  in
 //                    return Promise.init(value: (c, image))
 //                })
-                // Upload to Syte. Parse json, store it and classification to DB.
-                return self.syteAsClarifaiReplacement(image: image)
-            }.then(on: self.processingQ) { (imageClassification, image) -> Void in
-                if imageClassification != .unrecognized {
+                imageData = self.data(for: image)
+                return NetworkingPromise.sharedInstance.uploadToSyte(imageData: imageData, orImageUrlString: nil)
+                }.then (on: self.processingQ) { tuple -> Promise<Bool> in
+                    // Store screenshot and syteJson to DB.
+                    return Promise { fulfill, reject in
+                        self.performBackgroundTask(assetId: asset.localIdentifier, shoppableId: nil) { (managedObjectContext) in
+                            if let _ = managedObjectContext.screenshotWith(assetId: asset.localIdentifier) {
+                                //do nothing if already exsists
+                                let error = NSError.init(domain: "Craze", code: -90, userInfo: [NSLocalizedDescriptionKey:"already have screenshot in database"])
+                                reject(error)
+                            } else {
+                                let addedScreenshot = DataModel.sharedInstance.saveScreenshot(managedObjectContext: managedObjectContext,
+                                                                                              assetId: asset.localIdentifier,
+                                                                                              createdAt: asset.creationDate,
+                                                                                              isRecognized: true,
+                                                                                              source: .screenshot,
+                                                                                              isHidden: true,
+                                                                                              imageData: imageData,
+                                                                                              classification: nil)
+                                addedScreenshot.uploadedImageURL = tuple.0
+                                addedScreenshot.syteJson = NetworkingPromise.sharedInstance.jsonStringify(object: tuple.1)
+                                managedObjectContext.saveIfNeeded()
+                                fulfill(true)
+                            }
+                        }
+                    }
+            }.then(on: self.processingQ) { aBool -> Void in
                     self.performBackgroundTask(assetId: nil, shoppableId: nil) { (managedObjectContext) in
                         if managedObjectContext.screenshotWith(assetId: asset.localIdentifier) == nil {
                             AccumulatorModel.screenshot.addAssetId(asset.localIdentifier)
@@ -581,7 +611,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                                 self.processingQ.async {
                                     if self.shouldSendPushWhenFindFashionWithoutUserScreenshotAction && ApplicationStateModel.sharedInstance.isBackground(){  //need to check twice due to async craziness
                                         self.shouldSendPushWhenFindFashionWithoutUserScreenshotAction = false
-                                        self.sendScreenshotAddedLocalNotification(backgroundScreenshotData: [BackgroundScreenshotData.init(assetId: asset.localIdentifier, imageData: self.data(for: image))])
+                                        self.sendScreenshotAddedLocalNotification(backgroundScreenshotData: [BackgroundScreenshotData.init(assetId: asset.localIdentifier, imageData: imageData)])
                                     }
                                 }
                             }
@@ -589,8 +619,6 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                            
                         }
                     }
-                    
-                }
             }.catch { error in
                 print("uploadScreenshotWithClarifai catch error:\(error)")
             }.always(on: self.serialQ) {
@@ -603,15 +631,6 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                 completeOperation()
             }
         }))
-    }
-    
-    func syteAsClarifaiReplacement(image: UIImage) -> Promise<(ClarifaiModel.ImageClassification, UIImage)> {
-        let isUsc = UserDefaults.standard.bool(forKey: UserDefaultsKeys.isUSC)
-        let imageData = self.data(for: image)
-        return NetworkingPromise.sharedInstance.uploadToSyte(imageData: imageData, orImageUrlString: nil, isUsc: isUsc)
-            .then { uploadedURLString, segments -> Promise<(ClarifaiModel.ImageClassification, UIImage)> in
-            return Promise(value: (ClarifaiModel.ImageClassification.human, image))
-        }
     }
     
     func sendScreenshotAddedLocalNotification(backgroundScreenshotData: [BackgroundScreenshotData]) {
@@ -728,29 +747,27 @@ extension AssetSyncModel {
         }))
     }
     
-    func syteProcessing(imageClassification: ClarifaiModel.ImageClassification, imageData: Data?, orImageUrlString:String?, assetId: String, optionsMask: ProductsOptionsMask = ProductsOptionsMask.global) {
-        var localImageData = imageData
-        if assetId.hasPrefix("shamrock") {
-            if let imageData = imageData, let image = UIImage.init(data: imageData),  let image2 = image.shamrock(), let data = self.data(for: image2) {
-                localImageData = data
-            }
+    func syteProcessing(imageClassification: ClarifaiModel.ImageClassification,
+                        imageData: Data?,
+                        orImageUrlString:String?,
+                        assetId: String,
+                        optionsMask: ProductsOptionsMask = ProductsOptionsMask.global,
+                        gottenUploadedURLString: String? = nil,
+                        gottenSegments: [[String : Any]]? = nil) {
+        let localImageData: Data?
+        if assetId.hasPrefix("shamrock"), let imageData = imageData, let image = UIImage.init(data: imageData), let image2 = image.shamrock(), let data = self.data(for: image2) {
+            localImageData = data
+        } else {
+            localImageData = imageData
         }
         
         if imageClassification != .unrecognized {
             DispatchQueue.main.async {
                 self.networkingIndicatorDelegate?.networkingIndicatorDidStart(type: .Product)
             }
-            self.syteProcessingQueue.addOperation(AsyncOperation.init(timeout: 90, assetId: assetId, shoppableId: nil, completion: { (completion) in
-                firstly { // _ -> Promise<Bool> in
-                    let userDefaults = UserDefaults.standard
-                    if userDefaults.object(forKey: UserDefaultsKeys.isUSC) == nil {
-                        return NetworkingPromise.sharedInstance.geoLocateIsUSC()
-                    } else {
-                        let isUSC: Bool = userDefaults.bool(forKey: UserDefaultsKeys.isUSC)
-                        return Promise(value: isUSC)
-                    }
-                }.then(on: self.processingQ) { isUsc -> Promise<(String, [[String : Any]])> in
-                    return NetworkingPromise.sharedInstance.uploadToSyte(imageData: localImageData, orImageUrlString:orImageUrlString, isUsc: isUsc)
+            self.syteProcessingQueue.addOperation(AsyncOperation(timeout: 90, assetId: assetId, shoppableId: nil, completion: { (completion) in
+                firstly {
+                    return (gottenUploadedURLString != nil && gottenSegments != nil) ? Promise(value: (gottenUploadedURLString!, gottenSegments!)) : NetworkingPromise.sharedInstance.uploadToSyte(imageData: localImageData, orImageUrlString:orImageUrlString)
                 }.then(on: self.processingQ) { uploadedURLString, segments -> Void in
                     let categories = segments.map({ (segment: [String : Any]) -> String? in segment["label"] as? String}).compactMap({$0}).joined(separator: ",")
                     Analytics.trackReceivedResponseFromSyte(imageUrl: uploadedURLString, segmentCount: segments.count, categories: categories)
@@ -1054,6 +1071,7 @@ extension AssetSyncModel {
             self.syteProcessing(imageClassification: ClarifaiModel.ImageClassification.from(shortString:classificationString), imageData: backgroundScreenshot?.imageData, orImageUrlString: backgroundScreenshot?.uploadedImageURL, assetId: assetId)
         }
     }
+    
 }
 
 //Image processing
