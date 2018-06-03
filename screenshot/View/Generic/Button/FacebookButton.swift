@@ -9,29 +9,6 @@
 import UIKit
 
 class FacebookButton: UIButton {
-    enum TextCopy {
-        case none
-        case login
-        case register
-        
-        var localized: String {
-            switch self {
-            case .none:
-                return ""
-            case .login:
-                return "facebook.login".localized
-            case .register:
-                return "facebook.register".localized
-            }
-        }
-    }
-    
-    var textCopy: TextCopy = .none {
-        didSet {
-            setTitle(textCopy.localized, for: .normal)
-        }
-    }
-    
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -43,6 +20,7 @@ class FacebookButton: UIButton {
         
         setBackgroundImage(backgroundImage, for: .normal)
         setTitleColor(.gray5, for: .highlighted)
+        setTitle("facebook.register".localized, for: .normal)
         contentEdgeInsets = UIEdgeInsets(top: 0, left: 48, bottom: 0, right: 40)
         layer.shadowColor = Shadow.basic.color.cgColor
         layer.shadowOffset = Shadow.basic.offset

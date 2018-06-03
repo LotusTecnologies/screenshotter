@@ -61,7 +61,6 @@ class LoginViewController: AuthorizeContentViewController {
             _view.emailTextField.text = email
         }
         
-        _view.facebookLoginButton.textCopy = .login
         _view.continueButton.setTitle("authorize.login.continue".localized, for: .normal)
         
         _view.forgotPasswordButton.addTarget(self, action: #selector(forgotPasswordAction), for: .touchUpInside)

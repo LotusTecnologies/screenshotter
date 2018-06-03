@@ -7,11 +7,39 @@
 //
 
 import UIKit
+import Appsee
+import FacebookCore
+import FacebookLogin
 
-class RegisterView: AuthorizeContentScrollView {
+protocol RegisterViewControllerDelegate: NSObjectProtocol {
+    func registerViewControllerDidSkip(_ viewController: RegisterViewController)
+    func registerViewControllerDidLogin(_ viewController: RegisterViewController)
+    func registerViewControllerDidSignup(_ viewController: RegisterViewController)
+    func registerViewControllerDidFacebookLogin(_ viewController: RegisterViewController)
+    func registerViewControllerDidFacebookSignup(_ viewController: RegisterViewController)
+}
+
+class RegisterView: UIScrollView {
+    let facebookLoginButton = FacebookButton()
+    private let horizontalLinesView = HorizontalLinesView()
+    let contentView = ContentContainerView()
+    let emailTextField = UnderlineTextField()
+    let passwordTextField = UnderlineTextField()
+    let continueButton = MainButton()
     let dealsSwitch = UISwitch()
     let skipButton = UIButton()
     let legalTextView = TappableTextView()
+    
+    var activeTextFieldTopOffset: CGFloat {
+        return horizontalLinesView.frame.maxY
+    }
+    
+    var verticalNegativeMargin: CGFloat {
+        return contentView.layoutMargins.top * 0.4
+    }
+    
+    let _layoutMargins = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
+    
     
     // MARK: Life Cycle
     
@@ -22,6 +50,10 @@ class RegisterView: AuthorizeContentScrollView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
+        if let backgroundImage = UIImage(named: "BrandConfettiFullBackground") {
+            backgroundColor = UIColor(patternImage: backgroundImage)
+        }
+        
         // Force the height to be at least that of the scroll view
         let verticalLayoutView = UIView()
         verticalLayoutView.translatesAutoresizingMaskIntoConstraints = false
@@ -30,6 +62,59 @@ class RegisterView: AuthorizeContentScrollView {
         verticalLayoutView.topAnchor.constraint(equalTo: topAnchor).isActive = true
         verticalLayoutView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
         verticalLayoutView.heightAnchor.constraint(greaterThanOrEqualTo: heightAnchor).isActive = true
+        
+        facebookLoginButton.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(facebookLoginButton)
+        facebookLoginButton.topAnchor.constraint(equalTo: topAnchor, constant: _layoutMargins.top).isActive = true
+        facebookLoginButton.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
+        facebookLoginButton.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
+        
+        horizontalLinesView.translatesAutoresizingMaskIntoConstraints = false
+        horizontalLinesView.label.text = "generic.or".localized
+        horizontalLinesView.leftLine.backgroundColor = .gray6
+        horizontalLinesView.rightLine.backgroundColor = .gray6
+        addSubview(horizontalLinesView)
+        horizontalLinesView.topAnchor.constraint(equalTo: facebookLoginButton.bottomAnchor, constant: .padding).isActive = true
+        horizontalLinesView.centerXAnchor.constraint(equalTo: layoutMarginsGuide.centerXAnchor).isActive = true
+        horizontalLinesView.widthAnchor.constraint(equalToConstant: 170).isActive = true
+        
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(contentView)
+        contentView.topAnchor.constraint(equalTo: horizontalLinesView.bottomAnchor, constant: .padding).isActive = true
+        contentView.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
+        contentView.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor, constant: -_layoutMargins.bottom).isActive = true
+        contentView.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
+        
+        emailTextField.translatesAutoresizingMaskIntoConstraints = false
+        emailTextField.placeholder = "authorize.generic.email".localized
+        emailTextField.returnKeyType = .next
+        emailTextField.keyboardType = .emailAddress
+        emailTextField.autocapitalizationType = .none
+        emailTextField.autocorrectionType = .no
+        emailTextField.spellCheckingType = .no
+        contentView.addSubview(emailTextField)
+        emailTextField.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor, constant: verticalNegativeMargin - contentView.layoutMargins.top).isActive = true
+        emailTextField.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
+        emailTextField.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
+        
+        passwordTextField.translatesAutoresizingMaskIntoConstraints = false
+        passwordTextField.placeholder = "authorize.generic.password".localized
+        passwordTextField.isSecureTextEntry = true
+        passwordTextField.autocapitalizationType = .none
+        passwordTextField.autocorrectionType = .no
+        passwordTextField.spellCheckingType = .no
+        contentView.addSubview(passwordTextField)
+        passwordTextField.topAnchor.constraint(equalTo: emailTextField.bottomAnchor, constant: verticalNegativeMargin).isActive = true
+        passwordTextField.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
+        passwordTextField.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
+        Appsee.markView(asSensitive: passwordTextField)
+        
+        continueButton.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(continueButton)
+        continueButton.topAnchor.constraint(equalTo: passwordTextField.bottomAnchor, constant: contentView.layoutMargins.bottom).isActive = true
+        continueButton.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
+        continueButton.bottomAnchor.constraint(lessThanOrEqualTo: contentView.layoutMarginsGuide.bottomAnchor).isActive = true
+        continueButton.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
         
         let skipLayoutGuide = UILayoutGuide()
         addLayoutGuide(skipLayoutGuide)
@@ -97,6 +182,12 @@ class RegisterView: AuthorizeContentScrollView {
         legalTextView.trailingAnchor.constraint(equalTo: dealsLayoutGuide.trailingAnchor).isActive = true
     }
     
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        layoutMargins = _layoutMargins
+    }
+    
     // MARK: Legal
     
     fileprivate let legalLinkTOS = "TOS"
@@ -132,13 +223,23 @@ class RegisterView: AuthorizeContentScrollView {
     }
 }
 
-class RegisterViewController: AuthorizeContentViewController {
-    override var classForView: AuthorizeContentScrollView.Type {
+class RegisterViewController: UIViewController {
+    private let inputViewAdjustsScrollViewController = InputViewAdjustsScrollViewController()
+    
+    weak var delegate: RegisterViewControllerDelegate?
+    
+    // MARK: View
+    
+    var classForView: RegisterView.Type {
         return RegisterView.self
     }
     
-    override var _view: RegisterView {
+    var _view: RegisterView {
         return view as! RegisterView
+    }
+    
+    var facebookLoginButton: FacebookButton {
+        return _view.facebookLoginButton
     }
     
     var continueButton: UIButton {
@@ -149,12 +250,118 @@ class RegisterViewController: AuthorizeContentViewController {
         return _view.skipButton
     }
     
+    override func loadView() {
+        view = classForView.self.init()
+    }
+    
+    // MARK: Life Cycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        _view.facebookLoginButton.textCopy = .register
-        _view.continueButton.setTitle("authorize.register.continue".localized, for: .normal)
+        _view.facebookLoginButton.addTarget(self, action: #selector(facebookLoginAction), for: .touchUpInside)
+        
+        _view.emailTextField.delegate = self
+        _view.passwordTextField.delegate = self
         _view.legalTextView.delegate = self
+        
+        _view.continueButton.setTitle("authorize.register.continue".localized, for: .normal)
+        _view.continueButton.addTarget(self, action: #selector(registerAction), for: .touchUpInside)
+        
+        _view.skipButton.addTarget(self, action: #selector(skipRegistration), for: .touchUpInside)
+        
+        inputViewAdjustsScrollViewController.scrollView = _view
+        inputViewAdjustsScrollViewController.delegate = self
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        _view.addGestureRecognizer(tapGesture)
+    }
+    
+    deinit {
+        inputViewAdjustsScrollViewController.delegate = nil
+        _view.emailTextField.delegate = nil
+        _view.passwordTextField.delegate = nil
+        _view.legalTextView.delegate = nil
+    }
+    
+    // MARK: Keyboard
+    
+    @objc fileprivate func dismissKeyboard() {
+        view.endEditing(true)
+    }
+    
+    // MARK: Register
+    
+    @objc fileprivate func registerAction() {
+        let isValidRegistration = true
+        
+        if isValidRegistration {
+            delegate?.registerViewControllerDidSignup(self)
+        }
+        else {
+            // TODO: notify user there was an issue
+        }
+    }
+    
+    @objc fileprivate func skipRegistration() {
+        delegate?.registerViewControllerDidSkip(self)
+    }
+    
+    // MARK: Facebook
+    
+    @objc fileprivate func facebookLoginAction() {
+        // TODO: use AccessToken to see if user already logged in
+        //        AccessToken.current
+        
+        let loginManager = LoginManager()
+        
+        loginManager.logIn(readPermissions: [.publicProfile, .email], viewController: self) { loginResult in
+            switch loginResult {
+            case .failed(let error):
+                print(error)
+                
+            case .cancelled:
+                print("User cancelled login.")
+                
+            case .success(let grantedPermissions, let declinedPermissions, let accessToken):
+                // TODO: set up user
+                
+                let isExistingUser = false
+                
+                if isExistingUser {
+                    self.delegate?.registerViewControllerDidFacebookLogin(self)
+                }
+                else {
+                    self.delegate?.registerViewControllerDidFacebookSignup(self)
+                }
+            }
+        }
+    }
+}
+
+extension RegisterViewController: InputViewAdjustsScrollViewControllerDelegate {
+    func inputViewAdjustsScrollViewControllerWillShow(_ controller: InputViewAdjustsScrollViewController) {
+        var contentInset = _view.contentInset
+        contentInset.top = -_view.activeTextFieldTopOffset
+        _view.contentInset = contentInset
+    }
+    
+    func inputViewAdjustsScrollViewControllerWillHide(_ controller: InputViewAdjustsScrollViewController) {
+        var contentInset = _view.contentInset
+        contentInset.top = 0
+        _view.contentInset = contentInset
+    }
+}
+
+extension RegisterViewController: UITextFieldDelegate {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        if textField == _view.emailTextField {
+            _view.passwordTextField.becomeFirstResponder()
+        }
+        else if textField == _view.passwordTextField {
+            textField.resignFirstResponder()
+        }
+        return true
     }
 }
 

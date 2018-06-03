@@ -61,9 +61,9 @@ extension TutorialNavigationController: OnboardingWelcomeViewControllerDelegate 
     func onboardingWelcomeViewControllerDidComplete(_ viewController: OnboardingWelcomeViewController) {
         Analytics.trackOnboardingWelcome()
         
-        let authorizeViewController = AuthorizeViewController()
-        authorizeViewController.delegate = self
-        pushViewController(authorizeViewController, animated: true)
+        let registerViewController = RegisterViewController()
+        registerViewController.delegate = self
+        pushViewController(registerViewController, animated: true)
         
         // !!!: DEBUG
 //        let signup = TutorialEmailSlideViewController()
@@ -72,24 +72,24 @@ extension TutorialNavigationController: OnboardingWelcomeViewControllerDelegate 
     }
 }
 
-extension TutorialNavigationController: AuthorizeViewControllerDelegate {
-    func authorizeViewControllerDidSkip(_ viewController: AuthorizeViewController) {
+extension TutorialNavigationController: RegisterViewControllerDelegate {
+    func registerViewControllerDidSkip(_ viewController: RegisterViewController) {
         pushTutorialTrySlide()
     }
     
-    func authorizeViewControllerDidLogin(_ viewController: AuthorizeViewController) {
+    func registerViewControllerDidLogin(_ viewController: RegisterViewController) {
         tutorialCompleted()
     }
     
-    func authorizeViewControllerDidSignup(_ viewController: AuthorizeViewController) {
+    func registerViewControllerDidSignup(_ viewController: RegisterViewController) {
         dismissRegisterConfirmationViewController()
     }
     
-    func authorizeViewControllerDidFacebookLogin(_ viewController: AuthorizeViewController) {
+    func registerViewControllerDidFacebookLogin(_ viewController: RegisterViewController) {
         tutorialCompleted()
     }
     
-    func authorizeViewControllerDidFacebookSignup(_ viewController: AuthorizeViewController) {
+    func registerViewControllerDidFacebookSignup(_ viewController: RegisterViewController) {
         dismissRegisterConfirmationViewController()
     }
     
