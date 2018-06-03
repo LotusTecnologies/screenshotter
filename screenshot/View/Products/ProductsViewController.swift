@@ -38,7 +38,6 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
     var loader:Loader?
     var noItemsHelperView:HelperView?
     var collectionView:UICollectionView?
-    var shoppablesToolbar:ShoppablesToolbar?
     var productsOptions:ProductsOptions = ProductsOptions()
     var scrollRevealController:ScrollRevealController?
     var rateView:ProductsRateView!
@@ -46,12 +45,18 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
     var productsRateNegativeFeedbackTextField:UITextField?
     var shamrockButton : FloatingActionButton?
     var productsUnfilteredCount:Int = 0
-    var state:ProductsViewControllerState = .unknown {
+    
+    var screenshotLoadingState:ProductsViewControllerState = .unknown {
         didSet {
             self.syncViewsAfterStateChange()
         }
     }
-    
+    var productLoadingState:ProductsViewControllerState = .unknown {
+        didSet {
+            self.syncViewsAfterStateChange()
+        }
+    }
+
     var selectedShoppable:Shoppable?
     
     func getSelectedShoppable() -> Shoppable? {
@@ -77,6 +82,8 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
     fileprivate var shoppablesToolbarContainer: ShoppablesContainerView?
     
     var loadingMonitor:AsyncOperationMonitor?
+    var productsLoadingMonitor:AsyncOperationMonitor?
+
     init(screenshot: Screenshot) {
         self.screenshot = screenshot
         super.init(nibName: nil, bundle: nil)
@@ -192,7 +199,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
         }
         
         if self.screenshotController?.first?.shoppablesCount == -1 {
-            self.state = .retry
+            self.screenshotLoadingState = .retry
             Analytics.trackScreenshotOpenedWithoutShoppables(screenshot: screenshot)
         }
         else {
@@ -299,11 +306,21 @@ extension ProductsViewController: ShoppablesToolbarDelegate {
     func shoppablesToolbarDidChangeSelectedShoppable(toolbar:ShoppablesToolbar, shoppable:Shoppable){
         if toolbar == shoppablesToolbarContainer?.subToolbar {
             shoppablesToolbarContainer?.toolbar.deselectShoppable()
+            
+            if shoppable.products?.count == 0 {
+                let m = AsyncOperationMonitor.init(assetId: nil, shoppableId: shoppable.imageUrl, queues: AssetSyncModel.sharedInstance.queues, delegate: nil)
+                if m.didStart == false {
+                    AssetSyncModel.sharedInstance.reloadSubShoppable(shoppable: shoppable).then { (shoppable) -> Void in
+                        self.addSubShoppableCompletion(shoppable: shoppable)
+                    }
+                }
+            }
         }
-        else if toolbar == shoppablesToolbar {
+        else if toolbar == shoppablesToolbarContainer?.toolbar {
             shoppablesToolbarContainer?.subToolbar.rootShoppableObjectId = shoppable.objectID
             shoppablesToolbarContainer?.visibleToolbar = (shoppable.subShoppables?.count ?? 0 > 0) ? .bottom : .top
         }
+        
         self.selectedShoppable = shoppable
         self.reloadProductsFor(shoppable: shoppable)
     }
@@ -588,20 +605,27 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         }
     }
     
+    func addSubShoppableCompletion(shoppable:Shoppable) {
+        shoppablesToolbarContainer?.visibleToolbar = .both
+        self.shoppablesToolbarContainer?.toolbar.deselectShoppable()
+        self.shoppablesToolbarContainer?.subToolbar.selectShoppable(shoppable)
+        
+        if let p = self.productsLoadingMonitor {
+            p.delegate = nil
+        }
+        self.productsLoadingMonitor = AsyncOperationMonitor.init(assetId: nil, shoppableId: shoppable.imageUrl, queues: AssetSyncModel.sharedInstance.queues, delegate: self)
+        self.updateLoadingState()
+    }
+    
     @objc func productCollectionViewCellProductAction(_ control: UIControl, event: UIEvent) {
-        guard let indexPath = collectionView?.indexPath(for: event),
-            let shoppable = self.shoppablesToolbarContainer?.toolbar.selectedShoppable()
-            else {
+        guard let indexPath = collectionView?.indexPath(for: event) else {
                 return
         }
         
         let product = self.productAtIndex(indexPath.row)
-        
-        AssetSyncModel.sharedInstance.addSubShoppableTo(shoppable: shoppable, fromProduct: product).then { (shoppable) -> Void in
-            self.shoppablesToolbarContainer?.visibleToolbar = .both
-            self.shoppablesToolbarContainer?.toolbar.deselectShoppable()
-            self.shoppablesToolbarContainer?.subToolbar.selectShoppable(shoppable)
-            
+       
+        AssetSyncModel.sharedInstance.addSubShoppable(fromProduct: product).then { (shoppable) -> Void in
+            self.addSubShoppableCompletion(shoppable: shoppable)
         }
     }
 }
@@ -668,8 +692,9 @@ extension ProductsViewControllerProducts{
         self.productsUnfilteredCount = 0
         self.scrollRevealController?.resetViewOffset()
         
-        if shoppable.productFilterCount == -1 {
-            self.state = .retry
+        self.productLoadingState = .unknown
+          if shoppable.productFilterCount == -1 {
+            self.screenshotLoadingState = .retry
         } else {
             self.products = self.productsForShoppable(shoppable)
         }
@@ -885,7 +910,7 @@ extension ProductsViewController {
     func syncViewsAfterStateChange() {
         shoppablesToolbarContainer?.isHidden = shouldHideToolbar
         
-        switch (state) {
+        switch (screenshotLoadingState) {
         case .loading, .unknown:
             self.hideNoItemsHelperView()
             self.rateView.isHidden = true
@@ -899,7 +924,7 @@ extension ProductsViewController {
                         let shoppablesToolbar = self.shoppablesToolbarContainer?.toolbar
                     {
                         var scrollInsets = collectionView.scrollIndicatorInsets
-                        scrollInsets.top = shoppablesToolbar.bounds.size.height + (self.navigationController?.navigationBar.frame.maxY ?? 0)
+                        scrollInsets.top = (shoppablesToolbarContainer?.toolbar.bounds.size.height ?? 0) + (self.navigationController?.navigationBar.frame.maxY ?? 0)
                         collectionView.scrollIndicatorInsets = scrollInsets
                         
                         var insets = collectionView.contentInset
@@ -912,6 +937,21 @@ extension ProductsViewController {
             self.stopAndRemoveLoader()
             self.hideNoItemsHelperView()
             self.rateView.isHidden = false
+            
+            switch self.productLoadingState {
+            case .products, .unknown:
+                break;
+            case .loading:
+                self.startAndAddLoader()
+            case .retry:
+                self.stopAndRemoveLoader()
+                
+                let alert = UIAlertController.init(title: nil, message: "Unable to find products.", preferredStyle: .alert)
+                alert.addAction(UIAlertAction.init(title: "OK", style: .default, handler: { (a) in
+                    //maybe delete the sub shoppable.
+                }))
+                self.present(alert, animated: true, completion: nil)
+            }
             
         case .retry:
             if #available(iOS 11.0, *) {} else {
@@ -952,7 +992,7 @@ extension ProductsViewControllerNoItemsHelperView{
         helperView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
         self.noItemsHelperView = helperView
         
-        if self.state == .retry {
+        if self.screenshotLoadingState == .retry {
             let retryButton = MainButton()
             retryButton.translatesAutoresizingMaskIntoConstraints = false
             retryButton.backgroundColor = .crazeGreen
@@ -1175,9 +1215,27 @@ extension ProductsViewController : AsyncOperationMonitorDelegate {
                     }
                 }
             }()
-            if state != self.state {
-                self.state = state
+            if state != self.screenshotLoadingState {
+                self.screenshotLoadingState = state
             }
+            
+            
+            let isProductLoading = self.productsLoadingMonitor?.didStart ?? false
+            let productState:ProductsViewControllerState = {
+                if self.products.count > 0 {
+                    return .products
+                }else{
+                    if isProductLoading {
+                        return .loading
+                    }else{
+                        return .retry
+                    }
+                }
+            }()
+            if productState != self.productLoadingState {
+                self.productLoadingState = productState
+            }
+            
         }
     }
     

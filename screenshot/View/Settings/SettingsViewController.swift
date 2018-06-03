@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Corey Werner on 12/7/17.
-//  Copyright  2017 crazeapp. All rights reserved.
+//  Copyright 2017 crazeapp. All rights reserved.
 //
 
 import Foundation
@@ -225,7 +225,7 @@ class SettingsViewController : BaseViewController {
             .bug,
             .usageStreak,
             .coins,
-            .region,
+//            .region,  // Revert to never use USC.
             .version,
             .partners
         ],
