@@ -27,143 +27,6 @@ enum ProductsViewControllerState : Int {
     case unknown
 }
 
-
-
-
-
-class ShoppablesContainerView: UIView {
-    enum VisibleToolbar: Int {
-        case top
-        case bottom
-        case both
-    }
-    
-    private let containerView = UIView()
-    let toolbar: ShoppablesToolbar
-    let subToolbar: ShoppablesToolbar
-    
-    var visibleToolbar: VisibleToolbar = .top {
-        didSet {
-            switch visibleToolbar {
-            case .top:
-                NSLayoutConstraint.deactivate(bottomConstraints)
-                NSLayoutConstraint.deactivate(bothConstraints)
-                NSLayoutConstraint.activate(topConstraints)
-                
-            case .bottom:
-                NSLayoutConstraint.deactivate(topConstraints)
-                NSLayoutConstraint.deactivate(bothConstraints)
-                NSLayoutConstraint.activate(bottomConstraints)
-//                self.containerView.layer.anchorPoint = CGPoint(x: 0.5, y: 1)
-            case .both:
-                // TODO: animate the curve of the layer to be the same as the constraint
-                self.containerView.layer.anchorPoint = CGPoint(x: 0.5, y: 1)
-                NSLayoutConstraint.deactivate(topConstraints)
-                NSLayoutConstraint.deactivate(bottomConstraints)
-                NSLayoutConstraint.activate(bothConstraints)
-            }
-            
-            UIView.animate(withDuration: 2) {
-                self.containerView.layer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-                self.containerView.layoutIfNeeded()
-            }
-        }
-    }
-    
-    private var topConstraints: [NSLayoutConstraint] = []
-    private var bottomConstraints: [NSLayoutConstraint] = []
-    private var bothConstraints: [NSLayoutConstraint] = []
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    init(screenshot: Screenshot) {
-        toolbar = ShoppablesToolbar(screenshot: screenshot)
-        subToolbar = ShoppablesToolbar(screenshot: screenshot)
-        super.init(frame: .zero)
-        
-        clipsToBounds = true
-        backgroundColor = .green
-        
-        containerView.translatesAutoresizingMaskIntoConstraints = false
-        containerView.backgroundColor = .red
-        addSubview(containerView)
-        containerView.topAnchor.constraint(equalTo: topAnchor).isActive = true
-        containerView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-        containerView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
-        containerView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
-        
-        toolbar.translatesAutoresizingMaskIntoConstraints = false
-        toolbar.barTintColor = .white
-        containerView.addSubview(toolbar)
-        toolbar.leadingAnchor.constraint(equalTo: containerView.leadingAnchor).isActive = true
-        toolbar.trailingAnchor.constraint(equalTo: containerView.trailingAnchor).isActive = true
-        
-        topConstraints += [
-            toolbar.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 2),
-            toolbar.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -2)
-        ]
-        bottomConstraints += [
-            toolbar.bottomAnchor.constraint(equalTo: containerView.topAnchor)
-        ]
-        bothConstraints += [
-            toolbar.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 2),
-        ]
-        
-        subToolbar.translatesAutoresizingMaskIntoConstraints = false
-        subToolbar.barTintColor = .red
-        containerView.insertSubview(subToolbar, belowSubview: toolbar)
-        subToolbar.leadingAnchor.constraint(equalTo: containerView.leadingAnchor).isActive = true
-        subToolbar.trailingAnchor.constraint(equalTo: containerView.trailingAnchor).isActive = true
-        
-        topConstraints += [
-            subToolbar.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 2)
-        ]
-        bottomConstraints += [
-            subToolbar.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 2),
-            subToolbar.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -2)
-        ]
-        bothConstraints += [
-            subToolbar.topAnchor.constraint(equalTo: toolbar.bottomAnchor, constant: 2),
-            subToolbar.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -2)
-        ]
-        
-        NSLayoutConstraint.activate(topConstraints)
-        
-        toolbar.isUserInteractionEnabled = false
-        subToolbar.isUserInteractionEnabled = false
-        
-        let tap = UITapGestureRecognizer(target: self, action: #selector(tapAction(_:)))
-        addGestureRecognizer(tap)
-    }
-    
-    override var intrinsicContentSize: CGSize {
-        var size = super.intrinsicContentSize
-        size.height = toolbar.intrinsicContentSize.height
-        return size
-    }
-    
-    @objc private func tapAction(_ tapGesture: UITapGestureRecognizer) {
-        switch visibleToolbar {
-        case .top:
-            visibleToolbar = .both
-        case .bottom:
-            visibleToolbar = .top
-        case .both:
-            visibleToolbar = .bottom
-        }
-    }
-    
-}
-
-
-
-
-
-
-
-
 class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
     var screenshot:Screenshot
     var screenshotController: FetchedResultsControllerManager<Screenshot>?
@@ -194,31 +57,24 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
     func getSelectedShoppable() -> Shoppable? {
         if let s = selectedShoppable {
             return s
-        }else if self.isSubShoppablesToolbarDisplayed, let s = self.subShoppablesToolbar?.selectedShoppable() {
-            return s
-        }else {
-            return self.shoppablesToolbar?.selectedShoppable()
         }
+        else if let shoppablesContainer = shoppablesToolbarContainer {
+            let visible = shoppablesContainer.visibleToolbar
+            
+            if (visible == .both || visible == .bottom), let s = shoppablesContainer.subToolbar.selectedShoppable() {
+                return s
+            }
+            else {
+                return shoppablesContainer.toolbar.selectedShoppable()
+            }
+        }
+        return nil
     }
     
     var shareToDiscoverPrompt:UIView?
     fileprivate let filterView = CustomInputtableView()
     
-    fileprivate var subShoppablesToolbar:ShoppablesToolbar?
-    fileprivate var subShoppablesToolbarTopConstraint: NSLayoutConstraint?
-    fileprivate var subShoppablesContainerTopConstraint: NSLayoutConstraint?
-    fileprivate var isSubShoppablesToolbarDisplayed = false {
-        didSet {
-            subShoppablesContainerTopConstraint?.isActive = isSubShoppablesToolbarDisplayed
-            view.layoutIfNeeded()
-            
-            subShoppablesToolbarTopConstraint?.isActive = isSubShoppablesToolbarDisplayed
-            
-            UIView.animate(withDuration: .defaultAnimationDuration, delay: 0, options: [.beginFromCurrentState, .curveEaseIn], animations: {
-                self.subShoppablesToolbar?.superview?.layoutIfNeeded()
-            })
-        }
-    }
+    fileprivate var shoppablesToolbarContainer: ShoppablesContainerView?
     
     var loadingMonitor:AsyncOperationMonitor?
     init(screenshot: Screenshot) {
@@ -244,51 +100,19 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
         
         screenshotController = DataModel.sharedInstance.singleScreenshotFrc(delegate: self, screenshot: screenshot)
         
-        let shoppablesToolbar:ShoppablesToolbar = {
-            let toolbar = ShoppablesToolbar.init(screenshot: self.screenshot)
-            toolbar.translatesAutoresizingMaskIntoConstraints = false
-            toolbar.delegate = self
-            toolbar.shoppableToolbarDelegate = self
-            toolbar.barTintColor = .white
-            toolbar.isHidden = self.shouldHideToolbar
-            self.view.addSubview(toolbar)
-            
-            toolbar.topAnchor.constraint(equalTo: self.topLayoutGuide.bottomAnchor).isActive = true
-            toolbar.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
-            toolbar.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
-            return toolbar
+        let shoppablesToolbarContainer: ShoppablesContainerView = {
+            let container = ShoppablesContainerView(screenshot: screenshot)
+            container.translatesAutoresizingMaskIntoConstraints = false
+            container.isHidden = shouldHideToolbar
+            container.toolbar.shoppableToolbarDelegate = self
+            container.subToolbar.shoppableToolbarDelegate = self
+            view.addSubview(container)
+            container.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor).isActive = true
+            container.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+            container.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+            return container
         }()
-        
-        self.shoppablesToolbar = shoppablesToolbar
-        
-        let subShoppablesContainerView = UIView()
-        subShoppablesContainerView.translatesAutoresizingMaskIntoConstraints = false
-        view.insertSubview(subShoppablesContainerView, belowSubview: shoppablesToolbar)
-        subShoppablesContainerTopConstraint = subShoppablesContainerView.topAnchor.constraint(equalTo: shoppablesToolbar.bottomAnchor)
-        subShoppablesContainerView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        let subShoppablesBottomConstraint = subShoppablesContainerView.bottomAnchor.constraint(equalTo: shoppablesToolbar.bottomAnchor)
-        subShoppablesBottomConstraint.priority = .defaultLow
-        subShoppablesBottomConstraint.isActive = true
-        subShoppablesContainerView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        subShoppablesContainerView.heightAnchor.constraint(equalTo: shoppablesToolbar.heightAnchor).isActive = true
-        
-        let subShoppablesToolbar: ShoppablesToolbar = {
-            let toolbar = ShoppablesToolbar(screenshot: self.screenshot)
-            toolbar.translatesAutoresizingMaskIntoConstraints = false
-            toolbar.delegate = self
-            toolbar.shoppableToolbarDelegate = self
-            toolbar.barTintColor = .white
-            toolbar.isHidden = self.shouldHideToolbar
-            subShoppablesContainerView.addSubview(toolbar)
-            subShoppablesToolbarTopConstraint = toolbar.topAnchor.constraint(equalTo: shoppablesToolbar.bottomAnchor)
-            toolbar.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
-            let bottomConstraint = toolbar.bottomAnchor.constraint(equalTo: shoppablesToolbar.bottomAnchor)
-            bottomConstraint.priority = .defaultLow
-            bottomConstraint.isActive = true
-            toolbar.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
-            return toolbar
-        }()
-        self.subShoppablesToolbar = subShoppablesToolbar
+        self.shoppablesToolbarContainer = shoppablesToolbarContainer
         
         let collectionView:UICollectionView = {
             let minimumSpacing = self.collectionViewMinimumSpacing()
@@ -301,8 +125,8 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
             collectionView.translatesAutoresizingMaskIntoConstraints = false
             collectionView.delegate = self
             collectionView.dataSource = self
-            collectionView.contentInset = UIEdgeInsets(top: self.shoppablesToolbar?.bounds.size.height ?? 0, left: 0.0, bottom: minimumSpacing.y, right: 0.0)
-            collectionView.scrollIndicatorInsets = UIEdgeInsets(top: self.shoppablesToolbar?.bounds.size.height ?? 0, left: 0.0, bottom: 0.0, right: 0.0)
+            collectionView.contentInset = UIEdgeInsets(top: self.shoppablesToolbarContainer?.intrinsicContentSize.height ?? 0, left: 0.0, bottom: minimumSpacing.y, right: 0.0)
+            collectionView.scrollIndicatorInsets = UIEdgeInsets(top: self.shoppablesToolbarContainer?.intrinsicContentSize.height ?? 0, left: 0.0, bottom: 0.0, right: 0.0)
             collectionView.backgroundColor = self.view.backgroundColor
             // TODO: set the below to interactive and comment the dismissal in -scrollViewWillBeginDragging.
             // Then test why the control view (products options view) jumps before being dragged away.
@@ -372,24 +196,8 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
             Analytics.trackScreenshotOpenedWithoutShoppables(screenshot: screenshot)
         }
         else {
-            self.shoppablesToolbar?.selectFirstShoppable()
+            self.shoppablesToolbarContainer?.toolbar.selectFirstShoppable()
         }
-        
-        
-        
-        
-        
-        let a = ShoppablesContainerView(screenshot: screenshot)
-        a.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(a)
-        a.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor, constant: 200).isActive = true
-        a.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        a.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        
-        
-        
-        
-        
         
         let pinchZoom = UIPinchGestureRecognizer.init(target: self, action: #selector(pinch(gesture:)))
         self.view.addGestureRecognizer(pinchZoom)
@@ -418,7 +226,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        self.shoppablesToolbar?.didViewControllerAppear = true
+        self.shoppablesToolbarContainer?.toolbar.didViewControllerAppear = true
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -428,8 +236,8 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
     }
     
     deinit {
-        self.shoppablesToolbar?.delegate = nil
-        self.shoppablesToolbar?.shoppableToolbarDelegate = nil
+        self.shoppablesToolbarContainer?.toolbar.shoppableToolbarDelegate = nil
+        self.shoppablesToolbarContainer?.subToolbar.shoppableToolbarDelegate = nil
     }
 }
 
@@ -446,9 +254,7 @@ extension ProductsViewControllerScrollViewDelegate: UIScrollViewDelegate {
         self.dismissOptions()
         self.scrollRevealController?.scrollViewWillBeginDragging(scrollView)
         
-        if isSubShoppablesToolbarDisplayed {
-            isSubShoppablesToolbarDisplayed = false
-        }
+        shoppablesToolbarContainer?.visibleToolbar = .bottom
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
@@ -491,11 +297,12 @@ extension ProductsViewController: ShoppablesToolbarDelegate {
     }
     
     func shoppablesToolbarDidChangeSelectedShoppable(toolbar:ShoppablesToolbar, shoppable:Shoppable){
-        if toolbar == subShoppablesToolbar {
-            shoppablesToolbar?.deselectShoppable()
-        }else if toolbar == shoppablesToolbar {
-            self.subShoppablesToolbar?.rootShoppableObjectId = shoppable.objectID
-            isSubShoppablesToolbarDisplayed =  (shoppable.subShoppables?.count ?? 0 > 0)
+        if toolbar == shoppablesToolbarContainer?.subToolbar {
+            shoppablesToolbarContainer?.toolbar.deselectShoppable()
+        }
+        else if toolbar == shoppablesToolbar {
+            shoppablesToolbarContainer?.subToolbar.rootShoppableObjectId = shoppable.objectID
+            shoppablesToolbarContainer?.visibleToolbar = (shoppable.subShoppables?.count ?? 0 > 0) ? .bottom : .top
         }
         self.selectedShoppable = shoppable
         self.reloadProductsFor(shoppable: shoppable)
@@ -783,7 +590,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
     
     @objc func productCollectionViewCellProductAction(_ control: UIControl, event: UIEvent) {
         guard let indexPath = collectionView?.indexPath(for: event),
-            let shoppable = self.shoppablesToolbar?.selectedShoppable()
+            let shoppable = self.shoppablesToolbarContainer?.toolbar.selectedShoppable()
             else {
                 return
         }
@@ -791,9 +598,9 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         let product = self.productAtIndex(indexPath.row)
         
         AssetSyncModel.sharedInstance.addSubShoppableTo(shoppable: shoppable, fromProduct: product).then { (shoppable) -> Void in
-            self.isSubShoppablesToolbarDisplayed = true
-            self.shoppablesToolbar?.deselectShoppable()
-            self.subShoppablesToolbar?.selectShoppable(shoppable)
+            self.shoppablesToolbarContainer?.visibleToolbar = .both
+            self.shoppablesToolbarContainer?.toolbar.deselectShoppable()
+            self.shoppablesToolbarContainer?.subToolbar.selectShoppable(shoppable)
             
         }
     }
@@ -841,7 +648,7 @@ extension ProductsViewControllerShoppables: FetchedResultsControllerManagerDeleg
     }
     
     var hasShoppables: Bool {
-        return (self.shoppablesToolbar?.shoppablesController.fetchedObjectsCount ?? 0 ) > 0
+        return (self.shoppablesToolbarContainer?.toolbar.shoppablesController.fetchedObjectsCount ?? 0 ) > 0
     }
 }
 
@@ -1076,8 +883,7 @@ extension ProductsViewControllerShareToDiscoverPrompt {
 
 extension ProductsViewController {
     func syncViewsAfterStateChange() {
-        self.shoppablesToolbar?.isHidden = shouldHideToolbar
-        self.subShoppablesToolbar?.isHidden = shouldHideToolbar
+        shoppablesToolbarContainer?.isHidden = shouldHideToolbar
         
         switch (state) {
         case .loading, .unknown:
@@ -1089,7 +895,9 @@ extension ProductsViewController {
             if #available(iOS 11.0, *) {} else {
                 if !self.automaticallyAdjustsScrollViewInsets {
                     // Setting back to YES doesn't update. Need to manually adjust.
-                    if let collectionView = collectionView, let shoppablesToolbar = self.shoppablesToolbar {
+                    if let collectionView = collectionView,
+                        let shoppablesToolbar = self.shoppablesToolbarContainer?.toolbar
+                    {
                         var scrollInsets = collectionView.scrollIndicatorInsets
                         scrollInsets.top = shoppablesToolbar.bounds.size.height + (self.navigationController?.navigationBar.frame.maxY ?? 0)
                         collectionView.scrollIndicatorInsets = scrollInsets
@@ -1126,7 +934,7 @@ extension ProductsViewControllerNoItemsHelperView{
         let horPadding: CGFloat = .padding
         var topOffset: CGFloat = 0
         
-        if let shoppablesToolbar = self.shoppablesToolbar, !shoppablesToolbar.isHidden {
+        if let shoppablesToolbar = self.shoppablesToolbarContainer?.toolbar, !shoppablesToolbar.isHidden {
             topOffset = shoppablesToolbar.bounds.size.height
         }
         
