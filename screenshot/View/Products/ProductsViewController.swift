@@ -670,8 +670,10 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
                 return
         }
         
+        
         let product = self.productAtIndex(indexPath.row)
         
+        Analytics.trackProductBurrow(product: product, order: nil, sort: nil)
         AssetSyncModel.sharedInstance.addSubShoppable(fromProduct: product).then { (shoppable) -> Void in
             self.addSubShoppableCompletion(shoppable: shoppable)
         }
