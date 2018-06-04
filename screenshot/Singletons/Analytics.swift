@@ -143,10 +143,23 @@ class Analytics {
         if let category = shoppable.label {
             properties["shoppable-category"] = category
         }
-        if let parent = shoppable.parentShoppable, let offer = parent.offersURL {
-            properties["shoppable-parentOfferUrl"] = offer
+        if let parent = shoppable.parentShoppable {
+            if let offer = parent.offersURL {
+                properties["shoppable-parentOfferUrl"] = offer
+            }
+            properties["shoppable-isBurrow"] = true
+
+            var otherBurrows = 0
+            if let childBurrows = parent.subShoppables?.count, childBurrows > 1{
+                otherBurrows = childBurrows - 1
+            }
+            properties["shoppable-otherBurrows"] = otherBurrows
+        }else{
+            properties["shoppable-isBurrow"] = false
         }
-        
+
+       
+
         
         if let screenshot = shoppable.screenshot {
             propertiesFor(screenshot).forEach { properties[$0] = $1 }
