@@ -149,13 +149,11 @@ class Analytics {
             }
             properties["shoppable-isBurrow"] = true
 
-            var otherBurrows = 0
-            if let childBurrows = parent.subShoppables?.count, childBurrows > 1{
-                otherBurrows = childBurrows - 1
-            }
-            properties["shoppable-otherBurrows"] = otherBurrows
+            properties["shoppable-burrowsCount"] =  parent.subShoppables?.count ?? 0
         }else{
             properties["shoppable-isBurrow"] = false
+            let otherBurrows =  shoppable.subShoppables?.count ?? 0
+            properties["shoppable-burrowsCount"] = otherBurrows
         }
 
        
