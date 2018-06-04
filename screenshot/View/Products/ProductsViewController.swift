@@ -641,6 +641,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
     func addSubShoppableCompletion(shoppable:Shoppable) {
         shoppablesToolbarContainer?.visibleToolbar = .both
         self.shoppablesToolbarContainer?.toolbar.deselectShoppable()
+        self.shoppablesToolbarContainer?.subToolbar.rootShoppableObjectId = shoppable.parentShoppable?.objectID
         self.shoppablesToolbarContainer?.subToolbar.selectShoppable(shoppable)
         syncContentInset()
         
