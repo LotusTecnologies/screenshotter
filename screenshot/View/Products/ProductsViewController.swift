@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 import CoreData
 import PromiseKit
-
+import Hero
 enum ProductsSection : Int {
     case product = 0
     case relatedLooks = 1
@@ -27,7 +27,7 @@ enum ProductsViewControllerState : Int {
     case unknown
 }
 
-class ProductsViewController: BaseViewController, ProductsOptionsDelegate, InterViewAnimatable {
+class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
     
     var screenshot:Screenshot
     var screenshotController: FetchedResultsControllerManager<Screenshot>?
@@ -46,7 +46,6 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate, Inter
     var productsRateNegativeFeedbackTextField:UITextField?
     var shamrockButton : FloatingActionButton?
     var productsUnfilteredCount:Int = 0
-    var interTransitionView: UIView?
     var screenshotLoadingState:ProductsViewControllerState = .unknown {
         didSet {
             self.syncViewsAfterStateChange()
@@ -657,17 +656,24 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         guard let indexPath = collectionView?.indexPath(for: event) else {
                 return
         }
-        
-        if let cell = collectionView?.cellForItem(at: indexPath) as? ProductsCollectionViewCell{
-            interTransitionView = cell.productImageView
+        let uuid = UUID().uuidString
+        if let cell = collectionView?.cellForItem(at: indexPath) as? ProductsCollectionViewCell, let imageView = cell.productImageView{
+            imageView.hero.id = uuid
         }
+        
+        self.hero.isEnabled = true
         
         let product = self.productAtIndex(indexPath.row)
         let vc = ProductDetailViewController.init()
         vc.product = product
+        vc.productImageView.hero.id = uuid
         let _ = vc.view
-        self.navigationController?.pushViewController(vc, animated: true)
-        
+        if let navigationController = self.navigationController{
+            navigationController.hero.isEnabled = true
+            navigationController.hero.navigationAnimationType = .fade
+            navigationController.pushViewController(vc, animated: true)
+        }
+
         Analytics.trackProductBurrow(product: product, order: nil, sort: nil)
 //        AssetSyncModel.sharedInstance.addSubShoppable(fromProduct: product).then { (shoppable) -> Void in
 //            self.addSubShoppableCompletion(shoppable: shoppable)

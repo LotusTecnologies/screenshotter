@@ -78,9 +78,6 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
             screenshotsNavigationController,
             settingsNavigationController
         ]
-        viewControllerList.forEach { (nav) in
-            nav.delegate = self
-        }
         if UIApplication.isUSC {
             viewControllerList.append(cartNavigationController)
         }
@@ -401,18 +398,6 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
     
     @objc func presentChangelogAlertIfNeeded() {
         ChangelogAlertController.presentIfNeeded(inViewController: self)
-    }
-}
-extension MainTabBarController : UINavigationControllerDelegate{
-    func navigationController(_ navigationController: UINavigationController, animationControllerFor operation: UINavigationControllerOperation, from fromVC: UIViewController, to toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        
-        if let _ = fromVC as? InterViewAnimatable, let _ = toVC as? InterViewAnimatable {
-            let transtion = InterViewTransitioning()
-            return transtion
-        }
-        
-        return nil
-        
     }
 }
 

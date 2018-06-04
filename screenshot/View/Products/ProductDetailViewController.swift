@@ -7,18 +7,18 @@
 //
 
 import UIKit
-
-class ProductDetailViewController: UIViewController, InterViewAnimatable{    
+import SDWebImage
+import Hero
+class ProductDetailViewController: UIViewController{
 
     var product:Product?
-    var productImageView = UIImageView.init(frame: CGRect.init(x: 10, y: 50, width: 100, height: 100))
     
-    var interTransitionView: UIView?{
-        return productImageView
-    }
+    var productImageView:UIImageView =  UIImageView()
     
     override func viewDidLoad() {
+        
         super.viewDidLoad()
+        self.hero.isEnabled = true
         self.view.backgroundColor = .white
         self.title = product?.productTitle()
         if let imageURL = product?.imageURL {

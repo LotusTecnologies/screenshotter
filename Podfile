@@ -24,6 +24,7 @@ target 'screenshot' do
     pod 'Whisper'
     pod 'PhoneNumberKit'
     pod 'CardIO'
+    pod 'Hero'
 end
 
 post_install do |installer|
