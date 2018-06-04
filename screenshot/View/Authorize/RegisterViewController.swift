@@ -407,6 +407,7 @@ class RegisterViewController: UIViewController {
             let isValidCredentials = false // TODO:
             
             if isValidCredentials {
+                registerUser()
                 delegate?.registerViewControllerDidSignup(self)
             }
             else {
@@ -432,39 +433,26 @@ class RegisterViewController: UIViewController {
         }
     }
     
-    
-    
-//    @objc private func submitEmail() {
-//        let name = nameTextField.text?.trimmingCharacters(in: .whitespaces) ?? ""
-//        let trimmedEmail = emailTextField.text?.trimmingCharacters(in: .whitespaces) ?? ""
-//        let email = trimmedEmail.isValidEmail ? trimmedEmail : ""
-//        
-//        UserDefaults.standard.set(name, forKey: UserDefaultsKeys.name)
-//        UserDefaults.standard.set(email, forKey: UserDefaultsKeys.email)
-//        
-//        let user = AnalyticsUser(name: name, email: email)
-//        
-//        user.sendToServers()
-//        
-//        
-//        if email.count > 0 {
-//            Analytics.trackSubmittedEmail(email: email)
-//        }else{
-//            Analytics.trackSubmittedBlankEmail()
-//        }
-//        
-//        UserDefaults.standard.set(user.identifier, forKey: UserDefaultsKeys.userID)
-//        UserDefaults.standard.synchronize()
-//        
-//        resignTextField()
-//        delegate?.tutorialEmailSlideViewDidComplete(self)
-//    }
-    
-    
-    
-    
+    private func registerUser() {
+        // TODO: Gershon needs to deal with this
+        
+        let name = ""
+        let email = emailFormRow.value
+            
+        UserDefaults.standard.set(name, forKey: UserDefaultsKeys.name)
+        UserDefaults.standard.set(email, forKey: UserDefaultsKeys.email)
+        
+        let user = AnalyticsUser(name: name, email: email)
+        user.sendToServers()
+        
+        Analytics.trackSubmittedEmail(email: email)
+        
+        UserDefaults.standard.set(user.identifier, forKey: UserDefaultsKeys.userID)
+        UserDefaults.standard.synchronize()
+    }
     
     @objc fileprivate func skipRegistration() {
+        Analytics.trackSubmittedBlankEmail()
         delegate?.registerViewControllerDidSkip(self)
     }
     
@@ -494,6 +482,7 @@ class RegisterViewController: UIViewController {
                 
             case .success(let grantedPermissions, let declinedPermissions, let accessToken):
                 // TODO: set up user
+                self.fetchUserProfile(accessToken: accessToken)
                 
                 let isExistingUser = false
                 
@@ -502,6 +491,44 @@ class RegisterViewController: UIViewController {
                 }
                 else {
                     self.delegate?.registerViewControllerDidFacebookSignup(self)
+                }
+            }
+        }
+    }
+    
+    private func fetchUserProfile(accessToken: AccessToken) {
+        let pictureSize = 480
+        let parameters = ["fields": "id, email, name, picture.width(\(pictureSize)).height(\(pictureSize))"]
+        
+        let graphRequest = GraphRequest(graphPath: "me", parameters: parameters, accessToken: accessToken, httpMethod: .GET, apiVersion: .defaultVersion)
+        
+        graphRequest.start { (response, result) in
+            switch result {
+            case .failed(let error):
+                // TODO: handle error
+                break
+                
+            case .success(response: let data):
+                guard let data = data.dictionaryValue else {
+                    // TODO: handle error
+                    return
+                }
+                
+                if let id = data["id"] as? String {
+                    print("||| id = \(id)")
+                }
+                if let email = data["email"] as? String {
+                    print("||| email = \(email)")
+                }
+                if let name = data["name"] as? String {
+                    print("||| name = \(name)")
+                }
+                if let picture = data["picture"] as? [String: Any],
+                    let pictureData = picture["data"] as? [String: Any],
+                    let pictureURLPath = pictureData["url"] as? String,
+                    let pictureURL = URL(string: pictureURLPath)
+                {
+                    print("||| pic url = \(pictureURL)")
                 }
             }
         }
@@ -535,7 +562,7 @@ extension RegisterViewController: UITextFieldDelegate {
     
     @objc private func textFieldTextDidChange(_ notification: Notification) {
         if let textField = notification.object as? UITextField, textField == _view.emailTextField {
-            emailFormRow.value = textField.text
+            emailFormRow.value = textField.text?.trimmingCharacters(in: .whitespaces)
         }
     }
 }

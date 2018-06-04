@@ -50,6 +50,7 @@ extension TutorialNavigationController : UINavigationControllerDelegate {
             self.isNavigationBarHidden = !(viewController is CheckoutPaymentFormViewController)
         }
     }
+    
     func navigationController(_ navigationController: UINavigationController, didShow viewController: UIViewController, animated: Bool){
         if self.interactivePopGestureRecognizer?.state == UIGestureRecognizerState.possible {
             self.isNavigationBarHidden = !(viewController is CheckoutPaymentFormViewController)
@@ -77,7 +78,7 @@ extension TutorialNavigationController: RegisterViewControllerDelegate {
     }
     
     func registerViewControllerDidSignup(_ viewController: RegisterViewController) {
-        dismissRegisterConfirmationViewController()
+        presentRegisterConfirmationViewController(navigateToDetails: true)
     }
     
     func registerViewControllerDidFacebookLogin(_ viewController: RegisterViewController) {
@@ -85,11 +86,11 @@ extension TutorialNavigationController: RegisterViewControllerDelegate {
     }
     
     func registerViewControllerDidFacebookSignup(_ viewController: RegisterViewController) {
-        dismissRegisterConfirmationViewController()
+        presentRegisterConfirmationViewController()
     }
     
-    private func presentRegisterConfirmationViewController() {
-        let selector = #selector(dismissRegisterConfirmationViewController)
+    private func presentRegisterConfirmationViewController(navigateToDetails: Bool = false) {
+        let selector = navigateToDetails ? #selector(dismissRegisterNavigateToDetails) : #selector(dismissRegisterNavigateToTry)
         let tapGesture = UITapGestureRecognizer(target: self, action: selector)
         
         let registerConfirmationViewController = RegisterConfirmationViewController()
@@ -99,20 +100,32 @@ extension TutorialNavigationController: RegisterViewControllerDelegate {
         Timer.scheduledTimer(timeInterval: 3, target: self, selector: selector, userInfo: nil, repeats: false)
     }
     
-    @objc private func dismissRegisterConfirmationViewController() {
+    @objc private func dismissRegisterNavigateToDetails() {
         if let viewController = presentedViewController as? RegisterConfirmationViewController,
             !viewController.isBeingDismissed
         {
             dismiss(animated: true)
-            
-            let onboardingDetailsViewController = OnboardingDetailsViewController()
-            onboardingDetailsViewController.delegate = self
-            pushViewController(onboardingDetailsViewController, animated: true)
+            pushOnboardingDetailsViewController()
+        }
+    }
+    
+    @objc private func dismissRegisterNavigateToTry() {
+        if let viewController = presentedViewController as? RegisterConfirmationViewController,
+            !viewController.isBeingDismissed
+        {
+            dismiss(animated: true)
+            pushTutorialTrySlide()
         }
     }
 }
 
 extension TutorialNavigationController: OnboardingDetailsViewControllerDelegate {
+    private func pushOnboardingDetailsViewController() {
+        let onboardingDetailsViewController = OnboardingDetailsViewController()
+        onboardingDetailsViewController.delegate = self
+        pushViewController(onboardingDetailsViewController, animated: true)
+    }
+    
     func onboardingDetailsViewControllerDidSkip(_ viewController: OnboardingDetailsViewController) {
         pushTutorialTrySlide()
     }
