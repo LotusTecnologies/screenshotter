@@ -160,12 +160,14 @@ extension AssetSyncModel {
                 }else{
                     SDWebImageManager.shared().loadImage(with: URL.init(string: urlString), options: [SDWebImageOptions.fromCacheOnly], progress: nil, completed: { (image, data, error, cache, bool, url) in
                         
-                        var imageData =  data
-                        if imageData == nil {
-                            if let i = image {
-                                imageData = self.data(for: i)
+                        let imageData:Data? =  {
+                            if let data = data {
+                                return data
+                            }else if let i = image {
+                                return AssetSyncModel.sharedInstance.data(for: i)
                             }
-                        }
+                            return nil
+                        }()
                         if let imageData = imageData {
                             self.performBackgroundTask(assetId: urlString, shoppableId: nil, { (managedObjectContext) in
                                 
@@ -1144,7 +1146,34 @@ extension AssetSyncModel {
                                         
                                     }).first
                                 }
-                                
+
+                                // Analytics
+                                if let selectedSegment = segment {
+                                    var selectedSegmentLabelWithArea = selectedSegment["label"] as? String
+                                    if let label = selectedSegmentLabelWithArea {
+                                        if let rect1 = CGRect.rectFrom(syteDict: selectedSegment) {
+                                            selectedSegmentLabelWithArea = "\(label)(\(rect1.size.area))"
+                                        }
+                                    }
+                                    let otherLabels = segments.filter{ $0["offers"] as? String != selectedSegment["offers"] as? String }.compactMap({ (dict) -> String? in
+                                        if let label = dict["label"] as? String {
+                                            if let rect1 = CGRect.rectFrom(syteDict: dict) {
+                                                return "\(label)(\(rect1.size.area))"
+                                            }
+                                            return label
+                                        }
+                                        return nil
+                                    }).joined(separator: ", ")
+                                    
+                                    if let selectedSegmentLabel = selectedSegment["label"] as? String, rootShoppableLabel.contains(selectedSegmentLabel.lowercased()) {
+                                        Analytics.trackDevBurrowSelectedShoppable(rootShoppableLabel: rootShoppableLabel, productImageUrl: productImageUrl, selectedShoppableLabel: selectedSegmentLabelWithArea, otherLabels: otherLabels)
+                                    }else{
+                                        Analytics.trackDevBurrowSelectedShoppableMismatch(rootShoppableLabel: rootShoppableLabel, productImageUrl: productImageUrl, selectedShoppableLabel: selectedSegmentLabelWithArea, otherLabels: otherLabels)
+                                    }
+                                }else{
+                                    Analytics.trackDevBurrowErrorNoShoppables(productImageUrl: productImageUrl)
+                                }
+
                                 
                                 if  let segment = segment , let offersURL = segment["offers"] as? String,
                                     let url = AssetSyncModel.sharedInstance.augmentedUrl(offersURL: offersURL, optionsMask:optionsMask ) {
@@ -1195,9 +1224,18 @@ extension AssetSyncModel {
                                                     
                                                 })
                                             } else{
+                                                self.performBackgroundTask(assetId: nil, shoppableId: nil, { (context) in
+                                                    let shopable = context.shoppableWith(objectId:createdSubShopableObjectId)
+                                                    Analytics.trackDevBurrowErrorNoProducts(shoppable: shopable)
+                                                })
                                                 completion()
                                             }
                                     }).catch { (error) in
+                                        let error = error as NSError
+                                        self.performBackgroundTask(assetId: nil, shoppableId: nil, { (context) in
+                                            let shopable = context.shoppableWith(objectId:createdSubShopableObjectId)
+                                            Analytics.trackDevBurrowErrorGetProducts(shoppable: shopable, domain: error.domain, code: error.code, localizedDescription: error.localizedDescription)
+                                        })
                                         completion()
                                     }
                                 }else{
@@ -1205,6 +1243,8 @@ extension AssetSyncModel {
                                     completion()
                                 }
                             }).catch { (error) in
+                                let error = error as NSError
+                                Analytics.trackDevBurrowErrorGetShoppable(productImageUrl: productImageUrl, domain: error.domain, code: error.code, localizedDescription: error.localizedDescription)
                                 completion()
                             }
 

@@ -944,6 +944,67 @@ extension DataModel {
         }))
     }
     
+    public func favorite(toFavorited: Bool, productOIDs: [NSManagedObjectID]) {
+        performBackgroundTask { (managedObjectContext) in
+            let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
+            fetchRequest.predicate = NSPredicate(format: "SELF IN %@", productOIDs)
+            fetchRequest.sortDescriptors = nil
+            
+            do {
+                let results = try managedObjectContext.fetch(fetchRequest)
+                for product in results {
+                    product.isFavorite = toFavorited
+                    if toFavorited {
+                        product.track()
+                    }else{
+                        product.untrack()
+                    }
+                    if toFavorited == false {
+                        product.dateViewed  = nil
+                    }
+                    if toFavorited {
+                        let now = Date()
+                        product.dateFavorited = now
+                        product.dateSortProductBar = product.getSortDateForProductBar()
+                        product.hideFromProductBar = false
+                        if let screenshot = product.shoppable?.screenshot {
+                            screenshot.addToFavorites(product)
+                            if let favoritesCount = screenshot.favorites?.count {
+                                screenshot.favoritesCount = Int16(favoritesCount)
+                            } else {
+                                screenshot.favoritesCount += 1
+                            }
+                            screenshot.lastFavorited = now
+                        }
+                    } else {
+                        product.dateFavorited = nil
+                        if let screenshot = product.shoppable?.screenshot {
+                            screenshot.removeFromFavorites(product)
+                            if let favorites = screenshot.favorites {
+                                screenshot.favoritesCount = Int16(favorites.count)
+                            } else {
+                                screenshot.favoritesCount = 0
+                                screenshot.lastFavorited = nil
+                            }
+                        }
+                    }
+                }
+                try managedObjectContext.save()
+                
+                if toFavorited {
+                    let score = UserDefaults.standard.integer(forKey: UserDefaultsKeys.gameScore)
+                    UserDefaults.standard.set(score + 1, forKey: UserDefaultsKeys.gameScore)
+                    AccumulatorModel.favorite.incrementUninformedCount()
+                }else{
+                    AccumulatorModel.favorite.decrementUninformedCount(by:1)
+                }
+            } catch {
+                self.receivedCoreDataError(error: error)
+                print("favorite toFavorited:\(toFavorited) results with error:\(error)")
+            }
+        }
+    }
+    
     public func unfavorite(favoriteArray: [Product]) {
         let moiArray = favoriteArray.map { $0.objectID }
         self.unfavorite(favoriteArray: moiArray)
@@ -1070,7 +1131,7 @@ extension DataModel {
                     let managedObjectContext = container.newBackgroundContext()
                     self.initializeFavoritesCounts(managedObjectContext: managedObjectContext)
             }
-            op.queuePriority = .veryHigh   //earilier actions may have already been queue - make sure migration is at the top of the list
+            op.queuePriority = .veryHigh   // Earlier actions may have already been queued - make sure migration is at the top of the list.
             self.dbQ.addOperation(op)
         }
         if from < 8 && to >= 8 && installDate != nil {
@@ -1081,7 +1142,15 @@ extension DataModel {
                 self.fixProductFiltersNoClassification(managedObjectContext: managedObjectContext)
                 self.fixProductsNoClassification(managedObjectContext: managedObjectContext)
             }
-            op.queuePriority = .veryHigh //earilier actions may have already been queue - make sure migration is at the top of the list
+            op.queuePriority = .veryHigh // Earlier actions may have already been queued - make sure migration is at the top of the list.
+            self.dbQ.addOperation(op)
+        }
+        if from < 18 && to >= 18 && installDate != nil {
+            let op = BlockOperation{
+                let managedObjectContext = container.newBackgroundContext()
+                self.moveCartItemsToFavorites(managedObjectContext: managedObjectContext)
+            }
+            op.queuePriority = .veryHigh   // Earlier actions may have already been queued - make sure migration is at the top of the list.
             self.dbQ.addOperation(op)
         }
     }
@@ -1197,6 +1266,23 @@ extension DataModel {
         } catch {
             self.receivedCoreDataError(error: error)
             print("fixProductsNoClassification results with error:\(error)")
+        }
+    }
+    
+    func moveCartItemsToFavorites(managedObjectContext: NSManagedObjectContext) {
+        let fetchRequest: NSFetchRequest<CartItem> = CartItem.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "cart.isPastOrder == FALSE")
+        fetchRequest.sortDescriptors = nil
+        
+        do {
+            let results = try managedObjectContext.fetch(fetchRequest)
+            let unfavoritedProducts = Set<Product>(results.compactMap { $0.product != nil && !$0.product!.isFavorite ? $0.product : nil })
+            self.favorite(toFavorited: true, productOIDs: unfavoritedProducts.map { $0.objectID })
+            results.forEach { managedObjectContext.delete($0) }
+            try managedObjectContext.save()
+        } catch {
+            self.receivedCoreDataError(error: error)
+            print("moveCartItemsToFavorites results with error:\(error)")
         }
     }
     

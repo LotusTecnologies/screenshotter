@@ -8,6 +8,7 @@
 
 import Foundation
 import CoreData
+import SDWebImage
 
 enum ScreenshotSource : String {
     case unknown
@@ -19,6 +20,7 @@ enum ScreenshotSource : String {
     case share
     case tutorial
     case nativeShare = "native-share" //Andriod only - here for completment of analytics
+    case burrow
     
     var isUserGenerated:Bool {
         return (self == .nativeShare || self == .gallery || self == .share || self == .unknown || self == .screenshot || self == .camera)
@@ -135,6 +137,39 @@ extension Screenshot {
             return sortedFavorites
         }
         return []
+    }
+    
+    
+    static func createWith(subShoppable:Shoppable ){
+        if let imageUrl = subShoppable.imageUrl {
+            SDWebImageManager.shared().loadImage(with: URL.init(string: imageUrl), options: [SDWebImageOptions.fromCacheOnly], progress: nil, completed: { (image, data, error, cache, bool, url) in
+                
+                let imageData:Data? =  {
+                    if let data = data {
+                        return data
+                    }else if let i = image {
+                        return AssetSyncModel.sharedInstance.data(for: i)
+                    }
+                    return nil
+                }()
+                if let imageData = imageData {
+                    DataModel.sharedInstance.performBackgroundTask { (context) in
+                        
+                        let screenshotToSave = DataModel.sharedInstance.saveScreenshot(managedObjectContext: context, assetId: imageUrl, createdAt: Date(), isRecognized: true, source: .burrow, isHidden: false, imageData: imageData, classification: nil)
+                        
+                        screenshotToSave.uploadedImageURL = imageUrl
+                        screenshotToSave.shoppablesCount = 0
+                        screenshotToSave.syteJson = "h"
+                        
+                        // download stye stuff for URL
+                        AssetSyncModel.sharedInstance.syteProcessing(imageClassification: .human, imageData: nil, orImageUrlString: imageUrl, assetId: imageUrl)
+                        
+                        context.saveIfNeeded()
+                    }
+                }
+            })
+        }
+       
     }
     
 }

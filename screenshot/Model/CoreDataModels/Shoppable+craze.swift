@@ -182,4 +182,30 @@ extension Shoppable {
         }
     }
     
+    
+    func deleteSubshoppable(){
+        let shoppableObjectId = self.objectID
+        DataModel.sharedInstance.performBackgroundTask { (context) in
+            if let shoppable = context.shoppableWith(objectId: shoppableObjectId){
+                var toDelete:[Product] = []
+                if let products = shoppable.products{
+                    for product in products {
+                        if let product = product as? Product{
+                            if !product.isFavorite {
+                                toDelete.append(product)
+                            }else{
+                                product.screenshot = shoppable.screenshot
+                            }
+                        }
+                    }
+                }
+                for product in toDelete {
+                    context.delete(product)
+                }
+                context.delete(shoppable)
+                context.saveIfNeeded()
+            }
+        }
+    }
+    
 }

@@ -58,6 +58,12 @@ class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UIColle
         }
     }
     
+    override var intrinsicContentSize: CGSize {
+        var size = super.intrinsicContentSize
+        size.height = 74
+        return size
+    }
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return self.shoppables.count
     }
@@ -178,7 +184,7 @@ class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UIColle
             }
             if let firstShoppable = self.shoppables.first {
                 if collectionView.numberOfSections > 0 && collectionView.numberOfItems(inSection: 0) > 0 {
-                    collectionView.selectItem(at: IndexPath.init(item: 0, section: 0), animated: false, scrollPosition: [])
+                    collectionView.selectItem(at: IndexPath(item: 0, section: 0), animated: false, scrollPosition: [])
                     return firstShoppable
                 }
             }
@@ -188,9 +194,9 @@ class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UIColle
     func selectShoppable(_ s:Shoppable){
         if let collectionView = self.collectionView {
             if let index = shoppables.index(of: s) {
-                collectionView.selectItem(at: IndexPath.init(row: index, section: 0), animated: false, scrollPosition: [])
+                let isVisible = self.window != nil
+                collectionView.selectItem(at: IndexPath(row: index, section: 0), animated: isVisible, scrollPosition: .centeredHorizontally)
                 self.shoppableToolbarDelegate?.shoppablesToolbarDidChangeSelectedShoppable(toolbar: self, shoppable: s)
-
             }
         }
     }
