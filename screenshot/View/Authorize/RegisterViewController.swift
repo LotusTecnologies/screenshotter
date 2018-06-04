@@ -151,7 +151,7 @@ class RegisterView: UIScrollView {
         contentView.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
         
         emailTextField.translatesAutoresizingMaskIntoConstraints = false
-        emailTextField.placeholder = "authorize.generic.email".localized
+        emailTextField.placeholder = "authorize.register.email".localized
         emailTextField.returnKeyType = .next
         emailTextField.keyboardType = .emailAddress
         emailTextField.autocapitalizationType = .none
@@ -163,7 +163,7 @@ class RegisterView: UIScrollView {
         emailTextField.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
         
         passwordTextField.translatesAutoresizingMaskIntoConstraints = false
-        passwordTextField.placeholder = "authorize.generic.password".localized
+        passwordTextField.placeholder = "authorize.register.password".localized
         passwordTextField.isSecureTextEntry = true
         passwordTextField.autocapitalizationType = .none
         passwordTextField.autocorrectionType = .no
@@ -188,7 +188,7 @@ class RegisterView: UIScrollView {
         
         // TODO: underline
         forgotPasswordButton.translatesAutoresizingMaskIntoConstraints = false
-        forgotPasswordButton.setTitle("authorize.login.forgot".localized, for: .normal)
+        forgotPasswordButton.setTitle("authorize.register.forgot".localized, for: .normal)
         forgotPasswordButton.setTitleColor(color, for: .normal)
         forgotPasswordButton.setTitleColor(color.darker(), for: .highlighted)
         forgotPasswordButton.contentEdgeInsets = UIEdgeInsets(top: 6 + .padding, left: .padding, bottom: 6, right: .padding)
@@ -199,7 +199,7 @@ class RegisterView: UIScrollView {
         forgotPasswordButton.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
         
         showForgotPasswordConstraints += [
-            forgotPasswordButton.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor, constant: verticalNegativeMargin)
+            forgotPasswordButton.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor)
         ]
         
         NSLayoutConstraint.activate(hideForgotPasswordConstraints)
@@ -431,6 +431,38 @@ class RegisterViewController: UIViewController {
             ActionFeedbackGenerator().actionOccurred(.nope)
         }
     }
+    
+    
+    
+//    @objc private func submitEmail() {
+//        let name = nameTextField.text?.trimmingCharacters(in: .whitespaces) ?? ""
+//        let trimmedEmail = emailTextField.text?.trimmingCharacters(in: .whitespaces) ?? ""
+//        let email = trimmedEmail.isValidEmail ? trimmedEmail : ""
+//        
+//        UserDefaults.standard.set(name, forKey: UserDefaultsKeys.name)
+//        UserDefaults.standard.set(email, forKey: UserDefaultsKeys.email)
+//        
+//        let user = AnalyticsUser(name: name, email: email)
+//        
+//        user.sendToServers()
+//        
+//        
+//        if email.count > 0 {
+//            Analytics.trackSubmittedEmail(email: email)
+//        }else{
+//            Analytics.trackSubmittedBlankEmail()
+//        }
+//        
+//        UserDefaults.standard.set(user.identifier, forKey: UserDefaultsKeys.userID)
+//        UserDefaults.standard.synchronize()
+//        
+//        resignTextField()
+//        delegate?.tutorialEmailSlideViewDidComplete(self)
+//    }
+    
+    
+    
+    
     
     @objc fileprivate func skipRegistration() {
         delegate?.registerViewControllerDidSkip(self)

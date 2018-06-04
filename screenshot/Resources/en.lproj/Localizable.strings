@@ -29,26 +29,21 @@
 "application.error.no_disk_space.message" = "Free up some space on your phone for a better Screenshop experience.";
 "application.error.no_disk_space.title" = "Out Of Space!";
 
-"authorize.generic.email" = "Email Address";
-"authorize.generic.login" = "Log In";
-"authorize.generic.password" = "Password";
-"authorize.generic.signup" = "Sign Up";
-
 "authorize.initiate_reset_password.alert.message" = "Tap the link in the email we sent you to set a new password";
 "authorize.initiate_reset_password.alert.title" = "Emailed!";
 "authorize.initiate_reset_password.message" = "Enter the email you signed up with and we’ll send you a link to reset your password";
 "authorize.initiate_reset_password.title" = "Reset Password";
 
-"authorize.login.forgot" = "Forgot Password?";
-"authorize.login.continue" = "Log In";
-
+"authorize.register.continue" = "Start Shopping";
+"authorize.register.email" = "Email Address";
+"authorize.register.forgot" = "Forgot Password?";
 "authorize.register.legal.0" = "By tapping \"Sign Up\" above, you agree to our ";
 "authorize.register.legal.1" = "Terms of Service";
 "authorize.register.legal.2" = " and ";
 "authorize.register.legal.3" = "Privacy Policy";
 "authorize.register.legal.4" = " ";
 "authorize.register.offers" = "Send me emails about exclusive offers, sales and new features.";
-"authorize.register.continue" = "Start Shopping";
+"authorize.register.password" = "Password";
 
 "authorize.register.confirmation.message" = "You are now a\nScreenshop user.";
 "authorize.register.confirmation.title" = "Welcome!";

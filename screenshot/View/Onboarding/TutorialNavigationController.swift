@@ -64,11 +64,6 @@ extension TutorialNavigationController: OnboardingWelcomeViewControllerDelegate 
         let registerViewController = RegisterViewController()
         registerViewController.delegate = self
         pushViewController(registerViewController, animated: true)
-        
-        // !!!: DEBUG
-//        let signup = TutorialEmailSlideViewController()
-//        signup.delegate = self
-//        self.pushViewController(signup, animated: true)
     }
 }
 
@@ -145,26 +140,6 @@ extension TutorialNavigationController: OnboardingDetailsViewControllerDelegate 
             alertController.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
             alertController.preferredAction = continueAction
             present(alertController, animated: true)
-        }
-    }
-}
-
-extension TutorialNavigationController: TutorialEmailSlideViewControllerDelegate {
-    func tutorialEmailSlideViewDidComplete(_ slideView: TutorialEmailSlideViewController){
-        pushTutorialTrySlide()
-    }
-    
-    func tutorialEmailSlideViewDidTapTermsOfService(_ slideView: TutorialEmailSlideViewController){
-        Analytics.trackOnboardingSubmittedEmailTOS()
-        if let viewController = LegalViewControllerFactory.termsOfServiceViewController() {
-            present(viewController, animated: true, completion: nil)
-        }
-    }
-    
-    func tutorialEmailSlideViewDidTapPrivacyPolicy(_ slideView: TutorialEmailSlideViewController){
-        Analytics.trackOnboardingSubmittedEmailPrivacy()
-        if let viewController = LegalViewControllerFactory.privacyPolicyViewController() {
-            present(viewController, animated: true, completion: nil)
         }
     }
 }

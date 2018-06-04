@@ -101,9 +101,6 @@
 		C53154E620BE86370050EB76 /* Quicksand-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C53154E220BE86370050EB76 /* Quicksand-Light.ttf */; };
 		C53154E720BE86370050EB76 /* Quicksand-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C53154E320BE86370050EB76 /* Quicksand-Bold.ttf */; };
 		C53154E820BE86370050EB76 /* Quicksand-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C53154E420BE86370050EB76 /* Quicksand-Regular.ttf */; };
-		C53154F220BE99AC0050EB76 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53154EC20BE99AB0050EB76 /* LoginViewController.swift */; };
-		C53154F320BE99AC0050EB76 /* AuthorizeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53154ED20BE99AB0050EB76 /* AuthorizeViewController.swift */; };
-		C53154F420BE99AC0050EB76 /* AuthorizeContentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53154EE20BE99AB0050EB76 /* AuthorizeContentViewController.swift */; };
 		C53154F520BE99AC0050EB76 /* RegisterConfirmationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53154EF20BE99AC0050EB76 /* RegisterConfirmationViewController.swift */; };
 		C53154F620BE99AC0050EB76 /* RegisterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53154F020BE99AC0050EB76 /* RegisterViewController.swift */; };
 		C53154F720BE99AC0050EB76 /* InitiateResetPasswordViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53154F120BE99AC0050EB76 /* InitiateResetPasswordViewController.swift */; };
@@ -179,7 +176,6 @@
 		C58FA0F320A95FC300072966 /* TutorialVideoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0E720A95FC200072966 /* TutorialVideoViewController.swift */; };
 		C58FA0F420A95FC300072966 /* TutorialNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0E820A95FC300072966 /* TutorialNavigationController.swift */; };
 		C58FA0F520A95FC300072966 /* GiftCardCampaignViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0E920A95FC300072966 /* GiftCardCampaignViewController.swift */; };
-		C58FA0F620A95FC300072966 /* TutorialEmailSlideViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0EA20A95FC300072966 /* TutorialEmailSlideViewController.swift */; };
 		C58FA0F720A95FC300072966 /* CampaignPromotionExplanationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0EB20A95FC300072966 /* CampaignPromotionExplanationViewController.swift */; };
 		C58FA0F820A95FC300072966 /* GiftCardDoneViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0EC20A95FC300072966 /* GiftCardDoneViewController.swift */; };
 		C5A02E36209841D700CEEF7E /* CheckoutWhatIsCVVWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A02E35209841D700CEEF7E /* CheckoutWhatIsCVVWebViewController.swift */; };
@@ -377,9 +373,6 @@
 		C53154E220BE86370050EB76 /* Quicksand-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Light.ttf"; sourceTree = "<group>"; };
 		C53154E320BE86370050EB76 /* Quicksand-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Bold.ttf"; sourceTree = "<group>"; };
 		C53154E420BE86370050EB76 /* Quicksand-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Regular.ttf"; sourceTree = "<group>"; };
-		C53154EC20BE99AB0050EB76 /* LoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
-		C53154ED20BE99AB0050EB76 /* AuthorizeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthorizeViewController.swift; sourceTree = "<group>"; };
-		C53154EE20BE99AB0050EB76 /* AuthorizeContentViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthorizeContentViewController.swift; sourceTree = "<group>"; };
 		C53154EF20BE99AC0050EB76 /* RegisterConfirmationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegisterConfirmationViewController.swift; sourceTree = "<group>"; };
 		C53154F020BE99AC0050EB76 /* RegisterViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegisterViewController.swift; sourceTree = "<group>"; };
 		C53154F120BE99AC0050EB76 /* InitiateResetPasswordViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InitiateResetPasswordViewController.swift; sourceTree = "<group>"; };
@@ -455,7 +448,6 @@
 		C58FA0E720A95FC200072966 /* TutorialVideoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialVideoViewController.swift; sourceTree = "<group>"; };
 		C58FA0E820A95FC300072966 /* TutorialNavigationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialNavigationController.swift; sourceTree = "<group>"; };
 		C58FA0E920A95FC300072966 /* GiftCardCampaignViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GiftCardCampaignViewController.swift; sourceTree = "<group>"; };
-		C58FA0EA20A95FC300072966 /* TutorialEmailSlideViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialEmailSlideViewController.swift; sourceTree = "<group>"; };
 		C58FA0EB20A95FC300072966 /* CampaignPromotionExplanationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CampaignPromotionExplanationViewController.swift; sourceTree = "<group>"; };
 		C58FA0EC20A95FC300072966 /* GiftCardDoneViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GiftCardDoneViewController.swift; sourceTree = "<group>"; };
 		C5A02E35209841D700CEEF7E /* CheckoutWhatIsCVVWebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutWhatIsCVVWebViewController.swift; sourceTree = "<group>"; };
@@ -735,10 +727,7 @@
 		C53154EB20BE99220050EB76 /* Authorize */ = {
 			isa = PBXGroup;
 			children = (
-				C53154EE20BE99AB0050EB76 /* AuthorizeContentViewController.swift */,
-				C53154ED20BE99AB0050EB76 /* AuthorizeViewController.swift */,
 				C53154F120BE99AC0050EB76 /* InitiateResetPasswordViewController.swift */,
-				C53154EC20BE99AB0050EB76 /* LoginViewController.swift */,
 				C53154EF20BE99AC0050EB76 /* RegisterConfirmationViewController.swift */,
 				C53154F020BE99AC0050EB76 /* RegisterViewController.swift */,
 				C53154FA20BED3900050EB76 /* ResetPasswordViewController.swift */,
@@ -1087,7 +1076,6 @@
 				C58FA0EC20A95FC300072966 /* GiftCardDoneViewController.swift */,
 				C53154D520B6E3A90050EB76 /* OnboardingDetailsViewController.swift */,
 				C572C0D720AADA98004B0A17 /* OnboardingWelcomeViewController.swift */,
-				C58FA0EA20A95FC300072966 /* TutorialEmailSlideViewController.swift */,
 				C58FA0E820A95FC300072966 /* TutorialNavigationController.swift */,
 				C58FA0E520A95FC200072966 /* TutorialTrySlideViewController.swift */,
 				C58FA0E120A95FC200072966 /* TutorialVideoOverlayView.swift */,
@@ -1401,7 +1389,6 @@
 				C572FF01205C00070046BFEB /* Hind-SemiBold.ttf in Resources */,
 				C5CAF27A1FCC0EFD006F37DC /* ISO4217.plist in Resources */,
 				C53154E620BE86370050EB76 /* Quicksand-Light.ttf in Resources */,
-				E4DBC77920921B3C0019DE6E /* campaign_video_2018_04_20.mp4 in Resources */,
 				C53154E720BE86370050EB76 /* Quicksand-Bold.ttf in Resources */,
 				C572FEFE205C00070046BFEB /* Hind-Light.ttf in Resources */,
 				C572FF02205C00070046BFEB /* Hind-Medium.ttf in Resources */,
@@ -1598,7 +1585,6 @@
 				C54088571FE90E2200198955 /* ShadowCollectionViewCell.swift in Sources */,
 				31CE1113203BF055000156EE /* ProductsBarController.swift in Sources */,
 				C554B17920287DF50099622C /* ScreenshotsDeleteButton.swift in Sources */,
-				C58FA0F620A95FC300072966 /* TutorialEmailSlideViewController.swift in Sources */,
 				C5D57933203EDD7A00A076FE /* TableView.swift in Sources */,
 				319B030E2057AFCC00446054 /* ThankYouForSharingViewController.swift in Sources */,
 				C5336D23203D553400A7B4B0 /* BarItem.swift in Sources */,
@@ -1674,7 +1660,6 @@
 				C5233F0B1F6FF05800F25C7C /* LifeCycleProtocol.swift in Sources */,
 				C5CBD33920C3C5FB0067444A /* ShoppablesContainerView.swift in Sources */,
 				C501412E20623DFD00ABFB5C /* UICollectionView.swift in Sources */,
-				C53154F320BE99AC0050EB76 /* AuthorizeViewController.swift in Sources */,
 				C5E6C316208F22C0006E9C54 /* CheckoutSupportedLocationModel.swift in Sources */,
 				C50D200E1FEBE6CD005CFA4F /* ScrollRevealController.swift in Sources */,
 				31C0C81A20A2CD14002EE95B /* SectionBackgroundCollectionViewFlowLayout.swift in Sources */,
@@ -1689,7 +1674,6 @@
 				C5E9241820690B6100D44FF9 /* Form.swift in Sources */,
 				31C0C80620A15EAA002EE95B /* CrazeImageZoom.swift in Sources */,
 				C58FA0F820A95FC300072966 /* GiftCardDoneViewController.swift in Sources */,
-				C53154F220BE99AC0050EB76 /* LoginViewController.swift in Sources */,
 				31C0C81E20A2CD14002EE95B /* ProductsRateView.swift in Sources */,
 				3125446B2091C3A0009410D5 /* (null) in Sources */,
 				C5336D1B203AC9CE00A7B4B0 /* CartViewController.swift in Sources */,
@@ -1740,7 +1724,6 @@
 				C540880E1FE90C8E00198955 /* LoadingViewController.swift in Sources */,
 				31C0C81F20A2CD14002EE95B /* ProductsOptions.swift in Sources */,
 				E4859E19203044E100A26985 /* ScreenshotDisplayViewController.swift in Sources */,
-				C53154F420BE99AC0050EB76 /* AuthorizeContentViewController.swift in Sources */,
 				C572C0D820AADA98004B0A17 /* OnboardingWelcomeViewController.swift in Sources */,
 				C50DBB7D207B398100BB206E /* CheckoutOrderViewController.swift in Sources */,
 				5273E3811F7ACE0300C832F8 /* Analytics.swift in Sources */,
