@@ -25,10 +25,55 @@ class RegisterView: UIScrollView {
     let contentView = ContentContainerView()
     let emailTextField = UnderlineTextField()
     let passwordTextField = UnderlineTextField()
+    let forgotPasswordButton = UIButton()
     let continueButton = MainButton()
     let dealsSwitch = UISwitch()
     let skipButton = UIButton()
     let legalTextView = TappableTextView()
+    
+    private var showForgotPasswordConstraints: [NSLayoutConstraint] = []
+    private var hideForgotPasswordConstraints: [NSLayoutConstraint] = []
+    
+    var isForgotPasswordButtonHidden = true {
+        didSet {
+            let duration: TimeInterval = .defaultAnimationDuration
+            let curve: String
+            let startTime: TimeInterval
+            
+            if isForgotPasswordButtonHidden {
+                startTime = 0
+                curve = kCAMediaTimingFunctionEaseIn
+                
+                NSLayoutConstraint.deactivate(showForgotPasswordConstraints)
+                NSLayoutConstraint.activate(hideForgotPasswordConstraints)
+            }
+            else {
+                startTime = 0.5
+                curve = kCAMediaTimingFunctionEaseOut
+                
+                NSLayoutConstraint.deactivate(hideForgotPasswordConstraints)
+                NSLayoutConstraint.activate(showForgotPasswordConstraints)
+            }
+            
+            CATransaction.begin()
+            CATransaction.setAnimationDuration(duration)
+            CATransaction.setAnimationTimingFunction(CAMediaTimingFunction(name: curve))
+            
+            UIView.animateKeyframes(withDuration: duration, delay: 0, options: .init(rawValue: 0), animations: {
+                UIView.addKeyframe(withRelativeStartTime: startTime, relativeDuration: 0.5, animations: {
+                    self.forgotPasswordButton.alpha = self.isForgotPasswordButtonHidden ? 0 : 1
+                })
+                UIView.addKeyframe(withRelativeStartTime: 0, relativeDuration: 1, animations: {
+                    self.layoutSubviews()
+                })
+            })
+            
+            let animation = CABasicAnimation(keyPath: "shadowPath")
+            contentView.layer.add(animation, forKey: animation.keyPath)
+            
+            CATransaction.commit()
+        }
+    }
     
     var activeTextFieldTopOffset: CGFloat {
         return horizontalLinesView.frame.maxY
@@ -133,8 +178,31 @@ class RegisterView: UIScrollView {
         contentView.addSubview(continueButton)
         continueButton.topAnchor.constraint(equalTo: passwordTextField.bottomAnchor, constant: contentView.layoutMargins.bottom).isActive = true
         continueButton.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
-        continueButton.bottomAnchor.constraint(lessThanOrEqualTo: contentView.layoutMarginsGuide.bottomAnchor).isActive = true
         continueButton.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
+        
+        hideForgotPasswordConstraints += [
+            continueButton.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor, constant: verticalNegativeMargin)
+        ]
+        
+        let color: UIColor = .crazeRed
+        
+        // TODO: underline
+        forgotPasswordButton.translatesAutoresizingMaskIntoConstraints = false
+        forgotPasswordButton.setTitle("authorize.login.forgot".localized, for: .normal)
+        forgotPasswordButton.setTitleColor(color, for: .normal)
+        forgotPasswordButton.setTitleColor(color.darker(), for: .highlighted)
+        forgotPasswordButton.contentEdgeInsets = UIEdgeInsets(top: 6 + .padding, left: .padding, bottom: 6, right: .padding)
+        forgotPasswordButton.alpha = 0
+        contentView.addSubview(forgotPasswordButton)
+        forgotPasswordButton.topAnchor.constraint(equalTo: continueButton.bottomAnchor).isActive = true
+        forgotPasswordButton.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
+        forgotPasswordButton.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
+        
+        showForgotPasswordConstraints += [
+            forgotPasswordButton.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor, constant: verticalNegativeMargin)
+        ]
+        
+        NSLayoutConstraint.activate(hideForgotPasswordConstraints)
         
         let skipLayoutGuide = UILayoutGuide()
         addLayoutGuide(skipLayoutGuide)
@@ -246,6 +314,7 @@ class RegisterView: UIScrollView {
 
 class RegisterViewController: UIViewController {
     private let inputViewAdjustsScrollViewController = InputViewAdjustsScrollViewController()
+    private let emailFormRow = FormRow.Email()
     
     weak var delegate: RegisterViewControllerDelegate?
     
@@ -280,12 +349,19 @@ class RegisterViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        NotificationCenter.default.addObserver(self, selector: #selector(textFieldTextDidChange(_:)), name: .UITextFieldTextDidChange, object: _view.emailTextField)
+        
         _view.facebookLoginButton.addTarget(self, action: #selector(facebookLoginAction), for: .touchUpInside)
+        
+        if let email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email) {
+            _view.emailTextField.text = email
+        }
         
         _view.emailTextField.delegate = self
         _view.passwordTextField.delegate = self
         _view.legalTextView.delegate = self
         
+        _view.forgotPasswordButton.addTarget(self, action: #selector(forgotPasswordAction), for: .touchUpInside)
         _view.continueButton.setTitle("authorize.register.continue".localized, for: .normal)
         _view.continueButton.addTarget(self, action: #selector(registerAction), for: .touchUpInside)
         
@@ -299,6 +375,7 @@ class RegisterViewController: UIViewController {
     }
     
     deinit {
+        NotificationCenter.default.removeObserver(self)
         inputViewAdjustsScrollViewController.delegate = nil
         _view.emailTextField.delegate = nil
         _view.passwordTextField.delegate = nil
@@ -313,19 +390,58 @@ class RegisterViewController: UIViewController {
     
     // MARK: Register
     
+    private func isPasswordValid(_ password: String?) -> Bool {
+        if let password = password, !password.isEmpty {
+            return true
+        }
+        else {
+            return false
+        }
+    }
+    
     @objc fileprivate func registerAction() {
-        let isValidRegistration = true
+        let hasValidEmail = emailFormRow.isValid()
+        let hasValidPassword = isPasswordValid(_view.passwordTextField.text)
         
-        if isValidRegistration {
-            delegate?.registerViewControllerDidSignup(self)
+        if hasValidEmail && hasValidPassword {
+            let isValidCredentials = false // TODO:
+            
+            if isValidCredentials {
+                delegate?.registerViewControllerDidSignup(self)
+            }
+            else {
+                _view.emailTextField.isInvalid = true
+                _view.passwordTextField.isInvalid = true
+                ActionFeedbackGenerator().actionOccurred(.nope)
+                
+                // TODO: present forgot password button
+                _view.isForgotPasswordButtonHidden = false
+            }
         }
         else {
             // TODO: notify user there was an issue
+            
+            if !hasValidEmail {
+                _view.emailTextField.isInvalid = true
+            }
+            if !hasValidPassword {
+                _view.passwordTextField.isInvalid = true
+            }
+            
+            ActionFeedbackGenerator().actionOccurred(.nope)
         }
     }
     
     @objc fileprivate func skipRegistration() {
         delegate?.registerViewControllerDidSkip(self)
+    }
+    
+    // MARK: Forgot
+    
+    @objc private func forgotPasswordAction() {
+        let resetPasswordViewController = InitiateResetPasswordViewController()
+        resetPasswordViewController.delegate = self
+        navigationController?.pushViewController(resetPasswordViewController, animated: true)
     }
     
     // MARK: Facebook
@@ -384,6 +500,12 @@ extension RegisterViewController: UITextFieldDelegate {
         }
         return true
     }
+    
+    @objc private func textFieldTextDidChange(_ notification: Notification) {
+        if let textField = notification.object as? UITextField, textField == _view.emailTextField {
+            emailFormRow.value = textField.text
+        }
+    }
 }
 
 extension RegisterViewController: UITextViewDelegate {
@@ -413,5 +535,15 @@ extension RegisterViewController: UITextViewDelegate {
         if let viewController = LegalViewControllerFactory.privacyPolicyViewController() {
             present(viewController, animated: true)
         }
+    }
+}
+
+extension RegisterViewController: InitiateResetPasswordViewControllerDelegate {
+    func initiateResetPasswordViewControllerDidReset(_ viewController: InitiateResetPasswordViewController) {
+        navigationController?.popViewController(animated: true)
+    }
+    
+    func initiateResetPasswordViewControllerDidCancel(_ viewController: InitiateResetPasswordViewController) {
+        navigationController?.popViewController(animated: true)
     }
 }

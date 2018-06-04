@@ -11,16 +11,6 @@ import UIKit
 class TableViewCell: UITableViewCell {
     private var _next: UIResponder?
     
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
-        
-        
-    }
-    
     override func didMoveToSuperview() {
         super.didMoveToSuperview()
         
