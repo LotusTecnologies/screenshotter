@@ -11,6 +11,8 @@ import MessageUI
 import PromiseKit
 import Whisper
 import PushwooshInboxUI
+import Pushwoosh
+import BBBadgeBarButtonItem
 
 @objc protocol SettingsViewControllerDelegate : NSObjectProtocol {
     func settingsViewControllerDidGrantPermission(_ viewController: SettingsViewController)
@@ -129,7 +131,8 @@ class SettingsViewController : BaseViewController {
         tapper.numberOfTouchesRequired = 2
         tableView.addGestureRecognizer(tapper)
         
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem.init(title: "inbox", style: .plain, target: self, action: #selector(inboxAction(_:)))
+        self.navigationItem.rightBarButtonItem = BBBadgeBarButtonItem.init(image: UIImage.init(named: "iconMail"), style: .plain, target: self, action: #selector(inboxAction(_:)))
+        updateInboxBadgeCount()
     }
     @objc func inboxAction(_ sender:Any){
                     let inboxStyle = PWIInboxStyle.customStyle(withDefaultImageIcon: UIImage.init(named: "BrandIcon110"),
@@ -148,7 +151,19 @@ class SettingsViewController : BaseViewController {
             }
         
     }
+    func updateInboxBadgeCount() {
+        PWInbox.unreadMessagesCount(completion: { (count, error) in
+            DispatchQueue.mainAsyncIfNeeded {
+                if error == nil {
+                    if let inboxBarButtonItem = self.navigationItem.rightBarButtonItem as? BBBadgeBarButtonItem {
+                        inboxBarButtonItem.badgeValue = String(count)
+                    }
+                }
+            }
+        })
+    }
     @objc func dismissInboxAction(_ sender:Any){
+        updateInboxBadgeCount()
         self.dismiss(animated: true, completion: nil)
     }
 

@@ -26,6 +26,7 @@ target 'screenshot' do
     pod 'CardIO'
     pod 'PushwooshInboxUI'
     pod 'Pushwoosh'
+    pod 'BBBadgeBarButtonItem'
 end
 
 post_install do |installer|
