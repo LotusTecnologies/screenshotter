@@ -49,6 +49,14 @@ class ScreenshotsNavigationController: UINavigationController {
     }
 }
 
+extension ScreenshotsNavigationController: ViewControllerLifeCycle {
+    func viewController(_ viewController: UIViewController, didDisappear animated: Bool) {
+        if viewController.isKind(of: ProductsViewController.self) && needsToPresentPushAlert {
+            presentPushAlert()
+        }
+    }
+}
+
 extension ScreenshotsNavigationController {
     func createScreenshotPickerNavigationController()->ScreenshotPickerNavigationController{
         let navigationController = ScreenshotPickerNavigationController.init(nibName: nil, bundle: nil)
@@ -71,11 +79,7 @@ extension ScreenshotsNavigationController {
     }
     
     @objc func pickerViewControllerDidCancel() {
-        self.dismiss(animated: true) {
-            if self.needsToPresentPushAlert {
-                self.presentPushAlert()
-            }
-        }
+        self.dismiss(animated: true)
     }
     
     @objc func pickerViewControllerDidFinish(){
@@ -131,6 +135,8 @@ extension ScreenshotsNavigationController: GiftCardCampaignViewControllerDelegat
     
     func giftCardCampaignViewControllerDidSkip(_ viewController: GiftCardCampaignViewController) {
         Analytics.trackOnboardingCampainCreditCardSkip()
+        UserDefaults.standard.set(true, forKey: UserDefaultsKeys.isGiftCardHidden)
+        UserDefaults.standard.synchronize()
         
         giftCardActiveViewController.dismiss(animated: true, completion: nil)
     }
@@ -173,6 +179,7 @@ typealias ScreenshotsNavigationControllerProducts = ScreenshotsNavigationControl
 extension ScreenshotsNavigationControllerProducts {
     func createProductsViewController(screenshot: Screenshot) -> ProductsViewController {
         let productsViewController = ProductsViewController(screenshot: screenshot)
+        productsViewController.lifeCycleDelegate = self
         return productsViewController
     }
     
@@ -189,7 +196,7 @@ extension ScreenshotsNavigationControllerProducts {
 typealias ScreenshotsNavigationControllerPushPermission = ScreenshotsNavigationController
 extension ScreenshotsNavigationControllerPushPermission {
     fileprivate var needsToPresentPushAlert: Bool {
-        return !UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingPresentedPushAlert) && PermissionsManager.shared.hasPermission(for: .photo) && !PermissionsManager.shared.hasPermission(for: .push)
+        return !UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingPresentedPushAlert) && !PermissionsManager.shared.hasPermission(for: .push)
     }
     
     fileprivate func presentPushAlert() {

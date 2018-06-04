@@ -1,0 +1,132 @@
+PODS:
+  - Amplitude-iOS (4.2.1)
+  - Analytics (3.6.9)
+  - Appsee (2.4.1)
+  - Bolts (1.9.0):
+    - Bolts/AppLinks (= 1.9.0)
+    - Bolts/Tasks (= 1.9.0)
+  - Bolts/AppLinks (1.9.0):
+    - Bolts/Tasks
+  - Bolts/Tasks (1.9.0)
+  - Branch (0.25.0):
+    - Branch/Core (= 0.25.0)
+  - Branch/Core (0.25.0)
+  - CardIO (5.4.1)
+  - Clarifai-Apple-SDK (3.0.0-beta14)
+  - CreditCardValidator (0.4)
+  - EggRating (0.1.5):
+    - RateView
+  - FacebookCore (0.3.0):
+    - Bolts (~> 1.8)
+    - FBSDKCoreKit (~> 4.27)
+  - FacebookLogin (0.3.0):
+    - Bolts (~> 1.8)
+    - FacebookCore (~> 0.3)
+    - FBSDKCoreKit (~> 4.27)
+    - FBSDKLoginKit (~> 4.27)
+  - FacebookShare (0.3.0):
+    - Bolts (~> 1.8)
+    - FacebookCore (~> 0.3)
+    - FBSDKCoreKit (~> 4.27)
+    - FBSDKShareKit (~> 4.27)
+  - FBSDKCoreKit (4.33.0):
+    - Bolts (~> 1.7)
+  - FBSDKLoginKit (4.33.0):
+    - FBSDKCoreKit
+  - FBSDKShareKit (4.33.0):
+    - FBSDKCoreKit (~> 4.33.0)
+  - KochavaTrackeriOS (3.5.0)
+  - lottie-ios (2.5.0)
+  - PhoneNumberKit (2.1.0):
+    - PhoneNumberKit/PhoneNumberKitCore (= 2.1.0)
+    - PhoneNumberKit/UIKit (= 2.1.0)
+  - PhoneNumberKit/PhoneNumberKitCore (2.1.0)
+  - PhoneNumberKit/UIKit (2.1.0):
+    - PhoneNumberKit/PhoneNumberKitCore
+  - PromiseKit/CorePromise (4.5.2)
+  - PromiseKit/Foundation (4.5.2):
+    - PromiseKit/CorePromise
+  - PromiseKit/StoreKit (4.5.2):
+    - PromiseKit/CorePromise
+  - RateView (1.2)
+  - SDWebImage (4.3.3):
+    - SDWebImage/Core (= 4.3.3)
+  - SDWebImage/Core (4.3.3)
+  - SwiftKeychainWrapper (3.0.1)
+  - Whisper (6.0.2)
+
+DEPENDENCIES:
+  - Amplitude-iOS (~> 4.2.1)
+  - Analytics (~> 3.0)
+  - Appsee
+  - Branch
+  - CardIO
+  - Clarifai-Apple-SDK (= 3.0.0-beta14)
+  - CreditCardValidator
+  - EggRating
+  - FacebookCore
+  - FacebookLogin
+  - FacebookShare
+  - KochavaTrackeriOS
+  - lottie-ios
+  - PhoneNumberKit
+  - PromiseKit/Foundation (= 4.5.2)
+  - PromiseKit/StoreKit (~> 4.0)
+  - SDWebImage (~> 4.0)
+  - SwiftKeychainWrapper
+  - Whisper
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - Amplitude-iOS
+    - Analytics
+    - Appsee
+    - Bolts
+    - Branch
+    - CardIO
+    - Clarifai-Apple-SDK
+    - CreditCardValidator
+    - EggRating
+    - FacebookCore
+    - FacebookLogin
+    - FacebookShare
+    - FBSDKCoreKit
+    - FBSDKLoginKit
+    - FBSDKShareKit
+    - KochavaTrackeriOS
+    - lottie-ios
+    - PhoneNumberKit
+    - PromiseKit
+    - RateView
+    - SDWebImage
+    - SwiftKeychainWrapper
+    - Whisper
+
+SPEC CHECKSUMS:
+  Amplitude-iOS: 84da24ca8557fa3741888502c30c0b8b365acd7d
+  Analytics: 6541ce337e99d9f7a2240a8b3953940a7be5f998
+  Appsee: ab8b0317b0a5217d08637f61dbddaba2c9748f2a
+  Bolts: ac6567323eac61e203f6a9763667d0f711be34c8
+  Branch: 127d29ab0a8866025eece1cf9e950ddb6f7d4070
+  CardIO: 56983b39b62f495fc6dae9ad7cf875143df06443
+  Clarifai-Apple-SDK: 19a638c697dc7701dbb5edcfbfbf1750bf1507a3
+  CreditCardValidator: 9f0814dd61682c004071a250d89327ca83514a48
+  EggRating: 7f892b9b8da758689525caf9dcb1c9475f9d5139
+  FacebookCore: 3ffa190a3f1f96cec0e44d3fc221bc322c595ffa
+  FacebookLogin: 0af839ea858faef99550d16596b87b4a8e8906e6
+  FacebookShare: 0469964297ebd75f052be2c5083389a4208e82b7
+  FBSDKCoreKit: 572b047a7e029bc44542bcf8a59414e7ff2b543e
+  FBSDKLoginKit: 88cb456349cfb3b554427ce4f8b43729d85dfb40
+  FBSDKShareKit: 1869cb24db2cea90666a50cb9d568deb38e2d16e
+  KochavaTrackeriOS: b612efe2ddaead7e9aa8faf54e0ed96fb027a0ee
+  lottie-ios: d699fdee68d7b63e721d949388b015fef1aaa4ac
+  PhoneNumberKit: 62003f40ff75315fd3738286558bc365365ac222
+  PromiseKit: 743e497a5f505a470d3bbbf4ce0663c1268af0a4
+  RateView: d4d12e9bb76dc23a77a56f4e5c5fb530a3f3f998
+  SDWebImage: de4d90b5bff3571eae7bd16202b1f43135409fa5
+  SwiftKeychainWrapper: 38952a3636320ae61bad3513cadd870929de7a4a
+  Whisper: 169760fc4bab0abf24d5529f9276f95c25cf1025
+
+PODFILE CHECKSUM: 0eb215306ff0c2c54995c07f1c636bbfb4a6a708
+
+COCOAPODS: 1.5.3

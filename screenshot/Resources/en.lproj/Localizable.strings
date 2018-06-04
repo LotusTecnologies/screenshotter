@@ -12,20 +12,6 @@
 // https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/man1/genstrings.1.html
 
 
-// April 20, 2018 campain was a kim video to encourage users to submit to discover
-"2018_04_20_campaign.headline" = "Win up to $1,000";
-"2018_04_20_campaign.body" = "New winners every week! Send your favorite looks to Discover to enter, submit as many times as you’d like!";
-"2018_04_20_campaign.button" = "Learn More";
-"2018_04_20_campaign.instructions.headline" = "Share and Win!";
-"2018_04_20_campaign.instructions.step_1" = "Make sure you have notifications enabled and a valid email address (in Settings)";
-"2018_04_20_campaign.instructions.step_2" = "Add a fashion photo from your phone’s gallery to your Screenshop Homescreen";
-"2018_04_20_campaign.instructions.step_3" = "Tap Share, then Share to Discover";
-"2018_04_20_campaign.instructions.step_4" = "Submit as many images as you want, they each count as an entry";
-"2018_04_20_campaign.instructions.step_5" = "Follow us on Instagram to see when we announce the winners";
-"2018_04_20_campaign.instructions.button" = "Video Explanation";
-"2018_04_20_campaign.instructions.button" = "Got it!";
-"2018_04_20_campaign.instructions.secondButton" = "back to video";
-
 // May 1, 2018 campain is a $25 gift card for users who complete their first purchase.
 "2018_05_01_campaign.headline" = "Start Shopping!";
 "2018_05_01_campaign.message" = "Get a $25 gift card when you make your first purchase*";
@@ -289,6 +275,7 @@
 "products.rate.negative.popup.title" =  "What’s Wrong Here?";
 "products.rate.rated" = "Thanks for your feedback!";
 "products.rate.unrated" = "Are these results relevant?";
+"products.share.title" = "Check out what I just found on Screenshop";
 "products.title" = "Shop Photo";
 "products.related_looks.headline" = "Similar Looks";
 "products.related_looks.error.connection" = "Please check your connection and try again.";
@@ -355,9 +342,8 @@
 "settings.row.photo_permission.title" = "Camera Roll";
 "settings.row.push_permission.title" = "Push Notifications";
 "settings.row.region.title" = "Region";
-"settings.row.restore_in_app_purchase.title" = "Restore Purchases";
 "settings.row.size.title" = "Size";
-"settings.row.tutorial.title" = "Replay Tutorial";
+"settings.row.tutorial.title" = "Play Tutorial";
 "settings.row.usage_streak.detail.plural" = "%d days";
 "settings.row.usage_streak.detail.single" = "%d day";
 "settings.row.usage_streak.title" = "Daily Streak";

@@ -20,7 +20,7 @@ class Constants {
     static let tutorialScreenshotAssetId = "tutorialScreenshotAssetId"
     
     // DB
-    static let currentMomVersion = 17
+    static let currentMomVersion = 18
     
     // Cart
     static let cartItemMaxQuantity = 10
@@ -40,7 +40,7 @@ class Constants {
 #if DEV
     static let appSeeApiKey = "d9010050cea04490b6b9cdd795849dd4"
     static let screenShotLambdaDomain = "https://c3fkst0oq3.execute-api.us-east-1.amazonaws.com/dev/"
-    static let amplitudeApiKey = "22f09c1b641be78951bc3cc2e21024f9"
+    static let amplitudeApiKey = "1e8c1c66e73368665d6e3cc486104c7e"
     static let buildEnvironmentSuffix = "d"
     static let appSettingsDomain = "https://api.craze-dev.com/static/config.json"
     static let whatsNewDomain = "https://api.craze-dev.com/static/whatsnew"
@@ -56,7 +56,7 @@ class Constants {
 #else
     static let appSeeApiKey = "0ece18b50f7d4ef9aae3e473c28030bc"
     static let screenShotLambdaDomain = "https://q598b771ed.execute-api.us-east-1.amazonaws.com/production/"
-    static let amplitudeApiKey = "1e8c1c66e73368665d6e3cc486104c7e"
+    static let amplitudeApiKey = "22f09c1b641be78951bc3cc2e21024f9"
     static let buildEnvironmentSuffix = ""
     static let appSettingsDomain = "https://api.craze-api.com/static/config.json"
     static let whatsNewDomain = "https://api.craze-api.com/static/whatsnew"
