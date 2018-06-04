@@ -305,7 +305,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
                 }
             }
+        }else if urlString.hasPrefix("screenshop://openWebLink/") {
+            let link = ...
+            let browser = ...
+            
         }
+
         return false
     }
     func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([Any]?) -> Void) -> Bool {
