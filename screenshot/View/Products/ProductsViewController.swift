@@ -27,7 +27,8 @@ enum ProductsViewControllerState : Int {
     case unknown
 }
 
-class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
+class ProductsViewController: BaseViewController, ProductsOptionsDelegate, InterViewAnimatable {
+    
     var screenshot:Screenshot
     var screenshotController: FetchedResultsControllerManager<Screenshot>?
     fileprivate var productsFRC: FetchedResultsControllerManager<Product>?
@@ -45,7 +46,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
     var productsRateNegativeFeedbackTextField:UITextField?
     var shamrockButton : FloatingActionButton?
     var productsUnfilteredCount:Int = 0
-    
+    var interTransitionView: UIView?
     var screenshotLoadingState:ProductsViewControllerState = .unknown {
         didSet {
             self.syncViewsAfterStateChange()
@@ -657,12 +658,20 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
                 return
         }
         
+        if let cell = collectionView?.cellForItem(at: indexPath) as? ProductsCollectionViewCell{
+            interTransitionView = cell.productImageView
+        }
         
         let product = self.productAtIndex(indexPath.row)
+        let vc = ProductDetailViewController.init()
+        vc.product = product
+        let _ = vc.view
+        self.navigationController?.pushViewController(vc, animated: true)
+        
         Analytics.trackProductBurrow(product: product, order: nil, sort: nil)
-        AssetSyncModel.sharedInstance.addSubShoppable(fromProduct: product).then { (shoppable) -> Void in
-            self.addSubShoppableCompletion(shoppable: shoppable)
-        }
+//        AssetSyncModel.sharedInstance.addSubShoppable(fromProduct: product).then { (shoppable) -> Void in
+//            self.addSubShoppableCompletion(shoppable: shoppable)
+//        }
     }
 }
 
@@ -1359,3 +1368,4 @@ extension ProductsViewController {
         }
     }
 }
+

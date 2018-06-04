@@ -53,6 +53,8 @@
 		31CE1112203BF055000156EE /* ProductsBarCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE110F203BF055000156EE /* ProductsBarCollectionView.swift */; };
 		31CE1113203BF055000156EE /* ProductsBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE1110203BF055000156EE /* ProductsBarController.swift */; };
 		31CE1115203BF0BC000156EE /* ScreenshotProductBarCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE1114203BF0BC000156EE /* ScreenshotProductBarCollectionViewCell.swift */; };
+		31CEA0AB20C5768900058ECC /* ProductDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CEA0AA20C5768900058ECC /* ProductDetailViewController.swift */; };
+		31CEA0AD20C57A9E00058ECC /* InterViewTransitioning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CEA0AC20C57A9E00058ECC /* InterViewTransitioning.swift */; };
 		31EF9B0720299D15006D3B35 /* InAppPurchaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31EF9B0620299D15006D3B35 /* InAppPurchaseManager.swift */; };
 		31EF9B092029D542006D3B35 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 31EF9B082029D542006D3B35 /* StoreKit.framework */; };
 		523C11391F5C195D001BD969 /* RatingFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523C11381F5C195D001BD969 /* RatingFlow.swift */; };
@@ -308,6 +310,8 @@
 		31CE110F203BF055000156EE /* ProductsBarCollectionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductsBarCollectionView.swift; sourceTree = "<group>"; };
 		31CE1110203BF055000156EE /* ProductsBarController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductsBarController.swift; sourceTree = "<group>"; };
 		31CE1114203BF0BC000156EE /* ScreenshotProductBarCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenshotProductBarCollectionViewCell.swift; sourceTree = "<group>"; };
+		31CEA0AA20C5768900058ECC /* ProductDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductDetailViewController.swift; sourceTree = "<group>"; };
+		31CEA0AC20C57A9E00058ECC /* InterViewTransitioning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterViewTransitioning.swift; sourceTree = "<group>"; };
 		31EF9B0620299D15006D3B35 /* InAppPurchaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InAppPurchaseManager.swift; sourceTree = "<group>"; };
 		31EF9B082029D542006D3B35 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		3F0C1FB8EA3C6E2B9CFD91FD /* Pods-screenshot.prddebug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.prddebug.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.prddebug.xcconfig"; sourceTree = "<group>"; };
@@ -952,6 +956,7 @@
 				31C0C82120A30369002EE95B /* ErrorCollectionViewCell.swift */,
 				31C0C81120A2CD13002EE95B /* SectionBackgroundCollectionViewFlowLayout.swift */,
 				31C0C80F20A2CD13002EE95B /* SpinnerCollectionViewCell.swift */,
+				31CEA0AA20C5768900058ECC /* ProductDetailViewController.swift */,
 			);
 			path = Products;
 			sourceTree = "<group>";
@@ -1119,6 +1124,7 @@
 				C5F37CA220555C8C0072FE1D /* ModalAnimatedTransitioning.swift */,
 				C5F37CA020555C5C0072FE1D /* ViewControllerAnimatedTransitioning.swift */,
 				C5F37C9E20555C2A0072FE1D /* ViewControllerTransitioningDelegate.swift */,
+				31CEA0AC20C57A9E00058ECC /* InterViewTransitioning.swift */,
 			);
 			path = ViewControllerTransitioning;
 			sourceTree = "<group>";
@@ -1487,6 +1493,7 @@
 				E4978C3C1F53610F0008B87F /* Constants.swift in Sources */,
 				C5D2E306204D29D100B5BD92 /* CartTableViewCell.swift in Sources */,
 				C5F37CA320555C8C0072FE1D /* ModalAnimatedTransitioning.swift in Sources */,
+				31CEA0AB20C5768900058ECC /* ProductDetailViewController.swift in Sources */,
 				C5A6F1D81FF3C973001DCDD0 /* Screenshot.swift in Sources */,
 				31C0C82020A2CD14002EE95B /* ProductsCollectionView.swift in Sources */,
 				C50E25E6207DDD82003C8D24 /* CheckoutCreditCardTableViewCell.swift in Sources */,
@@ -1621,6 +1628,7 @@
 				31CE11002035AC44000156EE /* UIApplication+openInChrome.swift in Sources */,
 				C5D57936203F044B00A076FE /* EmptyListController.swift in Sources */,
 				C5406A87206B9BB2002977CE /* DynamicTypeAccessibilityLayout.swift in Sources */,
+				31CEA0AD20C57A9E00058ECC /* InterViewTransitioning.swift in Sources */,
 				C50DBB8A207CA36600BB206E /* CheckoutOrderView.swift in Sources */,
 				C57E93A9204BEE4E0069C378 /* OpenWebPage.swift in Sources */,
 				C5E6C31C208F46A5006E9C54 /* TableViewCell.swift in Sources */,
