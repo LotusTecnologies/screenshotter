@@ -223,7 +223,7 @@ extension FavoriteProductsViewController: ProductVariantsSelectorViewControllerD
             dismiss(animated: true, completion: nil)
         }
         if let tabBarController = self.tabBarController as? MainTabBarController {
-            tabBarController.goToCart()
+            tabBarController.goTo(page: .cart)
         }
         
     }

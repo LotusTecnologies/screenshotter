@@ -2,7 +2,6 @@ PODS:
   - Amplitude-iOS (4.2.1)
   - Analytics (3.6.9)
   - Appsee (2.4.1)
-  - BBBadgeBarButtonItem (1.2)
   - Bolts (1.9.0):
     - Bolts/AppLinks (= 1.9.0)
     - Bolts/Tasks (= 1.9.0)
@@ -38,6 +37,7 @@ PODS:
     - FBSDKCoreKit (~> 4.33.0)
   - KochavaTrackeriOS (3.5.0)
   - lottie-ios (2.5.0)
+  - MIBadgeButton-Swift (0.5)
   - PhoneNumberKit (2.1.0):
     - PhoneNumberKit/PhoneNumberKitCore (= 2.1.0)
     - PhoneNumberKit/UIKit (= 2.1.0)
@@ -63,7 +63,6 @@ DEPENDENCIES:
   - Amplitude-iOS (~> 4.2.1)
   - Analytics (~> 3.0)
   - Appsee
-  - BBBadgeBarButtonItem
   - Branch
   - CardIO
   - Clarifai-Apple-SDK (= 3.0.0-beta14)
@@ -74,6 +73,7 @@ DEPENDENCIES:
   - FacebookShare
   - KochavaTrackeriOS
   - lottie-ios
+  - MIBadgeButton-Swift (from `https://github.com/mustafaibrahim989/MIBadgeButton-Swift.git`, branch `master`)
   - PhoneNumberKit
   - PromiseKit/Foundation (= 4.5.2)
   - PromiseKit/StoreKit (~> 4.0)
@@ -88,7 +88,6 @@ SPEC REPOS:
     - Amplitude-iOS
     - Analytics
     - Appsee
-    - BBBadgeBarButtonItem
     - Bolts
     - Branch
     - CardIO
@@ -112,11 +111,20 @@ SPEC REPOS:
     - SwiftKeychainWrapper
     - Whisper
 
+EXTERNAL SOURCES:
+  MIBadgeButton-Swift:
+    :branch: master
+    :git: https://github.com/mustafaibrahim989/MIBadgeButton-Swift.git
+
+CHECKOUT OPTIONS:
+  MIBadgeButton-Swift:
+    :commit: 3c2638d2e6e46ec2e6dd978d8ada8863df3df5e6
+    :git: https://github.com/mustafaibrahim989/MIBadgeButton-Swift.git
+
 SPEC CHECKSUMS:
   Amplitude-iOS: 84da24ca8557fa3741888502c30c0b8b365acd7d
   Analytics: 6541ce337e99d9f7a2240a8b3953940a7be5f998
   Appsee: ab8b0317b0a5217d08637f61dbddaba2c9748f2a
-  BBBadgeBarButtonItem: c2fbca0bff18e21b70defc9438a8a5048008e7ca
   Bolts: ac6567323eac61e203f6a9763667d0f711be34c8
   Branch: 127d29ab0a8866025eece1cf9e950ddb6f7d4070
   CardIO: 56983b39b62f495fc6dae9ad7cf875143df06443
@@ -131,6 +139,7 @@ SPEC CHECKSUMS:
   FBSDKShareKit: 1869cb24db2cea90666a50cb9d568deb38e2d16e
   KochavaTrackeriOS: b612efe2ddaead7e9aa8faf54e0ed96fb027a0ee
   lottie-ios: d699fdee68d7b63e721d949388b015fef1aaa4ac
+  MIBadgeButton-Swift: 9e57309b00b168d75ca8fecb45bc75124a8ffddf
   PhoneNumberKit: 62003f40ff75315fd3738286558bc365365ac222
   PromiseKit: 743e497a5f505a470d3bbbf4ce0663c1268af0a4
   Pushwoosh: cdf31f49f8a50d47c1b03b67ad8af1e47250022e
@@ -140,6 +149,6 @@ SPEC CHECKSUMS:
   SwiftKeychainWrapper: 38952a3636320ae61bad3513cadd870929de7a4a
   Whisper: 169760fc4bab0abf24d5529f9276f95c25cf1025
 
-PODFILE CHECKSUM: dbe728af689d6751df60d448a3e26ccba4ebd4a5
+PODFILE CHECKSUM: 1d7db5ee3caf86f7395d62a7b211cc2f9d0d6ef1
 
 COCOAPODS: 1.5.3

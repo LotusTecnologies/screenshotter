@@ -211,9 +211,54 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
     }
 
     // MARK: - Tab Bar
-    func goToCart(){
-        if let index = self.viewControllers?.index(of: cartNavigationController){
-            self.selectedIndex = index
+    
+    func goTo(page:TabIndex) {
+        func subViewControllers(_ vc:UIViewController) -> [UIViewController] {
+            var subVC:[UIViewController] = vc.childViewControllers
+            if let presentedViewController  = vc.presentedViewController{
+                subVC.append(presentedViewController)
+            }
+            return subVC
+        }
+        func dismissViewController(_ vc:UIViewController) {
+            
+            let subViewController = subViewControllers(vc)
+            for vc  in subViewController {
+                dismissViewController(vc)
+            }
+            if vc.presentedViewController != nil {
+                vc.dismiss(animated: false, completion: nil)
+            }
+            if let nav = vc.navigationController {
+                nav.popToRootViewController(animated: false)
+            }
+        }
+        
+        if let current = self.selectedViewController {
+            dismissViewController(current)
+        }
+        
+        switch page {
+        case .cart:
+            if let index = self.viewControllers?.index(of: cartNavigationController){
+                self.selectedIndex = index
+            }
+        case .discover:
+            if let index = self.viewControllers?.index(of: discoverNavigationController){
+                self.selectedIndex = index
+            }
+        case .favorites:
+            if let index = self.viewControllers?.index(of: favoritesNavigationController){
+                self.selectedIndex = index
+            }
+        case .screenshots:
+            if let index = self.viewControllers?.index(of: screenshotsNavigationController){
+                self.selectedIndex = index
+            }
+        case .settings:
+            if let index = self.viewControllers?.index(of: settingsNavigationController){
+                self.selectedIndex = index
+            }
         }
     }
     func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {

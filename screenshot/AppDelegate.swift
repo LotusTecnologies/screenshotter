@@ -276,11 +276,38 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if !handled {
             handled = FBSDKApplicationDelegate.sharedInstance().application(app, open: url, options: options)
         }
-        
+        if !handled {
+            handled = self.handleDeepLink(application: app, url: url, options: options)
+        }
         print("open url: \(url.absoluteString)")
         return handled
     }
-    
+    func handleDeepLink(application:UIApplication, url:URL, options:[UIApplicationOpenURLOptionsKey : Any] ) -> Bool {
+        let urlString = url.absoluteString
+        if urlString.hasPrefix("screenshop://openTab/") {
+            if let mainTabBarController = self.window?.rootViewController as? MainTabBarController {
+                let page = urlString.components(separatedBy: "/").last?.lowercased()
+                var tab:MainTabBarController.TabIndex? = nil
+                if page == "favorites"  || page == "favorite" {
+                    tab = .favorites
+                }else if page == "discover" || page == "matchstick" {
+                    tab = .discover
+                }else if page == "screenshots" ||  page == "main"{
+                    tab = .screenshots
+                }else if page == "settings" {
+                    tab = .settings
+                }else if page == "cart" {
+                    tab = .cart
+                }
+                if let tab = tab {
+                    mainTabBarController.goTo(page: tab)
+                    return true
+
+                }
+            }
+        }
+        return false
+    }
     func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([Any]?) -> Void) -> Bool {
         let handled = Branch.getInstance().continue(userActivity)
         return handled

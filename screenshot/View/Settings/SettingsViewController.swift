@@ -12,7 +12,7 @@ import PromiseKit
 import Whisper
 import PushwooshInboxUI
 import Pushwoosh
-import BBBadgeBarButtonItem
+import MIBadgeButton_Swift
 
 @objc protocol SettingsViewControllerDelegate : NSObjectProtocol {
     func settingsViewControllerDidGrantPermission(_ viewController: SettingsViewController)
@@ -131,7 +131,17 @@ class SettingsViewController : BaseViewController {
         tapper.numberOfTouchesRequired = 2
         tableView.addGestureRecognizer(tapper)
         
-        self.navigationItem.rightBarButtonItem = BBBadgeBarButtonItem.init(image: UIImage.init(named: "iconMail"), style: .plain, target: self, action: #selector(inboxAction(_:)))
+//        let mailIconImage = UIImage.init(named: "iconMail")
+//        let icon = MIBadgeButton.init(frame: CGRect.init(origin: .zero, size: mailIconImage?.size ?? .zero))
+//        icon.setImage(mailIconImage, for: .normal)
+//        icon.badgeString = "2"
+//        icon.badgeBackgroundColor = .crazeRed
+//        
+//        let mailIcon = UIBarButtonItem.init(customView: icon)
+//        mailIcon.target = self
+//        mailIcon.action = #selector(inboxAction(_:))
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem.init(title: "inbox", style: .plain, target: self, action: #selector(inboxAction(_:)))
+        
         updateInboxBadgeCount()
     }
     @objc func inboxAction(_ sender:Any){
@@ -155,8 +165,8 @@ class SettingsViewController : BaseViewController {
         PWInbox.unreadMessagesCount(completion: { (count, error) in
             DispatchQueue.mainAsyncIfNeeded {
                 if error == nil {
-                    if let inboxBarButtonItem = self.navigationItem.rightBarButtonItem as? BBBadgeBarButtonItem {
-                        inboxBarButtonItem.badgeValue = String(count)
+                    if let badgeButton = self.navigationItem.rightBarButtonItem?.customView as? MIBadgeButton{
+                        badgeButton.badgeString = String(count)
                     }
                 }
             }
