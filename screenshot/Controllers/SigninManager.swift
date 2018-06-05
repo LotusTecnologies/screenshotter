@@ -15,7 +15,7 @@ class SigninManager {
         case unconfirmed
     }
     enum SignUpError: Error {
-        case userAccountAlreadyExsists
+        case userAccountAlreadyExists
         case wrongEmailOrPassword
         case invalidPassword //For creating an account the password must be at least x digits long etc
         case noInternet
