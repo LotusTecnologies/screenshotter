@@ -36,6 +36,12 @@ class SigninManager {
         case invalidPassword
         case noInternet
     }
+    
+    enum LoginResult {
+        case success(isValidCredentials: Bool, isExistingUser: Bool)
+        case failed(Error)
+    }
+    
 
     static let shared = SigninManager()
 
@@ -56,13 +62,18 @@ class SigninManager {
     }
     
     
-    //If unconfirmed, user must get a confirm code to finialize login
-    func signUp(email:String, password:String) -> Promise<UserConfirmedStatus>{
-        return Promise<UserConfirmedStatus>.init(resolvers: { (fulfil, reject) in
-            fulfil(.confirmed)
-
-            
-        })
+    func isExistingUser(email: String) -> Promise<Bool> {
+        return Promise { fulfill, reject in
+            fulfill(email == "a@a.aa")
+        }
+    }
+    
+    func login(email: String, password: String) -> Promise<LoginResult> {
+        return Promise { fulfill, reject in
+            let valid = password == "aaa"
+            let existing = email == "a@a.aa"
+            fulfill(LoginResult.success(isValidCredentials: valid, isExistingUser: existing))
+        }
     }
     
     func confirmSignup(code:String) -> Promise<Void>{
