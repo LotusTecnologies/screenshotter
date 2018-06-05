@@ -641,6 +641,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
     func addSubShoppableCompletion(shoppable:Shoppable) {
         shoppablesToolbarContainer?.visibleToolbar = .both
         self.shoppablesToolbarContainer?.toolbar.deselectShoppable()
+        self.shoppablesToolbarContainer?.subToolbar.rootShoppableObjectId = shoppable.parentShoppable?.objectID
         self.shoppablesToolbarContainer?.subToolbar.selectShoppable(shoppable)
         syncContentInset()
         
@@ -1319,8 +1320,9 @@ extension ProductsViewController {
             
             let shoppables = shoppablesToolbarContainer.subToolbar.shoppables
             if shoppables.count > index.row {
-                let shoppable = shoppables[index.row]
                 
+                let shoppable = shoppables[index.row]
+                Analytics.trackProductBurrowConvertedToScreenshot(shoppable: shoppable)
                 Screenshot.createWith(subShoppable: shoppable)
                     
                 if let tabBarController = tabBarController as? MainTabBarController {
@@ -1341,6 +1343,8 @@ extension ProductsViewController {
             let shoppables = shoppablesToolbarContainer.subToolbar.shoppables
             if shoppables.count > index.row {
                 let shoppable = shoppables[index.row]
+                Analytics.trackProductBurrowDelete(shoppable: shoppable)
+
                 if selected == shoppable {
                     shoppablesToolbarContainer.subToolbar.deselectShoppable()
                     if let objectId = shoppablesToolbarContainer.subToolbar.rootShoppableObjectId, let parentShoppable = DataModel.sharedInstance.mainMoc().shoppableWith(objectId: objectId){
