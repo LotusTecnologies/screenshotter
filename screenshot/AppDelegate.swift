@@ -264,6 +264,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             handled = FBSDKApplicationDelegate.sharedInstance().application(app, open: url, options: options)
         }
         
+        if !handled {
+            handled = SigninManager.shared.application(app, open: url, options: options)
+        }
         return handled
     }
     
@@ -414,6 +417,8 @@ extension AppDelegate : KochavaTrackerDelegate {
         
         KochavaTracker.shared.configure(withParametersDictionary: trackerParametersDictionary, delegate: self)
         
+        
+        SigninManager.shared.application(application, didFinishLaunchingWithOptions: launchOptions)
         
         if UIApplication.isDev {
             Branch.setUseTestBranchKey(true)
