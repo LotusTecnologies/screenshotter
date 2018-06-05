@@ -53,6 +53,7 @@
 		31CE1112203BF055000156EE /* ProductsBarCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE110F203BF055000156EE /* ProductsBarCollectionView.swift */; };
 		31CE1113203BF055000156EE /* ProductsBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE1110203BF055000156EE /* ProductsBarController.swift */; };
 		31CE1115203BF0BC000156EE /* ScreenshotProductBarCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE1114203BF0BC000156EE /* ScreenshotProductBarCollectionViewCell.swift */; };
+		31CEA0A920C562B700058ECC /* SigninManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CEA0A820C562B700058ECC /* SigninManager.swift */; };
 		31EF9B0720299D15006D3B35 /* InAppPurchaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31EF9B0620299D15006D3B35 /* InAppPurchaseManager.swift */; };
 		31EF9B092029D542006D3B35 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 31EF9B082029D542006D3B35 /* StoreKit.framework */; };
 		523C11391F5C195D001BD969 /* RatingFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523C11381F5C195D001BD969 /* RatingFlow.swift */; };
@@ -322,6 +323,7 @@
 		31CE110F203BF055000156EE /* ProductsBarCollectionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductsBarCollectionView.swift; sourceTree = "<group>"; };
 		31CE1110203BF055000156EE /* ProductsBarController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductsBarController.swift; sourceTree = "<group>"; };
 		31CE1114203BF0BC000156EE /* ScreenshotProductBarCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenshotProductBarCollectionViewCell.swift; sourceTree = "<group>"; };
+		31CEA0A820C562B700058ECC /* SigninManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SigninManager.swift; sourceTree = "<group>"; };
 		31EF9B0620299D15006D3B35 /* InAppPurchaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InAppPurchaseManager.swift; sourceTree = "<group>"; };
 		31EF9B082029D542006D3B35 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		3F0C1FB8EA3C6E2B9CFD91FD /* Pods-screenshot.prddebug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.prddebug.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.prddebug.xcconfig"; sourceTree = "<group>"; };
@@ -716,6 +718,7 @@
 			children = (
 				523C11381F5C195D001BD969 /* RatingFlow.swift */,
 				E42AC3901F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift */,
+				31CEA0A820C562B700058ECC /* SigninManager.swift */,
 				52FA93901F6FF106000C7A71 /* UpdatePrompt.swift */,
 				524DB5391FC6F69800BD408F /* UsageStreak.swift */,
 				5268B5251FE65E1800B7D257 /* ChangelogAlert.swift */,
@@ -1591,6 +1594,7 @@
 				316C831920C3AEBD0012A908 /* Screenshot+craze.swift in Sources */,
 				31C0C81C20A2CD14002EE95B /* ProductsViewHeaderReusableView.swift in Sources */,
 				C54369642046B4E800599134 /* ProductCartBarButtonItem.swift in Sources */,
+				31CEA0A920C562B700058ECC /* SigninManager.swift in Sources */,
 				529A36661FCC99B300BCA798 /* SilentPushSubscriptionManager.swift in Sources */,
 				C54369672046D6FD00599134 /* BaseViewController.swift in Sources */,
 				C50DBB7F207B4A8B00BB206E /* AutoresizingTableView.swift in Sources */,
