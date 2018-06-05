@@ -24,6 +24,11 @@ target 'screenshot' do
     pod 'Whisper'
     pod 'PhoneNumberKit'
     pod 'CardIO'
+    pod 'AWSCore'
+    pod 'AWSCognito'
+    pod 'AWSCognitoAuth'
+    pod 'AWSCognitoIdentityProvider'
+
 end
 
 post_install do |installer|

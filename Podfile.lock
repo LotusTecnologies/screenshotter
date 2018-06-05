@@ -2,6 +2,15 @@ PODS:
   - Amplitude-iOS (4.2.1)
   - Analytics (3.6.9)
   - Appsee (2.4.1)
+  - AWSCognito (2.6.20):
+    - AWSCore (= 2.6.20)
+  - AWSCognitoAuth (2.6.20):
+    - AWSCognitoIdentityProviderASF (= 1.0.1)
+  - AWSCognitoIdentityProvider (2.6.20):
+    - AWSCognitoIdentityProviderASF (= 1.0.1)
+    - AWSCore (= 2.6.20)
+  - AWSCognitoIdentityProviderASF (1.0.1)
+  - AWSCore (2.6.20)
   - Bolts (1.9.0):
     - Bolts/AppLinks (= 1.9.0)
     - Bolts/Tasks (= 1.9.0)
@@ -59,6 +68,10 @@ DEPENDENCIES:
   - Amplitude-iOS (~> 4.2.1)
   - Analytics (~> 3.0)
   - Appsee
+  - AWSCognito
+  - AWSCognitoAuth
+  - AWSCognitoIdentityProvider
+  - AWSCore
   - Branch
   - CardIO
   - Clarifai-Apple-SDK (= 3.0.0-beta14)
@@ -81,6 +94,11 @@ SPEC REPOS:
     - Amplitude-iOS
     - Analytics
     - Appsee
+    - AWSCognito
+    - AWSCognitoAuth
+    - AWSCognitoIdentityProvider
+    - AWSCognitoIdentityProviderASF
+    - AWSCore
     - Bolts
     - Branch
     - CardIO
@@ -106,6 +124,11 @@ SPEC CHECKSUMS:
   Amplitude-iOS: 84da24ca8557fa3741888502c30c0b8b365acd7d
   Analytics: 6541ce337e99d9f7a2240a8b3953940a7be5f998
   Appsee: ab8b0317b0a5217d08637f61dbddaba2c9748f2a
+  AWSCognito: 76b0fcfa24c6432b95059775c38e66ca7f18f839
+  AWSCognitoAuth: c76ee50bcd8624b08ab248be6ce6d482c6b552e2
+  AWSCognitoIdentityProvider: 82158b2c4555ceab8c04368f9cc9ef216bf862e6
+  AWSCognitoIdentityProviderASF: f94f1a502e72ef3d0a1de93e10bf7a79c8698118
+  AWSCore: dd4d3d4fcafdce68a42025c3e9e45b026cf1f33b
   Bolts: ac6567323eac61e203f6a9763667d0f711be34c8
   Branch: 127d29ab0a8866025eece1cf9e950ddb6f7d4070
   CardIO: 56983b39b62f495fc6dae9ad7cf875143df06443
@@ -127,6 +150,6 @@ SPEC CHECKSUMS:
   SwiftKeychainWrapper: 38952a3636320ae61bad3513cadd870929de7a4a
   Whisper: 169760fc4bab0abf24d5529f9276f95c25cf1025
 
-PODFILE CHECKSUM: 0eb215306ff0c2c54995c07f1c636bbfb4a6a708
+PODFILE CHECKSUM: d9179bd123ad52c26e1fdbb3da1dd4b23bbad4e9
 
 COCOAPODS: 1.5.3
