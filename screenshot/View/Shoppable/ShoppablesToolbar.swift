@@ -29,6 +29,8 @@ class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UIColle
     }
     
     var shoppables:[Shoppable] = []
+    var shoppableObjectIdToSelectWhenControllerChanges:NSManagedObjectID?
+    
     init(screenshot s:Screenshot) {
         if let data = s.imageData,
             let i = UIImage(data: data as Data) {
@@ -133,14 +135,19 @@ class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UIColle
     }
     
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
-        
+
         var selected:Shoppable? = nil
         if let index = self.collectionView?.indexPathsForSelectedItems?.first?.item {
             selected = shoppables[index]
         }
         shoppables = shoppablesController.fetchedObjects.filter { $0.parentShoppable?.objectID == rootShoppableObjectId }
         self.collectionView?.reloadData()
-        if let selected = selected, let index = self.shoppables.index(of: selected) {
+        if let selectedObjectId = shoppableObjectIdToSelectWhenControllerChanges, let shoppable = shoppables.first(where: { $0.objectID == selectedObjectId }) {
+            self.shoppableObjectIdToSelectWhenControllerChanges = nil
+            shoppables = shoppablesController.fetchedObjects.filter { $0.parentShoppable?.objectID == rootShoppableObjectId }
+            self.selectShoppable(shoppable)
+            
+        }else if let selected = selected, let index = self.shoppables.index(of: selected) {
             self.collectionView?.selectItem(at: IndexPath.init(row: index, section: 0), animated: false, scrollPosition: [])
         }
         
@@ -197,6 +204,9 @@ class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UIColle
                 let isVisible = self.window != nil
                 collectionView.selectItem(at: IndexPath(row: index, section: 0), animated: isVisible, scrollPosition: .centeredHorizontally)
                 self.shoppableToolbarDelegate?.shoppablesToolbarDidChangeSelectedShoppable(toolbar: self, shoppable: s)
+            }else{
+                self.shoppableObjectIdToSelectWhenControllerChanges = s.objectID
+                print("unable to find shoppable!")
             }
         }
     }
