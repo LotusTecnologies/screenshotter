@@ -152,6 +152,7 @@
 		C548D4EB20022E26003364E9 /* DiscoverScreenshotViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C548D4EA20022E26003364E9 /* DiscoverScreenshotViewController.swift */; };
 		C553563C1F8369DF00849E64 /* DeviceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C553563B1F8369DE00849E64 /* DeviceHelper.swift */; };
 		C554B17920287DF50099622C /* ScreenshotsDeleteButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C554B17820287DF50099622C /* ScreenshotsDeleteButton.swift */; };
+		C5594A4620C66B1C00BC4EA0 /* RegisterExistingTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5594A4520C66B1C00BC4EA0 /* RegisterExistingTextField.swift */; };
 		C55D89BD2021CF6D004A5245 /* SettingsNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C55D89BC2021CF6D004A5245 /* SettingsNavigationController.swift */; };
 		C55D89C02021EF93004A5245 /* PartnersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C55D89BF2021EF93004A5245 /* PartnersViewController.swift */; };
 		C565333B2019D81C00F022D4 /* ProductViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C565333A2019D81C00F022D4 /* ProductViewController.swift */; };
@@ -425,6 +426,7 @@
 		C548D4EA20022E26003364E9 /* DiscoverScreenshotViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverScreenshotViewController.swift; sourceTree = "<group>"; };
 		C553563B1F8369DE00849E64 /* DeviceHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceHelper.swift; sourceTree = "<group>"; };
 		C554B17820287DF50099622C /* ScreenshotsDeleteButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotsDeleteButton.swift; sourceTree = "<group>"; };
+		C5594A4520C66B1C00BC4EA0 /* RegisterExistingTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterExistingTextField.swift; sourceTree = "<group>"; };
 		C55D89BC2021CF6D004A5245 /* SettingsNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsNavigationController.swift; sourceTree = "<group>"; };
 		C55D89BF2021EF93004A5245 /* PartnersViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartnersViewController.swift; sourceTree = "<group>"; };
 		C565333A2019D81C00F022D4 /* ProductViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductViewController.swift; sourceTree = "<group>"; };
@@ -732,6 +734,7 @@
 			children = (
 				C53154F120BE99AC0050EB76 /* InitiateResetPasswordViewController.swift */,
 				C53154EF20BE99AC0050EB76 /* RegisterConfirmationViewController.swift */,
+				C5594A4520C66B1C00BC4EA0 /* RegisterExistingTextField.swift */,
 				C53154F020BE99AC0050EB76 /* RegisterViewController.swift */,
 				C53154FA20BED3900050EB76 /* ResetPasswordViewController.swift */,
 			);
@@ -1571,6 +1574,7 @@
 				C5F73C9E1FE244C800E49F2B /* Permissions.swift in Sources */,
 				315186412033FC81001BD8D6 /* ShoppablesToolbar.swift in Sources */,
 				C50E25EA207DDFF1003C8D24 /* CreditCardValidator.swift in Sources */,
+				C5594A4620C66B1C00BC4EA0 /* RegisterExistingTextField.swift in Sources */,
 				C51ED5BA1FF39A0700AABD68 /* FavoritesNavigationController.swift in Sources */,
 				E492CE3D2011051100060FB2 /* MatchstickModel.swift in Sources */,
 				C5F8D81420B2E877004A32FD /* FacebookButton.swift in Sources */,

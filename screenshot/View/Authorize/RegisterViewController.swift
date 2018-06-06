@@ -23,7 +23,7 @@ class RegisterView: UIScrollView {
     let facebookLoginButton = FacebookButton()
     private let horizontalLinesView = HorizontalLinesView()
     let contentView = ContentContainerView()
-    let emailTextField = UnderlineTextField()
+    let emailTextField = RegisterExistingTextField()
     let passwordTextField = UnderlineTextField()
     let forgotPasswordButton = UIButton()
     let continueButton = MainButton()
@@ -199,7 +199,7 @@ class RegisterView: UIScrollView {
         forgotPasswordButton.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
         
         showForgotPasswordConstraints += [
-            forgotPasswordButton.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor)
+            forgotPasswordButton.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor, constant: verticalNegativeMargin)
         ]
         
         NSLayoutConstraint.activate(hideForgotPasswordConstraints)
@@ -313,10 +313,43 @@ class RegisterView: UIScrollView {
 }
 
 class RegisterViewController: UIViewController {
-    private let inputViewAdjustsScrollViewController = InputViewAdjustsScrollViewController()
-    private let emailFormRow = FormRow.Email()
+    private enum ContinueCopy {
+        case `default`
+        case login
+        case register
+    }
     
     weak var delegate: RegisterViewControllerDelegate?
+    
+    private let inputViewAdjustsScrollViewController = InputViewAdjustsScrollViewController()
+    
+    private func setContinueCopy(_ continueCopy: ContinueCopy) {
+        let copy: String
+        
+        switch continueCopy {
+        case .default:
+            copy = "authorize.register.continue".localized
+        case .login:
+            copy = "authorize.register.continue.login".localized
+        case .register:
+            copy = "authorize.register.continue.register".localized
+        }
+        
+        _view.continueButton.setTitle(copy, for: .normal)
+    }
+    
+    private let emailFormRow = FormRow.Email()
+    private var previousEmail: String?
+    var email: String? {
+        set {
+            let newEmail = newValue?.trimmingCharacters(in: .whitespaces)
+            emailFormRow.value = newEmail
+            _view.emailTextField.text = newEmail
+        }
+        get {
+            return emailFormRow.value
+        }
+    }
     
     // MARK: View
     
@@ -353,17 +386,19 @@ class RegisterViewController: UIViewController {
         
         _view.facebookLoginButton.addTarget(self, action: #selector(facebookLoginAction), for: .touchUpInside)
         
-        if let email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email) {
-            _view.emailTextField.text = email
-        }
-        
         _view.emailTextField.delegate = self
         _view.passwordTextField.delegate = self
         _view.legalTextView.delegate = self
         
         _view.forgotPasswordButton.addTarget(self, action: #selector(forgotPasswordAction), for: .touchUpInside)
-        _view.continueButton.setTitle("authorize.register.continue".localized, for: .normal)
         _view.continueButton.addTarget(self, action: #selector(registerAction), for: .touchUpInside)
+        setContinueCopy(.default)
+        
+        if let email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email) {
+            self.email = email
+            _view.emailTextField.exists = .yes
+            setContinueCopy(.login)
+        }
         
         _view.skipButton.addTarget(self, action: #selector(skipRegistration), for: .touchUpInside)
         
@@ -403,25 +438,41 @@ class RegisterViewController: UIViewController {
         let hasValidEmail = emailFormRow.isValid()
         let hasValidPassword = isPasswordValid(_view.passwordTextField.text)
         
-        if hasValidEmail && hasValidPassword {
-            let isValidCredentials = false // TODO:
-            
-            if isValidCredentials {
-                registerUser()
-                delegate?.registerViewControllerDidSignup(self)
-            }
-            else {
-                _view.emailTextField.isInvalid = true
-                _view.passwordTextField.isInvalid = true
-                ActionFeedbackGenerator().actionOccurred(.nope)
-                
-                // TODO: present forgot password button
-                _view.isForgotPasswordButtonHidden = false
+        if hasValidEmail && hasValidPassword,
+            let email = self.email,
+            let password = _view.passwordTextField.text
+        {
+            SigninManager.shared.login(email: email, password: password)
+                .then { result -> Void in
+                    switch result {
+                    case .success(let isValidCredentials, let isExistingUser):
+                        if isValidCredentials {
+                            self.registerUser() // ???: Gershon is this needed
+                            
+                            if isExistingUser {
+                                self.delegate?.registerViewControllerDidLogin(self)
+                            }
+                            else {
+                                self.delegate?.registerViewControllerDidSignup(self)
+                            }
+                        }
+                        else {
+                            self._view.emailTextField.isInvalid = true
+                            self._view.passwordTextField.isInvalid = true
+                            self._view.isForgotPasswordButtonHidden = false
+                            ActionFeedbackGenerator().actionOccurred(.nope)
+                        }
+                        
+                    case .failed(let error):
+                        // TDDO: network issue or something else
+                        break
+                    }
+                }
+                .catch { error in
+                    
             }
         }
         else {
-            // TODO: notify user there was an issue
-            
             if !hasValidEmail {
                 _view.emailTextField.isInvalid = true
             }
@@ -437,7 +488,7 @@ class RegisterViewController: UIViewController {
         // TODO: Gershon needs to deal with this
         
         let name = ""
-        let email = emailFormRow.value
+        let email = self.email
             
         UserDefaults.standard.set(name, forKey: UserDefaultsKeys.name)
         UserDefaults.standard.set(email, forKey: UserDefaultsKeys.email)
@@ -550,6 +601,12 @@ extension RegisterViewController: InputViewAdjustsScrollViewControllerDelegate {
 }
 
 extension RegisterViewController: UITextFieldDelegate {
+    @objc private func textFieldTextDidChange(_ notification: Notification) {
+        if let textField = notification.object as? UITextField, textField == _view.emailTextField {
+            email = textField.text?.trimmingCharacters(in: .whitespaces)
+        }
+    }
+    
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         if textField == _view.emailTextField {
             _view.passwordTextField.becomeFirstResponder()
@@ -560,9 +617,39 @@ extension RegisterViewController: UITextFieldDelegate {
         return true
     }
     
-    @objc private func textFieldTextDidChange(_ notification: Notification) {
-        if let textField = notification.object as? UITextField, textField == _view.emailTextField {
-            emailFormRow.value = textField.text?.trimmingCharacters(in: .whitespaces)
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        if textField == _view.emailTextField {
+            if let email = self.email, emailFormRow.isValid() {
+                _view.emailTextField.exists = .unknown
+                
+                SigninManager.shared.isExistingUser(email: email)
+                    .then { [weak self] isExistingUser -> Void in
+                        if isExistingUser {
+                            self?._view.emailTextField.exists = .yes
+                            self?.setContinueCopy(.login)
+                        }
+                        else {
+                            self?._view.emailTextField.exists = .no
+                            self?.setContinueCopy(.register)
+                        }
+                    }
+                    .catch { [weak self] error in
+                        // TODO:
+                        self?._view.emailTextField.exists = .unknown
+                        self?.setContinueCopy(.default)
+                }
+                
+                if previousEmail != email {
+                    _view.isForgotPasswordButtonHidden = true
+                }
+                
+                previousEmail = email
+            }
+            else {
+                _view.emailTextField.exists = .unknown
+                _view.emailTextField.isInvalid = true
+                ActionFeedbackGenerator().actionOccurred(.nope)
+            }
         }
     }
 }

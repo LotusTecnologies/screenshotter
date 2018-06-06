@@ -29,7 +29,7 @@ class SigninManager : NSObject {
         case userAccountAlreadyExists
         case errorIllegalArgument //For creating an account the password must be at least x digits long etc
     }
-    
+
     static let shared = SigninManager()
 
     var user:AWSCognitoIdentityUser?
@@ -74,7 +74,7 @@ class SigninManager : NSObject {
     }
     
     //If unconfirmed, user must get a confirm code to finialize login
-    func signUp(email:String, password:String) -> Promise<UserConfirmedStatus>{
+    func login(email:String, password:String) -> Promise<LoginResult>{
         return Promise<UserConfirmedStatus>.init(resolvers: { (fulfil, reject) in
             let emailAttribute = AWSCognitoIdentityUserAttributeType.init(name: "email", value: email)
             if let pool = self.pool {
@@ -100,6 +100,10 @@ class SigninManager : NSObject {
             }
             
         })
+    func isExistingUser(email: String) -> Promise<Bool> {
+        return Promise { fulfill, reject in
+            fulfill(email == "a@a.aa")
+        }
     }
     
     func confirmSignup(code:String) -> Promise<Void>{
