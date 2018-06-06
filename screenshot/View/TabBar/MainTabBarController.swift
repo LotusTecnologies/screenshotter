@@ -10,9 +10,9 @@ import UIKit
 
 class MainTabBarController: UITabBarController, UITabBarControllerDelegate, ScreenshotsNavigationControllerDelegate, SettingsViewControllerDelegate, ScreenshotDetectionProtocol, ViewControllerLifeCycle {
     enum TabIndex: Int {
-        case screenshots = 0
-        case favorites   = 1
-        case discover    = 2
+        case favorites   = 0
+        case discover    = 1
+        case screenshots = 2
         case settings    = 3
         case cart        = 4
     }
