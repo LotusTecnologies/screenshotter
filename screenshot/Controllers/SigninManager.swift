@@ -13,7 +13,7 @@ import AWSCognitoIdentityProviderASF
 import AWSCore
 import AWSCognitoIdentityProvider
 
-class SigninManager {
+class SigninManager : NSObject {
    
     enum UserConfirmedStatus {
         case confirmed
@@ -35,9 +35,15 @@ class SigninManager {
     var user:AWSCognitoIdentityUser?
     var pool:AWSCognitoIdentityUserPool?
     
-    init() {
-        
-        
+    override init() {
+        let credentialsProvider = AWSCognitoCredentialsProvider.init(regionType: .USEast1, identityPoolId: "us-east-1:dfdfa4f8-0991-4af5-9cc7-999eeb98a6b5")
+        let serviseConfig = AWSServiceConfiguration.init(region: .USEast1, credentialsProvider: credentialsProvider)
+        let cognitoIdentityUserPoolConfiguration = AWSCognitoIdentityUserPoolConfiguration.init(clientId: "2g32lvnd3iui7nnul4k4qs8lh3", clientSecret: "of5kkq70mvo4f1i4k7j7b4n8k4imfseed83pd9ia8e6f5i7uuek", poolId: "us-east-1_AqZGFLzds", shouldProvideCognitoValidationData: true, pinpointAppId: "screenshop", migrationEnabled: true)
+        AWSCognitoIdentityUserPool.register(with: serviseConfig, userPoolConfiguration: cognitoIdentityUserPoolConfiguration, forKey: "craze")
+        self.pool = AWSCognitoIdentityUserPool.init(forKey: "craze")
+        super.init()
+//        self.pool?.delegate = self
+
     }
     
     
@@ -188,3 +194,32 @@ class SigninManager {
     
     
 }
+//extension SigninManager : AWSCognitoIdentityInteractiveAuthenticationDelegate {
+//    func startPasswordAuthentication() -> AWSCognitoIdentityPasswordAuthentication {
+//
+//    }
+//
+//    func startMultiFactorAuthentication() -> AWSCognitoIdentityMultiFactorAuthentication {
+//
+//    }
+//
+//    func startRememberDevice() -> AWSCognitoIdentityRememberDevice {
+//
+//    }
+//
+//    func startNewPasswordRequired() -> AWSCognitoIdentityNewPasswordRequired {
+//
+//    }
+//
+//    func startCustomAuthentication() -> AWSCognitoIdentityCustomAuthentication {
+//
+//    }
+//
+//    func startSoftwareMfaSetupRequired() -> AWSCognitoIdentitySoftwareMfaSetupRequired {
+//
+//    }
+//
+//    func startSelectMfa() -> AWSCognitoIdentitySelectMfa {
+//
+//    }
+//}
