@@ -6,7 +6,7 @@
 //  Copyright © 2017 crazeapp. All rights reserved.
 //
 
-import Foundation
+import UIKit
 import SDWebImage
 
 class EmbossedView : UIView {
@@ -17,7 +17,7 @@ class EmbossedView : UIView {
     // MARK: Life Cycle
     
     required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
+        fatalError("init(coder:) has not been implemented")
     }
     
     override init(frame: CGRect) {

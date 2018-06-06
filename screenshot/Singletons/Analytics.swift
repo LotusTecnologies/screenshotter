@@ -41,17 +41,19 @@ class Analytics {
     }
     
     static func uscExperience() -> String {
-        let uscExperience: String
-        if UserDefaults.standard.object(forKey: UserDefaultsKeys.isUSC) == nil {
-            uscExperience = "unset"
-        } else if UserDefaults.standard.bool(forKey: UserDefaultsKeys.isUSC) {
-            uscExperience = "full-usc"
-        } else if UserDefaults.standard.bool(forKey: UserDefaultsKeys.abUSC) {
-            uscExperience = "usc-feed-external-ui"
-        } else {
-            uscExperience = "non-usc"
-        }
-        return uscExperience
+//        let uscExperience: String
+//        if UserDefaults.standard.object(forKey: UserDefaultsKeys.isUSC) == nil {
+//            uscExperience = "unset"
+//        } else if UserDefaults.standard.bool(forKey: UserDefaultsKeys.isUSC) {
+//            uscExperience = "full-usc"
+//        } else if UserDefaults.standard.bool(forKey: UserDefaultsKeys.abUSC) {
+//            uscExperience = "usc-feed-external-ui"
+//        } else {
+//            uscExperience = "non-usc"
+//        }
+//        return uscExperience
+        // Revert to never use USC.
+        return "non-usc"
     }
     
     static func propertiesFor(_ matchstick:Matchstick) -> [String:Any] {
@@ -141,7 +143,21 @@ class Analytics {
         if let category = shoppable.label {
             properties["shoppable-category"] = category
         }
-        
+        if let parent = shoppable.parentShoppable {
+            if let offer = parent.offersURL {
+                properties["shoppable-parentOfferUrl"] = offer
+            }
+            properties["shoppable-isBurrow"] = true
+
+            properties["shoppable-burrowsCount"] =  parent.subShoppables?.count ?? 0
+        }else{
+            properties["shoppable-isBurrow"] = false
+            let otherBurrows =  shoppable.subShoppables?.count ?? 0
+            properties["shoppable-burrowsCount"] = otherBurrows
+        }
+
+       
+
         
         if let screenshot = shoppable.screenshot {
             propertiesFor(screenshot).forEach { properties[$0] = $1 }

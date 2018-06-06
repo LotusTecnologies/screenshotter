@@ -20,23 +20,29 @@ class AsyncOperationMonitor {
     private(set) var didStart = false
     let tags:[AsyncOperationTag]
     let queueUUIDs:[UUID]
-    init(tags:[AsyncOperationTag], queues:[AsyncOperationQueue], delegate:AsyncOperationMonitorDelegate) {
+    init(tags:[AsyncOperationTag], queues:[AsyncOperationQueue], delegate:AsyncOperationMonitorDelegate?) {
         self.tags = tags
         self.delegate = delegate
-        self.queueUUIDs = queues.map{ $0.uuid }
-        self.didStart = self.calculateDidStart()
+        let queueUUIDs = queues.map{ $0.uuid }
+        self.queueUUIDs = queueUUIDs
+        self.didStart = self.calculateDidStart(tags: tags, queueUUIDS: queueUUIDs)
 
         NotificationCenter.default.addObserver(self, selector: #selector(asyncOperationDidChange(_:)), name: .AsyncOperationTagMonitorCenterDidChange, object: nil)
     }
     
-    private func calculateDidStart() -> Bool{
+    private func calculateDidStart(tags:[AsyncOperationTag], queueUUIDS:[UUID]) -> Bool{
         var count = 0
-        self.tags.forEach { (tag) in
-            self.queueUUIDs.forEach({ (uuid) in
+        tags.forEach { (tag) in
+            queueUUIDs.forEach({ (uuid) in
                 count +=  AsyncOperationMonitorCenter.shared.countFor(tag: tag, queue: uuid)
             })
         }
         return count > 0
+    }
+
+    
+    private func calculateDidStart() -> Bool{
+       return self.calculateDidStart(tags: self.tags, queueUUIDS: self.queueUUIDs)
     }
     @objc private func asyncOperationDidChange(_ notification:Notification){
         if let userInfo = notification.userInfo, let changedTags = userInfo["tags"] as? [AsyncOperationTag], let queueUUID = userInfo["queueUUID"] as? UUID {
@@ -73,30 +79,30 @@ class AsyncOperationMonitorCenter {
     
     
     
-    public func registerStarted(_ op:AsyncOperation) {
-        if let queueUUID = op.queueUuid {
+    public func registerStarted(queueUUID:UUID?, tags:[AsyncOperationTag]?) {
+        if let queueUUID = queueUUID, let tags = tags {
             var queueDict = self.runningTags[queueUUID] ?? [:]
-            for tag in op.tags {
+            for tag in tags {
                 var tagDict = queueDict[tag.type] ?? [:]
                 tagDict[tag.value] = (tagDict[tag.value] ?? 0) + 1
                 queueDict[tag.type] = tagDict
             }
             self.runningTags[queueUUID] = queueDict
-            NotificationCenter.default.post(name: .AsyncOperationTagMonitorCenterDidChange, object: nil, userInfo: ["tags":op.tags,"queueUUID":(op.queueUuid ?? "")])
+            NotificationCenter.default.post(name: .AsyncOperationTagMonitorCenterDidChange, object: nil, userInfo: ["tags":tags,"queueUUID":queueUUID.uuidString])
         }
 
     }
     
-    public func registerStopped(_ op:AsyncOperation) {
-        if let queueUUID = op.queueUuid {
+    public func registerStopped(queueUUID:UUID?, tags:[AsyncOperationTag]?) {
+        if let queueUUID = queueUUID, let tags = tags {
             var queueDict = self.runningTags[queueUUID] ?? [:]
-            for tag in op.tags {
+            for tag in tags {
                 var tagDict = queueDict[tag.type] ?? [:]
                 tagDict[tag.value] = (tagDict[tag.value] ?? 1) - 1
                 queueDict[tag.type] = tagDict
             }
             self.runningTags[queueUUID] = queueDict
-            NotificationCenter.default.post(name: .AsyncOperationTagMonitorCenterDidChange, object: nil, userInfo: ["tags":op.tags,"queueUUID":(op.queueUuid ?? "")])
+            NotificationCenter.default.post(name: .AsyncOperationTagMonitorCenterDidChange, object: nil, userInfo: ["tags":tags,"queueUUID":queueUUID])
         }
     }
     
@@ -140,7 +146,7 @@ class AsyncOperationQueue : OperationQueue {
     override func addOperation(_ op: Operation) {
         if let op = op as? AsyncOperation {
             op.queueUuid = self.uuid
-            AsyncOperationMonitorCenter.shared.registerStarted(op)
+            AsyncOperationMonitorCenter.shared.registerStarted(queueUUID: uuid, tags: op.tags)
         }
         super.addOperation(op)
     }
@@ -207,9 +213,11 @@ class AsyncOperation: Operation {
     }
     
     override func main() {
+        let tags = self.tags
+        let localQueueUUID = self.queueUuid
         guard isCancelled == false else {
             finish(true)
-            AsyncOperationMonitorCenter.shared.registerStopped(self)
+            AsyncOperationMonitorCenter.shared.registerStopped(queueUUID: localQueueUUID, tags: tags)
             return
         }
         
@@ -220,7 +228,7 @@ class AsyncOperation: Operation {
                 if !self.isFinished {
                     self.executing(false)
                     self.finish(true)
-                    AsyncOperationMonitorCenter.shared.registerStopped(self)
+                    AsyncOperationMonitorCenter.shared.registerStopped(queueUUID: localQueueUUID, tags: tags)
                     //print("operation completed - timeout \(date.timeIntervalSinceNow)")
                 }
             })
@@ -230,7 +238,7 @@ class AsyncOperation: Operation {
                 if !self.isFinished {
                     self.executing(false)
                     self.finish(true)
-                    AsyncOperationMonitorCenter.shared.registerStopped(self)
+                    AsyncOperationMonitorCenter.shared.registerStopped(queueUUID: localQueueUUID, tags: tags)
                     //print("operation completed \(date.timeIntervalSinceNow)")
                     
                 }else{
@@ -241,7 +249,7 @@ class AsyncOperation: Operation {
             print("CRITICAL bug in asyncOperation")
             self.executing(false)
             self.finish(true)
-            AsyncOperationMonitorCenter.shared.registerStopped(self)
+            AsyncOperationMonitorCenter.shared.registerStopped(queueUUID: localQueueUUID, tags: tags)
         }
         self.executionBlock = nil
     }
@@ -269,7 +277,7 @@ extension AsyncOperation {
 }
 
 extension AsyncOperationMonitor {
-    convenience init(assetId:String?, shoppableId:String?, queues:[AsyncOperationQueue], delegate:AsyncOperationMonitorDelegate) {
+    convenience init(assetId:String?, shoppableId:String?, queues:[AsyncOperationQueue], delegate:AsyncOperationMonitorDelegate?) {
         var tags:[AsyncOperationTag] = []
         if let assetId = assetId {
             tags.append(AsyncOperationTag.init(type: .assetId, value: assetId))
@@ -280,7 +288,7 @@ extension AsyncOperationMonitor {
         self.init(tags: tags, queues:queues, delegate: delegate)
     }
     
-    convenience init(tracking partNumbers:[String], delegate:AsyncOperationMonitorDelegate) {
+    convenience init(tracking partNumbers:[String], delegate:AsyncOperationMonitorDelegate?) {
         var tags:[AsyncOperationTag] = []
         partNumbers.forEach { tags.append(AsyncOperationTag.init(type: .productNumber, value: $0)) }
         
