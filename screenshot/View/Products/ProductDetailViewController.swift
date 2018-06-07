@@ -15,8 +15,18 @@ class ProductDetailViewController: BaseViewController {
     var collectionView:UICollectionView?
     var product:Product?
     var products:[Product] = []
-    var uuid:String?
+    var shoppable:Shoppable?
+    var productsOptions:ProductsOptions = ProductsOptions()
 
+    var uuid:String?
+    var productsLoadingMonitor:AsyncOperationMonitor?
+    fileprivate var productsFRC: FetchedResultsControllerManager<Product>?
+
+    var productLoadingState:ProductsViewControllerState = .unknown {
+        didSet {
+            self.syncViewsAfterStateChange()
+        }
+    }
     var headerCell:ProductHeaderCollectionViewCell? {
         if self.collectionView?.numberOfSections ?? 0 > 0 && self.collectionView?.numberOfItems(inSection: 0) ?? 0 > 0 {
             return self.collectionView?.cellForItem(at: IndexPath.init(row: 0, section: 0)) as? ProductHeaderCollectionViewCell
@@ -28,6 +38,16 @@ class ProductDetailViewController: BaseViewController {
         
         super.viewDidLoad()
         self.title = product?.calculatedDisplayTitle
+        
+        
+        if let shoppable = self.shoppable {
+            productsFRC = DataModel.sharedInstance.productFrc(delegate: self, shoppableOID: shoppable.objectID)
+            
+            self.products = self.productCollectionViewManager.productsForShoppable(shoppable, productsOptions: self.productsOptions).filter{ $0.objectID != self.product?.objectID}
+            self.productsLoadingMonitor = AsyncOperationMonitor.init(assetId: nil, shoppableId: shoppable.imageUrl, queues: AssetSyncModel.sharedInstance.queues, delegate: self)
+            self.updateLoadingState()
+        }
+        
         let collectionView:UICollectionView = {
             let minimumSpacing = self.collectionViewMinimumSpacing()
             
@@ -39,8 +59,6 @@ class ProductDetailViewController: BaseViewController {
             collectionView.delegate = self
             collectionView.dataSource = self
             collectionView.backgroundColor = self.view.backgroundColor
-            // TODO: set the below to interactive and comment the dismissal in -scrollViewWillBeginDragging.
-            // Then test why the control view (products options view) jumps before being dragged away.
             collectionView.keyboardDismissMode = .onDrag
             self.productCollectionViewManager.setup(collectionView: collectionView)
             
@@ -55,11 +73,26 @@ class ProductDetailViewController: BaseViewController {
         self.collectionView = collectionView
         
         
-        
-        
+        let pinchZoom = UIPinchGestureRecognizer.init(target: self, action: #selector(pinch(gesture:)))
+        self.view.addGestureRecognizer(pinchZoom)
         
     }
-
+    
+    @objc func pinch( gesture:UIPinchGestureRecognizer) {
+        if CrazeImageZoom.shared.isHandlingGesture, let imageView = CrazeImageZoom.shared.hostedImageView  {
+            CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: imageView)
+            return
+        }
+        let point = gesture.location(in: self.collectionView)
+        if let collectionView = self.collectionView, let indexPath = collectionView.indexPathForItem(at: point),  let cell = collectionView.cellForItem(at: indexPath){
+            if let cell = cell as? ProductsCollectionViewCell, let imageView = cell.productImageView {
+                CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: imageView)
+            }else if let cell = cell as? ProductHeaderCollectionViewCell {
+                let imageView = cell.productImageView.imageView
+                CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: imageView)
+            }
+        }
+    }
 }
 
 
@@ -201,3 +234,63 @@ extension ProductDetailViewController : UICollectionViewDelegateFlowLayout, UICo
     
 }
 
+
+
+
+extension ProductDetailViewController : AsyncOperationMonitorDelegate, FetchedResultsControllerManagerDelegate {
+    func syncViewsAfterStateChange() {
+
+        switch (self.productLoadingState) {
+        case .loading, .unknown:
+            break;
+            
+            
+        case .products:
+            
+            break;
+            
+            
+        case .retry:
+            break;
+        }
+    }
+    
+    func updateLoadingState(){
+        DispatchQueue.main.async {
+           
+            let isProductLoading = self.productsLoadingMonitor?.didStart ?? false
+            let productState:ProductsViewControllerState = {
+                if self.products.count > 0 {
+                    return .products
+                }else{
+                    if isProductLoading {
+                        return .loading
+                    }else{
+                        return .retry
+                    }
+                }
+            }()
+            if productState != self.productLoadingState {
+                self.productLoadingState = productState
+            }
+        }
+    }
+    
+    func asyncOperationMonitorDidChange(_ monitor: AsyncOperationMonitor) {
+        self.updateLoadingState()
+    }
+    func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
+        if let shoppable = self.shoppable {
+            self.products = self.productCollectionViewManager.productsForShoppable(shoppable, productsOptions: self.productsOptions)
+        }
+        self.updateLoadingState()
+        if view.window != nil, let collectionView = collectionView {
+            if change.updatedRows.count > 0 && change.deletedRows.count == 0 && change.insertedRows.count == 0 {
+                collectionView.reloadItems(at: collectionView.indexPathsForVisibleItems)
+            }else{
+                collectionView.reloadData()
+            }
+        }
+        
+    }
+}

@@ -73,7 +73,7 @@ class ProductHeaderCollectionViewCell: UICollectionViewCell {
         
         
         productImageView.translatesAutoresizingMaskIntoConstraints = false
-        productImageView.contentMode = .scaleAspectFill
+        productImageView.contentMode = .scaleAspectFit
         productImageView.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: -.padding)
         contentView.addSubview(productImageView)
         productImageView.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true

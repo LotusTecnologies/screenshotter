@@ -107,24 +107,97 @@ class ProductCollectionViewManager {
     
     
     public func burrow(cell:ProductsCollectionViewCell, product: Product, fromVC: UIViewController) {
+        AssetSyncModel.sharedInstance.addSubShoppable(fromProduct: product).then { shoppable -> Void in
+            let uuid = UUID().uuidString
+            cell.productImageView?.hero.id = "\(uuid)-image"
+            cell.favoriteControl.hero.id = "\(uuid)-heart"
+            
+            
+            fromVC.hero.isEnabled = true
+            
+            let vc = ProductDetailViewController.init()
+            vc.product = product
+            vc.shoppable = shoppable
+            vc.uuid = uuid
+            let _ = vc.view
+            
+            fromVC.navigationController?.hero.isEnabled = true
+            fromVC.navigationController?.pushViewController(vc, animated: true)
+            fromVC.navigationController?.hero.isEnabled = false
+            
+            Analytics.trackProductBurrow(product: product, order: nil, sort: nil)
+        }
 
-        let uuid = UUID().uuidString
-        cell.productImageView?.hero.id = "\(uuid)-image"
-        cell.favoriteControl.hero.id = "\(uuid)-heart"
+      
+    }
+    
+    public func noProductsView() -> (HelperView, MainButton) {
+        let verPadding: CGFloat = .extendedPadding
+        let horPadding: CGFloat = .padding
 
+       let helperView = HelperView()
+        helperView.translatesAutoresizingMaskIntoConstraints = false
+        helperView.layoutMargins = UIEdgeInsets(top: verPadding, left: horPadding, bottom: verPadding, right: horPadding)
+        helperView.titleLabel.text = "products.helper.title".localized
+        helperView.subtitleLabel.text = "products.helper.message".localized
+        helperView.contentImage = UIImage(named: "ProductsEmptyListGraphic")
         
-        fromVC.hero.isEnabled = true
+        let retryButton = MainButton()
+        retryButton.translatesAutoresizingMaskIntoConstraints = false
+        retryButton.backgroundColor = .crazeGreen
+        retryButton.setTitle("products.helper.retry".localized, for: .normal)
+        helperView.controlView.addSubview(retryButton)
+        retryButton.topAnchor.constraint(equalTo: helperView.controlView.topAnchor).isActive = true
+        retryButton.leadingAnchor.constraint(greaterThanOrEqualTo: helperView.controlView.layoutMarginsGuide.leadingAnchor).isActive = true
+        retryButton.bottomAnchor.constraint(equalTo: helperView.controlView.bottomAnchor).isActive = true
+        retryButton.trailingAnchor.constraint(greaterThanOrEqualTo: helperView.controlView.layoutMarginsGuide.trailingAnchor).isActive = true
+        retryButton.centerXAnchor.constraint(equalTo: helperView.contentView.centerXAnchor).isActive = true
+        return (helperView, retryButton)
+    }
+    
+    func productsForShoppable(_ shoppable:Shoppable, productsOptions:ProductsOptions) -> [Product] {
         
-        let vc = ProductDetailViewController.init()
-        vc.product = product
-        vc.uuid = uuid
-        vc.products = product.shoppable?.products?.allObjects as? [Product] ?? []
-        let _ = vc.view
+        func stockOrder(a: Product, b: Product) -> Bool? {
+            if a.hasVariants && !b.hasVariants {
+                return true
+            } else if !a.hasVariants && b.hasVariants {
+                return false
+            } else {
+                return nil
+            }
+        }
+        func titleOrder(a: Product, b: Product) -> Bool? {
+            if let aDisplayTitle = a.calculatedDisplayTitle?.lowercased(),
+                let bDisplayTitle = b.calculatedDisplayTitle?.lowercased(),
+                aDisplayTitle != bDisplayTitle {
+                return aDisplayTitle < bDisplayTitle
+            } else if a.calculatedDisplayTitle == nil && b.calculatedDisplayTitle != nil {
+                return false // Empty brands at end
+            } else if a.calculatedDisplayTitle != nil && b.calculatedDisplayTitle == nil {
+                return true // Empty brands at end
+            } else {
+                return nil
+            }
+        }
+        if let mask = shoppable.getLast()?.rawValue,
+            var products = shoppable.products?.filtered(using: NSPredicate(format: "(optionsMask & %d) == %d", mask, mask)) as? Set<Product> {
+            if productsOptions.sale == .sale {
+                products = products.filter { $0.floatPrice < $0.floatOriginalPrice }
+            }
+            let productArray: [Product]
+            switch productsOptions.sort {
+            case .similar :
+                productArray = products.sorted { stockOrder(a: $0, b: $1) ?? ($0.order < $1.order) }
+            case .priceAsc :
+                productArray = products.sorted { stockOrder(a: $0, b: $1) ?? ($0.floatPrice < $1.floatPrice) }
+            case .priceDes :
+                productArray = products.sorted { stockOrder(a: $0, b: $1) ?? ($0.floatPrice > $1.floatPrice) }
+            case .brands :
+                productArray = products.sorted { stockOrder(a: $0, b: $1) ?? titleOrder(a: $0, b: $1) ?? ($0.order < $1.order) }
+            }
+            return productArray
+        }
         
-        fromVC.navigationController?.hero.isEnabled = true
-        fromVC.navigationController?.pushViewController(vc, animated: true)
-        fromVC.navigationController?.hero.isEnabled = false
-        
-        Analytics.trackProductBurrow(product: product, order: nil, sort: nil)
+        return []
     }
 }
