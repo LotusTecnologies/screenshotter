@@ -129,29 +129,6 @@ class SettingsViewController : BaseViewController {
         tableView.addGestureRecognizer(tapper)
     }
     
-    @objc func didTripleTapTableView(_ tapper:UITapGestureRecognizer){
-        if tapper.state == .recognized {
-            if let index = self.indexPath(for: .version, in: .about), let cell = self.tableView.cellForRow(at: index) {
-                let point = tapper.location(in: cell)
-                if cell.bounds.contains(point) {
-                    let enabled = UserDefaults.standard.bool(forKey: UserDefaultsKeys.showsDebugAnalyticsUI)
-                    if enabled {
-                        UserDefaults.standard.set(false, forKey: UserDefaultsKeys.showsDebugAnalyticsUI)
-                    }else{
-                        UserDefaults.standard.set(true, forKey: UserDefaultsKeys.showsDebugAnalyticsUI)
-                    }
-                    if let viewController = AppDelegate.shared.window?.rootViewController {
-                        let announcement = Announcement(title: "Analytics debug UI", subtitle: (enabled ? "Disabled":"Enabled"), image: nil, duration:10.0, action:{
-                        })
-                        Whisper.show(shout: announcement, to: viewController, completion: {
-                        })
-                    }
-                }
-                
-            }
-        }
-    }
-    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
@@ -847,6 +824,33 @@ extension SettingsViewController : UITextFieldDelegate {
     }
 }
 
+// MARK: - Debug
+
+extension SettingsViewController {
+    @objc func didTripleTapTableView(_ tapper:UITapGestureRecognizer){
+        if tapper.state == .recognized {
+            if let index = self.indexPath(for: .version, in: .about), let cell = self.tableView.cellForRow(at: index) {
+                let point = tapper.location(in: cell)
+                if cell.bounds.contains(point) {
+                    let enabled = UserDefaults.standard.bool(forKey: UserDefaultsKeys.showsDebugAnalyticsUI)
+                    if enabled {
+                        UserDefaults.standard.set(false, forKey: UserDefaultsKeys.showsDebugAnalyticsUI)
+                    }else{
+                        UserDefaults.standard.set(true, forKey: UserDefaultsKeys.showsDebugAnalyticsUI)
+                    }
+                    if let viewController = AppDelegate.shared.window?.rootViewController {
+                        let announcement = Announcement(title: "Analytics debug UI", subtitle: (enabled ? "Disabled":"Enabled"), image: nil, duration:10.0, action:{
+                        })
+                        Whisper.show(shout: announcement, to: viewController, completion: {
+                        })
+                    }
+                }
+                
+            }
+        }
+    }
+}
+
 // MARK: - Tutorial
 
 extension SettingsViewController : VideoDisplayingViewControllerDelegate {
@@ -863,8 +867,6 @@ extension SettingsViewController : VideoDisplayingViewControllerDelegate {
 // MARK: - Mail
 
 extension SettingsViewController : MFMailComposeViewControllerDelegate {
-  
-   
     func presentMail(recipient:String, gmailMessage:String, subject:String, message:String ){
         if MFMailComposeViewController.canSendMail() {
             let mail = MFMailComposeViewController()
