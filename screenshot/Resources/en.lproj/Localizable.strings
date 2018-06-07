@@ -231,13 +231,12 @@
 "product.alert.price" = "Price alert: Your fav just dropped to %@, get it quick!!";
 "product.alert.price_stock" = "In-stock alert: Your fav just dropped to %@, get it quick!!";
 "product.alert.stock" = "In-stock alert: Your fav just became available, get it quick!!";
-"product.buy" = "BUY";
+"product.buy" = "Buy";
 "product.buy_now" = "Buy Now";
 "product.color.default" = "Color";
 "product.next_step.cancel" = "Continue Shopping";
 "product.next_step.continue" = "Go to Cart";
 "product.next_step.added" = "Product was added to your cart!";
-"product.out_of_stock" = "OUT OF STOCK";
 "product.price_alert_on" = "NOTIFY ME WHEN IN STOCK";
 "product.price_alert_off" = "IN-STOCK ALERT ON";
 "product.similar_items" = "Related Items";

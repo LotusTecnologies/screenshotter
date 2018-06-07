@@ -128,7 +128,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
             let layout = SectionBackgroundCollectionViewFlowLayout()
             layout.minimumInteritemSpacing = minimumSpacing.x
             layout.minimumLineSpacing = minimumSpacing.y
-
+            
             let collectionView = UICollectionView(frame: self.view.bounds, collectionViewLayout: layout)
             collectionView.translatesAutoresizingMaskIntoConstraints = false
             collectionView.delegate = self
@@ -460,8 +460,9 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         if sectionType == .product {
             let columns = CGFloat(numberOfCollectionViewProductColumns)
             size.width = floor((collectionView.bounds.size.width - (padding * (columns + 1))) / columns)
-            size.height = ProductsCollectionViewCell.cellHeight(for: size.width, withBottomLabel: true)
-        }else if sectionType == .relatedLooks {
+            size.height = ProductsCollectionViewCell.cellHeight(for: size.width, withActionButton: true)
+        }
+        else if sectionType == .relatedLooks {
             if let _ = self.relatedLooks?.value {
                 let columns = CGFloat(numberOfCollectionViewProductColumns)
                 size.width = floor((collectionView.bounds.size.width - (padding * (columns + 1))) / columns)
@@ -517,8 +518,8 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
                 cell.isSale = product.isSale()
                 cell.favoriteControl.isSelected = product.isFavorite
                 cell.favoriteControl.addTarget(self, action: #selector(productCollectionViewCellFavoriteAction(_:event:)), for: .touchUpInside)
-                cell.productViewControl.addTarget(self, action: #selector(productCollectionViewCellProductAction(_:event:)), for: .touchUpInside)
-                cell.actionType = product.hasVariants || product.dateCheckedStock == nil ? .buy : .outStock
+                cell.actionButton.addTarget(self, action: #selector(productCollectionViewCellBuyAction(_:event:)), for: .touchUpInside)
+                cell.actionType = .buy
                 return cell
             }
         }else if sectionType == .relatedLooks {
@@ -596,12 +597,13 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
 
         if sectionType == .product {
             let product = self.productAtIndex(indexPath.item)
-            product.recordViewedProduct()
             
-            if let productViewController = presentProduct(product, atLocation: .products) {
-                productViewController.similarProducts = products
+            Analytics.trackProductBurrow(product: product, order: nil, sort: nil)
+            AssetSyncModel.sharedInstance.addSubShoppable(fromProduct: product).then { shoppable -> Void in
+                self.addSubShoppableCompletion(shoppable: shoppable)
             }
-        }else if sectionType == .relatedLooks {
+        }
+        else if sectionType == .relatedLooks {
             if let relatedLooks = self.relatedLooks?.value {
                 if relatedLooks.count > indexPath.row {
                     let url = relatedLooks[indexPath.row]
@@ -651,16 +653,16 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         self.updateLoadingState()
     }
     
-    @objc func productCollectionViewCellProductAction(_ control: UIControl, event: UIEvent) {
+    @objc func productCollectionViewCellBuyAction(_ control: UIControl, event: UIEvent) {
         guard let indexPath = collectionView?.indexPath(for: event) else {
-                return
+            return
         }
         
+        let product = self.productAtIndex(indexPath.item)
+        product.recordViewedProduct()
         
-        let product = self.productAtIndex(indexPath.row)
-        Analytics.trackProductBurrow(product: product, order: nil, sort: nil)
-        AssetSyncModel.sharedInstance.addSubShoppable(fromProduct: product).then { (shoppable) -> Void in
-            self.addSubShoppableCompletion(shoppable: shoppable)
+        if let productViewController = presentProduct(product, atLocation: .products) {
+            productViewController.similarProducts = products
         }
     }
 }
