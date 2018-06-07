@@ -88,7 +88,6 @@ class ProductsCollectionViewCell : UICollectionViewCell {
     var originalPriceLabelWidthConstraint:NSLayoutConstraint?
     
     fileprivate var saleView: SaleView?
-    fileprivate let externalPreviewImageView = UIImageView(image: UIImage(named: "ProductsArrowExitingBox"))
     
     static let labelFont = UIFont.systemFont(ofSize: 17)
     static let labelVerticalPadding:CGFloat = 6.0
@@ -129,15 +128,6 @@ class ProductsCollectionViewCell : UICollectionViewCell {
         }()
         self.productView = productView
         
-        let topLabelContainerView = UIView()
-        topLabelContainerView.translatesAutoresizingMaskIntoConstraints = false
-        contentView.addSubview(topLabelContainerView)
-        topLabelContainerView.topAnchor.constraint(equalTo: productView.bottomAnchor).isActive = true
-        topLabelContainerView.leadingAnchor.constraint(greaterThanOrEqualTo: productView.leadingAnchor).isActive = true
-        topLabelContainerView.trailingAnchor.constraint(lessThanOrEqualTo: productView.trailingAnchor).isActive = true
-        topLabelContainerView.centerXAnchor.constraint(equalTo: productView.centerXAnchor).isActive = true
-        topLabelContainerView.heightAnchor.constraint(equalToConstant: ProductsCollectionViewCell.titleLabelHeight).isActive = true
-        
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.numberOfLines = ProductsCollectionViewCell.titleLabelNumberOfLines
         titleLabel.minimumScaleFactor = 0.7
@@ -145,30 +135,18 @@ class ProductsCollectionViewCell : UICollectionViewCell {
         titleLabel.adjustsFontSizeToFitWidth = true
         titleLabel.textAlignment = .center
         titleLabel.font = ProductsCollectionViewCell.labelFont
-        topLabelContainerView.addSubview(titleLabel)
-        titleLabel.topAnchor.constraint(equalTo: topLabelContainerView.topAnchor).isActive = true
-        titleLabel.leadingAnchor.constraint(equalTo: topLabelContainerView.leadingAnchor).isActive = true
-        titleLabel.bottomAnchor.constraint(equalTo: topLabelContainerView.bottomAnchor).isActive = true
-        
-        externalPreviewImageView.translatesAutoresizingMaskIntoConstraints = false
-        externalPreviewImageView.layoutMargins = .zero
-        externalPreviewImageView.isHidden = true
-        externalPreviewImageView.contentMode = .scaleAspectFit
-        topLabelContainerView.addSubview(externalPreviewImageView)
-        externalPreviewImageView.setContentCompressionResistancePriority(UILayoutPriority.required, for: .horizontal)
-        externalPreviewImageView.topAnchor.constraint(equalTo: topLabelContainerView.topAnchor).isActive = true
-        externalPreviewImageView.layoutMarginsGuide.leadingAnchor.constraint(equalTo: titleLabel.trailingAnchor).isActive = true
-        externalPreviewImageView.bottomAnchor.constraint(equalTo: topLabelContainerView.bottomAnchor).isActive = true
-        externalPreviewImageView.trailingAnchor.constraint(equalTo: topLabelContainerView.trailingAnchor).isActive = true
-        externalPreviewImageViewWidthConstraint = externalPreviewImageView.widthAnchor.constraint(equalToConstant: 0)
-        externalPreviewImageViewWidthConstraint?.isActive = true
+        contentView.addSubview(titleLabel)
+        titleLabel.topAnchor.constraint(equalTo: productView.bottomAnchor).isActive = true
+        titleLabel.leadingAnchor.constraint(equalTo: productView.leadingAnchor).isActive = true
+        titleLabel.trailingAnchor.constraint(equalTo: productView.trailingAnchor).isActive = true
+        titleLabel.heightAnchor.constraint(equalToConstant: ProductsCollectionViewCell.titleLabelHeight).isActive = true
         
         let priceContainer:UIView = {
             let view = UIView()
             view.translatesAutoresizingMaskIntoConstraints = false
             self.contentView.addSubview(view)
             
-            view.topAnchor.constraint(equalTo: topLabelContainerView.bottomAnchor).isActive = true
+            view.topAnchor.constraint(equalTo: titleLabel.bottomAnchor).isActive = true
             view.leadingAnchor.constraint(greaterThanOrEqualTo: productView.leadingAnchor).isActive = true
             view.bottomAnchor.constraint(lessThanOrEqualTo: self.contentView.bottomAnchor).isActive = true
             view.trailingAnchor.constraint(lessThanOrEqualTo: productView.trailingAnchor).isActive = true
@@ -294,22 +272,6 @@ class ProductsCollectionViewCell : UICollectionViewCell {
     
     // MARK: External Indicator
     
-    fileprivate var externalPreviewImageViewWidthConstraint: NSLayoutConstraint?
-    
-    var hasExternalPreview = false {
-        didSet {
-            if hasExternalPreview {
-                externalPreviewImageView.isHidden = false
-                externalPreviewImageView.layoutMargins = UIEdgeInsets(top: 0, left: -6, bottom: 0, right: 0)
-                externalPreviewImageViewWidthConstraint?.isActive = false
-            }
-            else {
-                externalPreviewImageView.isHidden = true
-                externalPreviewImageView.layoutMargins = .zero
-                externalPreviewImageViewWidthConstraint?.isActive = true
-            }
-        }
-    }
     var productImageView: UIImageView? {
         return self.productView?.imageView
     }

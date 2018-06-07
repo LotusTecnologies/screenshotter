@@ -19,8 +19,8 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
     
     weak var lifeCycleDelegate: ViewControllerLifeCycle?
     
-    let favoritesNavigationController = FavoritesNavigationController()
     let screenshotsNavigationController = ScreenshotsNavigationController()
+    let favoritesNavigationController = FavoritesNavigationController()
     let discoverNavigationController = DiscoverNavigationController()
     let profileNavigationController = ProfileNavigationController()
     let cartNavigationController = CartNavigationController()
@@ -51,15 +51,15 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
             return tabBarItem
         }
         
+        screenshotsNavigationController.screenshotsNavigationControllerDelegate = self
+        screenshotsNavigationController.title = screenshotsNavigationController.screenshotsViewController.title
+        screenshotsNavigationController.tabBarItem = createTabBarItem(title: screenshotsNavigationController.title, imageNamed: "TabBarScreenshot", tag: .screenshots)
+        
         favoritesNavigationController.title = favoritesNavigationController.favoritesViewController.title
         favoritesNavigationController.tabBarItem = createTabBarItem(title: favoritesNavigationController.title, imageNamed: "TabBarHeart", tag: .favorites)
         
         discoverNavigationController.title = discoverNavigationController.discoverScreenshotViewController.title
         discoverNavigationController.tabBarItem = createTabBarItem(title: discoverNavigationController.title, imageNamed: "TabBarGlobe", tag: .discover)
-        
-        screenshotsNavigationController.screenshotsNavigationControllerDelegate = self
-        screenshotsNavigationController.title = screenshotsNavigationController.screenshotsViewController.title
-        screenshotsNavigationController.tabBarItem = createTabBarItem(title: screenshotsNavigationController.title, imageNamed: "TabBarScreenshot", tag: .screenshots)
         
         profileNavigationController.title = profileNavigationController.profileViewController.title
         profileNavigationController.tabBarItem = createTabBarItem(title: profileNavigationController.title, imageNamed: "TabBarUser", tag: .profile)
@@ -72,9 +72,9 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         self.restorationIdentifier = String(describing: type(of: self))
     
         var viewControllerList =  [
+            screenshotsNavigationController,
             favoritesNavigationController,
             discoverNavigationController,
-            screenshotsNavigationController,
             profileNavigationController
         ]
         if UIApplication.isUSC {
@@ -105,6 +105,7 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         DispatchQueue.mainAsyncIfNeeded {
             let index = self.selectedIndex
             var viewControllerList = [
+                self.screenshotsNavigationController,
                 self.favoritesNavigationController,
                 self.discoverNavigationController,
                 self.screenshotsNavigationController,
