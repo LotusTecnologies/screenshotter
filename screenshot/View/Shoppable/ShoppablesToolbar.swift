@@ -21,12 +21,6 @@ class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UIColle
     var collectionView:UICollectionView?
     var screenshotImage:UIImage
     var shoppablesController:FetchedResultsControllerManager<Shoppable>
-    var rootShoppableObjectId:NSManagedObjectID? {
-        didSet {
-            shoppables = shoppablesController.fetchedObjects.filter { $0.parentShoppable?.objectID == rootShoppableObjectId }
-            self.collectionView?.reloadData()
-        }
-    }
     
     var shoppables:[Shoppable] = []
     var shoppableObjectIdToSelectWhenControllerChanges:NSManagedObjectID?
@@ -121,7 +115,7 @@ class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UIColle
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.delegate = self
         collectionView.dataSource = self
-        collectionView.backgroundColor = .clear
+        collectionView.backgroundColor = .white
         collectionView.scrollsToTop = false
         collectionView.contentInset = UIEdgeInsets.init(top: p2, left: p, bottom: p2, right: p)
         collectionView.showsHorizontalScrollIndicator = false
@@ -140,11 +134,11 @@ class ShoppablesToolbar : UIToolbar, UICollectionViewDelegateFlowLayout, UIColle
         if let index = self.collectionView?.indexPathsForSelectedItems?.first?.item {
             selected = shoppables[index]
         }
-        shoppables = shoppablesController.fetchedObjects.filter { $0.parentShoppable?.objectID == rootShoppableObjectId }
+        shoppables = shoppablesController.fetchedObjects.filter { $0.parentShoppable?.objectID == nil }
         self.collectionView?.reloadData()
         if let selectedObjectId = shoppableObjectIdToSelectWhenControllerChanges, let shoppable = shoppables.first(where: { $0.objectID == selectedObjectId }) {
             self.shoppableObjectIdToSelectWhenControllerChanges = nil
-            shoppables = shoppablesController.fetchedObjects.filter { $0.parentShoppable?.objectID == rootShoppableObjectId }
+            shoppables = shoppablesController.fetchedObjects.filter { $0.parentShoppable?.objectID == nil }
             self.selectShoppable(shoppable)
             
         }else if let selected = selected, let index = self.shoppables.index(of: selected) {
