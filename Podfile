@@ -13,9 +13,6 @@ target 'screenshot' do
     pod 'SDWebImage', '~> 4.0'
     pod 'Analytics', '~> 3.0'
     pod 'Appsee'
-    pod 'FacebookCore'
-    pod 'FacebookLogin'
-    pod 'FacebookShare'
     pod 'Branch'
     pod 'EggRating'
     pod 'lottie-ios'
@@ -28,6 +25,7 @@ target 'screenshot' do
     pod 'AWSCognito'
     pod 'AWSCognitoAuth'
     pod 'AWSCognitoIdentityProvider'
+    pod 'AWSFacebookSignIn'
 
 end
 

@@ -12,6 +12,7 @@ import AWSCognito
 import AWSCognitoIdentityProviderASF
 import AWSCore
 import AWSCognitoIdentityProvider
+import AWSFacebookSignIn
 
 class SigninManager : NSObject {
    
@@ -34,25 +35,40 @@ class SigninManager : NSObject {
 
     var user:AWSCognitoIdentityUser?
     var pool:AWSCognitoIdentityUserPool?
+//    var anon:AWSAnonymousCredentialsProvider?
+    var facebook = AWSFacebookSignInProvider.sharedInstance()
+    private var userCredential:AWSCredentials?
     
     override init() {
+        
         let credentialsProvider = AWSCognitoCredentialsProvider.init(regionType: .USEast1, identityPoolId: "us-east-1:dfdfa4f8-0991-4af5-9cc7-999eeb98a6b5")
+        
         let serviseConfig = AWSServiceConfiguration.init(region: .USEast1, credentialsProvider: credentialsProvider)
         let cognitoIdentityUserPoolConfiguration = AWSCognitoIdentityUserPoolConfiguration.init(clientId: "2g32lvnd3iui7nnul4k4qs8lh3", clientSecret: "of5kkq70mvo4f1i4k7j7b4n8k4imfseed83pd9ia8e6f5i7uuek", poolId: "us-east-1_AqZGFLzds", shouldProvideCognitoValidationData: true, pinpointAppId: "screenshop", migrationEnabled: true)
         AWSCognitoIdentityUserPool.register(with: serviseConfig, userPoolConfiguration: cognitoIdentityUserPoolConfiguration, forKey: "craze")
         self.pool = AWSCognitoIdentityUserPool.init(forKey: "craze")
+        
+        AWSSignInManager.sharedInstance().register(signInProvider: self.facebook)
         super.init()
+        
 //        self.pool?.delegate = self
 
     }
     
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+        self.facebook.interceptApplication(application, didFinishLaunchingWithOptions: launchOptions)
         return true
     }
     
     func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any]) -> Bool {
-        return false
+        var handled = false
+        if !handled{
+            let source = options[.sourceApplication] as? String
+            let annotation = options[.annotation]
+            handled = self.facebook.interceptApplication(app, open: url, sourceApplication: source, annotation: annotation ?? "")
+        }
+        return handled
     }
     
     private func nserrorToSigninManagerError(_ error:NSError) ->SigninManagerError {
@@ -73,12 +89,37 @@ class SigninManager : NSObject {
         return SigninManagerError.error(error)
     }
     
+    func loginWithFacebook()  -> Promise<Void>{
+        return Promise<Void>.init(resolvers: { (fulfil, reject) in
+            AWSSignInManager.sharedInstance().login(signInProviderKey: self.facebook.identityProviderName, completionHandler: { (result, error) in
+                if let error = error {
+                    let nserror = error as NSError
+                    reject(self.nserrorToSigninManagerError(nserror))
+                }else if let result = result{
+                    if let credentials = result as? AWSCredentials {
+                        self.userCredential = credentials
+                        fulfil(())
+                    }else{
+                        reject(SigninManagerError.notSetup)
+
+                    }
+                }else{
+                    reject(SigninManagerError.notSetup)
+                }
+            })
+        })
+    }
+//    func skipLogin() -> Promise<Void>{
+////        AWSSignInManager.sharedInstance().lo
+//    }
+    
     //If unconfirmed, user must get a confirm code to finialize login
-    func login(email:String, password:String) -> Promise<LoginResult>{
+    func login(email:String, password:String) -> Promise<UserConfirmedStatus>{
         return Promise<UserConfirmedStatus>.init(resolvers: { (fulfil, reject) in
             let emailAttribute = AWSCognitoIdentityUserAttributeType.init(name: "email", value: email)
+            let userName = email.sha1()
             if let pool = self.pool {
-                pool.signUp(email, password: password, userAttributes: [emailAttribute], validationData: nil).continueWith(executor: AWSExecutor.mainThread(), block: { (task) -> Any? in
+                pool.signUp(userName, password: password, userAttributes: [emailAttribute], validationData: nil).continueWith(executor: AWSExecutor.mainThread(), block: { (task) -> Any? in
                     if let error = task.error  {
                         let nserror = error as NSError
                         reject(self.nserrorToSigninManagerError(nserror))
@@ -98,8 +139,9 @@ class SigninManager : NSObject {
             }else{
                 reject(SigninManagerError.notSetup)
             }
-            
         })
+    }
+    
     func isExistingUser(email: String) -> Promise<Bool> {
         return Promise { fulfill, reject in
             fulfill(email == "a@a.aa")
@@ -109,7 +151,7 @@ class SigninManager : NSObject {
     func confirmSignup(code:String) -> Promise<Void>{
         return Promise { fulfill, reject in
             if let user = self.user{
-                user.confirmSignUp(code).continueWith(executor: AWSExecutor.mainThread(), block: { (task) -> Any? in
+                user.confirmSignUp(code, forceAliasCreation: true).continueWith(executor: AWSExecutor.mainThread(), block: { (task) -> Any? in
                     if let error = task.error  {
                         let nserror = error as NSError
                         reject(self.nserrorToSigninManagerError(nserror))
@@ -186,44 +228,15 @@ class SigninManager : NSObject {
     
     func signOut() -> Promise<Void>{
         return Promise { fulfill, reject in
-            if let user = self.user {
-                if user.isSignedIn {
-                    user.signOut()
+            AWSSignInManager.sharedInstance().logout(completionHandler: { (result, error) in
+                if let error = error {
+                    let nserror = error as NSError
+                    reject(self.nserrorToSigninManagerError(nserror))
+
+                }else{
+                    fulfill(())
                 }
-            }
-            fulfill(())
+            })
         }
     }
-    
-    
-    
 }
-//extension SigninManager : AWSCognitoIdentityInteractiveAuthenticationDelegate {
-//    func startPasswordAuthentication() -> AWSCognitoIdentityPasswordAuthentication {
-//
-//    }
-//
-//    func startMultiFactorAuthentication() -> AWSCognitoIdentityMultiFactorAuthentication {
-//
-//    }
-//
-//    func startRememberDevice() -> AWSCognitoIdentityRememberDevice {
-//
-//    }
-//
-//    func startNewPasswordRequired() -> AWSCognitoIdentityNewPasswordRequired {
-//
-//    }
-//
-//    func startCustomAuthentication() -> AWSCognitoIdentityCustomAuthentication {
-//
-//    }
-//
-//    func startSoftwareMfaSetupRequired() -> AWSCognitoIdentitySoftwareMfaSetupRequired {
-//
-//    }
-//
-//    func startSelectMfa() -> AWSCognitoIdentitySelectMfa {
-//
-//    }
-//}

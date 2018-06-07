@@ -8,8 +8,6 @@
 
 import UIKit
 import Appsee
-import FacebookCore
-import FacebookLogin
 
 protocol RegisterViewControllerDelegate: NSObjectProtocol {
     func registerViewControllerDidSkip(_ viewController: RegisterViewController)
@@ -444,32 +442,24 @@ class RegisterViewController: UIViewController {
         {
             SigninManager.shared.login(email: email, password: password)
                 .then { result -> Void in
+                  
+                    
+                    self.registerUser() // ???: Gershon is this needed
+                    
                     switch result {
-                    case .success(let isValidCredentials, let isExistingUser):
-                        if isValidCredentials {
-                            self.registerUser() // ???: Gershon is this needed
-                            
-                            if isExistingUser {
-                                self.delegate?.registerViewControllerDidLogin(self)
-                            }
-                            else {
-                                self.delegate?.registerViewControllerDidSignup(self)
-                            }
-                        }
-                        else {
-                            self._view.emailTextField.isInvalid = true
-                            self._view.passwordTextField.isInvalid = true
-                            self._view.isForgotPasswordButtonHidden = false
-                            ActionFeedbackGenerator().actionOccurred(.nope)
-                        }
+                    case .confirmed:
+                        self.delegate?.registerViewControllerDidLogin(self)
                         
-                    case .failed(let error):
-                        // TDDO: network issue or something else
-                        break
+                    case .unconfirmed:
+                        self.delegate?.registerViewControllerDidSignup(self)
                     }
                 }
                 .catch { error in
-                    
+                    self._view.emailTextField.isInvalid = true
+                    self._view.passwordTextField.isInvalid = true
+                    self._view.isForgotPasswordButtonHidden = false
+                    ActionFeedbackGenerator().actionOccurred(.nope)
+                   
             }
         }
         else {
@@ -518,73 +508,25 @@ class RegisterViewController: UIViewController {
     // MARK: Facebook
     
     @objc fileprivate func facebookLoginAction() {
-        // TODO: use AccessToken to see if user already logged in
-        //        AccessToken.current
-        
-        let loginManager = LoginManager()
-        
-        loginManager.logIn(readPermissions: [.publicProfile, .email], viewController: self) { loginResult in
-            switch loginResult {
-            case .failed(let error):
-                print(error)
-                
-            case .cancelled:
-                print("User cancelled login.")
-                
-            case .success(let grantedPermissions, let declinedPermissions, let accessToken):
-                // TODO: set up user
-                self.fetchUserProfile(accessToken: accessToken)
-                
-                let isExistingUser = false
-                
-                if isExistingUser {
-                    self.delegate?.registerViewControllerDidFacebookLogin(self)
-                }
-                else {
-                    self.delegate?.registerViewControllerDidFacebookSignup(self)
-                }
+       
+        SigninManager.shared.loginWithFacebook().then { (result) -> Void in
+            let isExistingUser = false
+            
+            if isExistingUser {
+                self.delegate?.registerViewControllerDidFacebookLogin(self)
             }
-        }
-    }
-    
-    private func fetchUserProfile(accessToken: AccessToken) {
-        let pictureSize = 480
-        let parameters = ["fields": "id, email, name, picture.width(\(pictureSize)).height(\(pictureSize))"]
-        
-        let graphRequest = GraphRequest(graphPath: "me", parameters: parameters, accessToken: accessToken, httpMethod: .GET, apiVersion: .defaultVersion)
-        
-        graphRequest.start { (response, result) in
-            switch result {
-            case .failed(let error):
-                // TODO: handle error
-                break
-                
-            case .success(response: let data):
-                guard let data = data.dictionaryValue else {
-                    // TODO: handle error
-                    return
-                }
-                
-                if let id = data["id"] as? String {
-                    print("||| id = \(id)")
-                }
-                if let email = data["email"] as? String {
-                    print("||| email = \(email)")
-                }
-                if let name = data["name"] as? String {
-                    print("||| name = \(name)")
-                }
-                if let picture = data["picture"] as? [String: Any],
-                    let pictureData = picture["data"] as? [String: Any],
-                    let pictureURLPath = pictureData["url"] as? String,
-                    let pictureURL = URL(string: pictureURLPath)
-                {
-                    print("||| pic url = \(pictureURL)")
-                }
+            else {
+                self.delegate?.registerViewControllerDidFacebookSignup(self)
             }
+            
+            }.catch { (error) in
+                print("facebook login error: \(error)")
         }
+        
+        
     }
 }
+    
 
 extension RegisterViewController: InputViewAdjustsScrollViewControllerDelegate {
     func inputViewAdjustsScrollViewControllerWillShow(_ controller: InputViewAdjustsScrollViewController) {

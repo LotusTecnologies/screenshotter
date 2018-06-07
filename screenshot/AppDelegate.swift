@@ -261,10 +261,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         var handled = Branch.getInstance().application(app, open: url, options:options)
         
         if !handled {
-            handled = FBSDKApplicationDelegate.sharedInstance().application(app, open: url, options: options)
-        }
-        
-        if !handled {
             handled = SigninManager.shared.application(app, open: url, options: options)
         }
         return handled
@@ -416,8 +412,7 @@ extension AppDelegate : KochavaTrackerDelegate {
         trackerParametersDictionary[kKVAParamLogLevelEnumKey] = kKVALogLevelEnumInfo
         
         KochavaTracker.shared.configure(withParametersDictionary: trackerParametersDictionary, delegate: self)
-        
-        
+                
         SigninManager.shared.application(application, didFinishLaunchingWithOptions: launchOptions)
         
         if UIApplication.isDev {
@@ -455,7 +450,6 @@ extension AppDelegate : KochavaTrackerDelegate {
         }
         
     
-        FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
     }
     
     fileprivate func frameworkSetupMainViewDidLoad() {

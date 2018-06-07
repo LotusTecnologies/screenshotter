@@ -2,6 +2,8 @@ PODS:
   - Amplitude-iOS (4.2.1)
   - Analytics (3.6.9)
   - Appsee (2.4.1)
+  - AWSAuthCore (2.6.20):
+    - AWSCore (= 2.6.20)
   - AWSCognito (2.6.20):
     - AWSCore (= 2.6.20)
   - AWSCognitoAuth (2.6.20):
@@ -11,6 +13,10 @@ PODS:
     - AWSCore (= 2.6.20)
   - AWSCognitoIdentityProviderASF (1.0.1)
   - AWSCore (2.6.20)
+  - AWSFacebookSignIn (2.6.20):
+    - AWSAuthCore (= 2.6.20)
+    - FBSDKCoreKit (~> 4.0)
+    - FBSDKLoginKit (~> 4.0)
   - Bolts (1.9.0):
     - Bolts/AppLinks (= 1.9.0)
     - Bolts/Tasks (= 1.9.0)
@@ -25,25 +31,10 @@ PODS:
   - CreditCardValidator (0.4)
   - EggRating (0.1.5):
     - RateView
-  - FacebookCore (0.3.0):
-    - Bolts (~> 1.8)
-    - FBSDKCoreKit (~> 4.27)
-  - FacebookLogin (0.3.0):
-    - Bolts (~> 1.8)
-    - FacebookCore (~> 0.3)
-    - FBSDKCoreKit (~> 4.27)
-    - FBSDKLoginKit (~> 4.27)
-  - FacebookShare (0.3.0):
-    - Bolts (~> 1.8)
-    - FacebookCore (~> 0.3)
-    - FBSDKCoreKit (~> 4.27)
-    - FBSDKShareKit (~> 4.27)
   - FBSDKCoreKit (4.33.0):
     - Bolts (~> 1.7)
   - FBSDKLoginKit (4.33.0):
     - FBSDKCoreKit
-  - FBSDKShareKit (4.33.0):
-    - FBSDKCoreKit (~> 4.33.0)
   - KochavaTrackeriOS (3.5.0)
   - lottie-ios (2.5.0)
   - PhoneNumberKit (2.1.0):
@@ -72,14 +63,12 @@ DEPENDENCIES:
   - AWSCognitoAuth
   - AWSCognitoIdentityProvider
   - AWSCore
+  - AWSFacebookSignIn
   - Branch
   - CardIO
   - Clarifai-Apple-SDK (= 3.0.0-beta14)
   - CreditCardValidator
   - EggRating
-  - FacebookCore
-  - FacebookLogin
-  - FacebookShare
   - KochavaTrackeriOS
   - lottie-ios
   - PhoneNumberKit
@@ -94,23 +83,21 @@ SPEC REPOS:
     - Amplitude-iOS
     - Analytics
     - Appsee
+    - AWSAuthCore
     - AWSCognito
     - AWSCognitoAuth
     - AWSCognitoIdentityProvider
     - AWSCognitoIdentityProviderASF
     - AWSCore
+    - AWSFacebookSignIn
     - Bolts
     - Branch
     - CardIO
     - Clarifai-Apple-SDK
     - CreditCardValidator
     - EggRating
-    - FacebookCore
-    - FacebookLogin
-    - FacebookShare
     - FBSDKCoreKit
     - FBSDKLoginKit
-    - FBSDKShareKit
     - KochavaTrackeriOS
     - lottie-ios
     - PhoneNumberKit
@@ -124,23 +111,21 @@ SPEC CHECKSUMS:
   Amplitude-iOS: 84da24ca8557fa3741888502c30c0b8b365acd7d
   Analytics: 6541ce337e99d9f7a2240a8b3953940a7be5f998
   Appsee: ab8b0317b0a5217d08637f61dbddaba2c9748f2a
+  AWSAuthCore: d435d8b0842c3ee33d1ff6c390d3a62b499b8504
   AWSCognito: 76b0fcfa24c6432b95059775c38e66ca7f18f839
   AWSCognitoAuth: c76ee50bcd8624b08ab248be6ce6d482c6b552e2
   AWSCognitoIdentityProvider: 82158b2c4555ceab8c04368f9cc9ef216bf862e6
   AWSCognitoIdentityProviderASF: f94f1a502e72ef3d0a1de93e10bf7a79c8698118
   AWSCore: dd4d3d4fcafdce68a42025c3e9e45b026cf1f33b
+  AWSFacebookSignIn: 9c24c3322ca5001278140c710d5076bd8d77f215
   Bolts: ac6567323eac61e203f6a9763667d0f711be34c8
   Branch: 127d29ab0a8866025eece1cf9e950ddb6f7d4070
   CardIO: 56983b39b62f495fc6dae9ad7cf875143df06443
   Clarifai-Apple-SDK: 19a638c697dc7701dbb5edcfbfbf1750bf1507a3
   CreditCardValidator: 9f0814dd61682c004071a250d89327ca83514a48
   EggRating: 7f892b9b8da758689525caf9dcb1c9475f9d5139
-  FacebookCore: 3ffa190a3f1f96cec0e44d3fc221bc322c595ffa
-  FacebookLogin: 0af839ea858faef99550d16596b87b4a8e8906e6
-  FacebookShare: 0469964297ebd75f052be2c5083389a4208e82b7
   FBSDKCoreKit: 572b047a7e029bc44542bcf8a59414e7ff2b543e
   FBSDKLoginKit: 88cb456349cfb3b554427ce4f8b43729d85dfb40
-  FBSDKShareKit: 1869cb24db2cea90666a50cb9d568deb38e2d16e
   KochavaTrackeriOS: b612efe2ddaead7e9aa8faf54e0ed96fb027a0ee
   lottie-ios: d699fdee68d7b63e721d949388b015fef1aaa4ac
   PhoneNumberKit: 62003f40ff75315fd3738286558bc365365ac222
@@ -150,6 +135,6 @@ SPEC CHECKSUMS:
   SwiftKeychainWrapper: 38952a3636320ae61bad3513cadd870929de7a4a
   Whisper: 169760fc4bab0abf24d5529f9276f95c25cf1025
 
-PODFILE CHECKSUM: d9179bd123ad52c26e1fdbb3da1dd4b23bbad4e9
+PODFILE CHECKSUM: 6a59be26751c7b4fdaf7dc9b850d38a376ef6f76
 
 COCOAPODS: 1.5.3
