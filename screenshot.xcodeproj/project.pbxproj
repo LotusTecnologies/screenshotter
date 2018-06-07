@@ -7,9 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3125446B2091C3A0009410D5 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
-		3125446C2091C3A0009410D5 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
-		3125446D2091C3A0009410D5 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
+		3125446B2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
+		3125446C2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
+		3125446D2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		3125448F209871B4009410D5 /* Analytics+api.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3125448E209871B4009410D5 /* Analytics+api.swift */; };
 		314C488A205E86E700B8381D /* PHAsset+craze.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314C4889205E86E700B8381D /* PHAsset+craze.swift */; };
 		315186412033FC81001BD8D6 /* ShoppablesToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3151863F2033FC81001BD8D6 /* ShoppablesToolbar.swift */; };
@@ -54,6 +54,7 @@
 		31CE1113203BF055000156EE /* ProductsBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE1110203BF055000156EE /* ProductsBarController.swift */; };
 		31CE1115203BF0BC000156EE /* ScreenshotProductBarCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE1114203BF0BC000156EE /* ScreenshotProductBarCollectionViewCell.swift */; };
 		31CEA0AB20C5768900058ECC /* ProductDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CEA0AA20C5768900058ECC /* ProductDetailViewController.swift */; };
+		31CEA0B720C91A4B00058ECC /* ProductCollectionViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CEA0B620C91A4B00058ECC /* ProductCollectionViewManager.swift */; };
 		31EF9B0720299D15006D3B35 /* InAppPurchaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31EF9B0620299D15006D3B35 /* InAppPurchaseManager.swift */; };
 		31EF9B092029D542006D3B35 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 31EF9B082029D542006D3B35 /* StoreKit.framework */; };
 		523C11391F5C195D001BD969 /* RatingFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523C11381F5C195D001BD969 /* RatingFlow.swift */; };
@@ -310,6 +311,7 @@
 		31CE1110203BF055000156EE /* ProductsBarController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductsBarController.swift; sourceTree = "<group>"; };
 		31CE1114203BF0BC000156EE /* ScreenshotProductBarCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenshotProductBarCollectionViewCell.swift; sourceTree = "<group>"; };
 		31CEA0AA20C5768900058ECC /* ProductDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductDetailViewController.swift; sourceTree = "<group>"; };
+		31CEA0B620C91A4B00058ECC /* ProductCollectionViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductCollectionViewManager.swift; sourceTree = "<group>"; };
 		31EF9B0620299D15006D3B35 /* InAppPurchaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InAppPurchaseManager.swift; sourceTree = "<group>"; };
 		31EF9B082029D542006D3B35 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		3F0C1FB8EA3C6E2B9CFD91FD /* Pods-screenshot.prddebug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.prddebug.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.prddebug.xcconfig"; sourceTree = "<group>"; };
@@ -949,6 +951,7 @@
 				31C0C81620A2CD14002EE95B /* ProductsOptions.swift */,
 				31C0C81520A2CD14002EE95B /* ProductsRateView.swift */,
 				31C0C81420A2CD13002EE95B /* ProductsViewController.swift */,
+				31CEA0B620C91A4B00058ECC /* ProductCollectionViewManager.swift */,
 				31C0C81320A2CD13002EE95B /* ProductsViewHeaderReusableView.swift */,
 				31C0C81020A2CD13002EE95B /* RelatedLooksCollectionViewCell.swift */,
 				31C0C82120A30369002EE95B /* ErrorCollectionViewCell.swift */,
@@ -1459,7 +1462,7 @@
 				525691881FD5DD51008D728D /* UsageStreak.swift in Sources */,
 				C54124C220A8308600CA03DB /* AccumulatorModel.swift in Sources */,
 				C53B46581FBC3DFA00A8C886 /* NotificationCenterKeys.swift in Sources */,
-				3125446C2091C3A0009410D5 /* BuildFile in Sources */,
+				3125446C2091C3A0009410D5 /* (null) in Sources */,
 				52E547441FE2487B00627D6D /* ScreenshotHelper.swift in Sources */,
 				316C831620C3AEBD0012A908 /* Shoppable+craze.swift in Sources */,
 				C50E2617207F6703003C8D24 /* TextFieldFormatter.swift in Sources */,
@@ -1574,7 +1577,7 @@
 				316C831420C3AEBD0012A908 /* Variant+craze.swift in Sources */,
 				C5C43A54209599D8000AF22A /* ActionFeedbackGenerator.swift in Sources */,
 				316C831020C3AEBD0012A908 /* DataModel.swift in Sources */,
-				3125446D2091C3A0009410D5 /* BuildFile in Sources */,
+				3125446D2091C3A0009410D5 /* (null) in Sources */,
 				C5336D25203D9AC800A7B4B0 /* GameViewController.swift in Sources */,
 				C52800622052B78B004DD7A3 /* CheckoutConfirmationViewController.swift in Sources */,
 				C5336D21203C511300A7B4B0 /* ActivityBadgeView.swift in Sources */,
@@ -1598,6 +1601,7 @@
 				C5CBD33920C3C5FB0067444A /* ShoppablesContainerView.swift in Sources */,
 				C501412E20623DFD00ABFB5C /* UICollectionView.swift in Sources */,
 				C5E6C316208F22C0006E9C54 /* CheckoutSupportedLocationModel.swift in Sources */,
+				31CEA0B720C91A4B00058ECC /* ProductCollectionViewManager.swift in Sources */,
 				C50D200E1FEBE6CD005CFA4F /* ScrollRevealController.swift in Sources */,
 				31C0C81A20A2CD14002EE95B /* SectionBackgroundCollectionViewFlowLayout.swift in Sources */,
 				C58FA0F220A95FC300072966 /* VideoDisplayingViewControllerDelegate.swift in Sources */,
@@ -1611,7 +1615,7 @@
 				31C0C80620A15EAA002EE95B /* CrazeImageZoom.swift in Sources */,
 				C58FA0F820A95FC300072966 /* GiftCardDoneViewController.swift in Sources */,
 				31C0C81E20A2CD14002EE95B /* ProductsRateView.swift in Sources */,
-				3125446B2091C3A0009410D5 /* BuildFile in Sources */,
+				3125446B2091C3A0009410D5 /* (null) in Sources */,
 				C5336D1B203AC9CE00A7B4B0 /* CartViewController.swift in Sources */,
 				C5FF4140200BA23900342DEC /* DiscoverScreenshotHelperView.swift in Sources */,
 				C58FA0F520A95FC300072966 /* GiftCardCampaignViewController.swift in Sources */,

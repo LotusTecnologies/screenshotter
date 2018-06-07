@@ -14,7 +14,8 @@ import Hero
 enum ProductsSection : Int {
     case product = 0
     case relatedLooks = 1
-
+    case productHeader = -1
+    case error = -2
     var section: Int {
         return self.rawValue
     }
@@ -29,6 +30,8 @@ enum ProductsViewControllerState : Int {
 
 class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
     
+    
+    var productCollectionViewManager = ProductCollectionViewManager()
     var screenshot:Screenshot
     var screenshotController: FetchedResultsControllerManager<Screenshot>?
     fileprivate var productsFRC: FetchedResultsControllerManager<Product>?
@@ -452,50 +455,34 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
     
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         
-        var size:CGSize = .zero
-        let shadowInsets = ScreenshotCollectionViewCell.shadowInsets
-        let padding: CGFloat = .padding - shadowInsets.left - shadowInsets.right
-        let sectionType = productSectionType(forSection: indexPath.section)
-
-        if sectionType == .product {
-            let columns = CGFloat(numberOfCollectionViewProductColumns)
-            size.width = floor((collectionView.bounds.size.width - (padding * (columns + 1))) / columns)
-            size.height = ProductsCollectionViewCell.cellHeight(for: size.width, withBottomLabel: true)
-        }else if sectionType == .relatedLooks {
-            if let _ = self.relatedLooks?.value {
-                let columns = CGFloat(numberOfCollectionViewProductColumns)
-                size.width = floor((collectionView.bounds.size.width - (padding * (columns + 1))) / columns)
-                size.height = size.width * CGFloat(Double.goldenRatio)
-            }else{
-                // error or pending is the same size
-                size.width = collectionView.bounds.size.width
-                size.height = 200
+        var sectionType = productSectionType(forSection: indexPath.section)
+        if sectionType == .relatedLooks {
+            if self.relatedLooks?.value == nil {
+                sectionType = .error
             }
         }
-        
-        return size
+        return self.productCollectionViewManager.collectionView(collectionView, sizeForItemInSectionType: sectionType)
     }
+    
     public func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         let sectionType = productSectionType(forSection: indexPath.section)
         if kind == UICollectionElementKindSectionHeader {
-            if let cell = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "header", for: indexPath) as? ProductsViewHeaderReusableView{
-                if sectionType == .relatedLooks {
-                    cell.label.text = "products.related_looks.headline".localized
-                }
-                
-                return cell
+            
+            if sectionType == .relatedLooks {
+                return self.productCollectionViewManager.collectionView(collectionView, viewForHeaderWith:  "products.related_looks.headline".localized, indexPath: indexPath)
             }
+            
+            return self.productCollectionViewManager.collectionView(collectionView, viewForHeaderWith:  "", indexPath: indexPath)
         }else if kind == SectionBackgroundCollectionViewFlowLayout.ElementKindSectionSectionBackground {
-            let cell = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "background", for: indexPath)
             if sectionType == .product {
-                cell.backgroundColor = self.view.backgroundColor
+                return self.productCollectionViewManager.collectionView(collectionView, viewForBackgroundWith: self.view.backgroundColor, indexPath: indexPath)
             }else if sectionType == .relatedLooks{
                 if let image = UIImage.init(named: "confetti") {
-                    cell.backgroundColor = UIColor.init(patternImage: image )
-                    
+                    let confettiColor = UIColor.init(patternImage: image )
+                    return self.productCollectionViewManager.collectionView(collectionView, viewForBackgroundWith: confettiColor, indexPath: indexPath)
                 }
             }
-            return cell
+            return self.productCollectionViewManager.collectionView(collectionView, viewForBackgroundWith: .white, indexPath: indexPath)
             
         }
         return UICollectionReusableView()
@@ -507,21 +494,12 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
 
         if sectionType == .product {
             let product = self.productAtIndex(indexPath.item)
-            
-            if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as? ProductsCollectionViewCell {
-                cell.contentView.backgroundColor = collectionView.backgroundColor
-                cell.title = product.calculatedDisplayTitle
-                cell.price = product.price
-                cell.originalPrice = product.originalPrice
-                cell.imageUrl = product.imageURL
-                cell.isSale = product.isSale()
-                cell.favoriteControl.isSelected = product.isFavorite
+            let cell = self.productCollectionViewManager.collectionView(collectionView, cellForItemAt: indexPath, with: product)
+            if let cell = cell as? ProductsCollectionViewCell {
                 cell.favoriteControl.addTarget(self, action: #selector(productCollectionViewCellFavoriteAction(_:event:)), for: .touchUpInside)
                 cell.productViewControl.addTarget(self, action: #selector(productCollectionViewCellProductAction(_:event:)), for: .touchUpInside)
-                cell.hasExternalPreview = !product.isSupportingUSC
-                cell.actionType = product.hasVariants || product.dateCheckedStock == nil ? .buy : .outStock
-                return cell
             }
+            return cell
         }else if sectionType == .relatedLooks {
             if let relatedLooks = self.relatedLooks?.value, relatedLooks.count > indexPath.row {
                 if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "relatedLooks", for: indexPath) as? RelatedLooksCollectionViewCell {
