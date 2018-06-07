@@ -631,34 +631,12 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
     }
     
     @objc func productCollectionViewCellProductAction(_ control: UIControl, event: UIEvent) {
-        guard let indexPath = collectionView?.indexPath(for: event) else {
+        guard let indexPath = collectionView?.indexPath(for: event), let cell = collectionView?.cellForItem(at: indexPath) as? ProductsCollectionViewCell else {
                 return
         }
-        let uuid = UUID().uuidString
-        if let cell = collectionView?.cellForItem(at: indexPath) as? ProductsCollectionViewCell{
-            cell.productImageView?.hero.id = "\(uuid)-image"
-            cell.favoriteControl.hero.id = "\(uuid)-heart"
-        }
-        
-        self.hero.isEnabled = true
-        
         let product = self.productAtIndex(indexPath.row)
-        let vc = ProductDetailViewController.init()
-        vc.product = product
-        vc.productImageView.hero.id = "\(uuid)-image"
-        vc.favoriteControl.hero.id = "\(uuid)-heart"
-vc.products = self.products
-        let _ = vc.view
-        if let navigationController = self.navigationController{
-            navigationController.hero.isEnabled = true
-            navigationController.pushViewController(vc, animated: true)
-            navigationController.hero.isEnabled = false
-        }
 
-        Analytics.trackProductBurrow(product: product, order: nil, sort: nil)
-//        AssetSyncModel.sharedInstance.addSubShoppable(fromProduct: product).then { (shoppable) -> Void in
-//            self.addSubShoppableCompletion(shoppable: shoppable)
-//        }
+        self.productCollectionViewManager.burrow(cell: cell, product: product, fromVC: self)
     }
 }
 
