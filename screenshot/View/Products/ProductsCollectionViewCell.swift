@@ -121,7 +121,7 @@ class ProductsCollectionViewCell : UICollectionViewCell {
             productView.topAnchor.constraint(equalTo: self.contentView.topAnchor).isActive = true
             productView.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor).isActive = true
             productView.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor).isActive = true
-            productView.heightAnchor.constraint(equalTo: productView.widthAnchor).isActive = true
+            productView.heightAnchor.constraint(lessThanOrEqualTo: productView.widthAnchor, multiplier: 1.0).isActive = true
             return productView
         }()
         self.productView = productView
