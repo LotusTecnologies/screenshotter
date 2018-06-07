@@ -131,7 +131,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
             let layout = SectionBackgroundCollectionViewFlowLayout()
             layout.minimumInteritemSpacing = minimumSpacing.x
             layout.minimumLineSpacing = minimumSpacing.y
-
+            
             let collectionView = UICollectionView(frame: self.view.bounds, collectionViewLayout: layout)
             collectionView.translatesAutoresizingMaskIntoConstraints = false
             collectionView.delegate = self
@@ -497,7 +497,8 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
             let cell = self.productCollectionViewManager.collectionView(collectionView, cellForItemAt: indexPath, with: product)
             if let cell = cell as? ProductsCollectionViewCell {
                 cell.favoriteControl.addTarget(self, action: #selector(productCollectionViewCellFavoriteAction(_:event:)), for: .touchUpInside)
-                cell.productViewControl.addTarget(self, action: #selector(productCollectionViewCellProductAction(_:event:)), for: .touchUpInside)
+                cell.actionButton.addTarget(self, action: #selector(productCollectionViewCellBuyAction(_:event:)), for: .touchUpInside)
+                return cell
             }
             return cell
         }else if sectionType == .relatedLooks {
@@ -575,12 +576,11 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
 
         if sectionType == .product {
             let product = self.productAtIndex(indexPath.item)
-            product.recordViewedProduct()
-            
-            if let productViewController = presentProduct(product, atLocation: .products) {
-                productViewController.similarProducts = products
+            if let cell = collectionView.cellForItem(at: indexPath) as? ProductsCollectionViewCell {
+                self.productCollectionViewManager.burrow(cell: cell, product: product, fromVC: self)
             }
-        }else if sectionType == .relatedLooks {
+        }
+        else if sectionType == .relatedLooks {
             if let relatedLooks = self.relatedLooks?.value {
                 if relatedLooks.count > indexPath.row {
                     let url = relatedLooks[indexPath.row]
@@ -629,14 +629,18 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         self.productsLoadingMonitor = AsyncOperationMonitor.init(assetId: nil, shoppableId: shoppable.imageUrl, queues: AssetSyncModel.sharedInstance.queues, delegate: self)
         self.updateLoadingState()
     }
-    
-    @objc func productCollectionViewCellProductAction(_ control: UIControl, event: UIEvent) {
-        guard let indexPath = collectionView?.indexPath(for: event), let cell = collectionView?.cellForItem(at: indexPath) as? ProductsCollectionViewCell else {
-                return
-        }
-        let product = self.productAtIndex(indexPath.row)
 
-        self.productCollectionViewManager.burrow(cell: cell, product: product, fromVC: self)
+    @objc func productCollectionViewCellBuyAction(_ control: UIControl, event: UIEvent) {
+        guard let indexPath = collectionView?.indexPath(for: event) else {
+            return
+        }
+        
+        let product = self.productAtIndex(indexPath.item)
+        product.recordViewedProduct()
+        
+        if let productViewController = presentProduct(product, atLocation: .products) {
+            productViewController.similarProducts = products
+        }
     }
 }
 

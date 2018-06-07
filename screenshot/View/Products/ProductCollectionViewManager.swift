@@ -51,7 +51,7 @@ class ProductCollectionViewManager {
         }else if sectionType == .product {
             let columns = CGFloat(2)
             size.width = floor((collectionView.bounds.size.width - (padding * (columns + 1))) / columns)
-            size.height = ProductsCollectionViewCell.cellHeight(for: size.width, withBottomLabel: true)
+            size.height = ProductsCollectionViewCell.cellHeight(for: size.width, withActionButton: true)
         }else if sectionType == .relatedLooks {
             let columns:CGFloat = 2
             size.width = floor((collectionView.bounds.size.width - (padding * (columns + 1))) / columns)
@@ -99,8 +99,7 @@ class ProductCollectionViewManager {
             cell.imageUrl = product.imageURL
             cell.isSale = product.isSale()
             cell.favoriteControl.isSelected = product.isFavorite
-            cell.hasExternalPreview = !product.isSupportingUSC
-            cell.actionType = product.hasVariants || product.dateCheckedStock == nil ? .buy : .outStock
+            cell.actionType = .buy
         }
         return cell
        

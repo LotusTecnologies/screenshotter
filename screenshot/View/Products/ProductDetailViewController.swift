@@ -105,7 +105,7 @@ extension ProductDetailViewController : UICollectionViewDelegateFlowLayout, UICo
         let cell = self.productCollectionViewManager.collectionView(collectionView, cellForItemAt: indexPath, with: product)
         if let cell = cell as? ProductsCollectionViewCell {
             cell.favoriteControl.addTarget(self, action: #selector(productCollectionViewCellFavoriteAction(_:event:)), for: .touchUpInside)
-            cell.productViewControl.addTarget(self, action: #selector(productCollectionViewCellProductAction(_:event:)), for: .touchUpInside)
+            cell.actionButton.addTarget(self, action: #selector(productCollectionViewCellProductAction(_:event:)), for: .touchUpInside)
         }
         return cell
     }
