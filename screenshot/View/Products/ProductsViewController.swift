@@ -39,7 +39,6 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
     var products:[Product] = []
     var relatedLooks:Promise<[String]>?
     
-    var loader:Loader?
     var noItemsHelperView:HelperView?
     var collectionView:UICollectionView?
     var productsOptions:ProductsOptions = ProductsOptions()
@@ -655,34 +654,6 @@ extension ProductsViewControllerProducts{
   
 }
 
-private typealias ProductsViewControllerLoader = ProductsViewController
-extension ProductsViewControllerLoader {
-    
-    func startAndAddLoader() {
-        let loader = self.loader ?? ( {
-            let loader = Loader()
-            loader.translatesAutoresizingMaskIntoConstraints = false
-            view.addSubview(loader)
-            loader.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
-            loader.centerYAnchor.constraint(equalTo: self.view.centerYAnchor).isActive = true
-            
-            
-            return loader
-        }())
-        self.loader = loader
-        loader.startAnimation()
-    }
-    
-    func stopAndRemoveLoader() {
-        if let loader = self.loader {
-            loader.stopAnimation()
-            loader.removeFromSuperview()
-            self.loader = nil
-        }
-    }
-    
-}
-
 private typealias ProductsViewControllerRatings = ProductsViewController
 extension ProductsViewControllerRatings: UITextFieldDelegate {
     
@@ -830,11 +801,11 @@ extension ProductsViewController {
         case .loading, .unknown:
             self.hideNoItemsHelperView()
             self.rateView.isHidden = true
-            self.startAndAddLoader()
+            self.productCollectionViewManager.startAndAddLoader(view: self.view)
             
         case .products:
             syncContentInset()
-            self.stopAndRemoveLoader()
+            self.productCollectionViewManager.stopAndRemoveLoader()
             self.hideNoItemsHelperView()
             self.rateView.isHidden = false
         
@@ -844,7 +815,7 @@ extension ProductsViewController {
                 self.automaticallyAdjustsScrollViewInsets = false
             }
             
-            self.stopAndRemoveLoader()
+            self.productCollectionViewManager.stopAndRemoveLoader()
             self.rateView.isHidden = true
             self.hideNoItemsHelperView()
             self.showNoItemsHelperView()

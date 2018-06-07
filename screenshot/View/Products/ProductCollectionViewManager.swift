@@ -24,7 +24,8 @@ class ProductCollectionViewManager {
     
     weak var delegate:ProductCollectionViewManagerDelegate?
     
-    
+    var loader:Loader?
+
     
     public func setup(collectionView:UICollectionView){
         collectionView.register(ProductsCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
@@ -109,9 +110,9 @@ class ProductCollectionViewManager {
     public func burrow(cell:ProductsCollectionViewCell, product: Product, fromVC: UIViewController) {
         AssetSyncModel.sharedInstance.addSubShoppable(fromProduct: product).then { shoppable -> Void in
             let uuid = UUID().uuidString
-            cell.productImageView?.hero.id = "\(uuid)-image"
-            cell.favoriteControl.hero.id = "\(uuid)-heart"
             
+            cell.productView?.hero.id = "\(uuid)-image"
+            cell.favoriteControl.hero.id = "\(uuid)-heart"
             
             fromVC.hero.isEnabled = true
             
@@ -199,5 +200,28 @@ class ProductCollectionViewManager {
         }
         
         return []
+    }
+    
+    func startAndAddLoader(view:UIView) {
+        let loader = self.loader ?? ( {
+            let loader = Loader()
+            loader.translatesAutoresizingMaskIntoConstraints = false
+            view.addSubview(loader)
+            loader.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+            loader.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+            
+            
+            return loader
+            }())
+        self.loader = loader
+        loader.startAnimation()
+    }
+    
+    func stopAndRemoveLoader() {
+        if let loader = self.loader {
+            loader.stopAnimation()
+            loader.removeFromSuperview()
+            self.loader = nil
+        }
     }
 }

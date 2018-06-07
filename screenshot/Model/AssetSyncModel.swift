@@ -1069,6 +1069,37 @@ extension AssetSyncModel {
         return self.addSubShoppable(productImageUrl: productImageUrl, shoppable: shoppable, optionsMask: optionsMask)
     }
     
+    public func clearSubShoppables(screenshot:Screenshot) {
+        let objectId = screenshot.objectID
+        DataModel.sharedInstance.performBackgroundTask { (context) in
+            if let screenshot = context.screenshotWith(objectId: objectId) {
+                var objectsToDelete:[NSManagedObject] = []
+                var productsToNilOutShoppable:[Product] = []
+                screenshot.shoppables?.forEach({ (shoppable) in
+                    if let shoppable = shoppable as? Shoppable {
+                        if let _ = shoppable.parentShoppable {
+                            objectsToDelete.append(shoppable)
+                            shoppable.products?.forEach({ (product) in
+                                if let product = product as? Product {
+                                    if product.isFavorite {
+                                        product.screenshot = shoppable.screenshot
+                                        productsToNilOutShoppable.append(product)
+                                    }else{
+                                        objectsToDelete.append(product)
+                                    }
+                                }
+                            })
+                        }
+                    }
+                })
+                productsToNilOutShoppable.forEach({ $0.shoppable = nil })
+                objectsToDelete.forEach({ (object) in
+                    context.delete(object)
+                })
+                context.saveIfNeeded()
+            }
+        }
+    }
     private func addSubShoppable(productImageUrl:String?, shoppable:Shoppable?, optionsMask:ProductsOptionsMask) -> Promise<Shoppable> {
         var rootShoppable = shoppable
         if let parent = rootShoppable?.parentShoppable {

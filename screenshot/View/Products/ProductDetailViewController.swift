@@ -17,6 +17,7 @@ class ProductDetailViewController: BaseViewController {
     var products:[Product] = []
     var shoppable:Shoppable?
     var productsOptions:ProductsOptions = ProductsOptions()
+    var noItemsHelperView:HelperView?
 
     var uuid:String?
     var productsLoadingMonitor:AsyncOperationMonitor?
@@ -43,7 +44,7 @@ class ProductDetailViewController: BaseViewController {
         if let shoppable = self.shoppable {
             productsFRC = DataModel.sharedInstance.productFrc(delegate: self, shoppableOID: shoppable.objectID)
             
-            self.products = self.productCollectionViewManager.productsForShoppable(shoppable, productsOptions: self.productsOptions).filter{ $0.objectID != self.product?.objectID}
+            self.products = self.productCollectionViewManager.productsForShoppable(shoppable, productsOptions: self.productsOptions).filter{ $0.price != self.product?.price || $0.merchant != self.product?.merchant || $0.productTitle() != self.product?.productTitle() || $0.imageURL != self.product?.imageURL }
             self.productsLoadingMonitor = AsyncOperationMonitor.init(assetId: nil, shoppableId: shoppable.imageUrl, queues: AssetSyncModel.sharedInstance.queues, delegate: self)
             self.updateLoadingState()
         }
@@ -127,6 +128,8 @@ extension ProductDetailViewController : UICollectionViewDelegateFlowLayout, UICo
             if let cell  = cell as? ProductHeaderCollectionViewCell, let uuid = uuid {
                 cell.productImageView.hero.id = "\(uuid)-image"
                 cell.favoriteControl.hero.id = "\(uuid)-heart"
+                cell.buyNowButton.hero.id = "\(uuid)-button"
+
                 cell.favoriteControl.addTarget(self, action: #selector(productCollectionViewCellFavoriteAction(_:event:)), for: .touchUpInside)
                 cell.buyNowButton.addTarget(self, action: #selector(productCollectionViewCellBuyAction(_:event:)), for: .touchUpInside)
             }
@@ -177,7 +180,7 @@ extension ProductDetailViewController : UICollectionViewDelegateFlowLayout, UICo
     public func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
 
         if kind == UICollectionElementKindSectionHeader {
-            if indexPath.section == 1 {
+            if indexPath.section == 1 && self.productLoadingState != .retry {
                 let view = self.productCollectionViewManager.collectionView(collectionView, viewForHeaderWith: "Similar Items".localized, indexPath: indexPath)
                 view.backgroundColor = self.view.backgroundColor
                 return view
@@ -239,19 +242,47 @@ extension ProductDetailViewController : UICollectionViewDelegateFlowLayout, UICo
 
 extension ProductDetailViewController : AsyncOperationMonitorDelegate, FetchedResultsControllerManagerDelegate {
     func syncViewsAfterStateChange() {
-
+        self.collectionView?.reloadData()
+        
         switch (self.productLoadingState) {
         case .loading, .unknown:
-            break;
-            
-            
+            self.hideNoItemsHelperView()
+
+            self.productCollectionViewManager.startAndAddLoader(view: self.view)
         case .products:
-            
-            break;
-            
-            
+            self.productCollectionViewManager.stopAndRemoveLoader()
+            self.hideNoItemsHelperView()
         case .retry:
-            break;
+            self.productCollectionViewManager.stopAndRemoveLoader()
+            self.hideNoItemsHelperView()
+            self.showNoItemsHelperView()
+        }
+    }
+    
+    func showNoItemsHelperView() {
+        
+        let (helperView, retryButton) = self.productCollectionViewManager.noProductsView()
+        
+        self.view.addSubview(helperView)
+        self.noItemsHelperView = helperView
+        
+        retryButton.addTarget(self, action: #selector(noItemsRetryAction), for: .touchUpInside)
+        
+        helperView.topAnchor.constraint(equalTo: self.topLayoutGuide.bottomAnchor, constant:200).isActive = true
+        helperView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
+        helperView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
+        helperView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
+        
+    }
+    
+    func hideNoItemsHelperView() {
+        self.noItemsHelperView?.removeFromSuperview()
+        self.noItemsHelperView = nil
+    }
+    
+    @objc func noItemsRetryAction() {
+        if let shoppable = self.shoppable {
+            let _ = AssetSyncModel.sharedInstance.reloadSubShoppable(shoppable: shoppable)
         }
     }
     
