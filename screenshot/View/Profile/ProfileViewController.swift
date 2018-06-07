@@ -10,8 +10,9 @@ import UIKit
 
 class ProfileViewController: UITableViewController {
     enum Section: Int {
-        case invite
         case account
+        case invite
+        case options
         case activity
         case logout
     }
@@ -25,8 +26,9 @@ class ProfileViewController: UITableViewController {
     }
     
     private var data: [Section: [Row]] = [
+        .account: [],
         .invite: [],
-        .account: [
+        .options: [
             .currency,
             .name,
             .email
@@ -36,10 +38,34 @@ class ProfileViewController: UITableViewController {
         ]
     ]
     
+    private let profileAccountView = ProfileAccountView()
+    
+    private let inviteView: UIView = {
+        let view = UIView()
+        view.layoutMargins = UIEdgeInsets(top: 0, left: .padding, bottom: 0, right: .padding)
+        
+        let button = MainButton()
+        button.translatesAutoresizingMaskIntoConstraints = false
+        if let patternImage = UIImage(named: "BrandGradientConfettiControl") {
+            button.backgroundColor = UIColor(patternImage: patternImage)
+        }
+        button.setTitle("Tell a Friend!", for: .normal)
+//        button.addTarget(self, action: #selector(inviteAction), for: .touchUpInside)
+        button.clipsToBounds = true
+        view.addSubview(button)
+        button.setContentHuggingPriority(.required, for: .vertical)
+        button.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor).isActive = true
+        button.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor).isActive = true
+        button.bottomAnchor.constraint(equalTo: view.layoutMarginsGuide.bottomAnchor).isActive = true
+        button.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor).isActive = true
+        
+        return view
+    }()
+    
     lazy var textFieldRows: [IndexPath?] = {
         return [
-            self.indexPath(for: .name, in: .account),
-            self.indexPath(for: .email, in: .account)
+            self.indexPath(for: .name, in: .options),
+            self.indexPath(for: .email, in: .options)
         ]
     }()
     
@@ -104,7 +130,7 @@ class ProfileViewController: UITableViewController {
 extension ProfileViewController: ViewControllerLifeCycle {
     func viewController(_ viewController: UIViewController, willDisappear animated: Bool) {
         if viewController.isKind(of: CurrencyViewController.self),
-            let indexPath = indexPath(for: .currency, in: .account)
+            let indexPath = indexPath(for: .currency, in: .options)
         {
             tableView.reloadRows(at: [indexPath], with: .none)
         }
@@ -137,6 +163,32 @@ extension ProfileViewController {
             return 0
         }
         return data[settingsSection]?.count ?? 0
+    }
+    
+//    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+//        return 0
+//    }
+
+    override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        if [Section.invite.rawValue].contains(section) {
+            return 0
+        }
+        return tableView.sectionFooterHeight
+    }
+    
+    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        if section == Section.account.rawValue {
+            profileAccountView.isLoggedIn = true
+            return profileAccountView
+        }
+        else if section == Section.invite.rawValue {
+            return inviteView
+        }
+        return nil
+    }
+    
+    override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        return nil
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

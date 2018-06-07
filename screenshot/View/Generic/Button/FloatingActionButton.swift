@@ -6,16 +6,12 @@
 //  Copyright © 2017 crazeapp. All rights reserved.
 //
 
-import Foundation
 import UIKit
 
-class FloatingActionButton: UIButton {
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-    }
-    
+class FloatingActionButton: RoundButton {
     override init(frame: CGRect) {
         super.init(frame: frame)
+        
         self.showsTouchWhenHighlighted = true
         layer.shadowColor = UIColor.black.cgColor
         layer.shadowOffset = CGSize(width: 0, height: 2)
@@ -23,10 +19,13 @@ class FloatingActionButton: UIButton {
         layer.shadowOpacity = 0.5
     }
     
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        layer.cornerRadius = bounds.size.width * 0.5
         layer.shadowPath = UIBezierPath(ovalIn: bounds).cgPath
     }
 }
