@@ -125,9 +125,10 @@ class ProductsCollectionViewCell : UICollectionViewCell {
             return productView
         }()
         self.productView = productView
-        
+        self.contentView.backgroundColor = .clear
+        self.backgroundColor = .clear
         actionButton.translatesAutoresizingMaskIntoConstraints = false
-        actionButton.backgroundColor = .white
+        actionButton.backgroundColor = .clear
         actionButton.setTitleColor(.crazeGreen, for: .normal)
         contentView.addSubview(actionButton)
         actionButton.topAnchor.constraint(equalTo: productView.bottomAnchor, constant: 8).isActive = true

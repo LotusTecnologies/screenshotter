@@ -282,24 +282,6 @@ extension ProductsViewControllerScrollViewDelegate: UIScrollViewDelegate {
             }
         }
         self.scrollRevealController?.scrollViewDidScroll(scrollView)
-        
-        if scrollView.isTracking {
-            let translation = scrollView.panGestureRecognizer.translation(in: scrollView.superview)
-            let subShoppablesCount = shoppablesToolbarContainer?.subToolbar.collectionView?.numberOfItems(inSection: 0) ?? 0
-            let visible: ShoppablesContainerView.VisibleToolbar = {
-                if subShoppablesCount > 0 {
-                    return translation.y > 0 ? .both : .bottom
-                }
-                else {
-                    return .top
-                }
-            }()
-            
-            if shoppablesToolbarContainer?.visibleToolbar != visible {
-                shoppablesToolbarContainer?.visibleToolbar = visible
-                syncContentInset()
-            }
-        }
     }
     
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
@@ -342,8 +324,7 @@ extension ProductsViewController: ShoppablesToolbarDelegate {
         else if toolbar == shoppablesToolbarContainer?.toolbar {
             shoppablesToolbarContainer?.subToolbar.rootShoppableObjectId = shoppable.objectID
             
-            let visible: ShoppablesContainerView.VisibleToolbar = (shoppable.subShoppables?.count ?? 0 > 0) ? .both
-                : .top
+            let visible: ShoppablesContainerView.VisibleToolbar = .top
             
             if view.window == nil {
                 UIView.performWithoutAnimation {
@@ -617,7 +598,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
     }
     
     func addSubShoppableCompletion(shoppable:Shoppable) {
-        shoppablesToolbarContainer?.visibleToolbar = .both
+        shoppablesToolbarContainer?.visibleToolbar = .top
         self.shoppablesToolbarContainer?.toolbar.deselectShoppable()
         self.shoppablesToolbarContainer?.subToolbar.rootShoppableObjectId = shoppable.parentShoppable?.objectID
         self.shoppablesToolbarContainer?.subToolbar.selectShoppable(shoppable)
