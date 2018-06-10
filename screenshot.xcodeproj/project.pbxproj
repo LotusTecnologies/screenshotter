@@ -53,6 +53,9 @@
 		31CE1112203BF055000156EE /* ProductsBarCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE110F203BF055000156EE /* ProductsBarCollectionView.swift */; };
 		31CE1113203BF055000156EE /* ProductsBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE1110203BF055000156EE /* ProductsBarController.swift */; };
 		31CE1115203BF0BC000156EE /* ScreenshotProductBarCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE1114203BF0BC000156EE /* ScreenshotProductBarCollectionViewCell.swift */; };
+		31CEA0AB20C5768900058ECC /* ProductDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CEA0AA20C5768900058ECC /* ProductDetailViewController.swift */; };
+		31CEA0B720C91A4B00058ECC /* ProductCollectionViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CEA0B620C91A4B00058ECC /* ProductCollectionViewManager.swift */; };
+		31CEA0B920C93F9E00058ECC /* ProductHeaderCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CEA0B820C93F9E00058ECC /* ProductHeaderCollectionViewCell.swift */; };
 		31EF9B0720299D15006D3B35 /* InAppPurchaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31EF9B0620299D15006D3B35 /* InAppPurchaseManager.swift */; };
 		31EF9B092029D542006D3B35 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 31EF9B082029D542006D3B35 /* StoreKit.framework */; };
 		523C11391F5C195D001BD969 /* RatingFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523C11381F5C195D001BD969 /* RatingFlow.swift */; };
@@ -313,6 +316,9 @@
 		31CE110F203BF055000156EE /* ProductsBarCollectionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductsBarCollectionView.swift; sourceTree = "<group>"; };
 		31CE1110203BF055000156EE /* ProductsBarController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductsBarController.swift; sourceTree = "<group>"; };
 		31CE1114203BF0BC000156EE /* ScreenshotProductBarCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenshotProductBarCollectionViewCell.swift; sourceTree = "<group>"; };
+		31CEA0AA20C5768900058ECC /* ProductDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductDetailViewController.swift; sourceTree = "<group>"; };
+		31CEA0B620C91A4B00058ECC /* ProductCollectionViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductCollectionViewManager.swift; sourceTree = "<group>"; };
+		31CEA0B820C93F9E00058ECC /* ProductHeaderCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductHeaderCollectionViewCell.swift; sourceTree = "<group>"; };
 		31EF9B0620299D15006D3B35 /* InAppPurchaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InAppPurchaseManager.swift; sourceTree = "<group>"; };
 		31EF9B082029D542006D3B35 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		3F0C1FB8EA3C6E2B9CFD91FD /* Pods-screenshot.prddebug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.prddebug.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.prddebug.xcconfig"; sourceTree = "<group>"; };
@@ -959,11 +965,14 @@
 				31C0C81620A2CD14002EE95B /* ProductsOptions.swift */,
 				31C0C81520A2CD14002EE95B /* ProductsRateView.swift */,
 				31C0C81420A2CD13002EE95B /* ProductsViewController.swift */,
+				31CEA0B620C91A4B00058ECC /* ProductCollectionViewManager.swift */,
 				31C0C81320A2CD13002EE95B /* ProductsViewHeaderReusableView.swift */,
 				31C0C81020A2CD13002EE95B /* RelatedLooksCollectionViewCell.swift */,
 				31C0C82120A30369002EE95B /* ErrorCollectionViewCell.swift */,
 				31C0C81120A2CD13002EE95B /* SectionBackgroundCollectionViewFlowLayout.swift */,
 				31C0C80F20A2CD13002EE95B /* SpinnerCollectionViewCell.swift */,
+				31CEA0AA20C5768900058ECC /* ProductDetailViewController.swift */,
+				31CEA0B820C93F9E00058ECC /* ProductHeaderCollectionViewCell.swift */,
 			);
 			path = Products;
 			sourceTree = "<group>";
@@ -1397,6 +1406,7 @@
 				"${BUILT_PRODUCTS_DIR}/FacebookCore/FacebookCore.framework",
 				"${BUILT_PRODUCTS_DIR}/FacebookLogin/FacebookLogin.framework",
 				"${BUILT_PRODUCTS_DIR}/FacebookShare/FacebookShare.framework",
+				"${BUILT_PRODUCTS_DIR}/Hero/Hero.framework",
 				"${BUILT_PRODUCTS_DIR}/PhoneNumberKit/PhoneNumberKit.framework",
 				"${BUILT_PRODUCTS_DIR}/PromiseKit/PromiseKit.framework",
 				"${BUILT_PRODUCTS_DIR}/RateView/RateView.framework",
@@ -1420,6 +1430,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FacebookCore.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FacebookLogin.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FacebookShare.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Hero.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PhoneNumberKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PromiseKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RateView.framework",
@@ -1495,6 +1506,7 @@
 				C50E25EC207DEAFC003C8D24 /* CheckoutShippingListViewController.swift in Sources */,
 				31C0C81820A2CD14002EE95B /* SpinnerCollectionViewCell.swift in Sources */,
 				31A33750203D9AA000FFD2F2 /* ScreenshotsNavigationController.swift in Sources */,
+				31CEA0B920C93F9E00058ECC /* ProductHeaderCollectionViewCell.swift in Sources */,
 				C58FA0F120A95FC300072966 /* TutorialTrySlideViewController.swift in Sources */,
 				C5CAF27C1FCC14C1006F37DC /* CurrencyModel.swift in Sources */,
 				C5F37CA120555C5C0072FE1D /* ViewControllerAnimatedTransitioning.swift in Sources */,
@@ -1513,6 +1525,7 @@
 				E4978C3C1F53610F0008B87F /* Constants.swift in Sources */,
 				C5D2E306204D29D100B5BD92 /* CartTableViewCell.swift in Sources */,
 				C5F37CA320555C8C0072FE1D /* ModalAnimatedTransitioning.swift in Sources */,
+				31CEA0AB20C5768900058ECC /* ProductDetailViewController.swift in Sources */,
 				C5A6F1D81FF3C973001DCDD0 /* Screenshot.swift in Sources */,
 				31C0C82020A2CD14002EE95B /* ProductsCollectionView.swift in Sources */,
 				C50E25E6207DDD82003C8D24 /* CheckoutCreditCardTableViewCell.swift in Sources */,
@@ -1619,6 +1632,7 @@
 				C5CBD33920C3C5FB0067444A /* ShoppablesContainerView.swift in Sources */,
 				C501412E20623DFD00ABFB5C /* UICollectionView.swift in Sources */,
 				C5E6C316208F22C0006E9C54 /* CheckoutSupportedLocationModel.swift in Sources */,
+				31CEA0B720C91A4B00058ECC /* ProductCollectionViewManager.swift in Sources */,
 				C50D200E1FEBE6CD005CFA4F /* ScrollRevealController.swift in Sources */,
 				31C0C81A20A2CD14002EE95B /* SectionBackgroundCollectionViewFlowLayout.swift in Sources */,
 				C58FA0F220A95FC300072966 /* VideoDisplayingViewControllerDelegate.swift in Sources */,
@@ -1839,7 +1853,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 150;
+				CURRENT_PROJECT_VERSION = 151;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/dev/;
 				INFOPLIST_FILE = screenshot/dev/Info.plist;
@@ -1869,7 +1883,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 150;
+				CURRENT_PROJECT_VERSION = 151;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/dev/;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -1957,7 +1971,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 150;
+				CURRENT_PROJECT_VERSION = 151;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/prd/;
 				INFOPLIST_FILE = screenshot/prd/Info.plist;
@@ -2040,7 +2054,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 150;
+				CURRENT_PROJECT_VERSION = 151;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/prd/;
 				INFOPLIST_FILE = screenshot/prd/Info.plist;
