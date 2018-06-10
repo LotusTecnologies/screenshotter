@@ -73,9 +73,15 @@ class ProfileAccountView: UIView {
         loggedInContainerView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
         loggedInContainerView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
         
+        let hasAvatar = false
+        
         let avatarButton = RoundButton()
         avatarButton.translatesAutoresizingMaskIntoConstraints = false
-        avatarButton.backgroundColor = .orange
+        avatarButton.setBackgroundImage(UIImage(named: "DefaultUser"), for: .selected)
+        avatarButton.setBackgroundImage(UIImage(named: "DefaultUser"), for: [.selected, .highlighted])
+        avatarButton.setImage(UIImage(named: "UserCamera"), for: .selected)
+        avatarButton.setImage(UIImage(named: "UserCamera"), for: [.selected, .highlighted])
+        avatarButton.isSelected = !hasAvatar
         avatarButton.layer.borderColor = UIColor.gray6.cgColor
         avatarButton.layer.borderWidth = 2
         loggedInContainerView.addSubview(avatarButton)
