@@ -195,6 +195,11 @@ extension ProductDetailViewController : UICollectionViewDelegateFlowLayout, UICo
             if indexPath.section == 1 && self.productLoadingState != .retry {
                 let view = self.productCollectionViewManager.collectionView(collectionView, viewForHeaderWith: "products.details.similar".localized, indexPath: indexPath)
                 view.backgroundColor = self.view.backgroundColor
+                
+                if let view = view as? ProductsViewHeaderReusableView {
+                    view.filterButton.addTarget(self, action: #selector(presentFilterAction), for: .touchUpInside)
+                }
+                
                 return view
             }
             return self.productCollectionViewManager.collectionView(collectionView, viewForHeaderWith: "", indexPath: indexPath)
@@ -251,7 +256,11 @@ extension ProductDetailViewController : UICollectionViewDelegateFlowLayout, UICo
     
 }
 
-
+extension ProductDetailViewController {
+    @objc private func presentFilterAction() {
+        
+    }
+}
 
 
 extension ProductDetailViewController : AsyncOperationMonitorDelegate, FetchedResultsControllerManagerDelegate {
