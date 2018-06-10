@@ -220,6 +220,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.updateLoadingState()
+        self.collectionView?.reloadData()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -598,7 +599,12 @@ extension ProductsViewControllerShoppables: FetchedResultsControllerManagerDeleg
             
             if view.window != nil, let collectionView = collectionView {
                 if change.updatedRows.count > 0 && change.deletedRows.count == 0 && change.insertedRows.count == 0 {
-                    collectionView.reloadItems(at: collectionView.indexPathsForVisibleItems)
+                    collectionView.indexPathsForVisibleItems.forEach { (indexPath) in
+                        let product = self.productAtIndex(indexPath.item)
+                        if let cell = collectionView.cellForItem(at: indexPath) as? ProductsCollectionViewCell {
+                            self.productCollectionViewManager.setup(cell: cell, with: product)
+                        }
+                    }
                 }else{
                     collectionView.reloadData()
                 }

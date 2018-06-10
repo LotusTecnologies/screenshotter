@@ -74,7 +74,7 @@ extension DataModel {
     
     func productFrc(delegate:FetchedResultsControllerManagerDelegate?, shoppableOID: NSManagedObjectID) -> FetchedResultsControllerManager<Product> {
         let request: NSFetchRequest = Product.fetchRequest()
-        request.sortDescriptors = [NSSortDescriptor(key: "dateFavorited", ascending: false)]
+        request.sortDescriptors = [NSSortDescriptor(key: "order", ascending: false)]
         request.predicate = NSPredicate(format: "shoppable == %@", shoppableOID)
         
         let context = self.mainMoc()
