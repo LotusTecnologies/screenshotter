@@ -363,7 +363,7 @@ class RegisterViewController: UIViewController {
         return _view.facebookLoginButton
     }
     
-    var continueButton: UIButton {
+    var continueButton: MainButton {
         return _view.continueButton
     }
     
@@ -438,28 +438,33 @@ class RegisterViewController: UIViewController {
         
         if hasValidEmail && hasValidPassword,
             let email = self.email,
-            let password = _view.passwordTextField.text
+            let password = _view.passwordTextField.text,
+            self.continueButton.isLoading == false
         {
+            self._view.emailTextField.isUserInteractionEnabled = false
+            self._view.passwordTextField.isUserInteractionEnabled = false
+            self.continueButton.isLoading = true
             SigninManager.shared.login(email: email, password: password)
-                .then { result -> Void in
-                  
+            .then { result -> Void in
+                
+                switch result {
+                case .confirmed:
+                    self.delegate?.registerViewControllerDidLogin(self)
                     
-                    self.registerUser() // ???: Gershon is this needed
-                    
-                    switch result {
-                    case .confirmed:
-                        self.delegate?.registerViewControllerDidLogin(self)
-                        
-                    case .unconfirmed:
-                        self.delegate?.registerViewControllerDidSignup(self)
-                    }
+                case .unconfirmed:
+                    self.delegate?.registerViewControllerDidSignup(self)
                 }
-                .catch { error in
-                    self._view.emailTextField.isInvalid = true
-                    self._view.passwordTextField.isInvalid = true
-                    self._view.isForgotPasswordButtonHidden = false
-                    ActionFeedbackGenerator().actionOccurred(.nope)
-                   
+            }
+            .catch { error in
+                self._view.emailTextField.isInvalid = true
+                self._view.passwordTextField.isInvalid = true
+                self._view.isForgotPasswordButtonHidden = false
+                ActionFeedbackGenerator().actionOccurred(.nope)
+               
+            }.always {
+                self._view.emailTextField.isUserInteractionEnabled = true
+                self._view.passwordTextField.isUserInteractionEnabled = true
+                self.continueButton.isLoading = false
             }
         }
         else {
@@ -472,24 +477,6 @@ class RegisterViewController: UIViewController {
             
             ActionFeedbackGenerator().actionOccurred(.nope)
         }
-    }
-    
-    private func registerUser() {
-        // TODO: Gershon needs to deal with this
-        
-        let name = ""
-        let email = self.email
-            
-        UserDefaults.standard.set(name, forKey: UserDefaultsKeys.name)
-        UserDefaults.standard.set(email, forKey: UserDefaultsKeys.email)
-        
-        let user = AnalyticsUser(name: name, email: email)
-        user.sendToServers()
-        
-        Analytics.trackSubmittedEmail(email: email)
-        
-        UserDefaults.standard.set(user.identifier, forKey: UserDefaultsKeys.userID)
-        UserDefaults.standard.synchronize()
     }
     
     @objc fileprivate func skipRegistration() {

@@ -113,11 +113,16 @@ class SigninManager : NSObject {
 ////        AWSSignInManager.sharedInstance().lo
 //    }
     
+    func login(email:String, password:String) -> Promise<UserConfirmedStatus>{
+       
+    
+    }
     //If unconfirmed, user must get a confirm code to finialize login
     func login(email:String, password:String) -> Promise<UserConfirmedStatus>{
         return Promise<UserConfirmedStatus>.init(resolvers: { (fulfil, reject) in
             let emailAttribute = AWSCognitoIdentityUserAttributeType.init(name: "email", value: email)
             if let pool = self.pool, let userName = email.sha1() {
+                
                 pool.signUp(userName, password: password, userAttributes: [emailAttribute], validationData: nil).continueWith(executor: AWSExecutor.mainThread(), block: { (task) -> Any? in
                     if let error = task.error  {
                         let nserror = error as NSError
@@ -145,6 +150,24 @@ class SigninManager : NSObject {
         return Promise { fulfill, reject in
             fulfill(email == "a@a.aa")
         }
+    }
+    
+    private func registerUser() {
+        // TODO: Gershon needs to deal with this
+//        
+//        let name = ""
+//        let email = self.email
+//        
+//        UserDefaults.standard.set(name, forKey: UserDefaultsKeys.name)
+//        UserDefaults.standard.set(email, forKey: UserDefaultsKeys.email)
+//        
+//        let user = AnalyticsUser(name: name, email: email)
+//        user.sendToServers()
+//        
+//        Analytics.trackSubmittedEmail(email: email)
+//        
+//        UserDefaults.standard.set(user.identifier, forKey: UserDefaultsKeys.userID)
+//        UserDefaults.standard.synchronize()
     }
     
     func confirmSignup(code:String) -> Promise<Void>{
@@ -238,4 +261,35 @@ class SigninManager : NSObject {
             })
         }
     }
+}
+extension SigninManager : AWSCognitoIdentityInteractiveAuthenticationDelegate, AWSCognitoIdentityPasswordAuthentication  {
+    func startPasswordAuthentication() -> AWSCognitoIdentityPasswordAuthentication {
+        return self
+    }
+    func getDetails(_ authenticationInput: AWSCognitoIdentityPasswordAuthenticationInput, passwordAuthenticationCompletionSource: AWSTaskCompletionSource<AWSCognitoIdentityPasswordAuthenticationDetails>) {
+        
+    }
+    func didCompleteStepWithError(_ error: Error?) {
+    
+    }
+    func startMultiFactorAuthentication() -> AWSCognitoIdentityMultiFactorAuthentication {
+        
+    }
+    
+    func startRememberDevice() -> AWSCognitoIdentityRememberDevice {
+        
+    }
+    func startNewPasswordRequired() -> AWSCognitoIdentityNewPasswordRequired {
+        
+    }
+    func startCustomAuthentication() -> AWSCognitoIdentityCustomAuthentication {
+        
+    }
+    func startSoftwareMfaSetupRequired() -> AWSCognitoIdentitySoftwareMfaSetupRequired {
+        
+    }
+    func startSelectMfa() -> AWSCognitoIdentitySelectMfa {
+        
+    }
+    
 }
