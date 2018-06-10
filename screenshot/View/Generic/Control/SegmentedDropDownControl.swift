@@ -11,7 +11,9 @@ import UIKit
 class SegmentedDropDownItem : NSObject {
     var pickerItems: [String] {
         didSet {
-            segment?.isEnabled = !pickerItems.isEmpty
+            if let segment = segment as? DropDownControl {
+                segment.isEnabled = !pickerItems.isEmpty
+            }
         }
     }
     private(set) var selectedPickerItem: String?
@@ -32,8 +34,10 @@ class SegmentedDropDownItem : NSObject {
     /// width. -1 uses auto calculate.
     var widthRatio: CGFloat = -1
     
-    fileprivate var segment: DropDownControl?
+    fileprivate var segment: UIView?
     fileprivate var frameLayer: CAShapeLayer?
+    
+    fileprivate var titleItemText: String?
     
     init(pickerItems: [String], selectedPickerItem: String? = nil) {
         self.pickerItems = pickerItems
@@ -42,6 +46,11 @@ class SegmentedDropDownItem : NSObject {
         if let selectedPickerItem = selectedPickerItem, pickerItems.contains(selectedPickerItem) {
             self.selectedPickerItem = selectedPickerItem
         }
+    }
+    
+    convenience init(titleItem: String) {
+        self.init(pickerItems: [], selectedPickerItem: nil)
+        titleItemText = titleItem
     }
     
     fileprivate func setBorderColor(_ color: UIColor) {
@@ -81,7 +90,9 @@ class SegmentedDropDownItem : NSObject {
     
     fileprivate var title: String? {
         set(newTitle) {
-            segment?.titleLabel.text = newTitle
+            if let segment = segment as? DropDownControl {
+                segment.titleLabel.text = newTitle
+            }
             selectedPickerItem = (newTitle == placeholderTitle) ? nil : newTitle
         }
         get {
@@ -165,17 +176,27 @@ class SegmentedDropDownControl : UIButton {
             items.enumerated().forEach { (index, item) in
                 let isFirst = index == 0
                 let isLast = index == items.count - 1
+                let segment: UIView
                 
-                let segment = DropDownControl()
+                if let titleItemText = item.titleItemText {
+                    let label = DropDownLabel()
+                    label.text = titleItemText
+                    segment = label
+                }
+                else {
+                    let dropDownControl = DropDownControl()
+                    dropDownControl.pickerDataSource = self
+                    dropDownControl.pickerDelegate = self
+                    dropDownControl.titleLabel.text = item.title
+                    dropDownControl.titleLabel.textColor = .gray3
+                    dropDownControl.imageView.tintColor = dropDownControl.titleLabel.textColor
+                    dropDownControl.isEnabled = !item.pickerItems.isEmpty
+                    dropDownControl.pickerInputView.doneButton.addTarget(self, action: #selector(pickerDoneButtonAction(_:)), for: .touchUpInside)
+                    segment = dropDownControl
+                }
+                
                 segment.translatesAutoresizingMaskIntoConstraints = false
                 segment.isUserInteractionEnabled = false
-                segment.pickerDataSource = self
-                segment.pickerDelegate = self
-                segment.titleLabel.text = item.title
-                segment.titleLabel.textColor = .gray3
-                segment.imageView.tintColor = segment.titleLabel.textColor
-                segment.isEnabled = !item.pickerItems.isEmpty
-                segment.pickerInputView.doneButton.addTarget(self, action: #selector(pickerDoneButtonAction(_:)), for: .touchUpInside)
                 addSubview(segment)
                 segment.topAnchor.constraint(equalTo: topAnchor).isActive = true
                 segment.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
@@ -267,13 +288,19 @@ class SegmentedDropDownControl : UIButton {
     
     var highlightedItem: SegmentedDropDownItem? {
         return items.first { item -> Bool in
-            return item.segment?.isHighlighted ?? false
+            if let segment = item.segment as? DropDownControl {
+                return segment.isHighlighted
+            }
+            return false
         }
     }
     
     var selectedItem: SegmentedDropDownItem? {
         return items.first { item -> Bool in
-            return item.segment?.isSelected ?? false
+            if let segment = item.segment as? DropDownControl {
+                return segment.isSelected
+            }
+            return false
         }
     }
     
@@ -304,7 +331,7 @@ class SegmentedDropDownControl : UIButton {
 extension SegmentedDropDownControl : UIPickerViewDataSource, UIPickerViewDelegate {
     private func itemIndex(pickerView: UIPickerView) -> Int {
         return items.index { item -> Bool in
-            guard let segment = item.segment else {
+            guard let segment = item.segment as? DropDownControl else {
                 return false
             }
             
@@ -384,6 +411,24 @@ extension SegmentedDropDownControl : UIPickerViewDataSource, UIPickerViewDelegat
         }
         
         item.segment?.resignFirstResponder()
+    }
+}
+
+fileprivate class DropDownLabel: UILabel {
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        
+        backgroundColor = UIColor(white: 240/255, alpha: 1)
+        textAlignment = .center
+        textColor = .gray2
+        baselineAdjustment = .alignCenters
+        minimumScaleFactor = 0.7
+        adjustsFontSizeToFitWidth = true
+        font = .screenshopFont(.quicksand, size: 16)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }
 

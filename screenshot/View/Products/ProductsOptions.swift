@@ -285,6 +285,9 @@ class ProductsOptionsControls : NSObject {
     }
     
     func createSortControl() -> UIControl {
+        let segmentedTitleItem = SegmentedDropDownItem(titleItem: "Sort by")
+        segmentedTitleItem.widthRatio = 0.25
+        
         let pickerItems = [
             ProductsOptionsSort.priceAsc.stringValue,
             ProductsOptionsSort.priceDes.stringValue,
@@ -293,16 +296,8 @@ class ProductsOptionsControls : NSObject {
         ]
         let segmentedItem = SegmentedDropDownItem(pickerItems: pickerItems, selectedPickerItem: pickerItems.first)
         
-        
         let control = SegmentedDropDownControl()
-        control.items = [segmentedItem]
-        
-//        let control = UISegmentedControl(items: [
-//            ProductsOptionsSort.priceAsc.stringValue,
-//            ProductsOptionsSort.priceDes.stringValue,
-//            ProductsOptionsSort.brands.stringValue,
-//            ProductsOptionsSort.similar.stringValue
-//            ])
+        control.items = [segmentedTitleItem, segmentedItem]
         control.addTarget(self, action: #selector(syncSortControl), for: .valueChanged)
         
         sortControl?.removeFromSuperview()
@@ -584,16 +579,29 @@ class ProductsOptionsViewController: UIViewController {
         titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: containerView.layoutMarginsGuide.trailingAnchor).isActive = true
         titleLabel.centerXAnchor.constraint(equalTo: containerView.layoutMarginsGuide.centerXAnchor).isActive = true
         
+        sortControl = controls.createSortControl()
+        sortControl.translatesAutoresizingMaskIntoConstraints = false
+        sortControl.tintColor = .crazeGreen
+        sortControl.isExclusiveTouch = true
+        containerView.addSubview(sortControl)
+        sortControl.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: .padding).isActive = true
+        sortControl.leadingAnchor.constraint(equalTo: containerView.layoutMarginsGuide.leadingAnchor).isActive = true
+        sortControl.trailingAnchor.constraint(equalTo: containerView.layoutMarginsGuide.trailingAnchor).isActive = true
         
+        saleControl = controls.createSaleControl()
+        saleControl.translatesAutoresizingMaskIntoConstraints = false
+        saleControl.tintColor = .crazeGreen
+        containerView.addSubview(saleControl)
+        saleControl.topAnchor.constraint(equalTo: sortControl.bottomAnchor, constant: .padding).isActive = true
+        saleControl.leadingAnchor.constraint(equalTo: containerView.layoutMarginsGuide.leadingAnchor).isActive = true
+        saleControl.trailingAnchor.constraint(equalTo: containerView.layoutMarginsGuide.trailingAnchor).isActive = true
         
         genderControl = controls.createGenderControl()
         genderControl.translatesAutoresizingMaskIntoConstraints = false
         genderControl.tintColor = .crazeGreen
         genderControl.isExclusiveTouch = true
         containerView.addSubview(genderControl)
-        genderControl.setContentCompressionResistancePriority(UILayoutPriority.required, for: .vertical)
-        genderControl.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
-        genderControl.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: .padding).isActive = true
+        genderControl.topAnchor.constraint(equalTo: saleControl.bottomAnchor, constant: .padding).isActive = true
         genderControl.leadingAnchor.constraint(equalTo: containerView.layoutMarginsGuide.leadingAnchor).isActive = true
         genderControl.trailingAnchor.constraint(equalTo: containerView.layoutMarginsGuide.trailingAnchor).isActive = true
         
@@ -602,33 +610,9 @@ class ProductsOptionsViewController: UIViewController {
         sizeControl.tintColor = .crazeGreen
         sizeControl.isExclusiveTouch = true
         containerView.addSubview(sizeControl)
-        sizeControl.setContentCompressionResistancePriority(UILayoutPriority.required, for: .vertical)
-        sizeControl.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
         sizeControl.topAnchor.constraint(equalTo: genderControl.bottomAnchor, constant: .padding).isActive = true
         sizeControl.leadingAnchor.constraint(equalTo: containerView.layoutMarginsGuide.leadingAnchor).isActive = true
         sizeControl.trailingAnchor.constraint(equalTo: containerView.layoutMarginsGuide.trailingAnchor).isActive = true
-        
-        saleControl = controls.createSaleControl()
-        saleControl.translatesAutoresizingMaskIntoConstraints = false
-        saleControl.tintColor = .crazeGreen
-        containerView.addSubview(saleControl)
-        saleControl.setContentCompressionResistancePriority(UILayoutPriority.required, for: .vertical)
-        saleControl.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
-        saleControl.topAnchor.constraint(equalTo: sizeControl.bottomAnchor, constant: .padding).isActive = true
-        saleControl.leadingAnchor.constraint(equalTo: containerView.layoutMarginsGuide.leadingAnchor).isActive = true
-        saleControl.trailingAnchor.constraint(equalTo: containerView.layoutMarginsGuide.trailingAnchor).isActive = true
-        
-        sortControl = controls.createSortControl()
-        sortControl.translatesAutoresizingMaskIntoConstraints = false
-        sortControl.tintColor = .crazeGreen
-        sortControl.isExclusiveTouch = true
-        containerView.addSubview(sortControl)
-        sortControl.setContentCompressionResistancePriority(UILayoutPriority.required, for: .vertical)
-        sortControl.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
-        sortControl.topAnchor.constraint(equalTo: saleControl.bottomAnchor, constant: .padding).isActive = true
-        sortControl.leadingAnchor.constraint(equalTo: containerView.layoutMarginsGuide.leadingAnchor).isActive = true
-        sortControl.trailingAnchor.constraint(equalTo: containerView.layoutMarginsGuide.trailingAnchor).isActive = true
-        
         
         
         continueButton.translatesAutoresizingMaskIntoConstraints = false
@@ -637,11 +621,10 @@ class ProductsOptionsViewController: UIViewController {
         continueButton.layer.cornerRadius = 0
         continueButton.layer.shadowOpacity = 0
         containerView.addSubview(continueButton)
-        continueButton.topAnchor.constraint(equalTo: sortControl.bottomAnchor, constant: .padding).isActive = true
+        continueButton.topAnchor.constraint(equalTo: sizeControl.bottomAnchor, constant: .padding).isActive = true
         continueButton.leadingAnchor.constraint(equalTo: containerView.leadingAnchor).isActive = true
         continueButton.bottomAnchor.constraint(equalTo: containerView.bottomAnchor).isActive = true
         continueButton.trailingAnchor.constraint(equalTo: containerView.trailingAnchor).isActive = true
-        
     }
 }
 

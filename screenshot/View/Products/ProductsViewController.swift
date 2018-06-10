@@ -11,6 +11,7 @@ import UIKit
 import CoreData
 import PromiseKit
 import Hero
+
 enum ProductsSection : Int {
     case product = 0
     case relatedLooks = 1
