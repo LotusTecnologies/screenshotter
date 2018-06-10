@@ -1148,7 +1148,7 @@ extension AssetSyncModel {
                                 reject(error)
                             }
                         }
-                        if let rootShoppableLabel = rootShoppableLabel {
+                        if let rootShoppableLabel = rootShoppableLabel, alreadyExsistingSubShoppable?.products?.count ?? 0 == 0 {
                             self.userInitiatedQueue.addOperation(AsyncOperation.init(timeout: 90, assetId: nil, shoppableId: productImageUrl, completion: { (completion) in
                                 NetworkingPromise.sharedInstance.uploadToSyte(imageData: nil, orImageUrlString: productImageUrl, imageClassification: .human, isUsc: false).then(execute: { (uploadedURLString, segments) -> Void in
                                     var segment:[String:Any]? = nil
