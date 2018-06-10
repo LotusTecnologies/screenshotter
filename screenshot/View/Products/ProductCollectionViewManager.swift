@@ -40,6 +40,7 @@ class ProductCollectionViewManager {
         
     }
     
+    let productHeaderHeight: CGFloat = 176
     
     public func collectionView(_ collectionView: UICollectionView, sizeForItemInSectionType sectionType: ProductsSection) -> CGSize {
         
@@ -48,7 +49,7 @@ class ProductCollectionViewManager {
         let padding: CGFloat = .padding - shadowInsets.left - shadowInsets.right
         if sectionType == .productHeader{
             size.width = collectionView.bounds.size.width
-            size.height = 200
+            size.height = productHeaderHeight
         }else if sectionType == .product {
             let columns = CGFloat(2)
             size.width = floor((collectionView.bounds.size.width - (padding * (columns + 1))) / columns)
