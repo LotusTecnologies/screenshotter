@@ -273,7 +273,7 @@ class ProductsOptionsControls : NSObject {
     }
     
     func createSaleControl() -> UISegmentedControl {
-        let control = UISegmentedControl(items: [
+        let control = MainSegmentedControl(items: [
             ProductsOptionsSale.sale.stringValue,
             ProductsOptionsSale.all.stringValue
             ])
@@ -285,7 +285,7 @@ class ProductsOptionsControls : NSObject {
     }
     
     func createSortControl() -> UIControl {
-        let segmentedTitleItem = SegmentedDropDownItem(titleItem: "Sort by")
+        let segmentedTitleItem = SegmentedDropDownItem(titleItem: "products.options.sort.title".localized)
         segmentedTitleItem.widthRatio = 0.25
         
         let pickerItems = [
@@ -298,7 +298,6 @@ class ProductsOptionsControls : NSObject {
         
         let control = SegmentedDropDownControl()
         control.items = [segmentedTitleItem, segmentedItem]
-        control.addTarget(self, action: #selector(syncSortControl), for: .valueChanged)
         
         sortControl?.removeFromSuperview()
         sortControl = control
@@ -405,14 +404,6 @@ class ProductsOptionsControls : NSObject {
         let index = ProductsOptionsGender.male.offsetValue
         let isEnabled = enabledControls[genderControl]?[index] ?? true
         genderControl.setEnabled(isEnabled, forSegmentAt: index)
-    }
-    
-    @objc private func syncSortControl() {
-        guard let sortControl = sortControl else {
-            return
-        }
-        
-        // TODO: ?
     }
 }
 
