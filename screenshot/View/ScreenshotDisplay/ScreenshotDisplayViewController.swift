@@ -61,6 +61,17 @@ class ScreenshotDisplayViewController: BaseViewController, UIScrollViewDelegate 
         #endif
     }
     
+    override var previewActionItems: [UIPreviewActionItem] {
+        guard let screenshot = screenshot else {
+            return []
+        }
+        
+        let deleteAction = UIPreviewAction(title: "generic.delete".localized, style: .destructive) { (action, viewController) in
+            DataModel.sharedInstance.hide(screenshotOIDArray: [screenshot.objectID])
+        }
+        return [deleteAction]
+    }
+    
     // MARK: Screenshot
     
     fileprivate var shoppablesFrc: FetchedResultsControllerManager<Shoppable>?

@@ -26,7 +26,7 @@ target 'screenshot' do
     pod 'AWSCognitoAuth'
     pod 'AWSCognitoIdentityProvider'
     pod 'AWSFacebookSignIn'
-
+    pod 'Hero'
 end
 
 post_install do |installer|

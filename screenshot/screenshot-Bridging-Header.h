@@ -9,6 +9,8 @@
 #ifndef screenshot_Bridging_Header_h
 #define screenshot_Bridging_Header_h
 
+#import <CommonCrypto/CommonCrypto.h>
+
 #import "KochavaTracker.h"
 #import "CardIO.h"
 

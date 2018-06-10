@@ -117,8 +117,7 @@ class SigninManager : NSObject {
     func login(email:String, password:String) -> Promise<UserConfirmedStatus>{
         return Promise<UserConfirmedStatus>.init(resolvers: { (fulfil, reject) in
             let emailAttribute = AWSCognitoIdentityUserAttributeType.init(name: "email", value: email)
-            let userName = email.sha1()
-            if let pool = self.pool {
+            if let pool = self.pool, let userName = email.sha1() {
                 pool.signUp(userName, password: password, userAttributes: [emailAttribute], validationData: nil).continueWith(executor: AWSExecutor.mainThread(), block: { (task) -> Any? in
                     if let error = task.error  {
                         let nserror = error as NSError

@@ -35,6 +35,7 @@ PODS:
     - Bolts (~> 1.7)
   - FBSDKLoginKit (4.33.0):
     - FBSDKCoreKit
+  - Hero (1.2.0)
   - KochavaTrackeriOS (3.5.0)
   - lottie-ios (2.5.0)
   - PhoneNumberKit (2.1.0):
@@ -49,9 +50,9 @@ PODS:
   - PromiseKit/StoreKit (4.5.2):
     - PromiseKit/CorePromise
   - RateView (1.2)
-  - SDWebImage (4.3.3):
-    - SDWebImage/Core (= 4.3.3)
-  - SDWebImage/Core (4.3.3)
+  - SDWebImage (4.4.0):
+    - SDWebImage/Core (= 4.4.0)
+  - SDWebImage/Core (4.4.0)
   - SwiftKeychainWrapper (3.0.1)
   - Whisper (6.0.2)
 
@@ -69,6 +70,7 @@ DEPENDENCIES:
   - Clarifai-Apple-SDK (= 3.0.0-beta14)
   - CreditCardValidator
   - EggRating
+  - Hero
   - KochavaTrackeriOS
   - lottie-ios
   - PhoneNumberKit
@@ -98,6 +100,7 @@ SPEC REPOS:
     - EggRating
     - FBSDKCoreKit
     - FBSDKLoginKit
+    - Hero
     - KochavaTrackeriOS
     - lottie-ios
     - PhoneNumberKit
@@ -126,15 +129,16 @@ SPEC CHECKSUMS:
   EggRating: 7f892b9b8da758689525caf9dcb1c9475f9d5139
   FBSDKCoreKit: 572b047a7e029bc44542bcf8a59414e7ff2b543e
   FBSDKLoginKit: 88cb456349cfb3b554427ce4f8b43729d85dfb40
+  Hero: 33dadf2cd1c98af71e213dcbc2902e6e03622a4e
   KochavaTrackeriOS: b612efe2ddaead7e9aa8faf54e0ed96fb027a0ee
   lottie-ios: d699fdee68d7b63e721d949388b015fef1aaa4ac
   PhoneNumberKit: 62003f40ff75315fd3738286558bc365365ac222
   PromiseKit: 743e497a5f505a470d3bbbf4ce0663c1268af0a4
   RateView: d4d12e9bb76dc23a77a56f4e5c5fb530a3f3f998
-  SDWebImage: de4d90b5bff3571eae7bd16202b1f43135409fa5
+  SDWebImage: b534502786e43dde36dfcaee89356fe6df30e203
   SwiftKeychainWrapper: 38952a3636320ae61bad3513cadd870929de7a4a
   Whisper: 169760fc4bab0abf24d5529f9276f95c25cf1025
 
-PODFILE CHECKSUM: 6a59be26751c7b4fdaf7dc9b850d38a376ef6f76
+PODFILE CHECKSUM: 465967bfa06c25dc323d420c6e4b610b66233d5c
 
 COCOAPODS: 1.5.3

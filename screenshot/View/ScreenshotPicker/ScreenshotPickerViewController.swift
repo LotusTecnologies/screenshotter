@@ -190,7 +190,9 @@ class ScreenshotPickerViewController : BaseViewController {
     
     private func reloadAssets() {
         let fetchOptions = PHFetchOptions()
-        fetchOptions.predicate = screenshotsOnlyOrExcludedPredicate()
+        if let screenshotsOnlyOrExcludedPredicate = screenshotsOnlyOrExcludedPredicate {
+            fetchOptions.predicate = screenshotsOnlyOrExcludedPredicate
+        }
         fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
         assets = PHAsset.fetchAssets(with: .image, options: fetchOptions)
         
@@ -217,12 +219,11 @@ class ScreenshotPickerViewController : BaseViewController {
         return selectedAssets
     }
     
-    private func screenshotsOnlyOrExcludedPredicate() -> NSPredicate {
+    private var screenshotsOnlyOrExcludedPredicate: NSPredicate? {
         if isScreenshotsOnly {
             return NSPredicate(format: "((mediaSubtype & %d) != 0)", PHAssetMediaSubtype.photoScreenshot.rawValue)
-        }else {
-            return NSPredicate(format: "NOT ((mediaSubtype & %d) != 0)", PHAssetMediaSubtype.photoScreenshot.rawValue)
         }
+        return nil
     }
     
     // MARK: Segment

@@ -7,24 +7,15 @@
 //
 
 import Foundation
-
-extension String
-{
-    func sha1() -> String
-    {
-        var selfAsSha1 = ""
-        
-        if let data = self.dataUsingEncoding(NSUTF8StringEncoding)
-        {
-            var digest = [UInt8](count: Int(CC_SHA1_DIGEST_LENGTH), repeatedValue: 0)
-            CC_SHA1(data.bytes, CC_LONG(data.length), &digest)
-            
-            for index in 0..<CC_SHA1_DIGEST_LENGTH
-            {
-                selfAsSha1 += String(format: "%02x", digest[Int(index)])
-            }
+extension String {
+    func sha1() -> String? {
+        if let data = self.data(using: String.Encoding.utf8) {
+        var digest = [UInt8](repeating: 0, count:Int(CC_SHA1_DIGEST_LENGTH))
+        data.withUnsafeBytes {
+            _ = CC_SHA1($0, CC_LONG(data.count), &digest)
         }
-        
-        return selfAsSha1
+        return Data(bytes: digest).base64EncodedString()
+        }
+        return nil
     }
 }

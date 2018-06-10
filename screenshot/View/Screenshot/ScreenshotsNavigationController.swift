@@ -51,8 +51,15 @@ class ScreenshotsNavigationController: UINavigationController {
 
 extension ScreenshotsNavigationController: ViewControllerLifeCycle {
     func viewController(_ viewController: UIViewController, didDisappear animated: Bool) {
-        if viewController.isKind(of: ProductsViewController.self) && needsToPresentPushAlert {
-            presentPushAlert()
+        if let productsViewController = viewController as? ProductsViewController, let _ = self.topViewController as? ScreenshotsViewController {
+            if needsToPresentPushAlert {
+                presentPushAlert()
+            }
+            
+            let screenshot = productsViewController.screenshot
+            AssetSyncModel.sharedInstance.clearSubShoppables(screenshot: screenshot)
+            
+            
         }
     }
 }
