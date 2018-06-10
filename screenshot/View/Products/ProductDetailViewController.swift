@@ -282,7 +282,7 @@ extension ProductDetailViewController : AsyncOperationMonitorDelegate, FetchedRe
         
         retryButton.addTarget(self, action: #selector(noItemsRetryAction), for: .touchUpInside)
         
-        helperView.topAnchor.constraint(equalTo: self.topLayoutGuide.bottomAnchor, constant:200).isActive = true
+        helperView.topAnchor.constraint(equalTo: self.topLayoutGuide.bottomAnchor, constant: productCollectionViewManager.productHeaderHeight).isActive = true
         helperView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
         helperView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
         helperView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
