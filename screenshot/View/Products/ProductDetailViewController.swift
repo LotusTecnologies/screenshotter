@@ -258,10 +258,15 @@ extension ProductDetailViewController : UICollectionViewDelegateFlowLayout, UICo
 
 extension ProductDetailViewController {
     @objc private func presentFilterAction() {
-        
+        let viewController = ProductsOptionsViewController()
+        viewController.continueButton.addTarget(self, action: #selector(dismissFilterAction), for: .touchUpInside)
+        present(viewController, animated: true)
+    }
+    
+    @objc private func dismissFilterAction() {
+        dismiss(animated: true)
     }
 }
-
 
 extension ProductDetailViewController : AsyncOperationMonitorDelegate, FetchedResultsControllerManagerDelegate {
     func syncViewsAfterStateChange() {
