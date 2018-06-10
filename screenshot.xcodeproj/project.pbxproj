@@ -197,6 +197,10 @@
 		C5DBA2C8207A14A8006CC6C9 /* CheckoutPaymentFormViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5DBA2C7207A14A8006CC6C9 /* CheckoutPaymentFormViewController.swift */; };
 		C5DC531120CCFD5600E90DB8 /* SpinnerCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5DC531020CCFD5600E90DB8 /* SpinnerCollectionViewCell.swift */; };
 		C5DC531320CCFD6E00E90DB8 /* ErrorCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5DC531220CCFD6E00E90DB8 /* ErrorCollectionViewCell.swift */; };
+		C5DC531A20CD3F2100E90DB8 /* Quicksand-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C5DC531620CD3F2000E90DB8 /* Quicksand-Medium.ttf */; };
+		C5DC531B20CD3F2100E90DB8 /* Quicksand-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C5DC531720CD3F2000E90DB8 /* Quicksand-Regular.ttf */; };
+		C5DC531C20CD3F2100E90DB8 /* Quicksand-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C5DC531820CD3F2000E90DB8 /* Quicksand-Light.ttf */; };
+		C5DC531D20CD3F2100E90DB8 /* Quicksand-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C5DC531920CD3F2100E90DB8 /* Quicksand-Bold.ttf */; };
 		C5DDC0DC2015C6D900B009BF /* AttributedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5DDC0DB2015C6D900B009BF /* AttributedString.swift */; };
 		C5E21D8E2091A88900807395 /* CheckoutListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5E21D8D2091A88900807395 /* CheckoutListViewController.swift */; };
 		C5E6C316208F22C0006E9C54 /* CheckoutSupportedLocationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5E6C315208F22BF006E9C54 /* CheckoutSupportedLocationModel.swift */; };
@@ -457,6 +461,10 @@
 		C5DBA2C7207A14A8006CC6C9 /* CheckoutPaymentFormViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutPaymentFormViewController.swift; sourceTree = "<group>"; };
 		C5DC531020CCFD5600E90DB8 /* SpinnerCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SpinnerCollectionViewCell.swift; sourceTree = "<group>"; };
 		C5DC531220CCFD6E00E90DB8 /* ErrorCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ErrorCollectionViewCell.swift; sourceTree = "<group>"; };
+		C5DC531620CD3F2000E90DB8 /* Quicksand-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Medium.ttf"; sourceTree = "<group>"; };
+		C5DC531720CD3F2000E90DB8 /* Quicksand-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Regular.ttf"; sourceTree = "<group>"; };
+		C5DC531820CD3F2000E90DB8 /* Quicksand-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Light.ttf"; sourceTree = "<group>"; };
+		C5DC531920CD3F2100E90DB8 /* Quicksand-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Bold.ttf"; sourceTree = "<group>"; };
 		C5DDC0DB2015C6D900B009BF /* AttributedString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttributedString.swift; sourceTree = "<group>"; };
 		C5E21D8D2091A88900807395 /* CheckoutListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutListViewController.swift; sourceTree = "<group>"; };
 		C5E6C315208F22BF006E9C54 /* CheckoutSupportedLocationModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CheckoutSupportedLocationModel.swift; sourceTree = "<group>"; };
@@ -613,6 +621,10 @@
 				C572FEFD205C00070046BFEB /* Hind-Medium.ttf */,
 				C572FEFB205C00060046BFEB /* Hind-Regular.ttf */,
 				C572FEFC205C00060046BFEB /* Hind-SemiBold.ttf */,
+				C5DC531920CD3F2100E90DB8 /* Quicksand-Bold.ttf */,
+				C5DC531820CD3F2000E90DB8 /* Quicksand-Light.ttf */,
+				C5DC531620CD3F2000E90DB8 /* Quicksand-Medium.ttf */,
+				C5DC531720CD3F2000E90DB8 /* Quicksand-Regular.ttf */,
 			);
 			path = Fonts;
 			sourceTree = "<group>";
@@ -1336,6 +1348,8 @@
 				C53B15B11FDD1EF400658A78 /* FavoriteHeart.json in Resources */,
 				C572FF01205C00070046BFEB /* Hind-SemiBold.ttf in Resources */,
 				C5CAF27A1FCC0EFD006F37DC /* ISO4217.plist in Resources */,
+				C5DC531B20CD3F2100E90DB8 /* Quicksand-Regular.ttf in Resources */,
+				C5DC531C20CD3F2100E90DB8 /* Quicksand-Light.ttf in Resources */,
 				C572FEFE205C00070046BFEB /* Hind-Light.ttf in Resources */,
 				C572FF02205C00070046BFEB /* Hind-Medium.ttf in Resources */,
 				E4139D501F09083B00E8A53B /* Assets.xcassets in Resources */,
@@ -1344,9 +1358,11 @@
 				E4DB2B7C1F7E1D4600320BE5 /* LaunchScreen.storyboard in Resources */,
 				C53B15BA1FDD638C00658A78 /* Localizable.strings in Resources */,
 				C5E6C318208F23AA006E9C54 /* CheckoutSupportedStates.plist in Resources */,
+				C5DC531D20CD3F2100E90DB8 /* Quicksand-Bold.ttf in Resources */,
 				527F174A1FA21CA6008082BC /* Craze_Video.mp4 in Resources */,
 				C5E6C31A208F2415006E9C54 /* CheckoutSupportedCountries.plist in Resources */,
 				C5D98CCC1FFA642300CC1A97 /* GameScene.sks in Resources */,
+				C5DC531A20CD3F2100E90DB8 /* Quicksand-Medium.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
