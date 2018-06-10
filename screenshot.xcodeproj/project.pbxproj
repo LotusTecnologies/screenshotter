@@ -183,7 +183,6 @@
 		C5C43A54209599D8000AF22A /* ActionFeedbackGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5C43A53209599D7000AF22A /* ActionFeedbackGenerator.swift */; };
 		C5CAF27A1FCC0EFD006F37DC /* ISO4217.plist in Resources */ = {isa = PBXBuildFile; fileRef = C5CAF2791FCC0EFD006F37DC /* ISO4217.plist */; };
 		C5CAF27C1FCC14C1006F37DC /* CurrencyModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CAF27B1FCC14C1006F37DC /* CurrencyModel.swift */; };
-		C5CBD33920C3C5FB0067444A /* ShoppablesContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CBD33820C3C5FB0067444A /* ShoppablesContainerView.swift */; };
 		C5CC3E391F94A85900DA3425 /* NetworkingIndicatorProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CC3E381F94A85900DA3425 /* NetworkingIndicatorProtocol.swift */; };
 		C5CF974E20861B17004F5F41 /* CheckoutFormViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CF974D20861B17004F5F41 /* CheckoutFormViewController.swift */; };
 		C5D2E304204D1C6500B5BD92 /* CartItemCountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5D2E303204D1C6500B5BD92 /* CartItemCountView.swift */; };
@@ -444,7 +443,6 @@
 		C5C43A53209599D7000AF22A /* ActionFeedbackGenerator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActionFeedbackGenerator.swift; sourceTree = "<group>"; };
 		C5CAF2791FCC0EFD006F37DC /* ISO4217.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = ISO4217.plist; sourceTree = "<group>"; };
 		C5CAF27B1FCC14C1006F37DC /* CurrencyModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyModel.swift; sourceTree = "<group>"; };
-		C5CBD33820C3C5FB0067444A /* ShoppablesContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShoppablesContainerView.swift; sourceTree = "<group>"; };
 		C5CC3E381F94A85900DA3425 /* NetworkingIndicatorProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkingIndicatorProtocol.swift; sourceTree = "<group>"; };
 		C5CF974D20861B17004F5F41 /* CheckoutFormViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutFormViewController.swift; sourceTree = "<group>"; };
 		C5D2E303204D1C6500B5BD92 /* CartItemCountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartItemCountView.swift; sourceTree = "<group>"; };
@@ -783,7 +781,6 @@
 			isa = PBXGroup;
 			children = (
 				C54087D81FE90C8D00198955 /* ShoppableCollectionViewCell.swift */,
-				C5CBD33820C3C5FB0067444A /* ShoppablesContainerView.swift */,
 				3151863F2033FC81001BD8D6 /* ShoppablesToolbar.swift */,
 			);
 			path = Shoppable;
@@ -1602,7 +1599,6 @@
 				31CE1107203BEF36000156EE /* SaleView.swift in Sources */,
 				31EF9B0720299D15006D3B35 /* InAppPurchaseManager.swift in Sources */,
 				C5233F0B1F6FF05800F25C7C /* LifeCycleProtocol.swift in Sources */,
-				C5CBD33920C3C5FB0067444A /* ShoppablesContainerView.swift in Sources */,
 				C501412E20623DFD00ABFB5C /* UICollectionView.swift in Sources */,
 				C5E6C316208F22C0006E9C54 /* CheckoutSupportedLocationModel.swift in Sources */,
 				31CEA0B720C91A4B00058ECC /* ProductCollectionViewManager.swift in Sources */,

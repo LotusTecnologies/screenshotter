@@ -54,13 +54,12 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
     }
 
     var selectedShoppable:Shoppable?
-    var menuDisplayingIndexPath:IndexPath?
 
     func getSelectedShoppable() -> Shoppable? {
         if let s = selectedShoppable {
             return s
-        } else if let shoppablesContainer = shoppablesToolbarContainer {
-            let s = shoppablesContainer.toolbar.selectedShoppable()
+        } else if let toolbar = shoppablesToolbar {
+            let s = toolbar.selectedShoppable()
             selectedShoppable = s
             return s
         }
@@ -71,7 +70,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
     var shareToDiscoverPrompt:UIView?
     fileprivate let filterView = CustomInputtableView()
     
-    fileprivate var shoppablesToolbarContainer: ShoppablesContainerView?
+    fileprivate var shoppablesToolbar: ShoppablesToolbar?
     
     var loadingMonitor:AsyncOperationMonitor?
 
@@ -98,19 +97,18 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
         
         screenshotController = DataModel.sharedInstance.singleScreenshotFrc(delegate: self, screenshot: screenshot)
         
-        let shoppablesToolbarContainer: ShoppablesContainerView = {
-            let container = ShoppablesContainerView(screenshot: screenshot)
-            container.translatesAutoresizingMaskIntoConstraints = false
-            container.isHidden = shouldHideToolbar
-            container.toolbar.shoppableToolbarDelegate = self
-            container.subToolbar.shoppableToolbarDelegate = self
-            view.addSubview(container)
-            container.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor).isActive = true
-            container.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-            container.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-            return container
+        let shoppablesToolbar: ShoppablesToolbar = {
+            let toolbar = ShoppablesToolbar(screenshot: screenshot)
+            toolbar.translatesAutoresizingMaskIntoConstraints = false
+            toolbar.isHidden = shouldHideToolbar
+            toolbar.shoppableToolbarDelegate = self
+            view.addSubview(toolbar)
+            toolbar.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor).isActive = true
+            toolbar.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+            toolbar.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+            return toolbar
         }()
-        self.shoppablesToolbarContainer = shoppablesToolbarContainer
+        self.shoppablesToolbar = shoppablesToolbar
         
         let collectionView:UICollectionView = {
             let minimumSpacing = self.collectionViewMinimumSpacing()
@@ -123,8 +121,8 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
             collectionView.translatesAutoresizingMaskIntoConstraints = false
             collectionView.delegate = self
             collectionView.dataSource = self
-            collectionView.contentInset = UIEdgeInsets(top: self.shoppablesToolbarContainer?.intrinsicContentSize.height ?? 0, left: 0.0, bottom: minimumSpacing.y, right: 0.0)
-            collectionView.scrollIndicatorInsets = UIEdgeInsets(top: self.shoppablesToolbarContainer?.intrinsicContentSize.height ?? 0, left: 0.0, bottom: 0.0, right: 0.0)
+            collectionView.contentInset = UIEdgeInsets(top: self.shoppablesToolbar?.intrinsicContentSize.height ?? 0, left: 0.0, bottom: minimumSpacing.y, right: 0.0)
+            collectionView.scrollIndicatorInsets = UIEdgeInsets(top: self.shoppablesToolbar?.intrinsicContentSize.height ?? 0, left: 0.0, bottom: 0.0, right: 0.0)
             collectionView.backgroundColor = self.view.backgroundColor
             // TODO: set the below to interactive and comment the dismissal in -scrollViewWillBeginDragging.
             // Then test why the control view (products options view) jumps before being dragged away.
@@ -194,14 +192,12 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
             Analytics.trackScreenshotOpenedWithoutShoppables(screenshot: screenshot)
         }
         else {
-            self.shoppablesToolbarContainer?.toolbar.selectFirstShoppable()
+            self.shoppablesToolbar?.selectFirstShoppable()
         }
         
         let pinchZoom = UIPinchGestureRecognizer.init(target: self, action: #selector(pinch(gesture:)))
         self.view.addGestureRecognizer(pinchZoom)
         
-        let longPress = UILongPressGestureRecognizer.init(target: self, action: #selector(longPress(gesture:)))
-        shoppablesToolbarContainer.addGestureRecognizer(longPress)
 
     }
     
@@ -228,7 +224,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        self.shoppablesToolbarContainer?.toolbar.didViewControllerAppear = true
+        self.shoppablesToolbar?.didViewControllerAppear = true
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -238,8 +234,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
     }
     
     deinit {
-        self.shoppablesToolbarContainer?.toolbar.shoppableToolbarDelegate = nil
-        self.shoppablesToolbarContainer?.subToolbar.shoppableToolbarDelegate = nil
+        self.shoppablesToolbar?.shoppableToolbarDelegate = nil
     }
 }
 
@@ -612,7 +607,7 @@ extension ProductsViewControllerShoppables: FetchedResultsControllerManagerDeleg
     }
     
     var hasShoppables: Bool {
-        return (self.shoppablesToolbarContainer?.toolbar.shoppablesController.fetchedObjectsCount ?? 0 ) > 0
+        return (self.shoppablesToolbar?.shoppablesController.fetchedObjectsCount ?? 0 ) > 0
     }
 }
 
@@ -776,7 +771,7 @@ extension ProductsViewControllerShareToDiscoverPrompt {
 
 extension ProductsViewController {
     func syncContentInset() {
-        guard let collectionView = collectionView, let shoppablesToolbar = self.shoppablesToolbarContainer else {
+        guard let collectionView = collectionView, let shoppablesToolbar = self.shoppablesToolbar else {
             return
         }
         
@@ -795,7 +790,7 @@ extension ProductsViewController {
     }
     
     func syncViewsAfterStateChange() {
-        shoppablesToolbarContainer?.isHidden = shouldHideToolbar
+        shoppablesToolbar?.isHidden = shouldHideToolbar
         
         switch (screenshotLoadingState) {
         case .loading, .unknown:
@@ -835,8 +830,8 @@ extension ProductsViewControllerNoItemsHelperView{
 
         retryButton.addTarget(self, action: #selector(noItemsRetryAction), for: .touchUpInside)
 
-        if let shoppablesToolbarContainer = self.shoppablesToolbarContainer{
-            helperView.topAnchor.constraint(equalTo: shoppablesToolbarContainer.bottomAnchor, constant:0).isActive = true
+        if let shoppablesToolbar = self.shoppablesToolbar{
+            helperView.topAnchor.constraint(equalTo: shoppablesToolbar.bottomAnchor, constant:0).isActive = true
         }else{
             helperView.topAnchor.constraint(equalTo: self.topLayoutGuide.bottomAnchor).isActive = true
         }
@@ -1069,80 +1064,4 @@ extension ProductsViewController : AsyncOperationMonitorDelegate {
 
 }
 
-//Sub shoppable poup menu
-extension ProductsViewController {
-    @objc func longPress( gesture:UIPinchGestureRecognizer) {
-        
-        if let shoppablesToolbarContainer = self.shoppablesToolbarContainer, let collectionView = shoppablesToolbarContainer.subToolbar.collectionView, let indexPath = collectionView.indexPathForItem(at:gesture.location(in: collectionView)), let cell = collectionView.cellForItem(at: indexPath) {
-            let editMenu = UIMenuController.shared
-            if !editMenu.isMenuVisible {
-                self.menuDisplayingIndexPath = indexPath
-                let createScreenshot = UIMenuItem.init(title: "Create Screenshot", action: #selector(createScreenshot(_:)))
-                let delete = UIMenuItem.init(title: "Delete", action: #selector(deleteSubShoppable(_:)))
-                
-                editMenu.menuItems = [createScreenshot, delete]
-                editMenu.setTargetRect(cell.bounds, in: cell)
-                editMenu.setMenuVisible(true, animated: true)
-            }
-            
-        }
-        
-        
-    }
-    override var canBecomeFirstResponder: Bool {
-        return true
-    }
-    override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
-        if action == #selector(ProductsViewController.deleteSubShoppable) ||  action == #selector(ProductsViewController.createScreenshot) {
-            return true
-        }
-        return false
-        
-    }
-    
-    @objc func createScreenshot(_ sender:Any) {
-        if let index = menuDisplayingIndexPath, let shoppablesToolbarContainer = self.shoppablesToolbarContainer{
-            menuDisplayingIndexPath = nil
-            
-            let shoppables = shoppablesToolbarContainer.subToolbar.shoppables
-            if shoppables.count > index.row {
-                
-                let shoppable = shoppables[index.row]
-                Analytics.trackProductBurrowConvertedToScreenshot(shoppable: shoppable)
-                Screenshot.createWith(subShoppable: shoppable)
-                    
-                if let tabBarController = tabBarController as? MainTabBarController {
-                    AccumulatorModel.screenshotUninformed.incrementUninformedCount()
-                    tabBarController.screenshotsTabPulseAnimation()
-                }
-            }
-
-            
-        }
-        
-    }
-    
-    @objc func deleteSubShoppable(_ sender:Any) {
-    
-        if let index = menuDisplayingIndexPath, let shoppablesToolbarContainer = self.shoppablesToolbarContainer, let selected = shoppablesToolbarContainer.subToolbar.selectedShoppable() {
-            menuDisplayingIndexPath = nil
-            let shoppables = shoppablesToolbarContainer.subToolbar.shoppables
-            if shoppables.count > index.row {
-                let shoppable = shoppables[index.row]
-                Analytics.trackProductBurrowDelete(shoppable: shoppable)
-
-                if selected == shoppable {
-                    shoppablesToolbarContainer.subToolbar.deselectShoppable()
-                    if let objectId = shoppablesToolbarContainer.subToolbar.rootShoppableObjectId, let parentShoppable = DataModel.sharedInstance.mainMoc().shoppableWith(objectId: objectId){
-                        shoppablesToolbarContainer.toolbar.selectShoppable(parentShoppable)
-                        if parentShoppable.subShoppables?.count == 1 {
-                            shoppablesToolbarContainer.visibleToolbar = .top
-                        }
-                    }
-                }
-                shoppable.deleteSubshoppable()
-            }
-        }
-    }
-}
 
