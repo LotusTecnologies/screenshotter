@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Jonathan Rose on 2/11/18.
-//  Copyright Â© 2018 crazeapp. All rights reserved.
+//  Copyright © 2018 crazeapp. All rights reserved.
 //
 
 import UIKit
@@ -121,7 +121,9 @@ class ProductsCollectionViewCell : UICollectionViewCell {
             productView.topAnchor.constraint(equalTo: self.contentView.topAnchor).isActive = true
             productView.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor).isActive = true
             productView.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor).isActive = true
-            productView.heightAnchor.constraint(lessThanOrEqualTo: productView.widthAnchor, multiplier: 1.0).isActive = true
+            let heightConstraint = productView.heightAnchor.constraint(equalTo: productView.widthAnchor)
+            heightConstraint.priority = .defaultHigh
+            heightConstraint.isActive = true
             return productView
         }()
         self.productView = productView
