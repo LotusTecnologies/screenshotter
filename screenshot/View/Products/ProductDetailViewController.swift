@@ -18,7 +18,7 @@ class ProductDetailViewController: BaseViewController {
     var shoppable:Shoppable?
     var productsOptions:ProductsOptions = ProductsOptions()
     var noItemsHelperView:HelperView?
-
+    var loaderContainer = UIView()
     var uuid:String?
     var productsLoadingMonitor:AsyncOperationMonitor?
     fileprivate var productsFRC: FetchedResultsControllerManager<Product>?
@@ -72,6 +72,15 @@ class ProductDetailViewController: BaseViewController {
             return collectionView
         }()
         self.collectionView = collectionView
+        
+        loaderContainer.backgroundColor = .clear
+        loaderContainer.isUserInteractionEnabled = false
+        loaderContainer.translatesAutoresizingMaskIntoConstraints = false
+        self.view.addSubview(loaderContainer)
+        loaderContainer.topAnchor.constraint(equalTo: self.topLayoutGuide.bottomAnchor, constant:200).isActive = true
+        loaderContainer.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
+        loaderContainer.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
+        loaderContainer.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
         
         
         let pinchZoom = UIPinchGestureRecognizer.init(target: self, action: #selector(pinch(gesture:)))
@@ -253,7 +262,7 @@ extension ProductDetailViewController : AsyncOperationMonitorDelegate, FetchedRe
         case .loading, .unknown:
             self.hideNoItemsHelperView()
 
-            self.productCollectionViewManager.startAndAddLoader(view: self.view)
+            self.productCollectionViewManager.startAndAddLoader(view: self.loaderContainer)
         case .products:
             self.productCollectionViewManager.stopAndRemoveLoader()
             self.hideNoItemsHelperView()
