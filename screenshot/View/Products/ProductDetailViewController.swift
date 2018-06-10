@@ -103,6 +103,10 @@ class ProductDetailViewController: BaseViewController {
             }
         }
     }
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.collectionView?.reloadData()
+    }
 }
 
 
@@ -320,13 +324,17 @@ extension ProductDetailViewController : AsyncOperationMonitorDelegate, FetchedRe
         self.updateLoadingState()
     }
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
-        if let shoppable = self.shoppable {
+        if let shoppable = self.shoppable, self.products.count == 0 {
             self.products = self.productCollectionViewManager.productsForShoppable(shoppable, productsOptions: self.productsOptions)
-        }
-        self.updateLoadingState()
-        if view.window != nil, let collectionView = collectionView {
+            self.updateLoadingState()
+        }else if view.window != nil, let collectionView = collectionView {
             if change.updatedRows.count > 0 && change.deletedRows.count == 0 && change.insertedRows.count == 0 {
-                collectionView.reloadItems(at: collectionView.indexPathsForVisibleItems)
+                collectionView.indexPathsForVisibleItems.forEach { (indexPath) in
+                    let product = self.productAtIndex(indexPath.item)
+                    if let cell = collectionView.cellForItem(at: indexPath) as? ProductsCollectionViewCell {
+                        self.productCollectionViewManager.setup(cell: cell, with: product)
+                    }
+                }
             }else{
                 collectionView.reloadData()
             }
