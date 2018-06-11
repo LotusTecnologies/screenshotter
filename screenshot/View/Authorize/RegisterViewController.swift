@@ -472,6 +472,7 @@ class RegisterViewController: UIViewController {
             }
             if !hasValidPassword {
                 _view.passwordTextField.isInvalid = true
+                // password must be at least 8 characters long. 
             }
             
             ActionFeedbackGenerator().actionOccurred(.nope)
