@@ -499,6 +499,7 @@ class RegisterViewController: UIViewController {
     @objc private func forgotPasswordAction() {
         let resetPasswordViewController = InitiateResetPasswordViewController()
         resetPasswordViewController.delegate = self
+        resetPasswordViewController._view.emailTextField.text = self.email
         navigationController?.pushViewController(resetPasswordViewController, animated: true)
     }
     
@@ -561,22 +562,6 @@ extension RegisterViewController: UITextFieldDelegate {
             if let email = self.email, emailFormRow.isValid() {
                 _view.emailTextField.exists = .unknown
                 
-                SigninManager.shared.isExistingUser(email: email)
-                    .then { [weak self] isExistingUser -> Void in
-                        if isExistingUser {
-                            self?._view.emailTextField.exists = .yes
-                            self?.setContinueCopy(.login)
-                        }
-                        else {
-                            self?._view.emailTextField.exists = .no
-                            self?.setContinueCopy(.register)
-                        }
-                    }
-                    .catch { [weak self] error in
-                        // TODO:
-                        self?._view.emailTextField.exists = .unknown
-                        self?.setContinueCopy(.default)
-                }
                 
                 if previousEmail != email {
                     _view.isForgotPasswordButtonHidden = true
@@ -625,10 +610,26 @@ extension RegisterViewController: UITextViewDelegate {
 
 extension RegisterViewController: InitiateResetPasswordViewControllerDelegate {
     func initiateResetPasswordViewControllerDidReset(_ viewController: InitiateResetPasswordViewController) {
-        navigationController?.popViewController(animated: true)
+        let resetPasswordViewController = ResetPasswordViewController()
+        resetPasswordViewController.delegate = self
+        self.email = viewController._view.emailTextField.text
+        resetPasswordViewController.email = self.email
+        self.navigationController?.pushViewController(resetPasswordViewController, animated: true)
     }
     
     func initiateResetPasswordViewControllerDidCancel(_ viewController: InitiateResetPasswordViewController) {
         navigationController?.popViewController(animated: true)
     }
+}
+extension RegisterViewController: ResetPasswordViewControllerDelegate {
+    func resetPasswordViewControllerDidReset(_ viewController: ResetPasswordViewController) {
+        self.delegate?.registerViewControllerDidSignup(self)
+    }
+    
+    func resetPasswordViewControllerDidCancel(_ viewController: ResetPasswordViewController) {
+        navigationController?.popToRootViewController(animated: true)
+
+    }
+    
+    
 }

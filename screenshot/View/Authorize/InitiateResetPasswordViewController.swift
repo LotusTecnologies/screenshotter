@@ -129,7 +129,7 @@ class InitiateResetPasswordViewController: UIViewController {
         return view as! InitiateResetPasswordView
     }
     
-    var continueButton: UIButton {
+    var continueButton: MainButton {
         return _view.continueButton
     }
     
@@ -167,13 +167,17 @@ class InitiateResetPasswordViewController: UIViewController {
         dismissKeyboard()
         
         if let email = validateEmail(_view.emailTextField.text) {
-            sendEmail(email)
-            
-            let alertController = UIAlertController(title: "authorize.initiate_reset_password.alert.title".localized, message: "authorize.initiate_reset_password.alert.message".localized, preferredStyle: .alert)
-            alertController.addAction(UIAlertAction(title: "generic.ok".localized, style: .cancel, handler: { alertAction in
-                self.delegate?.initiateResetPasswordViewControllerDidReset(self)
-            }))
-            present(alertController, animated: true)
+            SigninManager.shared.forgotPassword(email: email)
+                .then(on: .main) { () -> Void in
+                    self.delegate?.initiateResetPasswordViewControllerDidReset(self)
+                }.catch { (error) in
+                    
+                }.always {
+                    self.continueButton.isLoading = false
+                    self.continueButton.isEnabled = true
+                    self._view.emailTextField.isUserInteractionEnabled = true
+                    
+            }
         }
         else {
             _view.emailTextField.isInvalid = true
@@ -196,9 +200,6 @@ class InitiateResetPasswordViewController: UIViewController {
         return nil
     }
     
-    private func sendEmail(_ email: String) {
-        // TODO:
-    }
     
     // MARK: Keyboard
     

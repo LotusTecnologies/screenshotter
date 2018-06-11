@@ -192,11 +192,6 @@ class SigninManager : NSObject {
         })
     }
     
-    func isExistingUser(email: String) -> Promise<Bool> {
-        return Promise { fulfill, reject in
-            fulfill(email == "a@a.aa")
-        }
-    }
     
     private func registerUser() {
         // TODO: Gershon needs to deal with this
@@ -254,6 +249,12 @@ class SigninManager : NSObject {
                 reject(SigninManagerError.notSetup)
             }
         }
+    }
+    public func validatePassword(_ password: String?) -> String? {
+        if let password = password, !password.isEmpty, password.lengthOfBytes(using: .utf8) >= 8 {
+            return password
+        }
+        return nil
     }
     
     func forgotPassword(email:String) ->Promise<Void> {

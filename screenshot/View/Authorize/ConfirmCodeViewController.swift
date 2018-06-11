@@ -50,7 +50,7 @@ class ConfirmCodeView: UIScrollView {
         
         let explainLabel = UILabel()
         explainLabel.translatesAutoresizingMaskIntoConstraints = false
-        explainLabel.text = "An email was sent to %@. please enter the code that you recieved in the email.".localized(withFormat: email)
+        explainLabel.text = "authorize.confirm.explaination".localized(withFormat: email)
         explainLabel.textColor = .gray3
         explainLabel.font = .screenshopFont(.hindLight, textStyle: .headline, staticSize: true)
         explainLabel.minimumScaleFactor = 0.7
