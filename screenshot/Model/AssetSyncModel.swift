@@ -1069,6 +1069,37 @@ extension AssetSyncModel {
         return self.addSubShoppable(productImageUrl: productImageUrl, shoppable: shoppable, optionsMask: optionsMask)
     }
     
+    public func clearSubShoppables(screenshot:Screenshot) {
+        let objectId = screenshot.objectID
+        DataModel.sharedInstance.performBackgroundTask { (context) in
+            if let screenshot = context.screenshotWith(objectId: objectId) {
+                var objectsToDelete:[NSManagedObject] = []
+                var productsToNilOutShoppable:[Product] = []
+                screenshot.shoppables?.forEach({ (shoppable) in
+                    if let shoppable = shoppable as? Shoppable {
+                        if let _ = shoppable.parentShoppable {
+                            objectsToDelete.append(shoppable)
+                            shoppable.products?.forEach({ (product) in
+                                if let product = product as? Product {
+                                    if product.isFavorite {
+                                        product.screenshot = shoppable.screenshot
+                                        productsToNilOutShoppable.append(product)
+                                    }else{
+                                        objectsToDelete.append(product)
+                                    }
+                                }
+                            })
+                        }
+                    }
+                })
+                productsToNilOutShoppable.forEach({ $0.shoppable = nil })
+                objectsToDelete.forEach({ (object) in
+                    context.delete(object)
+                })
+                context.saveIfNeeded()
+            }
+        }
+    }
     private func addSubShoppable(productImageUrl:String?, shoppable:Shoppable?, optionsMask:ProductsOptionsMask) -> Promise<Shoppable> {
         var rootShoppable = shoppable
         if let parent = rootShoppable?.parentShoppable {
@@ -1117,94 +1148,94 @@ extension AssetSyncModel {
                                 reject(error)
                             }
                         }
-                        if let rootShoppableLabel = rootShoppableLabel {
-                        self.userInitiatedQueue.addOperation(AsyncOperation.init(timeout: 90, assetId: nil, shoppableId: productImageUrl, completion: { (completion) in
-                            NetworkingPromise.sharedInstance.uploadToSyte(imageData: nil, orImageUrlString: productImageUrl, imageClassification: .human, isUsc: false).then(execute: { (uploadedURLString, segments) -> Void in
-                                var segment:[String:Any]? = nil
-                                
-                                
-                                if segments.count == 1 {
-                                    segment = segments.first
-                                }
-                                
-                                if segment == nil {
-                                    segment = segments.first(where: { (segDict) -> Bool in
-                                        if let label = segDict["label"] as? String {
-                                            return rootShoppableLabel.contains(label.lowercased())
+                        if let rootShoppableLabel = rootShoppableLabel, alreadyExsistingSubShoppable?.products?.count ?? 0 == 0 {
+                            self.userInitiatedQueue.addOperation(AsyncOperation.init(timeout: 90, assetId: nil, shoppableId: productImageUrl, completion: { (completion) in
+                                NetworkingPromise.sharedInstance.uploadToSyte(imageData: nil, orImageUrlString: productImageUrl, imageClassification: .human, isUsc: false).then(execute: { (uploadedURLString, segments) -> Void in
+                                    var segment:[String:Any]? = nil
+                                    
+                                    
+                                    if segments.count == 1 {
+                                        segment = segments.first
+                                    }
+                                    
+                                    if segment == nil {
+                                        segment = segments.first(where: { (segDict) -> Bool in
+                                            if let label = segDict["label"] as? String {
+                                                return rootShoppableLabel.contains(label.lowercased())
+                                            }
+                                            return false
+                                        })
+                                    }
+                                    
+                                    if segment == nil {
+                                        segment = segments.sorted(by: { (dict1, dict2) -> Bool in
+                                            if let rect1 = CGRect.rectFrom(syteDict: dict1),
+                                                let rect2 = CGRect.rectFrom(syteDict: dict2) {
+                                                return rect1.size.area > rect2.size.area
+                                            }
+                                            return false
+                                            
+                                        }).first
+                                    }
+                                    
+                                    // Analytics
+                                    if let selectedSegment = segment {
+                                        var selectedSegmentLabelWithArea = selectedSegment["label"] as? String
+                                        if let label = selectedSegmentLabelWithArea {
+                                            if let rect1 = CGRect.rectFrom(syteDict: selectedSegment) {
+                                                selectedSegmentLabelWithArea = "\(label)(\(rect1.size.area))"
+                                            }
                                         }
-                                        return false
-                                    })
-                                }
-                                
-                                if segment == nil {
-                                    segment = segments.sorted(by: { (dict1, dict2) -> Bool in
-                                        if let rect1 = CGRect.rectFrom(syteDict: dict1),
-                                            let rect2 = CGRect.rectFrom(syteDict: dict2) {
-                                            return rect1.size.area > rect2.size.area
-                                        }
-                                        return false
+                                        let otherLabels = segments.filter{ $0["offers"] as? String != selectedSegment["offers"] as? String }.compactMap({ (dict) -> String? in
+                                            if let label = dict["label"] as? String {
+                                                if let rect1 = CGRect.rectFrom(syteDict: dict) {
+                                                    return "\(label)(\(rect1.size.area))"
+                                                }
+                                                return label
+                                            }
+                                            return nil
+                                        }).joined(separator: ", ")
                                         
-                                    }).first
-                                }
-
-                                // Analytics
-                                if let selectedSegment = segment {
-                                    var selectedSegmentLabelWithArea = selectedSegment["label"] as? String
-                                    if let label = selectedSegmentLabelWithArea {
-                                        if let rect1 = CGRect.rectFrom(syteDict: selectedSegment) {
-                                            selectedSegmentLabelWithArea = "\(label)(\(rect1.size.area))"
+                                        if let selectedSegmentLabel = selectedSegment["label"] as? String, rootShoppableLabel.contains(selectedSegmentLabel.lowercased()) {
+                                            Analytics.trackDevBurrowSelectedShoppable(rootShoppableLabel: rootShoppableLabel, productImageUrl: productImageUrl, selectedShoppableLabel: selectedSegmentLabelWithArea, otherLabels: otherLabels)
+                                        }else{
+                                            Analytics.trackDevBurrowSelectedShoppableMismatch(rootShoppableLabel: rootShoppableLabel, productImageUrl: productImageUrl, selectedShoppableLabel: selectedSegmentLabelWithArea, otherLabels: otherLabels)
                                         }
-                                    }
-                                    let otherLabels = segments.filter{ $0["offers"] as? String != selectedSegment["offers"] as? String }.compactMap({ (dict) -> String? in
-                                        if let label = dict["label"] as? String {
-                                            if let rect1 = CGRect.rectFrom(syteDict: dict) {
-                                                return "\(label)(\(rect1.size.area))"
-                                            }
-                                            return label
-                                        }
-                                        return nil
-                                    }).joined(separator: ", ")
-                                    
-                                    if let selectedSegmentLabel = selectedSegment["label"] as? String, rootShoppableLabel.contains(selectedSegmentLabel.lowercased()) {
-                                        Analytics.trackDevBurrowSelectedShoppable(rootShoppableLabel: rootShoppableLabel, productImageUrl: productImageUrl, selectedShoppableLabel: selectedSegmentLabelWithArea, otherLabels: otherLabels)
                                     }else{
-                                        Analytics.trackDevBurrowSelectedShoppableMismatch(rootShoppableLabel: rootShoppableLabel, productImageUrl: productImageUrl, selectedShoppableLabel: selectedSegmentLabelWithArea, otherLabels: otherLabels)
+                                        Analytics.trackDevBurrowErrorNoShoppables(productImageUrl: productImageUrl)
                                     }
-                                }else{
-                                    Analytics.trackDevBurrowErrorNoShoppables(productImageUrl: productImageUrl)
-                                }
-
-                                
-                                if  let segment = segment , let offersURL = segment["offers"] as? String,
-                                    let url = AssetSyncModel.sharedInstance.augmentedUrl(offersURL: offersURL, optionsMask:optionsMask ) {
                                     
-                                    //Save the updated data for the shoppable - eventhough it is not used.
-                                    self.performBackgroundTask(assetId: nil, shoppableId: productImageUrl, { (context) in
-                                        if let shopable = context.shoppableWith(objectId:createdSubShopableObjectId) {
-                                            shopable.offersURL = offersURL
-                                            if let b0 = segment["b0"] as? [Any],
-                                                b0.count >= 2,
-                                                let b1 = segment["b1"] as? [Any],
-                                                b1.count >= 2,
-                                                let b0x = b0[0] as? Double,
-                                                let b0y = b0[1] as? Double,
-                                                let b1x = b1[0] as? Double,
-                                                let b1y = b1[1] as? Double {
-                                                shopable.b0x = b0x
-                                                shopable.b0y = b0y
-                                                shopable.b1x = b1x
-                                                shopable.b1y = b1y
+                                    
+                                    if  let segment = segment , let offersURL = segment["offers"] as? String,
+                                        let url = AssetSyncModel.sharedInstance.augmentedUrl(offersURL: offersURL, optionsMask:optionsMask ) {
+                                        
+                                        //Save the updated data for the shoppable - eventhough it is not used.
+                                        self.performBackgroundTask(assetId: nil, shoppableId: productImageUrl, { (context) in
+                                            if let shopable = context.shoppableWith(objectId:createdSubShopableObjectId) {
+                                                shopable.offersURL = offersURL
+                                                if let b0 = segment["b0"] as? [Any],
+                                                    b0.count >= 2,
+                                                    let b1 = segment["b1"] as? [Any],
+                                                    b1.count >= 2,
+                                                    let b0x = b0[0] as? Double,
+                                                    let b0y = b0[1] as? Double,
+                                                    let b1x = b1[0] as? Double,
+                                                    let b1y = b1[1] as? Double {
+                                                    shopable.b0x = b0x
+                                                    shopable.b0y = b0y
+                                                    shopable.b1x = b1x
+                                                    shopable.b1y = b1y
+                                                }
+                                                shoppable?.relatedImagesURLString = segment["related_looks"] as? String
+                                                context.saveIfNeeded()
                                             }
-                                            shoppable?.relatedImagesURLString = segment["related_looks"] as? String
-                                            context.saveIfNeeded()
-                                        }
-                                    })
-                                    NetworkingPromise.sharedInstance.downloadProductsWithRetry(url: url).then(execute:                                                                               { productsDict -> Void in
+                                        })
+                                        NetworkingPromise.sharedInstance.downloadProductsWithRetry(url: url).then(execute:                                                                               { productsDict -> Void in
                                             if let productsArray = productsDict["ads"] as? [[String : Any]],
                                                 productsArray.count > 0 {
                                                 self.performBackgroundTask(assetId: nil, shoppableId: productImageUrl, { (context) in
                                                     if let shopable = context.shoppableWith(objectId:createdSubShopableObjectId) {
-
+                                                        
                                                         shopable.products = NSSet.init()
                                                         var productOrder: Int16 = 0
                                                         for prod in productsArray {
@@ -1215,12 +1246,12 @@ extension AssetSyncModel {
                                                                                                       optionsMask: Int32(optionsMask.rawValue))
                                                             productOrder += 1
                                                         }
-
+                                                        
                                                         context.saveIfNeeded()
                                                     }
-
+                                                    
                                                     completion()
-
+                                                    
                                                     
                                                 })
                                             } else{
@@ -1230,21 +1261,21 @@ extension AssetSyncModel {
                                                 })
                                                 completion()
                                             }
-                                    }).catch { (error) in
-                                        let error = error as NSError
-                                        self.performBackgroundTask(assetId: nil, shoppableId: nil, { (context) in
-                                            let shopable = context.shoppableWith(objectId:createdSubShopableObjectId)
-                                            Analytics.trackDevBurrowErrorGetProducts(shoppable: shopable, domain: error.domain, code: error.code, localizedDescription: error.localizedDescription)
-                                        })
+                                        }).catch { (error) in
+                                            let error = error as NSError
+                                            self.performBackgroundTask(assetId: nil, shoppableId: nil, { (context) in
+                                                let shopable = context.shoppableWith(objectId:createdSubShopableObjectId)
+                                                Analytics.trackDevBurrowErrorGetProducts(shoppable: shopable, domain: error.domain, code: error.code, localizedDescription: error.localizedDescription)
+                                            })
+                                            completion()
+                                        }
+                                    }else{
+                                        print("can't find segment for label \(rootShoppableLabel) in \( segments.map{$0["label"] ?? ""} )")
                                         completion()
                                     }
-                                }else{
-                                    print("can't find segment for label \(rootShoppableLabel) in \( segments.map{$0["label"] ?? ""} )")
-                                    completion()
-                                }
-                            }).catch { (error) in
-                                let error = error as NSError
-                                Analytics.trackDevBurrowErrorGetShoppable(productImageUrl: productImageUrl, domain: error.domain, code: error.code, localizedDescription: error.localizedDescription)
+                                }).catch { (error) in
+                                    let error = error as NSError
+                                    Analytics.trackDevBurrowErrorGetShoppable(productImageUrl: productImageUrl, domain: error.domain, code: error.code, localizedDescription: error.localizedDescription)
                                 completion()
                             }
 
@@ -1258,7 +1289,7 @@ extension AssetSyncModel {
                     }
                     
                     
-                    }else{
+                }else{
                     
                     let error = NSError.init(domain: "Craze-addSubShoppableTo", code: -91, userInfo: [NSLocalizedDescriptionKey:"cannot find parent shoppable in performBackgroundTask"])
                     reject(error)

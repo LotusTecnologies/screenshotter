@@ -52,7 +52,9 @@ class FavoriteControl: UIControl {
     
     override var isSelected: Bool {
         didSet {
-            heartSwitch.setOn(isSelected, animated: animate)
+            if isSelected != heartSwitch.isOn {
+                heartSwitch.setOn(isSelected, animated: animate)
+            }
         }
     }
     

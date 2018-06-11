@@ -115,7 +115,9 @@ extension Screenshot {
         if let shoppables = shoppables {
             for shoppable in shoppables {
                 if let shoppable = shoppable as? Shoppable {
-                    frame = frame.union(shoppable.frame(size: size))
+                    if shoppable.parentShoppable == nil {
+                        frame = frame.union(shoppable.frame(size: size))
+                    }
                 }
             }
         }
