@@ -29,9 +29,7 @@ enum ProductsViewControllerState : Int {
     case unknown
 }
 
-class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
-    
-    
+class ProductsViewController: BaseViewController {
     var productCollectionViewManager = ProductCollectionViewManager()
     var screenshot:Screenshot
     var screenshotController: FetchedResultsControllerManager<Screenshot>?
@@ -69,7 +67,6 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
     }
     
     var shareToDiscoverPrompt:UIView?
-    fileprivate let filterView = CustomInputtableView()
     
     fileprivate var shoppablesToolbar: ShoppablesToolbar?
     
@@ -176,8 +173,6 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
         rateView.leadingAnchor.constraint(equalTo:scrollRevealController.view.leadingAnchor).isActive = true
         rateView.bottomAnchor.constraint(equalTo:scrollRevealController.view.bottomAnchor).isActive = true
         rateView.trailingAnchor.constraint(equalTo:scrollRevealController.view.trailingAnchor).isActive = true
-        
-        view.addSubview(filterView)
         
         if !scrollRevealController.hasBottomBar {
             var height = self.rateView.intrinsicContentSize.height
@@ -297,34 +292,6 @@ extension ProductsViewController: ShoppablesToolbarDelegate {
         self.selectedShoppable = shoppable
         self.reloadProductsFor(shoppable: shoppable)
     }
-}
-
-extension ProductsViewController {
-    func clearProductListAndStateLoading(){
-        self.products = []
-        self.relatedLooks = nil
-        self.collectionView?.reloadData()
-    }
-    func productsOptionsDidComplete(_ productsOptions: ProductsOptions, withChange changed: Bool) {
-        
-        if changed {
-            if  let shoppable = self.getSelectedShoppable(){
-                shoppable.set(productsOptions: productsOptions, callback:  {
-                    if  let shoppable = self.getSelectedShoppable(){
-                        self.reloadProductsFor(shoppable: shoppable)
-                    }else{
-                        self.clearProductListAndStateLoading()
-                    }
-                })
-            }
-        }
-        self.dismissOptions()
-    }
-    
-    var shouldHideToolbar: Bool {
-        return !self.hasShoppables
-    }
-    
 }
 
 private typealias ProductsViewControllerCollectionView = ProductsViewController
@@ -568,24 +535,42 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
 }
 
 private typealias ProductsViewControllerOptionsView = ProductsViewController
-extension ProductsViewControllerOptionsView {
+extension ProductsViewControllerOptionsView: ProductsOptionsDelegate {
     @objc func presentOptions() {
-        if filterView.isFirstResponder {
-            filterView.resignFirstResponder()
+        Analytics.trackOpenedFiltersView()
+        
+        if let shoppable = self.getSelectedShoppable() {
+            self.productsOptions.syncOptions(withMask: shoppable.getLast())
         }
-        else {
-            Analytics.trackOpenedFiltersView()
-            
-            if let shoppable = self.getSelectedShoppable() {
-                self.productsOptions.syncOptions(withMask: shoppable.getLast())
-            }
-            filterView.customInputView = self.productsOptions.view
-            filterView.becomeFirstResponder()
-        }
+        
+        present(self.productsOptions.viewController, animated: true)
     }
     
     func dismissOptions() {
-        filterView.endEditing(true)
+        dismiss(animated: true)
+    }
+    
+    func clearProductListAndStateLoading() {
+        self.products = []
+        self.relatedLooks = nil
+        self.collectionView?.reloadData()
+    }
+    
+    func productsOptionsDidComplete(_ productsOptions: ProductsOptions, withChange changed: Bool) {
+        if changed, let shoppable = self.getSelectedShoppable(){
+            shoppable.set(productsOptions: productsOptions, callback: {
+                if let shoppable = self.getSelectedShoppable(){
+                    self.reloadProductsFor(shoppable: shoppable)
+                }else{
+                    self.clearProductListAndStateLoading()
+                }
+            })
+        }
+        self.dismissOptions()
+    }
+    
+    var shouldHideToolbar: Bool {
+        return !self.hasShoppables
     }
 }
 

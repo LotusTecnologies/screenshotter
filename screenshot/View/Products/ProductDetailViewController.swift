@@ -40,6 +40,7 @@ class ProductDetailViewController: BaseViewController {
         super.viewDidLoad()
         self.title = product?.calculatedDisplayTitle
         
+        self.productsOptions.delegate = self
         
         if let shoppable = self.shoppable {
             productsFRC = DataModel.sharedInstance.productFrc(delegate: self, shoppableOID: shoppable.objectID)
@@ -201,7 +202,7 @@ extension ProductDetailViewController : UICollectionViewDelegateFlowLayout, UICo
                 view.backgroundColor = self.view.backgroundColor
                 
                 if let view = view as? ProductsViewHeaderReusableView {
-                    view.filterButton.addTarget(self, action: #selector(presentFilterAction), for: .touchUpInside)
+                    view.filterButton.addTarget(self, action: #selector(presentOptions), for: .touchUpInside)
                 }
                 
                 return view
@@ -260,15 +261,35 @@ extension ProductDetailViewController : UICollectionViewDelegateFlowLayout, UICo
     
 }
 
-extension ProductDetailViewController {
-    @objc private func presentFilterAction() {
-        let viewController = ProductsOptionsViewController()
-        viewController.continueButton.addTarget(self, action: #selector(dismissFilterAction), for: .touchUpInside)
-        present(viewController, animated: true)
+extension ProductDetailViewController: ProductsOptionsDelegate {
+    @objc private func presentOptions() {
+        Analytics.trackOpenedFiltersView()
+        
+        if let shoppable = self.shoppable {
+            self.productsOptions.syncOptions(withMask: shoppable.getLast())
+        }
+        
+        present(self.productsOptions.viewController, animated: true)
     }
     
-    @objc private func dismissFilterAction() {
+    @objc private func dismissOptions() {
         dismiss(animated: true)
+    }
+    
+    func productsOptionsDidComplete(_ productsOptions: ProductsOptions, withChange changed: Bool) {
+        if changed, let shoppable = self.shoppable {
+            // TODO:
+            shoppable.set(productsOptions: productsOptions, callback: {
+                if let shoppable = self.shoppable {
+//                    self.reloadProductsFor(shoppable: shoppable)
+                }
+                else {
+//                    self.clearProductListAndStateLoading()
+                }
+            })
+        }
+        
+        self.dismissOptions()
     }
 }
 

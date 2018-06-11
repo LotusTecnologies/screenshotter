@@ -24,20 +24,30 @@ class MainSegmentedControl: UISegmentedControl {
     }
     
     private func setup() {
-        let font: UIFont = .screenshopFont(.quicksand, size: 16)
-        
-        let normalAttributes: [AnyHashable: Any] = [
-            NSAttributedStringKey.foregroundColor.rawValue: UIColor.gray8,
-            NSAttributedStringKey.font.rawValue: font
+        var attributes: [AnyHashable: Any] = [
+            NSAttributedStringKey.foregroundColor.rawValue: UIColor.gray7,
+            NSAttributedStringKey.font.rawValue: UIFont.screenshopFont(.quicksand, size: 16)
         ]
-        let selectedAttributes: [AnyHashable: Any] = [
-            NSAttributedStringKey.foregroundColor.rawValue: UIColor.gray2,
-            NSAttributedStringKey.font.rawValue: font
-        ]
+        setTitleTextAttributes(attributes, for: .normal)
         
-        setTitleTextAttributes(normalAttributes, for: .normal)
-        setTitleTextAttributes(selectedAttributes, for: .selected)
-        setTitleTextAttributes(selectedAttributes, for: .highlighted)
+        attributes[NSAttributedStringKey.foregroundColor.rawValue] = UIColor.gray4
+        setTitleTextAttributes(attributes, for: .highlighted)
+        
+        attributes[NSAttributedStringKey.foregroundColor.rawValue] = UIColor.gray2
+        setTitleTextAttributes(attributes, for: .selected)
+        
+        attributes[NSAttributedStringKey.foregroundColor.rawValue] = UIColor.gray9
+        setTitleTextAttributes(attributes, for: .disabled)
+        
+        layer.borderColor = UIColor.gray8.cgColor
+        layer.borderWidth = 1
+        layer.cornerRadius = .defaultCornerRadius
+        
+        let dividerImage = UIImage(named: "SegmentedControlDivider")
+        setDividerImage(dividerImage, forLeftSegmentState: .normal, rightSegmentState: .normal, barMetrics: .default)
+        
+        let backgroundImage = UIImage(named: "SegmentedControlBackground")
+        setBackgroundImage(backgroundImage, for: .normal, barMetrics: .default)
         
         heightAnchor.constraint(equalToConstant: intrinsicContentSize.height).isActive = true
     }

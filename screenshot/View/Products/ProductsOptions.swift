@@ -117,8 +117,15 @@ class ProductsOptions : NSObject {
         view.sortPickerView.dataSource = self
         view.sortPickerView.delegate = self
         view.doneButton.addTarget(self, action: #selector(doneButtonAction), for: .touchUpInside)
-        self.syncOptions(withView: view)
+        self.syncOptions(with: view)
         return view
+    }()
+    
+    private(set) lazy var viewController: ProductsOptionsViewController = {
+        let viewController = ProductsOptionsViewController()
+        viewController.continueButton.addTarget(self, action: #selector(doneButtonAction), for: .touchUpInside)
+        self.syncOptions(with: viewController)
+        return viewController
     }()
     
     func syncOptions(withMask mask: ProductsOptionsMask? = nil) {
@@ -127,15 +134,22 @@ class ProductsOptions : NSObject {
         size = mask?.size ?? ProductsOptionsSize.globalValue
         sale = ProductsOptionsSale.globalValue
         sort = ProductsOptionsSort.globalValue
-        
-        syncOptions(withView: view)
+        syncOptions(with: view)
     }
     
-    private func syncOptions(withView view: ProductsOptionsView) {
+    private func syncOptions(with view: ProductsOptionsView) {
         view.categoryControl.selectedSegmentIndex = category.offsetValue
         view.genderControl.selectedSegmentIndex = gender.offsetValue
         view.sizeControl.selectedSegmentIndex = size.offsetValue
         view.saleControl.selectedSegmentIndex = sale.offsetValue
+        view.sortPickerView.selectRow(sort.offsetValue, inComponent: 0, animated: false)
+    }
+    
+    private func syncOptions(with viewController: ProductsOptionsViewController) {
+        viewController.genderControl.selectedSegmentIndex = gender.offsetValue
+        viewController.sizeControl.selectedSegmentIndex = size.offsetValue
+        viewController.saleControl.selectedSegmentIndex = sale.offsetValue
+//        viewController.sortControl. // TODO:
         view.sortPickerView.selectRow(sort.offsetValue, inComponent: 0, animated: false)
     }
     
@@ -205,7 +219,7 @@ class ProductsOptionsControls : NSObject {
     private var gender: ProductsOptionsGender?
     private var size: ProductsOptionsSize?
     
-    private class SegmentedControl : UISegmentedControl {
+    private class SegmentedControl : MainSegmentedControl {
         private var needsSelectedIndexUpdate = true
         var didUpdateSelectedIndex: (() -> ())?
         
@@ -524,13 +538,21 @@ class ProductsOptionsView : UIView { // TODO: remove
 class ProductsOptionsViewController: UIViewController {
     private let transitioning = ViewControllerTransitioningDelegate(presentation: .dimmed, transition: .modal)
     private let controls = ProductsOptionsControls()
-    
+
     private let containerView = UIView()
     private let titleLabel = UILabel()
-    private var genderControl: UISegmentedControl!
-    private var sizeControl: UISegmentedControl!
-    private var saleControl: UISegmentedControl!
-    private var sortControl: UIControl!
+    private(set) lazy var genderControl: UISegmentedControl = {
+        return self.controls.createGenderControl()
+    }()
+    private(set) lazy var sizeControl: UISegmentedControl = {
+        return self.controls.createSizeControl()
+    }()
+    private(set) lazy var saleControl: UISegmentedControl = {
+        return self.controls.createSaleControl()
+    }()
+    private(set) lazy var sortControl: UIControl = {
+        return self.controls.createSortControl()
+    }()
     let sortPickerView = UIPickerView()
     
     let continueButton = MainButton()
@@ -563,48 +585,40 @@ class ProductsOptionsViewController: UIViewController {
         titleLabel.textColor = .gray1
         titleLabel.text = "products.options.title".localized
         titleLabel.textAlignment = .center
-        titleLabel.font = .screenshopFont(.hindMedium, textStyle: .headline, staticSize: true)
+        titleLabel.font = .screenshopFont(.quicksandBold, size: 16)
         containerView.addSubview(titleLabel)
         titleLabel.topAnchor.constraint(equalTo: containerView.layoutMarginsGuide.topAnchor).isActive = true
         titleLabel.leadingAnchor.constraint(greaterThanOrEqualTo: containerView.layoutMarginsGuide.leadingAnchor).isActive = true
         titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: containerView.layoutMarginsGuide.trailingAnchor).isActive = true
         titleLabel.centerXAnchor.constraint(equalTo: containerView.layoutMarginsGuide.centerXAnchor).isActive = true
         
-        sortControl = controls.createSortControl()
         sortControl.translatesAutoresizingMaskIntoConstraints = false
-        sortControl.tintColor = .crazeGreen
         sortControl.isExclusiveTouch = true
         containerView.addSubview(sortControl)
-        sortControl.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: .padding).isActive = true
+        sortControl.topAnchor.constraint(equalTo: titleLabel.lastBaselineAnchor, constant: verticalPadding).isActive = true
         sortControl.leadingAnchor.constraint(equalTo: containerView.layoutMarginsGuide.leadingAnchor).isActive = true
         sortControl.trailingAnchor.constraint(equalTo: containerView.layoutMarginsGuide.trailingAnchor).isActive = true
         
-        saleControl = controls.createSaleControl()
         saleControl.translatesAutoresizingMaskIntoConstraints = false
-        saleControl.tintColor = .crazeGreen
+        saleControl.isExclusiveTouch = true
         containerView.addSubview(saleControl)
         saleControl.topAnchor.constraint(equalTo: sortControl.bottomAnchor, constant: .padding).isActive = true
         saleControl.leadingAnchor.constraint(equalTo: containerView.layoutMarginsGuide.leadingAnchor).isActive = true
         saleControl.trailingAnchor.constraint(equalTo: containerView.layoutMarginsGuide.trailingAnchor).isActive = true
         
-        genderControl = controls.createGenderControl()
         genderControl.translatesAutoresizingMaskIntoConstraints = false
-        genderControl.tintColor = .crazeGreen
         genderControl.isExclusiveTouch = true
         containerView.addSubview(genderControl)
         genderControl.topAnchor.constraint(equalTo: saleControl.bottomAnchor, constant: .padding).isActive = true
         genderControl.leadingAnchor.constraint(equalTo: containerView.layoutMarginsGuide.leadingAnchor).isActive = true
         genderControl.trailingAnchor.constraint(equalTo: containerView.layoutMarginsGuide.trailingAnchor).isActive = true
         
-        sizeControl = controls.createSizeControl()
         sizeControl.translatesAutoresizingMaskIntoConstraints = false
-        sizeControl.tintColor = .crazeGreen
         sizeControl.isExclusiveTouch = true
         containerView.addSubview(sizeControl)
         sizeControl.topAnchor.constraint(equalTo: genderControl.bottomAnchor, constant: .padding).isActive = true
         sizeControl.leadingAnchor.constraint(equalTo: containerView.layoutMarginsGuide.leadingAnchor).isActive = true
         sizeControl.trailingAnchor.constraint(equalTo: containerView.layoutMarginsGuide.trailingAnchor).isActive = true
-        
         
         continueButton.translatesAutoresizingMaskIntoConstraints = false
         continueButton.backgroundColor = .crazeGreen
@@ -612,10 +626,15 @@ class ProductsOptionsViewController: UIViewController {
         continueButton.layer.cornerRadius = 0
         continueButton.layer.shadowOpacity = 0
         containerView.addSubview(continueButton)
-        continueButton.topAnchor.constraint(equalTo: sizeControl.bottomAnchor, constant: .padding).isActive = true
+        continueButton.topAnchor.constraint(equalTo: sizeControl.bottomAnchor, constant: verticalPadding).isActive = true
         continueButton.leadingAnchor.constraint(equalTo: containerView.leadingAnchor).isActive = true
         continueButton.bottomAnchor.constraint(equalTo: containerView.bottomAnchor).isActive = true
         continueButton.trailingAnchor.constraint(equalTo: containerView.trailingAnchor).isActive = true
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        controls.sync()
     }
 }
 
