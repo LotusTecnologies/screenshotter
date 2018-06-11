@@ -9,7 +9,7 @@
 import UIKit
 
 protocol ConfirmCodeViewControllerDelegate: NSObjectProtocol {
-    func confirmCodeViewControllerDidReset(_ viewController: ConfirmCodeViewController)
+    func confirmCodeViewControllerDidConfirm(_ viewController: ConfirmCodeViewController)
     func confirmCodeViewControllerDidCancel(_ viewController: ConfirmCodeViewController)
 }
 
@@ -35,7 +35,7 @@ class ConfirmCodeView: UIScrollView {
         
         let titleLabel = UILabel()
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.text = "authorize.reset_password.title".localized
+        titleLabel.text = "Confirm Email".localized
         titleLabel.textColor = .gray3
         titleLabel.font = .screenshopFont(.hindSemibold, textStyle: .title1, staticSize: true)
         titleLabel.adjustsFontSizeToFitWidth = true
@@ -54,7 +54,7 @@ class ConfirmCodeView: UIScrollView {
         
         let codeLabel = UILabel()
         codeLabel.translatesAutoresizingMaskIntoConstraints = false
-        codeLabel.text = "authorize.reset_password.enter".localized
+        codeLabel.text = "Enter Code".localized
         codeLabel.textColor = .gray2
         codeLabel.font = .screenshopFont(.hindLight, textStyle: .body, staticSize: true)
         codeLabel.adjustsFontSizeToFitWidth = true
@@ -110,12 +110,12 @@ class ConfirmCodeViewController: UIViewController {
     
     // MARK: View
     
-    var classForView: ResetPasswordView.Type {
-        return ResetPasswordView.self
+    var classForView: ConfirmCodeView.Type {
+        return ConfirmCodeView.self
     }
     
-    var _view: ResetPasswordView {
-        return view as! ResetPasswordView
+    var _view: ConfirmCodeView {
+        return view as! ConfirmCodeView
     }
     
     override func loadView() {
@@ -129,8 +129,7 @@ class ConfirmCodeViewController: UIViewController {
         
         inputViewAdjustsScrollViewController.scrollView = _view
         
-        _view.passwordTextField.delegate = self
-        _view.rePasswordTextField.delegate = self
+        _view.codeTextField.delegate = self
         
         _view.continueButton.addTarget(self, action: #selector(continueAction), for: .touchUpInside)
         _view.cancelButton.addTarget(self, action: #selector(cancelAction), for: .touchUpInside)
@@ -140,50 +139,22 @@ class ConfirmCodeViewController: UIViewController {
     }
     
     deinit {
-        _view.passwordTextField.delegate = nil
-        _view.rePasswordTextField.delegate = nil
+        _view.codeTextField.delegate = nil
     }
     
     // MARK: Actions
     
     @objc private func continueAction() {
-        let password = validatePassword(_view.passwordTextField.text)
-        let rePassword = validatePassword(_view.rePasswordTextField.text)
-        
-        if let password = password, let rePassword = rePassword {
-            dismissKeyboard()
-            
-            if password == rePassword {
-                savePassword(password)
-                
-                let alertController = UIAlertController(title: "authorize.reset_password.success_alert.title".localized, message: "authorize.reset_password.success_alert.message".localized, preferredStyle: .alert)
-                alertController.addAction(UIAlertAction(title: "generic.ok".localized, style: .cancel, handler: { alertAction in
-                    self.delegate?.confirmCodeViewControllerDidReset(self)
-                }))
-                present(alertController, animated: true)
+        if let code = _view.codeTextField.text {
+            SigninManager.shared.confirmSignup(code: code).then(on: .main) { () -> Void in
+                self.delegate?.confirmCodeViewControllerDidConfirm(self)
+                }.catch { (error) in
+                    DispatchQueue.mainAsyncIfNeeded {
+                        if let error = error as? SigninManager.SigninManagerError {
+                            
+                        }
+                    }
             }
-            else {
-                let alertController = UIAlertController(title: "authorize.reset_password.failed_alert.title".localized, message: nil, preferredStyle: .alert)
-                alertController.addAction(UIAlertAction(title: "generic.ok".localized, style: .cancel, handler: { alertAction in
-                    self.resetPassword()
-                }))
-                present(alertController, animated: true)
-                
-                _view.passwordTextField.isInvalid = true
-                _view.rePasswordTextField.isInvalid = true
-                
-                ActionFeedbackGenerator().actionOccurred(.nope)
-            }
-        }
-        else {
-            if password == nil {
-                _view.passwordTextField.isInvalid = true
-            }
-            if rePassword == nil {
-                _view.rePasswordTextField.isInvalid = true
-            }
-            
-            ActionFeedbackGenerator().actionOccurred(.nope)
         }
     }
     
@@ -191,21 +162,6 @@ class ConfirmCodeViewController: UIViewController {
         delegate?.confirmCodeViewControllerDidCancel(self)
     }
     
-    // MARK: Password
-    
-    private func validatePassword(_ password: String?) -> String? {
-        if let password = password, !password.isEmpty {
-            return password
-        }
-        return nil
-    }
-    
-    private func resetPassword() {
-        _view.passwordTextField.text = nil
-        _view.passwordTextField.isInvalid = false
-        _view.rePasswordTextField.text = nil
-        _view.rePasswordTextField.isInvalid = false
-    }
     
     private func savePassword(_ password: String) {
         // TODO:
@@ -220,11 +176,8 @@ class ConfirmCodeViewController: UIViewController {
 
 extension ConfirmCodeViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        if textField == _view.passwordTextField {
-            _view.rePasswordTextField.becomeFirstResponder()
-        }
-        else if textField == _view.rePasswordTextField {
-            textField.resignFirstResponder()
+        if textField == _view.codeTextField {
+            _view.codeTextField.becomeFirstResponder()
         }
         return true
     }

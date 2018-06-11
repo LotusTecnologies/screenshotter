@@ -73,8 +73,10 @@ extension TutorialNavigationController: RegisterViewControllerDelegate {
         pushTutorialTrySlide()
     }
     
-    func registerViewControllerDidLogin(_ viewController: RegisterViewController) {
-        tutorialCompleted()
+    func registerViewControllerNeedEmailConfirmation(_ viewController: RegisterViewController) {
+        let confirm = ConfirmCodeViewController()
+        confirm.delegate = self
+        self.pushViewController(confirm, animated: true)
     }
     
     func registerViewControllerDidSignup(_ viewController: RegisterViewController) {
@@ -116,6 +118,14 @@ extension TutorialNavigationController: RegisterViewControllerDelegate {
             dismiss(animated: true)
             pushTutorialTrySlide()
         }
+    }
+}
+extension TutorialNavigationController : ConfirmCodeViewControllerDelegate {
+    func confirmCodeViewControllerDidConfirm(_ viewController: ConfirmCodeViewController){
+        self.presentRegisterConfirmationViewController(navigateToDetails: true)
+    }
+    func confirmCodeViewControllerDidCancel(_ viewController: ConfirmCodeViewController){
+        self.popViewController(animated: true)
     }
 }
 

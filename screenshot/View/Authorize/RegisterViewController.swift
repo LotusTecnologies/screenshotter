@@ -11,7 +11,7 @@ import Appsee
 
 protocol RegisterViewControllerDelegate: NSObjectProtocol {
     func registerViewControllerDidSkip(_ viewController: RegisterViewController)
-    func registerViewControllerDidLogin(_ viewController: RegisterViewController)
+    func registerViewControllerNeedEmailConfirmation(_ viewController: RegisterViewController)
     func registerViewControllerDidSignup(_ viewController: RegisterViewController)
     func registerViewControllerDidFacebookLogin(_ viewController: RegisterViewController)
     func registerViewControllerDidFacebookSignup(_ viewController: RegisterViewController)
@@ -424,7 +424,7 @@ class RegisterViewController: UIViewController {
     // MARK: Register
     
     private func isPasswordValid(_ password: String?) -> Bool {
-        if let password = password, !password.isEmpty {
+        if let password = password, !password.isEmpty, password.lengthOfBytes(using: .utf8) >= 8 {
             return true
         }
         else {
@@ -444,15 +444,14 @@ class RegisterViewController: UIViewController {
             self._view.emailTextField.isUserInteractionEnabled = false
             self._view.passwordTextField.isUserInteractionEnabled = false
             self.continueButton.isLoading = true
-            SigninManager.shared.login(email: email, password: password)
+            SigninManager.shared.loginOrCreatAccountAsNeeded(email: email, password: password)
             .then { result -> Void in
                 
                 switch result {
-                case .confirmed:
-                    self.delegate?.registerViewControllerDidLogin(self)
-                    
-                case .unconfirmed:
+                case .login, .createAccountConfirmed:
                     self.delegate?.registerViewControllerDidSignup(self)
+                case .createAccountUnconfirmed:
+                    self.delegate?.registerViewControllerNeedEmailConfirmation(self)
                 }
             }
             .catch { error in

@@ -15,10 +15,10 @@ import AWSCognitoIdentityProvider
 import AWSFacebookSignIn
 
 class SigninManager : NSObject {
-   
-    enum UserConfirmedStatus {
-        case confirmed
-        case unconfirmed
+    enum LoginOrCreateAccountResult {
+        case login
+        case createAccountUnconfirmed
+        case createAccountConfirmed
     }
     enum SigninManagerError : Error {
         case error(NSError)
@@ -89,7 +89,7 @@ class SigninManager : NSObject {
         return SigninManagerError.error(error)
     }
     
-    func loginWithFacebook()  -> Promise<Void>{
+    public func loginWithFacebook()  -> Promise<Void>{
         return Promise<Void>.init(resolvers: { (fulfil, reject) in
             AWSSignInManager.sharedInstance().login(signInProviderKey: self.facebook.identityProviderName, completionHandler: { (result, error) in
                 if let error = error {
@@ -113,26 +113,64 @@ class SigninManager : NSObject {
 ////        AWSSignInManager.sharedInstance().lo
 //    }
     
-    func login(email:String, password:String) -> Promise<UserConfirmedStatus>{
-       
-    
+    public func loginOrCreatAccountAsNeeded(email:String, password:String) -> Promise<LoginOrCreateAccountResult> {
+        
+        return createAccount(email:email.lowercased(), password: password).recover(execute: { (error) -> Promise<SigninManager.LoginOrCreateAccountResult> in
+            let nsError = error as NSError
+            let usernameExistsException = 37
+            if nsError.code == usernameExistsException && nsError.domain == AWSCognitoIdentityProviderErrorDomain {
+                return self.login(email: email.lowercased(), password: password)
+            }
+            let signInError = self.nserrorToSigninManagerError(nsError)
+            return Promise.init(error: signInError)
+        })
+        
+//        return login(email:email.lowercased(), password: password).recover(execute: { (error) -> Promise<SigninManager.LoginOrCreateAccountResult> in
+//            let nsError = error as NSError
+//            let UserNotFoundException = 34
+//            if nsError.code == UserNotFoundException && nsError.domain == AWSCognitoIdentityProviderErrorDomain {
+//                return self.createAccount(email: email.lowercased(), password: password)
+//            }
+//            return Promise.init(error: error)
+//        })
     }
-    //If unconfirmed, user must get a confirm code to finialize login
-    func login(email:String, password:String) -> Promise<UserConfirmedStatus>{
-        return Promise<UserConfirmedStatus>.init(resolvers: { (fulfil, reject) in
+    private func login(email:String, password:String) -> Promise<LoginOrCreateAccountResult>{
+        return Promise<LoginOrCreateAccountResult>.init(resolvers: { (fulfil, reject) in
+            
+            if let pool = self.pool, let userName = email.sha1() {
+                let emailAttribute = AWSCognitoIdentityUserAttributeType.init(name: "email", value: email)
+                
+                let user = pool.getUser(userName)
+                user.getSession(userName, password: password, validationData: [emailAttribute]).continueWith { (task) -> Any? in
+                    if let error = task.error {
+                        reject(error)
+                    }else{
+                        fulfil(LoginOrCreateAccountResult.login)
+                    }
+                    return task
+                }
+                
+                
+            }else{
+                reject(SigninManagerError.notSetup)
+            }
+        })
+    }
+    
+    private func createAccount(email:String, password:String) -> Promise<LoginOrCreateAccountResult>{
+        return Promise<LoginOrCreateAccountResult>.init(resolvers: { (fulfil, reject) in
+            let email = email.lowercased()
             let emailAttribute = AWSCognitoIdentityUserAttributeType.init(name: "email", value: email)
             if let pool = self.pool, let userName = email.sha1() {
-                
                 pool.signUp(userName, password: password, userAttributes: [emailAttribute], validationData: nil).continueWith(executor: AWSExecutor.mainThread(), block: { (task) -> Any? in
                     if let error = task.error  {
-                        let nserror = error as NSError
-                        reject(self.nserrorToSigninManagerError(nserror))
+                        reject(error)
                     }else if let user = task.result?.user {
                         self.user = user
                         if user.confirmedStatus == .confirmed {
-                            fulfil(UserConfirmedStatus.confirmed)
+                            fulfil(LoginOrCreateAccountResult.createAccountConfirmed)
                         }else {
-                            fulfil(UserConfirmedStatus.unconfirmed)
+                            fulfil(LoginOrCreateAccountResult.createAccountUnconfirmed)
                         }
                     }else{
                         //shouldn't happen
@@ -261,35 +299,4 @@ class SigninManager : NSObject {
             })
         }
     }
-}
-extension SigninManager : AWSCognitoIdentityInteractiveAuthenticationDelegate, AWSCognitoIdentityPasswordAuthentication  {
-    func startPasswordAuthentication() -> AWSCognitoIdentityPasswordAuthentication {
-        return self
-    }
-    func getDetails(_ authenticationInput: AWSCognitoIdentityPasswordAuthenticationInput, passwordAuthenticationCompletionSource: AWSTaskCompletionSource<AWSCognitoIdentityPasswordAuthenticationDetails>) {
-        
-    }
-    func didCompleteStepWithError(_ error: Error?) {
-    
-    }
-    func startMultiFactorAuthentication() -> AWSCognitoIdentityMultiFactorAuthentication {
-        
-    }
-    
-    func startRememberDevice() -> AWSCognitoIdentityRememberDevice {
-        
-    }
-    func startNewPasswordRequired() -> AWSCognitoIdentityNewPasswordRequired {
-        
-    }
-    func startCustomAuthentication() -> AWSCognitoIdentityCustomAuthentication {
-        
-    }
-    func startSoftwareMfaSetupRequired() -> AWSCognitoIdentitySoftwareMfaSetupRequired {
-        
-    }
-    func startSelectMfa() -> AWSCognitoIdentitySelectMfa {
-        
-    }
-    
 }
