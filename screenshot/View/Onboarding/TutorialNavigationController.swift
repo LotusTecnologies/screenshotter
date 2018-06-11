@@ -75,6 +75,7 @@ extension TutorialNavigationController: RegisterViewControllerDelegate {
     
     func registerViewControllerNeedEmailConfirmation(_ viewController: RegisterViewController) {
         let confirm = ConfirmCodeViewController()
+        confirm.email = viewController.email
         confirm.delegate = self
         self.pushViewController(confirm, animated: true)
     }

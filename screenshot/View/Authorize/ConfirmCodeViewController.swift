@@ -17,7 +17,6 @@ class ConfirmCodeView: UIScrollView {
     let codeTextField = UnderlineTextField()
     let continueButton = MainButton()
     let cancelButton = UIButton()
-    
     let _layoutMargins = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
     
     // MARK: Life Cycle
@@ -25,8 +24,11 @@ class ConfirmCodeView: UIScrollView {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    override convenience init(frame: CGRect) {
+        self.init(frame: frame, email: "")
+    }
     
-    override init(frame: CGRect) {
+    init(frame: CGRect, email:String) {
         super.init(frame: frame)
         
         if let backgroundImage = UIImage(named: "BrandConfettiFullBackground") {
@@ -35,7 +37,7 @@ class ConfirmCodeView: UIScrollView {
         
         let titleLabel = UILabel()
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.text = "Confirm Email".localized
+        titleLabel.text = "authorize.confirm.title".localized
         titleLabel.textColor = .gray3
         titleLabel.font = .screenshopFont(.hindSemibold, textStyle: .title1, staticSize: true)
         titleLabel.adjustsFontSizeToFitWidth = true
@@ -45,16 +47,31 @@ class ConfirmCodeView: UIScrollView {
         titleLabel.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
         titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: layoutMarginsGuide.trailingAnchor).isActive = true
         
+        
+        let explainLabel = UILabel()
+        explainLabel.translatesAutoresizingMaskIntoConstraints = false
+        explainLabel.text = "An email was sent to %@. please enter the code that you recieved in the email.".localized(withFormat: email)
+        explainLabel.textColor = .gray3
+        explainLabel.font = .screenshopFont(.hindLight, textStyle: .headline, staticSize: true)
+        explainLabel.minimumScaleFactor = 0.7
+        explainLabel.numberOfLines = -1
+        addSubview(explainLabel)
+        explainLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: .extendedPadding).isActive = true
+        explainLabel.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
+        explainLabel.trailingAnchor.constraint(lessThanOrEqualTo: layoutMarginsGuide.trailingAnchor).isActive = true
+        
+        
+        
         let contentView = ContentContainerView()
         contentView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(contentView)
-        contentView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: .padding).isActive = true
+        contentView.topAnchor.constraint(equalTo: explainLabel.bottomAnchor, constant: .padding).isActive = true
         contentView.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
         contentView.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
         
         let codeLabel = UILabel()
         codeLabel.translatesAutoresizingMaskIntoConstraints = false
-        codeLabel.text = "Enter Code".localized
+        codeLabel.text = "authorize.confirm.code".localized
         codeLabel.textColor = .gray2
         codeLabel.font = .screenshopFont(.hindLight, textStyle: .body, staticSize: true)
         codeLabel.adjustsFontSizeToFitWidth = true
@@ -80,7 +97,7 @@ class ConfirmCodeView: UIScrollView {
       
         continueButton.translatesAutoresizingMaskIntoConstraints = false
         continueButton.backgroundColor = .crazeGreen
-        continueButton.setTitle("generic.save".localized, for: .normal)
+        continueButton.setTitle("generic.submit".localized, for: .normal)
         contentView.addSubview(continueButton)
         continueButton.topAnchor.constraint(equalTo: codeTextField.bottomAnchor, constant: .extendedPadding).isActive = true
         continueButton.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
@@ -105,7 +122,7 @@ class ConfirmCodeView: UIScrollView {
 
 class ConfirmCodeViewController: UIViewController {
     weak var delegate: ConfirmCodeViewControllerDelegate?
-    
+    var email:String?
     private let inputViewAdjustsScrollViewController = InputViewAdjustsScrollViewController()
     
     // MARK: View
@@ -119,7 +136,8 @@ class ConfirmCodeViewController: UIViewController {
     }
     
     override func loadView() {
-        view = classForView.self.init()
+        let email = self.email ?? ""
+        view = ConfirmCodeView.init(frame: .zero, email: email)
     }
     
     // MARK: Life Cycle

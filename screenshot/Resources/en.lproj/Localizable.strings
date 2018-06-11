@@ -46,9 +46,12 @@
 "authorize.register.legal.4" = " ";
 "authorize.register.offers" = "Send me emails about exclusive offers, sales and new features.";
 "authorize.register.password" = "Password";
-
 "authorize.register.confirmation.message" = "You are now a\nScreenshop user.";
 "authorize.register.confirmation.title" = "Welcome!";
+
+"authorize.confirm.title" = "Confirm Email";
+"authorize.confirm.code" = "Enter Code";
+"authorize.confirm.explaination" = "An email was sent to %@. please enter the code that you recieved in the email.";
 
 "authorize.reset_password.enter" = "Enter new password";
 "authorize.reset_password.failed_alert.title" = "Passwords Don’t Match";

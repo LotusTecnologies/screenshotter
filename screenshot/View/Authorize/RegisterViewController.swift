@@ -444,6 +444,7 @@ class RegisterViewController: UIViewController {
             self._view.emailTextField.isUserInteractionEnabled = false
             self._view.passwordTextField.isUserInteractionEnabled = false
             self.continueButton.isLoading = true
+            self.continueButton.isEnabled = false
             SigninManager.shared.loginOrCreatAccountAsNeeded(email: email, password: password)
             .then { result -> Void in
                 
@@ -464,6 +465,7 @@ class RegisterViewController: UIViewController {
                 self._view.emailTextField.isUserInteractionEnabled = true
                 self._view.passwordTextField.isUserInteractionEnabled = true
                 self.continueButton.isLoading = false
+                self.continueButton.isEnabled = true
             }
         }
         else {
