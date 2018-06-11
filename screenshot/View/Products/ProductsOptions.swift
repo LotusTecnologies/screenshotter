@@ -103,23 +103,13 @@ protocol ProductsOptionsDelegate : NSObjectProtocol {
 class ProductsOptions : NSObject {
     weak var delegate: ProductsOptionsDelegate?
     
-    fileprivate(set) var category = ProductsOptionsCategory.globalValue
+    fileprivate(set) var category = ProductsOptionsCategory.globalValue // TODO: remove
     fileprivate(set) var gender = ProductsOptionsGender.globalValue
     fileprivate(set) var size = ProductsOptionsSize.globalValue
     fileprivate(set) var sale = ProductsOptionsSale.globalValue
     fileprivate(set) var sort = ProductsOptionsSort.globalValue
     
     fileprivate let sortItems: [ProductsOptionsSort] = [.similar, .priceAsc, .priceDes, .brands]
-    
-    private(set) lazy var view: ProductsOptionsView = {
-        let view = ProductsOptionsView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.sortPickerView.dataSource = self
-        view.sortPickerView.delegate = self
-        view.doneButton.addTarget(self, action: #selector(doneButtonAction), for: .touchUpInside)
-        self.syncOptions(with: view)
-        return view
-    }()
     
     private(set) lazy var viewController: ProductsOptionsViewController = {
         let viewController = ProductsOptionsViewController()
@@ -134,15 +124,7 @@ class ProductsOptions : NSObject {
         size = mask?.size ?? ProductsOptionsSize.globalValue
         sale = ProductsOptionsSale.globalValue
         sort = ProductsOptionsSort.globalValue
-        syncOptions(with: view)
-    }
-    
-    private func syncOptions(with view: ProductsOptionsView) {
-        view.categoryControl.selectedSegmentIndex = category.offsetValue
-        view.genderControl.selectedSegmentIndex = gender.offsetValue
-        view.sizeControl.selectedSegmentIndex = size.offsetValue
-        view.saleControl.selectedSegmentIndex = sale.offsetValue
-        view.sortPickerView.selectRow(sort.offsetValue, inComponent: 0, animated: false)
+        syncOptions(with: viewController)
     }
     
     private func syncOptions(with viewController: ProductsOptionsViewController) {
@@ -150,7 +132,7 @@ class ProductsOptions : NSObject {
         viewController.sizeControl.selectedSegmentIndex = size.offsetValue
         viewController.saleControl.selectedSegmentIndex = sale.offsetValue
 //        viewController.sortControl. // TODO:
-        view.sortPickerView.selectRow(sort.offsetValue, inComponent: 0, animated: false)
+//        view.sortPickerView.selectRow(sort.offsetValue, inComponent: 0, animated: false)
     }
     
     @objc private func doneButtonAction() {
@@ -158,11 +140,11 @@ class ProductsOptions : NSObject {
         let previousSale = sale
         let previousSort = sort
         
-        category = ProductsOptionsCategory(offsetValue: view.categoryControl.selectedSegmentIndex)
-        gender = ProductsOptionsGender(offsetValue: view.genderControl.selectedSegmentIndex)
-        size = ProductsOptionsSize(offsetValue: view.sizeControl.selectedSegmentIndex)
-        sale = ProductsOptionsSale(offsetValue: view.saleControl.selectedSegmentIndex)
-        sort = ProductsOptionsSort(offsetValue: view.sortPickerView.selectedRow(inComponent: 0))
+//        category = ProductsOptionsCategory(offsetValue: viewController.categoryControl.selectedSegmentIndex)
+        gender = ProductsOptionsGender(offsetValue: viewController.genderControl.selectedSegmentIndex)
+        size = ProductsOptionsSize(offsetValue: viewController.sizeControl.selectedSegmentIndex)
+        sale = ProductsOptionsSale(offsetValue: viewController.saleControl.selectedSegmentIndex)
+//        sort = ProductsOptionsSort(offsetValue: viewController.sortPickerView.selectedRow(inComponent: 0))
         
         UserDefaults.standard.set(sale.rawValue, forKey: UserDefaultsKeys.productSale)
         UserDefaults.standard.set(sort.rawValue, forKey: UserDefaultsKeys.productSort)
@@ -298,7 +280,7 @@ class ProductsOptionsControls : NSObject {
         return control
     }
     
-    func createSortControl() -> UIControl {
+    func createSortControl(pickerViewAnimation: (()->())? = nil) -> UIControl {
         let segmentedTitleItem = SegmentedDropDownItem(titleItem: "products.options.sort.title".localized)
         segmentedTitleItem.widthRatio = 0.25
         
@@ -309,9 +291,12 @@ class ProductsOptionsControls : NSObject {
             ProductsOptionsSort.similar.stringValue
         ]
         let segmentedItem = SegmentedDropDownItem(pickerItems: pickerItems, selectedPickerItem: pickerItems.first)
+        segmentedItem.isPickerViewInsertedInline = true
+        segmentedItem.pickerViewAnimation = pickerViewAnimation
         
         let control = SegmentedDropDownControl()
         control.items = [segmentedTitleItem, segmentedItem]
+        control.changeValueOnRowChange = true
         
         sortControl?.removeFromSuperview()
         sortControl = control
@@ -421,120 +406,6 @@ class ProductsOptionsControls : NSObject {
     }
 }
 
-class ProductsOptionsView : UIView { // TODO: remove
-    fileprivate let controls = ProductsOptionsControls()
-    
-    private(set) var categoryControl: UISegmentedControl!
-    private(set) var genderControl: UISegmentedControl!
-    private(set) var sizeControl: UISegmentedControl!
-    private(set) var saleControl: UISegmentedControl!
-    let sortPickerView = UIPickerView()
-    let doneButton = MainButton()
-    
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-    }
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        
-        backgroundColor = .white
-        
-        addSubview(BorderView(edge: .top))
-        
-        categoryControl = controls.createCategoryControl()
-        categoryControl.translatesAutoresizingMaskIntoConstraints = false
-        categoryControl.tintColor = .crazeGreen
-        categoryControl.isExclusiveTouch = true
-        addSubview(categoryControl)
-        categoryControl.setContentCompressionResistancePriority(UILayoutPriority.required, for: .vertical)
-        categoryControl.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
-        categoryControl.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor).isActive = true
-        categoryControl.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
-        categoryControl.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
-        
-        genderControl = controls.createGenderControl()
-        genderControl.translatesAutoresizingMaskIntoConstraints = false
-        genderControl.tintColor = .crazeGreen
-        genderControl.isExclusiveTouch = true
-        addSubview(genderControl)
-        genderControl.setContentCompressionResistancePriority(UILayoutPriority.required, for: .vertical)
-        genderControl.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
-        genderControl.topAnchor.constraint(equalTo: categoryControl.bottomAnchor, constant: .padding).isActive = true
-        genderControl.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
-        genderControl.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
-        
-        sizeControl = controls.createSizeControl()
-        sizeControl.translatesAutoresizingMaskIntoConstraints = false
-        sizeControl.tintColor = .crazeGreen
-        sizeControl.isExclusiveTouch = true
-        addSubview(sizeControl)
-        sizeControl.setContentCompressionResistancePriority(UILayoutPriority.required, for: .vertical)
-        sizeControl.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
-        sizeControl.topAnchor.constraint(equalTo: genderControl.bottomAnchor, constant: .padding).isActive = true
-        sizeControl.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
-        sizeControl.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
-        
-        saleControl = controls.createSaleControl()
-        saleControl.translatesAutoresizingMaskIntoConstraints = false
-        saleControl.tintColor = .crazeGreen
-        addSubview(saleControl)
-        saleControl.setContentCompressionResistancePriority(UILayoutPriority.required, for: .vertical)
-        saleControl.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
-        saleControl.topAnchor.constraint(equalTo: sizeControl.bottomAnchor, constant: .padding).isActive = true
-        saleControl.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
-        saleControl.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
-        
-        let sortLabel = UILabel()
-        sortLabel.translatesAutoresizingMaskIntoConstraints = false
-        sortLabel.text = "products.options.sort.title".localized
-        sortLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
-        sortLabel.adjustsFontForContentSizeCategory = true
-        addSubview(sortLabel)
-        sortLabel.setContentCompressionResistancePriority(UILayoutPriority.required, for: .vertical)
-        sortLabel.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
-        sortLabel.topAnchor.constraint(equalTo: saleControl.bottomAnchor, constant: .extendedPadding).isActive = true
-        sortLabel.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
-        sortLabel.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
-        
-        sortPickerView.translatesAutoresizingMaskIntoConstraints = false
-        addSubview(sortPickerView)
-        sortPickerView.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
-        sortPickerView.topAnchor.constraint(equalTo: sortLabel.bottomAnchor).isActive = true
-        sortPickerView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-        sortPickerView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
-        sortPickerView.heightAnchor.constraint(equalToConstant: 130).isActive = true
-        
-        doneButton.translatesAutoresizingMaskIntoConstraints = false
-        doneButton.backgroundColor = .gray3
-        doneButton.setTitle("generic.done".localized, for: .normal)
-        addSubview(doneButton)
-        doneButton.setContentCompressionResistancePriority(UILayoutPriority.required, for: .vertical)
-        doneButton.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
-        doneButton.topAnchor.constraint(equalTo: sortPickerView.bottomAnchor, constant: .padding).isActive = true
-        doneButton.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
-        doneButton.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor).isActive = true
-        doneButton.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
-    }
-    
-    override func willMove(toWindow newWindow: UIWindow?) {
-        super.willMove(toWindow: newWindow)
-        
-        controls.sync()
-    }
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        
-        // Needed in iOS 10
-        layoutMargins = UIEdgeInsets(top: .padding, left: .extendedPadding, bottom: .padding, right: .extendedPadding)
-    }
-    
-    override var intrinsicContentSize: CGSize {
-        return UILayoutFittingExpandedSize
-    }
-}
-
 class ProductsOptionsViewController: UIViewController {
     private let transitioning = ViewControllerTransitioningDelegate(presentation: .dimmed, transition: .modal)
     private let controls = ProductsOptionsControls()
@@ -551,7 +422,9 @@ class ProductsOptionsViewController: UIViewController {
         return self.controls.createSaleControl()
     }()
     private(set) lazy var sortControl: UIControl = {
-        return self.controls.createSortControl()
+        return self.controls.createSortControl(pickerViewAnimation: { [weak self] in
+            self?.view.layoutIfNeeded()
+        })
     }()
     let sortPickerView = UIPickerView()
     

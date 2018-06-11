@@ -63,7 +63,7 @@ class MainSegmentedControl: UISegmentedControl {
     
     override var intrinsicContentSize: CGSize {
         var size = super.intrinsicContentSize
-        size.height = min(44, layoutMargins.top + ceil(size.height) + layoutMargins.bottom)
+        size.height = min(.defaultViewHeight, layoutMargins.top + ceil(size.height) + layoutMargins.bottom)
         return size
     }
 }

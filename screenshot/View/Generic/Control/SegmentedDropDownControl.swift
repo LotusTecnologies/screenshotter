@@ -28,6 +28,8 @@ class SegmentedDropDownItem : NSObject {
             }
         }
     }
+    var isPickerViewInsertedInline = false
+    var pickerViewAnimation: (()->())?
     var placeholderTitle: String?
     
     /// Value from 1 to 0 where 1 takes up the whole segmented control
@@ -177,6 +179,7 @@ class SegmentedDropDownControl : UIButton {
                 let isFirst = index == 0
                 let isLast = index == items.count - 1
                 let segment: UIView
+                var pickerView: UIPickerView?
                 
                 if let titleItemText = item.titleItemText {
                     let label = DropDownLabel()
@@ -191,7 +194,16 @@ class SegmentedDropDownControl : UIButton {
                     dropDownControl.titleLabel.textColor = .gray3
                     dropDownControl.imageView.tintColor = dropDownControl.titleLabel.textColor
                     dropDownControl.isEnabled = !item.pickerItems.isEmpty
-                    dropDownControl.pickerInputView.doneButton.addTarget(self, action: #selector(pickerDoneButtonAction(_:)), for: .touchUpInside)
+                    dropDownControl.isPickerViewInsertedInline = item.isPickerViewInsertedInline
+                    
+                    if !item.isPickerViewInsertedInline {
+                        dropDownControl.pickerInputView.doneButton.addTarget(self, action: #selector(pickerDoneButtonAction(_:)), for: .touchUpInside)
+                    }
+                    else {
+                        dropDownControl.pickerViewAnimation = item.pickerViewAnimation
+                        pickerView = dropDownControl.pickerView
+                    }
+                    
                     segment = dropDownControl
                 }
                 
@@ -199,7 +211,7 @@ class SegmentedDropDownControl : UIButton {
                 segment.isUserInteractionEnabled = false
                 addSubview(segment)
                 segment.topAnchor.constraint(equalTo: topAnchor).isActive = true
-                segment.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+                segment.heightAnchor.constraint(equalToConstant: .defaultViewHeight).isActive = true
                 
                 if isFirst {
                     segment.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
@@ -211,7 +223,7 @@ class SegmentedDropDownControl : UIButton {
                 }
                 
                 if isLast {
-                    segment.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -borderWidth).isActive = true
+                    segment.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
                 }
                 
                 if item.widthRatio > -1 {
@@ -245,6 +257,28 @@ class SegmentedDropDownControl : UIButton {
                 }
                 
                 item.segment = segment
+                
+                if let pickerView = pickerView {
+                    let pickerViewContainer = UIView()
+                    pickerViewContainer.translatesAutoresizingMaskIntoConstraints = false
+                    pickerViewContainer.backgroundColor = .white
+                    pickerViewContainer.layer.masksToBounds = true
+                    pickerViewContainer.layer.cornerRadius = .defaultCornerRadius
+                    pickerViewContainer.layer.borderColor = type(of: self).borderColor.cgColor
+                    pickerViewContainer.layer.borderWidth = borderWidth
+                    insertSubview(pickerViewContainer, at: 0)
+                    pickerViewContainer.topAnchor.constraint(equalTo: segment.bottomAnchor, constant: -.defaultCornerRadius * 2).isActive = true
+                    pickerViewContainer.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+                    pickerViewContainer.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+                    pickerViewContainer.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+                    
+                    pickerView.translatesAutoresizingMaskIntoConstraints = false
+                    pickerViewContainer.addSubview(pickerView)
+                    pickerView.topAnchor.constraint(equalTo: segment.bottomAnchor).isActive = true
+                    pickerView.leadingAnchor.constraint(equalTo: pickerViewContainer.leadingAnchor).isActive = true
+                    pickerView.bottomAnchor.constraint(equalTo: pickerViewContainer.bottomAnchor).isActive = true
+                    pickerView.trailingAnchor.constraint(equalTo: pickerViewContainer.trailingAnchor).isActive = true
+                }
             }
         }
     }
@@ -335,7 +369,7 @@ extension SegmentedDropDownControl : UIPickerViewDataSource, UIPickerViewDelegat
                 return false
             }
             
-            return segment.pickerInputView.pickerView == pickerView
+            return segment.pickerView == pickerView
         } ?? 0
     }
     
@@ -435,24 +469,27 @@ fileprivate class DropDownLabel: UILabel {
 fileprivate class DropDownControl : UIControl {
     weak var pickerDataSource: UIPickerViewDataSource? {
         didSet {
-            pickerInputView.pickerView.dataSource = pickerDataSource
+            pickerView.dataSource = pickerDataSource
         }
     }
     weak var pickerDelegate: UIPickerViewDelegate? {
         didSet {
-            pickerInputView.pickerView.delegate = pickerDelegate
+            pickerView.delegate = pickerDelegate
         }
     }
     
     let titleLabel = UILabel()
     let imageView = UIImageView()
     let image = UIImage(named: "DropDownArrow")?.withRenderingMode(.alwaysTemplate)
-    let pickerInputView = PickerInputView(frame: .zero, inputViewStyle: .default)
+    let pickerView = UIPickerView()
+    private(set) lazy var pickerInputView: PickerInputView = {
+        return PickerInputView(pickerView: self.pickerView)
+    }()
     
     // MARK: Life Cycle
     
     required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
+        fatalError("init(coder:) has not been implemented")
     }
     
     override init(frame: CGRect) {
@@ -503,7 +540,7 @@ fileprivate class DropDownControl : UIControl {
         let imageWidth = image?.size.width ?? 0
         
         size.width = layoutMargins.left + ceil(labelSize.width) + layoutMargins.right + imageWidth + layoutMargins.right
-        size.height = min(44, layoutMargins.top + ceil(labelSize.height) + layoutMargins.bottom)
+        size.height = min(.defaultViewHeight, layoutMargins.top + ceil(labelSize.height) + layoutMargins.bottom)
         return size
     }
     
@@ -556,19 +593,27 @@ fileprivate class DropDownControl : UIControl {
     
     // MARK: Picker
     
-    override var canBecomeFirstResponder: Bool {
-        return true
-    }
-    
     override var inputView: UIView? {
         get {
-            return pickerInputView
+            return isPickerViewInsertedInline ? nil : pickerInputView
+        }
+    }
+    
+    var isPickerViewInsertedInline = false {
+        didSet {
+            pickerView.removeFromSuperview()
+            
+            if isPickerViewInsertedInline {
+                pickerViewHeightConstraint?.constant = 0
+            }
+            else {
+                pickerViewHeightConstraint = nil
+                pickerInputView.insert(pickerView: pickerView)
+            }
         }
     }
     
     func selectCurrentRow() {
-        let pickerView = pickerInputView.pickerView
-        
         guard let dataSource = pickerView.dataSource, let delegate = pickerView.delegate else {
             return
         }
@@ -587,7 +632,31 @@ fileprivate class DropDownControl : UIControl {
         pickerView.selectRow(row, inComponent: 0, animated: false)
     }
     
+    private lazy var pickerViewHeightConstraint: NSLayoutConstraint? = {
+        let constraint = pickerView.heightAnchor.constraint(equalToConstant: 0)
+        constraint.isActive = true
+        return constraint
+    }()
+    
+    var pickerViewAnimation: (()->())?
+    
+    private func animatePickerView(isExpanding: Bool) {
+        pickerViewHeightConstraint?.constant = isExpanding ? 130 : 0
+        
+        var options: UIViewAnimationOptions = .beginFromCurrentState
+        options.insert(isExpanding ? .curveEaseOut : .curveEaseIn)
+        
+        UIView.animate(withDuration: .defaultAnimationDuration, delay: 0, options: options, animations: {
+            self.pickerView.superview?.layoutIfNeeded()
+            self.pickerViewAnimation?()
+        })
+    }
+    
     // MARK: First Responder
+    
+    override var canBecomeFirstResponder: Bool {
+        return true
+    }
     
     @discardableResult override func becomeFirstResponder() -> Bool {
         let becomeFirstResponder = super.becomeFirstResponder()
@@ -595,6 +664,10 @@ fileprivate class DropDownControl : UIControl {
         if becomeFirstResponder {
             isSelected = true
             selectCurrentRow()
+            
+            if isPickerViewInsertedInline {
+                animatePickerView(isExpanding: true)
+            }
         }
         
         return becomeFirstResponder
@@ -605,6 +678,10 @@ fileprivate class DropDownControl : UIControl {
         
         if resignFirstResponder {
             isSelected = false
+            
+            if isPickerViewInsertedInline {
+                animatePickerView(isExpanding: false)
+            }
         }
         
         return resignFirstResponder
@@ -613,11 +690,10 @@ fileprivate class DropDownControl : UIControl {
 
 fileprivate extension DropDownControl {
     class PickerInputView: UIInputView {
-        let pickerView = UIPickerView()
         let doneButton = UIButton()
         
         required init?(coder aDecoder: NSCoder) {
-            super.init(coder: aDecoder)
+            fatalError("init(coder:) has not been implemented")
         }
         
         override init(frame: CGRect, inputViewStyle: UIInputViewStyle) {
@@ -634,7 +710,14 @@ fileprivate extension DropDownControl {
             addSubview(doneButton)
             doneButton.topAnchor.constraint(equalTo: topAnchor).isActive = true
             doneButton.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
-            
+        }
+        
+        convenience init(pickerView: UIPickerView) {
+            self.init(frame: .zero, inputViewStyle: .default)
+            insert(pickerView: pickerView)
+        }
+        
+        func insert(pickerView: UIPickerView) {
             pickerView.translatesAutoresizingMaskIntoConstraints = false
             addSubview(pickerView)
             pickerView.topAnchor.constraint(equalTo: doneButton.bottomAnchor).isActive = true
