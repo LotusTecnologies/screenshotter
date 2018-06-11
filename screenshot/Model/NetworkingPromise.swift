@@ -578,7 +578,12 @@ class NetworkingPromise : NSObject {
             var isUsc = false
             if let countryCode = dict["geoplugin_countryCode"] as? String,
               countryCode == "US" || countryCode == "IL" {
-                isUsc = true
+                // Set half of the USC audience to non-USC UI, but continue to give USC feed.
+                if arc4random_uniform(2) == 1 {
+                    UserDefaults.standard.set(true, forKey: UserDefaultsKeys.abUSC)
+                } else {
+                    isUsc = true
+                }
             }
             UserDefaults.standard.set(isUsc, forKey: UserDefaultsKeys.isUSC)
             UserDefaults.standard.synchronize()

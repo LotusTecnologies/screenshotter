@@ -15,10 +15,20 @@ class ShoppableCollectionViewCell : UICollectionViewCell {
     
     var image: UIImage? {
         set {
+            imageView.sd_cancelCurrentImageLoad()
             imageView.image = newValue
         }
         get {
             return imageView.image
+        }
+    }
+    var imageUrl:String? {
+        didSet {
+            imageView.sd_cancelCurrentImageLoad()
+            imageView.image = nil
+            if let imageUrl = imageUrl, let url = URL(string:imageUrl) {
+                imageView.sd_setImage(with: url, completed: nil)
+            }
         }
     }
     

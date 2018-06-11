@@ -12,20 +12,6 @@
 // https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/man1/genstrings.1.html
 
 
-// April 20, 2018 campain was a kim video to encourage users to submit to discover
-"2018_04_20_campaign.headline" = "Win up to $1,000";
-"2018_04_20_campaign.body" = "New winners every week! Send your favorite looks to Discover to enter, submit as many times as you’d like!";
-"2018_04_20_campaign.button" = "Learn More";
-"2018_04_20_campaign.instructions.headline" = "Share and Win!";
-"2018_04_20_campaign.instructions.step_1" = "Make sure you have notifications enabled and a valid email address (in Settings)";
-"2018_04_20_campaign.instructions.step_2" = "Add a fashion photo from your phone’s gallery to your Screenshop Homescreen";
-"2018_04_20_campaign.instructions.step_3" = "Tap Share, then Share to Discover";
-"2018_04_20_campaign.instructions.step_4" = "Submit as many images as you want, they each count as an entry";
-"2018_04_20_campaign.instructions.step_5" = "Follow us on Instagram to see when we announce the winners";
-"2018_04_20_campaign.instructions.button" = "Video Explanation";
-"2018_04_20_campaign.instructions.button" = "Got it!";
-"2018_04_20_campaign.instructions.secondButton" = "back to video";
-
 // May 1, 2018 campain is a $25 gift card for users who complete their first purchase.
 "2018_05_01_campaign.headline" = "Start Shopping!";
 "2018_05_01_campaign.message" = "Get a $25 gift card when you make your first purchase*";
@@ -229,11 +215,6 @@
 "permission.photo.denied.message" = "We need access to your photos in order to show you shoppable items.";
 "permission.push.denied.message" = "Turn on notifications to get updates from Screenshop";
 
-"personal_stylist.error" = "Unlocking a personal stylist requires a one time in-app purchase.\nUnable to connect to the appstore at this time:\n%@";
-"personal_stylist.error.invalid_device" = "Unlocking a personal stylist requires an in app purchase. This device is not able or allowed to make in app purchases.";
-"personal_stylist.loading" = "Unlocking a personal stylist requires a one time in-app purchase.\nConnecting to appstore....";
-"personal_stylist.unlock" = "Unlocking a personal stylist requires a one time in-app purchase for %@";
-
 "picker.empty.detail" = "Start taking screenshots of fashion items to fill up your gallery!";
 "picker.empty.title" = "No Photos!";
 "picker.limit.alert.title" = "Limit Exceeded";
@@ -250,13 +231,12 @@
 "product.alert.price" = "Price alert: Your fav just dropped to %@, get it quick!!";
 "product.alert.price_stock" = "In-stock alert: Your fav just dropped to %@, get it quick!!";
 "product.alert.stock" = "In-stock alert: Your fav just became available, get it quick!!";
-"product.buy" = "BUY";
+"product.buy" = "Buy";
 "product.buy_now" = "Buy Now";
 "product.color.default" = "Color";
 "product.next_step.cancel" = "Continue Shopping";
 "product.next_step.continue" = "Go to Cart";
 "product.next_step.added" = "Product was added to your cart!";
-"product.out_of_stock" = "OUT OF STOCK";
 "product.price_alert_on" = "NOTIFY ME WHEN IN STOCK";
 "product.price_alert_off" = "IN-STOCK ALERT ON";
 "product.similar_items" = "Related Items";
@@ -267,6 +247,7 @@
 "product.variants.size" = "Size";
 "product.website" = "Go To %@";
 
+"products.details.similar" = "Similar Items";
 "products.helper.message" = "No visually similar products were detected";
 "products.helper.retry" = "Try Again";
 "products.helper.retry.fashion" = "Fashion";
@@ -293,8 +274,8 @@
 "products.rate.negative.popup.message" =  "What were you expecting to see and what did you see instead?";
 "products.rate.negative.popup.title" =  "What’s Wrong Here?";
 "products.rate.rated" = "Thanks for your feedback!";
-"products.rate.talk_to_stylist" = "Talk to your stylist";
 "products.rate.unrated" = "Are these results relevant?";
+"products.share.title" = "Check out what I just found on Screenshop";
 "products.title" = "Shop Photo";
 "products.related_looks.headline" = "Similar Looks";
 "products.related_looks.error.connection" = "Please check your connection and try again.";
@@ -361,10 +342,8 @@
 "settings.row.photo_permission.title" = "Camera Roll";
 "settings.row.push_permission.title" = "Push Notifications";
 "settings.row.region.title" = "Region";
-"settings.row.restore_in_app_purchase.title" = "Restore Purchases";
 "settings.row.size.title" = "Size";
-"settings.row.talk_to_stylist.title" = "Talk to Your Stylist";
-"settings.row.tutorial.title" = "Replay Tutorial";
+"settings.row.tutorial.title" = "Play Tutorial";
 "settings.row.usage_streak.detail.plural" = "%d days";
 "settings.row.usage_streak.detail.single" = "%d day";
 "settings.row.usage_streak.title" = "Daily Streak";

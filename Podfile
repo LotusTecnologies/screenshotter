@@ -6,6 +6,7 @@ target 'screenshot' do
     # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
     use_frameworks!
     pod 'KochavaTrackeriOS'
+    pod 'Amplitude-iOS', '~> 4.2.1'
     pod 'Clarifai-Apple-SDK', '3.0.0-beta14'
     pod 'PromiseKit/Foundation', '4.5.2'
     pod 'PromiseKit/StoreKit', '~> 4.0'
@@ -17,14 +18,13 @@ target 'screenshot' do
     pod 'FacebookShare'
     pod 'Branch'
     pod 'EggRating'
-    pod 'Intercom'
     pod 'lottie-ios'
-    pod 'Segment-Amplitude'
     pod 'SwiftKeychainWrapper'
     pod 'CreditCardValidator'
     pod 'Whisper'
     pod 'PhoneNumberKit'
     pod 'CardIO'
+    pod 'Hero'
 end
 
 post_install do |installer|
