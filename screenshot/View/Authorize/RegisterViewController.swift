@@ -460,6 +460,14 @@ class RegisterViewController: UIViewController {
                 self._view.passwordTextField.isInvalid = true
                 self._view.isForgotPasswordButtonHidden = false
                 ActionFeedbackGenerator().actionOccurred(.nope)
+                let error = SigninManager.shared.nserrorToSigninManagerError(error as NSError)
+                switch error {
+                case SigninManager.SigninManagerError.authenticationFailed:
+                    self._view.isForgotPasswordButtonHidden = true
+                default:
+                    break
+                }
+                
                
             }.always {
                 self._view.emailTextField.isUserInteractionEnabled = true

@@ -27,7 +27,6 @@ class SigninManager : NSObject {
     // Sign in error
         case authenticationFailed // wrong password or code
     // SignUpError
-        case userAccountAlreadyExists
         case errorIllegalArgument //For creating an account the password must be at least x digits long etc
     }
 
@@ -71,7 +70,7 @@ class SigninManager : NSObject {
         return handled
     }
     
-    private func nserrorToSigninManagerError(_ error:NSError) ->SigninManagerError {
+    public func nserrorToSigninManagerError(_ error:NSError) ->SigninManagerError {
         // check if problem is no internet. etc
         if error.domain == AWSCognitoErrorDomain{
             if let code = AWSCognitoErrorType.init(rawValue: error.code) {
@@ -93,8 +92,7 @@ class SigninManager : NSObject {
         return Promise<Void>.init(resolvers: { (fulfil, reject) in
             AWSSignInManager.sharedInstance().login(signInProviderKey: self.facebook.identityProviderName, completionHandler: { (result, error) in
                 if let error = error {
-                    let nserror = error as NSError
-                    reject(self.nserrorToSigninManagerError(nserror))
+                    reject(error)
                 }else if let result = result{
                     if let credentials = result as? AWSCredentials {
                         self.userCredential = credentials
@@ -119,10 +117,18 @@ class SigninManager : NSObject {
             let nsError = error as NSError
             let usernameExistsException = 37
             if nsError.code == usernameExistsException && nsError.domain == AWSCognitoIdentityProviderErrorDomain {
-                return self.login(email: email.lowercased(), password: password)
+                return self.login(email: email.lowercased(), password: password).recover(execute: { (error) -> Promise<SigninManager.LoginOrCreateAccountResult> in
+                    let nsError = error as NSError
+                    let userNotConfirmedException = 33
+                    if nsError.code == userNotConfirmedException && nsError.domain == AWSCognitoIdentityProviderErrorDomain {
+                        return self.resendConfirmCode(email: email.lowercased()).then(execute: { () -> (Promise<LoginOrCreateAccountResult>) in
+                            return Promise.init(value: .createAccountUnconfirmed)
+                        })
+                    }
+                    return Promise.init(error: nsError)
+                })
             }
-            let signInError = self.nserrorToSigninManagerError(nsError)
-            return Promise.init(error: signInError)
+            return Promise.init(error: nsError)
         })
         
 //        return login(email:email.lowercased(), password: password).recover(execute: { (error) -> Promise<SigninManager.LoginOrCreateAccountResult> in
@@ -141,6 +147,8 @@ class SigninManager : NSObject {
                 let emailAttribute = AWSCognitoIdentityUserAttributeType.init(name: "email", value: email)
                 
                 let user = pool.getUser(userName)
+                self.user = user
+
                 user.getSession(userName, password: password, validationData: [emailAttribute]).continueWith { (task) -> Any? in
                     if let error = task.error {
                         reject(error)
@@ -227,13 +235,16 @@ class SigninManager : NSObject {
         }
     }
     
-    func resendConfirmCode() -> Promise<Void>{
+    func resendConfirmCode(email:String) -> Promise<Void>{
+       
         return Promise { fulfill, reject in
-            if let user = self.user{
+            if let userName = email.lowercased().sha1(), let pool = self.pool{
+                
+                let user = pool.getUser(userName)
+                self.user = user
                 user.resendConfirmationCode().continueWith(executor: AWSExecutor.mainThread(), block: { (task) -> Any? in
                     if let error = task.error  {
-                        let nserror = error as NSError
-                        reject(self.nserrorToSigninManagerError(nserror))
+                        reject(error)
                     }else{
                         fulfill(())
                     }
@@ -254,7 +265,7 @@ class SigninManager : NSObject {
                 user.forgotPassword().continueWith(executor: AWSExecutor.mainThread(), block: { (task) -> Any? in
                     if let error = task.error {
                         let nserror = error as NSError
-                        reject(self.nserrorToSigninManagerError(nserror))
+                        reject(nserror)
                     }else{
                         fulfill(())
                     }
@@ -273,8 +284,7 @@ class SigninManager : NSObject {
             if let user = self.user {
                 user.confirmForgotPassword(code, password: password).continueWith(executor: AWSExecutor.mainThread(), block: { (task) -> Any? in
                     if let error = task.error {
-                        let nserror = error as NSError
-                        reject(self.nserrorToSigninManagerError(nserror))
+                        reject(error)
                     }else{
                         fulfill(())
                     }
@@ -291,7 +301,7 @@ class SigninManager : NSObject {
             AWSSignInManager.sharedInstance().logout(completionHandler: { (result, error) in
                 if let error = error {
                     let nserror = error as NSError
-                    reject(self.nserrorToSigninManagerError(nserror))
+                    reject(nserror)
 
                 }else{
                     fulfill(())

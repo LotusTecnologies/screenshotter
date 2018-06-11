@@ -168,9 +168,8 @@ class ConfirmCodeViewController: UIViewController {
                 self.delegate?.confirmCodeViewControllerDidConfirm(self)
                 }.catch { (error) in
                     DispatchQueue.mainAsyncIfNeeded {
-                        if let error = error as? SigninManager.SigninManagerError {
-                            
-                        }
+                        let error = SigninManager.shared.nserrorToSigninManagerError(error as NSError)
+
                     }
             }
         }
