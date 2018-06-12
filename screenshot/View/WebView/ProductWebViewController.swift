@@ -41,7 +41,6 @@ class ProductWebViewController : WebViewController {
         hidesBottomBarWhenPushed = true
         
         addNavigationItemLogo()
-        loaderLabelText = "webview.product.loading".localized
     }
     
     @objc fileprivate func favoriteAction() {
