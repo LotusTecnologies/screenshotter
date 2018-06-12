@@ -248,7 +248,6 @@ class ResetPasswordViewController: UIViewController {
     }
     
     // MARK: Password
-    
     private func validatePassword(_ password: String?) -> String? {
         if let password = password, !password.isEmpty {
             return password

@@ -405,6 +405,8 @@ class RegisterViewController: UIViewController {
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         _view.addGestureRecognizer(tapGesture)
+        
+        self._view.isForgotPasswordButtonHidden = false
     }
     
     deinit {
@@ -556,11 +558,6 @@ extension RegisterViewController: UITextFieldDelegate {
             if let email = self.email, emailFormRow.isValid() {
                 _view.emailTextField.exists = .unknown
                 
-                
-                if previousEmail != email {
-                    _view.isForgotPasswordButtonHidden = true
-                }
-                
                 previousEmail = email
             }
             else {
@@ -621,7 +618,7 @@ extension RegisterViewController: ResetPasswordViewControllerDelegate {
     }
     
     func resetPasswordViewControllerDidCancel(_ viewController: ResetPasswordViewController) {
-        navigationController?.popToRootViewController(animated: true)
+        navigationController?.popToViewController(self, animated: true)
 
     }
     

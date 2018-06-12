@@ -193,9 +193,12 @@ class InitiateResetPasswordViewController: UIViewController {
     // MARK: Email
     
     private func validateEmail(_ email: String?) -> String? {
-        // TODO: email regex
         if let email = email, !email.isEmpty {
-            return email
+            let emailFormRow = FormRow.Email()
+            emailFormRow.value = email
+            if emailFormRow.isValid() {
+                return email
+            }
         }
         return nil
     }
