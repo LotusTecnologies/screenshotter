@@ -36,6 +36,8 @@ class SettingsViewController : BaseViewController {
         case bug
         case version
         case coins
+        case termsOfService
+        case privacyPolicy
         case productGender
         case productSize
         case currency
@@ -225,6 +227,8 @@ class SettingsViewController : BaseViewController {
             .bug,
             .usageStreak,
             .coins,
+            .termsOfService,
+            .privacyPolicy,
 //            .region,  // Revert to never use USC.
             .version,
             .partners
@@ -444,9 +448,15 @@ extension SettingsViewController : UITableViewDelegate {
             presentMailComposerForContactUs()
 
         case .coins:
-            let navigationController = ModalNavigationController(rootViewController: GameViewController())
-            present(navigationController, animated: true, completion: nil)
-            
+            break
+        case .termsOfService:
+            if let viewController = LegalViewControllerFactory.termsOfServiceViewController() {
+                present(viewController, animated: true, completion: nil)
+            }
+        case .privacyPolicy:
+            if let viewController = LegalViewControllerFactory.privacyPolicyViewController() {
+                present(viewController, animated: true, completion: nil)
+            }
         case .pushPermission, .photoPermission:
             if let permissionType = row.permissionType {
                 PermissionsManager.shared.requestPermission(for: permissionType, openSettingsIfNeeded: true, response: { granted in
@@ -587,6 +597,10 @@ fileprivate extension SettingsViewController {
             return "settings.row.version.title".localized
         case .coins:
             return "settings.row.coins.title".localized
+        case .termsOfService:
+            return "legal.terms_of_service".localized
+        case .privacyPolicy:
+            return "legal.privacy_policy".localized
         case .productGender:
             return "settings.row.gender.title".localized
         case .productSize:

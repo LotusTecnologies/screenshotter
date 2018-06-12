@@ -8,7 +8,6 @@
 
 import UIKit
 import WebKit
-import SpriteKit
 import Appsee
 
 @objc protocol WebViewControllerDelegate : NSObjectProtocol {
@@ -17,13 +16,11 @@ import Appsee
 
 class WebViewController : BaseViewController {
     let webView = WebView()
-    
+    fileprivate var loader: Loader?
+    var failLabel:UILabel?
+    var tryAgainButton:MainButton?
     weak var delegate: WebViewControllerDelegate?
     
-    // MARK: Life Cycle
-    
-    fileprivate var didLoadInitialPage = false
-    fileprivate var didViewAppear = false
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -33,9 +30,6 @@ class WebViewController : BaseViewController {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
         setupBarButtonItems()
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(applicationDidEnterBackground(_:)), name: .UIApplicationDidEnterBackground, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(applicationWillEnterForeground(_:)), name: .UIApplicationWillEnterForeground, object: nil)
     }
     
     override func viewDidLoad() {
@@ -53,70 +47,31 @@ class WebViewController : BaseViewController {
         
         syncToolbar()
         setBarButtonItemsToToolbarIfPossible()
+        
+        
+        let loader = Loader()
+        loader.translatesAutoresizingMaskIntoConstraints = false
+        loader.color = .crazeRed
+        loader.activityView.hidesWhenStopped = true
+        self.view.addSubview(loader)
+        loader.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
+        loader.centerYAnchor.constraint(equalTo: self.view.centerYAnchor).isActive = true
+        self.loader = loader
+        loader.startAnimation()
+        
         loadURL(url)
+        
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        if !didLoadInitialPage {
-            showLoadingView()
-        }
-    }
+   
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        didViewAppear = true
-        
-        if !didLoadInitialPage {
-            loader?.startAnimation()
-        }
-        
         Appsee.startScreen("WebView")
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        
-        if isShowingGame {
-            Analytics.trackGameInterrupted(from: .userNavigating)
-        }
-    }
     
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        didViewAppear = false
-        
-        hideLoadingView()
-    }
-    
-    @available(iOS 11.0, *)
-    override func viewSafeAreaInsetsDidChange() {
-        super.viewSafeAreaInsetsDidChange()
-        
-        updateLoadingCoverLayoutMargins()
-    }
-    
-    @objc func applicationDidEnterBackground(_ notification: Notification) {
-        if view.window != nil {
-            loader?.stopAnimation()
-            
-            if isShowingGame {
-                Analytics.trackGameInterrupted(from: .appBackgrounding)
-            }
-        }
-    }
-    
-    @objc func applicationWillEnterForeground(_ notification: Notification) {
-        if view.window != nil {
-            loader?.startAnimation()
-            
-            if isShowingGame {
-                Analytics.trackGameResumed(from: .appBackgrounding)
-            }
-        }
-    }
-    
+   
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         var shouldCallSuper = true
         
@@ -155,7 +110,6 @@ class WebViewController : BaseViewController {
             return
         }
         
-        didLoadInitialPage = false
         webView.load(URLRequest(url: url))
     }
     
@@ -321,110 +275,6 @@ class WebViewController : BaseViewController {
         
         UIApplication.shared.open(url, options: [:], completionHandler: nil)
     }
-    
-    // MARK: Loading
-    
-    var loaderLabelText = "webview.loading".localized
-    
-    fileprivate var loadingCoverView: UIImageView?
-    fileprivate var loader: Loader?
-    
-    fileprivate func showLoadingView() {
-        guard self.loadingCoverView == nil else {
-            return
-        }
-        
-        let loadingCoverView = UIImageView(image: UIImage(named: "LoaderBackground"))
-        loadingCoverView.translatesAutoresizingMaskIntoConstraints = false
-        loadingCoverView.isUserInteractionEnabled = true
-        loadingCoverView.contentMode = .scaleAspectFill
-        view.addSubview(loadingCoverView)
-        loadingCoverView.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor).isActive = true
-        loadingCoverView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        loadingCoverView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-        loadingCoverView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        self.loadingCoverView = loadingCoverView
-        
-        updateLoadingCoverLayoutMargins()
-        
-        let loader = Loader()
-        loader.translatesAutoresizingMaskIntoConstraints = false
-        loader.color = .crazeRed
-        loadingCoverView.addSubview(loader)
-        loader.centerXAnchor.constraint(equalTo: loadingCoverView.centerXAnchor).isActive = true
-        NSLayoutConstraint(item: loader, attribute: .centerY, relatedBy: .equal, toItem: loadingCoverView, attribute: .centerY, multiplier: 0.8, constant: 0).isActive = true
-        self.loader = loader
-        
-        let loaderLabel = UILabel()
-        loaderLabel.translatesAutoresizingMaskIntoConstraints = false
-        loaderLabel.text = self.loaderLabelText
-        loaderLabel.textColor = .gray3
-        loaderLabel.textAlignment = .center
-        loaderLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
-        loaderLabel.numberOfLines = 0
-        loaderLabel.adjustsFontForContentSizeCategory = true
-        loadingCoverView.addSubview(loaderLabel)
-        loaderLabel.topAnchor.constraint(equalTo: loader.bottomAnchor, constant: .padding).isActive = true
-        loaderLabel.leadingAnchor.constraint(equalTo: loadingCoverView.leadingAnchor, constant: .padding).isActive = true
-        loaderLabel.trailingAnchor.constraint(equalTo: loadingCoverView.trailingAnchor, constant: -.padding).isActive = true
-        
-        let button = MainButton()
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.backgroundColor = .crazeGreen
-        button.setTitle("game.enter".localized, for: .normal)
-        button.addTarget(self, action: #selector(showLoadingGame), for: .touchUpInside)
-        loadingCoverView.addSubview(button)
-        button.bottomAnchor.constraint(lessThanOrEqualTo: loadingCoverView.layoutMarginsGuide.bottomAnchor, constant: -.extendedPadding).isActive = true
-        button.bottomAnchor.constraint(lessThanOrEqualTo: bottomLayoutGuide.topAnchor, constant: -.extendedPadding).isActive = true
-        button.centerXAnchor.constraint(equalTo: loadingCoverView.centerXAnchor).isActive = true
-    }
-    
-    fileprivate func hideLoadingView() {
-        loadingCoverView?.removeFromSuperview()
-        loadingCoverView = nil
-        
-        loader?.stopAnimation()
-        loader = nil
-        
-        if isShowingGame {
-            isShowingGame = false
-            Analytics.trackGameInterrupted(from: .pageLoading)
-        }
-    }
-    
-    fileprivate func updateLoadingCoverLayoutMargins() {
-        if #available(iOS 11.0, *) {
-            loadingCoverView?.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: view.window?.safeAreaInsets.bottom ?? 0, right: 0)
-        }
-    }
-    
-    // MARK: Game
-    
-    fileprivate var isShowingGame = false
-    
-    @objc fileprivate func showLoadingGame() {
-        guard let loadingCoverView = loadingCoverView,
-            let scene = GameScene.unarchiveFromFile("GameScene") as? GameScene else {
-            return
-        }
-        
-        isShowingGame = true
-        
-        let gameView = SKView()
-        gameView.translatesAutoresizingMaskIntoConstraints = false
-        gameView.ignoresSiblingOrder = true
-        loadingCoverView.addSubview(gameView)
-        gameView.topAnchor.constraint(equalTo: loadingCoverView.topAnchor).isActive = true
-        gameView.leadingAnchor.constraint(equalTo: loadingCoverView.leadingAnchor).isActive = true
-        gameView.bottomAnchor.constraint(equalTo: loadingCoverView.layoutMarginsGuide.bottomAnchor).isActive = true
-        gameView.trailingAnchor.constraint(equalTo: loadingCoverView.trailingAnchor).isActive = true
-        
-        scene.gameDelegate = self
-        scene.scaleMode = .aspectFill
-        gameView.presentScene(scene)
-        
-        loader?.stopAnimation()
-    }
 }
 
 extension WebViewController : WKNavigationDelegate {
@@ -445,72 +295,69 @@ extension WebViewController : WKNavigationDelegate {
     }
     
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-        if !didLoadInitialPage {
-            showLoadingView()
-            
-            if didViewAppear {
-                loader?.startAnimation()
-            }
-        }
+       
     }
     
     func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
-        if didLoadInitialPage == false {
-            if !isTrackerURL(url: navigationResponse.response.url) {
-                didLoadInitialPage = true
-                
-                if !isShowingGame {
-                    hideLoadingView()
-                }
-            }
-        }
-        
+        self.loader?.stopAnimation()
         decisionHandler(.allow)
     }
    
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        if didLoadInitialPage == false {
-            didLoadInitialPage = true
-            
-            if !isShowingGame {
-                hideLoadingView()
-            }
-        }
+        self.loader?.stopAnimation()
     }
-    
-    func declinedInvalidURLAlertController() -> UIAlertController {
-        let alertController = UIAlertController(title: "webview.invalid.title".localized, message: "webview.invalid.message".localized, preferredStyle: .alert)
-        alertController.addAction(UIAlertAction(title: "generic.ok".localized, style: .cancel, handler: nil))
-        return alertController
+   
+    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        self.failedToLoad()
     }
-    
-    fileprivate func isTrackerURL(url: URL?) -> Bool {
-        let trackers = [
-            "api.shopstyle.com",
-            "doubleclick.net",
-            "adservice.google",
-            "www.googletagmanager.com"
-        ]
-        if let host = url?.host {
-            for tracker in trackers {
-                if host.contains(tracker) {
-                    return true
-                }
-            }
-        }
+    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        self.failedToLoad()
+    }
+    func failedToLoad() {
+        self.loader?.stopAnimation()
         
-        return false
+        if let label = self.failLabel {
+            label.removeFromSuperview()
+        }
+        if let button = self.tryAgainButton{
+            button.removeFromSuperview()
+        }
+        let failLabel = UILabel()
+        failLabel.translatesAutoresizingMaskIntoConstraints = false
+        failLabel.text = "products.related_looks.error.connection".localized
+        failLabel.textColor = .gray3
+        failLabel.textAlignment = .center
+        failLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
+        failLabel.numberOfLines = 0
+        failLabel.adjustsFontForContentSizeCategory = true
+        self.view.addSubview(failLabel)
+        failLabel.bottomAnchor.constraint(equalTo: self.view.centerYAnchor, constant:-.padding).isActive = true
+        failLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor, constant: -.padding).isActive = true
+        
+        let button = MainButton()
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.backgroundColor = .crazeGreen
+        button.setTitle("generic.retry".localized, for: .normal)
+        button.addTarget(self, action: #selector(tryAgain(_:)), for: .touchUpInside)
+        self.view.addSubview(button)
+        button.topAnchor.constraint(equalTo: self.view.centerYAnchor, constant:.padding).isActive = true
+        button.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
+        self.tryAgainButton = button
+        self.failLabel = failLabel
+
     }
+    
+    @objc func tryAgain(_ sender:Any) {
+        self.tryAgainButton?.removeFromSuperview()
+        self.tryAgainButton = nil
+        
+        self.failLabel?.removeFromSuperview()
+        self.failLabel = nil
+        self.loader?.startAnimation()
+        
+        loadURL(url)
+
+    }
+    
 }
 
-extension WebViewController : GameSceneDelegate {
-    func gameSceneDidStartGame(_ gameScene: GameScene) {
-        
-    }
-    
-    func gameSceneDidEndGame(_ gameScene: GameScene) {
-        if didLoadInitialPage {
-            hideLoadingView()
-        }
-    }
-}

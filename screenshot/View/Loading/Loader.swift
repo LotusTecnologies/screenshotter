@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 
 class Loader: UIView {
-    private let activityView = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
+    let activityView = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
     
     private let activityTransform = CGAffineTransform(scaleX: 1.5, y: 1.5)
         
