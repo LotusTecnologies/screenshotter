@@ -101,6 +101,7 @@ class ResetPasswordView: UIScrollView {
         codeTextField.spellCheckingType = .no
         codeTextField.returnKeyType = .next
         codeTextField.textColor = .gray2
+        codeTextField.keyboardType = .numbersAndPunctuation
         contentView.addSubview(codeTextField)
         codeTextField.topAnchor.constraint(equalTo: codeLabel.bottomAnchor).isActive = true
         codeTextField.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
