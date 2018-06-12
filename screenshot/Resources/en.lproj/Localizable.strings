@@ -299,6 +299,7 @@
 "product.variants.size" = "Size";
 "product.website" = "Go To %@";
 
+"products.details.similar" = "Similar Items";
 "products.helper.message" = "No visually similar products were detected";
 "products.helper.retry" = "Try Again";
 "products.helper.retry.fashion" = "Fashion";

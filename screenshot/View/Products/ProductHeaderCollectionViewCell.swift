@@ -3,18 +3,18 @@
 //  screenshot
 //
 //  Created by Jonathan Rose on 6/7/18.
-//  Copyright © 2018 crazeapp. All rights reserved.
+//  Copyright (c) 2018 crazeapp. All rights reserved.
 //
 
 import UIKit
 
 class ProductHeaderCollectionViewCell: UICollectionViewCell {
     
-    var productImageView:EmbossedView =  EmbossedView()
+    let productImageView = EmbossedView()
     let favoriteControl = FavoriteControl()
     
-    var titleLabel = UILabel()
-    var priceLabel = UILabel()
+    let titleLabel = UILabel()
+    let priceLabel = UILabel()
     let buyNowButton = BorderButton()
     let merchantLabel = UILabel()
     let shareButton = UIButton()
@@ -30,14 +30,11 @@ class ProductHeaderCollectionViewCell: UICollectionViewCell {
     }
     
     func setupViews(){
-        let contentView = UIView()
+        let shadowInsets = ScreenshotCollectionViewCell.shadowInsets
+        let horPadding: CGFloat = .padding - shadowInsets.left - shadowInsets.right
+        
         contentView.backgroundColor = .white
-        contentView.translatesAutoresizingMaskIntoConstraints = false
-        self.contentView.addSubview(contentView)
-        contentView.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor).isActive = true
-        contentView.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor).isActive = true
-        contentView.topAnchor.constraint(equalTo: self.contentView.topAnchor).isActive = true
-        contentView.bottomAnchor.constraint(equalTo: self.contentView.bottomAnchor).isActive = true
+        contentView.layoutMargins = UIEdgeInsets(top: .padding, left: horPadding, bottom: .padding, right: horPadding)
         
         let halfPadding: CGFloat = .padding / 2
         
@@ -49,8 +46,8 @@ class ProductHeaderCollectionViewCell: UICollectionViewCell {
         labelsContainerView.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
         
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.numberOfLines = 2
-        titleLabel.font = .screenshopFont(.hindLight, textStyle: .body)
+        titleLabel.numberOfLines = 3
+        titleLabel.font = .screenshopFont(.hindLight, textStyle: .body, staticSize: true)
         titleLabel.adjustsFontForContentSizeCategory = true
         titleLabel.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: -halfPadding, right: 0)
         labelsContainerView.addSubview(titleLabel)
@@ -60,7 +57,7 @@ class ProductHeaderCollectionViewCell: UICollectionViewCell {
         
         priceLabel.translatesAutoresizingMaskIntoConstraints = false
         priceLabel.textColor = .crazeGreen
-        priceLabel.font = .screenshopFont(.hindMedium, textStyle: .body)
+        priceLabel.font = .screenshopFont(.hindMedium, textStyle: .body, staticSize: true)
         priceLabel.adjustsFontForContentSizeCategory = true
         labelsContainerView.addSubview(priceLabel)
         priceLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
@@ -110,6 +107,6 @@ class ProductHeaderCollectionViewCell: UICollectionViewCell {
         buyNowButton.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
         buyNowButton.topAnchor.constraint(equalTo: labelsContainerView.bottomAnchor, constant: halfPadding).isActive = true
         
-        
+        contentView.addSubview(BorderView(edge: .bottom))
     }
 }

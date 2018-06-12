@@ -2,19 +2,19 @@ PODS:
   - Amplitude-iOS (4.2.1)
   - Analytics (3.6.9)
   - Appsee (2.4.1)
-  - AWSAuthCore (2.6.20):
-    - AWSCore (= 2.6.20)
-  - AWSCognito (2.6.20):
-    - AWSCore (= 2.6.20)
-  - AWSCognitoAuth (2.6.20):
+  - AWSAuthCore (2.6.21):
+    - AWSCore (= 2.6.21)
+  - AWSCognito (2.6.21):
+    - AWSCore (= 2.6.21)
+  - AWSCognitoAuth (2.6.21):
     - AWSCognitoIdentityProviderASF (= 1.0.1)
-  - AWSCognitoIdentityProvider (2.6.20):
+  - AWSCognitoIdentityProvider (2.6.21):
     - AWSCognitoIdentityProviderASF (= 1.0.1)
-    - AWSCore (= 2.6.20)
+    - AWSCore (= 2.6.21)
   - AWSCognitoIdentityProviderASF (1.0.1)
-  - AWSCore (2.6.20)
-  - AWSFacebookSignIn (2.6.20):
-    - AWSAuthCore (= 2.6.20)
+  - AWSCore (2.6.21)
+  - AWSFacebookSignIn (2.6.21):
+    - AWSAuthCore (= 2.6.21)
     - FBSDKCoreKit (~> 4.0)
     - FBSDKLoginKit (~> 4.0)
   - Bolts (1.9.0):
@@ -50,9 +50,9 @@ PODS:
   - PromiseKit/StoreKit (4.5.2):
     - PromiseKit/CorePromise
   - RateView (1.2)
-  - SDWebImage (4.4.0):
-    - SDWebImage/Core (= 4.4.0)
-  - SDWebImage/Core (4.4.0)
+  - SDWebImage (4.4.1):
+    - SDWebImage/Core (= 4.4.1)
+  - SDWebImage/Core (4.4.1)
   - SwiftKeychainWrapper (3.0.1)
   - Whisper (6.0.2)
 
@@ -114,13 +114,13 @@ SPEC CHECKSUMS:
   Amplitude-iOS: 84da24ca8557fa3741888502c30c0b8b365acd7d
   Analytics: 6541ce337e99d9f7a2240a8b3953940a7be5f998
   Appsee: ab8b0317b0a5217d08637f61dbddaba2c9748f2a
-  AWSAuthCore: d435d8b0842c3ee33d1ff6c390d3a62b499b8504
-  AWSCognito: 76b0fcfa24c6432b95059775c38e66ca7f18f839
-  AWSCognitoAuth: c76ee50bcd8624b08ab248be6ce6d482c6b552e2
-  AWSCognitoIdentityProvider: 82158b2c4555ceab8c04368f9cc9ef216bf862e6
+  AWSAuthCore: f912e4f032092818ee21860a44386c485329a92b
+  AWSCognito: ddd3d4cb90dc0adb47acd199ca9bbe48ea1d18a7
+  AWSCognitoAuth: cf6bcf6613fc074f3fde7df8073d423cd43ddbae
+  AWSCognitoIdentityProvider: 1f724c5e43528580cd9f60f0a1290888793ed473
   AWSCognitoIdentityProviderASF: f94f1a502e72ef3d0a1de93e10bf7a79c8698118
-  AWSCore: dd4d3d4fcafdce68a42025c3e9e45b026cf1f33b
-  AWSFacebookSignIn: 9c24c3322ca5001278140c710d5076bd8d77f215
+  AWSCore: a1ff1d32ea7af235fe64be301c204b34cb1f9f83
+  AWSFacebookSignIn: b18b9e83eb6b117f94c11c4a4e014bbb58b07bfa
   Bolts: ac6567323eac61e203f6a9763667d0f711be34c8
   Branch: 127d29ab0a8866025eece1cf9e950ddb6f7d4070
   CardIO: 56983b39b62f495fc6dae9ad7cf875143df06443
@@ -135,7 +135,7 @@ SPEC CHECKSUMS:
   PhoneNumberKit: 62003f40ff75315fd3738286558bc365365ac222
   PromiseKit: 743e497a5f505a470d3bbbf4ce0663c1268af0a4
   RateView: d4d12e9bb76dc23a77a56f4e5c5fb530a3f3f998
-  SDWebImage: b534502786e43dde36dfcaee89356fe6df30e203
+  SDWebImage: 47e9b5b925cbce75946c23f0c42dd19464189af4
   SwiftKeychainWrapper: 38952a3636320ae61bad3513cadd870929de7a4a
   Whisper: 169760fc4bab0abf24d5529f9276f95c25cf1025
 

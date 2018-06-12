@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Jonathan Rose on 6/7/18.
-//  Copyright © 2018 crazeapp. All rights reserved.
+//  Copyright (c) 2018 crazeapp. All rights reserved.
 //
 
 import Foundation
@@ -40,6 +40,7 @@ class ProductCollectionViewManager {
         
     }
     
+    let productHeaderHeight: CGFloat = 176
     
     public func collectionView(_ collectionView: UICollectionView, sizeForItemInSectionType sectionType: ProductsSection) -> CGSize {
         
@@ -48,7 +49,7 @@ class ProductCollectionViewManager {
         let padding: CGFloat = .padding - shadowInsets.left - shadowInsets.right
         if sectionType == .productHeader{
             size.width = collectionView.bounds.size.width
-            size.height = 200
+            size.height = productHeaderHeight
         }else if sectionType == .product {
             let columns = CGFloat(2)
             size.width = floor((collectionView.bounds.size.width - (padding * (columns + 1))) / columns)
@@ -94,16 +95,19 @@ class ProductCollectionViewManager {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
         if let cell = cell  as? ProductsCollectionViewCell{
             cell.contentView.backgroundColor = collectionView.backgroundColor
-            cell.title = product.calculatedDisplayTitle
-            cell.price = product.price
-            cell.originalPrice = product.originalPrice
-            cell.imageUrl = product.imageURL
-            cell.isSale = product.isSale()
-            cell.favoriteControl.isSelected = product.isFavorite
-            cell.actionType = .buy
+            self.setup(cell: cell, with: product)
         }
         return cell
-       
+    }
+    public func setup(cell:ProductsCollectionViewCell, with product:Product) {
+        
+        cell.title = product.calculatedDisplayTitle
+        cell.price = product.price
+        cell.originalPrice = product.originalPrice
+        cell.imageUrl = product.imageURL
+        cell.isSale = product.isSale()
+        cell.favoriteControl.isSelected = product.isFavorite
+        cell.actionType = .buy
     }
     
     
