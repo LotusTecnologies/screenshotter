@@ -30,6 +30,12 @@ class SegmentedDropDownItem : NSObject {
     }
     var isPickerViewInsertedInline = false
     var pickerViewAnimation: (()->())?
+    var pickerView: UIPickerView? {
+        if let segment = segment as? DropDownControl {
+            return segment.pickerView
+        }
+        return nil
+    }
     var placeholderTitle: String?
     
     /// Value from 1 to 0 where 1 takes up the whole segmented control

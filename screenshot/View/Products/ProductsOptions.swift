@@ -188,6 +188,7 @@ class ProductsOptionsControls : NSObject {
     var sizeControl: UISegmentedControl?
     var saleControl: UISegmentedControl?
     var sortControl: UIControl?
+    var sortPickerView: UIPickerView?
     
     private var gender: ProductsOptionsGender?
     private var size: ProductsOptionsSize?
@@ -277,6 +278,7 @@ class ProductsOptionsControls : NSObject {
         
         sortControl?.removeFromSuperview()
         sortControl = control
+        sortPickerView = segmentedItem.pickerView
         
         return control
     }
