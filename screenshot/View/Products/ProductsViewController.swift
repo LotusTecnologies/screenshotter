@@ -635,8 +635,8 @@ extension ProductsViewControllerProducts{
           if shoppable.productFilterCount == -1 {
             self.screenshotLoadingState = .retry
         } else {
-            self.screenshotLoadingState = .products
             self.products = self.productCollectionViewManager.productsForShoppable(shoppable, productsOptions: self.productsOptions)
+            self.updateLoadingState()
         }
         
         self.collectionView?.reloadData()
