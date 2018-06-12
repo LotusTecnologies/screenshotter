@@ -3,7 +3,7 @@
 //  coreDataNeverCrash
 //
 //  Created by Jonathan Rose on 2/17/18.
-//  Copyright © 2018 Jonathan Rose. All rights reserved.
+//  Copyright (c) 2018 Jonathan Rose. All rights reserved.
 //
 
 import UIKit
