@@ -3,7 +3,7 @@
 // created by: Jonathan Rose(rose@screenshopit.com) on computer -jonathanrose
 // created on: Mon Jun  4 10:57:42 IDT 2018
 // created from: errorEventsForBurrow -  - 8095ea8 
-//  Copyright © 2018 crazeapp. All rights reserved.
+//  Copyright (c) 2018 crazeapp. All rights reserved.
 
 
 import Foundation

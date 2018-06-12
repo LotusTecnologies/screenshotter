@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Corey Werner on 11/7/17.
-//  Copyright © 2017 crazeapp. All rights reserved.
+//  Copyright (c) 2017 crazeapp. All rights reserved.
 //
 
 import Foundation

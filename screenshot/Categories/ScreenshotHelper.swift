@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Jacob Relkin on 12/14/17.
-//  Copyright © 2017 crazeapp. All rights reserved.
+//  Copyright (c) 2017 crazeapp. All rights reserved.
 //
 
 fileprivate let S3BaseURL = "https://s3.amazonaws.com/s3-file-store/generated"

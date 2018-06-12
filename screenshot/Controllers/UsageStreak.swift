@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Jacob Relkin on 11/23/17.
-//  Copyright © 2017 crazeapp. All rights reserved.
+//  Copyright (c) 2017 crazeapp. All rights reserved.
 //
 
 import Foundation
