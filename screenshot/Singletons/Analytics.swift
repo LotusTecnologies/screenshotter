@@ -189,7 +189,6 @@ class Analytics {
         let options = ProductsOptionsMask.init(rawValue: Int(product.optionsMask))
         properties["product-filter-size"] = options.size.analyticsStringValue
         properties["product-filter-gender"] = options.gender.analyticsStringValue
-        properties["product-filter-category"] = options.category.analyticsStringValue
         
         if let priceString = product.price {
             properties["product-price-display"] = priceString

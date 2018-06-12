@@ -541,10 +541,7 @@ extension ProductsViewControllerOptionsView: ProductsOptionsDelegate {
     @objc func presentOptions() {
         Analytics.trackOpenedFiltersView()
         
-        if let shoppable = self.getSelectedShoppable() {
-            self.productsOptions.syncOptions(withMask: shoppable.getLast())
-        }
-        
+        self.productsOptions.syncOptions()
         present(self.productsOptions.viewController, animated: true)
     }
     
