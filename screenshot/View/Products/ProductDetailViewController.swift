@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Jonathan Rose on 6/4/18.
-//  Copyright © 2018 crazeapp. All rights reserved.
+//  Copyright (c) 2018 crazeapp. All rights reserved.
 //
 
 import UIKit
@@ -18,7 +18,7 @@ class ProductDetailViewController: BaseViewController {
     var shoppable:Shoppable?
     var productsOptions:ProductsOptions = ProductsOptions()
     var noItemsHelperView:HelperView?
-
+    var loaderContainer = UIView()
     var uuid:String?
     var productsLoadingMonitor:AsyncOperationMonitor?
     fileprivate var productsFRC: FetchedResultsControllerManager<Product>?
@@ -73,6 +73,15 @@ class ProductDetailViewController: BaseViewController {
         }()
         self.collectionView = collectionView
         
+        loaderContainer.backgroundColor = .clear
+        loaderContainer.isUserInteractionEnabled = false
+        loaderContainer.translatesAutoresizingMaskIntoConstraints = false
+        self.view.addSubview(loaderContainer)
+        loaderContainer.topAnchor.constraint(equalTo: self.topLayoutGuide.bottomAnchor, constant:200).isActive = true
+        loaderContainer.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
+        loaderContainer.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
+        loaderContainer.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
+        
         
         let pinchZoom = UIPinchGestureRecognizer.init(target: self, action: #selector(pinch(gesture:)))
         self.view.addGestureRecognizer(pinchZoom)
@@ -94,6 +103,10 @@ class ProductDetailViewController: BaseViewController {
             }
         }
     }
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.collectionView?.reloadData()
+    }
 }
 
 
@@ -111,7 +124,7 @@ extension ProductDetailViewController : UICollectionViewDelegateFlowLayout, UICo
             return 1
         }
         return self.products.count
-            }
+    }
     
     
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -119,32 +132,34 @@ extension ProductDetailViewController : UICollectionViewDelegateFlowLayout, UICo
             return self.productCollectionViewManager.collectionView(collectionView, sizeForItemInSectionType: .productHeader)
         }
             return self.productCollectionViewManager.collectionView(collectionView, sizeForItemInSectionType: .product)
-        
     }
+    
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        if indexPath.section == 0{
+        if indexPath.section == 0 {
             let product = self.product
             let cell = self.productCollectionViewManager.collectionView(collectionView, cellForItemAt: indexPath, withProductHeader: product)
+            
             if let cell  = cell as? ProductHeaderCollectionViewCell, let uuid = uuid {
                 cell.productImageView.hero.id = "\(uuid)-image"
                 cell.favoriteControl.hero.id = "\(uuid)-heart"
                 cell.buyNowButton.hero.id = "\(uuid)-button"
-
+                
                 cell.favoriteControl.addTarget(self, action: #selector(productCollectionViewCellFavoriteAction(_:event:)), for: .touchUpInside)
                 cell.buyNowButton.addTarget(self, action: #selector(productCollectionViewCellBuyAction(_:event:)), for: .touchUpInside)
             }
-          
-
+            
             return cell
-
         }
-        let product = self.products[indexPath.row]
-        let cell = self.productCollectionViewManager.collectionView(collectionView, cellForItemAt: indexPath, with: product)
-        if let cell = cell as? ProductsCollectionViewCell {
-            cell.favoriteControl.addTarget(self, action: #selector(productCollectionViewCellFavoriteAction(_:event:)), for: .touchUpInside)
-            cell.actionButton.addTarget(self, action: #selector(productCollectionViewCellBuyAction(_:event:)), for: .touchUpInside)
+        else {
+            let product = self.products[indexPath.row]
+            let cell = self.productCollectionViewManager.collectionView(collectionView, cellForItemAt: indexPath, with: product)
+            
+            if let cell = cell as? ProductsCollectionViewCell {
+                cell.favoriteControl.addTarget(self, action: #selector(productCollectionViewCellFavoriteAction(_:event:)), for: .touchUpInside)
+                cell.actionButton.addTarget(self, action: #selector(productCollectionViewCellBuyAction(_:event:)), for: .touchUpInside)
+            }
+            return cell
         }
-        return cell
     }
     
     public func collectionView(_ collectionView: UICollectionView, shouldHighlightItemAt indexPath: IndexPath) -> Bool {
@@ -168,25 +183,27 @@ extension ProductDetailViewController : UICollectionViewDelegateFlowLayout, UICo
         }
         
         let minimumSpacing:CGPoint = self.collectionViewMinimumSpacing()
-        return UIEdgeInsets(top: minimumSpacing.y, left: minimumSpacing.x, bottom: 30, right: minimumSpacing.x)
+        return UIEdgeInsets(top: minimumSpacing.y, left: minimumSpacing.x, bottom: minimumSpacing.y, right: minimumSpacing.x)
     }
+    
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         if section == 1{
-            return CGSize.init(width: collectionView.bounds.size.width, height: 80)
+            return CGSize.init(width: collectionView.bounds.size.width, height: 50)
         }
         return .zero
-        
     }
+    
     public func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
 
         if kind == UICollectionElementKindSectionHeader {
             if indexPath.section == 1 && self.productLoadingState != .retry {
-                let view = self.productCollectionViewManager.collectionView(collectionView, viewForHeaderWith: "Similar Items".localized, indexPath: indexPath)
+                let view = self.productCollectionViewManager.collectionView(collectionView, viewForHeaderWith: "products.details.similar".localized, indexPath: indexPath)
                 view.backgroundColor = self.view.backgroundColor
                 return view
             }
-            return self.productCollectionViewManager.collectionView(collectionView, viewForHeaderWith: "".localized, indexPath: indexPath)
-        }else if kind == SectionBackgroundCollectionViewFlowLayout.ElementKindSectionSectionBackground {
+            return self.productCollectionViewManager.collectionView(collectionView, viewForHeaderWith: "", indexPath: indexPath)
+        }
+        else if kind == SectionBackgroundCollectionViewFlowLayout.ElementKindSectionSectionBackground {
             if indexPath.section == 1 {
                 return self.productCollectionViewManager.collectionView(collectionView, viewForBackgroundWith: .background, indexPath: indexPath)
             }
@@ -194,6 +211,7 @@ extension ProductDetailViewController : UICollectionViewDelegateFlowLayout, UICo
         }
         return UICollectionReusableView()
     }
+    
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if indexPath.section == 1{
             let product = self.productAtIndex(indexPath.item)
@@ -248,7 +266,7 @@ extension ProductDetailViewController : AsyncOperationMonitorDelegate, FetchedRe
         case .loading, .unknown:
             self.hideNoItemsHelperView()
 
-            self.productCollectionViewManager.startAndAddLoader(view: self.view)
+            self.productCollectionViewManager.startAndAddLoader(view: self.loaderContainer)
         case .products:
             self.productCollectionViewManager.stopAndRemoveLoader()
             self.hideNoItemsHelperView()
@@ -268,7 +286,7 @@ extension ProductDetailViewController : AsyncOperationMonitorDelegate, FetchedRe
         
         retryButton.addTarget(self, action: #selector(noItemsRetryAction), for: .touchUpInside)
         
-        helperView.topAnchor.constraint(equalTo: self.topLayoutGuide.bottomAnchor, constant:200).isActive = true
+        helperView.topAnchor.constraint(equalTo: self.topLayoutGuide.bottomAnchor, constant: productCollectionViewManager.productHeaderHeight).isActive = true
         helperView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
         helperView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
         helperView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
@@ -311,13 +329,17 @@ extension ProductDetailViewController : AsyncOperationMonitorDelegate, FetchedRe
         self.updateLoadingState()
     }
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
-        if let shoppable = self.shoppable {
+        if let shoppable = self.shoppable, self.products.count == 0 {
             self.products = self.productCollectionViewManager.productsForShoppable(shoppable, productsOptions: self.productsOptions)
-        }
-        self.updateLoadingState()
-        if view.window != nil, let collectionView = collectionView {
+            self.updateLoadingState()
+        }else if view.window != nil, let collectionView = collectionView {
             if change.updatedRows.count > 0 && change.deletedRows.count == 0 && change.insertedRows.count == 0 {
-                collectionView.reloadItems(at: collectionView.indexPathsForVisibleItems)
+                collectionView.indexPathsForVisibleItems.forEach { (indexPath) in
+                    let product = self.productAtIndex(indexPath.item)
+                    if let cell = collectionView.cellForItem(at: indexPath) as? ProductsCollectionViewCell {
+                        self.productCollectionViewManager.setup(cell: cell, with: product)
+                    }
+                }
             }else{
                 collectionView.reloadData()
             }

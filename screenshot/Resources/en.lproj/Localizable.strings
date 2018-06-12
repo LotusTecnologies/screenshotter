@@ -161,11 +161,6 @@
 "form.personal.email" = "Email";
 "form.personal.phone" = "Phone Number";
 
-"game.enter" = "Get More Coins";
-"game.restart" = "Tap to play again";
-"game.score" = "My coins: %d";
-"game.start" = "Tap to get more coins";
-
 "generic.buy" = "BUY";
 "generic.cancel" = "Cancel";
 "generic.close" = "Close";
@@ -247,6 +242,7 @@
 "product.variants.size" = "Size";
 "product.website" = "Go To %@";
 
+"products.details.similar" = "Similar Items";
 "products.helper.message" = "No visually similar products were detected";
 "products.helper.retry" = "Try Again";
 "products.helper.retry.fashion" = "Fashion";

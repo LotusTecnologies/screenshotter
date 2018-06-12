@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Jonathan Rose on 6/3/18.
-//  Copyright © 2018 crazeapp. All rights reserved.
+//  Copyright (c) 2018 crazeapp. All rights reserved.
 //
 
 import Foundation
@@ -74,7 +74,7 @@ extension DataModel {
     
     func productFrc(delegate:FetchedResultsControllerManagerDelegate?, shoppableOID: NSManagedObjectID) -> FetchedResultsControllerManager<Product> {
         let request: NSFetchRequest = Product.fetchRequest()
-        request.sortDescriptors = [NSSortDescriptor(key: "dateFavorited", ascending: false)]
+        request.sortDescriptors = [NSSortDescriptor(key: "order", ascending: false)]
         request.predicate = NSPredicate(format: "shoppable == %@", shoppableOID)
         
         let context = self.mainMoc()

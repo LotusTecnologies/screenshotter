@@ -17,7 +17,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>4.4</string>
+	<string>4.5</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -55,7 +55,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>151</string>
+	<string>152</string>
 	<key>FacebookAppID</key>
 	<string>1960379067541863</string>
 	<key>FacebookDisplayName</key>
@@ -92,6 +92,10 @@
 		<string>Hind-Medium.ttf</string>
 		<string>Hind-Regular.ttf</string>
 		<string>Hind-SemiBold.ttf</string>
+		<string>Quicksand-Bold.ttf</string>
+		<string>Quicksand-Light.ttf</string>
+		<string>Quicksand-Medium.ttf</string>
+		<string>Quicksand-Regular.ttf</string>
 	</array>
 	<key>UIBackgroundModes</key>
 	<array>

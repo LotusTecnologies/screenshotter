@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Jacob Relkin on 9/5/17.
-//  Copyright © 2017 crazeapp. All rights reserved.
+//  Copyright (c) 2017 crazeapp. All rights reserved.
 //
 
 import Foundation
@@ -77,6 +77,7 @@ class UserDefaultsKeys  {
     static let discoverScreenshotPresentedHelper = "discoverScreenshotPresentedHelper"
     
     // Game
+    @available(*, deprecated)
     static let gameScore = "GameScore"
     
     // Silent Push

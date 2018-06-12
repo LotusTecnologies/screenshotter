@@ -31,6 +31,8 @@ class SettingsViewController : BaseViewController {
         case contactUs
         case bug
         case version
+        case termsOfService
+        case privacyPolicy
         case productGender
         case productSize
         case followFacebook
@@ -167,6 +169,8 @@ class SettingsViewController : BaseViewController {
             .contactUs,
             .bug,
             .usageStreak,
+            .termsOfService,
+            .privacyPolicy,
 //            .region,  // Revert to never use USC.
             .partners,
             .version
@@ -325,6 +329,16 @@ extension SettingsViewController : UITableViewDelegate {
         case .contactUs:
             presentMailComposerForContactUs()
             
+        case .termsOfService:
+            if let viewController = LegalViewControllerFactory.termsOfServiceViewController() {
+                present(viewController, animated: true, completion: nil)
+            }
+            
+        case .privacyPolicy:
+            if let viewController = LegalViewControllerFactory.privacyPolicyViewController() {
+                present(viewController, animated: true, completion: nil)
+            }
+            
         case .pushPermission, .photoPermission:
             if let permissionType = row.permissionType {
                 PermissionsManager.shared.requestPermission(for: permissionType, openSettingsIfNeeded: true, response: { granted in
@@ -437,6 +451,10 @@ fileprivate extension SettingsViewController {
             return "settings.row.photo_permission.title".localized
         case .version:
             return "settings.row.version.title".localized
+        case .termsOfService:
+            return "legal.terms_of_service".localized
+        case .privacyPolicy:
+            return "legal.privacy_policy".localized
         case .productGender:
             return "settings.row.gender.title".localized
         case .productSize:
@@ -598,6 +616,7 @@ fileprivate extension SettingsViewController {
         
         var indexPaths = sectionIndexPaths(.permission)
         append(section: .about, row: .usageStreak, to: &indexPaths)
+        
         tableView.reloadRows(at: indexPaths, with: .none)
     }
 }

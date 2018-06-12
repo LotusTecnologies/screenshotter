@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Corey Werner on 1/29/18.
-//  Copyright © 2018 crazeapp. All rights reserved.
+//  Copyright (c) 2018 crazeapp. All rights reserved.
 //
 
 import UIKit
@@ -95,13 +95,65 @@ class SegmentedDropDownItem : NSObject {
     }
 }
 
-class SegmentedDropDownControl : UIControl {
+class SegmentedDropDownControl : UIButton {
     fileprivate let borderWidth: CGFloat = 1
     static fileprivate let borderColor: UIColor = .gray8
     static fileprivate let borderErrorColor: UIColor = .crazeRed
     var changeValueOnRowChange = false
 
     // MARK: Life Cycle
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        
+        addTarget(self, action: #selector(touchUpInside(_:event:)), for: .touchUpInside)
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        if #available(iOS 11.0, *) {} else if items.count > 1 {
+            items.enumerated().forEach { (index, item) in
+                guard let segment = item.segment else {
+                    return
+                }
+                
+                let isFirst = index == 0
+                let isLast = index == items.count - 1
+                let maskPath: CGPath
+                
+                if isFirst || isLast {
+                    let corners: UIRectCorner = isFirst ? [.topLeft, .bottomLeft] : [.topRight, .bottomRight]
+                    let radii = CGSize(width: .defaultCornerRadius, height: .defaultCornerRadius)
+                    
+                    maskPath = UIBezierPath(roundedRect: segment.bounds, byRoundingCorners: corners, cornerRadii: radii).cgPath
+                }
+                else {
+                    maskPath = UIBezierPath(rect: segment.bounds).cgPath
+                }
+                
+                let maskLayer = CAShapeLayer()
+                maskLayer.path = maskPath
+                segment.layer.mask = maskLayer
+                
+                item.frameLayer?.removeFromSuperlayer()
+                
+                let frameLayer = CAShapeLayer()
+                frameLayer.path = maskPath
+                frameLayer.strokeColor = item.frameLayer?.strokeColor ?? type(of: self).borderColor.cgColor
+                frameLayer.lineWidth = borderWidth * 2 // 2x since the clipping cuts half
+                frameLayer.fillColor = nil
+                segment.layer.addSublayer(frameLayer)
+                item.frameLayer = frameLayer
+            }
+        }
+    }
+    
+    // MARK: Segments
     
     var items: [SegmentedDropDownItem] = [] {
         willSet {
@@ -116,12 +168,13 @@ class SegmentedDropDownControl : UIControl {
                 
                 let segment = DropDownControl()
                 segment.translatesAutoresizingMaskIntoConstraints = false
+                segment.isUserInteractionEnabled = false
                 segment.pickerDataSource = self
                 segment.pickerDelegate = self
                 segment.titleLabel.text = item.title
-                segment.titleLabel.textColor = .gray6
+                segment.titleLabel.textColor = .gray3
+                segment.imageView.tintColor = segment.titleLabel.textColor
                 segment.isEnabled = !item.pickerItems.isEmpty
-                segment.addTarget(self, action: #selector(touchUpInside(_:)), for: .touchUpInside)
                 segment.pickerInputView.doneButton.addTarget(self, action: #selector(pickerDoneButtonAction(_:)), for: .touchUpInside)
                 addSubview(segment)
                 segment.topAnchor.constraint(equalTo: topAnchor).isActive = true
@@ -175,61 +228,41 @@ class SegmentedDropDownControl : UIControl {
         }
     }
     
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        
-        if #available(iOS 11.0, *) {} else if items.count > 1 {
-            items.enumerated().forEach { (index, item) in
-                guard let segment = item.segment else {
-                    return
-                }
-                
-                let isFirst = index == 0
-                let isLast = index == items.count - 1
-                let maskPath: CGPath
-                
-                if isFirst || isLast {
-                    let corners: UIRectCorner = isFirst ? [.topLeft, .bottomLeft] : [.topRight, .bottomRight]
-                    let radii = CGSize(width: .defaultCornerRadius, height: .defaultCornerRadius)
-                    
-                    maskPath = UIBezierPath(roundedRect: segment.bounds, byRoundingCorners: corners, cornerRadii: radii).cgPath
-                }
-                else {
-                    maskPath = UIBezierPath(rect: segment.bounds).cgPath
-                }
-                
-                let maskLayer = CAShapeLayer()
-                maskLayer.path = maskPath
-                segment.layer.mask = maskLayer
-                
-                item.frameLayer?.removeFromSuperlayer()
-                
-                let frameLayer = CAShapeLayer()
-                frameLayer.path = maskPath
-                frameLayer.strokeColor = item.frameLayer?.strokeColor ?? type(of: self).borderColor.cgColor
-                frameLayer.lineWidth = borderWidth * 2 // 2x since the clipping cuts half
-                frameLayer.fillColor = nil
-                segment.layer.addSublayer(frameLayer)
-                item.frameLayer = frameLayer
-            }
-        }
+    private func dropDownControl(at location: CGPoint) -> DropDownControl? {
+        return subviews.first(where: { $0.frame.contains(location) }) as? DropDownControl
     }
     
     // MARK: Interaction
     
-    @objc fileprivate func touchUpInside(_ control: DropDownControl) {
-        guard let item = items.first(where: { $0.segment == control }), !item.pickerItems.isEmpty else {
-            return
+    private var touchLocation: CGPoint?
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        touchLocation = event?.allTouches?.first?.location(in: self)
+        super.touchesBegan(touches, with: event)
+    }
+    
+    override var isHighlighted: Bool {
+        didSet {
+            if let location = touchLocation, let dropDownControl = dropDownControl(at: location) {
+                dropDownControl.isHighlighted = isHighlighted
+            }
+        }
+    }
+    
+    @objc fileprivate func touchUpInside(_ control: SegmentedDropDownControl, event: UIEvent) {
+        guard let location = event.allTouches?.first?.location(in: self),
+            let dropDownControl = dropDownControl(at: location),
+            let item = items.first(where: { $0.segment == dropDownControl }), !item.pickerItems.isEmpty
+            else {
+                return
         }
         
-        if control.isFirstResponder {
-            control.resignFirstResponder()
+        if dropDownControl.isFirstResponder {
+            dropDownControl.resignFirstResponder()
         }
         else {
-            control.becomeFirstResponder()
+            dropDownControl.becomeFirstResponder()
         }
-        
-        sendActions(for: .touchUpInside)
     }
     
     var highlightedItem: SegmentedDropDownItem? {
@@ -248,28 +281,27 @@ class SegmentedDropDownControl : UIControl {
     
     override var isFirstResponder: Bool {
         var isFirstResponder = false
-        
+
         for item in items {
             if item.segment?.isFirstResponder ?? false {
                 isFirstResponder = true
                 break
             }
         }
-        
+
         return isFirstResponder
     }
-    
+
     @discardableResult override func resignFirstResponder() -> Bool {
         items.forEach { item in
             item.segment?.resignFirstResponder()
         }
-        
+
         return super.resignFirstResponder()
     }
 }
 
 extension SegmentedDropDownControl : UIPickerViewDataSource, UIPickerViewDelegate {
-    
     private func itemIndex(pickerView: UIPickerView) -> Int {
         return items.index { item -> Bool in
             guard let segment = item.segment else {
@@ -310,14 +342,15 @@ extension SegmentedDropDownControl : UIPickerViewDataSource, UIPickerViewDelegat
             let color: UIColor = .gray5
             
             attributes = [
-                NSAttributedStringKey.foregroundColor: color,
-                NSAttributedStringKey.strikethroughColor: color,
-                NSAttributedStringKey.strikethroughStyle: NSUnderlineStyle.styleSingle.rawValue
+                .foregroundColor: color,
+                .strikethroughColor: color,
+                .strikethroughStyle: NSUnderlineStyle.styleSingle.rawValue
             ]
         }
         
         return NSAttributedString(string: title, attributes: attributes)
     }
+    
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         if changeValueOnRowChange {
             let item = items[itemIndex(pickerView: pickerView)]
@@ -368,7 +401,7 @@ fileprivate class DropDownControl : UIControl {
     
     let titleLabel = UILabel()
     let imageView = UIImageView()
-    let image = UIImage(named: "DropDownArrow")
+    let image = UIImage(named: "DropDownArrow")?.withRenderingMode(.alwaysTemplate)
     let pickerInputView = PickerInputView(frame: .zero, inputViewStyle: .default)
     
     // MARK: Life Cycle
@@ -379,6 +412,17 @@ fileprivate class DropDownControl : UIControl {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        
+        backgroundColor = .white
+        
+        backgroundImageView.translatesAutoresizingMaskIntoConstraints = false
+        backgroundImageView.image = backgroundImage
+        backgroundImageView.contentMode = .scaleToFill
+        addSubview(backgroundImageView)
+        backgroundImageView.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        backgroundImageView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        backgroundImageView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        backgroundImageView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
         
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.image = image
@@ -414,15 +458,46 @@ fileprivate class DropDownControl : UIControl {
         let imageWidth = image?.size.width ?? 0
         
         size.width = layoutMargins.left + ceil(labelSize.width) + layoutMargins.right + imageWidth + layoutMargins.right
-        size.height = layoutMargins.top + ceil(labelSize.height) + layoutMargins.bottom
+        size.height = min(44, layoutMargins.top + ceil(labelSize.height) + layoutMargins.bottom)
         return size
+    }
+    
+    // MARK: Background
+    
+    private let backgroundImageView = UIImageView()
+    private let backgroundImage = UIImage(named: "DropDownBackground")
+    private let backgroundSelectedImage = UIImage(named: "DropDownSelectedBackground")
+    
+    private func syncBackgroundImage() {
+        switch state {
+        case .normal:
+            backgroundImageView.image = backgroundImage
+            backgroundImageView.alpha = 1
+            
+        case .highlighted:
+            backgroundImageView.image = backgroundSelectedImage
+            backgroundImageView.alpha = 1
+            
+        case .selected:
+            backgroundImageView.image = backgroundSelectedImage
+            backgroundImageView.alpha = 0.7
+            
+        default:
+            break
+        }
     }
     
     // MARK: States
     
+    override var isHighlighted: Bool {
+        didSet {
+            syncBackgroundImage()
+        }
+    }
+    
     override var isSelected: Bool {
         didSet {
-            backgroundColor = isSelected ? .gray9 : nil
+            syncBackgroundImage()
         }
     }
     
