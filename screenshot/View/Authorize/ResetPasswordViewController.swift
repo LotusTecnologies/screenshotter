@@ -236,6 +236,7 @@ class ResetPasswordViewController: UIViewController {
             }
             if password == nil {
                 _view.newPasswordTextField.isInvalid = true
+                _view.newPasswordTextField.errorText = "authorize.error.passwordInvalid".localized
             }
             
             ActionFeedbackGenerator().actionOccurred(.nope)

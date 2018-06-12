@@ -61,6 +61,9 @@
 "authorize.reset_password.title" = "Set New Password";
 "authorize.reset_password.explanation" = "An email was sent to %@.\nEnter the code you recieved and a new password.";
 
+"authorize.error.passwordInvalid" = "password must be at least 8 characters long.";
+
+
 "cart.checkout.button" = "Checkout";
 "cart.checkout.total" = "Total: %@";
 "cart.empty.button" = "Find your next outfit!";
