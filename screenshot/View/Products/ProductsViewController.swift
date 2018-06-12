@@ -99,6 +99,7 @@ class ProductsViewController: BaseViewController {
             let toolbar = ShoppablesToolbar(screenshot: screenshot)
             toolbar.translatesAutoresizingMaskIntoConstraints = false
             toolbar.isHidden = shouldHideToolbar
+            toolbar.delegate = self
             toolbar.shoppableToolbarDelegate = self
             view.addSubview(toolbar)
             toolbar.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor).isActive = true
@@ -231,6 +232,7 @@ class ProductsViewController: BaseViewController {
     }
     
     deinit {
+        self.shoppablesToolbar?.delegate = nil
         self.shoppablesToolbar?.shoppableToolbarDelegate = nil
     }
 }
@@ -567,6 +569,10 @@ extension ProductsViewControllerOptionsView: ProductsOptionsDelegate {
             })
         }
         self.dismissOptions()
+    }
+    
+    func productsOptionsDidCancel(_ productsOptions: ProductsOptions) {
+        dismissOptions()
     }
     
     var shouldHideToolbar: Bool {

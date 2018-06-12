@@ -291,6 +291,10 @@ extension ProductDetailViewController: ProductsOptionsDelegate {
         
         self.dismissOptions()
     }
+    
+    func productsOptionsDidCancel(_ productsOptions: ProductsOptions) {
+        dismissOptions()
+    }
 }
 
 extension ProductDetailViewController : AsyncOperationMonitorDelegate, FetchedResultsControllerManagerDelegate {

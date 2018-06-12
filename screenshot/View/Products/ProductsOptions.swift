@@ -98,6 +98,7 @@ class ProductsOptionsMask : NSObject {
 
 protocol ProductsOptionsDelegate : NSObjectProtocol {
     func productsOptionsDidComplete(_ productsOptions: ProductsOptions, withChange changed: Bool)
+    func productsOptionsDidCancel(_ productsOptions: ProductsOptions)
 }
 
 class ProductsOptions : NSObject {
@@ -113,8 +114,12 @@ class ProductsOptions : NSObject {
     
     private(set) lazy var viewController: ProductsOptionsViewController = {
         let viewController = ProductsOptionsViewController()
-        viewController.continueButton.addTarget(self, action: #selector(doneButtonAction), for: .touchUpInside)
+        viewController.continueButton.addTarget(self, action: #selector(continueAction), for: .touchUpInside)
         self.syncOptions(with: viewController)
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(cancelAction))
+        viewController.view.addGestureRecognizer(tapGesture)
+        
         return viewController
     }()
     
@@ -135,7 +140,7 @@ class ProductsOptions : NSObject {
 //        view.sortPickerView.selectRow(sort.offsetValue, inComponent: 0, animated: false)
     }
     
-    @objc private func doneButtonAction() {
+    @objc private func continueAction() {
         let previousMask = ProductsOptionsMask(category, gender, size)
         let previousSale = sale
         let previousSort = sort
@@ -172,6 +177,10 @@ class ProductsOptions : NSObject {
                 }
             }
         }
+    }
+    
+    @objc private func cancelAction() {
+        delegate?.productsOptionsDidCancel(self)
     }
 }
 
@@ -285,10 +294,10 @@ class ProductsOptionsControls : NSObject {
         segmentedTitleItem.widthRatio = 0.25
         
         let pickerItems = [
+            ProductsOptionsSort.similar.stringValue,
             ProductsOptionsSort.priceAsc.stringValue,
             ProductsOptionsSort.priceDes.stringValue,
-            ProductsOptionsSort.brands.stringValue,
-            ProductsOptionsSort.similar.stringValue
+            ProductsOptionsSort.brands.stringValue
         ]
         let segmentedItem = SegmentedDropDownItem(pickerItems: pickerItems, selectedPickerItem: pickerItems.first)
         segmentedItem.isPickerViewInsertedInline = true
@@ -467,6 +476,7 @@ class ProductsOptionsViewController: UIViewController {
         
         sortControl.translatesAutoresizingMaskIntoConstraints = false
         sortControl.isExclusiveTouch = true
+        sortControl.addTarget(self, action: #selector(optionsChangedAction), for: .valueChanged)
         containerView.addSubview(sortControl)
         sortControl.topAnchor.constraint(equalTo: titleLabel.lastBaselineAnchor, constant: verticalPadding).isActive = true
         sortControl.leadingAnchor.constraint(equalTo: containerView.layoutMarginsGuide.leadingAnchor).isActive = true
@@ -474,6 +484,7 @@ class ProductsOptionsViewController: UIViewController {
         
         saleControl.translatesAutoresizingMaskIntoConstraints = false
         saleControl.isExclusiveTouch = true
+        saleControl.addTarget(self, action: #selector(optionsChangedAction), for: .valueChanged)
         containerView.addSubview(saleControl)
         saleControl.topAnchor.constraint(equalTo: sortControl.bottomAnchor, constant: .padding).isActive = true
         saleControl.leadingAnchor.constraint(equalTo: containerView.layoutMarginsGuide.leadingAnchor).isActive = true
@@ -481,6 +492,7 @@ class ProductsOptionsViewController: UIViewController {
         
         genderControl.translatesAutoresizingMaskIntoConstraints = false
         genderControl.isExclusiveTouch = true
+        genderControl.addTarget(self, action: #selector(optionsChangedAction), for: .valueChanged)
         containerView.addSubview(genderControl)
         genderControl.topAnchor.constraint(equalTo: saleControl.bottomAnchor, constant: .padding).isActive = true
         genderControl.leadingAnchor.constraint(equalTo: containerView.layoutMarginsGuide.leadingAnchor).isActive = true
@@ -488,6 +500,7 @@ class ProductsOptionsViewController: UIViewController {
         
         sizeControl.translatesAutoresizingMaskIntoConstraints = false
         sizeControl.isExclusiveTouch = true
+        sizeControl.addTarget(self, action: #selector(optionsChangedAction), for: .valueChanged)
         containerView.addSubview(sizeControl)
         sizeControl.topAnchor.constraint(equalTo: genderControl.bottomAnchor, constant: .padding).isActive = true
         sizeControl.leadingAnchor.constraint(equalTo: containerView.layoutMarginsGuide.leadingAnchor).isActive = true
@@ -508,6 +521,15 @@ class ProductsOptionsViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         controls.sync()
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        continueButton.setTitle("generic.close".localized, for: .normal)
+    }
+    
+    @objc private func optionsChangedAction() {
+        continueButton.setTitle("generic.save".localized, for: .normal)
     }
 }
 
