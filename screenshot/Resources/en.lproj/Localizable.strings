@@ -59,7 +59,7 @@
 "authorize.reset_password.success_alert.message" = "Your password was changed. Now log in to your account with your new password";
 "authorize.reset_password.success_alert.title" = "Success!";
 "authorize.reset_password.title" = "Set New Password";
-"authorize.reset_password.explanation" = "An email was sent to %@. Please enter the code that you recieved in the email, and a new password";
+"authorize.reset_password.explanation" = "An email was sent to %@. Enter the code you recieved and a new password.";
 
 "cart.checkout.button" = "Checkout";
 "cart.checkout.total" = "Total: %@";

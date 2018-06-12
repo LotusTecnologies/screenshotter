@@ -44,6 +44,7 @@ class UserDefaultsKeys  {
     static let openWebPage = "OpenProductPageInSetting"  //open in safari, SFSafiriViewController, chrome, etc
     
     // Onboarding
+    static let userAccountsCreatedByDevice = "userAccountsCreatedByDevice"
     static let onboardingCompleted = "OnboardingCompleted"
     static let onboardingPresentedScreenshotHelper = "OnboardingPresentedScreenshotHelper"
     static let onboardingPresentedPushAlert = "OnboardingPresentedPushAlert"

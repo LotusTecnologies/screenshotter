@@ -32,6 +32,17 @@ class SigninManager : NSObject {
 
     static let shared = SigninManager()
 
+    var userAccountsCreatedByApp:[String] {
+        get {
+            if let array = UserDefaults.standard.object(forKey: UserDefaultsKeys.userAccountsCreatedByDevice) as? [String] {
+                return array
+            }
+            return []
+        }
+        set {
+            UserDefaults.standard.setValue(userAccountsCreatedByApp, forKey: UserDefaultsKeys.userAccountsCreatedByDevice)
+        }
+    }
     var user:AWSCognitoIdentityUser?
     var pool:AWSCognitoIdentityUserPool?
 //    var anon:AWSAnonymousCredentialsProvider?
@@ -108,7 +119,8 @@ class SigninManager : NSObject {
         })
     }
 //    func skipLogin() -> Promise<Void>{
-////        AWSSignInManager.sharedInstance().lo
+//        let anon = AWSAnonymousCredentialsProvider.init()
+//        AWSSignInManager.sharedInstance().login(signInProviderKey: <#T##String#>, completionHandler: <#T##(Any?, Error?) -> Void#>)
 //    }
     
     public func loginOrCreatAccountAsNeeded(email:String, password:String) -> Promise<LoginOrCreateAccountResult> {
@@ -121,9 +133,15 @@ class SigninManager : NSObject {
                     let nsError = error as NSError
                     let userNotConfirmedException = 33
                     if nsError.code == userNotConfirmedException && nsError.domain == AWSCognitoIdentityProviderErrorDomain {
-                        return self.resendConfirmCode(email: email.lowercased()).then(execute: { () -> (Promise<LoginOrCreateAccountResult>) in
-                            return Promise.init(value: .createAccountUnconfirmed)
-                        })
+                        if self.userAccountsCreatedByApp.contains(email.lowercased()) {
+                            return self.resendConfirmCode(email: email.lowercased()).then(execute: { () -> (Promise<LoginOrCreateAccountResult>) in
+                                return Promise.init(value: .createAccountUnconfirmed)
+                            })
+                        }else{
+                            return self.deleteUnconfirmedAccount(email: email.lowercased()).then(on: .main, execute: { () -> Promise<LoginOrCreateAccountResult> in
+                                return self.createAccount(email: email.lowercased(), password: password)
+                            })
+                        }
                     }
                     return Promise.init(error: nsError)
                 })
@@ -131,14 +149,11 @@ class SigninManager : NSObject {
             return Promise.init(error: nsError)
         })
         
-//        return login(email:email.lowercased(), password: password).recover(execute: { (error) -> Promise<SigninManager.LoginOrCreateAccountResult> in
-//            let nsError = error as NSError
-//            let UserNotFoundException = 34
-//            if nsError.code == UserNotFoundException && nsError.domain == AWSCognitoIdentityProviderErrorDomain {
-//                return self.createAccount(email: email.lowercased(), password: password)
-//            }
-//            return Promise.init(error: error)
-//        })
+    }
+    private func deleteUnconfirmedAccount(email:String) -> Promise<Void>{
+        return Promise.init(resolvers: { (fulfil, reject) in
+            reject(SigninManagerError.notSetup)
+        })
     }
     private func login(email:String, password:String) -> Promise<LoginOrCreateAccountResult>{
         return Promise<LoginOrCreateAccountResult>.init(resolvers: { (fulfil, reject) in
@@ -174,6 +189,7 @@ class SigninManager : NSObject {
                     if let error = task.error  {
                         reject(error)
                     }else if let user = task.result?.user {
+                        self.userAccountsCreatedByApp = self.userAccountsCreatedByApp + [email]
                         self.user = user
                         if user.confirmedStatus == .confirmed {
                             fulfil(LoginOrCreateAccountResult.createAccountConfirmed)
