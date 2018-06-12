@@ -1,9 +1,9 @@
 // STOP!  DO not edit the file below
 // only create by auto generting
 // created by: Jonathan Rose(rose@screenshopit.com) on computer -jonathanrose
-// created on: Tue Jun 12 09:11:04 IDT 2018
-// created from: master -  - d72516e 
-//  Copyright © 2018 crazeapp. All rights reserved.
+// created on: Mon Jun  4 10:57:42 IDT 2018
+// created from: errorEventsForBurrow -  - 8095ea8 
+//  Copyright (c) 2018 crazeapp. All rights reserved.
 
 
 import Foundation
