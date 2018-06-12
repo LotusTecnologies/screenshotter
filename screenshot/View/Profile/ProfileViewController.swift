@@ -46,9 +46,7 @@ class ProfileViewController: UITableViewController {
         
         let button = MainButton()
         button.translatesAutoresizingMaskIntoConstraints = false
-        if let patternImage = UIImage(named: "BrandGradientConfettiControl") {
-            button.backgroundColor = UIColor(patternImage: patternImage)
-        }
+        button.setBackgroundImage(UIImage(named: "BrandGradientControl"), for: .normal)
         button.setTitle("Tell a Friend!", for: .normal)
 //        button.addTarget(self, action: #selector(inviteAction), for: .touchUpInside)
         button.clipsToBounds = true

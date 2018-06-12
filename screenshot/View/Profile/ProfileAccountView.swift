@@ -22,11 +22,22 @@ class ProfileAccountView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
+        setupLoggedOutViews()
+        setupLoggedInViews()
+        
+        addSubview(BorderView(edge: .bottom))
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func setupLoggedOutViews() {
         loggedOutContainerView.translatesAutoresizingMaskIntoConstraints = false
-        loggedOutContainerView.image = UIImage(named: "BrandGradientConfettiSmall")
+        loggedOutContainerView.image = UIImage(named: "ProfileHeaderLoggedOut")
         loggedOutContainerView.contentMode = .scaleAspectFill
         loggedOutContainerView.isHidden = isLoggedIn
-        loggedOutContainerView.layoutMargins = UIEdgeInsetsMake(.padding, .padding, .padding, .padding)
+        loggedOutContainerView.layoutMargins = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
         loggedOutContainerView.isUserInteractionEnabled = true
         addSubview(loggedOutContainerView)
         loggedOutContainerView.topAnchor.constraint(equalTo: topAnchor).isActive = true
@@ -60,12 +71,15 @@ class ProfileAccountView: UIView {
         loggedOutButton.topAnchor.constraint(equalTo: loggedOutLabel.bottomAnchor, constant: .padding).isActive = true
         loggedOutButton.bottomAnchor.constraint(equalTo: loggedOutVerticalGuide.bottomAnchor).isActive = true
         loggedOutButton.centerXAnchor.constraint(equalTo: loggedOutContainerView.layoutMarginsGuide.centerXAnchor).isActive = true
-        
+    }
+    
+    private func setupLoggedInViews() {
         loggedInContainerView.translatesAutoresizingMaskIntoConstraints = false
+        loggedInContainerView.image = UIImage(named: "ProfileHeaderLoggedIn")
         loggedInContainerView.contentMode = .scaleAspectFill
-        loggedInContainerView.backgroundColor = .gray
+        loggedInContainerView.backgroundColor = .white
         loggedInContainerView.isHidden = !isLoggedIn
-        loggedInContainerView.layoutMargins = UIEdgeInsetsMake(.padding, .padding, .padding, .padding)
+        loggedInContainerView.layoutMargins = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
         loggedInContainerView.isUserInteractionEnabled = true
         addSubview(loggedInContainerView)
         loggedInContainerView.topAnchor.constraint(equalTo: topAnchor).isActive = true
@@ -92,9 +106,38 @@ class ProfileAccountView: UIView {
         avatarButton.widthAnchor.constraint(equalToConstant: 90).isActive = true
         avatarButton.heightAnchor.constraint(equalTo: avatarButton.widthAnchor).isActive = true
         
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        let labelsLayoutGuide = UILayoutGuide()
+        loggedInContainerView.addLayoutGuide(labelsLayoutGuide)
+        labelsLayoutGuide.topAnchor.constraint(greaterThanOrEqualTo: loggedInContainerView.layoutMarginsGuide.topAnchor).isActive = true
+        labelsLayoutGuide.bottomAnchor.constraint(lessThanOrEqualTo: loggedInContainerView.layoutMarginsGuide.bottomAnchor).isActive = true
+        labelsLayoutGuide.centerYAnchor.constraint(equalTo: loggedInContainerView.layoutMarginsGuide.centerYAnchor).isActive = true
+        
+        let nameLabel = UILabel()
+        nameLabel.translatesAutoresizingMaskIntoConstraints = false
+        nameLabel.font = .screenshopFont(.quicksandMedium, size: 22)
+        nameLabel.textColor = .gray2
+        nameLabel.text = "Corey Werner"
+        nameLabel.adjustsFontSizeToFitWidth = true
+        nameLabel.minimumScaleFactor = 0.5
+        nameLabel.baselineAdjustment = .alignCenters
+        loggedInContainerView.addSubview(nameLabel)
+        nameLabel.topAnchor.constraint(equalTo: labelsLayoutGuide.topAnchor).isActive = true
+        nameLabel.leadingAnchor.constraint(equalTo: avatarButton.trailingAnchor, constant: .padding).isActive = true
+        nameLabel.trailingAnchor.constraint(equalTo: loggedInContainerView.layoutMarginsGuide.trailingAnchor).isActive = true
+        
+        let emailLabel = UILabel()
+        emailLabel.translatesAutoresizingMaskIntoConstraints = false
+        emailLabel.font = .screenshopFont(.quicksand, size: 18)
+        emailLabel.textColor = .gray2
+        emailLabel.text = "cnotethegr8@gmail.com"
+        emailLabel.adjustsFontSizeToFitWidth = true
+        emailLabel.minimumScaleFactor = 0.5
+        emailLabel.baselineAdjustment = .alignCenters
+        loggedInContainerView.addSubview(emailLabel)
+        emailLabel.topAnchor.constraint(equalTo: labelsLayoutGuide.topAnchor).isActive = true
+        emailLabel.leadingAnchor.constraint(equalTo: avatarButton.trailingAnchor, constant: .padding).isActive = true
+        emailLabel.trailingAnchor.constraint(equalTo: loggedInContainerView.layoutMarginsGuide.trailingAnchor).isActive = true
+        
+        
     }
 }
