@@ -115,8 +115,9 @@ class ProductsOptions : NSObject {
         viewController.genderControl.selectedSegmentIndex = gender.offsetValue
         viewController.sizeControl.selectedSegmentIndex = size.offsetValue
         viewController.saleControl.selectedSegmentIndex = sale.offsetValue
-
-        viewController.sortControl.items.last?.selectedPickerItem = sort.stringValue
+        if let index = ProductsOptionsSort.all.index(of: sort) {
+            viewController.sortPickerView?.selectRow(index, inComponent: 0, animated: false)
+        }
     }
     
     @objc private func continueAction() {
@@ -128,7 +129,11 @@ class ProductsOptions : NSObject {
         gender = ProductsOptionsGender(offsetValue: viewController.genderControl.selectedSegmentIndex)
         size = ProductsOptionsSize(offsetValue: viewController.sizeControl.selectedSegmentIndex)
         sale = ProductsOptionsSale(offsetValue: viewController.saleControl.selectedSegmentIndex)
-        sort = viewController.sortValue
+        if let sortPickerView = viewController.sortPickerView {
+            let selected = sortPickerView.selectedRow(inComponent: 0)
+            sort = ProductsOptionsSort.all[selected]
+        }
+            
         
         UserDefaults.standard.set(gender.rawValue, forKey: UserDefaultsKeys.productGender)
         UserDefaults.standard.set(size.rawValue, forKey: UserDefaultsKeys.productSize)
@@ -138,9 +143,9 @@ class ProductsOptions : NSObject {
         
         let genderChanged = previousGender.rawValue != gender.rawValue
         let sizeChanged = previousSize.rawValue != size.rawValue
-        let saleChanged = previousSale.rawValue != sale.rawValue
-        let sortChanged = previousSort.rawValue != sort.rawValue
-        let changed = genderChanged || sizeChanged || saleChanged || sortChanged
+//        let saleChanged = previousSale.rawValue != sale.rawValue
+//        let sortChanged = previousSort.rawValue != sort.rawValue
+        let changed = genderChanged || sizeChanged
         
         delegate?.productsOptionsDidComplete(self, withChange: changed)
         
@@ -171,7 +176,9 @@ class ProductsOptionsControls : NSObject {
     var genderControl: UISegmentedControl?
     var sizeControl: UISegmentedControl?
     var saleControl: UISegmentedControl?
-    var sortControl: SegmentedDropDownControl?
+    var sortControl: UIControl?
+    var sortPickerView: UIPickerView?
+
     
     private var gender: ProductsOptionsGender?
     private var size: ProductsOptionsSize?
@@ -245,12 +252,7 @@ class ProductsOptionsControls : NSObject {
         let segmentedTitleItem = SegmentedDropDownItem(titleItem: "products.options.sort.title".localized)
         segmentedTitleItem.widthRatio = 0.25
         
-        let pickerItems = [
-            ProductsOptionsSort.similar.stringValue,
-            ProductsOptionsSort.priceAsc.stringValue,
-            ProductsOptionsSort.priceDes.stringValue,
-            ProductsOptionsSort.brands.stringValue
-        ]
+        let pickerItems = ProductsOptionsSort.all.map{ $0.stringValue }
         let segmentedItem = SegmentedDropDownItem(pickerItems: pickerItems, selectedPickerItem: pickerItems.first)
         segmentedItem.isPickerViewInsertedInline = true
         segmentedItem.pickerViewAnimation = pickerViewAnimation
@@ -261,6 +263,7 @@ class ProductsOptionsControls : NSObject {
         
         sortControl?.removeFromSuperview()
         sortControl = control
+        sortPickerView = segmentedItem.pickerView
         
         return control
     }
@@ -360,7 +363,10 @@ class ProductsOptionsViewController: UIViewController {
             self?.view.layoutIfNeeded()
         })
     }()
-    var sortValue:ProductsOptionsSort  = ProductsOptionsSort.globalValue
+    
+    var sortPickerView:UIPickerView? {
+        return self.controls.sortPickerView
+    }
 
     let continueButton = MainButton()
     
@@ -590,6 +596,12 @@ enum ProductsOptionsSort: Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol {
         return ProductsOptionsSort(intValue: UserDefaults.standard.integer(forKey: UserDefaultsKeys.productSort))
     }
     
+    static var all =  [
+            ProductsOptionsSort.similar,
+            ProductsOptionsSort.priceAsc,
+            ProductsOptionsSort.priceDes,
+            ProductsOptionsSort.brands
+        ]
     init(intValue: Int) {
         self = ProductsOptionsSort(rawValue: intValue) ?? .default
     }
@@ -603,8 +615,7 @@ enum ProductsOptionsSort: Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol {
     }
     
     static func with(stringValue:String) -> ProductsOptionsSort?{
-        let allOptions:[ProductsOptionsSort] = [.similar,.priceAsc, .priceDes, .brands]
-        for option in allOptions {
+        for option in all {
             if option.stringValue == stringValue {
                 return option
             }

@@ -566,6 +566,7 @@ extension ProductsViewControllerOptionsView: ProductsOptionsDelegate {
         }else{
             if let shoppable = self.getSelectedShoppable() {
                 self.products = self.productCollectionViewManager.productsForShoppable(shoppable, productsOptions: productsOptions)
+                self.collectionView?.reloadData()
             }else{
                 self.products = []
             }

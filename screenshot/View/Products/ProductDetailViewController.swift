@@ -290,15 +290,18 @@ extension ProductDetailViewController : AsyncOperationMonitorDelegate, FetchedRe
         switch (self.productLoadingState) {
         case .loading, .unknown:
             self.hideNoItemsHelperView()
-
+            _view.filterButton.isHidden = true
             self.productCollectionViewManager.startAndAddLoader(view: self.loaderContainer)
+            
         case .products:
             self.productCollectionViewManager.stopAndRemoveLoader()
             self.hideNoItemsHelperView()
+            _view.filterButton.isHidden = true
         case .retry:
             self.productCollectionViewManager.stopAndRemoveLoader()
             self.hideNoItemsHelperView()
             self.showNoItemsHelperView()
+            _view.filterButton.isHidden = true
         }
     }
     
