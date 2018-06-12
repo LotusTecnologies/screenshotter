@@ -35,7 +35,6 @@ class SettingsViewController : BaseViewController {
         case contactUs
         case bug
         case version
-        case coins
         case termsOfService
         case privacyPolicy
         case productGender
@@ -226,7 +225,6 @@ class SettingsViewController : BaseViewController {
             .contactUs,
             .bug,
             .usageStreak,
-            .coins,
             .termsOfService,
             .privacyPolicy,
 //            .region,  // Revert to never use USC.
@@ -447,8 +445,6 @@ extension SettingsViewController : UITableViewDelegate {
         case .contactUs:
             presentMailComposerForContactUs()
 
-        case .coins:
-            break
         case .termsOfService:
             if let viewController = LegalViewControllerFactory.termsOfServiceViewController() {
                 present(viewController, animated: true, completion: nil)
@@ -595,8 +591,6 @@ fileprivate extension SettingsViewController {
             return "settings.row.photo_permission.title".localized
         case .version:
             return "settings.row.version.title".localized
-        case .coins:
-            return "settings.row.coins.title".localized
         case .termsOfService:
             return "legal.terms_of_service".localized
         case .privacyPolicy:
@@ -644,8 +638,6 @@ fileprivate extension SettingsViewController {
             return "settings.row.name.detail".localized
         case .email:
             return "settings.row.email.detail".localized
-        case .coins:
-            return "\(UserDefaults.standard.integer(forKey: UserDefaultsKeys.gameScore))"
         case .currency:
             return CurrencyViewController.currentCurrency
         case .region:
@@ -793,7 +785,6 @@ fileprivate extension SettingsViewController {
         
         var indexPaths = sectionIndexPaths(.permission)
         append(section: .about, row: .usageStreak, to: &indexPaths)
-        append(section: .about, row: .coins, to: &indexPaths)
 
         tableView.reloadRows(at: indexPaths, with: .none)
     }

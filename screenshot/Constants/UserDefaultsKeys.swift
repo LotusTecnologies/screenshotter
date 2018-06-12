@@ -77,6 +77,7 @@ class UserDefaultsKeys  {
     static let discoverScreenshotPresentedHelper = "discoverScreenshotPresentedHelper"
     
     // Game
+    @available(*, deprecated)
     static let gameScore = "GameScore"
     
     // Silent Push
