@@ -46,15 +46,26 @@ class ResetPasswordView: UIScrollView {
         titleLabel.adjustsFontSizeToFitWidth = true
         titleLabel.minimumScaleFactor = 0.7
         addSubview(titleLabel)
-        titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: .extendedPadding).isActive = true
+        titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: .padding).isActive = true
         titleLabel.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
         titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: layoutMarginsGuide.trailingAnchor).isActive = true
         
         let explainLabel = UILabel()
         explainLabel.translatesAutoresizingMaskIntoConstraints = false
-        explainLabel.text = "authorize.reset_password.explanation".localized(withFormat: email)
-        explainLabel.textColor = .gray3
-        explainLabel.font = .screenshopFont(.hindLight, textStyle: .headline, staticSize: true)
+        
+        
+        let text = "authorize.reset_password.explanation".localized(withFormat: email)
+        let attributedString = NSMutableAttributedString(string: text, attributes: [
+            NSAttributedStringKey.font: UIFont.screenshopFont(.hindLight, textStyle: .headline, staticSize: true),
+            NSAttributedStringKey.foregroundColor : UIColor.gray3
+            ])
+        let range = NSString(string: text).range(of: email)
+        if range.location != NSNotFound{
+            attributedString.addAttribute(NSAttributedStringKey.foregroundColor, value: UIColor.gray2, range: range)
+            attributedString.addAttribute(NSAttributedStringKey.font, value: UIFont.screenshopFont(.hindMedium, textStyle: .headline, staticSize: true), range: range)
+        }
+        
+        explainLabel.attributedText = attributedString
         explainLabel.minimumScaleFactor = 0.7
         explainLabel.numberOfLines = -1
         addSubview(explainLabel)
