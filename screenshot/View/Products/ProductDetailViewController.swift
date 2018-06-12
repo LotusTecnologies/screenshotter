@@ -275,13 +275,10 @@ extension ProductDetailViewController: ProductsOptionsDelegate {
     
     func productsOptionsDidComplete(_ productsOptions: ProductsOptions, withChange changed: Bool) {
         if changed, let shoppable = self.shoppable {
-            // TODO:
+            // TODO: rose update product
             shoppable.set(productsOptions: productsOptions, callback: {
                 if let shoppable = self.shoppable {
-//                    self.reloadProductsFor(shoppable: shoppable)
-                }
-                else {
-//                    self.clearProductListAndStateLoading()
+                    
                 }
             })
         }

@@ -290,7 +290,6 @@ extension ProductsViewController: ShoppablesToolbarDelegate {
     }
     
     func shoppablesToolbarDidChangeSelectedShoppable(toolbar:ShoppablesToolbar, shoppable:Shoppable){
-        
         self.selectedShoppable = shoppable
         self.reloadProductsFor(shoppable: shoppable)
     }
@@ -621,7 +620,7 @@ extension ProductsViewControllerProducts{
         self.relatedLooks = nil
         self.scrollRevealController?.resetViewOffset()
         
-          if shoppable.productFilterCount == -1 {
+        if shoppable.productFilterCount == -1 {
             self.screenshotLoadingState = .retry
         } else {
             self.products = self.productCollectionViewManager.productsForShoppable(shoppable, productsOptions: self.productsOptions)
@@ -636,12 +635,6 @@ extension ProductsViewControllerProducts{
             self.collectionView?.scrollToItem(at: IndexPath(item: 0, section: ProductsSection.product.section), at: .top, animated: false)
         }
     }
-    
-    
-    
-   
-    
-  
 }
 
 private typealias ProductsViewControllerRatings = ProductsViewController
@@ -1047,9 +1040,6 @@ extension ProductsViewController : AsyncOperationMonitorDelegate {
             if state != self.screenshotLoadingState {
                 self.screenshotLoadingState = state
             }
-            
-        
-            
         }
     }
     
