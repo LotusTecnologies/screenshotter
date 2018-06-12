@@ -109,8 +109,6 @@ class ProductsOptions : NSObject {
     fileprivate(set) var sale = ProductsOptionsSale.globalValue
     fileprivate(set) var sort = ProductsOptionsSort.globalValue
     
-    fileprivate let sortItems: [ProductsOptionsSort] = [.similar, .priceAsc, .priceDes, .brands]
-    
     private(set) lazy var viewController: ProductsOptionsViewController = {
         let viewController = ProductsOptionsViewController()
         viewController.continueButton.addTarget(self, action: #selector(doneButtonAction), for: .touchUpInside)
@@ -131,8 +129,7 @@ class ProductsOptions : NSObject {
         viewController.genderControl.selectedSegmentIndex = gender.offsetValue
         viewController.sizeControl.selectedSegmentIndex = size.offsetValue
         viewController.saleControl.selectedSegmentIndex = sale.offsetValue
-//        viewController.sortControl. // TODO:
-//        view.sortPickerView.selectRow(sort.offsetValue, inComponent: 0, animated: false)
+        viewController.sortControl.items.last?.selectedPickerItem = sort.stringValue
     }
     
     @objc private func doneButtonAction() {
@@ -144,7 +141,7 @@ class ProductsOptions : NSObject {
         gender = ProductsOptionsGender(offsetValue: viewController.genderControl.selectedSegmentIndex)
         size = ProductsOptionsSize(offsetValue: viewController.sizeControl.selectedSegmentIndex)
         sale = ProductsOptionsSale(offsetValue: viewController.saleControl.selectedSegmentIndex)
-//        sort = ProductsOptionsSort(offsetValue: viewController.sortPickerView.selectedRow(inComponent: 0))
+        sort = viewController.sortValue
         
         UserDefaults.standard.set(sale.rawValue, forKey: UserDefaultsKeys.productSale)
         UserDefaults.standard.set(sort.rawValue, forKey: UserDefaultsKeys.productSort)
@@ -175,28 +172,13 @@ class ProductsOptions : NSObject {
     }
 }
 
-extension ProductsOptions : UIPickerViewDataSource {
-    func numberOfComponents(in pickerView: UIPickerView) -> Int {
-        return 1
-    }
-    
-    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return sortItems.count
-    }
-}
-
-extension ProductsOptions : UIPickerViewDelegate {
-    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        return sortItems[row].stringValue
-    }
-}
 
 class ProductsOptionsControls : NSObject {
     var categoryControl: UISegmentedControl?
     var genderControl: UISegmentedControl?
     var sizeControl: UISegmentedControl?
     var saleControl: UISegmentedControl?
-    var sortControl: UIControl?
+    var sortControl: SegmentedDropDownControl?
     
     private var gender: ProductsOptionsGender?
     private var size: ProductsOptionsSize?
@@ -280,7 +262,7 @@ class ProductsOptionsControls : NSObject {
         return control
     }
     
-    func createSortControl(pickerViewAnimation: (()->())? = nil) -> UIControl {
+    func createSortControl(pickerViewAnimation: (()->())? = nil) -> SegmentedDropDownControl {
         let segmentedTitleItem = SegmentedDropDownItem(titleItem: "products.options.sort.title".localized)
         segmentedTitleItem.widthRatio = 0.25
         
@@ -421,13 +403,13 @@ class ProductsOptionsViewController: UIViewController {
     private(set) lazy var saleControl: UISegmentedControl = {
         return self.controls.createSaleControl()
     }()
-    private(set) lazy var sortControl: UIControl = {
+    private(set) lazy var sortControl: SegmentedDropDownControl = {
         return self.controls.createSortControl(pickerViewAnimation: { [weak self] in
             self?.view.layoutIfNeeded()
         })
     }()
-    let sortPickerView = UIPickerView()
-    
+    var sortValue:ProductsOptionsSort  = ProductsOptionsSort.globalValue
+
     let continueButton = MainButton()
     
     required init?(coder aDecoder: NSCoder) {
@@ -674,7 +656,7 @@ enum ProductsOptionsSale : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol {
     }
 }
 
-enum ProductsOptionsSort : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol {
+enum ProductsOptionsSort: Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol {
     case similar = 1
     case priceAsc
     case priceDes
@@ -696,6 +678,17 @@ enum ProductsOptionsSort : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol {
     
     var offsetValue: Int {
         return self.rawValue - 1
+    }
+    
+    static func with(stringValue:String) -> ProductsOptionsSort?{
+        let allOptions:[ProductsOptionsSort] = [.similar,.priceAsc, .priceDes, .brands]
+        for option in allOptions {
+            if option.stringValue == stringValue {
+                return option
+            }
+        }
+        
+        return nil
     }
     
     var stringValue: String {

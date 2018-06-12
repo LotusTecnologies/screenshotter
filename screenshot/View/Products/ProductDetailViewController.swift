@@ -45,7 +45,7 @@ class ProductDetailViewController: BaseViewController {
         if let shoppable = self.shoppable {
             productsFRC = DataModel.sharedInstance.productFrc(delegate: self, shoppableOID: shoppable.objectID)
             
-            self.products = self.productCollectionViewManager.productsForShoppable(shoppable, productsOptions: self.productsOptions).filter{ $0.price != self.product?.price || $0.merchant != self.product?.merchant || $0.productTitle() != self.product?.productTitle() || $0.imageURL != self.product?.imageURL }
+            updateProductsWithShoppable()
             self.productsLoadingMonitor = AsyncOperationMonitor.init(assetId: nil, shoppableId: shoppable.imageUrl, queues: AssetSyncModel.sharedInstance.queues, delegate: self)
             self.updateLoadingState()
         }
@@ -265,10 +265,6 @@ extension ProductDetailViewController: ProductsOptionsDelegate {
     @objc private func presentOptions() {
         Analytics.trackOpenedFiltersView()
         
-        if let shoppable = self.shoppable {
-            self.productsOptions.syncOptions(withMask: shoppable.getLast())
-        }
-        
         present(self.productsOptions.viewController, animated: true)
     }
     
@@ -277,18 +273,8 @@ extension ProductDetailViewController: ProductsOptionsDelegate {
     }
     
     func productsOptionsDidComplete(_ productsOptions: ProductsOptions, withChange changed: Bool) {
-        if changed, let shoppable = self.shoppable {
-            // TODO:
-            shoppable.set(productsOptions: productsOptions, callback: {
-                if let shoppable = self.shoppable {
-//                    self.reloadProductsFor(shoppable: shoppable)
-                }
-                else {
-//                    self.clearProductListAndStateLoading()
-                }
-            })
-        }
-        
+        self.productsOptions = productsOptions
+        updateProductsWithShoppable()
         self.dismissOptions()
     }
 }
@@ -364,9 +350,8 @@ extension ProductDetailViewController : AsyncOperationMonitorDelegate, FetchedRe
         self.updateLoadingState()
     }
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
-        if let shoppable = self.shoppable, self.products.count == 0 {
-            self.products = self.productCollectionViewManager.productsForShoppable(shoppable, productsOptions: self.productsOptions)
-            self.updateLoadingState()
+        if self.products.count == 0 {
+            updateProductsWithShoppable()
         }else if view.window != nil, let collectionView = collectionView {
             if change.updatedRows.count > 0 && change.deletedRows.count == 0 && change.insertedRows.count == 0 {
                 collectionView.indexPathsForVisibleItems.forEach { (indexPath) in
@@ -379,6 +364,16 @@ extension ProductDetailViewController : AsyncOperationMonitorDelegate, FetchedRe
                 collectionView.reloadData()
             }
         }
+        
+    }
+    func updateProductsWithShoppable(){
+        if let shoppable = self.shoppable{
+            self.products = self.productCollectionViewManager.productsForShoppable(shoppable, productsOptions: self.productsOptions).filter{ $0.price != self.product?.price || $0.merchant != self.product?.merchant || $0.productTitle() != self.product?.productTitle()}
+        }else{
+            self.products = []
+        }
+        self.collectionView?.reloadData()
+        self.updateLoadingState()
         
     }
 }

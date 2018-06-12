@@ -539,10 +539,6 @@ extension ProductsViewControllerOptionsView: ProductsOptionsDelegate {
     @objc func presentOptions() {
         Analytics.trackOpenedFiltersView()
         
-        if let shoppable = self.getSelectedShoppable() {
-            self.productsOptions.syncOptions(withMask: shoppable.getLast())
-        }
-        
         present(self.productsOptions.viewController, animated: true)
     }
     
@@ -557,6 +553,7 @@ extension ProductsViewControllerOptionsView: ProductsOptionsDelegate {
     }
     
     func productsOptionsDidComplete(_ productsOptions: ProductsOptions, withChange changed: Bool) {
+        self.productsOptions = productsOptions
         if changed, let shoppable = self.getSelectedShoppable(){
             shoppable.set(productsOptions: productsOptions, callback: {
                 if let shoppable = self.getSelectedShoppable(){
@@ -565,6 +562,13 @@ extension ProductsViewControllerOptionsView: ProductsOptionsDelegate {
                     self.clearProductListAndStateLoading()
                 }
             })
+        }else{
+            if let shoppable = self.getSelectedShoppable() {
+                self.products = self.productCollectionViewManager.productsForShoppable(shoppable, productsOptions: productsOptions)
+            }else{
+                self.products = []
+            }
+            self.updateLoadingState()
         }
         self.dismissOptions()
     }
@@ -618,11 +622,8 @@ extension ProductsViewControllerProducts{
         self.relatedLooks = nil
         self.scrollRevealController?.resetViewOffset()
         
-          if shoppable.productFilterCount == -1 {
-            self.screenshotLoadingState = .retry
-        } else {
-            self.products = self.productCollectionViewManager.productsForShoppable(shoppable, productsOptions: self.productsOptions)
-        }
+        
+        self.products = self.productCollectionViewManager.productsForShoppable(shoppable, productsOptions: self.productsOptions)
         
         self.collectionView?.reloadData()
         self.rateView.setRating(UInt(shoppable.getRating()), animated: false)
@@ -632,6 +633,7 @@ extension ProductsViewControllerProducts{
         if self.collectionView?.numberOfItems(inSection: ProductsSection.product.section) ?? 0 > 0 {
             self.collectionView?.scrollToItem(at: IndexPath(item: 0, section: ProductsSection.product.section), at: .top, animated: false)
         }
+        self.updateLoadingState()
     }
     
     
