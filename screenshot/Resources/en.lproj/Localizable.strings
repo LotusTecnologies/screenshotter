@@ -161,11 +161,6 @@
 "form.personal.email" = "Email";
 "form.personal.phone" = "Phone Number";
 
-"game.enter" = "Get More Coins";
-"game.restart" = "Tap to play again";
-"game.score" = "My coins: %d";
-"game.start" = "Tap to get more coins";
-
 "generic.buy" = "BUY";
 "generic.cancel" = "Cancel";
 "generic.close" = "Close";
@@ -254,9 +249,6 @@
 "products.helper.retry.furniture" = "Furniture";
 "products.helper.retry.title" = "Try again as";
 "products.helper.title" = "No Items Found";
-"products.options.category.auto" = "Auto";
-"products.options.category.fashion" = "Fashion";
-"products.options.category.furniture" = "Furniture";
 "products.options.gender.auto" = "All";
 "products.options.gender.female" = "Female";
 "products.options.gender.male" = "Male";
@@ -329,7 +321,6 @@
 "settings.region.us" = "United States";
 "settings.row.address.title" = "Shipping Addresses";
 "settings.row.bug.title" = "Submit a Bug";
-"settings.row.coins.title" = "Coins Collected";
 "settings.row.contact.title" = "Contact Us";
 "settings.row.currency.title" = "Currency";
 "settings.row.email.detail" = "Enter Your Email";

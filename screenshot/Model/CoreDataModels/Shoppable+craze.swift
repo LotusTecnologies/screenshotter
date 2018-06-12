@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Jonathan Rose on 6/3/18.
-//  Copyright © 2018 crazeapp. All rights reserved.
+//  Copyright (c) 2018 crazeapp. All rights reserved.
 //
 
 import Foundation
@@ -78,7 +78,7 @@ extension Shoppable {
             return
         }
         let assetId = self.screenshot?.assetId
-        let optionsMask = ProductsOptionsMask(productsOptions.category, productsOptions.gender, productsOptions.size)
+        let optionsMask = ProductsOptionsMask(productsOptions.gender, productsOptions.size)
         let optionsMaskInt = optionsMask.rawValue
         DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
             let fetchRequest: NSFetchRequest<Shoppable> = Shoppable.fetchRequest()
@@ -163,7 +163,7 @@ extension Shoppable {
                     productFilter.rating = ratingValue
                     optionsMask = ProductsOptionsMask(rawValue: Int(productFilter.optionsMask))
                 } else {
-                    optionsMask = ProductsOptionsMask(.auto, .auto, .adult) // Historical value that was never set.
+                    optionsMask = ProductsOptionsMask(.auto, .adult) // Historical value that was never set.
                     shoppable.addProductFilter(managedObjectContext: managedObjectContext, optionsMask: optionsMask, rating: ratingValue)
                 }
                 var augmentedOffersUrl: String? = nil

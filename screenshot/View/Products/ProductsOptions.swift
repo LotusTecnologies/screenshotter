@@ -3,12 +3,13 @@
 //  screenshot
 //
 //  Created by Corey Werner on 11/21/17.
-//  Copyright © 2017 crazeapp. All rights reserved.
+//  Copyright (c) 2017 crazeapp. All rights reserved.
 //
 
 import Foundation
 import UIKit
 
+// TODO: can this be removed?
 class ProductsOptionsMask : NSObject {
     let rawValue: Int
     
@@ -20,29 +21,21 @@ class ProductsOptionsMask : NSObject {
     static let sizeChild    = ProductsOptionsMask(rawValue: 1 << 4) // 16
     static let sizePlus     = ProductsOptionsMask(rawValue: 1 << 5) // 32
     
+    // TODO: remove all category code
     static let categoryAuto      = ProductsOptionsMask(rawValue: 1 << 6) // 64
     static let categoryFashion   = ProductsOptionsMask(rawValue: 1 << 7) // 128
     static let categoryFurniture = ProductsOptionsMask(rawValue: 1 << 8) // 256
     
     static var global: ProductsOptionsMask {
-        return ProductsOptionsMask(ProductsOptionsCategory.globalValue, ProductsOptionsGender.globalValue, ProductsOptionsSize.globalValue)
+        return ProductsOptionsMask(ProductsOptionsGender.globalValue, ProductsOptionsSize.globalValue)
     }
     
     init(rawValue: Int) {
         self.rawValue = rawValue
     }
     
-    convenience init(_ category: ProductsOptionsCategory, _ gender: ProductsOptionsGender, _ size: ProductsOptionsSize) {
+    convenience init(_ gender: ProductsOptionsGender, _ size: ProductsOptionsSize) {
         var value: Int = 0
-        
-        switch category {
-        case .fashion:
-            value |= ProductsOptionsMask.categoryFashion.rawValue
-        case .furniture:
-            value |= ProductsOptionsMask.categoryFurniture.rawValue
-        default:
-            value |= ProductsOptionsMask.categoryAuto.rawValue
-        }
         
         switch gender {
         case .male:
@@ -63,16 +56,6 @@ class ProductsOptionsMask : NSObject {
         }
         
         self.init(rawValue: value)
-    }
-    
-    var category: ProductsOptionsCategory {
-        if rawValue & ProductsOptionsMask.categoryFashion.rawValue > 0 {
-            return .fashion
-        } else if rawValue & ProductsOptionsMask.categoryFurniture.rawValue > 0 {
-            return .furniture
-        } else {
-            return .auto
-        }
     }
     
     var gender: ProductsOptionsGender {
@@ -98,12 +81,12 @@ class ProductsOptionsMask : NSObject {
 
 protocol ProductsOptionsDelegate : NSObjectProtocol {
     func productsOptionsDidComplete(_ productsOptions: ProductsOptions, withChange changed: Bool)
+    func productsOptionsDidCancel(_ productsOptions: ProductsOptions)
 }
 
 class ProductsOptions : NSObject {
     weak var delegate: ProductsOptionsDelegate?
     
-    fileprivate(set) var category = ProductsOptionsCategory.globalValue // TODO: remove
     fileprivate(set) var gender = ProductsOptionsGender.globalValue
     fileprivate(set) var size = ProductsOptionsSize.globalValue
     fileprivate(set) var sale = ProductsOptionsSale.globalValue
@@ -111,15 +94,18 @@ class ProductsOptions : NSObject {
     
     private(set) lazy var viewController: ProductsOptionsViewController = {
         let viewController = ProductsOptionsViewController()
-        viewController.continueButton.addTarget(self, action: #selector(doneButtonAction), for: .touchUpInside)
+        viewController.continueButton.addTarget(self, action: #selector(continueAction), for: .touchUpInside)
         self.syncOptions(with: viewController)
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(cancelAction))
+        viewController.view.addGestureRecognizer(tapGesture)
+        
         return viewController
     }()
     
-    func syncOptions(withMask mask: ProductsOptionsMask? = nil) {
-        category = mask?.category ?? ProductsOptionsCategory.globalValue
-        gender = mask?.gender ?? ProductsOptionsGender.globalValue
-        size = mask?.size ?? ProductsOptionsSize.globalValue
+    func syncOptions() {
+        gender = ProductsOptionsGender.globalValue
+        size = ProductsOptionsSize.globalValue
         sale = ProductsOptionsSale.globalValue
         sort = ProductsOptionsSort.globalValue
         syncOptions(with: viewController)
@@ -129,36 +115,39 @@ class ProductsOptions : NSObject {
         viewController.genderControl.selectedSegmentIndex = gender.offsetValue
         viewController.sizeControl.selectedSegmentIndex = size.offsetValue
         viewController.saleControl.selectedSegmentIndex = sale.offsetValue
+
         viewController.sortControl.items.last?.selectedPickerItem = sort.stringValue
     }
     
-    @objc private func doneButtonAction() {
-        let previousMask = ProductsOptionsMask(category, gender, size)
+    @objc private func continueAction() {
+        let previousGender = gender
+        let previousSize = size
         let previousSale = sale
         let previousSort = sort
         
-//        category = ProductsOptionsCategory(offsetValue: viewController.categoryControl.selectedSegmentIndex)
         gender = ProductsOptionsGender(offsetValue: viewController.genderControl.selectedSegmentIndex)
         size = ProductsOptionsSize(offsetValue: viewController.sizeControl.selectedSegmentIndex)
         sale = ProductsOptionsSale(offsetValue: viewController.saleControl.selectedSegmentIndex)
         sort = viewController.sortValue
         
+        UserDefaults.standard.set(gender.rawValue, forKey: UserDefaultsKeys.productGender)
+        UserDefaults.standard.set(size.rawValue, forKey: UserDefaultsKeys.productSize)
         UserDefaults.standard.set(sale.rawValue, forKey: UserDefaultsKeys.productSale)
         UserDefaults.standard.set(sort.rawValue, forKey: UserDefaultsKeys.productSort)
         UserDefaults.standard.synchronize()
         
-        let maskChanged = previousMask.rawValue != ProductsOptionsMask(category, gender, size).rawValue
+        let genderChanged = previousGender.rawValue != gender.rawValue
+        let sizeChanged = previousSize.rawValue != size.rawValue
         let saleChanged = previousSale.rawValue != sale.rawValue
         let sortChanged = previousSort.rawValue != sort.rawValue
-        let changed = maskChanged || saleChanged || sortChanged
+        let changed = genderChanged || sizeChanged || saleChanged || sortChanged
         
         delegate?.productsOptionsDidComplete(self, withChange: changed)
         
         if changed {
             let changeMap = [
-                "Category": (new: category.stringValue, old: previousMask.category.stringValue),
-                "Gender": (new: gender.stringValue, old: previousMask.gender.stringValue),
-                "Size": (new: size.stringValue, old: previousMask.size.stringValue),
+                "Gender": (new: gender.stringValue, old: previousGender.stringValue),
+                "Size": (new: size.stringValue, old: previousSize.stringValue),
                 "Sale": (new: sale.stringValue, old: previousSale.stringValue),
                 "Sort": (new: sort.stringValue, old: previousSort.stringValue)
             ]
@@ -169,6 +158,10 @@ class ProductsOptions : NSObject {
                 }
             }
         }
+    }
+    
+    @objc private func cancelAction() {
+        delegate?.productsOptionsDidCancel(self)
     }
 }
 
@@ -200,20 +193,6 @@ class ProductsOptionsControls : NSObject {
                 }
             }
         }
-    }
-    
-    func createCategoryControl() -> UISegmentedControl { // TODO: remove
-        let control = UISegmentedControl(items: [
-            ProductsOptionsCategory.fashion.stringValue,
-            ProductsOptionsCategory.furniture.stringValue,
-            ProductsOptionsCategory.auto.stringValue
-            ])
-        control.addTarget(self, action: #selector(syncCategoryControl), for: .valueChanged)
-        
-        categoryControl?.removeFromSuperview()
-        categoryControl = control
-        
-        return control
     }
     
     func createGenderControl() -> UISegmentedControl {
@@ -267,10 +246,10 @@ class ProductsOptionsControls : NSObject {
         segmentedTitleItem.widthRatio = 0.25
         
         let pickerItems = [
+            ProductsOptionsSort.similar.stringValue,
             ProductsOptionsSort.priceAsc.stringValue,
             ProductsOptionsSort.priceDes.stringValue,
-            ProductsOptionsSort.brands.stringValue,
-            ProductsOptionsSort.similar.stringValue
+            ProductsOptionsSort.brands.stringValue
         ]
         let segmentedItem = SegmentedDropDownItem(pickerItems: pickerItems, selectedPickerItem: pickerItems.first)
         segmentedItem.isPickerViewInsertedInline = true
@@ -290,15 +269,6 @@ class ProductsOptionsControls : NSObject {
         var enabledControls: [UIControl : [Int : Bool]] = [:]
         
         if let genderControl = genderControl, let sizeControl = sizeControl {
-            let isFashion: Bool
-            
-            if let categoryControl = categoryControl {
-                isFashion = ProductsOptionsCategory(offsetValue: categoryControl.selectedSegmentIndex) != .furniture
-                
-            } else {
-                isFashion = ProductsOptionsCategory.default != .furniture
-            }
-            
             enabledControls[genderControl] = [:]
             
             for i in 0 ..< genderControl.numberOfSegments {
@@ -308,7 +278,7 @@ class ProductsOptionsControls : NSObject {
                     isEnabled = ProductsOptionsSize(offsetValue: sizeControl.selectedSegmentIndex) != .plus
                 }
                 
-                enabledControls[genderControl]?[i] = isFashion ? isEnabled : false
+                enabledControls[genderControl]?[i] = isEnabled
             }
             
             enabledControls[sizeControl] = [:]
@@ -320,7 +290,7 @@ class ProductsOptionsControls : NSObject {
                     isEnabled = ProductsOptionsGender(offsetValue: genderControl.selectedSegmentIndex) != .male
                 }
                 
-                enabledControls[sizeControl]?[i] = isFashion ? isEnabled : false
+                enabledControls[sizeControl]?[i] = isEnabled
             }
         }
         
@@ -343,24 +313,6 @@ class ProductsOptionsControls : NSObject {
             let isEnabled = enabledControls[sizeControl]?[index] ?? true
             sizeControl.setEnabled(isEnabled, forSegmentAt: index)
         }
-    }
-    
-    @objc private func syncCategoryControl() {
-        guard let categoryControl = categoryControl else {
-            return
-        }
-        
-        if ProductsOptionsCategory(offsetValue: categoryControl.selectedSegmentIndex) != .furniture {
-            if let genderControl = genderControl, let gender = gender {
-                genderControl.selectedSegmentIndex = gender.offsetValue
-            }
-            
-            if let sizeControl = sizeControl, let size = size {
-                sizeControl.selectedSegmentIndex = size.offsetValue
-            }
-        }
-        
-        sync()
     }
     
     @objc private func syncGenderControl() {
@@ -449,6 +401,7 @@ class ProductsOptionsViewController: UIViewController {
         
         sortControl.translatesAutoresizingMaskIntoConstraints = false
         sortControl.isExclusiveTouch = true
+        sortControl.addTarget(self, action: #selector(optionsChangedAction), for: .valueChanged)
         containerView.addSubview(sortControl)
         sortControl.topAnchor.constraint(equalTo: titleLabel.lastBaselineAnchor, constant: verticalPadding).isActive = true
         sortControl.leadingAnchor.constraint(equalTo: containerView.layoutMarginsGuide.leadingAnchor).isActive = true
@@ -456,6 +409,7 @@ class ProductsOptionsViewController: UIViewController {
         
         saleControl.translatesAutoresizingMaskIntoConstraints = false
         saleControl.isExclusiveTouch = true
+        saleControl.addTarget(self, action: #selector(optionsChangedAction), for: .valueChanged)
         containerView.addSubview(saleControl)
         saleControl.topAnchor.constraint(equalTo: sortControl.bottomAnchor, constant: .padding).isActive = true
         saleControl.leadingAnchor.constraint(equalTo: containerView.layoutMarginsGuide.leadingAnchor).isActive = true
@@ -463,6 +417,7 @@ class ProductsOptionsViewController: UIViewController {
         
         genderControl.translatesAutoresizingMaskIntoConstraints = false
         genderControl.isExclusiveTouch = true
+        genderControl.addTarget(self, action: #selector(optionsChangedAction), for: .valueChanged)
         containerView.addSubview(genderControl)
         genderControl.topAnchor.constraint(equalTo: saleControl.bottomAnchor, constant: .padding).isActive = true
         genderControl.leadingAnchor.constraint(equalTo: containerView.layoutMarginsGuide.leadingAnchor).isActive = true
@@ -470,6 +425,7 @@ class ProductsOptionsViewController: UIViewController {
         
         sizeControl.translatesAutoresizingMaskIntoConstraints = false
         sizeControl.isExclusiveTouch = true
+        sizeControl.addTarget(self, action: #selector(optionsChangedAction), for: .valueChanged)
         containerView.addSubview(sizeControl)
         sizeControl.topAnchor.constraint(equalTo: genderControl.bottomAnchor, constant: .padding).isActive = true
         sizeControl.leadingAnchor.constraint(equalTo: containerView.layoutMarginsGuide.leadingAnchor).isActive = true
@@ -491,48 +447,14 @@ class ProductsOptionsViewController: UIViewController {
         super.viewWillAppear(animated)
         controls.sync()
     }
-}
-
-enum ProductsOptionsCategory : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol {
-    case fashion = 1
-    case furniture
-    case auto
     
-    static let `default` = ProductsOptionsCategory.auto
-    
-    static var globalValue: ProductsOptionsCategory {
-        return ProductsOptionsCategory(intValue: UserDefaults.standard.integer(forKey: UserDefaultsKeys.productCategory))
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        continueButton.setTitle("generic.close".localized, for: .normal)
     }
     
-    init(intValue: Int) {
-        self = ProductsOptionsCategory(rawValue: intValue) ?? .default
-    }
-    
-    init(offsetValue: Int) {
-        self.init(intValue: offsetValue + 1)
-    }
-    
-    var offsetValue: Int {
-        return self.rawValue - 1
-    }
-    
-    var stringValue: String {
-        var string: String
-        
-        switch self {
-        case .fashion: string = "products.options.category.fashion".localized
-        case .furniture: string = "products.options.category.furniture".localized
-        case .auto: string = "products.options.category.auto".localized
-        }
-        
-        return string
-    }
-    var analyticsStringValue:String {
-        switch self {
-        case .fashion: return "fashion";
-        case .furniture: return "furniture";
-        case .auto: return "auto";
-        }
+    @objc private func optionsChangedAction() {
+        continueButton.setTitle("generic.save".localized, for: .normal)
     }
 }
 

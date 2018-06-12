@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Jonathan Rose on 2/11/18.
-//  Copyright © 2018 crazeapp. All rights reserved.
+//  Copyright (c) 2018 crazeapp. All rights reserved.
 //
 
 import Foundation
@@ -99,6 +99,7 @@ class ProductsViewController: BaseViewController {
             let toolbar = ShoppablesToolbar(screenshot: screenshot)
             toolbar.translatesAutoresizingMaskIntoConstraints = false
             toolbar.isHidden = shouldHideToolbar
+            toolbar.delegate = self
             toolbar.shoppableToolbarDelegate = self
             view.addSubview(toolbar)
             toolbar.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor).isActive = true
@@ -231,6 +232,7 @@ class ProductsViewController: BaseViewController {
     }
     
     deinit {
+        self.shoppablesToolbar?.delegate = nil
         self.shoppablesToolbar?.shoppableToolbarDelegate = nil
     }
 }
@@ -288,7 +290,6 @@ extension ProductsViewController: ShoppablesToolbarDelegate {
     }
     
     func shoppablesToolbarDidChangeSelectedShoppable(toolbar:ShoppablesToolbar, shoppable:Shoppable){
-        
         self.selectedShoppable = shoppable
         self.reloadProductsFor(shoppable: shoppable)
     }
@@ -573,6 +574,10 @@ extension ProductsViewControllerOptionsView: ProductsOptionsDelegate {
         self.dismissOptions()
     }
     
+    func productsOptionsDidCancel(_ productsOptions: ProductsOptions) {
+        dismissOptions()
+    }
+    
     var shouldHideToolbar: Bool {
         return !self.hasShoppables
     }
@@ -622,8 +627,8 @@ extension ProductsViewControllerProducts{
         self.relatedLooks = nil
         self.scrollRevealController?.resetViewOffset()
         
-        
         self.products = self.productCollectionViewManager.productsForShoppable(shoppable, productsOptions: self.productsOptions)
+
         
         self.collectionView?.reloadData()
         self.rateView.setRating(UInt(shoppable.getRating()), animated: false)
@@ -635,12 +640,6 @@ extension ProductsViewControllerProducts{
         }
         self.updateLoadingState()
     }
-    
-    
-    
-   
-    
-  
 }
 
 private typealias ProductsViewControllerRatings = ProductsViewController
@@ -924,14 +923,15 @@ extension ProductsViewController {
 extension ProductsViewController {
     func loadRelatedLooksIfNeeded() {
         if self.relatedLooks == nil {
-            let atLeastXSeconds = Promise.init(resolvers: { (fulfil, reject) in
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.2, execute: {
-                    fulfil(true);
+            if let product = products.first, let shopable = product.shoppable, let relatedlooksURL = shopable.relatedImagesUrl() {
+                Analytics.trackShoppableRelatedLooksLoaded(shoppable: shopable)
+                let atLeastXSeconds = Promise.init(resolvers: { (fulfil, reject) in
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.2, execute: {
+                        fulfil(true);
+                    })
                 })
-            })
-            let loadRequest:Promise<[String]> = Promise.init(resolvers: { (fulfil, reject) in
-
-                if let product = products.first, let shopable = product.shoppable, let relatedlooksURL = shopable.relatedImagesUrl() {
+                let loadRequest:Promise<[String]> = Promise.init(resolvers: { (fulfil, reject) in
+                    
                     let objectId = shopable.objectID
                     if let arrayString = shopable.relatedImagesArray, let data = arrayString.data(using: .utf8), let array = try? JSONSerialization.jsonObject(with:data, options: []), let a = array as? [String]{
                         fulfil(a)
@@ -962,37 +962,38 @@ extension ProductsViewController {
                                 reject(error)
 
                             }
-
+                            
+                        }).catch(execute: { (error) in
+                            reject(error)
+                        })   
+                    }
+                });
+                
+                let promise = Promise.init(resolvers: { (fulfil, reject) in
+                    
+                    atLeastXSeconds.always {
+                        loadRequest.then(execute: { (value) -> Void in
+                            fulfil(value)
                         }).catch(execute: { (error) in
                             reject(error)
                         })
-
                     }
-
-                }else{
-                    let error = NSError.init(domain: "related_looks", code: 1, userInfo: [NSLocalizedDescriptionKey:"no url", "retryable":false])
-                    reject(error)
+                })
+                promise.always(on: .main) {
+                    let section = self.sectionIndex(forProductType: .relatedLooks)
+                    self.collectionView?.reloadSections(IndexSet.init(integer: section))
                 }
-            });
-            
-            let promise = Promise.init(resolvers: { (fulfil, reject) in
-                
-                atLeastXSeconds.always {
-                    loadRequest.then(execute: { (value) -> Void in
-                        fulfil(value)
-                    }).catch(execute: { (error) in
-                        reject(error)
-                    })
-                }
-            })
-            promise.always(on: .main) {
-                let section = self.sectionIndex(forProductType: .relatedLooks)
-                self.collectionView?.reloadSections(IndexSet.init(integer: section))
+                self.relatedLooks = promise
+            }else{
+                let product = products.first
+                let shopable = product?.shoppable
+                Analytics.trackShoppableRelatedLooksNotLoaded(shoppable: shopable)
+                let error = NSError.init(domain: "related_looks", code: 1, userInfo: [NSLocalizedDescriptionKey:"no url", "retryable":false])
+                self.relatedLooks = Promise.init(error: error)
             }
-            self.relatedLooks = promise
-            
         }
     }
+    
     @objc func didPressDismissRelatedLooks(_ sender:Any) {
         let error = NSError.init(domain: "related_looks", code: 0, userInfo: [NSLocalizedDescriptionKey:"don't show section", "retryable":false])
         self.relatedLooks = Promise.init(error: error)
@@ -1046,9 +1047,6 @@ extension ProductsViewController : AsyncOperationMonitorDelegate {
             if state != self.screenshotLoadingState {
                 self.screenshotLoadingState = state
             }
-            
-        
-            
         }
     }
     

@@ -33,11 +33,12 @@ class MainSegmentedControl: UISegmentedControl {
         attributes[NSAttributedStringKey.foregroundColor.rawValue] = UIColor.gray4
         setTitleTextAttributes(attributes, for: .highlighted)
         
-        attributes[NSAttributedStringKey.foregroundColor.rawValue] = UIColor.gray2
-        setTitleTextAttributes(attributes, for: .selected)
-        
         attributes[NSAttributedStringKey.foregroundColor.rawValue] = UIColor.gray9
         setTitleTextAttributes(attributes, for: .disabled)
+        
+        attributes[NSAttributedStringKey.foregroundColor.rawValue] = UIColor.gray2
+        attributes[NSAttributedStringKey.font.rawValue] = UIFont.screenshopFont(.quicksandMedium, size: 16)
+        setTitleTextAttributes(attributes, for: .selected)
         
         layer.borderColor = UIColor.gray8.cgColor
         layer.borderWidth = 1
@@ -63,7 +64,7 @@ class MainSegmentedControl: UISegmentedControl {
     
     override var intrinsicContentSize: CGSize {
         var size = super.intrinsicContentSize
-        size.height = min(.defaultViewHeight, layoutMargins.top + ceil(size.height) + layoutMargins.bottom)
+        size.height = .defaultViewHeight
         return size
     }
 }

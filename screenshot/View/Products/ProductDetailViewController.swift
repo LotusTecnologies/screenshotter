@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Jonathan Rose on 6/4/18.
-//  Copyright © 2018 crazeapp. All rights reserved.
+//  Copyright (c) 2018 crazeapp. All rights reserved.
 //
 
 import UIKit
@@ -276,6 +276,10 @@ extension ProductDetailViewController: ProductsOptionsDelegate {
         self.productsOptions = productsOptions
         updateProductsWithShoppable()
         self.dismissOptions()
+    }
+    
+    func productsOptionsDidCancel(_ productsOptions: ProductsOptions) {
+        dismissOptions()
     }
 }
 

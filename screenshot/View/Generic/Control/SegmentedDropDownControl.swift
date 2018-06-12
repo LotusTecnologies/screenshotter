@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Corey Werner on 1/29/18.
-//  Copyright © 2018 crazeapp. All rights reserved.
+//  Copyright (c) 2018 crazeapp. All rights reserved.
 //
 
 import UIKit
@@ -166,6 +166,12 @@ class SegmentedDropDownControl : UIButton {
         }
     }
     
+    override var intrinsicContentSize: CGSize {
+        var size = super.intrinsicContentSize
+        size.height = .defaultViewHeight
+        return size
+    }
+    
     // MARK: Segments
     
     var items: [SegmentedDropDownItem] = [] {
@@ -179,7 +185,6 @@ class SegmentedDropDownControl : UIButton {
                 let isFirst = index == 0
                 let isLast = index == items.count - 1
                 let segment: UIView
-                var pickerView: UIPickerView?
                 
                 if let titleItemText = item.titleItemText {
                     let label = DropDownLabel()
@@ -199,10 +204,6 @@ class SegmentedDropDownControl : UIButton {
                     if !item.isPickerViewInsertedInline {
                         dropDownControl.pickerInputView.doneButton.addTarget(self, action: #selector(pickerDoneButtonAction(_:)), for: .touchUpInside)
                     }
-                    else {
-                        dropDownControl.pickerViewAnimation = item.pickerViewAnimation
-                        pickerView = dropDownControl.pickerView
-                    }
                     
                     segment = dropDownControl
                 }
@@ -211,6 +212,7 @@ class SegmentedDropDownControl : UIButton {
                 segment.isUserInteractionEnabled = false
                 addSubview(segment)
                 segment.topAnchor.constraint(equalTo: topAnchor).isActive = true
+                segment.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor).isActive = true
                 segment.heightAnchor.constraint(equalToConstant: .defaultViewHeight).isActive = true
                 
                 if isFirst {
@@ -258,27 +260,53 @@ class SegmentedDropDownControl : UIButton {
                 
                 item.segment = segment
                 
-                if let pickerView = pickerView {
-                    let pickerViewContainer = UIView()
-                    pickerViewContainer.translatesAutoresizingMaskIntoConstraints = false
-                    pickerViewContainer.backgroundColor = .white
-                    pickerViewContainer.layer.masksToBounds = true
-                    pickerViewContainer.layer.cornerRadius = .defaultCornerRadius
-                    pickerViewContainer.layer.borderColor = type(of: self).borderColor.cgColor
-                    pickerViewContainer.layer.borderWidth = borderWidth
-                    insertSubview(pickerViewContainer, at: 0)
-                    pickerViewContainer.topAnchor.constraint(equalTo: segment.bottomAnchor, constant: -.defaultCornerRadius * 2).isActive = true
-                    pickerViewContainer.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-                    pickerViewContainer.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
-                    pickerViewContainer.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
-                    
-                    pickerView.translatesAutoresizingMaskIntoConstraints = false
-                    pickerViewContainer.addSubview(pickerView)
-                    pickerView.topAnchor.constraint(equalTo: segment.bottomAnchor).isActive = true
-                    pickerView.leadingAnchor.constraint(equalTo: pickerViewContainer.leadingAnchor).isActive = true
-                    pickerView.bottomAnchor.constraint(equalTo: pickerViewContainer.bottomAnchor).isActive = true
-                    pickerView.trailingAnchor.constraint(equalTo: pickerViewContainer.trailingAnchor).isActive = true
+                insertSegmentPickerViewIfNeeded(item: item)
+            }
+        }
+    }
+    
+    private func insertSegmentPickerViewIfNeeded(item: SegmentedDropDownItem) {
+        if item.isPickerViewInsertedInline, let dropDownControl = item.segment as? DropDownControl {
+            let expandedHeight: CGFloat = 130
+            
+            let pickerViewContainer = UIView()
+            pickerViewContainer.translatesAutoresizingMaskIntoConstraints = false
+            pickerViewContainer.backgroundColor = .white
+            pickerViewContainer.layer.masksToBounds = true
+            pickerViewContainer.layer.cornerRadius = .defaultCornerRadius
+            pickerViewContainer.layer.borderColor = type(of: self).borderColor.cgColor
+            pickerViewContainer.layer.borderWidth = borderWidth
+            insertSubview(pickerViewContainer, at: 0)
+            pickerViewContainer.topAnchor.constraint(equalTo: dropDownControl.bottomAnchor, constant: -.defaultCornerRadius * 2).isActive = true
+            pickerViewContainer.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+            pickerViewContainer.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+            pickerViewContainer.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+            let pickerViewContainerHeightConstraint = pickerViewContainer.heightAnchor.constraint(equalToConstant: 0)
+            pickerViewContainerHeightConstraint.isActive = true
+            
+            let pickerView = dropDownControl.pickerView
+            pickerView.translatesAutoresizingMaskIntoConstraints = false
+            pickerViewContainer.addSubview(pickerView)
+            pickerView.leadingAnchor.constraint(equalTo: pickerViewContainer.leadingAnchor).isActive = true
+            pickerView.bottomAnchor.constraint(equalTo: pickerViewContainer.bottomAnchor).isActive = true
+            pickerView.trailingAnchor.constraint(equalTo: pickerViewContainer.trailingAnchor).isActive = true
+            pickerView.heightAnchor.constraint(equalToConstant: expandedHeight).isActive = true
+            
+            dropDownControl.animatePickerView = { isExpanding in
+                if isExpanding {
+                    pickerViewContainerHeightConstraint.constant = expandedHeight
                 }
+                else {
+                    pickerViewContainerHeightConstraint.constant = 0
+                }
+                
+                var options: UIViewAnimationOptions = .beginFromCurrentState
+                options.insert(isExpanding ? .curveEaseOut : .curveEaseIn)
+                
+                UIView.animate(withDuration: .defaultAnimationDuration, delay: 0, options: options, animations: {
+                    self.layoutIfNeeded()
+                    item.pickerViewAnimation?()
+                })
             }
         }
     }
@@ -540,7 +568,7 @@ fileprivate class DropDownControl : UIControl {
         let imageWidth = image?.size.width ?? 0
         
         size.width = layoutMargins.left + ceil(labelSize.width) + layoutMargins.right + imageWidth + layoutMargins.right
-        size.height = min(.defaultViewHeight, layoutMargins.top + ceil(labelSize.height) + layoutMargins.bottom)
+        size.height = .defaultViewHeight
         return size
     }
     
@@ -603,11 +631,7 @@ fileprivate class DropDownControl : UIControl {
         didSet {
             pickerView.removeFromSuperview()
             
-            if isPickerViewInsertedInline {
-                pickerViewHeightConstraint?.constant = 0
-            }
-            else {
-                pickerViewHeightConstraint = nil
+            if !isPickerViewInsertedInline {
                 pickerInputView.insert(pickerView: pickerView)
             }
         }
@@ -632,25 +656,7 @@ fileprivate class DropDownControl : UIControl {
         pickerView.selectRow(row, inComponent: 0, animated: false)
     }
     
-    private lazy var pickerViewHeightConstraint: NSLayoutConstraint? = {
-        let constraint = pickerView.heightAnchor.constraint(equalToConstant: 0)
-        constraint.isActive = true
-        return constraint
-    }()
-    
-    var pickerViewAnimation: (()->())?
-    
-    private func animatePickerView(isExpanding: Bool) {
-        pickerViewHeightConstraint?.constant = isExpanding ? 130 : 0
-        
-        var options: UIViewAnimationOptions = .beginFromCurrentState
-        options.insert(isExpanding ? .curveEaseOut : .curveEaseIn)
-        
-        UIView.animate(withDuration: .defaultAnimationDuration, delay: 0, options: options, animations: {
-            self.pickerView.superview?.layoutIfNeeded()
-            self.pickerViewAnimation?()
-        })
-    }
+    var animatePickerView: ((_ isExpanding: Bool)->())?
     
     // MARK: First Responder
     
@@ -666,7 +672,7 @@ fileprivate class DropDownControl : UIControl {
             selectCurrentRow()
             
             if isPickerViewInsertedInline {
-                animatePickerView(isExpanding: true)
+                animatePickerView?(true)
             }
         }
         
@@ -680,7 +686,7 @@ fileprivate class DropDownControl : UIControl {
             isSelected = false
             
             if isPickerViewInsertedInline {
-                animatePickerView(isExpanding: false)
+                animatePickerView?(false)
             }
         }
         

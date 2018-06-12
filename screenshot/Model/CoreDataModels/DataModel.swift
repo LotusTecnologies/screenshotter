@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Gershon Kagan on 8/9/17.
-//  Copyright © 2017 crazeapp. All rights reserved.
+//  Copyright (c) 2017 crazeapp. All rights reserved.
 //
 
 import UIKit
@@ -992,8 +992,6 @@ extension DataModel {
                 try managedObjectContext.save()
                 
                 if toFavorited {
-                    let score = UserDefaults.standard.integer(forKey: UserDefaultsKeys.gameScore)
-                    UserDefaults.standard.set(score + 1, forKey: UserDefaultsKeys.gameScore)
                     AccumulatorModel.favorite.incrementUninformedCount()
                 }else{
                     AccumulatorModel.favorite.decrementUninformedCount(by:1)

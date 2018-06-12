@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Jacob Relkin on 9/26/17.
-//  Copyright © 2017 crazeapp. All rights reserved.
+//  Copyright (c) 2017 crazeapp. All rights reserved.
 //
 
 import Foundation
@@ -189,7 +189,6 @@ class Analytics {
         let options = ProductsOptionsMask.init(rawValue: Int(product.optionsMask))
         properties["product-filter-size"] = options.size.analyticsStringValue
         properties["product-filter-gender"] = options.gender.analyticsStringValue
-        properties["product-filter-category"] = options.category.analyticsStringValue
         
         if let priceString = product.price {
             properties["product-price-display"] = priceString
