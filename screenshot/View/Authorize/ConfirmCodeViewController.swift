@@ -43,7 +43,7 @@ class ConfirmCodeView: UIScrollView {
         titleLabel.adjustsFontSizeToFitWidth = true
         titleLabel.minimumScaleFactor = 0.7
         addSubview(titleLabel)
-        titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: .padding).isActive = true
+        titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: .extendedPadding).isActive = true
         titleLabel.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
         titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: layoutMarginsGuide.trailingAnchor).isActive = true
         
@@ -65,7 +65,7 @@ class ConfirmCodeView: UIScrollView {
         explainLabel.minimumScaleFactor = 0.7
         explainLabel.numberOfLines = -1
         addSubview(explainLabel)
-        explainLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: .extendedPadding).isActive = true
+        explainLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: .padding).isActive = true
         explainLabel.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
         explainLabel.trailingAnchor.constraint(lessThanOrEqualTo: layoutMarginsGuide.trailingAnchor).isActive = true
         
