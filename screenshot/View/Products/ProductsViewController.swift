@@ -636,6 +636,7 @@ extension ProductsViewControllerProducts{
             self.screenshotLoadingState = .retry
         } else {
             self.products = self.productCollectionViewManager.productsForShoppable(shoppable, productsOptions: self.productsOptions)
+            self.updateLoadingState()
         }
         
         self.collectionView?.reloadData()
