@@ -9,6 +9,13 @@
 import UIKit
 
 class ProfileAccountView: UIView {
+    let contentView = UIView()
+    private let loggedInContainerView = UIImageView()
+    private let loggedOutContainerView = UIImageView()
+    private var heightConstraint: NSLayoutConstraint?
+    private var contentViewHeightConstraint: NSLayoutConstraint?
+    let loggedInControl = UIControl()
+    
     var isLoggedIn = false {
         didSet {
             loggedOutContainerView.isHidden = isLoggedIn
@@ -16,16 +23,36 @@ class ProfileAccountView: UIView {
         }
     }
     
-    private let loggedInContainerView = UIImageView()
-    private let loggedOutContainerView = UIImageView()
+    let minHeight: CGFloat = 150
+    var maxHeight: CGFloat = 150
+    
+    var isExpanded = false {
+        didSet {
+            let constant = isExpanded ? maxHeight : minHeight
+            heightConstraint?.constant = constant
+            contentViewHeightConstraint?.constant = constant
+        }
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         
+        heightConstraint = heightAnchor.constraint(equalToConstant: minHeight)
+        heightConstraint?.isActive = true
+        
+        // The contentView should expand independently so the animation is smooth in a table view
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(contentView)
+        contentView.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        contentView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        contentView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        contentViewHeightConstraint = contentView.heightAnchor.constraint(equalToConstant: minHeight)
+        contentViewHeightConstraint?.isActive = true
+        
         setupLoggedOutViews()
         setupLoggedInViews()
         
-        addSubview(BorderView(edge: .bottom))
+        contentView.addSubview(BorderView(edge: .bottom))
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -39,11 +66,11 @@ class ProfileAccountView: UIView {
         loggedOutContainerView.isHidden = isLoggedIn
         loggedOutContainerView.layoutMargins = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
         loggedOutContainerView.isUserInteractionEnabled = true
-        addSubview(loggedOutContainerView)
-        loggedOutContainerView.topAnchor.constraint(equalTo: topAnchor).isActive = true
-        loggedOutContainerView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-        loggedOutContainerView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
-        loggedOutContainerView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        contentView.addSubview(loggedOutContainerView)
+        loggedOutContainerView.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
+        loggedOutContainerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
+        loggedOutContainerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
+        loggedOutContainerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         
         let loggedOutVerticalGuide = UILayoutGuide()
         loggedOutContainerView.addLayoutGuide(loggedOutVerticalGuide)
@@ -81,11 +108,11 @@ class ProfileAccountView: UIView {
         loggedInContainerView.isHidden = !isLoggedIn
         loggedInContainerView.layoutMargins = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
         loggedInContainerView.isUserInteractionEnabled = true
-        addSubview(loggedInContainerView)
-        loggedInContainerView.topAnchor.constraint(equalTo: topAnchor).isActive = true
-        loggedInContainerView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-        loggedInContainerView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
-        loggedInContainerView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        contentView.addSubview(loggedInContainerView)
+        loggedInContainerView.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
+        loggedInContainerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
+        loggedInContainerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
+        loggedInContainerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         
         let hasAvatar = false
         
@@ -134,10 +161,16 @@ class ProfileAccountView: UIView {
         emailLabel.minimumScaleFactor = 0.5
         emailLabel.baselineAdjustment = .alignCenters
         loggedInContainerView.addSubview(emailLabel)
-        emailLabel.topAnchor.constraint(equalTo: labelsLayoutGuide.topAnchor).isActive = true
-        emailLabel.leadingAnchor.constraint(equalTo: avatarButton.trailingAnchor, constant: .padding).isActive = true
+        emailLabel.topAnchor.constraint(equalTo: nameLabel.lastBaselineAnchor, constant: .padding / 2).isActive = true
+        emailLabel.leadingAnchor.constraint(equalTo: nameLabel.leadingAnchor).isActive = true
+        emailLabel.bottomAnchor.constraint(equalTo: labelsLayoutGuide.bottomAnchor).isActive = true
         emailLabel.trailingAnchor.constraint(equalTo: loggedInContainerView.layoutMarginsGuide.trailingAnchor).isActive = true
         
-        
+        loggedInControl.translatesAutoresizingMaskIntoConstraints = false
+        loggedInContainerView.addSubview(loggedInControl)
+        loggedInControl.topAnchor.constraint(equalTo: loggedInContainerView.topAnchor).isActive = true
+        loggedInControl.leadingAnchor.constraint(equalTo: loggedInContainerView.leadingAnchor).isActive = true
+        loggedInControl.bottomAnchor.constraint(equalTo: loggedInContainerView.bottomAnchor).isActive = true
+        loggedInControl.trailingAnchor.constraint(equalTo: loggedInContainerView.trailingAnchor).isActive = true
     }
 }

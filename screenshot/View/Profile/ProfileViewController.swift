@@ -51,11 +51,16 @@ class ProfileViewController: UITableViewController {
 //        button.addTarget(self, action: #selector(inviteAction), for: .touchUpInside)
         button.clipsToBounds = true
         view.addSubview(button)
+        button.sizeToFit()
         button.setContentHuggingPriority(.required, for: .vertical)
         button.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor).isActive = true
         button.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor).isActive = true
         button.bottomAnchor.constraint(equalTo: view.layoutMarginsGuide.bottomAnchor).isActive = true
         button.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor).isActive = true
+        
+        var frame = view.frame
+        frame.size.height = button.bounds.height
+        view.frame = frame
         
         return view
     }()
@@ -109,6 +114,14 @@ class ProfileViewController: UITableViewController {
         
         tableView.keyboardDismissMode = .onDrag
         tableView.backgroundColor = .background
+        
+        profileAccountView.loggedInControl.addTarget(self, action: #selector(editProfileFields), for: .touchUpInside)
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        profileAccountView.maxHeight = tableView.bounds.size.height - tableView.contentInset.top - tableView.contentInset.bottom
     }
     
     // MARK: Login
@@ -122,6 +135,33 @@ class ProfileViewController: UITableViewController {
         else {
             data.removeValue(forKey: .logout)
         }
+    }
+    
+    // MARK: Profile
+    
+    private var profileViewHeight: CGFloat = 0
+    
+    @objc private func editProfileFields() {
+        profileAccountView.isExpanded = !profileAccountView.isExpanded
+        
+        UIView.animate(withDuration: .defaultAnimationDuration) {
+            self.profileAccountView.layoutIfNeeded()
+        }
+        
+        // TODO: test jumping. invite button should be auto sized for ios 11
+        let contentOffset: CGPoint = {
+            if #available(iOS 11.0, *) {
+                return CGPoint(x: 0, y: -topLayoutGuide.length)
+            }
+            else {
+                return CGPoint(x: 0, y: -topLayoutGuide.length)
+            }
+        }()
+        
+        tableView.setContentOffset(contentOffset, animated: true)
+        tableView.isScrollEnabled = !profileAccountView.isExpanded
+        tableView.beginUpdates()
+        tableView.endUpdates()
     }
 }
 
@@ -163,9 +203,20 @@ extension ProfileViewController {
         return data[settingsSection]?.count ?? 0
     }
     
-//    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-//        return 0
-//    }
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        if Section.account.rawValue == section {
+            if profileAccountView.isExpanded {
+                return profileAccountView.maxHeight
+            }
+            else {
+                return profileAccountView.minHeight
+            }
+        }
+        else if Section.invite.rawValue == section {
+            return inviteView.bounds.height
+        }
+        return 0
+    }
 
     override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         if [Section.invite.rawValue].contains(section) {
