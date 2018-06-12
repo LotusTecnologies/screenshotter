@@ -203,6 +203,7 @@ extension ProductDetailViewController : UICollectionViewDelegateFlowLayout, UICo
                 
                 if let view = view as? ProductsViewHeaderReusableView {
                     view.filterButton.addTarget(self, action: #selector(presentOptions), for: .touchUpInside)
+                    view.filterButton.isHidden = (self.productLoadingState != .products)
                 }
                 
                 return view
@@ -290,18 +291,30 @@ extension ProductDetailViewController : AsyncOperationMonitorDelegate, FetchedRe
         switch (self.productLoadingState) {
         case .loading, .unknown:
             self.hideNoItemsHelperView()
-            _view.filterButton.isHidden = true
-            self.productCollectionViewManager.startAndAddLoader(view: self.loaderContainer)
             
+            self.productCollectionViewManager.startAndAddLoader(view: self.loaderContainer)
+            self.collectionView?.visibleSupplementaryViews(ofKind: UICollectionElementKindSectionHeader).forEach({ (view) in
+                if let view = view as? ProductsViewHeaderReusableView {
+                    view.filterButton.isHidden = true
+                }
+            })
         case .products:
             self.productCollectionViewManager.stopAndRemoveLoader()
             self.hideNoItemsHelperView()
-            _view.filterButton.isHidden = true
+            self.collectionView?.visibleSupplementaryViews(ofKind: UICollectionElementKindSectionHeader).forEach({ (view) in
+                if let view = view as? ProductsViewHeaderReusableView {
+                    view.filterButton.isHidden = true
+                }
+            })
         case .retry:
             self.productCollectionViewManager.stopAndRemoveLoader()
             self.hideNoItemsHelperView()
             self.showNoItemsHelperView()
-            _view.filterButton.isHidden = true
+            self.collectionView?.visibleSupplementaryViews(ofKind: UICollectionElementKindSectionHeader).forEach({ (view) in
+                if let view = view as? ProductsViewHeaderReusableView {
+                    view.filterButton.isHidden = true
+                }
+            })
         }
     }
     
