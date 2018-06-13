@@ -174,6 +174,10 @@ class ConfirmCodeViewController: UIViewController {
     
     @objc func continueAction() {
         if let code = _view.codeTextField.text {
+            _view.codeTextField.resignFirstResponder()
+            _view.continueButton.isLoading = true
+            _view.continueButton.isUserInteractionEnabled = false
+            _view.codeTextField.isUserInteractionEnabled = false
             SigninManager.shared.confirmSignup(code: code).then(on: .main) { () -> Void in
                     self.delegate?.confirmCodeViewControllerDidConfirm(self)
                 }.catch { (error) in
@@ -192,6 +196,12 @@ class ConfirmCodeViewController: UIViewController {
                             let alert = SigninManager.shared.alertViewForUndefinedError(error: error, viewController: self)
                             self.present(alert, animated: true, completion: nil)
                         }
+                    }
+                }.always {
+                    DispatchQueue.main.async {
+                        self._view.continueButton.isLoading = false
+                        self._view.continueButton.isUserInteractionEnabled = true
+                        self._view.codeTextField.isUserInteractionEnabled = true
                     }
             }
         }

@@ -454,7 +454,8 @@ class RegisterViewController: UIViewController {
             self._view.passwordTextField.isUserInteractionEnabled = false
             self.continueButton.isLoading = true
             self.continueButton.isEnabled = false
-            SigninManager.shared.loginOrCreatAccountAsNeeded(email: email, password: password)
+            let sendMeEmails = self._view.dealsSwitch.isOn
+            SigninManager.shared.loginOrCreatAccountAsNeeded(email: email, password: password, sendMeEmails:sendMeEmails)
             .then { result -> Void in
                 
                 switch result {

@@ -106,8 +106,8 @@ class SigninManager : NSObject {
                                 return Promise.init(value: .createAccountUnconfirmed)
                             })
                         }else{
-                            return self.deleteUnconfirmedAccount(email: email.lowercased()).then(on: .main, execute: { () -> Promise<LoginOrCreateAccountResult> in
-                                return self.createAccount(email: email.lowercased(), password: password)
+                            return self.deleteUnconfirmedAccount(email: email.lowercased()).then(execute: { () -> Promise<LoginOrCreateAccountResult> in
+                                return self.createAccount(email: email.lowercased(), password: password, sendMeEmails: sendMeEmails)
                             })
                         }
                     }
@@ -119,9 +119,8 @@ class SigninManager : NSObject {
         
     }
     private func deleteUnconfirmedAccount(email:String) -> Promise<Void>{
-        return Promise.init(resolvers: { (fulfil, reject) in
-            reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
-        })
+        let poolId = self.pool?.userPoolConfiguration.poolId ?? ""
+        return NetworkingPromise.sharedInstance.deleteAccount(email: email, poolId: poolId)
     }
     private func login(email:String, password:String) -> Promise<LoginOrCreateAccountResult>{
         return Promise<LoginOrCreateAccountResult>.init(resolvers: { (fulfil, reject) in

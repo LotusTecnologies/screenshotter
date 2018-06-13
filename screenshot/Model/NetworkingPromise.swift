@@ -773,6 +773,47 @@ class NetworkingPromise : NSObject {
         }
     }
     
+    
+    func deleteAccount(email:String, poolId:String) -> Promise<Void> {
+        return Promise { fulfill, reject in
+           let stringURL = Constants.screenShotLambdaDomain.appending("user/deleteUnconfirmed")
+            guard let username = email.lowercased().sha1(), let url = URL.init(string: stringURL) else {
+                reject(NSError.init(domain: #file, code: #line, userInfo: nil))
+                return
+            }
+            let params = ["Username":username, "UserPoolId":poolId]
+            let postData = try? JSONSerialization.data(withJSONObject: params, options: [])
+            let postLength = "\(postData == nil ? 0 : postData!.count)"
+            
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            request.addValue(postLength, forHTTPHeaderField: "Content-Length")
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.httpBody = postData
+            
+            let task = URLSession.shared.dataTask(with: request) { (dataOpt, responseOpt, errorOpt) in
+                do {
+                    if let data = dataOpt, let json = try JSONSerialization.jsonObject(with: data) as? [String : Any]  {
+                        if let success = json["success"] as? Bool, success == true {
+                            fulfill(())
+                        }else{
+                            reject(NSError.init(domain: #file, code: #line, userInfo: nil))
+                        }
+                    }else if let error = errorOpt {
+                        reject(error)
+                    }else{
+                        reject(NSError.init(domain: #file, code: #line, userInfo: nil))
+                    }
+                } catch {
+                    reject(error)
+                }
+            }
+            
+            task.resume()
+        }
+        
+    }
+    
     func appSettings() -> Promise<[String : Any]> {
         return Promise { fulfill, reject in
             guard let URL = URL(string: Constants.appSettingsDomain) else {
