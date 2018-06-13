@@ -80,7 +80,7 @@ class ProductsOptionsMask : NSObject {
 }
 
 protocol ProductsOptionsDelegate : NSObjectProtocol {
-    func productsOptionsDidComplete(_ productsOptions: ProductsOptions, withChange changed: Bool)
+    func productsOptionsDidComplete(_ productsOptions: ProductsOptions, withModelChange changed: Bool)
     func productsOptionsDidCancel(_ productsOptions: ProductsOptions)
 }
 
@@ -133,7 +133,6 @@ class ProductsOptions : NSObject {
             let selected = sortPickerView.selectedRow(inComponent: 0)
             sort = ProductsOptionsSort.all[selected]
         }
-            
         
         UserDefaults.standard.set(gender.rawValue, forKey: UserDefaultsKeys.productGender)
         UserDefaults.standard.set(size.rawValue, forKey: UserDefaultsKeys.productSize)
@@ -147,7 +146,7 @@ class ProductsOptions : NSObject {
 //        let sortChanged = previousSort.rawValue != sort.rawValue
         let changed = genderChanged || sizeChanged
         
-        delegate?.productsOptionsDidComplete(self, withChange: changed)
+        delegate?.productsOptionsDidComplete(self, withModelChange: changed)
         
         if changed {
             let changeMap = [
@@ -170,7 +169,6 @@ class ProductsOptions : NSObject {
     }
 }
 
-
 class ProductsOptionsControls : NSObject {
     var categoryControl: UISegmentedControl?
     var genderControl: UISegmentedControl?
@@ -178,7 +176,6 @@ class ProductsOptionsControls : NSObject {
     var saleControl: UISegmentedControl?
     var sortControl: UIControl?
     var sortPickerView: UIPickerView?
-
     
     private var gender: ProductsOptionsGender?
     private var size: ProductsOptionsSize?
@@ -358,13 +355,13 @@ class ProductsOptionsViewController: UIViewController {
     private(set) lazy var saleControl: UISegmentedControl = {
         return self.controls.createSaleControl()
     }()
-    private(set) lazy var sortControl: SegmentedDropDownControl = {
+    private(set) lazy var sortControl: UIControl = {
         return self.controls.createSortControl(pickerViewAnimation: { [weak self] in
             self?.view.layoutIfNeeded()
         })
     }()
     
-    var sortPickerView:UIPickerView? {
+    var sortPickerView: UIPickerView? {
         return self.controls.sortPickerView
     }
 
@@ -596,12 +593,13 @@ enum ProductsOptionsSort: Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol {
         return ProductsOptionsSort(intValue: UserDefaults.standard.integer(forKey: UserDefaultsKeys.productSort))
     }
     
-    static var all =  [
-            ProductsOptionsSort.similar,
-            ProductsOptionsSort.priceAsc,
-            ProductsOptionsSort.priceDes,
-            ProductsOptionsSort.brands
-        ]
+    static let all: [ProductsOptionsSort] = [
+        .similar,
+        .priceAsc,
+        .priceDes,
+        .brands
+    ]
+    
     init(intValue: Int) {
         self = ProductsOptionsSort(rawValue: intValue) ?? .default
     }

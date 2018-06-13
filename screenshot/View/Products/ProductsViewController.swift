@@ -553,7 +553,7 @@ extension ProductsViewControllerOptionsView: ProductsOptionsDelegate {
         self.collectionView?.reloadData()
     }
     
-    func productsOptionsDidComplete(_ productsOptions: ProductsOptions, withChange changed: Bool) {
+    func productsOptionsDidComplete(_ productsOptions: ProductsOptions, withModelChange changed: Bool) {
         self.productsOptions = productsOptions
         if changed, let shoppable = self.getSelectedShoppable(){
             shoppable.set(productsOptions: productsOptions, callback: {

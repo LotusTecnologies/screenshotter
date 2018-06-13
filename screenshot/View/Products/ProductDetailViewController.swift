@@ -273,7 +273,7 @@ extension ProductDetailViewController: ProductsOptionsDelegate {
         dismiss(animated: true)
     }
     
-    func productsOptionsDidComplete(_ productsOptions: ProductsOptions, withChange changed: Bool) {
+    func productsOptionsDidComplete(_ productsOptions: ProductsOptions, withModelChange changed: Bool) {
         self.productsOptions = productsOptions
         updateProductsWithShoppable()
         self.dismissOptions()
