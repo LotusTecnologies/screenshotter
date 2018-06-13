@@ -143,7 +143,8 @@ extension DataModel {
                         source: ScreenshotSource,
                         isHidden: Bool,
                         imageData: Data?,
-                        classification: String?) -> Screenshot {
+                        uploadedImageURL: String?,
+                        syteJsonString: String?) -> Screenshot {
         let screenshotToSave = Screenshot(context: managedObjectContext)
         screenshotToSave.assetId = assetId
         screenshotToSave.createdAt = createdAt
@@ -152,11 +153,10 @@ extension DataModel {
         screenshotToSave.isHidden = isHidden
         screenshotToSave.isNew = true
         screenshotToSave.imageData = imageData
-        
+        screenshotToSave.uploadedImageURL = uploadedImageURL
+        screenshotToSave.syteJson = syteJsonString
+
         screenshotToSave.lastModified = Date()
-        if let classification = classification {
-            screenshotToSave.syteJson = classification // Dual-purposing syteJson field
-        }
         do {
             try managedObjectContext.save()
         } catch {
