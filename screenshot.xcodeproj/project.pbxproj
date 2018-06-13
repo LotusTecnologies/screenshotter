@@ -168,6 +168,9 @@
 		C58FA0F620A95FC300072966 /* TutorialEmailSlideViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0EA20A95FC300072966 /* TutorialEmailSlideViewController.swift */; };
 		C58FA0F720A95FC300072966 /* CampaignPromotionExplanationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0EB20A95FC300072966 /* CampaignPromotionExplanationViewController.swift */; };
 		C58FA0F820A95FC300072966 /* GiftCardDoneViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0EC20A95FC300072966 /* GiftCardDoneViewController.swift */; };
+		C593460720D0F4E300769BB9 /* TextExplanationTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C593460620D0F4E300769BB9 /* TextExplanationTableViewCell.swift */; };
+		C593460920D0F53300769BB9 /* OnboardingGDPRViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C593460820D0F53300769BB9 /* OnboardingGDPRViewController.swift */; };
+		C593460B20D0F5A900769BB9 /* GDPRViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C593460A20D0F5A900769BB9 /* GDPRViewController.swift */; };
 		C5A02E36209841D700CEEF7E /* CheckoutWhatIsCVVWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A02E35209841D700CEEF7E /* CheckoutWhatIsCVVWebViewController.swift */; };
 		C5A1922D2057AD520046303C /* IntrinsicContentSizePresentationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A1922B2057AD510046303C /* IntrinsicContentSizePresentationController.swift */; };
 		C5A1922E2057AD520046303C /* DimmedPresentationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A1922C2057AD510046303C /* DimmedPresentationController.swift */; };
@@ -429,6 +432,9 @@
 		C58FA0EA20A95FC300072966 /* TutorialEmailSlideViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialEmailSlideViewController.swift; sourceTree = "<group>"; };
 		C58FA0EB20A95FC300072966 /* CampaignPromotionExplanationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CampaignPromotionExplanationViewController.swift; sourceTree = "<group>"; };
 		C58FA0EC20A95FC300072966 /* GiftCardDoneViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GiftCardDoneViewController.swift; sourceTree = "<group>"; };
+		C593460620D0F4E300769BB9 /* TextExplanationTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextExplanationTableViewCell.swift; sourceTree = "<group>"; };
+		C593460820D0F53300769BB9 /* OnboardingGDPRViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingGDPRViewController.swift; sourceTree = "<group>"; };
+		C593460A20D0F5A900769BB9 /* GDPRViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GDPRViewController.swift; sourceTree = "<group>"; };
 		C5A02E35209841D700CEEF7E /* CheckoutWhatIsCVVWebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutWhatIsCVVWebViewController.swift; sourceTree = "<group>"; };
 		C5A1922B2057AD510046303C /* IntrinsicContentSizePresentationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IntrinsicContentSizePresentationController.swift; sourceTree = "<group>"; };
 		C5A1922C2057AD510046303C /* DimmedPresentationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DimmedPresentationController.swift; sourceTree = "<group>"; };
@@ -914,6 +920,7 @@
 				C50DBB8D207CC56000BB206E /* CardTableViewCell.swift */,
 				C5E6C31B208F46A5006E9C54 /* TableViewCell.swift */,
 				C54088451FE90E2200198955 /* TextFieldTableViewCell.swift */,
+				C593460620D0F4E300769BB9 /* TextExplanationTableViewCell.swift */,
 			);
 			path = TableViewCell;
 			sourceTree = "<group>";
@@ -1035,6 +1042,7 @@
 				C58FA0E320A95FC200072966 /* CampaignPromotionViewController.swift */,
 				C58FA0E920A95FC300072966 /* GiftCardCampaignViewController.swift */,
 				C58FA0EC20A95FC300072966 /* GiftCardDoneViewController.swift */,
+				C593460820D0F53300769BB9 /* OnboardingGDPRViewController.swift */,
 				C572C0D720AADA98004B0A17 /* OnboardingWelcomeViewController.swift */,
 				C58FA0EA20A95FC300072966 /* TutorialEmailSlideViewController.swift */,
 				C58FA0E820A95FC300072966 /* TutorialNavigationController.swift */,
@@ -1128,6 +1136,7 @@
 			isa = PBXGroup;
 			children = (
 				C5F53D8D2014A592003A57EC /* LegalViewControllerFactory.swift */,
+				C593460A20D0F5A900769BB9 /* GDPRViewController.swift */,
 			);
 			path = Legal;
 			sourceTree = "<group>";
@@ -1508,6 +1517,7 @@
 				31CE11022039570B000156EE /* FetchedResultsControllerManager.swift in Sources */,
 				523CA4861F5EF93300873D78 /* UserDefaultsKeys.swift in Sources */,
 				E4D644311F66D0FE00F5AA48 /* AppDelegate.swift in Sources */,
+				C593460720D0F4E300769BB9 /* TextExplanationTableViewCell.swift in Sources */,
 				C553563C1F8369DF00849E64 /* DeviceHelper.swift in Sources */,
 				C540880D1FE90C8E00198955 /* Loader.swift in Sources */,
 				C5709E451FC57B4500AB2D04 /* EnumProtocol.swift in Sources */,
@@ -1627,6 +1637,7 @@
 				C58FA0ED20A95FC300072966 /* TutorialVideoOverlayView.swift in Sources */,
 				31CE11002035AC44000156EE /* UIApplication+openInChrome.swift in Sources */,
 				C5D57936203F044B00A076FE /* EmptyListController.swift in Sources */,
+				C593460B20D0F5A900769BB9 /* GDPRViewController.swift in Sources */,
 				C5406A87206B9BB2002977CE /* DynamicTypeAccessibilityLayout.swift in Sources */,
 				C50DBB8A207CA36600BB206E /* CheckoutOrderView.swift in Sources */,
 				C57E93A9204BEE4E0069C378 /* OpenWebPage.swift in Sources */,
@@ -1658,6 +1669,7 @@
 				C540880E1FE90C8E00198955 /* LoadingViewController.swift in Sources */,
 				31C0C81F20A2CD14002EE95B /* ProductsOptions.swift in Sources */,
 				E4859E19203044E100A26985 /* ScreenshotDisplayViewController.swift in Sources */,
+				C593460920D0F53300769BB9 /* OnboardingGDPRViewController.swift in Sources */,
 				C572C0D820AADA98004B0A17 /* OnboardingWelcomeViewController.swift in Sources */,
 				C50DBB7D207B398100BB206E /* CheckoutOrderViewController.swift in Sources */,
 				5273E3811F7ACE0300C832F8 /* Analytics.swift in Sources */,
