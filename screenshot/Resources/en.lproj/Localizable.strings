@@ -169,6 +169,7 @@
 "gdpr.onboarding.subtitle" = "You can change these any time in the settings page of the app";
 "gdpr.onboarding.edit" = "Manage Settings";
 "gdpr.onboarding.continue" = "Accept and Continue";
+"gdpr.title" = "Privacy Settings";
 
 "generic.buy" = "BUY";
 "generic.cancel" = "Cancel";

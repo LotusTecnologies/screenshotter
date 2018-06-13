@@ -36,6 +36,7 @@ class TextExplanationTableViewCell: UITableViewCell {
         selectedIndicatorButton.setBackgroundImage(UIImage(named: "TextExplanationSelectedCheck"), for: .selected)
         selectedIndicatorButton.isUserInteractionEnabled = false
         contentView.addSubview(selectedIndicatorButton)
+        selectedIndicatorButton.setContentCompressionResistancePriority(.required, for: .horizontal)
         selectedIndicatorButton.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor).isActive = true
         selectedIndicatorButton.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
         
@@ -50,7 +51,7 @@ class TextExplanationTableViewCell: UITableViewCell {
         titleLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
         
         selectableAppearanceConstraints += [
-            titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: selectedIndicatorButton.leadingAnchor, constant: contentView.layoutMargins.left)
+            titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: selectedIndicatorButton.leadingAnchor, constant: -contentView.layoutMargins.left)
         ]
         unselectableAppearanceConstraints += [
             titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: contentView.layoutMarginsGuide.trailingAnchor)
@@ -81,6 +82,7 @@ class TextExplanationTableViewCell: UITableViewCell {
         ]
         
         syncSelectableAppearance()
+        syncSelectableText()
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -101,12 +103,16 @@ class TextExplanationTableViewCell: UITableViewCell {
         selectedLabel.isHidden = !hasSelectableAppearance
     }
     
+    private func syncSelectableText() {
+        selectedLabel.text = isSelected ? "text_explanation.enabled".localized : "text_explanation.disabled".localized
+    }
+    
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
         
         selectedLabel.textColor = selected ? .crazeGreen : .gray8
-        selectedLabel.text = selected ? "text_explanation.enabled".localized : "text_explanation.disabled".localized
         selectedIndicatorButton.isSelected = selected
+        syncSelectableText()
     }
     
     override func setHighlighted(_ highlighted: Bool, animated: Bool) {

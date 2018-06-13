@@ -47,14 +47,6 @@ class ScreenshotsNavigationController: UINavigationController {
         super.viewDidLoad()
         self.view.backgroundColor = .background
     }
-    
-    // !!!: DEBUG
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        
-        let vc = OnboardingGDPRViewController()
-        present(vc, animated: true)
-    }
 }
 
 extension ScreenshotsNavigationController: ViewControllerLifeCycle {
