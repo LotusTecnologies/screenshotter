@@ -126,6 +126,14 @@ class OnboardingGDPRViewController: UIViewController {
         return _view.tableView
     }
     
+    var editButton: UIButton {
+        return _view.editButton
+    }
+    
+    var continueButton: UIButton {
+        return _view.continueButton
+    }
+    
     override func loadView() {
         view = classForView.self.init()
     }
@@ -139,7 +147,7 @@ class OnboardingGDPRViewController: UIViewController {
         tableView.delegate = self
         tableView.register(TextExplanationTableViewCell.self, forCellReuseIdentifier: "cell")
         
-        _view.editButton.addTarget(self, action: #selector(editAction), for: .touchUpInside)
+        editButton.addTarget(self, action: #selector(editAction), for: .touchUpInside)
     }
     
     deinit {
