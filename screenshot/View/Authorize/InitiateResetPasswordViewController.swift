@@ -171,7 +171,22 @@ class InitiateResetPasswordViewController: UIViewController {
                 .then(on: .main) { () -> Void in
                     self.delegate?.initiateResetPasswordViewControllerDidReset(self)
                 }.catch { (error) in
-                    
+                    DispatchQueue.main.async {
+                        let error = error as NSError
+                        if SigninManager.shared.isNoInternetError(error: error) {
+                            let alert = SigninManager.shared.alertViewForNoInternet()
+                            self.present(alert, animated: true, completion: nil)
+                        }else if SigninManager.shared.isNoAccountWithEmailError(error: error) {
+                            let alert = SigninManager.shared.alertViewForNoAccountWithEmail()
+                            self.present(alert, animated: true, completion: nil)
+                        }else if SigninManager.shared.isCantSendEmailError(error: error) {
+                            let alert = SigninManager.shared.alertViewForCantSendEmail(email: email)
+                            self.present(alert, animated: true, completion: nil)
+                        }else {
+                            let alert = SigninManager.shared.alertViewForUndefinedError(error: error, viewController: self)
+                            self.present(alert, animated: true, completion: nil)
+                        }
+                    }
                 }.always {
                     self.continueButton.isLoading = false
                     self.continueButton.isEnabled = true

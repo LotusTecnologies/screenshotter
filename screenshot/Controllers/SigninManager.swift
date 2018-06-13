@@ -20,26 +20,10 @@ class SigninManager : NSObject {
         case createAccountUnconfirmed
         case createAccountConfirmed
     }
-    enum SigninManagerError : Error {
-        case error(NSError)
-        case noInternet(NSError)
-        case notSetup
-    // Sign in error
-        case authenticationFailed // wrong password or code
-    // SignUpError
-        case errorIllegalArgument //For creating an account the password must be at least x digits long etc
-    }
-
     static let shared = SigninManager()
 
-    var userAccountsCreatedByApp:[String] {
-        get {
-            if let array = UserDefaults.standard.object(forKey: UserDefaultsKeys.userAccountsCreatedByDevice) as? [String] {
-                return array
-            }
-            return []
-        }
-        set {
+    var userAccountsCreatedByApp:[String] = UserDefaults.standard.object(forKey: UserDefaultsKeys.userAccountsCreatedByDevice) as? [String] ?? [] {
+        didSet{
             UserDefaults.standard.setValue(userAccountsCreatedByApp, forKey: UserDefaultsKeys.userAccountsCreatedByDevice)
         }
     }
@@ -81,23 +65,8 @@ class SigninManager : NSObject {
         return handled
     }
     
-    public func nserrorToSigninManagerError(_ error:NSError) ->SigninManagerError {
-        // check if problem is no internet. etc
-        if error.domain == AWSCognitoErrorDomain{
-            if let code = AWSCognitoErrorType.init(rawValue: error.code) {
-                if code == .errorTimedOutWaitingForInFlightSync || code == .errorWiFiNotAvailable {
-                    return SigninManagerError.noInternet(error)
-                }else if code == .errorIllegalArgument {
-                    return SigninManagerError.errorIllegalArgument
-                }else if code == .authenticationFailed {
-                    return SigninManagerError.authenticationFailed
-                }
-            }
-        }else if error.domain == NSURLErrorDomain {
-            return SigninManagerError.noInternet(error)
-        }
-        return SigninManagerError.error(error)
-    }
+   
+    
     
     public func loginWithFacebook()  -> Promise<Void>{
         return Promise<Void>.init(resolvers: { (fulfil, reject) in
@@ -109,11 +78,10 @@ class SigninManager : NSObject {
                         self.userCredential = credentials
                         fulfil(())
                     }else{
-                        reject(SigninManagerError.notSetup)
-
+                        reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
                     }
                 }else{
-                    reject(SigninManagerError.notSetup)
+                    reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
                 }
             })
         })
@@ -123,9 +91,9 @@ class SigninManager : NSObject {
 //        AWSSignInManager.sharedInstance().login(signInProviderKey: <#T##String#>, completionHandler: <#T##(Any?, Error?) -> Void#>)
 //    }
     
-    public func loginOrCreatAccountAsNeeded(email:String, password:String) -> Promise<LoginOrCreateAccountResult> {
+    public func loginOrCreatAccountAsNeeded(email:String, password:String, sendMeEmails:Bool) -> Promise<LoginOrCreateAccountResult> {
         
-        return createAccount(email:email.lowercased(), password: password).recover(execute: { (error) -> Promise<SigninManager.LoginOrCreateAccountResult> in
+        return createAccount(email:email.lowercased(), password: password, sendMeEmails:sendMeEmails).recover(execute: { (error) -> Promise<SigninManager.LoginOrCreateAccountResult> in
             let nsError = error as NSError
             let usernameExistsException = 37
             if nsError.code == usernameExistsException && nsError.domain == AWSCognitoIdentityProviderErrorDomain {
@@ -152,7 +120,7 @@ class SigninManager : NSObject {
     }
     private func deleteUnconfirmedAccount(email:String) -> Promise<Void>{
         return Promise.init(resolvers: { (fulfil, reject) in
-            reject(SigninManagerError.notSetup)
+            reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
         })
     }
     private func login(email:String, password:String) -> Promise<LoginOrCreateAccountResult>{
@@ -175,17 +143,19 @@ class SigninManager : NSObject {
                 
                 
             }else{
-                reject(SigninManagerError.notSetup)
+                reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
             }
         })
     }
     
-    private func createAccount(email:String, password:String) -> Promise<LoginOrCreateAccountResult>{
+    private func createAccount(email:String, password:String, sendMeEmails:Bool) -> Promise<LoginOrCreateAccountResult>{
         return Promise<LoginOrCreateAccountResult>.init(resolvers: { (fulfil, reject) in
             let email = email.lowercased()
             let emailAttribute = AWSCognitoIdentityUserAttributeType.init(name: "email", value: email)
+            let sendMeEmailsAttribute = AWSCognitoIdentityUserAttributeType.init(name: "custom:SendMeEmails", value: sendMeEmails.toStringLiteral())
+
             if let pool = self.pool, let userName = email.sha1() {
-                pool.signUp(userName, password: password, userAttributes: [emailAttribute], validationData: nil).continueWith(executor: AWSExecutor.mainThread(), block: { (task) -> Any? in
+                pool.signUp(userName, password: password, userAttributes: [emailAttribute, sendMeEmailsAttribute], validationData: nil).continueWith(executor: AWSExecutor.mainThread(), block: { (task) -> Any? in
                     if let error = task.error  {
                         reject(error)
                     }else if let user = task.result?.user {
@@ -197,13 +167,12 @@ class SigninManager : NSObject {
                             fulfil(LoginOrCreateAccountResult.createAccountUnconfirmed)
                         }
                     }else{
-                        //shouldn't happen
-                        reject(SigninManagerError.notSetup)
+                        reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
                     }
                     return nil
                 })
             }else{
-                reject(SigninManagerError.notSetup)
+                reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
             }
         })
     }
@@ -233,14 +202,14 @@ class SigninManager : NSObject {
                 user.confirmSignUp(code, forceAliasCreation: true).continueWith(executor: AWSExecutor.mainThread(), block: { (task) -> Any? in
                     if let error = task.error  {
                         let nserror = error as NSError
-                        reject(self.nserrorToSigninManagerError(nserror))
+                        reject(nserror)
                     }else{
                         fulfill(())
                     }
                     return nil
                 })
             }else{
-                reject(SigninManagerError.notSetup)
+                reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
             }
             
         }
@@ -262,7 +231,7 @@ class SigninManager : NSObject {
                     return nil
                 })
             }else{
-                reject(SigninManagerError.notSetup)
+                reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
             }
         }
     }
@@ -289,10 +258,8 @@ class SigninManager : NSObject {
                     return nil
                 })
             }else{
-                reject(SigninManagerError.errorIllegalArgument)
-            }
-            
-            fulfill(())
+                reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+            }            
         }
     }
     
@@ -308,7 +275,7 @@ class SigninManager : NSObject {
                     return nil
                 })
             }else{
-                reject(SigninManagerError.notSetup)
+                reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
             }
         }
     }
@@ -325,5 +292,99 @@ class SigninManager : NSObject {
                 }
             })
         }
+    }
+}
+
+extension SigninManager {
+    public func isNoInternetError( error:NSError) ->Bool {
+        if error.domain == AWSCognitoErrorDomain{
+            if let code = AWSCognitoErrorType.init(rawValue: error.code) {
+                if code == .errorTimedOutWaitingForInFlightSync || code == .errorWiFiNotAvailable {
+                    return true
+                }
+            }
+        }else if error.domain == NSURLErrorDomain {
+            return true
+        }
+        return  false
+    }
+    func alertViewForNoInternet() -> UIAlertController{
+        let alert = UIAlertController.init(title: nil, message: "authorize.error.noInternet".localized, preferredStyle: .alert)
+        alert.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .default, handler: nil))
+        return alert
+    }
+    func alertViewForUndefinedError(error:NSError, viewController:UIViewController) -> UIAlertController {
+        let alert = UIAlertController.init(title: "generic.error".localized, message: "authorize.error.undefined".localized, preferredStyle: .alert)
+        alert.addAction(UIAlertAction.init(title: "authorize.error.undefined.contactSupport".localized, style: .default, handler: { (a) in
+            let recipient = "support@screenshopit.com"
+            let subject = "unable to login"
+            let userInfoJson:String = {
+                if let userinfoJsonData = try? JSONSerialization.data(withJSONObject: error.userInfo, options: []), let s = String.init(data: userinfoJsonData, encoding: .utf8) {
+                    return s
+                }
+                return "{}"
+            }()
+
+            let body = "Please help me. I’m getting this weirdo error: \(String.init(describing: viewController)) Domain: \(error.domain) Code: \(error.code) \(userInfoJson). I don’t know what this means, because I am not a programmer. But ya’ll should be able to help me."
+            let gmailMessage = body
+            viewController.presentMail(recipient: recipient, gmailMessage: gmailMessage, subject: subject, message: body)
+        }))
+        alert.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .cancel, handler: nil))
+        return alert
+    }
+    public func isBadCodeError( error:NSError) ->Bool {
+        if error.code == AWSCognitoIdentityProviderErrorType.codeMismatch.rawValue && error.domain == AWSCognitoIdentityProviderErrorDomain {
+            return true
+        }else if error.code == AWSCognitoIdentityProviderErrorType.expiredCode.rawValue && error.domain == AWSCognitoIdentityProviderErrorDomain {
+            return true
+        }
+        return  false
+    }
+    func alertViewForBadCode()  -> UIAlertController {
+        let alert = UIAlertController.init(title: nil, message: "authorize.error.badCode".localized, preferredStyle: .alert)
+        alert.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .cancel, handler: nil))
+        return alert
+    }
+    public func isNoAccountWithEmailError( error:NSError) ->Bool {
+        if error.code == AWSCognitoIdentityProviderErrorType.userNotFound.rawValue, error.domain == AWSCognitoIdentityProviderErrorDomain {
+            return true
+        }
+        return  false
+    }
+    func alertViewForNoAccountWithEmail() -> UIAlertController  {
+        let alert = UIAlertController.init(title: nil, message: "authorize.error.NoAccountWithEmail".localized, preferredStyle: .alert)
+        alert.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .cancel, handler: nil))
+
+        return alert
+    }
+    public func isCantSendEmailError( error:NSError) ->Bool {
+        if error.code == AWSCognitoIdentityProviderErrorType.invalidParameter.rawValue, error.domain == AWSCognitoIdentityProviderErrorDomain,  let message = error.userInfo["message"] as? String, message == "Invalid email address format." {
+            return true
+        }else if error.code == AWSCognitoIdentityProviderErrorType.codeDeliveryFailure.rawValue && error.domain == AWSCognitoIdentityProviderErrorDomain {
+               return true
+        }
+
+        return  false
+    }
+    func alertViewForCantSendEmail(email:String) -> UIAlertController  {
+        let alert = UIAlertController.init(title: nil, message: "authorize.error.cantSendMail".localized(withFormat: email), preferredStyle: .alert)
+        alert.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .cancel, handler: nil))
+        
+        return alert
+    }
+    
+    public func isWrongPasswordError( error:NSError) ->Bool {
+        if error.code == AWSCognitoIdentityProviderErrorType.invalidPassword.rawValue && error.domain == AWSCognitoIdentityProviderErrorDomain {
+            return true
+        }else if error.code == AWSCognitoIdentityProviderErrorType.invalidParameter.rawValue, error.domain == AWSCognitoIdentityProviderErrorDomain, let message = error.userInfo["message"] as? String, message.contains("password") {
+            return true
+        }
+        return  false
+    }
+    func alertViewForWrongPassword() -> UIAlertController  {
+        let alert = UIAlertController.init(title: nil, message: "authorize.error.wrongPassword".localized, preferredStyle: .alert)
+        alert.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .cancel, handler: nil))
+        
+        return alert
     }
 }

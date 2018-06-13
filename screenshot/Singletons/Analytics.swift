@@ -437,6 +437,7 @@ class AnalyticsTrackers : NSObject {
     class AmplitudeAnalyticsTracker : NSObject, AnalyticsTracker {
         func track(_ event: String, properties: [AnyHashable : Any]?, sendEvenIfAdvertisingTrackingIsOptOut: Bool?) {
             if  ASIdentifierManager.shared().isAdvertisingTrackingEnabled || sendEvenIfAdvertisingTrackingIsOptOut == true {
+
                 Amplitude.instance().logEvent(event, withEventProperties: properties)
             }
         }

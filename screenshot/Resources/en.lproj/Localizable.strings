@@ -48,7 +48,7 @@
 "authorize.register.password" = "Password";
 "authorize.register.confirmation.message" = "You are now a\nScreenshop user.";
 "authorize.register.confirmation.title" = "Welcome!";
-
+"authorize.register.skipConfirm" = "Are you sure you want to skip? Your account won’t be created.";
 "authorize.confirm.title" = "Confirm Email";
 "authorize.confirm.code" = "Enter Code";
 "authorize.confirm.explaination" = "An email was sent to %@.\nPlease enter the code that you recieved in the email.";
@@ -62,7 +62,14 @@
 "authorize.reset_password.explanation" = "An email was sent to %@.\nEnter the code you recieved and a new password.";
 
 "authorize.error.passwordInvalid" = "password must be at least 8 characters long.";
-
+"authorize.error.noInternet" = "Unable to login. Check your connection and try again.";
+"authorize.error.undefined" = "Something weird happened. Sorry about that, try again.";
+"authorize.error.undefined.contactSupport" = "Contact Support";
+"authorize.error.badCode" = "Incorrect code";
+"authorize.error.badPassword" = "No account associated with that email address";
+"authorize.error.cantSendMail" = "We were unable to send an email to the address %@. Please make sure you entered it correctly.";
+"authorize.error.NoAccountWithEmail" = "No account associated with that email address";
+"authorize.error.wrongPassword" = "Password and email address don’t match";
 
 "cart.checkout.button" = "Checkout";
 "cart.checkout.total" = "Total: %@";
@@ -219,6 +226,7 @@
 "generic.done" = "Done";
 "generic.dont_save" = "Don't Save";
 "generic.edit" = "Edit";
+"generic.error" = "Error";
 "generic.enabled" = "Enabled";
 "generic.later" = "Later";
 "generic.no" = "No";

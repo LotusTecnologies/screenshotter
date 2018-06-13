@@ -172,14 +172,26 @@ class ConfirmCodeViewController: UIViewController {
     
     // MARK: Actions
     
-    @objc private func continueAction() {
+    @objc func continueAction() {
         if let code = _view.codeTextField.text {
             SigninManager.shared.confirmSignup(code: code).then(on: .main) { () -> Void in
-                self.delegate?.confirmCodeViewControllerDidConfirm(self)
+                    self.delegate?.confirmCodeViewControllerDidConfirm(self)
                 }.catch { (error) in
-                    DispatchQueue.mainAsyncIfNeeded {
-                        let error = SigninManager.shared.nserrorToSigninManagerError(error as NSError)
-
+                    DispatchQueue.main.async {
+                        let error = error as NSError
+                        if SigninManager.shared.isNoInternetError(error: error) {
+                            let alert = SigninManager.shared.alertViewForNoInternet()
+                            self.present(alert, animated: true, completion: nil)
+                        }else if SigninManager.shared.isBadCodeError(error: error) {
+                            let alert = SigninManager.shared.alertViewForBadCode()
+                            self.present(alert, animated: true, completion: nil)
+                        }else if SigninManager.shared.isCantSendEmailError(error: error), let email = self.email {
+                            let alert = SigninManager.shared.alertViewForCantSendEmail(email: email)
+                            self.present(alert, animated: true, completion: nil)
+                        }else {
+                            let alert = SigninManager.shared.alertViewForUndefinedError(error: error, viewController: self)
+                            self.present(alert, animated: true, completion: nil)
+                        }
                     }
             }
         }

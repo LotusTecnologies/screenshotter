@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import MessageUI
 import PromiseKit
 import Whisper
 
@@ -862,36 +861,8 @@ extension SettingsViewController : VideoDisplayingViewControllerDelegate {
 
 // MARK: - Mail
 
-extension SettingsViewController : MFMailComposeViewControllerDelegate {
+extension SettingsViewController  {
   
-   
-    func presentMail(recipient:String, gmailMessage:String, subject:String, message:String ){
-        if MFMailComposeViewController.canSendMail() {
-            let mail = MFMailComposeViewController()
-            mail.mailComposeDelegate = self
-            mail.setSubject(subject)
-            mail.setMessageBody(message, isHTML: false)
-            mail.setToRecipients([recipient])
-            present(mail, animated: true, completion: nil)
-            
-        } else if let url = URL.googleMailUrl(to: recipient, body: gmailMessage, subject: subject), UIApplication.shared.canOpenURL(url) {
-            UIApplication.shared.open(url, options: [:], completionHandler: nil)
-            
-        } else {
-            let alertController = UIAlertController(title: "email.setup.title".localized, message: "email.setup.message".localized, preferredStyle: .alert)
-            alertController.addAction(UIAlertAction(title: "generic.later".localized, style: .cancel, handler: nil))
-            
-            if let mailURL = URL(string: "message://"), UIApplication.shared.canOpenURL(mailURL) {
-                alertController.addAction(UIAlertAction(title: "generic.setup".localized, style: .default, handler: { action in
-                    UIApplication.shared.open(mailURL, options: [:], completionHandler: nil)
-                }))
-            }
-            
-            present(alertController, animated: true, completion: nil)
-        }
-        
-    }
-    
     func presentMailComposerForContactUs(){
         let recipient = "Info+\(Bundle.displayVersionBuild)@screenshopit.com"
         self.presentMail(recipient: recipient, gmailMessage: "", subject: "To Screenshop:", message: "")
@@ -912,9 +883,6 @@ extension SettingsViewController : MFMailComposeViewControllerDelegate {
         self.presentMail(recipient: recipient, gmailMessage: gmailMessage, subject: subject, message: message)
     }
     
-    func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
-        dismiss(animated: true, completion: nil)
-    }
 }
 
 // MARK: - Permissions

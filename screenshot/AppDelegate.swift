@@ -95,7 +95,30 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         })
     }
-    
+    func codeForConfirmCodeUrl(_ url:URL) -> String? {
+        let absoluteString = url.absoluteString
+        if absoluteString.hasPrefix("screenshop://validate"), let components = URLComponents.init(string: absoluteString), let queryItems = components.queryItems {
+            for queryItem in queryItems {
+                if queryItem.name == "code" {
+                    return queryItem.value
+                }
+            }
+        }
+        return nil
+    }
+    func isConfirmCodeUrl(_ url:URL) ->Bool {
+        return self.codeForConfirmCodeUrl(url) != nil
+     
+    }
+    func executeConfirmCodeUrl(_ url:URL){
+        if let code = codeForConfirmCodeUrl(url) {
+            if let confirmVC = AppDelegate.shared.window?.rootViewController?.childViewControllers.last as? ConfirmCodeViewController {
+                confirmVC._view.codeTextField.text = code
+                confirmVC.continueAction()
+            }
+        }
+        
+    }
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         ApplicationStateModel.sharedInstance.applicationState = application.applicationState
         
@@ -119,6 +142,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             
             if self.isSendToDebugURL(url) {
                 self.sendDebugDataToDebugApp(url:url)
+                return true
+            }
+            if self.isConfirmCodeUrl(url) {
+                self.executeConfirmCodeUrl(url)
                 return true
             }
         }

@@ -216,12 +216,17 @@ class ResetPasswordViewController: UIViewController {
                     self.delegate?.resetPasswordViewControllerDidReset(self)
                 }.catch { (error) in
                     DispatchQueue.main.async {
-                        let alertController = UIAlertController(title: error.localizedDescription, message: nil, preferredStyle: .alert)
-                        alertController.addAction(UIAlertAction(title: "generic.ok".localized, style: .cancel, handler: { alertAction in
-                            
-                        }))
-                        self.present(alertController, animated: true)
-                        
+                        let error = error as NSError
+                        if SigninManager.shared.isNoInternetError(error: error) {
+                            let alert = SigninManager.shared.alertViewForNoInternet()
+                            self.present(alert, animated: true, completion: nil)
+                        }else if SigninManager.shared.isBadCodeError(error: error){
+                            let alert = SigninManager.shared.alertViewForBadCode()
+                            self.present(alert, animated: true, completion: nil)
+                       }else {
+                            let alert = SigninManager.shared.alertViewForUndefinedError(error: error, viewController: self)
+                            self.present(alert, animated: true, completion: nil)
+                        }
                     }
                 }.always(on: .main) {
                     self._view.continueButton.isEnabled = true

@@ -53,23 +53,29 @@ class RegisterView: UIScrollView {
                 NSLayoutConstraint.activate(showForgotPasswordConstraints)
             }
             
-            CATransaction.begin()
-            CATransaction.setAnimationDuration(duration)
-            CATransaction.setAnimationTimingFunction(CAMediaTimingFunction(name: curve))
-            
-            UIView.animateKeyframes(withDuration: duration, delay: 0, options: .init(rawValue: 0), animations: {
-                UIView.addKeyframe(withRelativeStartTime: startTime, relativeDuration: 0.5, animations: {
-                    self.forgotPasswordButton.alpha = self.isForgotPasswordButtonHidden ? 0 : 1
+            if self.window == nil {
+                self.forgotPasswordButton.alpha = self.isForgotPasswordButtonHidden ? 0 : 1
+                self.layoutSubviews()
+            }else{
+                CATransaction.begin()
+                CATransaction.setAnimationDuration(duration)
+                CATransaction.setAnimationTimingFunction(CAMediaTimingFunction(name: curve))
+                
+                UIView.animateKeyframes(withDuration: duration, delay: 0, options: .init(rawValue: 0), animations: {
+                    UIView.addKeyframe(withRelativeStartTime: startTime, relativeDuration: 0.5, animations: {
+                        self.forgotPasswordButton.alpha = self.isForgotPasswordButtonHidden ? 0 : 1
+                    })
+                    UIView.addKeyframe(withRelativeStartTime: 0, relativeDuration: 1, animations: {
+                        self.layoutSubviews()
+                    })
                 })
-                UIView.addKeyframe(withRelativeStartTime: 0, relativeDuration: 1, animations: {
-                    self.layoutSubviews()
-                })
-            })
-            
-            let animation = CABasicAnimation(keyPath: "shadowPath")
-            contentView.layer.add(animation, forKey: animation.keyPath)
-            
-            CATransaction.commit()
+                
+                let animation = CABasicAnimation(keyPath: "shadowPath")
+                contentView.layer.add(animation, forKey: animation.keyPath)
+                
+                CATransaction.commit()
+            }
+           
         }
     }
     
@@ -438,7 +444,8 @@ class RegisterViewController: UIViewController {
         let hasValidEmail = emailFormRow.isValid()
         let hasValidPassword = isPasswordValid(_view.passwordTextField.text)
         
-        if hasValidEmail && hasValidPassword,
+        if hasValidEmail,
+//            hasValidPassword,
             let email = self.email,
             let password = _view.passwordTextField.text,
             self.continueButton.isLoading == false
@@ -458,11 +465,27 @@ class RegisterViewController: UIViewController {
                 }
             }
             .catch { error in
-                self._view.emailTextField.isInvalid = true
-                self._view.passwordTextField.isInvalid = true
-                self._view.isForgotPasswordButtonHidden = false
-                ActionFeedbackGenerator().actionOccurred(.nope)
-
+                DispatchQueue.main.async {
+                 
+                    self._view.emailTextField.isInvalid = true
+                    self._view.passwordTextField.isInvalid = true
+                    self._view.isForgotPasswordButtonHidden = false
+                    ActionFeedbackGenerator().actionOccurred(.nope)
+                    let error = error as NSError
+                    if SigninManager.shared.isNoInternetError(error: error) {
+                        let alert = SigninManager.shared.alertViewForNoInternet()
+                        self.present(alert, animated: true, completion: nil)
+                    }else if SigninManager.shared.isCantSendEmailError(error: error) {
+                        let alert = SigninManager.shared.alertViewForCantSendEmail(email: email)
+                        self.present(alert, animated: true, completion: nil)
+                    }else if SigninManager.shared.isWrongPasswordError(error: error) {
+                        let alert = SigninManager.shared.alertViewForWrongPassword()
+                        self.present(alert, animated: true, completion: nil)
+                    }else {
+                        let alert = SigninManager.shared.alertViewForUndefinedError(error: error, viewController: self)
+                        self.present(alert, animated: true, completion: nil)
+                    }
+                }
                 
                
             }.always {
@@ -486,9 +509,25 @@ class RegisterViewController: UIViewController {
     }
     
     @objc fileprivate func skipRegistration() {
-        Analytics.trackSubmittedBlankEmail()
-        delegate?.registerViewControllerDidSkip(self)
+        func skip() {
+            Analytics.trackSubmittedBlankEmail()
+            delegate?.registerViewControllerDidSkip(self)
+
+        }
+        if let password = _view.passwordTextField.text, password.lengthOfBytes(using: .utf8) > 0, let email = _view.emailTextField.text, email.lengthOfBytes(using: .utf8) > 0{
+            skip()
+        }else{
+            let alert = UIAlertController.init(title: nil, message: "authorize.register.skipConfirm".localized, preferredStyle: .alert)
+            alert.addAction(UIAlertAction.init(title: "generic.cancel".localized, style: .cancel, handler: nil))
+            alert.addAction(UIAlertAction.init(title: "generic.skip".localized, style: .default, handler: { (a) in
+                skip()
+            }))
+
+            self.present(alert, animated: true, completion: nil)
+        }
     }
+    
+    
     
     // MARK: Forgot
     
