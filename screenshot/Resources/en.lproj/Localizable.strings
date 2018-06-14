@@ -199,6 +199,9 @@
 "notification.screenshot.shoppable" = "Your screenshot is shoppable in the screenshot tab";
 "notification.title" = "Ready to shop?";
 
+"onboarding.details.avatar.camera" = "Take a Photo";
+"onboarding.details.avatar.gallery" = "Upload From Gallery";
+
 "onboarding.welcome.content" = "Take a screenshot.\nShop it.";
 "onboarding.welcome.continue" = "Get Started";
 "onboarding.welcome.header" = "Welcome to";

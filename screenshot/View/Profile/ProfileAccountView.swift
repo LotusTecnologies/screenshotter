@@ -11,6 +11,7 @@ import UIKit
 protocol ProfileAccountViewDelegate: NSObjectProtocol {
     func profileAccountViewWantsToContract(_ view: ProfileAccountView)
     func profileAccountViewWantsToExpand(_ view: ProfileAccountView)
+    func profileAccountViewPresentImagePickerInViewController(_ view: ProfileAccountView) -> UIViewController
 }
 
 class ProfileAccountView: UIView {
@@ -19,6 +20,7 @@ class ProfileAccountView: UIView {
     let contentView = UIView()
     private let loggedInContainerView = UIImageView()
     private let loggedInControl = UIControl()
+    private let avatarButton = RoundButton()
     private let nameLabel = UILabel()
     private let nameTextField = UnderlineTextField()
     private let emailLabel = UILabel()
@@ -31,6 +33,8 @@ class ProfileAccountView: UIView {
     private var contractedConstraints: [NSLayoutConstraint] = []
     private var expandedConstraints: [NSLayoutConstraint] = []
     
+    private let emailFormRow = FormRow.Email()
+    
     var isLoggedIn = false {
         didSet {
             loggedOutContainerView.isHidden = isLoggedIn
@@ -38,22 +42,42 @@ class ProfileAccountView: UIView {
         }
     }
     
-    var name: String? {
+    var avatar: UIImage? {
         set {
-            nameLabel.text = newValue
-            nameTextField.text = newValue
+            avatarButton.setBackgroundImage(newValue, for: .normal)
+            avatarButton.isSelected = newValue == nil
         }
         get {
-            return nameTextField.text
+            return avatarButton.backgroundImage(for: .normal)
+        }
+    }
+    var name: String? {
+        set {
+            let newName = newValue?.trimmingCharacters(in: .whitespaces)
+            
+            nameLabel.text = newName
+            nameTextField.text = newName
+            UserDefaults.standard.set(newName, forKey: UserDefaultsKeys.name)
+            UserDefaults.standard.synchronize()
+        }
+        get {
+            return UserDefaults.standard.string(forKey: UserDefaultsKeys.name)
         }
     }
     var email: String? {
         set {
-            emailLabel.text = newValue
-            emailTextField.text = newValue
+            let newEmail = newValue?.trimmingCharacters(in: .whitespaces)
+            emailFormRow.value = newEmail
+            
+            if emailFormRow.isValid() {
+                emailLabel.text = newValue
+                emailTextField.text = newValue
+                UserDefaults.standard.set(newValue, forKey: UserDefaultsKeys.email)
+                UserDefaults.standard.synchronize()
+            }
         }
         get {
-            return emailTextField.text
+            return UserDefaults.standard.string(forKey: UserDefaultsKeys.email)
         }
     }
     
@@ -173,14 +197,14 @@ class ProfileAccountView: UIView {
         loggedInContainerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
         loggedInContainerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         
-        let hasAvatar = false
+        let hasAvatar = false // TODO:
         
-        let avatarButton = RoundButton()
         avatarButton.translatesAutoresizingMaskIntoConstraints = false
         avatarButton.setBackgroundImage(UIImage(named: "DefaultUser"), for: .selected)
         avatarButton.setBackgroundImage(UIImage(named: "DefaultUser"), for: [.selected, .highlighted])
         avatarButton.setImage(UIImage(named: "UserCamera"), for: .selected)
         avatarButton.setImage(UIImage(named: "UserCamera"), for: [.selected, .highlighted])
+        avatarButton.addTarget(self, action: #selector(avatarAction), for: .touchUpInside)
         avatarButton.isSelected = !hasAvatar
         avatarButton.layer.borderColor = UIColor.gray6.cgColor
         avatarButton.layer.borderWidth = 2
@@ -206,7 +230,8 @@ class ProfileAccountView: UIView {
         labelsLayoutGuide.centerYAnchor.constraint(equalTo: loggedInContainerView.layoutMarginsGuide.centerYAnchor).isActive = true
         
         nameTextField.translatesAutoresizingMaskIntoConstraints = false
-        nameTextField.placeholder = "Name"
+        nameTextField.text = name
+        nameTextField.placeholder = "settings.row.name.detail".localized
         nameTextField.alpha = 0
         nameTextField.delegate = self
         nameTextField.autocorrectionType = .no
@@ -215,6 +240,7 @@ class ProfileAccountView: UIView {
         loggedInContainerView.addSubview(nameTextField)
         
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
+        nameLabel.text = name
         nameLabel.font = .screenshopFont(.quicksandMedium, size: 22)
         nameLabel.textColor = .gray2
         nameLabel.adjustsFontSizeToFitWidth = true
@@ -242,7 +268,8 @@ class ProfileAccountView: UIView {
         ]
         
         emailTextField.translatesAutoresizingMaskIntoConstraints = false
-        emailTextField.placeholder = "Email"
+        emailTextField.text = email
+        emailTextField.placeholder = "settings.row.email.detail".localized
         emailTextField.alpha = 0
         emailTextField.delegate = self
         emailTextField.autocorrectionType = .no
@@ -252,6 +279,7 @@ class ProfileAccountView: UIView {
         loggedInContainerView.addSubview(emailTextField)
         
         emailLabel.translatesAutoresizingMaskIntoConstraints = false
+        emailLabel.text = email
         emailLabel.font = .screenshopFont(.quicksand, size: 18)
         emailLabel.textColor = .gray2
         emailLabel.adjustsFontSizeToFitWidth = true
@@ -304,8 +332,30 @@ class ProfileAccountView: UIView {
         loggedInControl.trailingAnchor.constraint(equalTo: loggedInContainerView.trailingAnchor).isActive = true
     }
     
+    @objc private func avatarAction() {
+        guard let viewController = delegate?.profileAccountViewPresentImagePickerInViewController(self) else {
+            return
+        }
+        
+        let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        alertController.addAction(UIAlertAction(title: "onboarding.details.avatar.camera".localized, style: .default, handler: { alertAction in
+            self.presentImagePickerController(in: viewController, sourceType: .camera)
+        }))
+        alertController.addAction(UIAlertAction(title: "onboarding.details.avatar.gallery".localized, style: .default, handler: { alertAction in
+            self.presentImagePickerController(in: viewController, sourceType: .photoLibrary)
+        }))
+        alertController.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
+        viewController.present(alertController, animated: true)
+    }
+    
     @objc private func loggedInContinueAction() {
+        reidentify()
         delegate?.profileAccountViewWantsToContract(self)
+        
+        if emailTextField.isInvalid {
+            emailTextField.text = email
+            emailTextField.isInvalid = false
+        }
     }
     
     @objc private func loggedInControlAction() {
@@ -315,6 +365,15 @@ class ProfileAccountView: UIView {
         else {
             delegate?.profileAccountViewWantsToExpand(self)
         }
+    }
+    
+    private func reidentify() {
+        guard emailFormRow.isValid() else {
+            return
+        }
+        
+        let user = AnalyticsUser(name: name, email: email)
+        user.sendToServers()
     }
 }
 
@@ -330,6 +389,38 @@ extension ProfileAccountView: UITextFieldDelegate {
         }
         else if textField == emailTextField {
             email = textField.text
+            syncEmailTextFieldValidation()
         }
+    }
+    
+    private func syncEmailTextFieldValidation() {
+        let isInvalid = !emailFormRow.isValid()
+        emailTextField.isInvalid = isInvalid
+        
+        if isInvalid {
+            ActionFeedbackGenerator().actionOccurred(.nope)
+        }
+    }
+}
+
+extension ProfileAccountView: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    private func presentImagePickerController(in viewController: UIViewController, sourceType: UIImagePickerControllerSourceType) {
+        let imagePicker = UIImagePickerController()
+        imagePicker.delegate = self
+        imagePicker.sourceType = sourceType
+        viewController.present(imagePicker, animated: true)
+    }
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+        if let pickedImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
+            avatar = pickedImage
+            // TODO: save image
+        }
+        
+        picker.presentingViewController?.dismiss(animated: true)
+    }
+    
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        picker.presentingViewController?.dismiss(animated: true)
     }
 }

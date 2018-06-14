@@ -19,8 +19,6 @@ class ProfileViewController: UITableViewController {
     
     enum Row: Int {
         case currency
-        case name // !!!: name and email are placeholders for the functionality. the code will be moved to the header
-        case email
         case tutorial
         case logout
     }
@@ -29,9 +27,7 @@ class ProfileViewController: UITableViewController {
         .account: [],
         .invite: [],
         .options: [
-            .currency,
-            .name,
-            .email
+            .currency
         ],
         .activity: [
             .tutorial
@@ -65,25 +61,6 @@ class ProfileViewController: UITableViewController {
         return view
     }()
     
-    lazy var textFieldRows: [IndexPath?] = {
-        return [
-            self.indexPath(for: .name, in: .options),
-            self.indexPath(for: .email, in: .options)
-        ]
-    }()
-    
-    
-    fileprivate var nameTextField: UITextField?
-    fileprivate var emailTextField: UITextField?
-    fileprivate var isRestoring = false
-    fileprivate lazy var previousTexts = {
-        return [
-            UserDefaultsKeys.name: self.cellText(for: .name),
-            UserDefaultsKeys.email: self.cellText(for: .email)
-        ]
-    }()
-    
-    
     // MARK: Life Cycle
     
     override var title: String? {
@@ -116,8 +93,14 @@ class ProfileViewController: UITableViewController {
         tableView.backgroundColor = .background
         
         profileAccountView.delegate = self
-        profileAccountView.name = "Corey Werner"
-        profileAccountView.email = "cnotethegr8@gmail.com"
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        
+        UIView.performWithoutAnimation {
+            self.animateProfileAccountView(isExpanded: false)
+        }
     }
     
     override func viewDidLayoutSubviews() {
@@ -168,13 +151,19 @@ extension ProfileViewController: ProfileAccountViewDelegate {
         animateProfileAccountView(isExpanded: true)
     }
     
+    func profileAccountViewPresentImagePickerInViewController(_ view: ProfileAccountView) -> UIViewController {
+        return self
+    }
+    
     private func animateProfileAccountView(isExpanded: Bool) {
+        tableView.endEditing(true)
+        
         UIView.animate(withDuration: .defaultAnimationDuration) {
             self.profileAccountView.isExpanded = isExpanded
             self.profileAccountView.layoutIfNeeded()
         }
         
-        let contentOffset: CGPoint = {
+        tableView.contentOffset = {
             if #available(iOS 11.0, *) {
                 return CGPoint(x: 0, y: -view.safeAreaInsets.top)
             }
@@ -182,8 +171,6 @@ extension ProfileViewController: ProfileAccountViewDelegate {
                 return CGPoint(x: 0, y: -topLayoutGuide.length)
             }
         }()
-        
-        tableView.setContentOffset(contentOffset, animated: true)
         tableView.isScrollEnabled = !profileAccountView.isExpanded
         tableView.beginUpdates()
         tableView.endUpdates()
@@ -253,46 +240,6 @@ extension ProfileViewController {
             return UITableViewCell()
         }
         
-        var cell: UITableViewCell
-        
-        if textFieldRows.contains(indexPath) {
-            cell = self.tableView(tableView, textFieldCellForRowAt: indexPath, withRow: row)
-        }
-        else {
-            cell = self.tableView(tableView, defaultCellForRowAt: indexPath, withRow: row)
-        }
-        
-        cell.accessoryType = cellAccessoryType(for: row)
-        return cell
-    }
-    
-    private func tableView(_ tableView: UITableView, textFieldCellForRowAt indexPath: IndexPath, withRow row: Row) -> UITableViewCell {
-        let reusableCell = tableView.dequeueReusableCell(withIdentifier: "input") as? TextFieldTableViewCell
-        let cell = reusableCell ?? TextFieldTableViewCell(style: .default, reuseIdentifier: "input")
-        
-        if reusableCell == nil {
-//            cell.textField.delegate = self
-            
-            if row == .name {
-                cell.textField.autocorrectionType = .no
-                cell.textField.autocapitalizationType = .words
-                cell.textField.spellCheckingType = .no
-                cell.textField.keyboardType = .default
-            }
-            else if row == .email {
-                cell.textField.autocorrectionType = .no
-                cell.textField.autocapitalizationType = .none
-                cell.textField.spellCheckingType = .no
-                cell.textField.keyboardType = .emailAddress
-            }
-        }
-        
-        cell.textField.text = cellText(for: row)
-        cell.textField.placeholder = cellDetailedText(for: row)
-        return cell
-    }
-    
-    private func tableView(_ tableView: UITableView, defaultCellForRowAt indexPath: IndexPath, withRow row: Row) -> UITableViewCell {
         let reusableCell = tableView.dequeueReusableCell(withIdentifier: "cell")
         let cell = reusableCell ?? UITableViewCell(style: .value1, reuseIdentifier: "cell")
         
@@ -311,6 +258,7 @@ extension ProfileViewController {
             cell.detailTextLabel?.attributedText = attributedText
         }
         
+        cell.accessoryType = cellAccessoryType(for: row)
         return cell
     }
     
@@ -320,11 +268,6 @@ extension ProfileViewController {
         }
         
         switch (row) {
-        case .name, .email:
-            if let cell = tableView.cellForRow(at: indexPath) {
-                cell.becomeFirstResponder()
-            }
-            
         case .currency:
             let viewController = CurrencyViewController()
             viewController.lifeCycleDelegate = self
@@ -349,10 +292,6 @@ extension ProfileViewController {
         switch (row) {
         case .currency:
             return "settings.row.currency.title".localized
-        case .name:
-            return UserDefaults.standard.string(forKey: UserDefaultsKeys.name)
-        case .email:
-            return UserDefaults.standard.string(forKey: UserDefaultsKeys.email)
         case .logout:
             return "Logout"
         case .tutorial:
@@ -364,10 +303,6 @@ extension ProfileViewController {
         switch (row) {
         case .currency:
             return CurrencyViewController.currentCurrency
-        case .name:
-            return "settings.row.name.detail".localized
-        case .email:
-            return "settings.row.email.detail".localized
         default:
             return nil
         }
@@ -392,68 +327,6 @@ extension ProfileViewController {
         default:
             return .none
         }
-    }
-}
-
-// MARK: Text Field
-
-extension ProfileViewController: UITextFieldDelegate {
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        if textField.returnKeyType == .done {
-            textField.resignFirstResponder()
-        }
-        return true
-    }
-    
-    func textFieldDidEndEditing(_ textField: UITextField) {
-        if let key = userDefaultsKey(for: textField) {
-            let trimmedText = textField.text?.trimmingCharacters(in: .whitespaces)
-            var canContinue = false
-            
-            if key == UserDefaultsKeys.email {
-                canContinue = textField.text?.isValidEmail ?? false
-                
-            } else if key == UserDefaultsKeys.name {
-                canContinue = (trimmedText?.count ?? 0) > 0
-            }
-            
-            if (canContinue) {
-                self.previousTexts[key] = trimmedText
-                textField.text = trimmedText
-                
-                UserDefaults.standard.set(trimmedText, forKey: key)
-                UserDefaults.standard.synchronize()
-                
-                reidentify()
-                
-            } else {
-//                textField.text = self.previousTexts[key]
-            }
-        }
-    }
-    
-    fileprivate func userDefaultsKey(for textField: UITextField) -> String? {
-        if textField == self.emailTextField {
-            return UserDefaultsKeys.email
-            
-        } else if textField == self.nameTextField {
-            return UserDefaultsKeys.name
-        }
-        
-        return nil
-    }
-    
-    fileprivate func reidentify() {
-        let name = nameTextField?.text?.trimmingCharacters(in: .whitespaces)
-        let email = emailTextField?.text?.trimmingCharacters(in: .whitespaces)
-        let user = AnalyticsUser(name: name, email: email)
-        
-        user.sendToServers()
-        
-    }
-    
-    fileprivate func dismissKeyboard() {
-        tableView.endEditing(true)
     }
 }
 
