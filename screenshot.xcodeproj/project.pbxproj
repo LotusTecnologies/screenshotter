@@ -199,6 +199,7 @@
 		C5DC531B20CD3F2100E90DB8 /* Quicksand-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C5DC531720CD3F2000E90DB8 /* Quicksand-Regular.ttf */; };
 		C5DC531C20CD3F2100E90DB8 /* Quicksand-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C5DC531820CD3F2000E90DB8 /* Quicksand-Light.ttf */; };
 		C5DC531D20CD3F2100E90DB8 /* Quicksand-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C5DC531920CD3F2100E90DB8 /* Quicksand-Bold.ttf */; };
+		C5DC532020CD505B00E90DB8 /* MainSegmentedControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5DC531F20CD505B00E90DB8 /* MainSegmentedControl.swift */; };
 		C5DDC0DC2015C6D900B009BF /* AttributedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5DDC0DB2015C6D900B009BF /* AttributedString.swift */; };
 		C5E21D8E2091A88900807395 /* CheckoutListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5E21D8D2091A88900807395 /* CheckoutListViewController.swift */; };
 		C5E6C316208F22C0006E9C54 /* CheckoutSupportedLocationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5E6C315208F22BF006E9C54 /* CheckoutSupportedLocationModel.swift */; };
@@ -461,6 +462,7 @@
 		C5DC531720CD3F2000E90DB8 /* Quicksand-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Regular.ttf"; sourceTree = "<group>"; };
 		C5DC531820CD3F2000E90DB8 /* Quicksand-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Light.ttf"; sourceTree = "<group>"; };
 		C5DC531920CD3F2100E90DB8 /* Quicksand-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Bold.ttf"; sourceTree = "<group>"; };
+		C5DC531F20CD505B00E90DB8 /* MainSegmentedControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSegmentedControl.swift; sourceTree = "<group>"; };
 		C5DDC0DB2015C6D900B009BF /* AttributedString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttributedString.swift; sourceTree = "<group>"; };
 		C5E21D8D2091A88900807395 /* CheckoutListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutListViewController.swift; sourceTree = "<group>"; };
 		C5E6C315208F22BF006E9C54 /* CheckoutSupportedLocationModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CheckoutSupportedLocationModel.swift; sourceTree = "<group>"; };
@@ -886,6 +888,7 @@
 				C5A1922A2057AD510046303C /* PresentationController */,
 				31CE1106203BEF36000156EE /* SaleView.swift */,
 				C50D200D1FEBE6CD005CFA4F /* ScrollRevealController.swift */,
+				C5DC531E20CD504D00E90DB8 /* SegmentedControl */,
 				C5D57930203EDD6200A076FE /* TableView */,
 				C54088441FE90E2200198955 /* TableViewCell */,
 				C572C0D920AAE5D2004B0A17 /* Template */,
@@ -1104,6 +1107,14 @@
 				C50E2616207F6703003C8D24 /* TextFieldFormatter.swift */,
 			);
 			path = Controller;
+			sourceTree = "<group>";
+		};
+		C5DC531E20CD504D00E90DB8 /* SegmentedControl */ = {
+			isa = PBXGroup;
+			children = (
+				C5DC531F20CD505B00E90DB8 /* MainSegmentedControl.swift */,
+			);
+			path = SegmentedControl;
 			sourceTree = "<group>";
 		};
 		C5E92414206901AA00D44FF9 /* Form */ = {
@@ -1526,6 +1537,7 @@
 				C5D98CD71FFCAF2700CC1A97 /* ScreenshotDisplayNavigationController.swift in Sources */,
 				C5E21D8E2091A88900807395 /* CheckoutListViewController.swift in Sources */,
 				C54088571FE90E2200198955 /* ShadowCollectionViewCell.swift in Sources */,
+				C5DC532020CD505B00E90DB8 /* MainSegmentedControl.swift in Sources */,
 				31CE1113203BF055000156EE /* ProductsBarController.swift in Sources */,
 				C554B17920287DF50099622C /* ScreenshotsDeleteButton.swift in Sources */,
 				C58FA0F620A95FC300072966 /* TutorialEmailSlideViewController.swift in Sources */,

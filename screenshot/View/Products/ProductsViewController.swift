@@ -11,6 +11,7 @@ import UIKit
 import CoreData
 import PromiseKit
 import Hero
+
 enum ProductsSection : Int {
     case product = 0
     case relatedLooks = 1
@@ -28,9 +29,7 @@ enum ProductsViewControllerState : Int {
     case unknown
 }
 
-class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
-    
-    
+class ProductsViewController: BaseViewController {
     var productCollectionViewManager = ProductCollectionViewManager()
     var screenshot:Screenshot
     var screenshotController: FetchedResultsControllerManager<Screenshot>?
@@ -68,7 +67,6 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
     }
     
     var shareToDiscoverPrompt:UIView?
-    fileprivate let filterView = CustomInputtableView()
     
     fileprivate var shoppablesToolbar: ShoppablesToolbar?
     
@@ -102,6 +100,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
             let toolbar = ShoppablesToolbar(screenshot: screenshot)
             toolbar.translatesAutoresizingMaskIntoConstraints = false
             toolbar.isHidden = shouldHideToolbar
+            toolbar.delegate = self
             toolbar.shoppableToolbarDelegate = self
             view.addSubview(toolbar)
             toolbar.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor).isActive = true
@@ -172,8 +171,6 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
         rateView.bottomAnchor.constraint(equalTo:scrollRevealController.view.bottomAnchor).isActive = true
         rateView.trailingAnchor.constraint(equalTo:scrollRevealController.view.trailingAnchor).isActive = true
         
-        view.addSubview(filterView)
-        
         if !scrollRevealController.hasBottomBar {
             var height = self.rateView.intrinsicContentSize.height
             
@@ -231,6 +228,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
     }
     
     deinit {
+        self.shoppablesToolbar?.delegate = nil
         self.shoppablesToolbar?.shoppableToolbarDelegate = nil
     }
 }
@@ -279,38 +277,9 @@ extension ProductsViewController: ShoppablesToolbarDelegate {
     }
     
     func shoppablesToolbarDidChangeSelectedShoppable(toolbar:ShoppablesToolbar, shoppable:Shoppable){
-        
         self.selectedShoppable = shoppable
         self.reloadProductsFor(shoppable: shoppable)
     }
-}
-
-extension ProductsViewController {
-    func clearProductListAndStateLoading(){
-        self.products = []
-        self.relatedLooksManager.relatedLooks = nil
-        self.collectionView?.reloadData()
-    }
-    func productsOptionsDidComplete(_ productsOptions: ProductsOptions, withChange changed: Bool) {
-        
-        if changed {
-            if  let shoppable = self.getSelectedShoppable(){
-                shoppable.set(productsOptions: productsOptions, callback:  {
-                    if  let shoppable = self.getSelectedShoppable(){
-                        self.reloadProductsFor(shoppable: shoppable)
-                    }else{
-                        self.clearProductListAndStateLoading()
-                    }
-                })
-            }
-        }
-        self.dismissOptions()
-    }
-    
-    var shouldHideToolbar: Bool {
-        return !self.hasShoppables
-    }
-    
 }
 
 private typealias ProductsViewControllerCollectionView = ProductsViewController
@@ -377,10 +346,10 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         if kind == UICollectionElementKindSectionHeader {
             
             if sectionType == .relatedLooks {
-               return self.productCollectionViewManager.collectionView(collectionView, viewForHeaderWith:  "products.related_looks.headline".localized, hasBackgroundAndLine:true, indexPath: indexPath)
+                return self.productCollectionViewManager.collectionView(collectionView, viewForHeaderWith:  "products.related_looks.headline".localized, hasBackgroundAndLine:true, hasFilterButton:false, indexPath: indexPath)
             }
             
-            return self.productCollectionViewManager.collectionView(collectionView, viewForHeaderWith:  "",hasBackgroundAndLine:false, indexPath: indexPath)
+            return self.productCollectionViewManager.collectionView(collectionView, viewForHeaderWith:  "",hasBackgroundAndLine:false, hasFilterButton:false, indexPath: indexPath)
         }else if kind == SectionBackgroundCollectionViewFlowLayout.ElementKindSectionSectionBackground {
             if sectionType == .product {
                 return self.productCollectionViewManager.collectionView(collectionView, viewForBackgroundWith: self.view.backgroundColor, indexPath: indexPath)
@@ -506,24 +475,51 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
 }
 
 private typealias ProductsViewControllerOptionsView = ProductsViewController
-extension ProductsViewControllerOptionsView {
+extension ProductsViewControllerOptionsView: ProductsOptionsDelegate {
     @objc func presentOptions() {
-        if filterView.isFirstResponder {
-            filterView.resignFirstResponder()
-        }
-        else {
-            Analytics.trackOpenedFiltersView()
-            
-            if let shoppable = self.getSelectedShoppable() {
-                self.productsOptions.syncOptions(withMask: shoppable.getLast())
-            }
-            filterView.customInputView = self.productsOptions.view
-            filterView.becomeFirstResponder()
-        }
+        Analytics.trackOpenedFiltersView()
+        
+        present(self.productsOptions.viewController, animated: true)
     }
     
     func dismissOptions() {
-        filterView.endEditing(true)
+        dismiss(animated: true)
+    }
+    
+    func clearProductListAndStateLoading() {
+        self.products = []
+        self.relatedLooksManager.relatedLooks = nil
+        self.collectionView?.reloadData()
+    }
+    
+    func productsOptionsDidComplete(_ productsOptions: ProductsOptions, withModelChange changed: Bool) {
+        self.productsOptions = productsOptions
+        if changed, let shoppable = self.getSelectedShoppable(){
+            shoppable.set(productsOptions: productsOptions, callback: {
+                if let shoppable = self.getSelectedShoppable(){
+                    self.reloadProductsFor(shoppable: shoppable)
+                }else{
+                    self.clearProductListAndStateLoading()
+                }
+            })
+        }else{
+            if let shoppable = self.getSelectedShoppable() {
+                self.products = self.productCollectionViewManager.productsForShoppable(shoppable, productsOptions: productsOptions)
+                self.collectionView?.reloadData()
+            }else{
+                self.products = []
+            }
+            self.updateLoadingState()
+        }
+        self.dismissOptions()
+    }
+    
+    func productsOptionsDidCancel(_ productsOptions: ProductsOptions) {
+        dismissOptions()
+    }
+    
+    var shouldHideToolbar: Bool {
+        return !self.hasShoppables
     }
 }
 
@@ -571,12 +567,8 @@ extension ProductsViewControllerProducts{
         self.relatedLooksManager.relatedLooks = nil
         self.scrollRevealController?.resetViewOffset()
         
-          if shoppable.productFilterCount == -1 {
-            self.screenshotLoadingState = .retry
-        } else {
-            self.products = self.productCollectionViewManager.productsForShoppable(shoppable, productsOptions: self.productsOptions)
-            self.updateLoadingState()
-        }
+        self.products = self.productCollectionViewManager.productsForShoppable(shoppable, productsOptions: self.productsOptions)
+
         
         self.collectionView?.reloadData()
         self.rateView.setRating(UInt(shoppable.getRating()), animated: false)
@@ -586,13 +578,8 @@ extension ProductsViewControllerProducts{
         if self.collectionView?.numberOfItems(inSection: ProductsSection.product.section) ?? 0 > 0 {
             self.collectionView?.scrollToItem(at: IndexPath(item: 0, section: ProductsSection.product.section), at: .top, animated: false)
         }
+        self.updateLoadingState()
     }
-    
-    
-    
-   
-    
-  
 }
 
 private typealias ProductsViewControllerRatings = ProductsViewController
@@ -838,9 +825,6 @@ extension ProductsViewController : AsyncOperationMonitorDelegate {
             if state != self.screenshotLoadingState {
                 self.screenshotLoadingState = state
             }
-            
-        
-            
         }
     }
     

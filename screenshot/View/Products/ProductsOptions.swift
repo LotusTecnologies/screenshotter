@@ -9,6 +9,7 @@
 import Foundation
 import UIKit
 
+// TODO: can this be removed?
 class ProductsOptionsMask : NSObject {
     let rawValue: Int
     
@@ -20,29 +21,21 @@ class ProductsOptionsMask : NSObject {
     static let sizeChild    = ProductsOptionsMask(rawValue: 1 << 4) // 16
     static let sizePlus     = ProductsOptionsMask(rawValue: 1 << 5) // 32
     
+    // TODO: remove all category code
     static let categoryAuto      = ProductsOptionsMask(rawValue: 1 << 6) // 64
     static let categoryFashion   = ProductsOptionsMask(rawValue: 1 << 7) // 128
     static let categoryFurniture = ProductsOptionsMask(rawValue: 1 << 8) // 256
     
     static var global: ProductsOptionsMask {
-        return ProductsOptionsMask(ProductsOptionsCategory.globalValue, ProductsOptionsGender.globalValue, ProductsOptionsSize.globalValue)
+        return ProductsOptionsMask(ProductsOptionsGender.globalValue, ProductsOptionsSize.globalValue)
     }
     
     init(rawValue: Int) {
         self.rawValue = rawValue
     }
     
-    convenience init(_ category: ProductsOptionsCategory, _ gender: ProductsOptionsGender, _ size: ProductsOptionsSize) {
+    convenience init(_ gender: ProductsOptionsGender, _ size: ProductsOptionsSize) {
         var value: Int = 0
-        
-        switch category {
-        case .fashion:
-            value |= ProductsOptionsMask.categoryFashion.rawValue
-        case .furniture:
-            value |= ProductsOptionsMask.categoryFurniture.rawValue
-        default:
-            value |= ProductsOptionsMask.categoryAuto.rawValue
-        }
         
         switch gender {
         case .male:
@@ -63,16 +56,6 @@ class ProductsOptionsMask : NSObject {
         }
         
         self.init(rawValue: value)
-    }
-    
-    var category: ProductsOptionsCategory {
-        if rawValue & ProductsOptionsMask.categoryFashion.rawValue > 0 {
-            return .fashion
-        } else if rawValue & ProductsOptionsMask.categoryFurniture.rawValue > 0 {
-            return .furniture
-        } else {
-            return .auto
-        }
     }
     
     var gender: ProductsOptionsGender {
@@ -96,82 +79,79 @@ class ProductsOptionsMask : NSObject {
     }
 }
 
-class _ProductsOptionsMask : NSObject {
-    static func current() -> Int {
-        return ProductsOptionsMask.global.rawValue
-    }
-}
-
 protocol ProductsOptionsDelegate : NSObjectProtocol {
-    func productsOptionsDidComplete(_ productsOptions: ProductsOptions, withChange changed: Bool)
+    func productsOptionsDidComplete(_ productsOptions: ProductsOptions, withModelChange changed: Bool)
+    func productsOptionsDidCancel(_ productsOptions: ProductsOptions)
 }
 
 class ProductsOptions : NSObject {
     weak var delegate: ProductsOptionsDelegate?
     
-    fileprivate(set) var category = ProductsOptionsCategory.globalValue
     fileprivate(set) var gender = ProductsOptionsGender.globalValue
     fileprivate(set) var size = ProductsOptionsSize.globalValue
     fileprivate(set) var sale = ProductsOptionsSale.globalValue
     fileprivate(set) var sort = ProductsOptionsSort.globalValue
     
-    fileprivate let sortItems: [ProductsOptionsSort] = [.similar, .priceAsc, .priceDes, .brands]
-    
-    private(set) lazy var view: ProductsOptionsView = {
-        let view = ProductsOptionsView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.sortPickerView.dataSource = self
-        view.sortPickerView.delegate = self
-        view.doneButton.addTarget(self, action: #selector(doneButtonAction), for: .touchUpInside)
-        self.syncOptions(withView: view)
-        return view
+    private(set) lazy var viewController: ProductsOptionsViewController = {
+        let viewController = ProductsOptionsViewController()
+        viewController.continueButton.addTarget(self, action: #selector(continueAction), for: .touchUpInside)
+        self.syncOptions(with: viewController)
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(cancelAction))
+        viewController.view.addGestureRecognizer(tapGesture)
+        
+        return viewController
     }()
     
-    func syncOptions(withMask mask: ProductsOptionsMask? = nil) {
-        category = mask?.category ?? ProductsOptionsCategory.globalValue
-        gender = mask?.gender ?? ProductsOptionsGender.globalValue
-        size = mask?.size ?? ProductsOptionsSize.globalValue
+    func syncOptions() {
+        gender = ProductsOptionsGender.globalValue
+        size = ProductsOptionsSize.globalValue
         sale = ProductsOptionsSale.globalValue
         sort = ProductsOptionsSort.globalValue
-        
-        syncOptions(withView: view)
+        syncOptions(with: viewController)
     }
     
-    private func syncOptions(withView view: ProductsOptionsView) {
-        view.categoryControl.selectedSegmentIndex = category.offsetValue
-        view.genderControl.selectedSegmentIndex = gender.offsetValue
-        view.sizeControl.selectedSegmentIndex = size.offsetValue
-        view.saleControl.selectedSegmentIndex = sale.offsetValue
-        view.sortPickerView.selectRow(sort.offsetValue, inComponent: 0, animated: false)
+    private func syncOptions(with viewController: ProductsOptionsViewController) {
+        viewController.genderControl.selectedSegmentIndex = gender.offsetValue
+        viewController.sizeControl.selectedSegmentIndex = size.offsetValue
+        viewController.saleControl.selectedSegmentIndex = sale.offsetValue
+        if let index = ProductsOptionsSort.all.index(of: sort) {
+            viewController.sortPickerView?.selectRow(index, inComponent: 0, animated: false)
+        }
     }
     
-    @objc private func doneButtonAction() {
-        let previousMask = ProductsOptionsMask(category, gender, size)
+    @objc private func continueAction() {
+        let previousGender = gender
+        let previousSize = size
         let previousSale = sale
         let previousSort = sort
         
-        category = ProductsOptionsCategory(offsetValue: view.categoryControl.selectedSegmentIndex)
-        gender = ProductsOptionsGender(offsetValue: view.genderControl.selectedSegmentIndex)
-        size = ProductsOptionsSize(offsetValue: view.sizeControl.selectedSegmentIndex)
-        sale = ProductsOptionsSale(offsetValue: view.saleControl.selectedSegmentIndex)
-        sort = ProductsOptionsSort(offsetValue: view.sortPickerView.selectedRow(inComponent: 0))
+        gender = ProductsOptionsGender(offsetValue: viewController.genderControl.selectedSegmentIndex)
+        size = ProductsOptionsSize(offsetValue: viewController.sizeControl.selectedSegmentIndex)
+        sale = ProductsOptionsSale(offsetValue: viewController.saleControl.selectedSegmentIndex)
+        if let sortPickerView = viewController.sortPickerView {
+            let selected = sortPickerView.selectedRow(inComponent: 0)
+            sort = ProductsOptionsSort.all[selected]
+        }
         
+        UserDefaults.standard.set(gender.rawValue, forKey: UserDefaultsKeys.productGender)
+        UserDefaults.standard.set(size.rawValue, forKey: UserDefaultsKeys.productSize)
         UserDefaults.standard.set(sale.rawValue, forKey: UserDefaultsKeys.productSale)
         UserDefaults.standard.set(sort.rawValue, forKey: UserDefaultsKeys.productSort)
         UserDefaults.standard.synchronize()
         
-        let maskChanged = previousMask.rawValue != ProductsOptionsMask(category, gender, size).rawValue
-        let saleChanged = previousSale.rawValue != sale.rawValue
-        let sortChanged = previousSort.rawValue != sort.rawValue
-        let changed = maskChanged || saleChanged || sortChanged
+        let genderChanged = previousGender.rawValue != gender.rawValue
+        let sizeChanged = previousSize.rawValue != size.rawValue
+//        let saleChanged = previousSale.rawValue != sale.rawValue
+//        let sortChanged = previousSort.rawValue != sort.rawValue
+        let changed = genderChanged || sizeChanged
         
-        delegate?.productsOptionsDidComplete(self, withChange: changed)
+        delegate?.productsOptionsDidComplete(self, withModelChange: changed)
         
         if changed {
             let changeMap = [
-                "Category": (new: category.stringValue, old: previousMask.category.stringValue),
-                "Gender": (new: gender.stringValue, old: previousMask.gender.stringValue),
-                "Size": (new: size.stringValue, old: previousMask.size.stringValue),
+                "Gender": (new: gender.stringValue, old: previousGender.stringValue),
+                "Size": (new: size.stringValue, old: previousSize.stringValue),
                 "Sale": (new: sale.stringValue, old: previousSale.stringValue),
                 "Sort": (new: sort.stringValue, old: previousSort.stringValue)
             ]
@@ -183,45 +163,9 @@ class ProductsOptions : NSObject {
             }
         }
     }
-}
-
-extension ProductsOptions {
-    // MARK: Objc
     
-    func _category() -> Int {
-        return category.rawValue
-    }
-    
-    func _gender() -> Int {
-        return gender.rawValue
-    }
-    
-    func _size() -> Int {
-        return size.rawValue
-    }
-    
-    func _sale() -> Int {
-        return sale.rawValue
-    }
-    
-    func _sort() -> Int {
-        return sort.rawValue
-    }
-}
-
-extension ProductsOptions : UIPickerViewDataSource {
-    func numberOfComponents(in pickerView: UIPickerView) -> Int {
-        return 1
-    }
-    
-    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return sortItems.count
-    }
-}
-
-extension ProductsOptions : UIPickerViewDelegate {
-    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        return sortItems[row].stringValue
+    @objc private func cancelAction() {
+        delegate?.productsOptionsDidCancel(self)
     }
 }
 
@@ -230,11 +174,13 @@ class ProductsOptionsControls : NSObject {
     var genderControl: UISegmentedControl?
     var sizeControl: UISegmentedControl?
     var saleControl: UISegmentedControl?
+    var sortControl: UIControl?
+    var sortPickerView: UIPickerView?
     
     private var gender: ProductsOptionsGender?
     private var size: ProductsOptionsSize?
     
-    private class SegmentedControl : UISegmentedControl {
+    private class SegmentedControl : MainSegmentedControl {
         private var needsSelectedIndexUpdate = true
         var didUpdateSelectedIndex: (() -> ())?
         
@@ -251,20 +197,6 @@ class ProductsOptionsControls : NSObject {
                 }
             }
         }
-    }
-    
-    func createCategoryControl() -> UISegmentedControl {
-        let control = UISegmentedControl(items: [
-            ProductsOptionsCategory.fashion.stringValue,
-            ProductsOptionsCategory.furniture.stringValue,
-            ProductsOptionsCategory.auto.stringValue
-            ])
-        control.addTarget(self, action: #selector(syncCategoryControl), for: .valueChanged)
-        
-        categoryControl?.removeFromSuperview()
-        categoryControl = control
-        
-        return control
     }
     
     func createGenderControl() -> UISegmentedControl {
@@ -302,7 +234,7 @@ class ProductsOptionsControls : NSObject {
     }
     
     func createSaleControl() -> UISegmentedControl {
-        let control = UISegmentedControl(items: [
+        let control = MainSegmentedControl(items: [
             ProductsOptionsSale.sale.stringValue,
             ProductsOptionsSale.all.stringValue
             ])
@@ -313,19 +245,30 @@ class ProductsOptionsControls : NSObject {
         return control
     }
     
+    func createSortControl(pickerViewAnimation: (()->())? = nil) -> SegmentedDropDownControl {
+        let segmentedTitleItem = SegmentedDropDownItem(titleItem: "products.options.sort.title".localized)
+        segmentedTitleItem.widthRatio = 0.25
+        
+        let pickerItems = ProductsOptionsSort.all.map{ $0.stringValue }
+        let segmentedItem = SegmentedDropDownItem(pickerItems: pickerItems, selectedPickerItem: pickerItems.first)
+        segmentedItem.isPickerViewInsertedInline = true
+        segmentedItem.pickerViewAnimation = pickerViewAnimation
+        
+        let control = SegmentedDropDownControl()
+        control.items = [segmentedTitleItem, segmentedItem]
+        control.changeValueOnRowChange = true
+        
+        sortControl?.removeFromSuperview()
+        sortControl = control
+        sortPickerView = segmentedItem.pickerView
+        
+        return control
+    }
+    
     private var enabledControls: [UIControl : [Int : Bool]] {
         var enabledControls: [UIControl : [Int : Bool]] = [:]
         
         if let genderControl = genderControl, let sizeControl = sizeControl {
-            let isFashion: Bool
-            
-            if let categoryControl = categoryControl {
-                isFashion = ProductsOptionsCategory(offsetValue: categoryControl.selectedSegmentIndex) != .furniture
-                
-            } else {
-                isFashion = ProductsOptionsCategory.default != .furniture
-            }
-            
             enabledControls[genderControl] = [:]
             
             for i in 0 ..< genderControl.numberOfSegments {
@@ -335,7 +278,7 @@ class ProductsOptionsControls : NSObject {
                     isEnabled = ProductsOptionsSize(offsetValue: sizeControl.selectedSegmentIndex) != .plus
                 }
                 
-                enabledControls[genderControl]?[i] = isFashion ? isEnabled : false
+                enabledControls[genderControl]?[i] = isEnabled
             }
             
             enabledControls[sizeControl] = [:]
@@ -347,7 +290,7 @@ class ProductsOptionsControls : NSObject {
                     isEnabled = ProductsOptionsGender(offsetValue: genderControl.selectedSegmentIndex) != .male
                 }
                 
-                enabledControls[sizeControl]?[i] = isFashion ? isEnabled : false
+                enabledControls[sizeControl]?[i] = isEnabled
             }
         }
         
@@ -370,24 +313,6 @@ class ProductsOptionsControls : NSObject {
             let isEnabled = enabledControls[sizeControl]?[index] ?? true
             sizeControl.setEnabled(isEnabled, forSegmentAt: index)
         }
-    }
-    
-    @objc private func syncCategoryControl() {
-        guard let categoryControl = categoryControl else {
-            return
-        }
-        
-        if ProductsOptionsCategory(offsetValue: categoryControl.selectedSegmentIndex) != .furniture {
-            if let genderControl = genderControl, let gender = gender {
-                genderControl.selectedSegmentIndex = gender.offsetValue
-            }
-            
-            if let sizeControl = sizeControl, let size = size {
-                sizeControl.selectedSegmentIndex = size.offsetValue
-            }
-        }
-        
-        sync()
     }
     
     @objc private func syncGenderControl() {
@@ -415,160 +340,124 @@ class ProductsOptionsControls : NSObject {
     }
 }
 
-class ProductsOptionsView : UIView {
-    fileprivate let controls = ProductsOptionsControls()
+class ProductsOptionsViewController: UIViewController {
+    private let transitioning = ViewControllerTransitioningDelegate(presentation: .dimmed, transition: .modal)
+    private let controls = ProductsOptionsControls()
+
+    private let containerView = UIView()
+    private let titleLabel = UILabel()
+    private(set) lazy var genderControl: UISegmentedControl = {
+        return self.controls.createGenderControl()
+    }()
+    private(set) lazy var sizeControl: UISegmentedControl = {
+        return self.controls.createSizeControl()
+    }()
+    private(set) lazy var saleControl: UISegmentedControl = {
+        return self.controls.createSaleControl()
+    }()
+    private(set) lazy var sortControl: UIControl = {
+        return self.controls.createSortControl(pickerViewAnimation: { [weak self] in
+            self?.view.layoutIfNeeded()
+        })
+    }()
     
-    private(set) var categoryControl: UISegmentedControl!
-    private(set) var genderControl: UISegmentedControl!
-    private(set) var sizeControl: UISegmentedControl!
-    private(set) var saleControl: UISegmentedControl!
-    let sortPickerView = UIPickerView()
-    let doneButton = MainButton()
+    var sortPickerView: UIPickerView? {
+        return self.controls.sortPickerView
+    }
+
+    let continueButton = MainButton()
     
     required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
+        fatalError("init(coder:) has not been implemented")
     }
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
-        backgroundColor = .white
+        transitioningDelegate = transitioning
+        modalPresentationStyle = .custom
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
         
-        addSubview(BorderView(edge: .top))
+        let verticalPadding: CGFloat = .padding * 1.5
         
-        categoryControl = controls.createCategoryControl()
-        categoryControl.translatesAutoresizingMaskIntoConstraints = false
-        categoryControl.tintColor = .crazeGreen
-        categoryControl.isExclusiveTouch = true
-        addSubview(categoryControl)
-        categoryControl.setContentCompressionResistancePriority(UILayoutPriority.required, for: .vertical)
-        categoryControl.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
-        categoryControl.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor).isActive = true
-        categoryControl.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
-        categoryControl.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
+        containerView.translatesAutoresizingMaskIntoConstraints = false
+        containerView.backgroundColor = .white
+        containerView.layoutMargins = UIEdgeInsets(top: verticalPadding, left: .padding, bottom: verticalPadding, right: .padding)
+        view.addSubview(containerView)
+        containerView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        containerView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        containerView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
-        genderControl = controls.createGenderControl()
-        genderControl.translatesAutoresizingMaskIntoConstraints = false
-        genderControl.tintColor = .crazeGreen
-        genderControl.isExclusiveTouch = true
-        addSubview(genderControl)
-        genderControl.setContentCompressionResistancePriority(UILayoutPriority.required, for: .vertical)
-        genderControl.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
-        genderControl.topAnchor.constraint(equalTo: categoryControl.bottomAnchor, constant: .padding).isActive = true
-        genderControl.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
-        genderControl.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        titleLabel.textColor = .gray1
+        titleLabel.text = "products.options.title".localized
+        titleLabel.textAlignment = .center
+        titleLabel.font = .screenshopFont(.quicksandBold, size: 16)
+        containerView.addSubview(titleLabel)
+        titleLabel.topAnchor.constraint(equalTo: containerView.layoutMarginsGuide.topAnchor).isActive = true
+        titleLabel.leadingAnchor.constraint(greaterThanOrEqualTo: containerView.layoutMarginsGuide.leadingAnchor).isActive = true
+        titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: containerView.layoutMarginsGuide.trailingAnchor).isActive = true
+        titleLabel.centerXAnchor.constraint(equalTo: containerView.layoutMarginsGuide.centerXAnchor).isActive = true
         
-        sizeControl = controls.createSizeControl()
-        sizeControl.translatesAutoresizingMaskIntoConstraints = false
-        sizeControl.tintColor = .crazeGreen
-        sizeControl.isExclusiveTouch = true
-        addSubview(sizeControl)
-        sizeControl.setContentCompressionResistancePriority(UILayoutPriority.required, for: .vertical)
-        sizeControl.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
-        sizeControl.topAnchor.constraint(equalTo: genderControl.bottomAnchor, constant: .padding).isActive = true
-        sizeControl.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
-        sizeControl.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
+        sortControl.translatesAutoresizingMaskIntoConstraints = false
+        sortControl.isExclusiveTouch = true
+        sortControl.addTarget(self, action: #selector(optionsChangedAction), for: .valueChanged)
+        containerView.addSubview(sortControl)
+        sortControl.topAnchor.constraint(equalTo: titleLabel.lastBaselineAnchor, constant: verticalPadding).isActive = true
+        sortControl.leadingAnchor.constraint(equalTo: containerView.layoutMarginsGuide.leadingAnchor).isActive = true
+        sortControl.trailingAnchor.constraint(equalTo: containerView.layoutMarginsGuide.trailingAnchor).isActive = true
         
-        saleControl = controls.createSaleControl()
         saleControl.translatesAutoresizingMaskIntoConstraints = false
-        saleControl.tintColor = .crazeGreen
-        addSubview(saleControl)
-        saleControl.setContentCompressionResistancePriority(UILayoutPriority.required, for: .vertical)
-        saleControl.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
-        saleControl.topAnchor.constraint(equalTo: sizeControl.bottomAnchor, constant: .padding).isActive = true
-        saleControl.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
-        saleControl.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
+        saleControl.isExclusiveTouch = true
+        saleControl.addTarget(self, action: #selector(optionsChangedAction), for: .valueChanged)
+        containerView.addSubview(saleControl)
+        saleControl.topAnchor.constraint(equalTo: sortControl.bottomAnchor, constant: .padding).isActive = true
+        saleControl.leadingAnchor.constraint(equalTo: containerView.layoutMarginsGuide.leadingAnchor).isActive = true
+        saleControl.trailingAnchor.constraint(equalTo: containerView.layoutMarginsGuide.trailingAnchor).isActive = true
         
-        let sortLabel = UILabel()
-        sortLabel.translatesAutoresizingMaskIntoConstraints = false
-        sortLabel.text = "products.options.sort.title".localized
-        sortLabel.font = UIFont.preferredFont(forTextStyle: .subheadline)
-        sortLabel.adjustsFontForContentSizeCategory = true
-        addSubview(sortLabel)
-        sortLabel.setContentCompressionResistancePriority(UILayoutPriority.required, for: .vertical)
-        sortLabel.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
-        sortLabel.topAnchor.constraint(equalTo: saleControl.bottomAnchor, constant: .extendedPadding).isActive = true
-        sortLabel.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
-        sortLabel.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
+        genderControl.translatesAutoresizingMaskIntoConstraints = false
+        genderControl.isExclusiveTouch = true
+        genderControl.addTarget(self, action: #selector(optionsChangedAction), for: .valueChanged)
+        containerView.addSubview(genderControl)
+        genderControl.topAnchor.constraint(equalTo: saleControl.bottomAnchor, constant: .padding).isActive = true
+        genderControl.leadingAnchor.constraint(equalTo: containerView.layoutMarginsGuide.leadingAnchor).isActive = true
+        genderControl.trailingAnchor.constraint(equalTo: containerView.layoutMarginsGuide.trailingAnchor).isActive = true
         
-        sortPickerView.translatesAutoresizingMaskIntoConstraints = false
-        addSubview(sortPickerView)
-        sortPickerView.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
-        sortPickerView.topAnchor.constraint(equalTo: sortLabel.bottomAnchor).isActive = true
-        sortPickerView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-        sortPickerView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
-        sortPickerView.heightAnchor.constraint(equalToConstant: 130).isActive = true
+        sizeControl.translatesAutoresizingMaskIntoConstraints = false
+        sizeControl.isExclusiveTouch = true
+        sizeControl.addTarget(self, action: #selector(optionsChangedAction), for: .valueChanged)
+        containerView.addSubview(sizeControl)
+        sizeControl.topAnchor.constraint(equalTo: genderControl.bottomAnchor, constant: .padding).isActive = true
+        sizeControl.leadingAnchor.constraint(equalTo: containerView.layoutMarginsGuide.leadingAnchor).isActive = true
+        sizeControl.trailingAnchor.constraint(equalTo: containerView.layoutMarginsGuide.trailingAnchor).isActive = true
         
-        doneButton.translatesAutoresizingMaskIntoConstraints = false
-        doneButton.backgroundColor = .gray3
-        doneButton.setTitle("generic.done".localized, for: .normal)
-        addSubview(doneButton)
-        doneButton.setContentCompressionResistancePriority(UILayoutPriority.required, for: .vertical)
-        doneButton.setContentHuggingPriority(UILayoutPriority.required, for: .vertical)
-        doneButton.topAnchor.constraint(equalTo: sortPickerView.bottomAnchor, constant: .padding).isActive = true
-        doneButton.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
-        doneButton.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor).isActive = true
-        doneButton.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
+        continueButton.translatesAutoresizingMaskIntoConstraints = false
+        continueButton.backgroundColor = .crazeGreen
+        continueButton.setTitle("generic.close".localized, for: .normal)
+        continueButton.layer.cornerRadius = 0
+        continueButton.layer.shadowOpacity = 0
+        containerView.addSubview(continueButton)
+        continueButton.topAnchor.constraint(equalTo: sizeControl.bottomAnchor, constant: verticalPadding).isActive = true
+        continueButton.leadingAnchor.constraint(equalTo: containerView.leadingAnchor).isActive = true
+        continueButton.bottomAnchor.constraint(equalTo: containerView.bottomAnchor).isActive = true
+        continueButton.trailingAnchor.constraint(equalTo: containerView.trailingAnchor).isActive = true
     }
     
-    override func willMove(toWindow newWindow: UIWindow?) {
-        super.willMove(toWindow: newWindow)
-        
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         controls.sync()
     }
     
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        
-        // Needed in iOS 10
-        layoutMargins = UIEdgeInsets(top: .padding, left: .extendedPadding, bottom: .padding, right: .extendedPadding)
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        continueButton.setTitle("generic.close".localized, for: .normal)
     }
     
-    override var intrinsicContentSize: CGSize {
-        return UILayoutFittingExpandedSize
-    }
-}
-
-enum ProductsOptionsCategory : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol {
-    case fashion = 1
-    case furniture
-    case auto
-    
-    static let `default` = ProductsOptionsCategory.auto
-    
-    static var globalValue: ProductsOptionsCategory {
-        return ProductsOptionsCategory(intValue: UserDefaults.standard.integer(forKey: UserDefaultsKeys.productCategory))
-    }
-    
-    init(intValue: Int) {
-        self = ProductsOptionsCategory(rawValue: intValue) ?? .default
-    }
-    
-    init(offsetValue: Int) {
-        self.init(intValue: offsetValue + 1)
-    }
-    
-    var offsetValue: Int {
-        return self.rawValue - 1
-    }
-    
-    var stringValue: String {
-        var string: String
-        
-        switch self {
-        case .fashion: string = "products.options.category.fashion".localized
-        case .furniture: string = "products.options.category.furniture".localized
-        case .auto: string = "products.options.category.auto".localized
-        }
-        
-        return string
-    }
-    var analyticsStringValue:String {
-        switch self {
-        case .fashion: return "fashion";
-        case .furniture: return "furniture";
-        case .auto: return "auto";
-        }
+    @objc private func optionsChangedAction() {
+        continueButton.setTitle("generic.save".localized, for: .normal)
     }
 }
 
@@ -615,16 +504,6 @@ enum ProductsOptionsGender : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol 
     }
 }
 
-class _ProductsOptionsGender : NSObject {
-    static func toOffsetValue(_ value: Int) -> Int {
-        return ProductsOptionsGender(offsetValue: value).rawValue
-    }
-    
-    static func fromOffsetValue(_ value: Int) -> Int {
-        return ProductsOptionsGender(intValue: value).offsetValue
-    }
-}
-
 enum ProductsOptionsSize : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol {
     case child = 1
     case adult
@@ -668,18 +547,6 @@ enum ProductsOptionsSize : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol {
     }
 }
 
-class _ProductsOptionsSize : NSObject {
-    static func toOffsetValue(_ value: Int) -> Int {
-        return ProductsOptionsSize(offsetValue: value).rawValue
-    }
-    
-    static func fromOffsetValue(_ value: Int) -> Int {
-        return ProductsOptionsSize(intValue: value).offsetValue
-    }
-    
-   
-}
-
 enum ProductsOptionsSale : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol {
     case sale = 1
     case all
@@ -714,7 +581,7 @@ enum ProductsOptionsSale : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol {
     }
 }
 
-enum ProductsOptionsSort : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol {
+enum ProductsOptionsSort: Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol {
     case similar = 1
     case priceAsc
     case priceDes
@@ -726,6 +593,13 @@ enum ProductsOptionsSort : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol {
         return ProductsOptionsSort(intValue: UserDefaults.standard.integer(forKey: UserDefaultsKeys.productSort))
     }
     
+    static let all: [ProductsOptionsSort] = [
+        .similar,
+        .priceAsc,
+        .priceDes,
+        .brands
+    ]
+    
     init(intValue: Int) {
         self = ProductsOptionsSort(rawValue: intValue) ?? .default
     }
@@ -736,6 +610,16 @@ enum ProductsOptionsSort : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol {
     
     var offsetValue: Int {
         return self.rawValue - 1
+    }
+    
+    static func with(stringValue:String) -> ProductsOptionsSort?{
+        for option in all {
+            if option.stringValue == stringValue {
+                return option
+            }
+        }
+        
+        return nil
     }
     
     var stringValue: String {
