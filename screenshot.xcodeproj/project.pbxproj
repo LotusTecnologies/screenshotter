@@ -219,7 +219,6 @@
 		C5FF413E200B817400342DEC /* DiscoverScreenshotCollectionViewLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5FF413D200B817400342DEC /* DiscoverScreenshotCollectionViewLayout.swift */; };
 		C5FF4140200BA23900342DEC /* DiscoverScreenshotHelperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5FF413F200BA23900342DEC /* DiscoverScreenshotHelperView.swift */; };
 		E4139D501F09083B00E8A53B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E4139D4F1F09083B00E8A53B /* Assets.xcassets */; };
-		E4144A001F41890900B1F039 /* ClarifaiModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E41449FF1F41890900B1F039 /* ClarifaiModel.swift */; };
 		E42AC3911F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E42AC3901F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift */; };
 		E4351D702031957800193657 /* MainTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4351D6F2031957800193657 /* MainTabBarController.swift */; };
 		E44CA6FC1F41E608001CB493 /* NetworkingPromise.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44CA6FB1F41E608001CB493 /* NetworkingPromise.swift */; };
@@ -483,7 +482,6 @@
 		E402A7C72084D59B00094F14 /* Model 15.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 15.xcdatamodel"; sourceTree = "<group>"; };
 		E4139D401F09083B00E8A53B /* screenshot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = screenshot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4139D4F1F09083B00E8A53B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		E41449FF1F41890900B1F039 /* ClarifaiModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClarifaiModel.swift; sourceTree = "<group>"; };
 		E41BB9321F61BDD200A74F04 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E41BB9341F61BDD900A74F04 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E41BB9361F652EA000A74F04 /* Model 3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 3.xcdatamodel"; sourceTree = "<group>"; };
@@ -644,7 +642,6 @@
 				C5278FB91F3C38510090E422 /* AssetSyncModel.swift */,
 				C5278FBD1F3C38510090E422 /* Model.xcdatamodeld */,
 				E44CA6FB1F41E608001CB493 /* NetworkingPromise.swift */,
-				E41449FF1F41890900B1F039 /* ClarifaiModel.swift */,
 				318FE265204C09C500277DD4 /* AsyncOperation.swift */,
 				E4CD8E681FA9E81B006F2CDA /* ApplicationStateModel.swift */,
 				C5CAF27B1FCC14C1006F37DC /* CurrencyModel.swift */,
@@ -1476,7 +1473,6 @@
 				316C831620C3AEBD0012A908 /* Shoppable+craze.swift in Sources */,
 				C50E2617207F6703003C8D24 /* TextFieldFormatter.swift in Sources */,
 				C501412A2061080700ABFB5C /* FavoriteProductsView.swift in Sources */,
-				E4144A001F41890900B1F039 /* ClarifaiModel.swift in Sources */,
 				C5F53D8E2014A592003A57EC /* LegalViewControllerFactory.swift in Sources */,
 				C5D579382042897300A076FE /* CollectionView.swift in Sources */,
 				C53EAF902019B68B000E4544 /* ProductWebViewController.swift in Sources */,

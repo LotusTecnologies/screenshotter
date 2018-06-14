@@ -841,7 +841,7 @@ extension ProductsViewControllerNoItemsHelperView{
     }
     
     @objc func noItemsRetryAction() {
-        AssetSyncModel.sharedInstance.refetchShoppables(screenshot: self.screenshot, classificationString: "h")
+        AssetSyncModel.sharedInstance.refetchShoppables(screenshot: self.screenshot)
     }
 }
 
