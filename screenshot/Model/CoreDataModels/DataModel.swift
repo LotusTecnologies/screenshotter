@@ -1137,8 +1137,6 @@ extension DataModel {
                 let managedObjectContext = container.newBackgroundContext()
                 self.initializeFavoritesSets(managedObjectContext: managedObjectContext)
                 self.cleanDeletedScreenshots(managedObjectContext: managedObjectContext)
-                self.fixProductFiltersNoClassification(managedObjectContext: managedObjectContext)
-                self.fixProductsNoClassification(managedObjectContext: managedObjectContext)
             }
             op.queuePriority = .veryHigh // Earlier actions may have already been queued - make sure migration is at the top of the list.
             self.dbQ.addOperation(op)
@@ -1228,42 +1226,6 @@ extension DataModel {
         } catch {
             self.receivedCoreDataError(error: error)
             print("cleanDeletedScreenshots results with error:\(error)")
-        }
-    }
-    
-    func fixProductFiltersNoClassification(managedObjectContext: NSManagedObjectContext) {
-        let noClassificationPredicate = NSPredicate(format: "(optionsMask & 192) == 0")
-        let fetchRequest: NSFetchRequest<ProductFilter> = ProductFilter.fetchRequest()
-        fetchRequest.predicate = noClassificationPredicate
-        fetchRequest.sortDescriptors = nil
-        
-        do {
-            let results = try managedObjectContext.fetch(fetchRequest)
-            for productFilter in results {
-                productFilter.optionsMask |= Int32(ProductsOptionsMask.categoryFashion.rawValue)
-            }
-            try managedObjectContext.save()
-        } catch {
-            self.receivedCoreDataError(error: error)
-            print("fixProductFiltersNoClassification results with error:\(error)")
-        }
-    }
-    
-    func fixProductsNoClassification(managedObjectContext: NSManagedObjectContext) {
-        let noClassificationPredicate = NSPredicate(format: "(optionsMask & 192) == 0")
-        let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
-        fetchRequest.predicate = noClassificationPredicate
-        fetchRequest.sortDescriptors = nil
-        
-        do {
-            let results = try managedObjectContext.fetch(fetchRequest)
-            for product in results {
-                product.optionsMask |= Int32(ProductsOptionsMask.categoryFashion.rawValue)
-            }
-            try managedObjectContext.save()
-        } catch {
-            self.receivedCoreDataError(error: error)
-            print("fixProductsNoClassification results with error:\(error)")
         }
     }
     
