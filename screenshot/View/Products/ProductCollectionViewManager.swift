@@ -229,3 +229,8 @@ class ProductCollectionViewManager {
         }
     }
 }
+
+//Related looks
+extension ProductCollectionViewManager {
+    
+}
