@@ -116,6 +116,8 @@ class ProfileViewController: UITableViewController {
         tableView.backgroundColor = .background
         
         profileAccountView.delegate = self
+        profileAccountView.name = "Corey Werner"
+        profileAccountView.email = "cnotethegr8@gmail.com"
     }
     
     override func viewDidLayoutSubviews() {
@@ -127,6 +129,10 @@ class ProfileViewController: UITableViewController {
         else {
             profileAccountView.maxHeight = tableView.bounds.size.height - tableView.contentInset.top - tableView.contentInset.bottom
         }
+    }
+    
+    deinit {
+        profileAccountView.delegate = nil
     }
     
     // MARK: Login

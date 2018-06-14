@@ -173,6 +173,7 @@
 		C58FA0F620A95FC300072966 /* TutorialEmailSlideViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0EA20A95FC300072966 /* TutorialEmailSlideViewController.swift */; };
 		C58FA0F720A95FC300072966 /* CampaignPromotionExplanationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0EB20A95FC300072966 /* CampaignPromotionExplanationViewController.swift */; };
 		C58FA0F820A95FC300072966 /* GiftCardDoneViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0EC20A95FC300072966 /* GiftCardDoneViewController.swift */; };
+		C593460E20D25D0B00769BB9 /* UnderlineTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C593460D20D25D0B00769BB9 /* UnderlineTextField.swift */; };
 		C5A02E36209841D700CEEF7E /* CheckoutWhatIsCVVWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A02E35209841D700CEEF7E /* CheckoutWhatIsCVVWebViewController.swift */; };
 		C5A1922D2057AD520046303C /* IntrinsicContentSizePresentationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A1922B2057AD510046303C /* IntrinsicContentSizePresentationController.swift */; };
 		C5A1922E2057AD520046303C /* DimmedPresentationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A1922C2057AD510046303C /* DimmedPresentationController.swift */; };
@@ -439,6 +440,7 @@
 		C58FA0EA20A95FC300072966 /* TutorialEmailSlideViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialEmailSlideViewController.swift; sourceTree = "<group>"; };
 		C58FA0EB20A95FC300072966 /* CampaignPromotionExplanationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CampaignPromotionExplanationViewController.swift; sourceTree = "<group>"; };
 		C58FA0EC20A95FC300072966 /* GiftCardDoneViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GiftCardDoneViewController.swift; sourceTree = "<group>"; };
+		C593460D20D25D0B00769BB9 /* UnderlineTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnderlineTextField.swift; sourceTree = "<group>"; };
 		C5A02E35209841D700CEEF7E /* CheckoutWhatIsCVVWebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutWhatIsCVVWebViewController.swift; sourceTree = "<group>"; };
 		C5A1922B2057AD510046303C /* IntrinsicContentSizePresentationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IntrinsicContentSizePresentationController.swift; sourceTree = "<group>"; };
 		C5A1922C2057AD510046303C /* DimmedPresentationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DimmedPresentationController.swift; sourceTree = "<group>"; };
@@ -898,6 +900,7 @@
 				C5D57930203EDD6200A076FE /* TableView */,
 				C54088441FE90E2200198955 /* TableViewCell */,
 				C572C0D920AAE5D2004B0A17 /* Template */,
+				C593460C20D25CF700769BB9 /* TextField */,
 				C540884A1FE90E2200198955 /* TextView */,
 				C54369652046D6E500599134 /* ViewController */,
 				C5F37C9D20555C0C0072FE1D /* ViewControllerTransitioning */,
@@ -1067,6 +1070,14 @@
 				C58FA0E620A95FC200072966 /* VideoDisplayingViewControllerDelegate.swift */,
 			);
 			path = Onboarding;
+			sourceTree = "<group>";
+		};
+		C593460C20D25CF700769BB9 /* TextField */ = {
+			isa = PBXGroup;
+			children = (
+				C593460D20D25D0B00769BB9 /* UnderlineTextField.swift */,
+			);
+			path = TextField;
 			sourceTree = "<group>";
 		};
 		C5A1922A2057AD510046303C /* PresentationController */ = {
@@ -1644,6 +1655,7 @@
 				C5FF4140200BA23900342DEC /* DiscoverScreenshotHelperView.swift in Sources */,
 				C58FA0F520A95FC300072966 /* GiftCardCampaignViewController.swift in Sources */,
 				523C11391F5C195D001BD969 /* RatingFlow.swift in Sources */,
+				C593460E20D25D0B00769BB9 /* UnderlineTextField.swift in Sources */,
 				C543F45D20C95065007F568E /* ProfileAccountView.swift in Sources */,
 				C527312720B67C2700A0E2EB /* ProductPriceAlertController.swift in Sources */,
 				31CE1112203BF055000156EE /* ProductsBarCollectionView.swift in Sources */,

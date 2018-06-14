@@ -20,9 +20,10 @@ class ProfileAccountView: UIView {
     private let loggedInContainerView = UIImageView()
     private let loggedInControl = UIControl()
     private let nameLabel = UILabel()
-    private let nameTextField = UITextField()
+    private let nameTextField = UnderlineTextField()
     private let emailLabel = UILabel()
-    private let emailTextField = UITextField()
+    private let emailTextField = UnderlineTextField()
+    private let continueButton = MainButton()
     private let loggedOutContainerView = UIImageView()
     
     private var heightConstraint: NSLayoutConstraint?
@@ -68,13 +69,15 @@ class ProfileAccountView: UIView {
             if isExpanded {
                 NSLayoutConstraint.deactivate(contractedConstraints)
                 NSLayoutConstraint.activate(expandedConstraints)
+                
+                loggedInContainerView.sendSubview(toBack: loggedInControl)
             }
             else {
                 NSLayoutConstraint.deactivate(expandedConstraints)
                 NSLayoutConstraint.activate(contractedConstraints)
+                
+                loggedInContainerView.bringSubview(toFront: loggedInControl)
             }
-            
-            loggedInControl.isUserInteractionEnabled = !isExpanded
             
             let contractedAlpha: CGFloat = isExpanded ? 0 : 1
             nameLabel.alpha = contractedAlpha
@@ -83,6 +86,7 @@ class ProfileAccountView: UIView {
             let expandedAlpha: CGFloat = isExpanded ? 1 : 0
             nameTextField.alpha = expandedAlpha
             emailTextField.alpha = expandedAlpha
+            continueButton.alpha = expandedAlpha
         }
     }
     
@@ -201,19 +205,18 @@ class ProfileAccountView: UIView {
         labelsLayoutGuide.bottomAnchor.constraint(lessThanOrEqualTo: loggedInContainerView.layoutMarginsGuide.bottomAnchor).isActive = true
         labelsLayoutGuide.centerYAnchor.constraint(equalTo: loggedInContainerView.layoutMarginsGuide.centerYAnchor).isActive = true
         
-        
-        // TODO: set delegate and set nameLabel.text = nameTextField.text
         nameTextField.translatesAutoresizingMaskIntoConstraints = false
-        nameTextField.text = "Corey Werner"
-        nameTextField.backgroundColor = .white
+        nameTextField.placeholder = "Name"
         nameTextField.alpha = 0
-        
+        nameTextField.delegate = self
+        nameTextField.autocorrectionType = .no
+        nameTextField.autocapitalizationType = .words
+        nameTextField.spellCheckingType = .no
         loggedInContainerView.addSubview(nameTextField)
         
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
         nameLabel.font = .screenshopFont(.quicksandMedium, size: 22)
         nameLabel.textColor = .gray2
-        nameLabel.text = "Corey Werner"
         nameLabel.adjustsFontSizeToFitWidth = true
         nameLabel.minimumScaleFactor = 0.5
         nameLabel.baselineAdjustment = .alignCenters
@@ -230,31 +233,55 @@ class ProfileAccountView: UIView {
         ]
         expandedConstraints += [
             nameTextField.topAnchor.constraint(equalTo: avatarButton.bottomAnchor, constant: .extendedPadding),
-            nameTextField.leadingAnchor.constraint(equalTo: loggedInContainerView.layoutMarginsGuide.leadingAnchor),
-            nameTextField.trailingAnchor.constraint(equalTo: loggedInContainerView.layoutMarginsGuide.trailingAnchor),
+            nameTextField.leadingAnchor.constraint(equalTo: loggedInContainerView.leadingAnchor, constant: .padding * 1.5),
+            nameTextField.trailingAnchor.constraint(equalTo: loggedInContainerView.trailingAnchor, constant: -.padding * 1.5),
             
             nameLabel.leadingAnchor.constraint(equalTo: nameTextField.leadingAnchor),
             nameLabel.trailingAnchor.constraint(equalTo: nameTextField.trailingAnchor),
             nameLabel.centerYAnchor.constraint(equalTo: nameTextField.centerYAnchor),
         ]
         
+        emailTextField.translatesAutoresizingMaskIntoConstraints = false
+        emailTextField.placeholder = "Email"
+        emailTextField.alpha = 0
+        emailTextField.delegate = self
+        emailTextField.autocorrectionType = .no
+        emailTextField.autocapitalizationType = .none
+        emailTextField.spellCheckingType = .no
+        emailTextField.keyboardType = .emailAddress
+        loggedInContainerView.addSubview(emailTextField)
+        
         emailLabel.translatesAutoresizingMaskIntoConstraints = false
         emailLabel.font = .screenshopFont(.quicksand, size: 18)
         emailLabel.textColor = .gray2
-        emailLabel.text = "cnotethegr8@gmail.com"
         emailLabel.adjustsFontSizeToFitWidth = true
         emailLabel.minimumScaleFactor = 0.5
         emailLabel.baselineAdjustment = .alignCenters
         loggedInContainerView.addSubview(emailLabel)
-        emailLabel.topAnchor.constraint(equalTo: nameLabel.lastBaselineAnchor, constant: .padding / 2).isActive = true
-        emailLabel.leadingAnchor.constraint(equalTo: nameLabel.leadingAnchor).isActive = true
-        emailLabel.bottomAnchor.constraint(equalTo: labelsLayoutGuide.bottomAnchor).isActive = true
-        emailLabel.trailingAnchor.constraint(equalTo: loggedInContainerView.layoutMarginsGuide.trailingAnchor).isActive = true
         
+        contractedConstraints += [
+            emailTextField.leadingAnchor.constraint(equalTo: emailLabel.leadingAnchor),
+            emailTextField.trailingAnchor.constraint(equalTo: emailLabel.trailingAnchor),
+            emailTextField.centerYAnchor.constraint(equalTo: emailLabel.centerYAnchor),
+            
+            emailLabel.topAnchor.constraint(equalTo: nameLabel.lastBaselineAnchor, constant: .padding / 2),
+            emailLabel.leadingAnchor.constraint(equalTo: nameLabel.leadingAnchor),
+            emailLabel.bottomAnchor.constraint(equalTo: labelsLayoutGuide.bottomAnchor),
+            emailLabel.trailingAnchor.constraint(equalTo: loggedInContainerView.layoutMarginsGuide.trailingAnchor)
+        ]
+        expandedConstraints += [
+            emailTextField.topAnchor.constraint(equalTo: nameTextField.bottomAnchor, constant: .padding),
+            emailTextField.leadingAnchor.constraint(equalTo: nameTextField.leadingAnchor),
+            emailTextField.trailingAnchor.constraint(equalTo: nameTextField.trailingAnchor),
+            
+            emailLabel.leadingAnchor.constraint(equalTo: nameTextField.leadingAnchor),
+            emailLabel.trailingAnchor.constraint(equalTo: nameTextField.trailingAnchor),
+            emailLabel.centerYAnchor.constraint(equalTo: nameTextField.centerYAnchor)
+        ]
         
-        let continueButton = MainButton()
         continueButton.translatesAutoresizingMaskIntoConstraints = false
         continueButton.backgroundColor = .crazeGreen
+        continueButton.alpha = 0
         continueButton.isExclusiveTouch = true
         continueButton.setTitle("Done", for: .normal)
         continueButton.addTarget(self, action: #selector(loggedInContinueAction), for: .touchUpInside)
@@ -265,7 +292,7 @@ class ProfileAccountView: UIView {
             continueButton.bottomAnchor.constraint(equalTo: loggedInContainerView.layoutMarginsGuide.bottomAnchor, constant: 80) // Constant large enough to not show the button
         ]
         expandedConstraints += [
-            continueButton.bottomAnchor.constraint(equalTo: loggedInContainerView.layoutMarginsGuide.bottomAnchor)
+            continueButton.bottomAnchor.constraint(equalTo: loggedInContainerView.bottomAnchor, constant: -.extendedPadding)
         ]
         
         loggedInControl.translatesAutoresizingMaskIntoConstraints = false
@@ -282,6 +309,27 @@ class ProfileAccountView: UIView {
     }
     
     @objc private func loggedInControlAction() {
-        delegate?.profileAccountViewWantsToExpand(self)
+        if isExpanded {
+            loggedInContainerView.endEditing(true)
+        }
+        else {
+            delegate?.profileAccountViewWantsToExpand(self)
+        }
+    }
+}
+
+extension ProfileAccountView: UITextFieldDelegate {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
+    }
+    
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        if textField == nameTextField {
+            name = textField.text
+        }
+        else if textField == emailTextField {
+            email = textField.text
+        }
     }
 }
