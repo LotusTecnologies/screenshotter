@@ -265,7 +265,7 @@ extension DataModel {
                 request.predicate = NSPredicate(format: "isHidden == FALSE AND isRecognized == TRUE AND sourceString != %@", ScreenshotSource.shuffle.rawValue)
                 if let count =  try? managedObjectContext.count(for: request) {
                     if count == 0{
-                        Analytics.trackScreenshotDeletedAll()
+                        Analytics.trackScreenshotDeletedAll(amountJustDeeleted: screenshotOIDArray.count)
                     }
                 }
 
