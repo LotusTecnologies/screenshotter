@@ -377,10 +377,10 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         if kind == UICollectionElementKindSectionHeader {
             
             if sectionType == .relatedLooks {
-                return self.productCollectionViewManager.collectionView(collectionView, viewForHeaderWith:  "products.related_looks.headline".localized, indexPath: indexPath)
+               return self.productCollectionViewManager.collectionView(collectionView, viewForHeaderWith:  "products.related_looks.headline".localized, hasBackgroundAndLine:true, indexPath: indexPath)
             }
             
-            return self.productCollectionViewManager.collectionView(collectionView, viewForHeaderWith:  "", indexPath: indexPath)
+            return self.productCollectionViewManager.collectionView(collectionView, viewForHeaderWith:  "",hasBackgroundAndLine:false, indexPath: indexPath)
         }else if kind == SectionBackgroundCollectionViewFlowLayout.ElementKindSectionSectionBackground {
             if sectionType == .product {
                 return self.productCollectionViewManager.collectionView(collectionView, viewForBackgroundWith: self.view.backgroundColor, indexPath: indexPath)

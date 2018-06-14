@@ -197,11 +197,10 @@ extension ProductDetailViewController : UICollectionViewDelegateFlowLayout, UICo
 
         if kind == UICollectionElementKindSectionHeader {
             if indexPath.section == 1 && self.productLoadingState != .retry {
-                let view = self.productCollectionViewManager.collectionView(collectionView, viewForHeaderWith: "products.details.similar".localized, indexPath: indexPath)
-                view.backgroundColor = self.view.backgroundColor
+                let view = self.productCollectionViewManager.collectionView(collectionView, viewForHeaderWith: "products.details.similar".localized, hasBackgroundAndLine:false, indexPath: indexPath)
                 return view
             }
-            return self.productCollectionViewManager.collectionView(collectionView, viewForHeaderWith: "", indexPath: indexPath)
+            return self.productCollectionViewManager.collectionView(collectionView, viewForHeaderWith: "",hasBackgroundAndLine:false, indexPath: indexPath)
         }
         else if kind == SectionBackgroundCollectionViewFlowLayout.ElementKindSectionSectionBackground {
             if indexPath.section == 1 {
