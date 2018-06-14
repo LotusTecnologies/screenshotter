@@ -85,7 +85,7 @@ extension TutorialNavigationController: RegisterViewControllerDelegate {
     }
     
     func registerViewControllerDidFacebookLogin(_ viewController: RegisterViewController) {
-        tutorialCompleted()
+        presentRegisterConfirmationViewController()
     }
     
     func registerViewControllerDidFacebookSignup(_ viewController: RegisterViewController) {

@@ -445,7 +445,7 @@ class RegisterViewController: UIViewController {
         let hasValidPassword = isPasswordValid(_view.passwordTextField.text)
         
         if hasValidEmail,
-//            hasValidPassword,
+            hasValidPassword,
             let email = self.email,
             let password = _view.passwordTextField.text,
             self.continueButton.isLoading == false
@@ -511,6 +511,9 @@ class RegisterViewController: UIViewController {
     
     @objc fileprivate func skipRegistration() {
         func skip() {
+            let sendMeEmails = self._view.dealsSwitch.isOn
+
+            SigninManager.shared.makeAnonAccount(sendMeEmails: sendMeEmails)
             Analytics.trackSubmittedBlankEmail()
             delegate?.registerViewControllerDidSkip(self)
 

@@ -20,6 +20,19 @@ class SigninManager : NSObject {
         case createAccountUnconfirmed
         case createAccountConfirmed
     }
+    
+    enum UserAttribute : String{
+        
+        case permissionPush = "custom:permissionPush"
+        case permissionEmail = "custom:permissionEmail"
+        case permissionStoreImage = "custom:permissionStoreImage"
+        case permissionPicDetect = "custom:permissionPicDetect"
+        case sendMeEmails = "custom:SendMeEmails"
+        case name = "name"
+        case email = "email"
+
+    }
+    
     static let shared = SigninManager()
 
     var userAccountsCreatedByApp:[String] = UserDefaults.standard.object(forKey: UserDefaultsKeys.userAccountsCreatedByDevice) as? [String] ?? [] {
@@ -28,10 +41,25 @@ class SigninManager : NSObject {
         }
     }
     var user:AWSCognitoIdentityUser?
+    
+    var email:String? {
+        didSet{
+            UserDefaults.standard.set(email, forKey: UserDefaultsKeys.email)
+        }
+    }
+    var userAttributes:[AWSCognitoIdentityProviderAttributeType]?
     var pool:AWSCognitoIdentityUserPool?
-//    var anon:AWSAnonymousCredentialsProvider?
+
     var facebook = AWSFacebookSignInProvider.sharedInstance()
-    private var userCredential:AWSCredentials?
+    private var userCredential:AWSCredentials? {
+        didSet {
+            let secretKey = userCredential?.secretKey ?? ""
+            let accessKey = userCredential?.accessKey ?? ""
+            let sessionKey = userCredential?.sessionKey ?? ""
+            let expiration = userCredential?.expiration ?? Date.init(timeIntervalSince1970: 0)
+            UserDefaults.standard.set(["secretKey":secretKey,"accessKey":accessKey,"sessionKey":sessionKey,"expiration":expiration  ], forKey: UserDefaultsKeys.awsCred)
+        }
+    }
     
     override init() {
         
@@ -45,7 +73,7 @@ class SigninManager : NSObject {
         AWSSignInManager.sharedInstance().register(signInProvider: self.facebook)
         super.init()
         
-//        self.pool?.delegate = self
+        self.pool?.delegate = self
 
     }
     
@@ -86,10 +114,7 @@ class SigninManager : NSObject {
             })
         })
     }
-//    func skipLogin() -> Promise<Void>{
-//        let anon = AWSAnonymousCredentialsProvider.init()
-//        AWSSignInManager.sharedInstance().login(signInProviderKey: <#T##String#>, completionHandler: <#T##(Any?, Error?) -> Void#>)
-//    }
+    
     
     public func loginOrCreatAccountAsNeeded(email:String, password:String, sendMeEmails:Bool) -> Promise<LoginOrCreateAccountResult> {
         
@@ -122,6 +147,7 @@ class SigninManager : NSObject {
         let poolId = self.pool?.userPoolConfiguration.poolId ?? ""
         return NetworkingPromise.sharedInstance.deleteAccount(email: email, poolId: poolId)
     }
+    
     private func login(email:String, password:String) -> Promise<LoginOrCreateAccountResult>{
         return Promise<LoginOrCreateAccountResult>.init(resolvers: { (fulfil, reject) in
             
@@ -130,11 +156,23 @@ class SigninManager : NSObject {
                 
                 let user = pool.getUser(userName)
                 self.user = user
+                self.email = email.lowercased()
 
                 user.getSession(userName, password: password, validationData: [emailAttribute]).continueWith { (task) -> Any? in
                     if let error = task.error {
                         reject(error)
                     }else{
+                        user.getDetails().continueWith(block: { (task) -> Any? in
+                            if let result = task.result, let userAttributes = result.userAttributes {
+                                self.userAttributes = userAttributes
+                                userAttributes.forEach({ (attr) in
+                                    if attr.name == UserAttribute.name.rawValue, let value = attr.value {
+                                        UserDefaults.standard.set(value, forKey: UserDefaultsKeys.name)
+                                    }
+                                })
+                            }
+                            return nil
+                        })
                         fulfil(LoginOrCreateAccountResult.login)
                     }
                     return task
@@ -146,7 +184,31 @@ class SigninManager : NSObject {
             }
         })
     }
-    
+    @discardableResult func makeAnonAccount(sendMeEmails:Bool) -> Promise<Void> {
+        return Promise<Void>.init(resolvers: { (fulfil, reject) in
+//            let anon = awsanonsign.init()
+//            AWSSignInManager
+//            AWSSignInManager.sharedInstance().login(signInProviderKey: , completionHandler: { (result, error) in
+//                
+//            })
+//            
+            
+            if let user = pool?.getUser() {
+                self.user = user
+                user.getSession().continueWith(block: { (task) -> Any? in
+                    if let error = task.error {
+                        reject(error)
+                    }else{
+                       let _ = self.set(attribute: UserAttribute.sendMeEmails, value: sendMeEmails)
+                        fulfil(())
+                    }
+                    return task
+                })
+            }else{
+                reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+            }
+        })
+    }
     private func createAccount(email:String, password:String, sendMeEmails:Bool) -> Promise<LoginOrCreateAccountResult>{
         return Promise<LoginOrCreateAccountResult>.init(resolvers: { (fulfil, reject) in
             let email = email.lowercased()
@@ -160,6 +222,7 @@ class SigninManager : NSObject {
                     }else if let user = task.result?.user {
                         self.userAccountsCreatedByApp = self.userAccountsCreatedByApp + [email]
                         self.user = user
+                        self.email = email.lowercased()
                         if user.confirmedStatus == .confirmed {
                             fulfil(LoginOrCreateAccountResult.createAccountConfirmed)
                         }else {
@@ -174,25 +237,6 @@ class SigninManager : NSObject {
                 reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
             }
         })
-    }
-    
-    
-    private func registerUser() {
-        // TODO: Gershon needs to deal with this
-//        
-//        let name = ""
-//        let email = self.email
-//        
-//        UserDefaults.standard.set(name, forKey: UserDefaultsKeys.name)
-//        UserDefaults.standard.set(email, forKey: UserDefaultsKeys.email)
-//        
-//        let user = AnalyticsUser(name: name, email: email)
-//        user.sendToServers()
-//        
-//        Analytics.trackSubmittedEmail(email: email)
-//        
-//        UserDefaults.standard.set(user.identifier, forKey: UserDefaultsKeys.userID)
-//        UserDefaults.standard.synchronize()
     }
     
     func confirmSignup(code:String) -> Promise<Void>{
@@ -221,6 +265,7 @@ class SigninManager : NSObject {
                 
                 let user = pool.getUser(userName)
                 self.user = user
+                self.email = email.lowercased()
                 user.resendConfirmationCode().continueWith(executor: AWSExecutor.mainThread(), block: { (task) -> Any? in
                     if let error = task.error  {
                         reject(error)
@@ -234,6 +279,7 @@ class SigninManager : NSObject {
             }
         }
     }
+    
     public func validatePassword(_ password: String?) -> String? {
         if let password = password, !password.isEmpty, password.lengthOfBytes(using: .utf8) >= 8 {
             return password
@@ -245,6 +291,7 @@ class SigninManager : NSObject {
         return Promise { fulfill, reject in
             if self.user == nil {
                 self.user = self.pool?.getUser(email)
+                self.email = email.lowercased()
             }
             if let user = self.user  {
                 user.forgotPassword().continueWith(executor: AWSExecutor.mainThread(), block: { (task) -> Any? in
@@ -285,13 +332,35 @@ class SigninManager : NSObject {
                 if let error = error {
                     let nserror = error as NSError
                     reject(nserror)
-
                 }else{
                     fulfill(())
                 }
             })
         }
     }
+    
+    func set(attribute:UserAttribute, value:Bool) -> Promise<Void> {
+        return set(attribute: attribute, value: value.toStringLiteral())
+    }
+    func set(attribute:UserAttribute, value:String) -> Promise<Void> {
+        return Promise { fulfill, reject in
+            if let user = self.user {
+                user.update([AWSCognitoIdentityUserAttributeType.init(name: attribute.rawValue, value: value)]).continueWith { (task) -> Any? in
+                    if let error = task.error {
+                        reject(error)
+                    }else{
+                        fulfill(())
+                    }
+                    return nil
+                }
+            }else{
+                reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+                
+            }
+        }
+
+    }
+
 }
 
 extension SigninManager {
@@ -386,4 +455,8 @@ extension SigninManager {
         
         return alert
     }
+}
+
+extension SigninManager: AWSCognitoIdentityInteractiveAuthenticationDelegate {
+    
 }

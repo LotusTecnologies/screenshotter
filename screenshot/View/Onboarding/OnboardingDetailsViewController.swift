@@ -308,11 +308,34 @@ class OnboardingDetailsViewController: UIViewController {
         present(alertController, animated: true)
     }
     
+    func syncGenderAndSizeOptions() {
+        if let genderString = self.gender, let gender = ProductsOptionsGender.from(string: genderString) {
+            UserDefaults.standard.set(gender.rawValue, forKey: UserDefaultsKeys.productGender)
+        }
+        if let sizeString = self.size, let size = ProductsOptionsSize.from(string: sizeString) {
+            UserDefaults.standard.set(size.rawValue, forKey: UserDefaultsKeys.productSize)
+        }
+    }
+    
+    func updateUserProperties() {
+        UserDefaults.standard.set(name, forKey: UserDefaultsKeys.name)
+
+        let user = AnalyticsUser(name: self.name, email: SigninManager.shared.email)
+        user.sendToServers()
+
+    }
     @objc private func continueAction() {
+        self.syncGenderAndSizeOptions()
+        self.updateUserProperties()
+        if let name = self.name {
+            SigninManager.shared.set(attribute:SigninManager.UserAttribute.name, value:name)
+        }
         delegate?.onboardingDetailsViewControllerDidContinue(self)
     }
     
     @objc private func skipAction() {
+        self.syncGenderAndSizeOptions()
+
         delegate?.onboardingDetailsViewControllerDidSkip(self)
     }
     
