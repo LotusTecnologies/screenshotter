@@ -841,15 +841,7 @@ extension ProductsViewControllerNoItemsHelperView{
     }
     
     @objc func noItemsRetryAction() {
-        let alert = UIAlertController(title: "products.helper.retry.title".localized, message: nil, preferredStyle: .actionSheet)
-        alert.addAction(UIAlertAction(title: "products.helper.retry.fashion".localized, style: .default, handler: { (a) in
-            AssetSyncModel.sharedInstance.refetchShoppables(screenshot: self.screenshot, classificationString: "h")
-        }))
-        alert.addAction(UIAlertAction(title: "products.helper.retry.furniture".localized, style: .default, handler: { (a) in
-            AssetSyncModel.sharedInstance.refetchShoppables(screenshot: self.screenshot, classificationString: "f")
-        }))
-        alert.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
-        self.present(alert, animated: true, completion: nil)
+        AssetSyncModel.sharedInstance.refetchShoppables(screenshot: self.screenshot)
     }
 }
 
