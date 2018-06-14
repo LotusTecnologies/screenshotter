@@ -9,6 +9,9 @@
 import Foundation
 
 class Constants {
+    // iTunes
+    static let itunesConnectApp = "itms-apps://itunes.apple.com/app/id1254964391"
+    static let itunesConnect = "https://itunes.apple.com/us/app/screenshop-by-craze/id1254964391"
 
     // Product decisions
     static let notificationProductToImportCountLimit = 4

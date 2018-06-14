@@ -44,7 +44,7 @@ class ProfileViewController: UITableViewController {
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setBackgroundImage(UIImage(named: "BrandGradientControl"), for: .normal)
         button.setTitle("Tell a Friend!", for: .normal)
-//        button.addTarget(self, action: #selector(inviteAction), for: .touchUpInside)
+        button.addTarget(self, action: #selector(inviteAction), for: .touchUpInside)
         button.clipsToBounds = true
         view.addSubview(button)
         button.sizeToFit()
@@ -121,7 +121,7 @@ class ProfileViewController: UITableViewController {
     // MARK: Login
     
     private func syncLoggedIn() {
-        let isLoggedIn = true
+        let isLoggedIn = true // TODO:
         
         if isLoggedIn {
             data[.logout] = [.logout]
@@ -129,6 +129,24 @@ class ProfileViewController: UITableViewController {
         else {
             data.removeValue(forKey: .logout)
         }
+    }
+    
+    // MARK: Invite
+    
+    @objc private func inviteAction() {
+        guard let url = URL(string: Constants.itunesConnect) else {
+            return
+        }
+        
+        let activityViewController = UIActivityViewController(activityItems: [url], applicationActivities: nil)
+        activityViewController.popoverPresentationController?.sourceView = self.view
+        activityViewController.excludedActivityTypes = [
+            .addToReadingList,
+            .airDrop,
+            .init("com.apple.reminders.RemindersEditorExtension"),
+            .init("com.apple.mobilenotes.SharingExtension")
+        ]
+        present(activityViewController, animated: true)
     }
 }
 
