@@ -15,6 +15,7 @@ extension CGFloat {
     static let halfPoint: CGFloat = UIScreen.main.scale > 1 ? 0.5 : 1
     
     static let defaultCornerRadius: CGFloat = 6
+    static let defaultViewHeight: CGFloat = 44
     
     var isValid:Bool {
         return !self.isNaN && self.isFinite

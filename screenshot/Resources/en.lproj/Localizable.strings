@@ -249,9 +249,6 @@
 "products.helper.retry.furniture" = "Furniture";
 "products.helper.retry.title" = "Try again as";
 "products.helper.title" = "No Items Found";
-"products.options.category.auto" = "Auto";
-"products.options.category.fashion" = "Fashion";
-"products.options.category.furniture" = "Furniture";
 "products.options.gender.auto" = "All";
 "products.options.gender.female" = "Female";
 "products.options.gender.male" = "Male";
@@ -265,6 +262,7 @@
 "products.options.sort.price_des" = "Price (highest first)";
 "products.options.sort.similar" = "Similar";
 "products.options.sort.title" = "Sort by";
+"products.options.title" = "FILTER YOUR RESULTS";
 "products.rate.negative.help_finding_outfit" = "I need help finding this outfit... %@";
 "products.rate.negative.popup.message" =  "What were you expecting to see and what did you see instead?";
 "products.rate.negative.popup.title" =  "What’s Wrong Here?";
