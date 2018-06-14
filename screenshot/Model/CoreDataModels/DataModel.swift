@@ -267,7 +267,7 @@ extension DataModel {
                     if count == 0{
                         //convert from different enums
                         let kind:Analytics.AnalyticsScreenshotDeletedAllKind = (kind == .single) ? .single : .multi
-                        Analytics.trackScreenshotDeletedAll(amountJustDeeleted: screenshotOIDArray.count, kind:kind)
+                        Analytics.trackScreenshotDeletedAll(amountJustDeleted: screenshotOIDArray.count, kind:kind)
                     }
                 }
 
