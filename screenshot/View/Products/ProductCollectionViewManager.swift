@@ -56,7 +56,7 @@ class ProductCollectionViewManager {
         if let cell = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionElementKindSectionHeader, withReuseIdentifier: "header", for: indexPath) as? ProductsViewHeaderReusableView{
             cell.label.text = text
             cell.line.isHidden = !hasBackgroundAndLine
-            cell.filterButton.isHidden = hasFilterButton
+            cell.filterButton.isHidden = !hasFilterButton
             if hasBackgroundAndLine, let image = UIImage.init(named: "confetti") {
                 cell.backgroundColor = UIColor.init(patternImage: image )
             }else {

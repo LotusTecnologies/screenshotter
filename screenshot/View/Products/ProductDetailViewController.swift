@@ -227,7 +227,7 @@ extension ProductDetailViewController : UICollectionViewDelegateFlowLayout, UICo
 
         if kind == UICollectionElementKindSectionHeader {
             if indexPath.section == 1 && self.productLoadingState != .retry {
-                let view = self.productCollectionViewManager.collectionView(collectionView, viewForHeaderWith: "products.details.similar".localized, hasBackgroundAndLine:false, hasFilterButton:(self.productLoadingState != .products), indexPath: indexPath)
+                let view = self.productCollectionViewManager.collectionView(collectionView, viewForHeaderWith: "products.details.similar".localized, hasBackgroundAndLine:false, hasFilterButton:(self.productLoadingState == .products), indexPath: indexPath)
                 if let view = view as? ProductsViewHeaderReusableView {
                     view.filterButton.addTarget(self, action: #selector(presentOptions), for: .touchUpInside)
                 }
