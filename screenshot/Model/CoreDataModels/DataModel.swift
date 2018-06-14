@@ -251,7 +251,7 @@ extension DataModel {
             do {
                 screenshotOIDArray.forEach { screenshotOID in
                     if let screenshot = managedObjectContext.object(with: screenshotOID) as? Screenshot {
-                        Analytics.trackScreenshotDeleted(screenshot: screenshot, kind: .multi)
+                        Analytics.trackScreenshotDeleted(screenshot: screenshot)
                         do{
                             try screenshot.validateForUpdate()
                             screenshot.isHidden = true
@@ -259,10 +259,16 @@ extension DataModel {
                         } catch{
                             
                         }
-                        
-                        
                     }
                 }
+                let request:NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
+                request.predicate = NSPredicate(format: "isHidden == FALSE AND isRecognized == TRUE AND sourceString != %@", ScreenshotSource.shuffle.rawValue)
+                if let count =  try? managedObjectContext.count(for: request) {
+                    if count == 0{
+                        Analytics.trackScreenshotDeletedAll()
+                    }
+                }
+
                 try managedObjectContext.save()
             } catch {
                 self.receivedCoreDataError(error: error)

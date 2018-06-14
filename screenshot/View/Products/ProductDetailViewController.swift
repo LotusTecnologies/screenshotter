@@ -243,14 +243,24 @@ extension ProductDetailViewController : UICollectionViewDelegateFlowLayout, UICo
         guard let indexPath = collectionView?.indexPath(for: event) else {
             return
         }
+        let product:Product?
+        let location:Analytics.AnalyticsProductOpenedFromPage?
         
-        if let product = indexPath.section == 0 ? self.product : self.productAtIndex(indexPath.item) {
+        if  indexPath.section == 0 {
+            product = self.product
+            location = .burrownMain
+        }else{
+            product = self.productAtIndex(indexPath.item)
+            location = .burrowList
+        }
+        
+        if let product = product, let location = location {
             product.recordViewedProduct()
-            
-            if let productViewController = presentProduct(product, atLocation: .products) {
+            if let productViewController = presentProduct(product, atLocation: location) {
                 productViewController.similarProducts = products
             }
         }
+        
     }
     
 }
