@@ -17,6 +17,7 @@ class ProductDetailViewController: BaseViewController {
     var products:[Product] = []
     var shoppable:Shoppable?
     var productsOptions:ProductsOptions = ProductsOptions()
+    var relatedLooksManager = RelatedLooksManager()
     var noItemsHelperView:HelperView?
     var loaderContainer = UIView()
     var uuid:String?
@@ -39,7 +40,7 @@ class ProductDetailViewController: BaseViewController {
         
         super.viewDidLoad()
         self.title = product?.calculatedDisplayTitle
-        
+        self.relatedLooksManager.delegate = self
         
         if let shoppable = self.shoppable {
             productsFRC = DataModel.sharedInstance.productFrc(delegate: self, shoppableOID: shoppable.objectID)
@@ -111,27 +112,43 @@ class ProductDetailViewController: BaseViewController {
 
 
 extension ProductDetailViewController : UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        self.relatedLooksManager.scrollViewDidScroll(scrollView)
+    }
     var numberOfCollectionViewProductColumns: Int {
         return 2
     }
     
     public func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 2
+        return 3
     }
     
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if section == 0 {
             return 1
+        }else if section == 1 {
+            return self.products.count
+        }else if section == 2{
+            return self.relatedLooksManager.numberOfItems()
         }
-        return self.products.count
+        return 0
     }
     
     
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        if indexPath.section == 0{
+        if indexPath.section == 0 {
             return self.productCollectionViewManager.collectionView(collectionView, sizeForItemInSectionType: .productHeader)
-        }
+        }else if indexPath.section == 1 {
             return self.productCollectionViewManager.collectionView(collectionView, sizeForItemInSectionType: .product)
+        }else if indexPath.section == 2 {
+            if self.relatedLooksManager.relatedLooks?.value == nil {
+                return self.productCollectionViewManager.collectionView(collectionView, sizeForItemInSectionType: .error)
+            }else{
+                return self.productCollectionViewManager.collectionView(collectionView, sizeForItemInSectionType: .relatedLooks)
+            }
+        }
+        return .zero
+        
     }
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -150,7 +167,7 @@ extension ProductDetailViewController : UICollectionViewDelegateFlowLayout, UICo
             
             return cell
         }
-        else {
+        else if indexPath.section == 1{
             let product = self.products[indexPath.row]
             let cell = self.productCollectionViewManager.collectionView(collectionView, cellForItemAt: indexPath, with: product)
             
@@ -159,6 +176,8 @@ extension ProductDetailViewController : UICollectionViewDelegateFlowLayout, UICo
                 cell.actionButton.addTarget(self, action: #selector(productCollectionViewCellBuyAction(_:event:)), for: .touchUpInside)
             }
             return cell
+        }else {
+            return self.relatedLooksManager.collectionView(collectionView, cellForItemAt: indexPath)
         }
     }
     
@@ -180,15 +199,25 @@ extension ProductDetailViewController : UICollectionViewDelegateFlowLayout, UICo
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         if section == 0 {
             return .zero
+        }else if section == 1{
+            let minimumSpacing:CGPoint = self.collectionViewMinimumSpacing()
+            return UIEdgeInsets(top: minimumSpacing.y, left: minimumSpacing.x, bottom: minimumSpacing.y, right: minimumSpacing.x)
+        }else if section == 2{
+            if self.relatedLooksManager.hasInset() {
+                let minimumSpacing:CGPoint = self.collectionViewMinimumSpacing()
+                return UIEdgeInsets(top: minimumSpacing.y, left: minimumSpacing.x, bottom: minimumSpacing.y, right: minimumSpacing.x)
+            }
         }
-        
-        let minimumSpacing:CGPoint = self.collectionViewMinimumSpacing()
-        return UIEdgeInsets(top: minimumSpacing.y, left: minimumSpacing.x, bottom: minimumSpacing.y, right: minimumSpacing.x)
+        return .zero
     }
     
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         if section == 1{
             return CGSize.init(width: collectionView.bounds.size.width, height: 50)
+        }else if section == 2 {
+            if  self.relatedLooksManager.hasRelatedLooksSection() {
+                return CGSize.init(width: collectionView.bounds.size.width, height: 50)
+            }
         }
         return .zero
     }
@@ -199,12 +228,21 @@ extension ProductDetailViewController : UICollectionViewDelegateFlowLayout, UICo
             if indexPath.section == 1 && self.productLoadingState != .retry {
                 let view = self.productCollectionViewManager.collectionView(collectionView, viewForHeaderWith: "products.details.similar".localized, hasBackgroundAndLine:false, indexPath: indexPath)
                 return view
+            }else if indexPath.section == 2 && self.relatedLooksManager.hasRelatedLooksSection() {
+                let view = self.productCollectionViewManager.collectionView(collectionView, viewForHeaderWith: "products.related_looks.headline".localized, hasBackgroundAndLine:true, indexPath: indexPath)
+                return view
             }
+            
             return self.productCollectionViewManager.collectionView(collectionView, viewForHeaderWith: "",hasBackgroundAndLine:false, indexPath: indexPath)
         }
         else if kind == SectionBackgroundCollectionViewFlowLayout.ElementKindSectionSectionBackground {
             if indexPath.section == 1 {
                 return self.productCollectionViewManager.collectionView(collectionView, viewForBackgroundWith: .background, indexPath: indexPath)
+            }else if indexPath.section == 2 {
+                if let image = UIImage.init(named: "confetti") {
+                    let confettiColor = UIColor.init(patternImage: image )
+                    return self.productCollectionViewManager.collectionView(collectionView, viewForBackgroundWith: confettiColor, indexPath: indexPath)
+                }
             }
             return self.productCollectionViewManager.collectionView(collectionView, viewForBackgroundWith: .white, indexPath: indexPath)
         }
@@ -216,6 +254,18 @@ extension ProductDetailViewController : UICollectionViewDelegateFlowLayout, UICo
             let product = self.productAtIndex(indexPath.item)
             if let cell = collectionView.cellForItem(at: indexPath) as? ProductsCollectionViewCell{
                 self.productCollectionViewManager.burrow(cell: cell, product: product, fromVC: self)
+            }
+        }else if indexPath.section == 2 {
+            if let url = self.relatedLooksManager.relatedLook(at:indexPath.row) {
+                Analytics.trackScreenshotRelatedLookAdd(url: url)
+                AssetSyncModel.sharedInstance.addFromRelatedLook(urlString: url, callback: { (screenshot) in
+                    Analytics.trackOpenedScreenshot(screenshot: screenshot, source: .relatedLooks)
+                    let productsViewController = ProductsViewController.init(screenshot: screenshot)
+                    //This is so 'back' doens't say 'shop photo' which looks weird when the tile is shop photo
+                    self.navigationItem.backBarButtonItem = UIBarButtonItem.init(title: "", style: .plain, target: nil, action: nil)
+                    self.navigationController?.pushViewController(productsViewController, animated: true)
+                    
+                })
             }
         }
     }
@@ -345,4 +395,21 @@ extension ProductDetailViewController : AsyncOperationMonitorDelegate, FetchedRe
         }
         
     }
+}
+extension ProductDetailViewController: RelatedLooksManagerDelegate {
+    func relatedLooksManager(_ relatedLooksManager: RelatedLooksManager, present viewController: UIViewController) {
+        self.present(viewController, animated: true, completion: nil)
+    }
+    
+    func relatedLooksManagerGetProducts(_ relatedLooksManager: RelatedLooksManager) -> [Product]? {
+        return self.products
+    }
+    
+    func relatedLooksManagerReloadSection(_ relatedLooksManager:RelatedLooksManager){
+        let section = 2
+        self.collectionView?.reloadSections(IndexSet.init(integer: section))
+        
+    }
+    
+    
 }

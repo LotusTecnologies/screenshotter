@@ -813,11 +813,7 @@ extension ProductsViewController : RelatedLooksManagerDelegate {
     func relatedLooksManagerGetProducts(_ relatedLooksManager: RelatedLooksManager) -> [Product]? {
         return self.products
     }
-    
-    func relatedLooksManagerGetShoppable(_ relatedLooksManager: RelatedLooksManager) -> Shoppable? {
-        return self.products.first?.shoppable
-    }
-    
+        
     func relatedLooksManagerReloadSection(_ relatedLooksManager:RelatedLooksManager){
         let section = self.sectionIndex(forProductType: .relatedLooks)
         self.collectionView?.reloadSections(IndexSet.init(integer: section))
