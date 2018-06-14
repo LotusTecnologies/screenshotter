@@ -102,6 +102,9 @@ class ProductDetailViewController: BaseViewController {
             }else if let cell = cell as? ProductHeaderCollectionViewCell {
                 let imageView = cell.productImageView.imageView
                 CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: imageView)
+            }else if let cell = cell as? RelatedLooksCollectionViewCell {
+                let imageView = cell.imageView
+                CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: imageView)
             }
         }
     }
