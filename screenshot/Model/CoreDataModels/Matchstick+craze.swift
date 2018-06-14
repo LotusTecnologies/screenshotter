@@ -28,9 +28,8 @@ extension Matchstick {
                                                                    source: .discover,
                                                                    isHidden: false,
                                                                    imageData: matchstick.imageData as Data?,
-                                                                   classification: nil)
-                    addedScreenshot.uploadedImageURL = uploadedImageURL
-                    addedScreenshot.syteJson = syteJson
+                                                                   uploadedImageURL: uploadedImageURL,
+                                                                   syteJsonString: syteJson)
                     addedScreenshot.trackingInfo = matchstick.trackingInfo
                     if callback == nil {
                         managedObjectContext.delete(matchstick)

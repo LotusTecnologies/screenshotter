@@ -40,11 +40,12 @@ class ProductDetailViewController: BaseViewController {
         super.viewDidLoad()
         self.title = product?.calculatedDisplayTitle
         
+        self.productsOptions.delegate = self
         
         if let shoppable = self.shoppable {
             productsFRC = DataModel.sharedInstance.productFrc(delegate: self, shoppableOID: shoppable.objectID)
             
-            self.products = self.productCollectionViewManager.productsForShoppable(shoppable, productsOptions: self.productsOptions).filter{ $0.price != self.product?.price || $0.merchant != self.product?.merchant || $0.productTitle() != self.product?.productTitle() || $0.imageURL != self.product?.imageURL }
+            updateProductsWithShoppable()
             self.productsLoadingMonitor = AsyncOperationMonitor.init(assetId: nil, shoppableId: shoppable.imageUrl, queues: AssetSyncModel.sharedInstance.queues, delegate: self)
             self.updateLoadingState()
         }
@@ -146,6 +147,7 @@ extension ProductDetailViewController : UICollectionViewDelegateFlowLayout, UICo
                 
                 cell.favoriteControl.addTarget(self, action: #selector(productCollectionViewCellFavoriteAction(_:event:)), for: .touchUpInside)
                 cell.buyNowButton.addTarget(self, action: #selector(productCollectionViewCellBuyAction(_:event:)), for: .touchUpInside)
+                cell.productControl.addTarget(self, action: #selector(productCollectionViewCellBuyAction(_:event:)), for: .touchUpInside)
             }
             
             return cell
@@ -199,6 +201,12 @@ extension ProductDetailViewController : UICollectionViewDelegateFlowLayout, UICo
             if indexPath.section == 1 && self.productLoadingState != .retry {
                 let view = self.productCollectionViewManager.collectionView(collectionView, viewForHeaderWith: "products.details.similar".localized, indexPath: indexPath)
                 view.backgroundColor = self.view.backgroundColor
+                
+                if let view = view as? ProductsViewHeaderReusableView {
+                    view.filterButton.addTarget(self, action: #selector(presentOptions), for: .touchUpInside)
+                    view.filterButton.isHidden = (self.productLoadingState != .products)
+                }
+                
                 return view
             }
             return self.productCollectionViewManager.collectionView(collectionView, viewForHeaderWith: "", indexPath: indexPath)
@@ -243,20 +251,49 @@ extension ProductDetailViewController : UICollectionViewDelegateFlowLayout, UICo
         guard let indexPath = collectionView?.indexPath(for: event) else {
             return
         }
+        let product:Product?
+        let location:Analytics.AnalyticsProductOpenedFromPage?
         
-        if let product = indexPath.section == 0 ? self.product : self.productAtIndex(indexPath.item) {
+        if  indexPath.section == 0 {
+            product = self.product
+            location = .burrownMain
+        }else{
+            product = self.productAtIndex(indexPath.item)
+            location = .burrowList
+        }
+        
+        if let product = product, let location = location {
             product.recordViewedProduct()
-            
-            if let productViewController = presentProduct(product, atLocation: .products) {
+            if let productViewController = presentProduct(product, atLocation: location) {
                 productViewController.similarProducts = products
             }
         }
+        
     }
     
 }
 
-
-
+extension ProductDetailViewController: ProductsOptionsDelegate {
+    @objc private func presentOptions() {
+        Analytics.trackOpenedFiltersView()
+        
+        present(self.productsOptions.viewController, animated: true)
+    }
+    
+    @objc private func dismissOptions() {
+        dismiss(animated: true)
+    }
+    
+    func productsOptionsDidComplete(_ productsOptions: ProductsOptions, withModelChange changed: Bool) {
+        self.productsOptions = productsOptions
+        updateProductsWithShoppable()
+        self.dismissOptions()
+    }
+    
+    func productsOptionsDidCancel(_ productsOptions: ProductsOptions) {
+        dismissOptions()
+    }
+}
 
 extension ProductDetailViewController : AsyncOperationMonitorDelegate, FetchedResultsControllerManagerDelegate {
     func syncViewsAfterStateChange() {
@@ -265,15 +302,30 @@ extension ProductDetailViewController : AsyncOperationMonitorDelegate, FetchedRe
         switch (self.productLoadingState) {
         case .loading, .unknown:
             self.hideNoItemsHelperView()
-
+            
             self.productCollectionViewManager.startAndAddLoader(view: self.loaderContainer)
+            self.collectionView?.visibleSupplementaryViews(ofKind: UICollectionElementKindSectionHeader).forEach({ (view) in
+                if let view = view as? ProductsViewHeaderReusableView {
+                    view.filterButton.isHidden = true
+                }
+            })
         case .products:
             self.productCollectionViewManager.stopAndRemoveLoader()
             self.hideNoItemsHelperView()
+            self.collectionView?.visibleSupplementaryViews(ofKind: UICollectionElementKindSectionHeader).forEach({ (view) in
+                if let view = view as? ProductsViewHeaderReusableView {
+                    view.filterButton.isHidden = true
+                }
+            })
         case .retry:
             self.productCollectionViewManager.stopAndRemoveLoader()
             self.hideNoItemsHelperView()
             self.showNoItemsHelperView()
+            self.collectionView?.visibleSupplementaryViews(ofKind: UICollectionElementKindSectionHeader).forEach({ (view) in
+                if let view = view as? ProductsViewHeaderReusableView {
+                    view.filterButton.isHidden = true
+                }
+            })
         }
     }
     
@@ -329,9 +381,8 @@ extension ProductDetailViewController : AsyncOperationMonitorDelegate, FetchedRe
         self.updateLoadingState()
     }
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
-        if let shoppable = self.shoppable, self.products.count == 0 {
-            self.products = self.productCollectionViewManager.productsForShoppable(shoppable, productsOptions: self.productsOptions)
-            self.updateLoadingState()
+        if self.products.count == 0 {
+            updateProductsWithShoppable()
         }else if view.window != nil, let collectionView = collectionView {
             if change.updatedRows.count > 0 && change.deletedRows.count == 0 && change.insertedRows.count == 0 {
                 collectionView.indexPathsForVisibleItems.forEach { (indexPath) in
@@ -344,6 +395,16 @@ extension ProductDetailViewController : AsyncOperationMonitorDelegate, FetchedRe
                 collectionView.reloadData()
             }
         }
+        
+    }
+    func updateProductsWithShoppable(){
+        if let shoppable = self.shoppable{
+            self.products = self.productCollectionViewManager.productsForShoppable(shoppable, productsOptions: self.productsOptions).filter{ $0.price != self.product?.price || $0.merchant != self.product?.merchant || $0.productTitle() != self.product?.productTitle()}
+        }else{
+            self.products = []
+        }
+        self.collectionView?.reloadData()
+        self.updateLoadingState()
         
     }
 }

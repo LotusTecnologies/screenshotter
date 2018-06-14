@@ -371,7 +371,7 @@ extension ProductViewController: UICollectionViewDelegate {
                     return
             }
             
-            if let productViewController = presentProduct(products[indexPath.item], atLocation: .productSimilar) {
+            if let productViewController = presentProduct(products[indexPath.item], atLocation: .products) {
                 productViewController.similarProducts = products
                 
                 let rootItem = UIBarButtonItem(image: UIImage(named: "NavigationBarDoubleArrow"), style: .plain, target: self, action: #selector(navigateToProductsViewController))

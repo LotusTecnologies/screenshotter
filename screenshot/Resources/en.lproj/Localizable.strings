@@ -161,6 +161,16 @@
 "form.personal.email" = "Email";
 "form.personal.phone" = "Phone Number";
 
+"gdpr.image.message" = "When this setting is turned on, we send screenshots you take in and outside of the app to our server to detect whether there are clothing items in the photo and allow you to shop relevant photos quickly. This happens in the background and is not shown to you. We do not save any photos that are not detected as fashion.";
+"gdpr.image.title" = "Image Detection";
+"gdpr.notification.message" = "When this setting is turned on, we will send you personalized push notifications and emails with sales, availability updates and information about products in the app you looked at and favorited. Your email will also be used to retarget ads to you and to provide brands and retailers with anonymous data about your shopping habits.";
+"gdpr.notification.title" = "Email & Push Notifications";
+"gdpr.onboarding.title" = "Your Privacy Settings";
+"gdpr.onboarding.subtitle" = "You can change these any time in the settings page of the app";
+"gdpr.onboarding.edit" = "Manage Settings";
+"gdpr.onboarding.continue" = "Accept and Continue";
+"gdpr.title" = "Privacy Settings";
+
 "generic.buy" = "BUY";
 "generic.cancel" = "Cancel";
 "generic.close" = "Close";
@@ -252,9 +262,6 @@
 "products.helper.retry.furniture" = "Furniture";
 "products.helper.retry.title" = "Try again as";
 "products.helper.title" = "No Items Found";
-"products.options.category.auto" = "Auto";
-"products.options.category.fashion" = "Fashion";
-"products.options.category.furniture" = "Furniture";
 "products.options.gender.auto" = "All";
 "products.options.gender.female" = "Female";
 "products.options.gender.male" = "Male";
@@ -268,6 +275,7 @@
 "products.options.sort.price_des" = "Price (highest first)";
 "products.options.sort.similar" = "Similar";
 "products.options.sort.title" = "Sort by";
+"products.options.title" = "FILTER YOUR RESULTS";
 "products.rate.negative.help_finding_outfit" = "I need help finding this outfit... %@";
 "products.rate.negative.popup.message" =  "What were you expecting to see and what did you see instead?";
 "products.rate.negative.popup.title" =  "What’s Wrong Here?";
@@ -348,6 +356,9 @@
 "settings.section.permission" = "Permissions";
 "settings.section.product" = "Product Options";
 "settings.title" = "Settings";
+
+"text_explanation.disabled" = "disabled";
+"text_explanation.enabled" = "enabled";
 
 "tutorial.email.detail" = "Fill out your info below";
 "tutorial.email.email" = "Email";

@@ -9,23 +9,9 @@
 import Foundation
 import PromiseKit
 import Hero
-protocol ProductCollectionViewManagerDelegate : class {
-    var rootProduct:Product? { get }
-    var products:[Product] { get }
-    var loadingState:ProductsViewControllerState { get }
-    var relatedLooks:Promise<[String]>? { get }
-    func hasRelatedLooksSection() -> Bool
-    var collectionView:UICollectionView? {get}
-
-}
 
 class ProductCollectionViewManager {
-    
-    
-    weak var delegate:ProductCollectionViewManagerDelegate?
-    
     var loader:Loader?
-
     
     public func setup(collectionView:UICollectionView){
         collectionView.register(ProductsCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
@@ -68,7 +54,7 @@ class ProductCollectionViewManager {
     }
     public func collectionView(_ collectionView: UICollectionView, viewForHeaderWith text:String, indexPath: IndexPath) -> UICollectionReusableView {
         if let cell = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionElementKindSectionHeader, withReuseIdentifier: "header", for: indexPath) as? ProductsViewHeaderReusableView{
-                cell.label.text = text
+            cell.label.text = text
             return cell
         }
         return UICollectionReusableView()
@@ -184,8 +170,8 @@ class ProductCollectionViewManager {
                 return nil
             }
         }
-        if let mask = shoppable.getLast()?.rawValue,
-            var products = shoppable.products?.filtered(using: NSPredicate(format: "(optionsMask & %d) == %d", mask, mask)) as? Set<Product> {
+
+        if var products = shoppable.products as? Set<Product> {
             if productsOptions.sale == .sale {
                 products = products.filter { $0.floatPrice < $0.floatOriginalPrice }
             }

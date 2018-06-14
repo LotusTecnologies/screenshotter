@@ -189,7 +189,6 @@ class Analytics {
         let options = ProductsOptionsMask.init(rawValue: Int(product.optionsMask))
         properties["product-filter-size"] = options.size.analyticsStringValue
         properties["product-filter-gender"] = options.gender.analyticsStringValue
-        properties["product-filter-category"] = options.category.analyticsStringValue
         
         if let priceString = product.price {
             properties["product-price-display"] = priceString
@@ -437,7 +436,13 @@ class AnalyticsTrackers : NSObject {
     class AmplitudeAnalyticsTracker : NSObject, AnalyticsTracker {
         func track(_ event: String, properties: [AnyHashable : Any]?, sendEvenIfAdvertisingTrackingIsOptOut: Bool?) {
             if  ASIdentifierManager.shared().isAdvertisingTrackingEnabled || sendEvenIfAdvertisingTrackingIsOptOut == true {
-                Amplitude.instance().logEvent(event, withEventProperties: properties)
+                DispatchQueue.mainAsyncIfNeeded {
+                    var outOfSession = (UIApplication.shared.applicationState == .background)
+                    if event == "sessionStarted" || event == "sessionEnded" {
+                        outOfSession = false
+                    }
+                    Amplitude.instance().logEvent(event, withEventProperties: properties, outOfSession: outOfSession)
+                }
             }
         }
         
