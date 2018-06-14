@@ -246,12 +246,12 @@ extension DataModel {
         }
     }
     
-    public func hide(screenshotOIDArray: [NSManagedObjectID]) {
+    public func hide(screenshotOIDArray: [NSManagedObjectID], kind:Analytics.AnalyticsScreenshotDeletedKind) {
         performBackgroundTask { (managedObjectContext) in
             do {
                 screenshotOIDArray.forEach { screenshotOID in
                     if let screenshot = managedObjectContext.object(with: screenshotOID) as? Screenshot {
-                        Analytics.trackScreenshotDeleted(screenshot: screenshot, kind: .multi)
+                        Analytics.trackScreenshotDeleted(screenshot: screenshot, kind: kind)
                         do{
                             try screenshot.validateForUpdate()
                             screenshot.isHidden = true
@@ -259,10 +259,18 @@ extension DataModel {
                         } catch{
                             
                         }
-                        
-                        
                     }
                 }
+                let request:NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
+                request.predicate = NSPredicate(format: "isHidden == FALSE AND isRecognized == TRUE AND sourceString != %@", ScreenshotSource.shuffle.rawValue)
+                if let count =  try? managedObjectContext.count(for: request) {
+                    if count == 0{
+                        //convert from different enums
+                        let kind:Analytics.AnalyticsScreenshotDeletedAllKind = (kind == .single) ? .single : .multi
+                        Analytics.trackScreenshotDeletedAll(amountJustDeeleted: screenshotOIDArray.count, kind:kind)
+                    }
+                }
+
                 try managedObjectContext.save()
             } catch {
                 self.receivedCoreDataError(error: error)
