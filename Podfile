@@ -7,7 +7,6 @@ target 'screenshot' do
     use_frameworks!
     pod 'KochavaTrackeriOS'
     pod 'Amplitude-iOS', '~> 4.2.1'
-    pod 'Clarifai-Apple-SDK', '3.0.0-beta14'
     pod 'PromiseKit/Foundation', '4.5.2'
     pod 'PromiseKit/StoreKit', '~> 4.0'
     pod 'SDWebImage', '~> 4.0'
