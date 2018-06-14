@@ -56,7 +56,7 @@ class NetworkingPromise : NSObject {
         }
     }
 
-    func uploadToSyteWorkhorse(imageData: Data?, orImageUrlString:String?, isUsc: Bool) -> Promise<NSDictionary> {
+    func uploadToSyteWorkhorse(imageData: Data?, orImageUrlString:String?) -> Promise<NSDictionary> {
         var httpBody:Data?
         var payloadType:String = ""
         if let url = orImageUrlString {
@@ -89,27 +89,17 @@ class NetworkingPromise : NSObject {
     }
 
     func uploadToSyte(imageData: Data?, orImageUrlString:String?) -> Promise<(String, [[String : Any]])> {
-        let startDate = Date()
-        return firstly {// _ -> Promise<Bool> in
-            let userDefaults = UserDefaults.standard
-            if userDefaults.object(forKey: UserDefaultsKeys.isUSC) == nil {
-                return self.geoLocateIsUSC()
-            } else {
-                let isUsc: Bool = userDefaults.bool(forKey: UserDefaultsKeys.isUSC)
-                return Promise(value: isUsc)
-            }
-            }.then { isUsc -> Promise<NSDictionary> in
-                return self.uploadToSyteWorkhorse(imageData: imageData, orImageUrlString:orImageUrlString, isUsc: isUsc)
+        return firstly {// _ -> Promise<NSDictionary> in
+                return self.uploadToSyteWorkhorse(imageData: imageData, orImageUrlString:orImageUrlString)
             }.then { dict -> Promise<(String, [[String : Any]])> in
                 guard let responseObjectDict = dict as? [String : Any],
                     let uploadedURLString = responseObjectDict.keys.first,
                     let segments = responseObjectDict[uploadedURLString] as? [[String : Any]],
                     segments.count > 0 else {
                         let emptyError = NSError(domain: "Craze", code: 4, userInfo: [NSLocalizedDescriptionKey : "Syte returned no segments"])
-                        print("Syte no segments. responseObject:\(dict)  GMK time to classify: \(-startDate.timeIntervalSinceNow) seconds")
+                        print("Syte no segments. responseObject:\(dict)")
                         return Promise(error: emptyError)
                 }
-                print("GMK time to classify: \(-startDate.timeIntervalSinceNow) seconds")
                 return Promise(value: (uploadedURLString, segments))
         }
     }
