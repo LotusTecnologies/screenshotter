@@ -67,7 +67,7 @@ class ScreenshotDisplayViewController: BaseViewController, UIScrollViewDelegate 
         }
         
         let deleteAction = UIPreviewAction(title: "generic.delete".localized, style: .destructive) { (action, viewController) in
-            DataModel.sharedInstance.hide(screenshotOIDArray: [screenshot.objectID])
+            DataModel.sharedInstance.hide(screenshotOIDArray: [screenshot.objectID], kind:.single)
         }
         return [deleteAction]
     }
