@@ -95,6 +95,7 @@ class ProductsViewController: BaseViewController, ProductsOptionsDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        self.relatedLooksManager.delegate = self
         screenshotController = DataModel.sharedInstance.singleScreenshotFrc(delegate: self, screenshot: screenshot)
         
         let shoppablesToolbar: ShoppablesToolbar = {
@@ -815,14 +816,6 @@ extension ProductsViewController : RelatedLooksManagerDelegate {
     
     func relatedLooksManagerGetShoppable(_ relatedLooksManager: RelatedLooksManager) -> Shoppable? {
         return self.products.first?.shoppable
-    }
-    
-    func relatedLooksManagerGetCollectionView(_ relatedLooksManager: RelatedLooksManager) -> UICollectionView? {
-        return self.collectionView
-    }
-    
-    func relatedLooksManagerGetRelatedLooksUrl(_ relatedLooksManager: RelatedLooksManager) -> URL? {
-        return self.products.first?.shoppable?.relatedImagesUrl()
     }
     
     func relatedLooksManagerReloadSection(_ relatedLooksManager:RelatedLooksManager){

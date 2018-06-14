@@ -13,22 +13,13 @@ protocol RelatedLooksManagerDelegate : class {
     func relatedLooksManagerReloadSection(_ relatedLooksManager:RelatedLooksManager)
     func relatedLooksManagerGetProducts(_ relatedLooksManager:RelatedLooksManager) -> [Product]?
     func relatedLooksManagerGetShoppable(_ relatedLooksManager:RelatedLooksManager) -> Shoppable?
-    func relatedLooksManagerGetCollectionView(_ relatedLooksManager:RelatedLooksManager) -> UICollectionView?
-    func relatedLooksManagerGetRelatedLooksUrl(_ relatedLooksManager:RelatedLooksManager) -> URL?
     func relatedLooksManager(_ relatedLooksManager:RelatedLooksManager, present viewController:UIViewController)
 
 }
 class RelatedLooksManager: NSObject {
     var relatedLooks:Promise<[String]>?
     weak var delegate:RelatedLooksManagerDelegate?
-    
-    
-    private var products:[Product]? {
-        return self.delegate?.relatedLooksManagerGetProducts(self)
-    }
-    private var collectionView:UICollectionView? {
-        return self.delegate?.relatedLooksManagerGetCollectionView(self)
-    }
+
 
     func hasRelatedLooksSection() -> Bool {
         if let error = self.relatedLooks?.error {
@@ -37,7 +28,7 @@ class RelatedLooksManager: NSObject {
                 return false
             }
         }
-        if let products = self.products {
+        if let products =  self.delegate?.relatedLooksManagerGetProducts(self) {
             return products.count > 0
         }
         return false
@@ -45,11 +36,11 @@ class RelatedLooksManager: NSObject {
     func numberOfItems() -> Int {
         
         if self.hasRelatedLooksSection()  {
-            //                if product is not load then related looks does not appear at all
+            // if product is not load then related looks does not appear at all
             if let relatedLooks = self.relatedLooks?.value {
                 return relatedLooks.count
             }else {
-                if let _ = self.products, let _ = self.delegate?.relatedLooksManagerGetRelatedLooksUrl(self) {
+                if let _ = self.delegate?.relatedLooksManagerGetProducts(self), let _ = self.delegate?.relatedLooksManagerGetShoppable(self)?.relatedImagesUrl() {
                     return 1 //loading or error
                 }else{
                     return 0
@@ -160,7 +151,7 @@ class RelatedLooksManager: NSObject {
     
     func loadRelatedLooksIfNeeded() {
         if self.relatedLooks == nil {
-            if let relatedlooksURL = delegate?.relatedLooksManagerGetRelatedLooksUrl(self), let shoppabe = self.delegate?.relatedLooksManagerGetShoppable(self) {
+            if let shoppabe = self.delegate?.relatedLooksManagerGetShoppable(self), let relatedlooksURL = shoppabe.relatedImagesUrl()  {
                 Analytics.trackShoppableRelatedLooksLoaded(shoppable: shoppabe)
                 let atLeastXSeconds = Promise.init(resolvers: { (fulfil, reject) in
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.2, execute: {
