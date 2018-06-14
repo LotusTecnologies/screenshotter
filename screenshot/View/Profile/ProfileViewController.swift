@@ -121,7 +121,7 @@ class ProfileViewController: UITableViewController {
     // MARK: Login
     
     private func syncLoggedIn() {
-        let isLoggedIn = true // TODO:
+        let isLoggedIn = false // TODO:
         
         if isLoggedIn {
             data[.logout] = [.logout]
@@ -161,6 +161,10 @@ extension ProfileViewController: ViewControllerLifeCycle {
 }
 
 extension ProfileViewController: ProfileAccountViewDelegate {
+    func profileAccountViewAuthorize(_ view: ProfileAccountView) {
+        // TODO:
+    }
+    
     func profileAccountViewWantsToContract(_ view: ProfileAccountView) {
         animateProfileAccountView(isExpanded: false)
     }
@@ -240,7 +244,7 @@ extension ProfileViewController {
     
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         if section == Section.account.rawValue {
-            profileAccountView.isLoggedIn = true
+//            profileAccountView.isLoggedIn = true
             return profileAccountView
         }
         else if section == Section.invite.rawValue {

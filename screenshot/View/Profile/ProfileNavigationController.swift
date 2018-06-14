@@ -24,8 +24,7 @@ class ProfileNavigationController: UINavigationController {
         
         restorationIdentifier = String(describing: type(of: self))
         
-        // TODO: use icon, not title
-        profileViewController.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Settings", style: .plain, target: self, action: #selector(pushSettingsViewController))
+        profileViewController.navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "NavigationBarGear"), style: .plain, target: self, action: #selector(pushSettingsViewController))
         
         viewControllers = [profileViewController]
     }

@@ -9,6 +9,7 @@
 import UIKit
 
 protocol ProfileAccountViewDelegate: NSObjectProtocol {
+    func profileAccountViewAuthorize(_ view: ProfileAccountView)
     func profileAccountViewWantsToContract(_ view: ProfileAccountView)
     func profileAccountViewWantsToExpand(_ view: ProfileAccountView)
     func profileAccountViewPresentImagePickerInViewController(_ view: ProfileAccountView) -> UIViewController
@@ -163,9 +164,11 @@ class ProfileAccountView: UIView {
         
         let loggedOutLabel = UILabel()
         loggedOutLabel.translatesAutoresizingMaskIntoConstraints = false
-        loggedOutLabel.text = "Log in for exclusive benefits!"
-        loggedOutLabel.textColor = .white
-        loggedOutLabel.font = .screenshopFont(.hind, size: 22)
+        loggedOutLabel.text = "profile.header.logged_out.title".localized
+        loggedOutLabel.textColor = .gray2
+        loggedOutLabel.font = .screenshopFont(.quicksandMedium, size: 22)
+        loggedOutLabel.minimumScaleFactor = 0.7
+        loggedOutLabel.adjustsFontSizeToFitWidth = true
         loggedOutContainerView.addSubview(loggedOutLabel)
         loggedOutLabel.topAnchor.constraint(equalTo: loggedOutVerticalGuide.topAnchor).isActive = true
         loggedOutLabel.leadingAnchor.constraint(greaterThanOrEqualTo: loggedOutContainerView.layoutMarginsGuide.leadingAnchor).isActive = true
@@ -175,8 +178,11 @@ class ProfileAccountView: UIView {
         let loggedOutButton = MainButton()
         loggedOutButton.translatesAutoresizingMaskIntoConstraints = false
         loggedOutButton.backgroundColor = .white
-        loggedOutButton.setTitle("Log In or Sign Up", for: .normal)
+        loggedOutButton.setTitle("profile.header.logged_out.continue".localized, for: .normal)
         loggedOutButton.setTitleColor(.gray2, for: .normal)
+        loggedOutButton.addTarget(self, action: #selector(authorizeAction), for: .touchUpInside)
+        loggedOutButton.layer.borderColor = UIColor.crazeGreen.cgColor
+        loggedOutButton.layer.borderWidth = 2
         loggedOutContainerView.addSubview(loggedOutButton)
         loggedOutButton.topAnchor.constraint(equalTo: loggedOutLabel.bottomAnchor, constant: .padding).isActive = true
         loggedOutButton.bottomAnchor.constraint(equalTo: loggedOutVerticalGuide.bottomAnchor).isActive = true
@@ -197,7 +203,7 @@ class ProfileAccountView: UIView {
         loggedInContainerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
         loggedInContainerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         
-        let hasAvatar = false // TODO:
+        let hasAvatar = avatar != nil
         
         avatarButton.translatesAutoresizingMaskIntoConstraints = false
         avatarButton.setBackgroundImage(UIImage(named: "DefaultUser"), for: .selected)
@@ -219,7 +225,7 @@ class ProfileAccountView: UIView {
             avatarButton.centerYAnchor.constraint(equalTo: loggedInContainerView.layoutMarginsGuide.centerYAnchor)
         ]
         expandedConstraints += [
-            avatarButton.topAnchor.constraint(equalTo: loggedInContainerView.topAnchor, constant: .extendedPadding),
+            avatarButton.topAnchor.constraint(equalTo: loggedInContainerView.topAnchor, constant: .containerPaddingY),
             avatarButton.centerXAnchor.constraint(equalTo: loggedInContainerView.layoutMarginsGuide.centerXAnchor)
         ]
         
@@ -258,9 +264,9 @@ class ProfileAccountView: UIView {
             nameLabel.trailingAnchor.constraint(equalTo: loggedInContainerView.layoutMarginsGuide.trailingAnchor)
         ]
         expandedConstraints += [
-            nameTextField.topAnchor.constraint(equalTo: avatarButton.bottomAnchor, constant: .extendedPadding),
-            nameTextField.leadingAnchor.constraint(equalTo: loggedInContainerView.leadingAnchor, constant: .padding * 1.5),
-            nameTextField.trailingAnchor.constraint(equalTo: loggedInContainerView.trailingAnchor, constant: -.padding * 1.5),
+            nameTextField.topAnchor.constraint(equalTo: avatarButton.bottomAnchor, constant: .marginY),
+            nameTextField.leadingAnchor.constraint(equalTo: loggedInContainerView.leadingAnchor, constant: .containerPaddingX),
+            nameTextField.trailingAnchor.constraint(equalTo: loggedInContainerView.trailingAnchor, constant: -.containerPaddingX),
             
             nameLabel.leadingAnchor.constraint(equalTo: nameTextField.leadingAnchor),
             nameLabel.trailingAnchor.constraint(equalTo: nameTextField.trailingAnchor),
@@ -311,7 +317,7 @@ class ProfileAccountView: UIView {
         continueButton.backgroundColor = .crazeGreen
         continueButton.alpha = 0
         continueButton.isExclusiveTouch = true
-        continueButton.setTitle("Done", for: .normal)
+        continueButton.setTitle("generic.done".localized, for: .normal)
         continueButton.addTarget(self, action: #selector(loggedInContinueAction), for: .touchUpInside)
         loggedInContainerView.addSubview(continueButton)
         continueButton.centerXAnchor.constraint(equalTo: loggedInContainerView.layoutMarginsGuide.centerXAnchor).isActive = true
@@ -320,7 +326,7 @@ class ProfileAccountView: UIView {
             continueButton.bottomAnchor.constraint(equalTo: loggedInContainerView.layoutMarginsGuide.bottomAnchor, constant: 80) // Constant large enough to not show the button
         ]
         expandedConstraints += [
-            continueButton.bottomAnchor.constraint(equalTo: loggedInContainerView.bottomAnchor, constant: -.extendedPadding)
+            continueButton.bottomAnchor.constraint(equalTo: loggedInContainerView.bottomAnchor, constant: -.containerPaddingY)
         ]
         
         loggedInControl.translatesAutoresizingMaskIntoConstraints = false
@@ -330,6 +336,10 @@ class ProfileAccountView: UIView {
         loggedInControl.leadingAnchor.constraint(equalTo: loggedInContainerView.leadingAnchor).isActive = true
         loggedInControl.bottomAnchor.constraint(equalTo: loggedInContainerView.bottomAnchor).isActive = true
         loggedInControl.trailingAnchor.constraint(equalTo: loggedInContainerView.trailingAnchor).isActive = true
+    }
+    
+    @objc private func authorizeAction() {
+        delegate?.profileAccountViewAuthorize(self)
     }
     
     @objc private func avatarAction() {

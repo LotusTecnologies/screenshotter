@@ -287,6 +287,9 @@
 "products.related_looks.error.connection" = "Please check your connection and try again.";
 "products.related_looks.error.no_looks" = "No similar looks found";
 
+"profile.header.logged_out.continue" = "Log In or Sign Up";
+"profile.header.logged_out.title" = "Log in for exclusive benefits!";
+
 "screenshot.empty.detail" = "Upload a photo or add a look from the Discover tab";
 "screenshot.empty.discover" = "Browse Looks";
 "screenshot.empty.title" = "Shop A Photo";
