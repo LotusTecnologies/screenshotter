@@ -782,7 +782,16 @@ extension AssetSyncModel {
     func augmentedUrl(offersURL: String, optionsMask: ProductsOptionsMask) -> URL? {
         let isChild = optionsMask.rawValue & ProductsOptionsMask.sizeChild.rawValue > 0
         let isPlus = optionsMask.rawValue & ProductsOptionsMask.sizePlus.rawValue > 0
-        let sizeParamString = isPlus ? "&feed=craze_plus_size" : isChild ? "&feed=kids_craze" : Constants.syteNonUscFeed
+//        let userDefaults = UserDefaults.standard
+//        if userDefaults.object(forKey: UserDefaultsKeys.isUSC) == nil {
+//            return self.geoLocateIsUSC()
+//        } else {
+//            let isUsc: Bool = userDefaults.bool(forKey: UserDefaultsKeys.isUSC)
+//            return Promise(value: isUsc)
+//        }
+        // Revert to never use USC.
+        // let sizeParamString = isPlus ? "&feed=craze_plus_size" : isChild ? "&feed=kids_craze" : isUsc ? "&feed=\(Constants.syteUscFeed)" : "&feed=\(Constants.syteNonUscFeed)"
+        let sizeParamString = isPlus ? "&feed=craze_plus_size" : isChild ? "&feed=kids_craze" : "&feed=\(Constants.syteNonUscFeed)"
         var genderParamString = ""
         if optionsMask.rawValue & ProductsOptionsMask.genderMale.rawValue > 0 {
             genderParamString = isChild ? "&force_gender=boy" : "&force_gender=male"
