@@ -8,18 +8,51 @@
 
 import UIKit
 
+protocol ProfileAccountViewDelegate: NSObjectProtocol {
+    func profileAccountViewWantsToContract(_ view: ProfileAccountView)
+    func profileAccountViewWantsToExpand(_ view: ProfileAccountView)
+}
+
 class ProfileAccountView: UIView {
+    weak var delegate: ProfileAccountViewDelegate?
+    
     let contentView = UIView()
     private let loggedInContainerView = UIImageView()
+    private let loggedInControl = UIControl()
+    private let nameLabel = UILabel()
+    private let nameTextField = UITextField()
+    private let emailLabel = UILabel()
+    private let emailTextField = UITextField()
     private let loggedOutContainerView = UIImageView()
+    
     private var heightConstraint: NSLayoutConstraint?
     private var contentViewHeightConstraint: NSLayoutConstraint?
-    let loggedInControl = UIControl()
+    private var contractedConstraints: [NSLayoutConstraint] = []
+    private var expandedConstraints: [NSLayoutConstraint] = []
     
     var isLoggedIn = false {
         didSet {
             loggedOutContainerView.isHidden = isLoggedIn
             loggedInContainerView.isHidden = !isLoggedIn
+        }
+    }
+    
+    var name: String? {
+        set {
+            nameLabel.text = newValue
+            nameTextField.text = newValue
+        }
+        get {
+            return nameTextField.text
+        }
+    }
+    var email: String? {
+        set {
+            emailLabel.text = newValue
+            emailTextField.text = newValue
+        }
+        get {
+            return emailTextField.text
         }
     }
     
@@ -31,6 +64,25 @@ class ProfileAccountView: UIView {
             let constant = isExpanded ? maxHeight : minHeight
             heightConstraint?.constant = constant
             contentViewHeightConstraint?.constant = constant
+            
+            if isExpanded {
+                NSLayoutConstraint.deactivate(contractedConstraints)
+                NSLayoutConstraint.activate(expandedConstraints)
+            }
+            else {
+                NSLayoutConstraint.deactivate(expandedConstraints)
+                NSLayoutConstraint.activate(contractedConstraints)
+            }
+            
+            loggedInControl.isUserInteractionEnabled = !isExpanded
+            
+            let contractedAlpha: CGFloat = isExpanded ? 0 : 1
+            nameLabel.alpha = contractedAlpha
+            emailLabel.alpha = contractedAlpha
+            
+            let expandedAlpha: CGFloat = isExpanded ? 1 : 0
+            nameTextField.alpha = expandedAlpha
+            emailTextField.alpha = expandedAlpha
         }
     }
     
@@ -42,6 +94,7 @@ class ProfileAccountView: UIView {
         
         // The contentView should expand independently so the animation is smooth in a table view
         contentView.translatesAutoresizingMaskIntoConstraints = false
+        contentView.clipsToBounds = true
         addSubview(contentView)
         contentView.topAnchor.constraint(equalTo: topAnchor).isActive = true
         contentView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
@@ -53,6 +106,8 @@ class ProfileAccountView: UIView {
         setupLoggedInViews()
         
         contentView.addSubview(BorderView(edge: .bottom))
+        
+        NSLayoutConstraint.activate(contractedConstraints)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -126,12 +181,19 @@ class ProfileAccountView: UIView {
         avatarButton.layer.borderColor = UIColor.gray6.cgColor
         avatarButton.layer.borderWidth = 2
         loggedInContainerView.addSubview(avatarButton)
-        avatarButton.topAnchor.constraint(greaterThanOrEqualTo: loggedInContainerView.layoutMarginsGuide.topAnchor).isActive = true
-        avatarButton.leadingAnchor.constraint(equalTo: loggedInContainerView.layoutMarginsGuide.leadingAnchor).isActive = true
-        avatarButton.bottomAnchor.constraint(lessThanOrEqualTo: loggedInContainerView.layoutMarginsGuide.bottomAnchor).isActive = true
-        avatarButton.centerYAnchor.constraint(equalTo: loggedInContainerView.layoutMarginsGuide.centerYAnchor).isActive = true
         avatarButton.widthAnchor.constraint(equalToConstant: 90).isActive = true
         avatarButton.heightAnchor.constraint(equalTo: avatarButton.widthAnchor).isActive = true
+        
+        contractedConstraints += [
+            avatarButton.topAnchor.constraint(greaterThanOrEqualTo: loggedInContainerView.layoutMarginsGuide.topAnchor),
+            avatarButton.leadingAnchor.constraint(equalTo: loggedInContainerView.layoutMarginsGuide.leadingAnchor),
+            avatarButton.bottomAnchor.constraint(lessThanOrEqualTo: loggedInContainerView.layoutMarginsGuide.bottomAnchor),
+            avatarButton.centerYAnchor.constraint(equalTo: loggedInContainerView.layoutMarginsGuide.centerYAnchor)
+        ]
+        expandedConstraints += [
+            avatarButton.topAnchor.constraint(equalTo: loggedInContainerView.topAnchor, constant: .extendedPadding),
+            avatarButton.centerXAnchor.constraint(equalTo: loggedInContainerView.layoutMarginsGuide.centerXAnchor)
+        ]
         
         let labelsLayoutGuide = UILayoutGuide()
         loggedInContainerView.addLayoutGuide(labelsLayoutGuide)
@@ -139,7 +201,15 @@ class ProfileAccountView: UIView {
         labelsLayoutGuide.bottomAnchor.constraint(lessThanOrEqualTo: loggedInContainerView.layoutMarginsGuide.bottomAnchor).isActive = true
         labelsLayoutGuide.centerYAnchor.constraint(equalTo: loggedInContainerView.layoutMarginsGuide.centerYAnchor).isActive = true
         
-        let nameLabel = UILabel()
+        
+        // TODO: set delegate and set nameLabel.text = nameTextField.text
+        nameTextField.translatesAutoresizingMaskIntoConstraints = false
+        nameTextField.text = "Corey Werner"
+        nameTextField.backgroundColor = .white
+        nameTextField.alpha = 0
+        
+        loggedInContainerView.addSubview(nameTextField)
+        
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
         nameLabel.font = .screenshopFont(.quicksandMedium, size: 22)
         nameLabel.textColor = .gray2
@@ -148,11 +218,26 @@ class ProfileAccountView: UIView {
         nameLabel.minimumScaleFactor = 0.5
         nameLabel.baselineAdjustment = .alignCenters
         loggedInContainerView.addSubview(nameLabel)
-        nameLabel.topAnchor.constraint(equalTo: labelsLayoutGuide.topAnchor).isActive = true
-        nameLabel.leadingAnchor.constraint(equalTo: avatarButton.trailingAnchor, constant: .padding).isActive = true
-        nameLabel.trailingAnchor.constraint(equalTo: loggedInContainerView.layoutMarginsGuide.trailingAnchor).isActive = true
         
-        let emailLabel = UILabel()
+        contractedConstraints += [
+            nameTextField.leadingAnchor.constraint(equalTo: nameLabel.leadingAnchor),
+            nameTextField.trailingAnchor.constraint(equalTo: nameLabel.trailingAnchor),
+            nameTextField.centerYAnchor.constraint(equalTo: nameLabel.centerYAnchor),
+            
+            nameLabel.topAnchor.constraint(equalTo: labelsLayoutGuide.topAnchor),
+            nameLabel.leadingAnchor.constraint(equalTo: avatarButton.trailingAnchor, constant: .padding),
+            nameLabel.trailingAnchor.constraint(equalTo: loggedInContainerView.layoutMarginsGuide.trailingAnchor)
+        ]
+        expandedConstraints += [
+            nameTextField.topAnchor.constraint(equalTo: avatarButton.bottomAnchor, constant: .extendedPadding),
+            nameTextField.leadingAnchor.constraint(equalTo: loggedInContainerView.layoutMarginsGuide.leadingAnchor),
+            nameTextField.trailingAnchor.constraint(equalTo: loggedInContainerView.layoutMarginsGuide.trailingAnchor),
+            
+            nameLabel.leadingAnchor.constraint(equalTo: nameTextField.leadingAnchor),
+            nameLabel.trailingAnchor.constraint(equalTo: nameTextField.trailingAnchor),
+            nameLabel.centerYAnchor.constraint(equalTo: nameTextField.centerYAnchor),
+        ]
+        
         emailLabel.translatesAutoresizingMaskIntoConstraints = false
         emailLabel.font = .screenshopFont(.quicksand, size: 18)
         emailLabel.textColor = .gray2
@@ -166,11 +251,37 @@ class ProfileAccountView: UIView {
         emailLabel.bottomAnchor.constraint(equalTo: labelsLayoutGuide.bottomAnchor).isActive = true
         emailLabel.trailingAnchor.constraint(equalTo: loggedInContainerView.layoutMarginsGuide.trailingAnchor).isActive = true
         
+        
+        let continueButton = MainButton()
+        continueButton.translatesAutoresizingMaskIntoConstraints = false
+        continueButton.backgroundColor = .crazeGreen
+        continueButton.isExclusiveTouch = true
+        continueButton.setTitle("Done", for: .normal)
+        continueButton.addTarget(self, action: #selector(loggedInContinueAction), for: .touchUpInside)
+        loggedInContainerView.addSubview(continueButton)
+        continueButton.centerXAnchor.constraint(equalTo: loggedInContainerView.layoutMarginsGuide.centerXAnchor).isActive = true
+        
+        contractedConstraints += [
+            continueButton.bottomAnchor.constraint(equalTo: loggedInContainerView.layoutMarginsGuide.bottomAnchor, constant: 80) // Constant large enough to not show the button
+        ]
+        expandedConstraints += [
+            continueButton.bottomAnchor.constraint(equalTo: loggedInContainerView.layoutMarginsGuide.bottomAnchor)
+        ]
+        
         loggedInControl.translatesAutoresizingMaskIntoConstraints = false
+        loggedInControl.addTarget(self, action: #selector(loggedInControlAction), for: .touchUpInside)
         loggedInContainerView.addSubview(loggedInControl)
         loggedInControl.topAnchor.constraint(equalTo: loggedInContainerView.topAnchor).isActive = true
         loggedInControl.leadingAnchor.constraint(equalTo: loggedInContainerView.leadingAnchor).isActive = true
         loggedInControl.bottomAnchor.constraint(equalTo: loggedInContainerView.bottomAnchor).isActive = true
         loggedInControl.trailingAnchor.constraint(equalTo: loggedInContainerView.trailingAnchor).isActive = true
+    }
+    
+    @objc private func loggedInContinueAction() {
+        delegate?.profileAccountViewWantsToContract(self)
+    }
+    
+    @objc private func loggedInControlAction() {
+        delegate?.profileAccountViewWantsToExpand(self)
     }
 }

@@ -115,7 +115,7 @@ class ProfileViewController: UITableViewController {
         tableView.keyboardDismissMode = .onDrag
         tableView.backgroundColor = .background
         
-        profileAccountView.loggedInControl.addTarget(self, action: #selector(editProfileFields), for: .touchUpInside)
+        profileAccountView.delegate = self
     }
     
     override func viewDidLayoutSubviews() {
@@ -141,15 +141,30 @@ class ProfileViewController: UITableViewController {
             data.removeValue(forKey: .logout)
         }
     }
+}
+
+extension ProfileViewController: ViewControllerLifeCycle {
+    func viewController(_ viewController: UIViewController, willDisappear animated: Bool) {
+        if viewController.isKind(of: CurrencyViewController.self),
+            let indexPath = indexPath(for: .currency, in: .options)
+        {
+            tableView.reloadRows(at: [indexPath], with: .none)
+        }
+    }
+}
+
+extension ProfileViewController: ProfileAccountViewDelegate {
+    func profileAccountViewWantsToContract(_ view: ProfileAccountView) {
+        animateProfileAccountView(isExpanded: false)
+    }
     
-    // MARK: Profile
+    func profileAccountViewWantsToExpand(_ view: ProfileAccountView) {
+        animateProfileAccountView(isExpanded: true)
+    }
     
-    private var profileViewHeight: CGFloat = 0
-    
-    @objc private func editProfileFields() {
-        profileAccountView.isExpanded = !profileAccountView.isExpanded
-        
+    private func animateProfileAccountView(isExpanded: Bool) {
         UIView.animate(withDuration: .defaultAnimationDuration) {
+            self.profileAccountView.isExpanded = isExpanded
             self.profileAccountView.layoutIfNeeded()
         }
         
@@ -166,16 +181,6 @@ class ProfileViewController: UITableViewController {
         tableView.isScrollEnabled = !profileAccountView.isExpanded
         tableView.beginUpdates()
         tableView.endUpdates()
-    }
-}
-
-extension ProfileViewController: ViewControllerLifeCycle {
-    func viewController(_ viewController: UIViewController, willDisappear animated: Bool) {
-        if viewController.isKind(of: CurrencyViewController.self),
-            let indexPath = indexPath(for: .currency, in: .options)
-        {
-            tableView.reloadRows(at: [indexPath], with: .none)
-        }
     }
 }
 
