@@ -11,6 +11,7 @@ import UIKit
 class ProductHeaderCollectionViewCell: UICollectionViewCell {
     
     let productImageView = EmbossedView()
+    let productControl = UIControl()
     let favoriteControl = FavoriteControl()
     
     let titleLabel = UILabel()
@@ -76,10 +77,15 @@ class ProductHeaderCollectionViewCell: UICollectionViewCell {
         productImageView.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
         productImageView.widthAnchor.constraint(equalToConstant: 120).isActive = true
         productImageView.heightAnchor.constraint(equalTo: productImageView.widthAnchor).isActive = true
-        
         productImageView.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor).isActive = true
         productImageView.trailingAnchor.constraint(equalTo: titleLabel.leadingAnchor, constant: productImageView.layoutMargins.right).isActive = true
         
+        productControl.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(productControl)
+        productControl.topAnchor.constraint(equalTo: productImageView.topAnchor).isActive = true
+        productControl.leadingAnchor.constraint(equalTo: productImageView.leadingAnchor).isActive = true
+        productControl.bottomAnchor.constraint(equalTo: productImageView.bottomAnchor).isActive = true
+        productControl.trailingAnchor.constraint(equalTo: productImageView.trailingAnchor).isActive = true
         
         favoriteControl.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(favoriteControl)

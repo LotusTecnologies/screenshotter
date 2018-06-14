@@ -146,6 +146,7 @@ extension ProductDetailViewController : UICollectionViewDelegateFlowLayout, UICo
                 
                 cell.favoriteControl.addTarget(self, action: #selector(productCollectionViewCellFavoriteAction(_:event:)), for: .touchUpInside)
                 cell.buyNowButton.addTarget(self, action: #selector(productCollectionViewCellBuyAction(_:event:)), for: .touchUpInside)
+                cell.productControl.addTarget(self, action: #selector(productCollectionViewCellBuyAction(_:event:)), for: .touchUpInside)
             }
             
             return cell
