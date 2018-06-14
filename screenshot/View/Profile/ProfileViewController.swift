@@ -121,7 +121,12 @@ class ProfileViewController: UITableViewController {
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
-        profileAccountView.maxHeight = tableView.bounds.size.height - tableView.contentInset.top - tableView.contentInset.bottom
+        if #available(iOS 11.0, *) {
+            profileAccountView.maxHeight = tableView.bounds.size.height - tableView.safeAreaInsets.top - tableView.safeAreaInsets.bottom
+        }
+        else {
+            profileAccountView.maxHeight = tableView.bounds.size.height - tableView.contentInset.top - tableView.contentInset.bottom
+        }
     }
     
     // MARK: Login
@@ -148,10 +153,9 @@ class ProfileViewController: UITableViewController {
             self.profileAccountView.layoutIfNeeded()
         }
         
-        // TODO: test jumping. invite button should be auto sized for ios 11
         let contentOffset: CGPoint = {
             if #available(iOS 11.0, *) {
-                return CGPoint(x: 0, y: -topLayoutGuide.length)
+                return CGPoint(x: 0, y: -view.safeAreaInsets.top)
             }
             else {
                 return CGPoint(x: 0, y: -topLayoutGuide.length)
@@ -216,13 +220,6 @@ extension ProfileViewController {
             return inviteView.bounds.height
         }
         return 0
-    }
-
-    override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        if [Section.invite.rawValue].contains(section) {
-            return 0
-        }
-        return tableView.sectionFooterHeight
     }
     
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
