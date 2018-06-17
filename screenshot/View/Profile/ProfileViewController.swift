@@ -8,28 +8,54 @@
 
 import UIKit
 
+@objc protocol ProfileViewControllerDelegate: NSObjectProtocol {
+    func profileViewControllerDidGrantPermission(_ viewController: ProfileViewController)
+}
+
 class ProfileViewController: UITableViewController {
     enum Section: Int {
         case account
         case invite
         case options
+        case permissions
         case logout
     }
     
     enum Row: Int {
-        case currency
+        case optionCurrency
+        case optionOpenIn
+        
+        case permissionPhoto
+        case permissionPush
+        
         case logout
-        case openIn
+        
+        var permissionType: PermissionType? {
+            switch self {
+            case .permissionPhoto:
+                return PermissionType.photo
+            case .permissionPush:
+                return PermissionType.push
+            default:
+                return nil
+            }
+        }
     }
     
     private var data: [Section: [Row]] = [
         .account: [],
         .invite: [],
         .options: [
-            .currency,
-            .openIn
+            .optionCurrency,
+            .optionOpenIn
+        ],
+        .permissions: [
+            .permissionPhoto,
+            .permissionPush
         ]
     ]
+    
+    weak var delegate: ProfileViewControllerDelegate?
     
     private let profileAccountView = ProfileAccountView()
     
@@ -79,6 +105,9 @@ class ProfileViewController: UITableViewController {
         
         restorationIdentifier = String(describing: type(of: self))
         
+        NotificationCenter.default.addObserver(self, selector: #selector(applicationDidBecomeActive(_:)), name: .UIApplicationDidBecomeActive, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(applicationWillEnterForeground(_:)), name: .UIApplicationWillEnterForeground, object: nil)
+        
         addNavigationItemLogo()
     }
     
@@ -96,11 +125,30 @@ class ProfileViewController: UITableViewController {
         profileAccountView.delegate = self
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        reloadChangeableIndexPaths()
+    }
+    
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         
         UIView.performWithoutAnimation {
             self.animateProfileAccountView(isExpanded: false)
+        }
+    }
+    
+    @objc private func applicationDidBecomeActive(_ notification: Notification) {
+        if view?.window != nil {
+            // Use did become active since the permissions values can change through an alert view
+            reloadChangeableIndexPaths()
+        }
+    }
+    
+    @objc private func applicationWillEnterForeground(_ notification: Notification) {
+        if view?.window != nil {
+            reloadChangeableIndexPaths()
         }
     }
     
@@ -116,6 +164,7 @@ class ProfileViewController: UITableViewController {
     }
     
     deinit {
+        NotificationCenter.default.removeObserver(self)
         profileAccountView.delegate = nil
     }
     
@@ -156,7 +205,7 @@ class ProfileViewController: UITableViewController {
 extension ProfileViewController: ViewControllerLifeCycle {
     func viewController(_ viewController: UIViewController, willDisappear animated: Bool) {
         if viewController.isKind(of: CurrencyViewController.self),
-            let indexPath = indexPath(for: .currency, in: .options)
+            let indexPath = indexPath(for: .optionCurrency, in: .options)
         {
             tableView.reloadRows(at: [indexPath], with: .none)
         }
@@ -262,6 +311,14 @@ extension ProfileViewController {
         return nil
     }
     
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        guard let profileSection = Section(rawValue: section) else {
+            return nil
+        }
+        
+        return sectionText(for: profileSection)
+    }
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let row = row(for: indexPath) else {
             return UITableViewCell()
@@ -297,9 +354,28 @@ extension ProfileViewController {
             }
             
             cell.accessoryType = cellAccessoryType(for: row)
+            cell.accessoryView = cellAccessoryView(for: row)
         }
         
         return cell
+    }
+    
+    override func tableView(_ tableView: UITableView, shouldHighlightRowAt indexPath: IndexPath) -> Bool {
+        guard let row = row(for: indexPath) else {
+            return true
+        }
+        
+        switch (row) {
+        case .permissionPush, .permissionPhoto:
+            if let permissionType = row.permissionType, !PermissionsManager.shared.hasPermission(for: permissionType) {
+                return true
+            }
+            else {
+                return false
+            }
+        default:
+            return true
+        }
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -308,7 +384,7 @@ extension ProfileViewController {
         }
         
         switch (row) {
-        case .currency:
+        case .optionCurrency:
             let viewController = CurrencyViewController()
             viewController.lifeCycleDelegate = self
             viewController.title = cellText(for: row)
@@ -316,7 +392,7 @@ extension ProfileViewController {
             viewController.selectedCurrencyCode = UserDefaults.standard.string(forKey: UserDefaultsKeys.productCurrency)
             navigationController?.pushViewController(viewController, animated: true)
             
-        case .openIn:
+        case .optionOpenIn:
             let alert = UIAlertController.init(title: nil, message: nil, preferredStyle: .actionSheet)
             let browsers: [OpenWebPage] = [.safari, .chrome]
             browsers.forEach({ browser in
@@ -328,29 +404,54 @@ extension ProfileViewController {
             alert.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
             present(alert, animated: true)
             
+        case .permissionPhoto, .permissionPush:
+            if let permissionType = row.permissionType {
+                PermissionsManager.shared.requestPermission(for: permissionType, openSettingsIfNeeded: true, response: { granted in
+                    if granted {
+                        tableView.reloadRows(at: [indexPath], with: .fade)
+                        self.delegate?.profileViewControllerDidGrantPermission(self)
+                    }
+                })
+            }
+            
         case .logout:
             // TODO:
-            break
+            syncLoggedIn()
+        }
+    }
+    
+    private func sectionText(for section: Section) -> String? {
+        switch section {
+        case .permissions:
+            return "settings.section.permission".localized
+        default:
+            return nil
         }
     }
     
     private func cellText(for row: Row) -> String? {
         switch (row) {
-        case .currency:
+        case .optionCurrency:
             return "profile.row.currency.title".localized
+        case .optionOpenIn:
+            return "profile.row.open_in.title".localized
+        case .permissionPush:
+            return "settings.row.push_permission.title".localized
+        case .permissionPhoto:
+            return "settings.row.photo_permission.title".localized
         case .logout:
             return "profile.row.logout.title".localized
-        case .openIn:
-            return "profile.row.open_in.title".localized
         }
     }
     
     private func cellDetailedText(for row: Row) -> String? {
         switch (row) {
-        case .currency:
+        case .optionCurrency:
             return CurrencyViewController.currentCurrency
-        case .openIn:
+        case .optionOpenIn:
             return OpenWebPage.fromSystemInfo().localizedDisplayString()
+        case .permissionPhoto, .permissionPush:
+            return cellEnabledText(for: row)
         default:
             return nil
         }
@@ -369,12 +470,62 @@ extension ProfileViewController {
 //        }
     }
     
+    private func cellEnabledText(for row: Row) -> String? {
+        guard let permissionType = row.permissionType else {
+            return nil
+        }
+        
+        if PermissionsManager.shared.hasPermission(for: permissionType) {
+            return "generic.enabled".localized
+        }
+        else {
+            return "generic.disabled".localized
+        }
+    }
+    
     private func cellAccessoryType(for row: Row) -> UITableViewCellAccessoryType {
         switch row {
-        case .currency:
+        case .optionCurrency:
             return .disclosureIndicator
         default:
             return .none
         }
+    }
+    
+    private func cellAccessoryView(for row: Row) -> UIView? {
+        switch (row) {
+        case .permissionPhoto, .permissionPush:
+            if let permissionType = row.permissionType, !PermissionsManager.shared.hasPermission(for: permissionType) {
+                let size: CGFloat = 18
+                let label = UILabel(frame: CGRect(x: 0, y: 0, width: size, height: size))
+                label.backgroundColor = .crazeRed
+                label.text = "!"
+                label.textAlignment = .center
+                label.font = UIFont(name: "Optima-ExtraBlack", size: 14)
+                label.textColor = .white
+                label.layer.cornerRadius = size / 2
+                label.layer.masksToBounds = true
+                return label
+            }
+            else {
+                return nil
+            }
+        default:
+            return nil
+        }
+    }
+    
+    @objc private func reloadChangeableIndexPaths() {
+        func append(section: Section, row: Row, to indexPaths: inout [IndexPath]) {
+            if let indexPath = indexPath(for: row, in: section) {
+                indexPaths.append(indexPath)
+            }
+        }
+        
+        var indexPaths: [IndexPath] = []
+        append(section: .permissions, row: .permissionPhoto, to: &indexPaths)
+        append(section: .permissions, row: .permissionPush, to: &indexPaths)
+        
+        tableView.reloadRows(at: indexPaths, with: .none)
     }
 }

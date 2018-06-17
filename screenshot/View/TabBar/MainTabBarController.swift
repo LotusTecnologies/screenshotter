@@ -8,7 +8,7 @@
 
 import UIKit
 
-class MainTabBarController: UITabBarController, UITabBarControllerDelegate, ScreenshotsNavigationControllerDelegate, SettingsViewControllerDelegate, ScreenshotDetectionProtocol, ViewControllerLifeCycle {
+class MainTabBarController: UITabBarController, UITabBarControllerDelegate, ScreenshotsNavigationControllerDelegate, ProfileViewControllerDelegate, ScreenshotDetectionProtocol, ViewControllerLifeCycle {
     enum TabIndex {
         case favorites
         case discover
@@ -76,6 +76,7 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         discoverNavigationController.title = discoverNavigationController.discoverScreenshotViewController.title
         discoverNavigationController.tabBarItem = createTabBarItem(title: discoverNavigationController.title, imageNamed: "TabBarGlobe", tag: .discover)
         
+        profileNavigationController.profileViewController.delegate = self
         profileNavigationController.title = profileNavigationController.profileViewController.title
         profileNavigationController.tabBarItem = createTabBarItem(title: profileNavigationController.title, imageNamed: "TabBarUser", tag: .profile)
         settingsTabBarItem = profileNavigationController.tabBarItem
@@ -174,7 +175,6 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
                 AccumulatorModel.favorite.resetUninformedCount()
             }
         }
-
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -381,9 +381,9 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         self.refreshTabBarSettingsBadge()
     }
     
-    // MARK: - Settings View Controller
+    // MARK: - Profile View Controller
     
-    func settingsViewControllerDidGrantPermission(_ viewController: SettingsViewController) {
+    func profileViewControllerDidGrantPermission(_ viewController: ProfileViewController) {
         self.refreshTabBarSettingsBadge()
     }
     

@@ -11,21 +11,14 @@ import MessageUI
 import PromiseKit
 import Whisper
 
-@objc protocol SettingsViewControllerDelegate : NSObjectProtocol {
-    func settingsViewControllerDidGrantPermission(_ viewController: SettingsViewController)
-}
-
 class SettingsViewController : BaseViewController {
     fileprivate enum Section : Int {
         // Order reflects in the TableView
-        case permission
         case follow
         case about
     }
     
     fileprivate enum Row : Int {
-        case photoPermission
-        case pushPermission
         case usageStreak
         case contactUs
         case bug
@@ -37,8 +30,6 @@ class SettingsViewController : BaseViewController {
         case partners
         case region
     }
-    
-    weak var delegate: SettingsViewControllerDelegate?
     
     fileprivate let tableView = UITableView(frame: .zero, style: .grouped)
     fileprivate let tableFooterTextView = UITextView()
@@ -60,11 +51,6 @@ class SettingsViewController : BaseViewController {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
         self.restorationIdentifier = String(describing: type(of: self))
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(applicationDidBecomeActive(_:)), name: .UIApplicationDidBecomeActive, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(applicationWillEnterForeground(_:)), name: .UIApplicationWillEnterForeground, object: nil)
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(reloadChangeableIndexPaths), name: .InAppPurchaseManagerDidUpdate, object: nil)
     }
     
     override func viewDidLoad() {
@@ -122,22 +108,7 @@ class SettingsViewController : BaseViewController {
         reloadChangeableIndexPaths()
     }
     
-    @objc private func applicationDidBecomeActive(_ notification: Notification) {
-        if view?.window != nil {
-            // Use did become active since the permissions values can change through an alert view
-            reloadChangeableIndexPaths()
-        }
-    }
-    
-    @objc private func applicationWillEnterForeground(_ notification: Notification) {
-        if view?.window != nil {
-            reloadChangeableIndexPaths()
-        }
-    }
-    
     deinit {
-        NotificationCenter.default.removeObserver(self)
-        
         tableView.delegate = nil
         tableView.dataSource = nil
     }
@@ -145,10 +116,6 @@ class SettingsViewController : BaseViewController {
     // MARK: Data
     
     fileprivate let data: [Section : [Row]] = [
-        .permission: [
-            .photoPermission,
-            .pushPermission
-        ],
         .about: [
             .contactUs,
             .bug,
@@ -217,7 +184,6 @@ extension SettingsViewController : UITableViewDataSource {
         
         let cell = self.tableView(tableView, defaultCellForRowAt: indexPath, withRow: row)
         cell.accessoryType = cellAccessoryType(for: row)
-        cell.accessoryView = cellAccessoryView(for: row)
         return cell
     }
     
@@ -244,15 +210,6 @@ extension SettingsViewController : UITableViewDelegate {
         switch (row) {
         case .version, .usageStreak:
             return false
-            
-        case .pushPermission, .photoPermission:
-            if let permissionType = row.permissionType, !PermissionsManager.shared.hasPermission(for: permissionType) {
-                return true
-            }
-            else {
-                return false
-            }
-            
         default:
             return true
         }
@@ -280,16 +237,6 @@ extension SettingsViewController : UITableViewDelegate {
                 present(viewController, animated: true, completion: nil)
             }
             
-        case .pushPermission, .photoPermission:
-            if let permissionType = row.permissionType {
-                PermissionsManager.shared.requestPermission(for: permissionType, openSettingsIfNeeded: true, response: { granted in
-                    if granted {
-                        tableView.reloadRows(at: [indexPath], with: .fade)
-                        self.delegate?.settingsViewControllerDidGrantPermission(self)
-                    }
-                })
-            }
-            
         case .followInstagram:
             if let url = URL(string: "https://www.instagram.com/screenshopit/") {
                 UIApplication.shared.open(url, options: [:], completionHandler: nil)
@@ -304,6 +251,7 @@ extension SettingsViewController : UITableViewDelegate {
             let viewController = PartnersViewController()
             viewController.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(viewController, animated: true)
+            
         case .region:
             let alert = UIAlertController.init(title: nil, message: nil, preferredStyle: .actionSheet)
             
@@ -324,9 +272,7 @@ extension SettingsViewController : UITableViewDelegate {
             
             present(alert, animated: true, completion: nil)
             
-        case .usageStreak:
-            break;
-        case .version:
+        case .usageStreak, .version:
             break;
         }
         
@@ -337,8 +283,6 @@ extension SettingsViewController : UITableViewDelegate {
 fileprivate extension SettingsViewController {
     func sectionText(for section: Section) -> String {
         switch section {
-        case .permission:
-            return "settings.section.permission".localized
         case .about:
             return "settings.section.about".localized
         case .follow:
@@ -365,10 +309,6 @@ fileprivate extension SettingsViewController {
             return "settings.row.bug.title".localized
         case .contactUs:
             return "settings.row.contact.title".localized
-        case .pushPermission:
-            return "settings.row.push_permission.title".localized
-        case .photoPermission:
-            return "settings.row.photo_permission.title".localized
         case .version:
             return "settings.row.version.title".localized
         case .termsOfService:
@@ -388,8 +328,6 @@ fileprivate extension SettingsViewController {
     
     func cellDetailedText(for row: Row) -> String? {
         switch (row) {
-        case .photoPermission, .pushPermission:
-            return cellEnabledText(for: row)
         case .usageStreak:
             let streak = UserDefaults.standard.integer(forKey: UserDefaultsKeys.dailyStreak)
             if streak == 1 {
@@ -416,50 +354,12 @@ fileprivate extension SettingsViewController {
         }
     }
     
-    func cellEnabledText(for row: Row) -> String? {
-        guard let permissionType = row.permissionType else {
-            return nil
-        }
-        
-        if PermissionsManager.shared.hasPermission(for: permissionType) {
-            return "generic.enabled".localized
-        }
-        else {
-            return "generic.disabled".localized
-        }
-    }
-    
     func cellAccessoryType(for row: Row) -> UITableViewCellAccessoryType {
         switch row {
         case .partners:
             return .disclosureIndicator
         default:
             return .none
-        }
-    }
-    
-    func cellAccessoryView(for row: Row) -> UIView? {
-        switch (row) {
-        case .photoPermission, .pushPermission:
-            if let permissionType = row.permissionType, !PermissionsManager.shared.hasPermission(for: permissionType) {
-                let size = CGFloat(18)
-                
-                let label = UILabel(frame: CGRect(x: 0, y: 0, width: size, height: size))
-                label.backgroundColor = .crazeRed
-                label.text = "!"
-                label.textAlignment = .center
-                label.font = UIFont(name: "Optima-ExtraBlack", size: 14)
-                label.textColor = .white
-                label.layer.cornerRadius = size / 2
-                label.layer.masksToBounds = true
-                return label
-                
-            } else {
-                return nil
-            }
-            
-        default:
-            return nil
         }
     }
     
@@ -479,17 +379,7 @@ fileprivate extension SettingsViewController {
             }
         }
         
-        func sectionIndexPaths(_ section: Section) -> [IndexPath] {
-            var indexPaths: [IndexPath] = []
-            
-            data[section]?.forEach { row in
-                append(section: section, row: row, to: &indexPaths)
-            }
-            
-            return indexPaths
-        }
-        
-        var indexPaths = sectionIndexPaths(.permission)
+        var indexPaths: [IndexPath] = []
         append(section: .about, row: .usageStreak, to: &indexPaths)
         
         tableView.reloadRows(at: indexPaths, with: .none)
@@ -575,20 +465,5 @@ extension SettingsViewController : MFMailComposeViewControllerDelegate {
     
     func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
         dismiss(animated: true, completion: nil)
-    }
-}
-
-// MARK: - Permissions
-
-fileprivate extension SettingsViewController.Row {
-    var permissionType: PermissionType? {
-        switch self {
-        case .photoPermission:
-            return PermissionType.photo
-        case .pushPermission:
-            return PermissionType.push
-        default:
-            return nil
-        }
     }
 }
