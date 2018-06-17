@@ -91,6 +91,7 @@ class ProfileViewController: UITableViewController {
         
         tableView.keyboardDismissMode = .onDrag
         tableView.backgroundColor = .background
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "logout")
         
         profileAccountView.delegate = self
     }
@@ -121,7 +122,7 @@ class ProfileViewController: UITableViewController {
     // MARK: Login
     
     private func syncLoggedIn() {
-        let isLoggedIn = false // TODO:
+        let isLoggedIn = true // TODO:
         
         if isLoggedIn {
             data[.logout] = [.logout]
@@ -129,6 +130,8 @@ class ProfileViewController: UITableViewController {
         else {
             data.removeValue(forKey: .logout)
         }
+        
+        tableView.reloadData()
     }
     
     // MARK: Invite
@@ -162,7 +165,10 @@ extension ProfileViewController: ViewControllerLifeCycle {
 
 extension ProfileViewController: ProfileAccountViewDelegate {
     func profileAccountViewAuthorize(_ view: ProfileAccountView) {
-        // TODO:
+        // TODO: do login
+        view.isLoggedIn = true
+        
+        syncLoggedIn()
     }
     
     func profileAccountViewWantsToContract(_ view: ProfileAccountView) {
@@ -244,7 +250,6 @@ extension ProfileViewController {
     
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         if section == Section.account.rawValue {
-//            profileAccountView.isLoggedIn = true
             return profileAccountView
         }
         else if section == Section.invite.rawValue {
@@ -262,25 +267,38 @@ extension ProfileViewController {
             return UITableViewCell()
         }
         
-        let reusableCell = tableView.dequeueReusableCell(withIdentifier: "cell")
-        let cell = reusableCell ?? UITableViewCell(style: .value1, reuseIdentifier: "cell")
+        let cell: UITableViewCell
         
-        cell.textLabel?.text = cellText(for: row)
-        cell.textLabel?.font = .screenshopFont(.hindLight, textStyle: .body)
-        cell.textLabel?.textColor = .black
-        
-        cell.detailTextLabel?.font = .screenshopFont(.hindSemibold, textStyle: .body)
-        cell.detailTextLabel?.text = nil
-        cell.detailTextLabel?.attributedText = nil
-        
-        if let text = cellDetailedText(for: row) {
-            cell.detailTextLabel?.text = text
+        if indexPath.section == Section.logout.rawValue {
+            cell = tableView.dequeueReusableCell(withIdentifier: "logout", for: indexPath)
+            
+            cell.textLabel?.text = cellText(for: row)
+            cell.textLabel?.font = .screenshopFont(.hindLight, textStyle: .body)
+            cell.textLabel?.textColor = .crazeRed
+            cell.textLabel?.textAlignment = .center
         }
-        else if let attributedText = cellDetailedAttributedText(for: row) {
-            cell.detailTextLabel?.attributedText = attributedText
+        else {
+            let reusableCell = tableView.dequeueReusableCell(withIdentifier: "cell")
+            cell = reusableCell ?? UITableViewCell(style: .value1, reuseIdentifier: "cell")
+            
+            cell.textLabel?.text = cellText(for: row)
+            cell.textLabel?.font = .screenshopFont(.hindLight, textStyle: .body)
+            cell.textLabel?.textColor = .gray4
+            
+            cell.detailTextLabel?.font = .screenshopFont(.hindSemibold, textStyle: .body)
+            cell.detailTextLabel?.text = nil
+            cell.detailTextLabel?.attributedText = nil
+            
+            if let text = cellDetailedText(for: row) {
+                cell.detailTextLabel?.text = text
+            }
+            else if let attributedText = cellDetailedAttributedText(for: row) {
+                cell.detailTextLabel?.attributedText = attributedText
+            }
+            
+            cell.accessoryType = cellAccessoryType(for: row)
         }
         
-        cell.accessoryType = cellAccessoryType(for: row)
         return cell
     }
     
@@ -311,6 +329,7 @@ extension ProfileViewController {
             present(alert, animated: true)
             
         case .logout:
+            // TODO:
             break
         }
     }
