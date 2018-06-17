@@ -294,6 +294,9 @@ extension ProfileViewController {
         else if Section.invite.rawValue == section {
             return inviteView.bounds.height
         }
+        else if let section = Section(rawValue: section), sectionText(for: section) != nil {
+            return tableView.sectionHeaderHeight
+        }
         return 0
     }
     
@@ -307,16 +310,24 @@ extension ProfileViewController {
         return nil
     }
     
-    override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-        return nil
+    override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+        guard let tableViewHeaderFooterView = view as? UITableViewHeaderFooterView else {
+            return
+        }
+        
+        tableViewHeaderFooterView.textLabel?.textColor = .gray3
+        tableViewHeaderFooterView.textLabel?.font = .screenshopFont(.quicksandMedium, textStyle: .subheadline)
     }
     
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        guard let profileSection = Section(rawValue: section) else {
-            return nil
+        if let section = Section(rawValue: section) {
+            return sectionText(for: section)
         }
-        
-        return sectionText(for: profileSection)
+        return nil
+    }
+    
+    override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        return nil
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -339,10 +350,11 @@ extension ProfileViewController {
             cell = reusableCell ?? UITableViewCell(style: .value1, reuseIdentifier: "cell")
             
             cell.textLabel?.text = cellText(for: row)
-            cell.textLabel?.font = .screenshopFont(.hindLight, textStyle: .body)
+            cell.textLabel?.font = .preferredFont(forTextStyle: .body)
             cell.textLabel?.textColor = .gray4
             
-            cell.detailTextLabel?.font = .screenshopFont(.hindSemibold, textStyle: .body)
+            cell.detailTextLabel?.font = .preferredFont(forTextStyle: .body, symbolicTraits: .traitBold)
+            cell.detailTextLabel?.textColor = .gray5
             cell.detailTextLabel?.text = nil
             cell.detailTextLabel?.attributedText = nil
             
@@ -423,7 +435,7 @@ extension ProfileViewController {
     private func sectionText(for section: Section) -> String? {
         switch section {
         case .permissions:
-            return "settings.section.permission".localized
+            return "profile.section.permission".localized
         default:
             return nil
         }
@@ -450,24 +462,43 @@ extension ProfileViewController {
             return CurrencyViewController.currentCurrency
         case .optionOpenIn:
             return OpenWebPage.fromSystemInfo().localizedDisplayString()
-        case .permissionPhoto, .permissionPush:
-            return cellEnabledText(for: row)
         default:
             return nil
         }
     }
     
     private func cellDetailedAttributedText(for row: Row) -> NSAttributedString? {
-        // Template code in case product creates another cell with an image and an arrow
-//        switch (row) {
-//        case .:
+        switch (row) {
+        case .permissionPhoto, .permissionPush:
+            guard let permissionType = row.permissionType else {
+                return nil
+            }
+            
+            let string: String
+            let attributes: [NSAttributedStringKey: Any]
+            
+            if PermissionsManager.shared.hasPermission(for: permissionType) {
+                string = "generic.enabled".localized
+                attributes = [
+                    NSAttributedStringKey.foregroundColor: UIColor.crazeGreen
+                ]
+            }
+            else {
+                string = "generic.disabled".localized
+                attributes = [
+                    NSAttributedStringKey.foregroundColor: UIColor.gray7
+                ]
+            }
+            
+            return NSAttributedString(string: string, attributes: attributes)
+            
+        default:
+            // Template code in case product creates another cell with an image and an arrow
 //            let textAttachment = NSTextAttachment()
 //            textAttachment.image = UIImage(named: "")
 //            return NSAttributedString(attachment: textAttachment)
-//
-//        default:
             return nil
-//        }
+        }
     }
     
     private func cellEnabledText(for row: Row) -> String? {
@@ -497,7 +528,12 @@ extension ProfileViewController {
         case .permissionPhoto, .permissionPush:
             if let permissionType = row.permissionType, !PermissionsManager.shared.hasPermission(for: permissionType) {
                 let size: CGFloat = 18
-                let label = UILabel(frame: CGRect(x: 0, y: 0, width: size, height: size))
+                let offset: CGFloat = 8
+                
+                let view = UIView(frame: CGRect(x: 0, y: 0, width: size + offset, height: size))
+                
+                let label = UILabel()
+                label.translatesAutoresizingMaskIntoConstraints = false
                 label.backgroundColor = .crazeRed
                 label.text = "!"
                 label.textAlignment = .center
@@ -505,7 +541,13 @@ extension ProfileViewController {
                 label.textColor = .white
                 label.layer.cornerRadius = size / 2
                 label.layer.masksToBounds = true
-                return label
+                view.addSubview(label)
+                label.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+                label.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+                label.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+                label.widthAnchor.constraint(equalTo: label.heightAnchor).isActive = true
+                
+                return view
             }
             else {
                 return nil

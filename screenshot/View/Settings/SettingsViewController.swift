@@ -174,7 +174,7 @@ extension SettingsViewController : UITableViewDataSource {
         }
         
         tableViewHeaderFooterView.textLabel?.textColor = .gray3
-        tableViewHeaderFooterView.textLabel?.font = .screenshopFont(.hind, textStyle: .subheadline)
+        tableViewHeaderFooterView.textLabel?.font = .screenshopFont(.quicksandMedium, textStyle: .subheadline)
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -193,9 +193,10 @@ extension SettingsViewController : UITableViewDataSource {
         
         cell.imageView?.image = cellImage(for: row)
         cell.textLabel?.text = cellText(for: row)
-        cell.textLabel?.font = .screenshopFont(.hindLight, textStyle: .body)
-        cell.textLabel?.textColor = .black
-        cell.detailTextLabel?.font = .screenshopFont(.hindSemibold, textStyle: .body)
+        cell.textLabel?.font = .preferredFont(forTextStyle: .body)
+        cell.textLabel?.textColor = .gray4
+        cell.detailTextLabel?.font = .preferredFont(forTextStyle: .body, symbolicTraits: .traitBold)
+        cell.detailTextLabel?.textColor = .gray5
         cell.detailTextLabel?.text = cellDetailedText(for: row)
         return cell
     }

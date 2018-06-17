@@ -290,6 +290,7 @@
 "profile.row.logout.title" = "Logout";
 "profile.row.open_in.title" = "Open Products In";
 "profile.row.tutorial.title" = "Play Tutorial";
+"profile.section.permission" = "Permissions";
 "profile.tell_friend" = "Tell a Friend!";
 "profile.title" = "Profile";
 
@@ -354,7 +355,6 @@
 "settings.row.version.title" = "App Version";
 "settings.section.about" = "About";
 "settings.section.follow" = "Follow Us";
-"settings.section.permission" = "Permissions";
 "settings.title" = "Settings";
 
 "text_explanation.disabled" = "disabled";
