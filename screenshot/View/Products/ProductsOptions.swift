@@ -115,9 +115,7 @@ class ProductsOptions : NSObject {
         viewController.genderControl.selectedSegmentIndex = gender.offsetValue
         viewController.sizeControl.selectedSegmentIndex = size.offsetValue
         viewController.saleControl.selectedSegmentIndex = sale.offsetValue
-        if let index = ProductsOptionsSort.all.index(of: sort) {
-            viewController.sortPickerView?.selectRow(index, inComponent: 0, animated: false)
-        }
+        viewController.sortControl.items.last?.title = sort.stringValue
     }
     
     @objc private func continueAction() {
@@ -165,6 +163,7 @@ class ProductsOptions : NSObject {
     }
     
     @objc private func cancelAction() {
+        self.syncOptions()
         delegate?.productsOptionsDidCancel(self)
     }
 }
@@ -355,7 +354,7 @@ class ProductsOptionsViewController: UIViewController {
     private(set) lazy var saleControl: UISegmentedControl = {
         return self.controls.createSaleControl()
     }()
-    private(set) lazy var sortControl: UIControl = {
+    private(set) lazy var sortControl: SegmentedDropDownControl = {
         return self.controls.createSortControl(pickerViewAnimation: { [weak self] in
             self?.view.layoutIfNeeded()
         })
