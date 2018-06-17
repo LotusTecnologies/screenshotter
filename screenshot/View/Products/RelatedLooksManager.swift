@@ -9,7 +9,7 @@
 import UIKit
 import PromiseKit
 
-protocol RelatedLooksManagerDelegate : class {
+protocol RelatedLooksManagerDelegate : NSObjectProtocol {
     func relatedLooksManagerReloadSection(_ relatedLooksManager:RelatedLooksManager)
     func relatedLooksManagerGetProducts(_ relatedLooksManager:RelatedLooksManager) -> [Product]?
     func relatedLooksManager(_ relatedLooksManager:RelatedLooksManager, present viewController:UIViewController)
