@@ -33,8 +33,6 @@ class SettingsViewController : BaseViewController {
         case version
         case termsOfService
         case privacyPolicy
-        case productGender
-        case productSize
         case followFacebook
         case followInstagram
         case partners
@@ -46,8 +44,6 @@ class SettingsViewController : BaseViewController {
     
     fileprivate let tableView = UITableView(frame: .zero, style: .grouped)
     fileprivate let tableFooterTextView = UITextView()
-    
-    fileprivate let productsOptionsControls = ProductsOptionsControls()
     
     override var title: String? {
         set {}
@@ -128,16 +124,6 @@ class SettingsViewController : BaseViewController {
         reloadChangeableIndexPaths()
     }
     
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        
-        // Very important to clear the controls to prevent retaining
-        // the same property in multiple cells. Not doing this will
-        // freeze the app on subsequent view will appears.
-        productsOptionsControls.genderControl = nil
-        productsOptionsControls.sizeControl = nil
-    }
-    
     @objc private func applicationDidBecomeActive(_ notification: Notification) {
         if view?.window != nil {
             // Use did become active since the permissions values can change through an alert view
@@ -180,8 +166,6 @@ class SettingsViewController : BaseViewController {
             .followFacebook
         ],
         .product: [
-            .productGender, // TODO: properly remove after updating filters feature
-            .productSize,
             .openIn
         ]
     ]
@@ -198,23 +182,6 @@ class SettingsViewController : BaseViewController {
             return nil
         }
         return IndexPath(row: rowValue, section: section.rawValue)
-    }
-    
-    // MARK: Product Options
-    
-    @objc fileprivate func genderControlAction(_ control: UISegmentedControl) {
-        let gender = ProductsOptionsGender(offsetValue: control.selectedSegmentIndex)
-        let integer = gender.rawValue
-        Analytics.trackSetGlobalGenderFiler(gender: gender.stringValue)
-        UserDefaults.standard.set(integer, forKey: UserDefaultsKeys.productGender)
-    }
-    
-    @objc fileprivate func sizeControlAction(_ control: UISegmentedControl) {
-        let size = ProductsOptionsSize(offsetValue: control.selectedSegmentIndex)
-        let integer = size.rawValue
-        
-        Analytics.trackSetGlobalSizeFiler(size: size.stringValue)
-        UserDefaults.standard.set(integer, forKey: UserDefaultsKeys.productSize)
     }
 }
 
@@ -259,27 +226,6 @@ extension SettingsViewController : UITableViewDataSource {
         return cell
     }
     
-    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        guard let row = settingsRow(for: indexPath) else {
-            return
-        }
-        
-        if indexPath.section == Section.product.rawValue &&
-            (row == .productGender || row == .productSize),
-            let genderControl = productsOptionsControls.genderControl,
-            let sizeControl = productsOptionsControls.sizeControl,
-            let width = [genderControl.bounds.width, sizeControl.bounds.width].max()
-        {
-            var frame = genderControl.frame
-            frame.size.width = width
-            genderControl.frame = frame
-            
-            frame = sizeControl.frame
-            frame.size.width = width
-            sizeControl.frame = frame
-        }
-    }
-    
     private func tableView(_ tableView: UITableView, defaultCellForRowAt indexPath: IndexPath, withRow row: Row) -> UITableViewCell {
         let reusableCell = tableView.dequeueReusableCell(withIdentifier: "cell")
         let cell = reusableCell ?? UITableViewCell(style: .value1, reuseIdentifier: "cell")
@@ -301,7 +247,7 @@ extension SettingsViewController : UITableViewDelegate {
         }
         
         switch (row) {
-        case .version, .productGender, .productSize, .usageStreak:
+        case .version, .usageStreak:
             return false
             
         case .pushPermission, .photoPermission:
@@ -402,10 +348,6 @@ extension SettingsViewController : UITableViewDelegate {
             break;
         case .version:
             break;
-        case .productGender:
-            break;
-        case .productSize:
-            break;
         }
         
         tableView.deselectRow(at: indexPath, animated: true)
@@ -455,10 +397,6 @@ fileprivate extension SettingsViewController {
             return "legal.terms_of_service".localized
         case .privacyPolicy:
             return "legal.privacy_policy".localized
-        case .productGender:
-            return "settings.row.gender.title".localized
-        case .productSize:
-            return "settings.row.size.title".localized
         case .openIn:
             return "settings.row.open_in.title".localized
         case .followInstagram:
@@ -545,43 +483,6 @@ fileprivate extension SettingsViewController {
             } else {
                 return nil
             }
-            
-        case .productGender:
-            let integer = UserDefaults.standard.integer(forKey: UserDefaultsKeys.productGender)
-            let control: UISegmentedControl
-            
-            if productsOptionsControls.genderControl != nil {
-                control = productsOptionsControls.genderControl!
-                
-            } else {
-                control = productsOptionsControls.createGenderControl()
-                control.tintColor = .crazeGreen
-                control.isExclusiveTouch = true
-                control.addTarget(self, action: #selector(genderControlAction(_:)), for: .valueChanged)
-            }
-            
-            control.selectedSegmentIndex = ProductsOptionsGender(intValue: integer).offsetValue
-            productsOptionsControls.sync()
-            
-            return control
-            
-        case .productSize:
-            let integer = UserDefaults.standard.integer(forKey: UserDefaultsKeys.productSize)
-            let control: UISegmentedControl
-            
-            if productsOptionsControls.sizeControl != nil {
-                control = productsOptionsControls.sizeControl!
-                
-            } else {
-                control = productsOptionsControls.createSizeControl()
-                control.tintColor = .crazeGreen
-                control.isExclusiveTouch = true
-                control.addTarget(self, action: #selector(sizeControlAction(_:)), for: .valueChanged)
-            }
-            
-            control.selectedSegmentIndex = ProductsOptionsSize(intValue: integer).offsetValue
-            productsOptionsControls.sync()
-            return control
             
         default:
             return nil

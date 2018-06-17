@@ -337,7 +337,6 @@
 "settings.row.currency.title" = "Currency";
 "settings.row.email.detail" = "Enter Your Email";
 "settings.row.facebook.title" = "Facebook";
-"settings.row.gender.title" = "Gender";
 "settings.row.instagram.title" = "Instagram";
 "settings.row.name.detail" = "Enter Your Name";
 "settings.row.open_in.title" = "Open Products In";
@@ -345,7 +344,6 @@
 "settings.row.photo_permission.title" = "Camera Roll";
 "settings.row.push_permission.title" = "Push Notifications";
 "settings.row.region.title" = "Region";
-"settings.row.size.title" = "Size";
 "settings.row.tutorial.title" = "Play Tutorial";
 "settings.row.usage_streak.detail.plural" = "%d days";
 "settings.row.usage_streak.detail.single" = "%d day";
