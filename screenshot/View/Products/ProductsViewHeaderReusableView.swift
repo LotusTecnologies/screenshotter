@@ -10,6 +10,8 @@ import UIKit
 
 class ProductsViewHeaderReusableView: UICollectionReusableView {
     let label = UILabel.init()
+    let line = UIView()
+
     let filterButton = UIButton()
     
     override init(frame: CGRect) {
@@ -24,6 +26,16 @@ class ProductsViewHeaderReusableView: UICollectionReusableView {
         label.topAnchor.constraint(equalTo: self.layoutMarginsGuide.topAnchor).isActive = true
         label.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
         
+        line.backgroundColor = UIColor(red:0.85, green:0.88, blue:0.89, alpha:1.0)
+        line.translatesAutoresizingMaskIntoConstraints = false
+        self.addSubview(line)
+        line.leadingAnchor.constraint(equalTo: self.leadingAnchor).isActive = true
+        line.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive = true
+        line.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
+        line.heightAnchor.constraint(equalToConstant: 2.0).isActive = true
+        
+        
+       
         self.filterButton.translatesAutoresizingMaskIntoConstraints = false
         self.filterButton.setImage(UIImage(named: "ProductsFilter"), for: .normal)
         self.filterButton.contentEdgeInsets = UIEdgeInsets(top: 0, left: layoutMargins.right, bottom: 0, right: layoutMargins.right)

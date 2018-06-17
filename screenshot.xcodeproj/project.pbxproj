@@ -11,6 +11,7 @@
 		3125446C2091C3A0009410D5 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
 		3125446D2091C3A0009410D5 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
 		3125448F209871B4009410D5 /* Analytics+api.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3125448E209871B4009410D5 /* Analytics+api.swift */; };
+		312A854620D245ED006F76C6 /* RelatedLooksManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 312A854520D245ED006F76C6 /* RelatedLooksManager.swift */; };
 		314C488A205E86E700B8381D /* PHAsset+craze.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314C4889205E86E700B8381D /* PHAsset+craze.swift */; };
 		315186412033FC81001BD8D6 /* ShoppablesToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3151863F2033FC81001BD8D6 /* ShoppablesToolbar.swift */; };
 		316C831020C3AEBD0012A908 /* DataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316C830520C3AEBD0012A908 /* DataModel.swift */; };
@@ -267,6 +268,7 @@
 		31107DA92098B20C006E8B86 /* Model 16.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 16.xcdatamodel"; sourceTree = "<group>"; };
 		31254460209079C7009410D5 /* screenshot-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "screenshot-Bridging-Header.h"; sourceTree = "<group>"; };
 		3125448E209871B4009410D5 /* Analytics+api.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Analytics+api.swift"; sourceTree = "<group>"; };
+		312A854520D245ED006F76C6 /* RelatedLooksManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelatedLooksManager.swift; sourceTree = "<group>"; };
 		314C4889205E86E700B8381D /* PHAsset+craze.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PHAsset+craze.swift"; sourceTree = "<group>"; };
 		3151863F2033FC81001BD8D6 /* ShoppablesToolbar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShoppablesToolbar.swift; sourceTree = "<group>"; };
 		3162AEDD207DD5B6008A746B /* Model 13.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 13.xcdatamodel"; sourceTree = "<group>"; };
@@ -965,6 +967,7 @@
 				31C0C81520A2CD14002EE95B /* ProductsRateView.swift */,
 				31C0C81420A2CD13002EE95B /* ProductsViewController.swift */,
 				31CEA0B620C91A4B00058ECC /* ProductCollectionViewManager.swift */,
+				312A854520D245ED006F76C6 /* RelatedLooksManager.swift */,
 				31C0C81320A2CD13002EE95B /* ProductsViewHeaderReusableView.swift */,
 				31C0C81020A2CD13002EE95B /* RelatedLooksCollectionViewCell.swift */,
 				31C0C81120A2CD13002EE95B /* SectionBackgroundCollectionViewFlowLayout.swift */,
@@ -1569,6 +1572,7 @@
 				C55D89C02021EF93004A5245 /* PartnersViewController.swift in Sources */,
 				C5278FEE1F3C38510090E422 /* Model.xcdatamodeld in Sources */,
 				317BFBB2207DFCD300E61D7C /* Random.swift in Sources */,
+				312A854620D245ED006F76C6 /* RelatedLooksManager.swift in Sources */,
 				E4351D702031957800193657 /* MainTabBarController.swift in Sources */,
 				C548D4EB20022E26003364E9 /* DiscoverScreenshotViewController.swift in Sources */,
 				C5AAE78B1FEA38AA00BCFF78 /* WebViewController.swift in Sources */,

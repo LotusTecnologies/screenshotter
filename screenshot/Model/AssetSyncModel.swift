@@ -1205,8 +1205,8 @@ extension AssetSyncModel {
                                         
                                         //Save the updated data for the shoppable - eventhough it is not used.
                                         self.performBackgroundTask(assetId: nil, shoppableId: productImageUrl, { (context) in
-                                            if let shopable = context.shoppableWith(objectId:createdSubShopableObjectId) {
-                                                shopable.offersURL = offersURL
+                                            if let shoppable = context.shoppableWith(objectId:createdSubShopableObjectId) {
+                                                shoppable.offersURL = offersURL
                                                 if let b0 = segment["b0"] as? [Any],
                                                     b0.count >= 2,
                                                     let b1 = segment["b1"] as? [Any],
@@ -1215,12 +1215,12 @@ extension AssetSyncModel {
                                                     let b0y = b0[1] as? Double,
                                                     let b1x = b1[0] as? Double,
                                                     let b1y = b1[1] as? Double {
-                                                    shopable.b0x = b0x
-                                                    shopable.b0y = b0y
-                                                    shopable.b1x = b1x
-                                                    shopable.b1y = b1y
+                                                    shoppable.b0x = b0x
+                                                    shoppable.b0y = b0y
+                                                    shoppable.b1x = b1x
+                                                    shoppable.b1y = b1y
                                                 }
-                                                shoppable?.relatedImagesURLString = segment["related_looks"] as? String
+                                                shoppable.relatedImagesURLString = segment["related_looks"] as? String
                                                 context.saveIfNeeded()
                                             }
                                         })
