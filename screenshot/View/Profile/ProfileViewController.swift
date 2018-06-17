@@ -26,7 +26,8 @@ class ProfileViewController: UITableViewController {
         .account: [],
         .invite: [],
         .options: [
-            .currency
+            .currency,
+            .openIn
         ]
     ]
     
@@ -40,9 +41,11 @@ class ProfileViewController: UITableViewController {
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setBackgroundImage(UIImage(named: "BrandGradientControl"), for: .normal)
         button.setBackgroundImage(UIImage(named: "BrandGradientHighlightedControl"), for: .highlighted)
+        button.setImage(UIImage(named: "ProfileFriends"), for: .normal)
         button.setTitle("profile.tell_friend".localized, for: .normal)
         button.addTarget(self, action: #selector(inviteAction), for: .touchUpInside)
         button.clipsToBounds = true
+        button.adjustInsetsForImage(withPadding: 6)
         view.addSubview(button)
         button.sizeToFit()
         button.setContentHuggingPriority(.required, for: .vertical)
