@@ -19,7 +19,6 @@ class SettingsViewController : BaseViewController {
     fileprivate enum Section : Int {
         // Order reflects in the TableView
         case permission
-        case product
         case follow
         case about
     }
@@ -36,7 +35,6 @@ class SettingsViewController : BaseViewController {
         case followFacebook
         case followInstagram
         case partners
-        case openIn
         case region
     }
     
@@ -164,9 +162,6 @@ class SettingsViewController : BaseViewController {
         .follow: [
             .followInstagram,
             .followFacebook
-        ],
-        .product: [
-            .openIn
         ]
     ]
     
@@ -295,21 +290,6 @@ extension SettingsViewController : UITableViewDelegate {
                 })
             }
             
-        case .openIn:
-            let alert = UIAlertController.init(title: nil, message: nil, preferredStyle: .actionSheet)
-            
-            let options:[OpenWebPage] = [.embededSafari, .safari, .chrome]
-            options.forEach({ (setting) in
-                alert.addAction(UIAlertAction.init(title:setting.localizedDisplayString(), style: .default, handler: { (a) in
-                    setting.saveToUserDefaults()
-                    tableView.reloadRows(at: [indexPath], with: .none)
-                }))
-            })
-            
-            alert.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
-            
-            present(alert, animated: true, completion: nil)
-            
         case .followInstagram:
             if let url = URL(string: "https://www.instagram.com/screenshopit/") {
                 UIApplication.shared.open(url, options: [:], completionHandler: nil)
@@ -363,8 +343,6 @@ fileprivate extension SettingsViewController {
             return "settings.section.about".localized
         case .follow:
             return "settings.section.follow".localized
-        case .product:
-            return "settings.section.product".localized
         }
     }
     
@@ -397,8 +375,6 @@ fileprivate extension SettingsViewController {
             return "legal.terms_of_service".localized
         case .privacyPolicy:
             return "legal.privacy_policy".localized
-        case .openIn:
-            return "settings.row.open_in.title".localized
         case .followInstagram:
             return "settings.row.instagram.title".localized
         case .followFacebook:
@@ -414,8 +390,6 @@ fileprivate extension SettingsViewController {
         switch (row) {
         case .photoPermission, .pushPermission:
             return cellEnabledText(for: row)
-        case .openIn:
-            return OpenWebPage.fromSystemInfo().localizedDisplayString()
         case .usageStreak:
             let streak = UserDefaults.standard.integer(forKey: UserDefaultsKeys.dailyStreak)
             if streak == 1 {

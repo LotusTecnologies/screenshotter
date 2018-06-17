@@ -286,6 +286,12 @@
 
 "profile.header.logged_out.continue" = "Log In or Sign Up";
 "profile.header.logged_out.title" = "Log in for exclusive benefits!";
+"profile.row.currency.title" = "Currency";
+"profile.row.logout.title" = "Logout";
+"profile.row.open_in.title" = "Open Products In";
+"profile.row.tutorial.title" = "Play Tutorial";
+"profile.tell_friend" = "Tell a Friend!";
+"profile.title" = "Profile";
 
 "screenshot.empty.detail" = "Upload a photo or add a look from the Discover tab";
 "screenshot.empty.discover" = "Browse Looks";
@@ -334,17 +340,14 @@
 "settings.region.us" = "United States";
 "settings.row.bug.title" = "Submit a Bug";
 "settings.row.contact.title" = "Contact Us";
-"settings.row.currency.title" = "Currency";
 "settings.row.email.detail" = "Enter Your Email";
 "settings.row.facebook.title" = "Facebook";
 "settings.row.instagram.title" = "Instagram";
 "settings.row.name.detail" = "Enter Your Name";
-"settings.row.open_in.title" = "Open Products In";
 "settings.row.partners.title" = "Our Technology";
 "settings.row.photo_permission.title" = "Camera Roll";
 "settings.row.push_permission.title" = "Push Notifications";
 "settings.row.region.title" = "Region";
-"settings.row.tutorial.title" = "Play Tutorial";
 "settings.row.usage_streak.detail.plural" = "%d days";
 "settings.row.usage_streak.detail.single" = "%d day";
 "settings.row.usage_streak.title" = "Daily Streak";
@@ -352,7 +355,6 @@
 "settings.section.about" = "About";
 "settings.section.follow" = "Follow Us";
 "settings.section.permission" = "Permissions";
-"settings.section.product" = "Product Options";
 "settings.title" = "Settings";
 
 "text_explanation.disabled" = "disabled";

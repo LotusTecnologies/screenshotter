@@ -21,6 +21,7 @@ class ProfileViewController: UITableViewController {
         case currency
         case tutorial
         case logout
+        case openIn
     }
     
     private var data: [Section: [Row]] = [
@@ -43,7 +44,7 @@ class ProfileViewController: UITableViewController {
         let button = MainButton()
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setBackgroundImage(UIImage(named: "BrandGradientControl"), for: .normal)
-        button.setTitle("Tell a Friend!", for: .normal)
+        button.setTitle("profile.tell_friend".localized, for: .normal)
         button.addTarget(self, action: #selector(inviteAction), for: .touchUpInside)
         button.clipsToBounds = true
         view.addSubview(button)
@@ -66,7 +67,7 @@ class ProfileViewController: UITableViewController {
     override var title: String? {
         set {}
         get {
-            return "Profile" // TODO: localize
+            return "profile.title".localized
         }
     }
     
@@ -305,6 +306,18 @@ extension ProfileViewController {
             viewController.modalTransitionStyle = .crossDissolve
             present(viewController, animated: true)
             
+        case .openIn:
+            let alert = UIAlertController.init(title: nil, message: nil, preferredStyle: .actionSheet)
+            let browsers: [OpenWebPage] = [.safari, .chrome]
+            browsers.forEach({ browser in
+                alert.addAction(UIAlertAction.init(title: browser.localizedDisplayString(), style: .default, handler: { alertAction in
+                    browser.saveToUserDefaults()
+                    tableView.reloadRows(at: [indexPath], with: .none)
+                }))
+            })
+            alert.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
+            present(alert, animated: true)
+            
         case .logout:
             break
         }
@@ -313,11 +326,13 @@ extension ProfileViewController {
     private func cellText(for row: Row) -> String? {
         switch (row) {
         case .currency:
-            return "settings.row.currency.title".localized
+            return "profile.row.currency.title".localized
         case .logout:
-            return "Logout"
+            return "profile.row.logout.title".localized
         case .tutorial:
-            return "settings.row.tutorial.title".localized
+            return "profile.row.tutorial.title".localized
+        case .openIn:
+            return "profile.row.open_in.title".localized
         }
     }
     
@@ -325,6 +340,8 @@ extension ProfileViewController {
         switch (row) {
         case .currency:
             return CurrencyViewController.currentCurrency
+        case .openIn:
+            return OpenWebPage.fromSystemInfo().localizedDisplayString()
         default:
             return nil
         }
