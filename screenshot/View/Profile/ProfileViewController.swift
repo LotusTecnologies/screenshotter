@@ -13,13 +13,11 @@ class ProfileViewController: UITableViewController {
         case account
         case invite
         case options
-        case activity
         case logout
     }
     
     enum Row: Int {
         case currency
-        case tutorial
         case logout
         case openIn
     }
@@ -29,9 +27,6 @@ class ProfileViewController: UITableViewController {
         .invite: [],
         .options: [
             .currency
-        ],
-        .activity: [
-            .tutorial
         ]
     ]
     
@@ -299,13 +294,6 @@ extension ProfileViewController {
             viewController.selectedCurrencyCode = UserDefaults.standard.string(forKey: UserDefaultsKeys.productCurrency)
             navigationController?.pushViewController(viewController, animated: true)
             
-        case .tutorial:
-            let viewController = TutorialVideoViewController()
-            viewController.showsReplayButtonUponFinishing = false
-            viewController.delegate = self
-            viewController.modalTransitionStyle = .crossDissolve
-            present(viewController, animated: true)
-            
         case .openIn:
             let alert = UIAlertController.init(title: nil, message: nil, preferredStyle: .actionSheet)
             let browsers: [OpenWebPage] = [.safari, .chrome]
@@ -329,8 +317,6 @@ extension ProfileViewController {
             return "profile.row.currency.title".localized
         case .logout:
             return "profile.row.logout.title".localized
-        case .tutorial:
-            return "profile.row.tutorial.title".localized
         case .openIn:
             return "profile.row.open_in.title".localized
         }
@@ -348,36 +334,24 @@ extension ProfileViewController {
     }
     
     private func cellDetailedAttributedText(for row: Row) -> NSAttributedString? {
-        switch (row) {
-        case .tutorial:
-            let textAttachment = NSTextAttachment()
-            textAttachment.image = UIImage(named: "ProfilePlayVideo")
-            return NSAttributedString(attachment: textAttachment)
-            
-        default:
+        // Template code in case product creates another cell with an image and an arrow
+//        switch (row) {
+//        case .:
+//            let textAttachment = NSTextAttachment()
+//            textAttachment.image = UIImage(named: "")
+//            return NSAttributedString(attachment: textAttachment)
+//
+//        default:
             return nil
-        }
+//        }
     }
     
     private func cellAccessoryType(for row: Row) -> UITableViewCellAccessoryType {
         switch row {
-        case .currency, .tutorial:
+        case .currency:
             return .disclosureIndicator
         default:
             return .none
         }
-    }
-}
-
-// MARK: - Tutorial
-
-extension ProfileViewController: VideoDisplayingViewControllerDelegate {
-    func videoDisplayingViewControllerDidTapDone(_ viewController: UIViewController) {
-        dismiss(animated: true)
-    }
-    
-    func videoDisplayingViewControllerDidEnd(_ viewController: UIViewController) {
-        dismiss(animated: true)
-        Analytics.trackAutomaticallyExitedTutorialVideo()
     }
 }

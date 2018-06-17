@@ -377,8 +377,6 @@
 "tutorial.try.detail.x.2" = " to take a screenshot";
 "tutorial.try.skip" = "Skip";
 "tutorial.try.title" = "Try It Out";
-"tutorial.video.mute.detail" = "In order to hear the sound in the video, please turn up the volume on your phone!";
-"tutorial.video.mute.title" = "Turn up the volume!";
 
 "update.force.message" = "You need to update to the latest version to keep using Screenshop.";
 "update.force.title" = "Update Required";
