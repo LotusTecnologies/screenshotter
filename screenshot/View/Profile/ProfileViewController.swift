@@ -126,9 +126,9 @@ class ProfileViewController: UITableViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
         reloadChangeableIndexPaths()
+        
+        super.viewWillAppear(animated)
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -199,16 +199,6 @@ class ProfileViewController: UITableViewController {
             .init("com.apple.mobilenotes.SharingExtension")
         ]
         present(activityViewController, animated: true)
-    }
-}
-
-extension ProfileViewController: ViewControllerLifeCycle {
-    func viewController(_ viewController: UIViewController, willDisappear animated: Bool) {
-        if viewController.isKind(of: CurrencyViewController.self),
-            let indexPath = indexPath(for: .optionCurrency, in: .options)
-        {
-            tableView.reloadRows(at: [indexPath], with: .none)
-        }
     }
 }
 
@@ -398,7 +388,6 @@ extension ProfileViewController {
         switch (row) {
         case .optionCurrency:
             let viewController = CurrencyViewController()
-            viewController.lifeCycleDelegate = self
             viewController.title = cellText(for: row)
             viewController.hidesBottomBarWhenPushed = true
             viewController.selectedCurrencyCode = UserDefaults.standard.string(forKey: UserDefaultsKeys.productCurrency)
@@ -411,9 +400,13 @@ extension ProfileViewController {
                 alert.addAction(UIAlertAction.init(title: browser.localizedDisplayString(), style: .default, handler: { alertAction in
                     browser.saveToUserDefaults()
                     tableView.reloadRows(at: [indexPath], with: .none)
+                    tableView.selectRow(at: indexPath, animated: false, scrollPosition: .none)
+                    tableView.deselectRow(at: indexPath, animated: true)
                 }))
             })
-            alert.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
+            alert.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: { alertAction in
+                tableView.deselectRow(at: indexPath, animated: true)
+            }))
             present(alert, animated: true)
             
         case .permissionPhoto, .permissionPush:
@@ -448,9 +441,9 @@ extension ProfileViewController {
         case .optionOpenIn:
             return "profile.row.open_in.title".localized
         case .permissionPush:
-            return "settings.row.push_permission.title".localized
+            return "profile.row.push_permission.title".localized
         case .permissionPhoto:
-            return "settings.row.photo_permission.title".localized
+            return "profile.row.photo_permission.title".localized
         case .logout:
             return "profile.row.logout.title".localized
         }
@@ -565,9 +558,18 @@ extension ProfileViewController {
         }
         
         var indexPaths: [IndexPath] = []
-        append(section: .permissions, row: .permissionPhoto, to: &indexPaths)
+        append(section: .options, row: .optionCurrency, to: &indexPaths)
+        append(section: .permissions, row: .permissionPush, to: &indexPaths)
         append(section: .permissions, row: .permissionPush, to: &indexPaths)
         
+        let selectedIndexPath = indexPaths.first { indexPath -> Bool in
+            return tableView.indexPathsForSelectedRows?.contains(indexPath) ?? false
+        }
+        
         tableView.reloadRows(at: indexPaths, with: .none)
+        
+        if let selectedIndexPath = selectedIndexPath {
+            tableView.selectRow(at: selectedIndexPath, animated: false, scrollPosition: .none)
+        }
     }
 }

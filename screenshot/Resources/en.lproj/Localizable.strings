@@ -289,6 +289,8 @@
 "profile.row.currency.title" = "Currency";
 "profile.row.logout.title" = "Logout";
 "profile.row.open_in.title" = "Open Products In";
+"profile.row.photo_permission.title" = "Camera Roll";
+"profile.row.push_permission.title" = "Push Notifications";
 "profile.row.tutorial.title" = "Play Tutorial";
 "profile.section.permission" = "Permissions";
 "profile.tell_friend" = "Tell a Friend!";
@@ -346,8 +348,6 @@
 "settings.row.instagram.title" = "Instagram";
 "settings.row.name.detail" = "Enter Your Name";
 "settings.row.partners.title" = "Our Technology";
-"settings.row.photo_permission.title" = "Camera Roll";
-"settings.row.push_permission.title" = "Push Notifications";
 "settings.row.region.title" = "Region";
 "settings.row.usage_streak.detail.plural" = "%d days";
 "settings.row.usage_streak.detail.single" = "%d day";
