@@ -54,10 +54,4 @@ class BaseViewController: UIViewController {
     override var prefersStatusBarHidden: Bool {
         return isStatusBarHidden
     }
-    
-    // MARK: - Extra
-    
-    func addNavigationItemLogo() {
-        self.navigationItem.titleView = UIImageView(image: UIImage(named: "BrandLogo20h"))
-    }
 }

@@ -26,8 +26,6 @@ class TutorialNavigationController : UINavigationController {
         welcomeViewController.delegate = self
         viewControllers = [welcomeViewController]
         
-        Analytics.trackStartedTutorialVideo()
-        
         view.backgroundColor = .white
         self.isNavigationBarHidden = true
         self.delegate = self

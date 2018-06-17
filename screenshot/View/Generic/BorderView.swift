@@ -16,7 +16,7 @@ class BorderView: UIView {
         super.init(coder: aDecoder)
     }
     
-    init(edge: UIRectEdge) {
+    init(edge: UIRectEdge, height: CGFloat = .halfPoint) {
         self.edge = edge
         super.init(frame: .zero)
         
@@ -29,9 +29,9 @@ class BorderView: UIView {
         
         switch edge {
         case .top, .bottom:
-            heightAnchor.constraint(equalToConstant: .halfPoint).isActive = true
+            heightAnchor.constraint(equalToConstant: height).isActive = true
         case .left, .right:
-            widthAnchor.constraint(equalToConstant: .halfPoint).isActive = true
+            widthAnchor.constraint(equalToConstant: height).isActive = true
         default:
             break
         }

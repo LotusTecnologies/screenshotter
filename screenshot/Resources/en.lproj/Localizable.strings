@@ -209,6 +209,9 @@
 "notification.screenshot.shoppable" = "Your screenshot is shoppable in the screenshot tab";
 "notification.title" = "Ready to shop?";
 
+"onboarding.details.avatar.camera" = "Take a Photo";
+"onboarding.details.avatar.gallery" = "Upload From Gallery";
+
 "onboarding.welcome.content" = "Take a screenshot.\nShop it.";
 "onboarding.welcome.continue" = "Get Started";
 "onboarding.welcome.header" = "Welcome to";
@@ -281,6 +284,18 @@
 "products.related_looks.error.connection" = "Please check your connection and try again.";
 "products.related_looks.error.no_looks" = "No similar looks found";
 
+"profile.header.logged_out.continue" = "Log In or Sign Up";
+"profile.header.logged_out.title" = "Log in for exclusive benefits!";
+"profile.row.currency.title" = "Currency";
+"profile.row.logout.title" = "Logout";
+"profile.row.open_in.title" = "Open Products In";
+"profile.row.photo_permission.title" = "Camera Roll";
+"profile.row.push_permission.title" = "Push Notifications";
+"profile.row.tutorial.title" = "Play Tutorial";
+"profile.section.permission" = "Permissions";
+"profile.tell_friend" = "Tell a Friend!";
+"profile.title" = "Profile";
+
 "screenshot.empty.detail" = "Upload a photo or add a look from the Discover tab";
 "screenshot.empty.discover" = "Browse Looks";
 "screenshot.empty.title" = "Shop A Photo";
@@ -326,32 +341,20 @@
 "settings.region.other" = "Other";
 "settings.region.unknown" = "Unknown";
 "settings.region.us" = "United States";
-"settings.row.address.title" = "Shipping Addresses";
 "settings.row.bug.title" = "Submit a Bug";
 "settings.row.contact.title" = "Contact Us";
-"settings.row.currency.title" = "Currency";
 "settings.row.email.detail" = "Enter Your Email";
 "settings.row.facebook.title" = "Facebook";
-"settings.row.gender.title" = "Gender";
 "settings.row.instagram.title" = "Instagram";
 "settings.row.name.detail" = "Enter Your Name";
-"settings.row.open_in.title" = "Open Products In";
 "settings.row.partners.title" = "Our Technology";
-"settings.row.payment.title" = "Payment Methods";
-"settings.row.photo_permission.title" = "Camera Roll";
-"settings.row.push_permission.title" = "Push Notifications";
 "settings.row.region.title" = "Region";
-"settings.row.size.title" = "Size";
-"settings.row.tutorial.title" = "Play Tutorial";
 "settings.row.usage_streak.detail.plural" = "%d days";
 "settings.row.usage_streak.detail.single" = "%d day";
 "settings.row.usage_streak.title" = "Daily Streak";
 "settings.row.version.title" = "App Version";
 "settings.section.about" = "About";
 "settings.section.follow" = "Follow Us";
-"settings.section.info" = "Your Info";
-"settings.section.permission" = "Permissions";
-"settings.section.product" = "Product Options";
 "settings.title" = "Settings";
 
 "text_explanation.disabled" = "disabled";
@@ -374,8 +377,6 @@
 "tutorial.try.detail.x.2" = " to take a screenshot";
 "tutorial.try.skip" = "Skip";
 "tutorial.try.title" = "Try It Out";
-"tutorial.video.mute.detail" = "In order to hear the sound in the video, please turn up the volume on your phone!";
-"tutorial.video.mute.title" = "Turn up the volume!";
 
 "update.force.message" = "You need to update to the latest version to keep using Screenshop.";
 "update.force.title" = "Update Required";

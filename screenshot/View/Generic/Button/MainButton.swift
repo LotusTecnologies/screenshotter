@@ -22,7 +22,7 @@ class MainButton: LoadingButton {
         super.init(frame: frame)
         
         backgroundColor = .crazeRed
-        contentEdgeInsets = UIEdgeInsets(top: .padding / 1.4, left: .padding, bottom: .padding / 1.4, right: .padding)
+        contentEdgeInsets = UIEdgeInsets(top: 0, left: .padding, bottom: 0, right: .padding)
         adjustsImageWhenHighlighted = false
         titleLabel?.font = UIFont(screenshopName: .hindMedium, size: UIFont.buttonFontSize)
         layer.cornerRadius = 9
@@ -41,6 +41,7 @@ class MainButton: LoadingButton {
     override var intrinsicContentSize: CGSize {
         var size = super.intrinsicContentSize
         size.width = max(size.width, 160)
+        size.height = 50
         return size
     }
     

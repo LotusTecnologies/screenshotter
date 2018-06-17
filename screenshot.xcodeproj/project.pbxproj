@@ -7,9 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3125446B2091C3A0009410D5 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
-		3125446C2091C3A0009410D5 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
-		3125446D2091C3A0009410D5 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
+		3125446B2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
+		3125446C2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
+		3125446D2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		3125448F209871B4009410D5 /* Analytics+api.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3125448E209871B4009410D5 /* Analytics+api.swift */; };
 		312A854620D245ED006F76C6 /* RelatedLooksManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 312A854520D245ED006F76C6 /* RelatedLooksManager.swift */; };
 		314C488A205E86E700B8381D /* PHAsset+craze.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314C4889205E86E700B8381D /* PHAsset+craze.swift */; };
@@ -62,7 +62,6 @@
 		525691881FD5DD51008D728D /* UsageStreak.swift in Sources */ = {isa = PBXBuildFile; fileRef = 524DB5391FC6F69800BD408F /* UsageStreak.swift */; };
 		5268B5261FE65E1800B7D257 /* ChangelogAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5268B5251FE65E1800B7D257 /* ChangelogAlert.swift */; };
 		5273E3811F7ACE0300C832F8 /* Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5273E3801F7ACE0300C832F8 /* Analytics.swift */; };
-		527F174A1FA21CA6008082BC /* Craze_Video.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 527F17491FA21CA6008082BC /* Craze_Video.mp4 */; };
 		529A36661FCC99B300BCA798 /* SilentPushSubscriptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529A36651FCC99B300BCA798 /* SilentPushSubscriptionManager.swift */; };
 		52E547441FE2487B00627D6D /* ScreenshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E547431FE2487B00627D6D /* ScreenshotHelper.swift */; };
 		52FA93911F6FF106000C7A71 /* UpdatePrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52FA93901F6FF106000C7A71 /* UpdatePrompt.swift */; };
@@ -138,10 +137,14 @@
 		C54369642046B4E800599134 /* ProductCartBarButtonItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54369632046B4E800599134 /* ProductCartBarButtonItem.swift */; };
 		C54369672046D6FD00599134 /* BaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54369662046D6FD00599134 /* BaseViewController.swift */; };
 		C543696B2046D74100599134 /* ModalNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C543696A2046D74100599134 /* ModalNavigationController.swift */; };
+		C543F45720C7EA3C007F568E /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C543F45620C7EA3C007F568E /* ProfileViewController.swift */; };
+		C543F45920C7EB82007F568E /* UIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C543F45820C7EB82007F568E /* UIViewController.swift */; };
+		C543F45B20C7F95A007F568E /* ProfileNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C543F45A20C7F95A007F568E /* ProfileNavigationController.swift */; };
+		C543F45D20C95065007F568E /* ProfileAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C543F45C20C95065007F568E /* ProfileAccountView.swift */; };
+		C543F45F20C95649007F568E /* RoundButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C543F45E20C95649007F568E /* RoundButton.swift */; };
 		C548D4EB20022E26003364E9 /* DiscoverScreenshotViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C548D4EA20022E26003364E9 /* DiscoverScreenshotViewController.swift */; };
 		C553563C1F8369DF00849E64 /* DeviceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C553563B1F8369DE00849E64 /* DeviceHelper.swift */; };
 		C554B17920287DF50099622C /* ScreenshotsDeleteButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C554B17820287DF50099622C /* ScreenshotsDeleteButton.swift */; };
-		C55D89BD2021CF6D004A5245 /* SettingsNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C55D89BC2021CF6D004A5245 /* SettingsNavigationController.swift */; };
 		C55D89C02021EF93004A5245 /* PartnersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C55D89BF2021EF93004A5245 /* PartnersViewController.swift */; };
 		C565333B2019D81C00F022D4 /* ProductViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C565333A2019D81C00F022D4 /* ProductViewController.swift */; };
 		C56F889C1FE9478D0006914C /* TappableTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56F889B1FE9478D0006914C /* TappableTextView.swift */; };
@@ -159,19 +162,15 @@
 		C572FF02205C00070046BFEB /* Hind-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C572FEFD205C00070046BFEB /* Hind-Medium.ttf */; };
 		C57E93A9204BEE4E0069C378 /* OpenWebPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C57E93A8204BEE4E0069C378 /* OpenWebPage.swift */; };
 		C5847EF81F7A53F60024DCAB /* CredentialHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */; };
-		C58FA0ED20A95FC300072966 /* TutorialVideoOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0E120A95FC200072966 /* TutorialVideoOverlayView.swift */; };
-		C58FA0EF20A95FC300072966 /* CampaignPromotionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0E320A95FC200072966 /* CampaignPromotionViewController.swift */; };
 		C58FA0F120A95FC300072966 /* TutorialTrySlideViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0E520A95FC200072966 /* TutorialTrySlideViewController.swift */; };
-		C58FA0F220A95FC300072966 /* VideoDisplayingViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0E620A95FC200072966 /* VideoDisplayingViewControllerDelegate.swift */; };
-		C58FA0F320A95FC300072966 /* TutorialVideoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0E720A95FC200072966 /* TutorialVideoViewController.swift */; };
 		C58FA0F420A95FC300072966 /* TutorialNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0E820A95FC300072966 /* TutorialNavigationController.swift */; };
 		C58FA0F520A95FC300072966 /* GiftCardCampaignViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0E920A95FC300072966 /* GiftCardCampaignViewController.swift */; };
 		C58FA0F620A95FC300072966 /* TutorialEmailSlideViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0EA20A95FC300072966 /* TutorialEmailSlideViewController.swift */; };
-		C58FA0F720A95FC300072966 /* CampaignPromotionExplanationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0EB20A95FC300072966 /* CampaignPromotionExplanationViewController.swift */; };
 		C58FA0F820A95FC300072966 /* GiftCardDoneViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0EC20A95FC300072966 /* GiftCardDoneViewController.swift */; };
 		C593460720D0F4E300769BB9 /* TextExplanationTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C593460620D0F4E300769BB9 /* TextExplanationTableViewCell.swift */; };
 		C593460920D0F53300769BB9 /* OnboardingGDPRViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C593460820D0F53300769BB9 /* OnboardingGDPRViewController.swift */; };
 		C593460B20D0F5A900769BB9 /* GDPRViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C593460A20D0F5A900769BB9 /* GDPRViewController.swift */; };
+		C593460E20D25D0B00769BB9 /* UnderlineTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C593460D20D25D0B00769BB9 /* UnderlineTextField.swift */; };
 		C5A02E36209841D700CEEF7E /* CheckoutWhatIsCVVWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A02E35209841D700CEEF7E /* CheckoutWhatIsCVVWebViewController.swift */; };
 		C5A1922D2057AD520046303C /* IntrinsicContentSizePresentationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A1922B2057AD510046303C /* IntrinsicContentSizePresentationController.swift */; };
 		C5A1922E2057AD520046303C /* DimmedPresentationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5A1922C2057AD510046303C /* DimmedPresentationController.swift */; };
@@ -326,7 +325,6 @@
 		524DB5391FC6F69800BD408F /* UsageStreak.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageStreak.swift; sourceTree = "<group>"; };
 		5268B5251FE65E1800B7D257 /* ChangelogAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangelogAlert.swift; sourceTree = "<group>"; };
 		5273E3801F7ACE0300C832F8 /* Analytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Analytics.swift; sourceTree = "<group>"; };
-		527F17491FA21CA6008082BC /* Craze_Video.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = Craze_Video.mp4; sourceTree = "<group>"; };
 		528D18691F5EEF8C00078223 /* UserDefaultsKeys.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserDefaultsKeys.swift; sourceTree = "<group>"; };
 		529A36651FCC99B300BCA798 /* SilentPushSubscriptionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SilentPushSubscriptionManager.swift; sourceTree = "<group>"; };
 		52E547431FE2487B00627D6D /* ScreenshotHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotHelper.swift; sourceTree = "<group>"; };
@@ -403,10 +401,14 @@
 		C54369632046B4E800599134 /* ProductCartBarButtonItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductCartBarButtonItem.swift; sourceTree = "<group>"; };
 		C54369662046D6FD00599134 /* BaseViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BaseViewController.swift; sourceTree = "<group>"; };
 		C543696A2046D74100599134 /* ModalNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModalNavigationController.swift; sourceTree = "<group>"; };
+		C543F45620C7EA3C007F568E /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
+		C543F45820C7EB82007F568E /* UIViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewController.swift; sourceTree = "<group>"; };
+		C543F45A20C7F95A007F568E /* ProfileNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileNavigationController.swift; sourceTree = "<group>"; };
+		C543F45C20C95065007F568E /* ProfileAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileAccountView.swift; sourceTree = "<group>"; };
+		C543F45E20C95649007F568E /* RoundButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundButton.swift; sourceTree = "<group>"; };
 		C548D4EA20022E26003364E9 /* DiscoverScreenshotViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverScreenshotViewController.swift; sourceTree = "<group>"; };
 		C553563B1F8369DE00849E64 /* DeviceHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceHelper.swift; sourceTree = "<group>"; };
 		C554B17820287DF50099622C /* ScreenshotsDeleteButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotsDeleteButton.swift; sourceTree = "<group>"; };
-		C55D89BC2021CF6D004A5245 /* SettingsNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsNavigationController.swift; sourceTree = "<group>"; };
 		C55D89BF2021EF93004A5245 /* PartnersViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PartnersViewController.swift; sourceTree = "<group>"; };
 		C565333A2019D81C00F022D4 /* ProductViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductViewController.swift; sourceTree = "<group>"; };
 		C56F889B1FE9478D0006914C /* TappableTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TappableTextView.swift; sourceTree = "<group>"; };
@@ -424,19 +426,15 @@
 		C572FEFD205C00070046BFEB /* Hind-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Hind-Medium.ttf"; sourceTree = "<group>"; };
 		C57E93A8204BEE4E0069C378 /* OpenWebPage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpenWebPage.swift; sourceTree = "<group>"; };
 		C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialHelper.swift; sourceTree = "<group>"; };
-		C58FA0E120A95FC200072966 /* TutorialVideoOverlayView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialVideoOverlayView.swift; sourceTree = "<group>"; };
-		C58FA0E320A95FC200072966 /* CampaignPromotionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CampaignPromotionViewController.swift; sourceTree = "<group>"; };
 		C58FA0E520A95FC200072966 /* TutorialTrySlideViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialTrySlideViewController.swift; sourceTree = "<group>"; };
-		C58FA0E620A95FC200072966 /* VideoDisplayingViewControllerDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoDisplayingViewControllerDelegate.swift; sourceTree = "<group>"; };
-		C58FA0E720A95FC200072966 /* TutorialVideoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialVideoViewController.swift; sourceTree = "<group>"; };
 		C58FA0E820A95FC300072966 /* TutorialNavigationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialNavigationController.swift; sourceTree = "<group>"; };
 		C58FA0E920A95FC300072966 /* GiftCardCampaignViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GiftCardCampaignViewController.swift; sourceTree = "<group>"; };
 		C58FA0EA20A95FC300072966 /* TutorialEmailSlideViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialEmailSlideViewController.swift; sourceTree = "<group>"; };
-		C58FA0EB20A95FC300072966 /* CampaignPromotionExplanationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CampaignPromotionExplanationViewController.swift; sourceTree = "<group>"; };
 		C58FA0EC20A95FC300072966 /* GiftCardDoneViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GiftCardDoneViewController.swift; sourceTree = "<group>"; };
 		C593460620D0F4E300769BB9 /* TextExplanationTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextExplanationTableViewCell.swift; sourceTree = "<group>"; };
 		C593460820D0F53300769BB9 /* OnboardingGDPRViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingGDPRViewController.swift; sourceTree = "<group>"; };
 		C593460A20D0F5A900769BB9 /* GDPRViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GDPRViewController.swift; sourceTree = "<group>"; };
+		C593460D20D25D0B00769BB9 /* UnderlineTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnderlineTextField.swift; sourceTree = "<group>"; };
 		C5A02E35209841D700CEEF7E /* CheckoutWhatIsCVVWebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckoutWhatIsCVVWebViewController.swift; sourceTree = "<group>"; };
 		C5A1922B2057AD510046303C /* IntrinsicContentSizePresentationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IntrinsicContentSizePresentationController.swift; sourceTree = "<group>"; };
 		C5A1922C2057AD510046303C /* DimmedPresentationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DimmedPresentationController.swift; sourceTree = "<group>"; };
@@ -587,7 +585,6 @@
 				E4139D4F1F09083B00E8A53B /* Assets.xcassets */,
 				C5E6C319208F2415006E9C54 /* CheckoutSupportedCountries.plist */,
 				C5E6C317208F23AA006E9C54 /* CheckoutSupportedStates.plist */,
-				527F17491FA21CA6008082BC /* Craze_Video.mp4 */,
 				C53B15B01FDD1EF400658A78 /* FavoriteHeart.json */,
 				C50EE26D1FC406F1002B4259 /* Fonts */,
 				C5CAF2791FCC0EFD006F37DC /* ISO4217.plist */,
@@ -748,6 +745,7 @@
 				C54087EC1FE90C8E00198955 /* Product */,
 				C543695120453FE300599134 /* Products */,
 				31CE110D203BF055000156EE /* ProductsBar */,
+				C543F45520C7EA33007F568E /* Profile */,
 				C54088051FE90C8E00198955 /* Screenshot */,
 				C54087E71FE90C8D00198955 /* ScreenshotDisplay */,
 				C54087DE1FE90C8D00198955 /* ScreenshotPicker */,
@@ -772,7 +770,6 @@
 		C54087C61FE90C8D00198955 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
-				C55D89BC2021CF6D004A5245 /* SettingsNavigationController.swift */,
 				C54087C71FE90C8D00198955 /* SettingsViewController.swift */,
 			);
 			path = Settings;
@@ -895,6 +892,7 @@
 				C5D57930203EDD6200A076FE /* TableView */,
 				C54088441FE90E2200198955 /* TableViewCell */,
 				C572C0D920AAE5D2004B0A17 /* Template */,
+				C593460C20D25CF700769BB9 /* TextField */,
 				C540884A1FE90E2200198955 /* TextView */,
 				C54369652046D6E500599134 /* ViewController */,
 				C5F37C9D20555C0C0072FE1D /* ViewControllerTransitioning */,
@@ -954,6 +952,7 @@
 				C540884F1FE90E2200198955 /* FloatingActionButton.swift */,
 				C501412F206283A200ABFB5C /* LoadingButton.swift */,
 				C540884E1FE90E2200198955 /* MainButton.swift */,
+				C543F45E20C95649007F568E /* RoundButton.swift */,
 			);
 			path = Button;
 			sourceTree = "<group>";
@@ -994,6 +993,16 @@
 			path = ViewController;
 			sourceTree = "<group>";
 		};
+		C543F45520C7EA33007F568E /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				C543F45620C7EA3C007F568E /* ProfileViewController.swift */,
+				C543F45A20C7F95A007F568E /* ProfileNavigationController.swift */,
+				C543F45C20C95065007F568E /* ProfileAccountView.swift */,
+			);
+			path = Profile;
+			sourceTree = "<group>";
+		};
 		C55184D01F4D5FAB00EE7855 /* Constants */ = {
 			isa = PBXGroup;
 			children = (
@@ -1024,6 +1033,7 @@
 				C501412D20623DFD00ABFB5C /* UICollectionView.swift */,
 				C5AB87EC208382EF00E2CB98 /* UIResponder.swift */,
 				C501412B2061101100ABFB5C /* UITableView.swift */,
+				C543F45820C7EB82007F568E /* UIViewController.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -1041,8 +1051,6 @@
 		C58FA0C820A95FB000072966 /* Onboarding */ = {
 			isa = PBXGroup;
 			children = (
-				C58FA0EB20A95FC300072966 /* CampaignPromotionExplanationViewController.swift */,
-				C58FA0E320A95FC200072966 /* CampaignPromotionViewController.swift */,
 				C58FA0E920A95FC300072966 /* GiftCardCampaignViewController.swift */,
 				C58FA0EC20A95FC300072966 /* GiftCardDoneViewController.swift */,
 				C593460820D0F53300769BB9 /* OnboardingGDPRViewController.swift */,
@@ -1050,11 +1058,16 @@
 				C58FA0EA20A95FC300072966 /* TutorialEmailSlideViewController.swift */,
 				C58FA0E820A95FC300072966 /* TutorialNavigationController.swift */,
 				C58FA0E520A95FC200072966 /* TutorialTrySlideViewController.swift */,
-				C58FA0E120A95FC200072966 /* TutorialVideoOverlayView.swift */,
-				C58FA0E720A95FC200072966 /* TutorialVideoViewController.swift */,
-				C58FA0E620A95FC200072966 /* VideoDisplayingViewControllerDelegate.swift */,
 			);
 			path = Onboarding;
+			sourceTree = "<group>";
+		};
+		C593460C20D25CF700769BB9 /* TextField */ = {
+			isa = PBXGroup;
+			children = (
+				C593460D20D25D0B00769BB9 /* UnderlineTextField.swift */,
+			);
+			path = TextField;
 			sourceTree = "<group>";
 		};
 		C5A1922A2057AD510046303C /* PresentationController */ = {
@@ -1362,7 +1375,6 @@
 				C53B15BA1FDD638C00658A78 /* Localizable.strings in Resources */,
 				C5E6C318208F23AA006E9C54 /* CheckoutSupportedStates.plist in Resources */,
 				C5DC531D20CD3F2100E90DB8 /* Quicksand-Bold.ttf in Resources */,
-				527F174A1FA21CA6008082BC /* Craze_Video.mp4 in Resources */,
 				C5E6C31A208F2415006E9C54 /* CheckoutSupportedCountries.plist in Resources */,
 				C5DC531A20CD3F2100E90DB8 /* Quicksand-Medium.ttf in Resources */,
 			);
@@ -1478,15 +1490,18 @@
 				525691881FD5DD51008D728D /* UsageStreak.swift in Sources */,
 				C54124C220A8308600CA03DB /* AccumulatorModel.swift in Sources */,
 				C53B46581FBC3DFA00A8C886 /* NotificationCenterKeys.swift in Sources */,
-				3125446C2091C3A0009410D5 /* BuildFile in Sources */,
+				3125446C2091C3A0009410D5 /* (null) in Sources */,
 				52E547441FE2487B00627D6D /* ScreenshotHelper.swift in Sources */,
 				316C831620C3AEBD0012A908 /* Shoppable+craze.swift in Sources */,
+				C543F45B20C7F95A007F568E /* ProfileNavigationController.swift in Sources */,
 				C50E2617207F6703003C8D24 /* TextFieldFormatter.swift in Sources */,
+				C543F45F20C95649007F568E /* RoundButton.swift in Sources */,
 				C501412A2061080700ABFB5C /* FavoriteProductsView.swift in Sources */,
 				C5F53D8E2014A592003A57EC /* LegalViewControllerFactory.swift in Sources */,
 				C5D579382042897300A076FE /* CollectionView.swift in Sources */,
 				C53EAF902019B68B000E4544 /* ProductWebViewController.swift in Sources */,
 				C50DBB90207CD53E00BB206E /* CheckoutPaymentListViewController.swift in Sources */,
+				C543F45720C7EA3C007F568E /* ProfileViewController.swift in Sources */,
 				C54088201FE90C8E00198955 /* ScreenshotPickerViewController.swift in Sources */,
 				C5DC531120CCFD5600E90DB8 /* SpinnerCollectionViewCell.swift in Sources */,
 				319B031320592A7700446054 /* ShowProduct.swift in Sources */,
@@ -1519,6 +1534,7 @@
 				C5F73C9E1FE244C800E49F2B /* Permissions.swift in Sources */,
 				315186412033FC81001BD8D6 /* ShoppablesToolbar.swift in Sources */,
 				C50E25EA207DDFF1003C8D24 /* CreditCardValidator.swift in Sources */,
+				C543F45920C7EB82007F568E /* UIViewController.swift in Sources */,
 				C51ED5BA1FF39A0700AABD68 /* FavoritesNavigationController.swift in Sources */,
 				E492CE3D2011051100060FB2 /* MatchstickModel.swift in Sources */,
 				31A0781B207E182100D70DC3 /* URL+craze.swift in Sources */,
@@ -1595,14 +1611,13 @@
 				316C831420C3AEBD0012A908 /* Variant+craze.swift in Sources */,
 				C5C43A54209599D8000AF22A /* ActionFeedbackGenerator.swift in Sources */,
 				316C831020C3AEBD0012A908 /* DataModel.swift in Sources */,
-				3125446D2091C3A0009410D5 /* BuildFile in Sources */,
+				3125446D2091C3A0009410D5 /* (null) in Sources */,
 				C52800622052B78B004DD7A3 /* CheckoutConfirmationViewController.swift in Sources */,
 				C5336D21203C511300A7B4B0 /* ActivityBadgeView.swift in Sources */,
 				C5DBA2C8207A14A8006CC6C9 /* CheckoutPaymentFormViewController.swift in Sources */,
 				C5DC531320CCFD6E00E90DB8 /* ErrorCollectionViewCell.swift in Sources */,
 				C572C0DD20AC1AEA004B0A17 /* HelperView.swift in Sources */,
 				C53B15BE1FDE585B00658A78 /* LocalizeHelper.swift in Sources */,
-				C58FA0F320A95FC300072966 /* TutorialVideoViewController.swift in Sources */,
 				C54088371FE90C8E00198955 /* ScreenshotNotificationCollectionViewCell.swift in Sources */,
 				31CE1115203BF0BC000156EE /* ScreenshotProductBarCollectionViewCell.swift in Sources */,
 				E49261D6206A704C006FE84E /* UIImage+craze.swift in Sources */,
@@ -1621,30 +1636,27 @@
 				31CEA0B720C91A4B00058ECC /* ProductCollectionViewManager.swift in Sources */,
 				C50D200E1FEBE6CD005CFA4F /* ScrollRevealController.swift in Sources */,
 				31C0C81A20A2CD14002EE95B /* SectionBackgroundCollectionViewFlowLayout.swift in Sources */,
-				C58FA0F220A95FC300072966 /* VideoDisplayingViewControllerDelegate.swift in Sources */,
 				C537F39E2004A20E00287360 /* DiscoverScreenshotCollectionViewCell.swift in Sources */,
 				C572C0E320AC48C1004B0A17 /* ProductStructures.swift in Sources */,
 				C5014110205E7BF200ABFB5C /* Label.swift in Sources */,
 				C501410B205E702C00ABFB5C /* Font.swift in Sources */,
 				C5A1922E2057AD520046303C /* DimmedPresentationController.swift in Sources */,
-				C55D89BD2021CF6D004A5245 /* SettingsNavigationController.swift in Sources */,
 				C5E9241820690B6100D44FF9 /* Form.swift in Sources */,
 				31C0C80620A15EAA002EE95B /* CrazeImageZoom.swift in Sources */,
 				C58FA0F820A95FC300072966 /* GiftCardDoneViewController.swift in Sources */,
 				31C0C81E20A2CD14002EE95B /* ProductsRateView.swift in Sources */,
-				3125446B2091C3A0009410D5 /* BuildFile in Sources */,
+				3125446B2091C3A0009410D5 /* (null) in Sources */,
 				C5336D1B203AC9CE00A7B4B0 /* CartViewController.swift in Sources */,
 				C5FF4140200BA23900342DEC /* DiscoverScreenshotHelperView.swift in Sources */,
 				C58FA0F520A95FC300072966 /* GiftCardCampaignViewController.swift in Sources */,
 				523C11391F5C195D001BD969 /* RatingFlow.swift in Sources */,
+				C593460E20D25D0B00769BB9 /* UnderlineTextField.swift in Sources */,
+				C543F45D20C95065007F568E /* ProfileAccountView.swift in Sources */,
 				C527312720B67C2700A0E2EB /* ProductPriceAlertController.swift in Sources */,
 				31CE1112203BF055000156EE /* ProductsBarCollectionView.swift in Sources */,
-				C58FA0F720A95FC300072966 /* CampaignPromotionExplanationViewController.swift in Sources */,
 				31C0C81920A2CD14002EE95B /* RelatedLooksCollectionViewCell.swift in Sources */,
-				C58FA0EF20A95FC300072966 /* CampaignPromotionViewController.swift in Sources */,
 				C54088561FE90E2200198955 /* ImageCollectionViewCell.swift in Sources */,
 				C5D2E304204D1C6500B5BD92 /* CartItemCountView.swift in Sources */,
-				C58FA0ED20A95FC300072966 /* TutorialVideoOverlayView.swift in Sources */,
 				31CE11002035AC44000156EE /* UIApplication+openInChrome.swift in Sources */,
 				C5D57936203F044B00A076FE /* EmptyListController.swift in Sources */,
 				C593460B20D0F5A900769BB9 /* GDPRViewController.swift in Sources */,
