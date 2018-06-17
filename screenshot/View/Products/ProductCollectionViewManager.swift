@@ -52,9 +52,16 @@ class ProductCollectionViewManager {
         
         return size
     }
-    public func collectionView(_ collectionView: UICollectionView, viewForHeaderWith text:String, indexPath: IndexPath) -> UICollectionReusableView {
+    public func collectionView(_ collectionView: UICollectionView, viewForHeaderWith text:String, hasBackgroundAndLine:Bool, hasFilterButton:Bool, indexPath: IndexPath) -> UICollectionReusableView {
         if let cell = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionElementKindSectionHeader, withReuseIdentifier: "header", for: indexPath) as? ProductsViewHeaderReusableView{
             cell.label.text = text
+            cell.line.isHidden = !hasBackgroundAndLine
+            cell.filterButton.isHidden = !hasFilterButton
+            if hasBackgroundAndLine, let image = UIImage.init(named: "confetti") {
+                cell.backgroundColor = UIColor.init(patternImage: image )
+            }else {
+                cell.backgroundColor = .clear
+            }
             return cell
         }
         return UICollectionReusableView()
@@ -171,7 +178,8 @@ class ProductCollectionViewManager {
             }
         }
 
-        if var products = shoppable.products as? Set<Product> {
+        if let mask = shoppable.getLast()?.rawValue,
+          var products = shoppable.products?.filtered(using: NSPredicate(format: "(optionsMask & %d) == %d", mask, mask)) as? Set<Product> {
             if productsOptions.sale == .sale {
                 products = products.filter { $0.floatPrice < $0.floatOriginalPrice }
             }
@@ -215,3 +223,4 @@ class ProductCollectionViewManager {
         }
     }
 }
+

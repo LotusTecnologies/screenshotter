@@ -258,9 +258,6 @@
 "products.details.similar" = "Similar Items";
 "products.helper.message" = "No visually similar products were detected";
 "products.helper.retry" = "Try Again";
-"products.helper.retry.fashion" = "Fashion";
-"products.helper.retry.furniture" = "Furniture";
-"products.helper.retry.title" = "Try again as";
 "products.helper.title" = "No Items Found";
 "products.options.gender.auto" = "All";
 "products.options.gender.female" = "Female";

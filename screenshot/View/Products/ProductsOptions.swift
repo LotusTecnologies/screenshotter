@@ -21,7 +21,7 @@ class ProductsOptionsMask : NSObject {
     static let sizeChild    = ProductsOptionsMask(rawValue: 1 << 4) // 16
     static let sizePlus     = ProductsOptionsMask(rawValue: 1 << 5) // 32
     
-    // TODO: remove all category code
+    // Category historical values. No longer used.
     static let categoryAuto      = ProductsOptionsMask(rawValue: 1 << 6) // 64
     static let categoryFashion   = ProductsOptionsMask(rawValue: 1 << 7) // 128
     static let categoryFurniture = ProductsOptionsMask(rawValue: 1 << 8) // 256
@@ -115,9 +115,7 @@ class ProductsOptions : NSObject {
         viewController.genderControl.selectedSegmentIndex = gender.offsetValue
         viewController.sizeControl.selectedSegmentIndex = size.offsetValue
         viewController.saleControl.selectedSegmentIndex = sale.offsetValue
-        if let index = ProductsOptionsSort.all.index(of: sort) {
-            viewController.sortPickerView?.selectRow(index, inComponent: 0, animated: false)
-        }
+        viewController.sortControl.items.last?.title = sort.stringValue
     }
     
     @objc private func continueAction() {
@@ -165,6 +163,7 @@ class ProductsOptions : NSObject {
     }
     
     @objc private func cancelAction() {
+        self.syncOptions()
         delegate?.productsOptionsDidCancel(self)
     }
 }
@@ -355,7 +354,7 @@ class ProductsOptionsViewController: UIViewController {
     private(set) lazy var saleControl: UISegmentedControl = {
         return self.controls.createSaleControl()
     }()
-    private(set) lazy var sortControl: UIControl = {
+    private(set) lazy var sortControl: SegmentedDropDownControl = {
         return self.controls.createSortControl(pickerViewAnimation: { [weak self] in
             self?.view.layoutIfNeeded()
         })

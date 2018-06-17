@@ -96,7 +96,7 @@ class SegmentedDropDownItem : NSObject {
         segment.superview?.sendSubview(toBack: segment)
     }
     
-    fileprivate var title: String? {
+    var title: String? {
         set(newTitle) {
             if let segment = segment as? DropDownControl {
                 segment.titleLabel.text = newTitle

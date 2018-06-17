@@ -302,7 +302,7 @@ extension ScreenshotsViewController {
     
     @objc fileprivate func emptyListViewDiscoverAction() {
         if let tabBarController = tabBarController as? MainTabBarController {
-            tabBarController.selectedIndex = MainTabBarController.TabIndex.discover.rawValue
+            tabBarController.goTo(tab: .discover)
         }
     }
 }
