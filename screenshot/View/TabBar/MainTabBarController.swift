@@ -9,14 +9,14 @@
 import UIKit
 
 class MainTabBarController: UITabBarController, UITabBarControllerDelegate, ScreenshotsNavigationControllerDelegate, SettingsViewControllerDelegate, ScreenshotDetectionProtocol, ViewControllerLifeCycle {
-    enum TabIndex  {
+    enum TabIndex {
         case favorites
         case discover
         case screenshots
         case settings
         case cart
         
-        func tagValue() -> Int {
+        var tagValue: Int {
             switch self {
             case .favorites:
                 return 1
@@ -30,7 +30,6 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
                 return 5
             }
         }
-        
     }
     
     weak var lifeCycleDelegate: ViewControllerLifeCycle?
@@ -62,7 +61,7 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         super.init(nibName: nil, bundle: nil)
         
         func createTabBarItem(title: String?, imageNamed: String, tag: TabIndex) -> UITabBarItem {
-            let tabBarItem = UITabBarItem(title: title, image: UIImage(named: imageNamed), tag: tag.tagValue())
+            let tabBarItem = UITabBarItem(title: title, image: UIImage(named: imageNamed), tag: tag.tagValue)
             tabBarItem.badgeColor = .crazeRed
             return tabBarItem
         }
@@ -235,7 +234,7 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
     
     func goTo(tab:TabIndex){
         if let toSelect = self.viewControllers?.first(where: { (vc) -> Bool in
-            return vc.tabBarItem.tag == tab.tagValue()
+            return vc.tabBarItem.tag == tab.tagValue
         }) {
             self.selectedViewController = toSelect
         }
