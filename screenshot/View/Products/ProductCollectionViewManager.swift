@@ -178,7 +178,8 @@ class ProductCollectionViewManager {
             }
         }
 
-        if var products = shoppable.products as? Set<Product> {
+        if let mask = shoppable.getLast()?.rawValue,
+          var products = shoppable.products?.filtered(using: NSPredicate(format: "(optionsMask & %d) == %d", mask, mask)) as? Set<Product> {
             if productsOptions.sale == .sale {
                 products = products.filter { $0.floatPrice < $0.floatOriginalPrice }
             }

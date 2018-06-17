@@ -160,7 +160,7 @@ extension Screenshot {
                         let _ = DataModel.sharedInstance.saveScreenshot(managedObjectContext: context, assetId: imageUrl, createdAt: Date(), isRecognized: true, source: .burrow, isHidden: false, imageData: imageData, uploadedImageURL: imageUrl, syteJsonString: nil)
                         
                         // download stye stuff for URL
-                        AssetSyncModel.sharedInstance.syteProcessing(imageClassification: .human, imageData: nil, orImageUrlString: imageUrl, assetId: imageUrl)
+                        AssetSyncModel.sharedInstance.syteProcessing(imageData: nil, orImageUrlString: imageUrl, assetId: imageUrl)
                         
                         context.saveIfNeeded()
                     }

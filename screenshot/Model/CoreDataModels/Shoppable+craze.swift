@@ -82,23 +82,12 @@ extension Shoppable {
         let optionsMaskInt = optionsMask.rawValue
         DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
             let fetchRequest: NSFetchRequest<Shoppable> = Shoppable.fetchRequest()
-            fetchRequest.predicate = NSPredicate(format: "screenshot == %@", screenshotId)
+            fetchRequest.predicate = NSPredicate(format: "screenshot == %@", screenshotId) // not subShoppables
             fetchRequest.sortDescriptors = nil
             
             do {
                 let results = try managedObjectContext.fetch(fetchRequest)
                 for shoppable in results {
-                    if let lastSetMask = shoppable.getLast(),
-                        lastSetMask.rawValue & 0x01C0 != optionsMaskInt & 0x01C0 { // Category bits
-                        if let screenshot = shoppable.screenshot {
-                            screenshot.hideWorkhorse(deleteImage: false)
-                            screenshot.syteJson = (optionsMaskInt & ProductsOptionsMask.categoryFurniture.rawValue > 0) ? "f" : "h"
-                            AssetSyncModel.sharedInstance.processingQ.async {
-                                AssetSyncModel.sharedInstance.rescanClassification(assetId: screenshot.assetId!, imageData: screenshot.imageData as Data?, optionsMask: optionsMask)
-                            }
-                        }
-                        break // Break out of the shoppable for loop
-                    }
                     if let matchingFilter = shoppable.productFilters?.filtered(using: NSPredicate(format: "optionsMask == %d", optionsMaskInt)).first as? ProductFilter {
                         matchingFilter.dateSet = Date()
                         if matchingFilter.productCount == 0,

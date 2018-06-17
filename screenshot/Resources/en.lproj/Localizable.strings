@@ -161,6 +161,16 @@
 "form.personal.email" = "Email";
 "form.personal.phone" = "Phone Number";
 
+"gdpr.image.message" = "When this setting is turned on, we send screenshots you take in and outside of the app to our server to detect whether there are clothing items in the photo and allow you to shop relevant photos quickly. This happens in the background and is not shown to you. We do not save any photos that are not detected as fashion.";
+"gdpr.image.title" = "Image Detection";
+"gdpr.notification.message" = "When this setting is turned on, we will send you personalized push notifications and emails with sales, availability updates and information about products in the app you looked at and favorited. Your email will also be used to retarget ads to you and to provide brands and retailers with anonymous data about your shopping habits.";
+"gdpr.notification.title" = "Email & Push Notifications";
+"gdpr.onboarding.title" = "Your Privacy Settings";
+"gdpr.onboarding.subtitle" = "You can change these any time in the settings page of the app";
+"gdpr.onboarding.edit" = "Manage Settings";
+"gdpr.onboarding.continue" = "Accept and Continue";
+"gdpr.title" = "Privacy Settings";
+
 "generic.buy" = "BUY";
 "generic.cancel" = "Cancel";
 "generic.close" = "Close";
@@ -245,9 +255,6 @@
 "products.details.similar" = "Similar Items";
 "products.helper.message" = "No visually similar products were detected";
 "products.helper.retry" = "Try Again";
-"products.helper.retry.fashion" = "Fashion";
-"products.helper.retry.furniture" = "Furniture";
-"products.helper.retry.title" = "Try again as";
 "products.helper.title" = "No Items Found";
 "products.options.gender.auto" = "All";
 "products.options.gender.female" = "Female";
@@ -346,6 +353,9 @@
 "settings.section.permission" = "Permissions";
 "settings.section.product" = "Product Options";
 "settings.title" = "Settings";
+
+"text_explanation.disabled" = "disabled";
+"text_explanation.enabled" = "enabled";
 
 "tutorial.email.detail" = "Fill out your info below";
 "tutorial.email.email" = "Email";

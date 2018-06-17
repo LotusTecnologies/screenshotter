@@ -302,7 +302,7 @@ extension ScreenshotsViewController {
     
     @objc fileprivate func emptyListViewDiscoverAction() {
         if let tabBarController = tabBarController as? MainTabBarController {
-            tabBarController.selectedIndex = MainTabBarController.TabIndex.discover.rawValue
+            tabBarController.goTo(tab: .discover)
         }
     }
 }
@@ -557,7 +557,7 @@ extension ScreenshotsViewController {
         setEditing(false, animated: true)
         
         if deleteScreenshotObjectIDs.count + toHideFromProductBarObjectIDs.count > 0 {
-            DataModel.sharedInstance.hide(screenshotOIDArray: deleteScreenshotObjectIDs)
+            DataModel.sharedInstance.hide(screenshotOIDArray: deleteScreenshotObjectIDs, kind: .multi)
             DataModel.sharedInstance.hideFromProductBar(toHideFromProductBarObjectIDs)
         }
         self.deleteScreenshotObjectIDs.removeAll()

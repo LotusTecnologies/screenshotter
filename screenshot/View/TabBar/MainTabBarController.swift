@@ -9,12 +9,27 @@
 import UIKit
 
 class MainTabBarController: UITabBarController, UITabBarControllerDelegate, ScreenshotsNavigationControllerDelegate, SettingsViewControllerDelegate, ScreenshotDetectionProtocol, ViewControllerLifeCycle {
-    enum TabIndex: Int {
-        case favorites   = 0
-        case discover    = 1
-        case screenshots = 2
-        case settings    = 3
-        case cart        = 4
+    enum TabIndex {
+        case favorites
+        case discover
+        case screenshots
+        case settings
+        case cart
+        
+        var tagValue: Int {
+            switch self {
+            case .favorites:
+                return 1
+            case .discover:
+                return 2
+            case .screenshots:
+                return 3
+            case .settings:
+                return 4
+            case .cart:
+                return 5
+            }
+        }
     }
     
     weak var lifeCycleDelegate: ViewControllerLifeCycle?
@@ -46,7 +61,7 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         super.init(nibName: nil, bundle: nil)
         
         func createTabBarItem(title: String?, imageNamed: String, tag: TabIndex) -> UITabBarItem {
-            let tabBarItem = UITabBarItem(title: title, image: UIImage(named: imageNamed), tag: tag.rawValue)
+            let tabBarItem = UITabBarItem(title: title, image: UIImage(named: imageNamed), tag: tag.tagValue)
             tabBarItem.badgeColor = .crazeRed
             return tabBarItem
         }
@@ -216,6 +231,15 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
             self.selectedIndex = index
         }
     }
+    
+    func goTo(tab:TabIndex){
+        if let toSelect = self.viewControllers?.first(where: { (vc) -> Bool in
+            return vc.tabBarItem.tag == tab.tagValue
+        }) {
+            self.selectedViewController = toSelect
+        }
+    }
+    
     func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
         if self.selectedViewController == self.settingsNavigationController {
             self.settingsNavigationController.popToRootViewController(animated: false)
@@ -339,27 +363,23 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
             }
         }
         
-        func select(_ tabBarController: MainTabBarController) {
-            tabBarController.selectedIndex = tabIndex.rawValue
-        }
-        
         func dismiss(_ tabBarController: MainTabBarController) {
             tabBarController.dismiss(animated: true, completion: nil)
         }
         
         if let mainTabBarController = viewController.presentingViewController as? MainTabBarController {
             popToRoot(mainTabBarController)
-            select(mainTabBarController)
+            mainTabBarController.goTo(tab: tabIndex)
             dismiss(mainTabBarController)
         }
         else if let mainTabBarController = viewController.presentingViewController?.tabBarController as? MainTabBarController {
             popToRoot(mainTabBarController)
-            select(mainTabBarController)
+            mainTabBarController.goTo(tab: tabIndex)
             dismiss(mainTabBarController)
         }
         else if let mainTabBarController = viewController.tabBarController as? MainTabBarController {
             popToRoot(mainTabBarController)
-            select(mainTabBarController)
+            mainTabBarController.goTo(tab: tabIndex)
         }
     }
     

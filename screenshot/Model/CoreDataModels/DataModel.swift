@@ -246,12 +246,12 @@ extension DataModel {
         }
     }
     
-    public func hide(screenshotOIDArray: [NSManagedObjectID]) {
+    public func hide(screenshotOIDArray: [NSManagedObjectID], kind:Analytics.AnalyticsScreenshotDeletedKind) {
         performBackgroundTask { (managedObjectContext) in
             do {
                 screenshotOIDArray.forEach { screenshotOID in
                     if let screenshot = managedObjectContext.object(with: screenshotOID) as? Screenshot {
-                        Analytics.trackScreenshotDeleted(screenshot: screenshot, kind: .multi)
+                        Analytics.trackScreenshotDeleted(screenshot: screenshot, kind: kind)
                         do{
                             try screenshot.validateForUpdate()
                             screenshot.isHidden = true
@@ -259,10 +259,18 @@ extension DataModel {
                         } catch{
                             
                         }
-                        
-                        
                     }
                 }
+                let request:NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
+                request.predicate = NSPredicate(format: "isHidden == FALSE AND isRecognized == TRUE AND sourceString != %@", ScreenshotSource.shuffle.rawValue)
+                if let count =  try? managedObjectContext.count(for: request) {
+                    if count == 0{
+                        //convert from different enums
+                        let kind:Analytics.AnalyticsScreenshotDeletedAllKind = (kind == .single) ? .single : .multi
+                        Analytics.trackScreenshotDeletedAll(amountJustDeleted: screenshotOIDArray.count, kind:kind)
+                    }
+                }
+
                 try managedObjectContext.save()
             } catch {
                 self.receivedCoreDataError(error: error)
@@ -1137,8 +1145,6 @@ extension DataModel {
                 let managedObjectContext = container.newBackgroundContext()
                 self.initializeFavoritesSets(managedObjectContext: managedObjectContext)
                 self.cleanDeletedScreenshots(managedObjectContext: managedObjectContext)
-                self.fixProductFiltersNoClassification(managedObjectContext: managedObjectContext)
-                self.fixProductsNoClassification(managedObjectContext: managedObjectContext)
             }
             op.queuePriority = .veryHigh // Earlier actions may have already been queued - make sure migration is at the top of the list.
             self.dbQ.addOperation(op)
@@ -1228,42 +1234,6 @@ extension DataModel {
         } catch {
             self.receivedCoreDataError(error: error)
             print("cleanDeletedScreenshots results with error:\(error)")
-        }
-    }
-    
-    func fixProductFiltersNoClassification(managedObjectContext: NSManagedObjectContext) {
-        let noClassificationPredicate = NSPredicate(format: "(optionsMask & 192) == 0")
-        let fetchRequest: NSFetchRequest<ProductFilter> = ProductFilter.fetchRequest()
-        fetchRequest.predicate = noClassificationPredicate
-        fetchRequest.sortDescriptors = nil
-        
-        do {
-            let results = try managedObjectContext.fetch(fetchRequest)
-            for productFilter in results {
-                productFilter.optionsMask |= Int32(ProductsOptionsMask.categoryFashion.rawValue)
-            }
-            try managedObjectContext.save()
-        } catch {
-            self.receivedCoreDataError(error: error)
-            print("fixProductFiltersNoClassification results with error:\(error)")
-        }
-    }
-    
-    func fixProductsNoClassification(managedObjectContext: NSManagedObjectContext) {
-        let noClassificationPredicate = NSPredicate(format: "(optionsMask & 192) == 0")
-        let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
-        fetchRequest.predicate = noClassificationPredicate
-        fetchRequest.sortDescriptors = nil
-        
-        do {
-            let results = try managedObjectContext.fetch(fetchRequest)
-            for product in results {
-                product.optionsMask |= Int32(ProductsOptionsMask.categoryFashion.rawValue)
-            }
-            try managedObjectContext.save()
-        } catch {
-            self.receivedCoreDataError(error: error)
-            print("fixProductsNoClassification results with error:\(error)")
         }
     }
     
