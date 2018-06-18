@@ -455,9 +455,15 @@ class RegisterViewController: UIViewController {
             self.continueButton.isLoading = true
             self.continueButton.isEnabled = false
             let sendMeEmails = self._view.dealsSwitch.isOn
-            SigninManager.shared.loginOrCreatAccountAsNeeded(email: email, password: password, sendMeEmails:sendMeEmails)
+            UserAccountManager.shared.loginOrCreatAccountAsNeeded(email: email, password: password, sendMeEmails:sendMeEmails)
             .then { result -> Void in
-                self.delegate?.registerViewControllerDidSignup(self)
+                switch result {
+                case .unconfirmed:
+                    self.delegate?.registerViewControllerNeedEmailConfirmation(self)
+                case .confirmed:
+                    self.delegate?.registerViewControllerDidSignup(self)
+                }
+                
                 }
             .catch { error in
                 DispatchQueue.main.async {
@@ -467,17 +473,21 @@ class RegisterViewController: UIViewController {
                     self._view.isForgotPasswordButtonHidden = false
                     ActionFeedbackGenerator().actionOccurred(.nope)
                     let error = error as NSError
-                    if SigninManager.shared.isNoInternetError(error: error) {
-                        let alert = SigninManager.shared.alertViewForNoInternet()
+                    if UserAccountManager.shared.isNoInternetError(error: error) {
+                        let alert = UserAccountManager.shared.alertViewForNoInternet()
                         self.present(alert, animated: true, completion: nil)
-                    }else if SigninManager.shared.isCantSendEmailError(error: error) {
-                        let alert = SigninManager.shared.alertViewForCantSendEmail(email: email)
+                    }else if UserAccountManager.shared.isCantSendEmailError(error: error) {
+                        let alert = UserAccountManager.shared.alertViewForCantSendEmail(email: email)
                         self.present(alert, animated: true, completion: nil)
-                    }else if SigninManager.shared.isWrongPasswordError(error: error) {
-                        let alert = SigninManager.shared.alertViewForWrongPassword()
+                    }else if UserAccountManager.shared.isWrongPasswordError(error: error) {
+                        let alert = UserAccountManager.shared.alertViewForWrongPassword()
                         self.present(alert, animated: true, completion: nil)
+                    }else if UserAccountManager.shared.isWeakPasswordError(error: error) {
+                        self._view.passwordTextField.isInvalid = true
+                        self._view.passwordTextField.errorText = "authorize.error.passwordInvalid.server".localized
+
                     }else {
-                        let alert = SigninManager.shared.alertViewForUndefinedError(error: error, viewController: self)
+                        let alert = UserAccountManager.shared.alertViewForUndefinedError(error: error, viewController: self)
                         self.present(alert, animated: true, completion: nil)
                     }
                 }
@@ -507,12 +517,12 @@ class RegisterViewController: UIViewController {
         func skip() {
             let sendMeEmails = self._view.dealsSwitch.isOn
 
-            SigninManager.shared.makeAnonAccount(sendMeEmails: sendMeEmails)
+            UserAccountManager.shared.makeAnonAccount(sendMeEmails: sendMeEmails)
             Analytics.trackSubmittedBlankEmail()
             delegate?.registerViewControllerDidSkip(self)
 
         }
-        if let password = _view.passwordTextField.text, password.lengthOfBytes(using: .utf8) > 0, let email = _view.emailTextField.text, email.lengthOfBytes(using: .utf8) > 0{
+        if let password = _view.passwordTextField.text, password.lengthOfBytes(using: .utf8) == 0, let email = _view.emailTextField.text, email.lengthOfBytes(using: .utf8) == 0{
             skip()
         }else{
             let alert = UIAlertController.init(title: nil, message: "authorize.register.skipConfirm".localized, preferredStyle: .alert)
@@ -540,7 +550,7 @@ class RegisterViewController: UIViewController {
     
     @objc fileprivate func facebookLoginAction() {
        
-        SigninManager.shared.loginWithFacebook().then { (result) -> Void in
+        UserAccountManager.shared.loginWithFacebook().then { (result) -> Void in
             let isExistingUser = false
             
             if isExistingUser {

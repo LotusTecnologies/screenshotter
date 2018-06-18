@@ -11,34 +11,47 @@ import PromiseKit
 import Firebase
 import FBSDKLoginKit
 
-class SigninManager : NSObject {
-    enum LoginOrCreateAccountResult {
-        case login
-        case createAccount
-    }
-    
-    enum UserAttribute : String{
-        
-        case permissionPush = "custom:permissionPush"
-        case permissionEmail = "custom:permissionEmail"
-        case permissionStoreImage = "custom:permissionStoreImage"
-        case permissionPicDetect = "custom:permissionPicDetect"
-        case sendMeEmails = "custom:SendMeEmails"
-        case name = "name"
-        case email = "email"
 
-    }
-    
-    var email:String?
-    static let shared = SigninManager()
+class FacebookProxy : NSObject, FBSDKLoginButtonDelegate {
+    let (promise, fulfill, reject) = Promise<FBSDKLoginManagerLoginResult>.pending()
+    var facebookButton = FBSDKLoginButton()
 
     override init() {
-        
-       
         super.init()
+        facebookButton.delegate = self
+        facebookButton.sendActions(for: .touchUpInside)
 
     }
     
+    func loginButton(_ loginButton: FBSDKLoginButton!, didCompleteWith result: FBSDKLoginManagerLoginResult!, error: Error!) {
+        if let error = error {
+            reject(error)
+        }else if let result = result {
+            fulfill(result)
+        }else{
+            reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+        }
+        facebookButton.delegate = nil
+    }
+    
+    func loginButtonDidLogOut(_ loginButton: FBSDKLoginButton!) {
+        
+    }
+}
+
+
+class UserAccountManager : NSObject {
+    enum LoginOrCreateAccountResult {
+        case confirmed
+        case unconfirmed
+    }
+    
+    
+    
+    var email:String?
+    static let shared = UserAccountManager()
+
+    var facebookProxy:FacebookProxy?
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         FirebaseApp.configure()
@@ -49,8 +62,9 @@ class SigninManager : NSObject {
     
     func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any]) -> Bool {
         var handled = false
-        let source = options[.sourceApplication] as? String
-        let annotation = options[.annotation]
+//        let source = options[.sourceApplication] as? String
+//        let annotation = options[.annotation]
+
 
         let queryParams = URLComponents.init(string: url.absoluteString)
         let mode = queryParams?.queryItems?.first(where: {$0.name == "mode"})
@@ -65,29 +79,39 @@ class SigninManager : NSObject {
                 resetVC._view.codeTextField.text = code
             }
             
-            return true
+            handled = true
         }
         return handled
     }
     
-   
-    
+//    func downloadUserFiles() -> Promise<Void> {
+//
+//    }
     
     public func loginWithFacebook()  -> Promise<Void>{
+
         return Promise<Void>.init(resolvers: { (fulfil, reject) in
-            let loginButton = FBSDKLoginButton()
-            loginButton.delegate = self
-            loginButton.sendActions(for: .touchUpInside)
-            
-            reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
-            
+            let proxy = FacebookProxy.init()
+            self.facebookProxy = proxy
+            proxy.promise.then(execute: { (result) -> Void in
+                let credential = FacebookAuthProvider.credential(withAccessToken: FBSDKAccessToken.current().tokenString)
+                Auth.auth().signInAndRetrieveData(with: credential, completion: { (result, error) in
+                    if let error = error{
+                        reject(error)
+                    }else {
+                        fulfil(())
+                    }
+                })
+            }).catch(execute: { (error) in
+                reject(error)
+            })
         })
     }
     
     
     public func loginOrCreatAccountAsNeeded(email:String, password:String, sendMeEmails:Bool) -> Promise<LoginOrCreateAccountResult> {
         
-        return createAccount(email:email.lowercased(), password: password, sendMeEmails:sendMeEmails).recover(execute: { (error) -> Promise<SigninManager.LoginOrCreateAccountResult> in
+        return createAccount(email:email.lowercased(), password: password, sendMeEmails:sendMeEmails).recover(execute: { (error) -> Promise<UserAccountManager.LoginOrCreateAccountResult> in
             let nsError = error as NSError
             if nsError.code == AuthErrorCode.emailAlreadyInUse.rawValue && nsError.domain == AuthErrorDomain {
                 return self.login(email: email.lowercased(), password: password)
@@ -101,17 +125,31 @@ class SigninManager : NSObject {
     private func login(email:String, password:String) -> Promise<LoginOrCreateAccountResult>{
         return Promise<LoginOrCreateAccountResult>.init(resolvers: { (fulfil, reject) in
             
-            Auth.auth().signIn(withEmail: email, password: password) { (user, error) in
+            Auth.auth().signIn(withEmail: email, password: password) { (authResult, error) in
                 
                 if let error = error {
                     reject(error)
                 }else{
-                    fulfil(LoginOrCreateAccountResult.login)
+                    if let authResult = authResult {
+                        if authResult.user.isEmailVerified {
+                            fulfil(LoginOrCreateAccountResult.confirmed)
+                        }else{
+                            authResult.user.sendEmailVerification(completion: { (error) in
+                                if let error = error {
+                                    reject(error)
+                                }else{
+                                    fulfil(LoginOrCreateAccountResult.unconfirmed)
+                                }
+                            })
+                        }
+                    }else{
+                        reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+                    }
                 }
             }
-
         })
     }
+    
     @discardableResult func makeAnonAccount(sendMeEmails:Bool) -> Promise<Void> {
         return Promise<Void>.init(resolvers: { (fulfil, reject) in
             Auth.auth().signInAnonymously() { (authResult, error) in
@@ -130,19 +168,23 @@ class SigninManager : NSObject {
                 if let error = error {
                     reject(error)
                 }else{
-                    let settings = ActionCodeSettings.init()
-                    settings.handleCodeInApp = true
-                    Auth.auth().sendSignInLink(toEmail: email.lowercased(), actionCodeSettings:settings , completion: { (error) in
-                        if let error = error {
-                            reject(error)
+                    if let authResult = authResult {
+                        if authResult.user.isEmailVerified {
+                            fulfil(LoginOrCreateAccountResult.confirmed)
                         }else{
-                            fulfil(LoginOrCreateAccountResult.createAccount)
+                            authResult.user.sendEmailVerification(completion: { (error) in
+                                if let error = error {
+                                    reject(error)
+                                }else{
+                                    fulfil(LoginOrCreateAccountResult.unconfirmed)
+                                }
+                            })
                         }
-                    })
-                    
+                    }else{
+                        reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+                    }
                 }
             }
-
         })
     }
     
@@ -206,33 +248,17 @@ class SigninManager : NSObject {
         }
     }
     
-    func set(attribute:UserAttribute, value:Bool) -> Promise<Void> {
-        return set(attribute: attribute, value: value.toStringLiteral())
-    }
-    func set(attribute:UserAttribute, value:String) -> Promise<Void> {
-        return Promise { fulfill, reject in
-            reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
-        }
-
-    }
-
-}
-extension SigninManager :FBSDKLoginButtonDelegate {
-    func loginButton(_ loginButton: FBSDKLoginButton!, didCompleteWith result: FBSDKLoginManagerLoginResult!, error: Error!) {
-        
-    }
-    
-    func loginButtonDidLogOut(_ loginButton: FBSDKLoginButton!) {
-        
-    }
-    
     
 }
-extension SigninManager {
+extension UserAccountManager {
     public func isNoInternetError( error:NSError) ->Bool {
         if error.domain == NSURLErrorDomain {
             return true
         }
+        if error.domain == AuthErrorDomain && error.code == AuthErrorCode.networkError.rawValue {
+            return true
+        }
+        
         return  false
     }
     func alertViewForNoInternet() -> UIAlertController{
@@ -269,7 +295,9 @@ extension SigninManager {
         return alert
     }
     public func isNoAccountWithEmailError( error:NSError) ->Bool {
-       
+        if error.domain == AuthErrorDomain && error.code == AuthErrorCode.userNotFound.rawValue {
+            return true
+        }
         return  false
     }
     func alertViewForNoAccountWithEmail() -> UIAlertController  {
@@ -280,9 +308,29 @@ extension SigninManager {
     }
     public func isCantSendEmailError( error:NSError) ->Bool {
        
+        if error.domain == AuthErrorDomain && error.code == AuthErrorCode.invalidEmail.rawValue {
+            return true
+        }
+        if error.domain == AuthErrorDomain && error.code == AuthErrorCode.invalidMessagePayload.rawValue {
+            return true
+        }
+        if error.domain == AuthErrorDomain && error.code == AuthErrorCode.invalidSender.rawValue {
+            return true
+        }
+        if error.domain == AuthErrorDomain && error.code == AuthErrorCode.invalidRecipientEmail.rawValue {
+            return true
+        }
 
         return  false
     }
+    public func isWeakPasswordError( error:NSError) -> Bool {
+        
+        if error.domain == AuthErrorDomain && error.code == AuthErrorCode.weakPassword.rawValue {
+            return true
+        }
+        return  false
+    }
+    
     func alertViewForCantSendEmail(email:String) -> UIAlertController  {
         let alert = UIAlertController.init(title: nil, message: "authorize.error.cantSendMail".localized(withFormat: email), preferredStyle: .alert)
         alert.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .cancel, handler: nil))
@@ -291,7 +339,9 @@ extension SigninManager {
     }
     
     public func isWrongPasswordError( error:NSError) ->Bool {
-        
+        if error.domain == AuthErrorDomain && error.code == AuthErrorCode.wrongPassword.rawValue {
+            return true
+        }
         return  false
     }
     func alertViewForWrongPassword() -> UIAlertController  {

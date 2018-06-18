@@ -203,7 +203,7 @@ class ResetPasswordViewController: UIViewController {
     
     @objc private func continueAction() {
         let code = validateCode(_view.codeTextField.text)
-        let password =  SigninManager.shared.validatePassword(_view.newPasswordTextField.text)
+        let password =  UserAccountManager.shared.validatePassword(_view.newPasswordTextField.text)
         
         if let password = password, let code = code {
             dismissKeyboard()
@@ -211,20 +211,20 @@ class ResetPasswordViewController: UIViewController {
             self._view.continueButton.isLoading = true
             self._view.codeTextField.isUserInteractionEnabled = false
             self._view.newPasswordTextField.isUserInteractionEnabled = false
-            SigninManager.shared.confirmForgotPassword(code: code, password: password)
+            UserAccountManager.shared.confirmForgotPassword(code: code, password: password)
                 .then(on: .main) { () -> Void in
                     self.delegate?.resetPasswordViewControllerDidReset(self)
                 }.catch { (error) in
                     DispatchQueue.main.async {
                         let error = error as NSError
-                        if SigninManager.shared.isNoInternetError(error: error) {
-                            let alert = SigninManager.shared.alertViewForNoInternet()
+                        if UserAccountManager.shared.isNoInternetError(error: error) {
+                            let alert = UserAccountManager.shared.alertViewForNoInternet()
                             self.present(alert, animated: true, completion: nil)
-                        }else if SigninManager.shared.isBadCodeError(error: error){
-                            let alert = SigninManager.shared.alertViewForBadCode()
+                        }else if UserAccountManager.shared.isBadCodeError(error: error){
+                            let alert = UserAccountManager.shared.alertViewForBadCode()
                             self.present(alert, animated: true, completion: nil)
                        }else {
-                            let alert = SigninManager.shared.alertViewForUndefinedError(error: error, viewController: self)
+                            let alert = UserAccountManager.shared.alertViewForUndefinedError(error: error, viewController: self)
                             self.present(alert, animated: true, completion: nil)
                         }
                     }

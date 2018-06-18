@@ -23,6 +23,7 @@ target 'screenshot' do
     pod 'Hero'
     pod 'Firebase/Core'
     pod 'Firebase/Auth'
+    pod 'Firebase/Database'
     pod 'FBSDKLoginKit'
 end
 

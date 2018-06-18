@@ -200,8 +200,8 @@
 		31C1C49E20D7804500762181 /* UIApplication+openInChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C1C48E20D7804500762181 /* UIApplication+openInChrome.swift */; };
 		31C1C49F20D7804500762181 /* LocalizeHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C1C48F20D7804500762181 /* LocalizeHelper.swift */; };
 		31C1C4A020D7804500762181 /* Appearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C1C49020D7804500762181 /* Appearance.swift */; };
-		31C1C4A220D7809E00762181 /* SigninManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C1C4A120D7809D00762181 /* SigninManager.swift */; };
-		31C1C4A420D7829C00762181 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 31C1C4A320D7829C00762181 /* GoogleService-Info.plist */; };
+		31C1C4A220D7809E00762181 /* UserAccountManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C1C4A120D7809D00762181 /* UserAccountManager.swift */; };
+		31C1C4A820D7901400762181 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 31C1C4A720D7901300762181 /* GoogleService-Info.plist */; };
 		31CE11022039570B000156EE /* FetchedResultsControllerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE11012039570B000156EE /* FetchedResultsControllerManager.swift */; };
 		31EF9B0720299D15006D3B35 /* InAppPurchaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31EF9B0620299D15006D3B35 /* InAppPurchaseManager.swift */; };
 		31EF9B092029D542006D3B35 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 31EF9B082029D542006D3B35 /* StoreKit.framework */; };
@@ -474,8 +474,8 @@
 		31C1C48E20D7804500762181 /* UIApplication+openInChrome.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIApplication+openInChrome.swift"; sourceTree = "<group>"; };
 		31C1C48F20D7804500762181 /* LocalizeHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocalizeHelper.swift; sourceTree = "<group>"; };
 		31C1C49020D7804500762181 /* Appearance.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Appearance.swift; sourceTree = "<group>"; };
-		31C1C4A120D7809D00762181 /* SigninManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SigninManager.swift; sourceTree = "<group>"; };
-		31C1C4A320D7829C00762181 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		31C1C4A120D7809D00762181 /* UserAccountManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserAccountManager.swift; sourceTree = "<group>"; };
+		31C1C4A720D7901300762181 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		31CE11012039570B000156EE /* FetchedResultsControllerManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FetchedResultsControllerManager.swift; sourceTree = "<group>"; };
 		31CE110C203BEFC1000156EE /* Model 10.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 10.xcdatamodel"; sourceTree = "<group>"; };
 		31EF9B0620299D15006D3B35 /* InAppPurchaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InAppPurchaseManager.swift; sourceTree = "<group>"; };
@@ -1191,7 +1191,7 @@
 				524DB5391FC6F69800BD408F /* UsageStreak.swift */,
 				5268B5251FE65E1800B7D257 /* ChangelogAlert.swift */,
 				31C0C80520A15EAA002EE95B /* CrazeImageZoom.swift */,
-				31C1C4A120D7809D00762181 /* SigninManager.swift */,
+				31C1C4A120D7809D00762181 /* UserAccountManager.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -1268,7 +1268,7 @@
 		E42AC3931F6144060035A07C /* dev */ = {
 			isa = PBXGroup;
 			children = (
-				31C1C4A320D7829C00762181 /* GoogleService-Info.plist */,
+				31C1C4A720D7901300762181 /* GoogleService-Info.plist */,
 				E41BB9321F61BDD200A74F04 /* Info.plist */,
 				E4D6D8A61F61B047009DD999 /* screenshot.entitlements */,
 			);
@@ -1423,7 +1423,7 @@
 				C572FEFF205C00070046BFEB /* Hind-Bold.ttf in Resources */,
 				E4DB2B7C1F7E1D4600320BE5 /* LaunchScreen.storyboard in Resources */,
 				C53B15BA1FDD638C00658A78 /* Localizable.strings in Resources */,
-				31C1C4A420D7829C00762181 /* GoogleService-Info.plist in Resources */,
+				31C1C4A820D7901400762181 /* GoogleService-Info.plist in Resources */,
 				C5E6C318208F23AA006E9C54 /* CheckoutSupportedStates.plist in Resources */,
 				C5DC531D20CD3F2100E90DB8 /* Quicksand-Bold.ttf in Resources */,
 				C5E6C31A208F2415006E9C54 /* CheckoutSupportedCountries.plist in Resources */,
@@ -1465,6 +1465,7 @@
 				"${BUILT_PRODUCTS_DIR}/SDWebImage/SDWebImage.framework",
 				"${BUILT_PRODUCTS_DIR}/SwiftKeychainWrapper/SwiftKeychainWrapper.framework",
 				"${BUILT_PRODUCTS_DIR}/Whisper/Whisper.framework",
+				"${BUILT_PRODUCTS_DIR}/leveldb-library/leveldb.framework",
 				"${BUILT_PRODUCTS_DIR}/lottie-ios/Lottie.framework",
 				"${BUILT_PRODUCTS_DIR}/nanopb/nanopb.framework",
 			);
@@ -1487,6 +1488,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SDWebImage.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftKeychainWrapper.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Whisper.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/leveldb.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Lottie.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/nanopb.framework",
 			);
@@ -1584,7 +1586,7 @@
 				31C1C47120D77FE000762181 /* ShoppablesToolbar.swift in Sources */,
 				C5F73C9E1FE244C800E49F2B /* Permissions.swift in Sources */,
 				31C1C49620D7804500762181 /* CredentialHelper.swift in Sources */,
-				31C1C4A220D7809E00762181 /* SigninManager.swift in Sources */,
+				31C1C4A220D7809E00762181 /* UserAccountManager.swift in Sources */,
 				31C1C46E20D77FE000762181 /* SaleView.swift in Sources */,
 				31C1C41E20D77FE000762181 /* CheckoutShippingFormViewController.swift in Sources */,
 				31C1C46720D77FE000762181 /* TextExplanationTableViewCell.swift in Sources */,

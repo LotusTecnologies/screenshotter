@@ -167,23 +167,27 @@ class InitiateResetPasswordViewController: UIViewController {
         dismissKeyboard()
         
         if let email = validateEmail(_view.emailTextField.text) {
-            SigninManager.shared.forgotPassword(email: email)
+            self.continueButton.isLoading = true
+            self.continueButton.isEnabled = false
+            self._view.emailTextField.isUserInteractionEnabled = false
+            
+            UserAccountManager.shared.forgotPassword(email: email)
                 .then(on: .main) { () -> Void in
                     self.delegate?.initiateResetPasswordViewControllerDidReset(self)
                 }.catch { (error) in
                     DispatchQueue.main.async {
                         let error = error as NSError
-                        if SigninManager.shared.isNoInternetError(error: error) {
-                            let alert = SigninManager.shared.alertViewForNoInternet()
+                        if UserAccountManager.shared.isNoInternetError(error: error) {
+                            let alert = UserAccountManager.shared.alertViewForNoInternet()
                             self.present(alert, animated: true, completion: nil)
-                        }else if SigninManager.shared.isNoAccountWithEmailError(error: error) {
-                            let alert = SigninManager.shared.alertViewForNoAccountWithEmail()
+                        }else if UserAccountManager.shared.isNoAccountWithEmailError(error: error) {
+                            let alert = UserAccountManager.shared.alertViewForNoAccountWithEmail()
                             self.present(alert, animated: true, completion: nil)
-                        }else if SigninManager.shared.isCantSendEmailError(error: error) {
-                            let alert = SigninManager.shared.alertViewForCantSendEmail(email: email)
+                        }else if UserAccountManager.shared.isCantSendEmailError(error: error) {
+                            let alert = UserAccountManager.shared.alertViewForCantSendEmail(email: email)
                             self.present(alert, animated: true, completion: nil)
                         }else {
-                            let alert = SigninManager.shared.alertViewForUndefinedError(error: error, viewController: self)
+                            let alert = UserAccountManager.shared.alertViewForUndefinedError(error: error, viewController: self)
                             self.present(alert, animated: true, completion: nil)
                         }
                     }

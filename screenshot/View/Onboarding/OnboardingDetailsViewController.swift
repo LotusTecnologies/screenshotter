@@ -320,16 +320,16 @@ class OnboardingDetailsViewController: UIViewController {
     func updateUserProperties() {
         UserDefaults.standard.set(name, forKey: UserDefaultsKeys.name)
 
-        let user = AnalyticsUser(name: self.name, email: SigninManager.shared.email)
+        let user = AnalyticsUser(name: self.name, email: UserAccountManager.shared.email)
         user.sendToServers()
 
     }
     @objc private func continueAction() {
         self.syncGenderAndSizeOptions()
         self.updateUserProperties()
-        if let name = self.name {
-            SigninManager.shared.set(attribute:SigninManager.UserAttribute.name, value:name)
-        }
+//        if let name = self.name {
+//            UserAccountManager.shared.set(attribute:UserAccountManager.UserAttribute.name, value:name)
+//        }
         delegate?.onboardingDetailsViewControllerDidContinue(self)
     }
     

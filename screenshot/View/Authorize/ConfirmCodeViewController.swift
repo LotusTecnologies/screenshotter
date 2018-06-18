@@ -178,22 +178,22 @@ class ConfirmCodeViewController: UIViewController {
             _view.continueButton.isLoading = true
             _view.continueButton.isUserInteractionEnabled = false
             _view.codeTextField.isUserInteractionEnabled = false
-            SigninManager.shared.confirmSignup(code: code).then(on: .main) { () -> Void in
+            UserAccountManager.shared.confirmSignup(code: code).then(on: .main) { () -> Void in
                     self.delegate?.confirmCodeViewControllerDidConfirm(self)
                 }.catch { (error) in
                     DispatchQueue.main.async {
                         let error = error as NSError
-                        if SigninManager.shared.isNoInternetError(error: error) {
-                            let alert = SigninManager.shared.alertViewForNoInternet()
+                        if UserAccountManager.shared.isNoInternetError(error: error) {
+                            let alert = UserAccountManager.shared.alertViewForNoInternet()
                             self.present(alert, animated: true, completion: nil)
-                        }else if SigninManager.shared.isBadCodeError(error: error) {
-                            let alert = SigninManager.shared.alertViewForBadCode()
+                        }else if UserAccountManager.shared.isBadCodeError(error: error) {
+                            let alert = UserAccountManager.shared.alertViewForBadCode()
                             self.present(alert, animated: true, completion: nil)
-                        }else if SigninManager.shared.isCantSendEmailError(error: error), let email = self.email {
-                            let alert = SigninManager.shared.alertViewForCantSendEmail(email: email)
+                        }else if UserAccountManager.shared.isCantSendEmailError(error: error), let email = self.email {
+                            let alert = UserAccountManager.shared.alertViewForCantSendEmail(email: email)
                             self.present(alert, animated: true, completion: nil)
                         }else {
-                            let alert = SigninManager.shared.alertViewForUndefinedError(error: error, viewController: self)
+                            let alert = UserAccountManager.shared.alertViewForUndefinedError(error: error, viewController: self)
                             self.present(alert, animated: true, completion: nil)
                         }
                     }
