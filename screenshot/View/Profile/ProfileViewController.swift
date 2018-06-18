@@ -134,8 +134,10 @@ class ProfileViewController: UITableViewController {
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         
-        UIView.performWithoutAnimation {
-            self.animateProfileAccountView(isExpanded: false)
+        if presentedViewController == nil {
+            UIView.performWithoutAnimation {
+                self.animateProfileAccountView(isExpanded: false)
+            }
         }
     }
     
