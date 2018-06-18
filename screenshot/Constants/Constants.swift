@@ -9,6 +9,9 @@
 import Foundation
 
 class Constants {
+    // iTunes
+    static let itunesConnectApp = "itms-apps://itunes.apple.com/app/id1254964391"
+    static let itunesConnect = "https://itunes.apple.com/us/app/screenshop-by-craze/id1254964391"
 
     // Product decisions
     static let notificationProductToImportCountLimit = 4
@@ -34,7 +37,7 @@ class Constants {
     static let furnitureAccountSignature = "G51b+lgvD2TO4l1AjvnVI1OxokzFK5FLw5lHBksXP1c="
     static let furnitureHardcodedAuth = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmaW5nZXIiOiJ2L0NhY3YzREs5K0NxaVFTQXB1ZDFBPT0iLCJ0aW1lc3RhbXAiOjE1MTQzNjgxOTYxNzIsInV1aWQiOiI3OWIyNWJkZi1lMWI2LTVkOWEtOGJkZi1iZDMwNDkzZmE4NjYifQ.IUpV_u797rI0Asvog26y7cHG1mIuHMnDiPsJvLnIAc4"
     
-    static let syteNonUscFeed = "default"
+    static let syteNonUscFeed = "craze_default"
     
     // Keys
 #if DEV

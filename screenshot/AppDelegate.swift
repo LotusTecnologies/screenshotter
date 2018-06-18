@@ -391,19 +391,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             
             viewController = navigationController.discoverScreenshotViewController
             
-        case s(SettingsNavigationController.self):
+        case s(ProfileNavigationController.self):
             guard let tabBarController = restorationViewControllers[s(MainTabBarController.self)] as? MainTabBarController else {
                 return nil
             }
             
-            viewController = tabBarController.settingsNavigationController
+            viewController = tabBarController.profileNavigationController
             
-        case s(SettingsViewController.self):
-            guard let navigationController = restorationViewControllers[s(SettingsNavigationController.self)] as? SettingsNavigationController else {
+        case s(ProfileViewController.self):
+            guard let navigationController = restorationViewControllers[s(ProfileNavigationController.self)] as? ProfileNavigationController else {
                 return nil
             }
             
-            viewController = navigationController.settingsViewController
+            viewController = navigationController.profileViewController
             
         default:
             viewController = nil

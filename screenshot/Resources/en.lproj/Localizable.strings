@@ -210,10 +210,15 @@
 "form.personal.email" = "Email";
 "form.personal.phone" = "Phone Number";
 
-"game.enter" = "Get More Coins";
-"game.restart" = "Tap to play again";
-"game.score" = "My coins: %d";
-"game.start" = "Tap to get more coins";
+"gdpr.image.message" = "When this setting is turned on, we send screenshots you take in and outside of the app to our server to detect whether there are clothing items in the photo and allow you to shop relevant photos quickly. This happens in the background and is not shown to you. We do not save any photos that are not detected as fashion.";
+"gdpr.image.title" = "Image Detection";
+"gdpr.notification.message" = "When this setting is turned on, we will send you personalized push notifications and emails with sales, availability updates and information about products in the app you looked at and favorited. Your email will also be used to retarget ads to you and to provide brands and retailers with anonymous data about your shopping habits.";
+"gdpr.notification.title" = "Email & Push Notifications";
+"gdpr.onboarding.title" = "Your Privacy Settings";
+"gdpr.onboarding.subtitle" = "You can change these any time in the settings page of the app";
+"gdpr.onboarding.edit" = "Manage Settings";
+"gdpr.onboarding.continue" = "Accept and Continue";
+"gdpr.title" = "Privacy Settings";
 
 "generic.back" = "Back";
 "generic.buy" = "BUY";
@@ -267,6 +272,7 @@
 "onboarding.details.size" = "Size";
 "onboarding.details.title" = "Your Details";
 
+
 "onboarding.welcome.content" = "Take a screenshot.\nShop it.";
 "onboarding.welcome.continue" = "Get Started";
 "onboarding.welcome.header" = "Welcome to";
@@ -313,13 +319,7 @@
 "products.details.similar" = "Similar Items";
 "products.helper.message" = "No visually similar products were detected";
 "products.helper.retry" = "Try Again";
-"products.helper.retry.fashion" = "Fashion";
-"products.helper.retry.furniture" = "Furniture";
-"products.helper.retry.title" = "Try again as";
 "products.helper.title" = "No Items Found";
-"products.options.category.auto" = "Auto";
-"products.options.category.fashion" = "Fashion";
-"products.options.category.furniture" = "Furniture";
 "products.options.gender.auto" = "All";
 "products.options.gender.female" = "Female";
 "products.options.gender.male" = "Male";
@@ -333,6 +333,7 @@
 "products.options.sort.price_des" = "Price (highest first)";
 "products.options.sort.similar" = "Similar";
 "products.options.sort.title" = "Sort by";
+"products.options.title" = "FILTER YOUR RESULTS";
 "products.rate.negative.help_finding_outfit" = "I need help finding this outfit... %@";
 "products.rate.negative.popup.message" =  "What were you expecting to see and what did you see instead?";
 "products.rate.negative.popup.title" =  "What’s Wrong Here?";
@@ -343,6 +344,18 @@
 "products.related_looks.headline" = "Similar Looks";
 "products.related_looks.error.connection" = "Please check your connection and try again.";
 "products.related_looks.error.no_looks" = "No similar looks found";
+
+"profile.header.logged_out.continue" = "Log In or Sign Up";
+"profile.header.logged_out.title" = "Log in for exclusive benefits!";
+"profile.row.currency.title" = "Currency";
+"profile.row.logout.title" = "Logout";
+"profile.row.open_in.title" = "Open Products In";
+"profile.row.photo_permission.title" = "Camera Roll";
+"profile.row.push_permission.title" = "Push Notifications";
+"profile.row.tutorial.title" = "Play Tutorial";
+"profile.section.permission" = "Permissions";
+"profile.tell_friend" = "Tell a Friend!";
+"profile.title" = "Profile";
 
 "screenshot.empty.detail" = "Upload a photo or add a look from the Discover tab";
 "screenshot.empty.discover" = "Browse Looks";
@@ -389,34 +402,35 @@
 "settings.region.other" = "Other";
 "settings.region.unknown" = "Unknown";
 "settings.region.us" = "United States";
-"settings.row.address.title" = "Shipping Addresses";
 "settings.row.bug.title" = "Submit a Bug";
-"settings.row.coins.title" = "Coins Collected";
 "settings.row.contact.title" = "Contact Us";
-"settings.row.currency.title" = "Currency";
 "settings.row.email.detail" = "Enter Your Email";
 "settings.row.facebook.title" = "Facebook";
-"settings.row.gender.title" = "Gender";
 "settings.row.instagram.title" = "Instagram";
 "settings.row.name.detail" = "Enter Your Name";
-"settings.row.open_in.title" = "Open Products In";
 "settings.row.partners.title" = "Our Technology";
-"settings.row.payment.title" = "Payment Methods";
-"settings.row.photo_permission.title" = "Camera Roll";
-"settings.row.push_permission.title" = "Push Notifications";
 "settings.row.region.title" = "Region";
-"settings.row.size.title" = "Size";
-"settings.row.tutorial.title" = "Play Tutorial";
 "settings.row.usage_streak.detail.plural" = "%d days";
 "settings.row.usage_streak.detail.single" = "%d day";
 "settings.row.usage_streak.title" = "Daily Streak";
 "settings.row.version.title" = "App Version";
 "settings.section.about" = "About";
 "settings.section.follow" = "Follow Us";
-"settings.section.info" = "Your Info";
-"settings.section.permission" = "Permissions";
-"settings.section.product" = "Product Options";
 "settings.title" = "Settings";
+
+
+"text_explanation.disabled" = "disabled";
+"text_explanation.enabled" = "enabled";
+
+"tutorial.email.detail" = "Fill out your info below";
+"tutorial.email.email" = "Email";
+"tutorial.email.legal.0" = "By tapping \"Submit\" above, you agree to our ";
+"tutorial.email.legal.1" = "Terms of Service";
+"tutorial.email.legal.2" = " and ";
+"tutorial.email.legal.3" = "Privacy Policy";
+"tutorial.email.legal.4" = " ";
+"tutorial.email.name" = "Name";
+"tutorial.email.title" = "Sign Up";
 
 "tutorial.try.detail.0" = "Press the home & power buttons";
 "tutorial.try.detail.1" = " on your phone";
@@ -426,6 +440,7 @@
 "tutorial.try.detail.x.2" = " to take a screenshot";
 "tutorial.try.skip" = "Skip";
 "tutorial.try.title" = "Try It Out";
+
 
 "tutorial.video.mute.detail" = "In order to hear the sound in the video, please turn up the volume on your phone!";
 "tutorial.video.mute.title" = "Turn up the volume!";

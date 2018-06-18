@@ -10,59 +10,28 @@ import Foundation
 import PromiseKit
 import Whisper
 
-@objc protocol SettingsViewControllerDelegate : NSObjectProtocol {
-    func settingsViewControllerDidGrantPermission(_ viewController: SettingsViewController)
-}
-
 class SettingsViewController : BaseViewController {
     fileprivate enum Section : Int {
         // Order reflects in the TableView
-        case info
-        case permission
-        case product
         case follow
         case about
     }
     
     fileprivate enum Row : Int {
-        case photoPermission
-        case pushPermission
-        case email
-        case name
-        case tutorialVideo
         case usageStreak
         case contactUs
         case bug
         case version
-        case coins
-        case productGender
-        case productSize
-        case currency
+        case termsOfService
+        case privacyPolicy
         case followFacebook
         case followInstagram
         case partners
-        case openIn
         case region
-        case payment
-        case address
     }
-    
-    weak var delegate: SettingsViewControllerDelegate?
     
     fileprivate let tableView = UITableView(frame: .zero, style: .grouped)
     fileprivate let tableFooterTextView = UITextView()
-    
-    fileprivate var nameTextField: UITextField?
-    fileprivate var emailTextField: UITextField?
-    fileprivate var isRestoring = false
-    fileprivate lazy var previousTexts = {
-        return [
-            UserDefaultsKeys.name: self.cellText(for: .name),
-            UserDefaultsKeys.email: self.cellText(for: .email)
-        ]
-    }()
-    
-    fileprivate let productsOptionsControls = ProductsOptionsControls()
     
     override var title: String? {
         set {}
@@ -81,13 +50,6 @@ class SettingsViewController : BaseViewController {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
         self.restorationIdentifier = String(describing: type(of: self))
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(applicationDidBecomeActive(_:)), name: .UIApplicationDidBecomeActive, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(applicationWillEnterForeground(_:)), name: .UIApplicationWillEnterForeground, object: nil)
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(reloadChangeableIndexPaths), name: .InAppPurchaseManagerDidUpdate, object: nil)
-
-        addNavigationItemLogo()
     }
     
     override func viewDidLoad() {
@@ -128,29 +90,6 @@ class SettingsViewController : BaseViewController {
         tableView.addGestureRecognizer(tapper)
     }
     
-    @objc func didTripleTapTableView(_ tapper:UITapGestureRecognizer){
-        if tapper.state == .recognized {
-            if let index = self.indexPath(for: .version, in: .about), let cell = self.tableView.cellForRow(at: index) {
-                let point = tapper.location(in: cell)
-                if cell.bounds.contains(point) {
-                    let enabled = UserDefaults.standard.bool(forKey: UserDefaultsKeys.showsDebugAnalyticsUI)
-                    if enabled {
-                        UserDefaults.standard.set(false, forKey: UserDefaultsKeys.showsDebugAnalyticsUI)
-                    }else{
-                        UserDefaults.standard.set(true, forKey: UserDefaultsKeys.showsDebugAnalyticsUI)
-                    }
-                    if let viewController = AppDelegate.shared.window?.rootViewController {
-                        let announcement = Announcement(title: "Analytics debug UI", subtitle: (enabled ? "Disabled":"Enabled"), image: nil, duration:10.0, action:{
-                        })
-                        Whisper.show(shout: announcement, to: viewController, completion: {
-                        })
-                    }
-                }
-                
-            }
-        }
-    }
-    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
@@ -168,38 +107,7 @@ class SettingsViewController : BaseViewController {
         reloadChangeableIndexPaths()
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        
-        dismissKeyboard()
-    }
-    
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        
-        // Very important to clear the controls to prevent retaining
-        // the same property in multiple cells. Not doing this will
-        // freeze the app on subsequent view will appears.
-        productsOptionsControls.genderControl = nil
-        productsOptionsControls.sizeControl = nil
-    }
-    
-    @objc private func applicationDidBecomeActive(_ notification: Notification) {
-        if view?.window != nil {
-            // Use did become active since the permissions values can change through an alert view
-            reloadChangeableIndexPaths()
-        }
-    }
-    
-    @objc private func applicationWillEnterForeground(_ notification: Notification) {
-        if view?.window != nil {
-            reloadChangeableIndexPaths()
-        }
-    }
-    
     deinit {
-        NotificationCenter.default.removeObserver(self)
-        
         tableView.delegate = nil
         tableView.dataSource = nil
     }
@@ -207,35 +115,19 @@ class SettingsViewController : BaseViewController {
     // MARK: Data
     
     fileprivate let data: [Section : [Row]] = [
-        .permission: [
-            .photoPermission,
-            .pushPermission
-        ],
-        .info: [
-            .name,
-            .email,
-//            .payment,
-//            .address,
-            .currency
-        ],
         .about: [
-            .tutorialVideo,
             .contactUs,
             .bug,
             .usageStreak,
-            .coins,
+            .termsOfService,
+            .privacyPolicy,
 //            .region,  // Revert to never use USC.
-            .version,
-            .partners
+            .partners,
+            .version
         ],
         .follow: [
             .followInstagram,
             .followFacebook
-        ],
-        .product: [
-            .productGender,
-            .productSize,
-            .openIn
         ]
     ]
     
@@ -251,31 +143,6 @@ class SettingsViewController : BaseViewController {
             return nil
         }
         return IndexPath(row: rowValue, section: section.rawValue)
-    }
-    
-    // MARK: Product Options
-    
-    @objc fileprivate func genderControlAction(_ control: UISegmentedControl) {
-        let gender = ProductsOptionsGender(offsetValue: control.selectedSegmentIndex)
-        let integer = gender.rawValue
-        Analytics.trackSetGlobalGenderFiler(gender: gender.stringValue)
-        UserDefaults.standard.set(integer, forKey: UserDefaultsKeys.productGender)
-    }
-    
-    @objc fileprivate func sizeControlAction(_ control: UISegmentedControl) {
-        let size = ProductsOptionsSize(offsetValue: control.selectedSegmentIndex)
-        let integer = size.rawValue
-        
-        Analytics.trackSetGlobalSizeFiler(size: size.stringValue)
-        UserDefaults.standard.set(integer, forKey: UserDefaultsKeys.productSize)
-    }
-}
-
-extension SettingsViewController : ViewControllerLifeCycle {
-    func viewController(_ viewController: UIViewController, willDisappear animated: Bool) {
-        if viewController.isKind(of: CurrencyViewController.self), let indexPath = indexPath(for: .currency, in: .info) {
-            tableView.reloadRows(at: [indexPath], with: .none)
-        }
     }
 }
 
@@ -306,7 +173,7 @@ extension SettingsViewController : UITableViewDataSource {
         }
         
         tableViewHeaderFooterView.textLabel?.textColor = .gray3
-        tableViewHeaderFooterView.textLabel?.font = .screenshopFont(.dinCondensedBold, textStyle: .title3)
+        tableViewHeaderFooterView.textLabel?.font = .screenshopFont(.quicksandMedium, textStyle: .subheadline)
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -314,60 +181,8 @@ extension SettingsViewController : UITableViewDataSource {
             return UITableViewCell()
         }
         
-        var cell: UITableViewCell
-        
-        if indexPath.section == Section.info.rawValue && (row == .name || row == .email) {
-            cell = self.tableView(tableView, inputCellForRowAt: indexPath, withRow: row)
-            
-        } else {
-            cell = self.tableView(tableView, defaultCellForRowAt: indexPath, withRow: row)
-        }
-        
+        let cell = self.tableView(tableView, defaultCellForRowAt: indexPath, withRow: row)
         cell.accessoryType = cellAccessoryType(for: row)
-        cell.accessoryView = cellAccessoryView(for: row)
-        return cell
-    }
-    
-    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        guard let row = settingsRow(for: indexPath) else {
-            return
-        }
-        
-        if indexPath.section == Section.product.rawValue &&
-            (row == .productGender || row == .productSize),
-            let genderControl = productsOptionsControls.genderControl,
-            let sizeControl = productsOptionsControls.sizeControl,
-            let width = [genderControl.bounds.width, sizeControl.bounds.width].max()
-        {
-            var frame = genderControl.frame
-            frame.size.width = width
-            genderControl.frame = frame
-            
-            frame = sizeControl.frame
-            frame.size.width = width
-            sizeControl.frame = frame
-        }
-    }
-    
-    private func tableView(_ tableView: UITableView, inputCellForRowAt indexPath: IndexPath, withRow row: Row) -> UITableViewCell {
-        let reusableCell = tableView.dequeueReusableCell(withIdentifier: "input") as? TextFieldTableViewCell
-        let cell = reusableCell ?? TextFieldTableViewCell(style: .default, reuseIdentifier: "input")
-        
-        if reusableCell == nil {
-            cell.textField.delegate = self
-            
-            if row == .email {
-                emailTextField = cell.textField
-                cell.textField.keyboardType = .emailAddress
-                
-            } else if row == .name {
-                nameTextField = cell.textField
-                cell.textField.keyboardType = .default
-            }
-        }
-        
-        cell.textField.text = cellText(for: row)
-        cell.textField.placeholder = cellDetailedText(for: row)
         return cell
     }
     
@@ -377,20 +192,11 @@ extension SettingsViewController : UITableViewDataSource {
         
         cell.imageView?.image = cellImage(for: row)
         cell.textLabel?.text = cellText(for: row)
-        cell.textLabel?.font = .screenshopFont(.hindLight, textStyle: .body)
-        cell.textLabel?.textColor = .black
-        
-        cell.detailTextLabel?.font = .screenshopFont(.hindSemibold, textStyle: .body)
-        cell.detailTextLabel?.text = nil
-        cell.detailTextLabel?.attributedText = nil
-        
-        if let text = cellDetailedText(for: row) {
-            cell.detailTextLabel?.text = text
-        }
-        else if let attributedText = cellDetailedAttributedText(for: row) {
-            cell.detailTextLabel?.attributedText = attributedText
-        }
-        
+        cell.textLabel?.font = .preferredFont(forTextStyle: .body)
+        cell.textLabel?.textColor = .gray4
+        cell.detailTextLabel?.font = .preferredFont(forTextStyle: .body, symbolicTraits: .traitBold)
+        cell.detailTextLabel?.textColor = .gray5
+        cell.detailTextLabel?.text = cellDetailedText(for: row)
         return cell
     }
 }
@@ -402,17 +208,8 @@ extension SettingsViewController : UITableViewDelegate {
         }
         
         switch (row) {
-        case .version, .productGender, .productSize, .usageStreak:
+        case .version, .usageStreak:
             return false
-            
-        case .pushPermission, .photoPermission:
-            if let permissionType = row.permissionType, !PermissionsManager.shared.hasPermission(for: permissionType) {
-                return true
-            }
-            else {
-                return false
-            }
-            
         default:
             return true
         }
@@ -424,61 +221,22 @@ extension SettingsViewController : UITableViewDelegate {
         }
         
         switch (row) {
-        case .email, .name:
-            if let cell = tableView.cellForRow(at: indexPath) {
-                cell.becomeFirstResponder()
-            }
-            
         case .bug:
             presentMailComposerForBug()
             
-        case .tutorialVideo:
-            let viewController = TutorialVideoViewController()
-            viewController.showsReplayButtonUponFinishing = false
-            viewController.delegate = self
-            viewController.modalTransitionStyle = .crossDissolve
-            present(viewController, animated: true, completion: nil)
-        
         case .contactUs:
             presentMailComposerForContactUs()
-
-        case .coins:
-            let navigationController = ModalNavigationController(rootViewController: GameViewController())
-            present(navigationController, animated: true, completion: nil)
             
-        case .pushPermission, .photoPermission:
-            if let permissionType = row.permissionType {
-                PermissionsManager.shared.requestPermission(for: permissionType, openSettingsIfNeeded: true, response: { granted in
-                    if granted {
-                        tableView.reloadRows(at: [indexPath], with: .fade)
-                        self.delegate?.settingsViewControllerDidGrantPermission(self)
-                    }
-                })
+        case .termsOfService:
+            if let viewController = LegalViewControllerFactory.termsOfServiceViewController() {
+                present(viewController, animated: true, completion: nil)
             }
             
-        case .openIn:
-            let alert = UIAlertController.init(title: nil, message: nil, preferredStyle: .actionSheet)
+        case .privacyPolicy:
+            if let viewController = LegalViewControllerFactory.privacyPolicyViewController() {
+                present(viewController, animated: true, completion: nil)
+            }
             
-            let options:[OpenWebPage] = [.embededSafari, .safari, .chrome]
-            options.forEach({ (setting) in
-                alert.addAction(UIAlertAction.init(title:setting.localizedDisplayString(), style: .default, handler: { (a) in
-                    setting.saveToUserDefaults()
-                    tableView.reloadRows(at: [indexPath], with: .none)
-                }))
-            })
-            
-            alert.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
-            
-            present(alert, animated: true, completion: nil)
-            
-        case .currency:
-            let viewController = CurrencyViewController()
-            viewController.lifeCycleDelegate = self
-            viewController.title = cellText(for: row)
-            viewController.hidesBottomBarWhenPushed = true
-            viewController.selectedCurrencyCode = UserDefaults.standard.string(forKey: UserDefaultsKeys.productCurrency)
-            navigationController?.pushViewController(viewController, animated: true)
-        
         case .followInstagram:
             if let url = URL(string: "https://www.instagram.com/screenshopit/") {
                 UIApplication.shared.open(url, options: [:], completionHandler: nil)
@@ -493,6 +251,7 @@ extension SettingsViewController : UITableViewDelegate {
             let viewController = PartnersViewController()
             viewController.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(viewController, animated: true)
+            
         case .region:
             let alert = UIAlertController.init(title: nil, message: nil, preferredStyle: .actionSheet)
             
@@ -513,23 +272,7 @@ extension SettingsViewController : UITableViewDelegate {
             
             present(alert, animated: true, completion: nil)
             
-        case .address:
-            let viewController = CheckoutShippingListViewController()
-            viewController.hidesBottomBarWhenPushed = true
-            navigationController?.pushViewController(viewController, animated: true)
-            
-        case .payment:
-            let viewController = CheckoutPaymentListViewController()
-            viewController.hidesBottomBarWhenPushed = true
-            navigationController?.pushViewController(viewController, animated: true)
-            
-        case .usageStreak:
-            break;
-        case .version:
-            break;
-        case .productGender:
-            break;
-        case .productSize:
+        case .usageStreak, .version:
             break;
         }
         
@@ -540,16 +283,10 @@ extension SettingsViewController : UITableViewDelegate {
 fileprivate extension SettingsViewController {
     func sectionText(for section: Section) -> String {
         switch section {
-        case .permission:
-            return "settings.section.permission".localized
         case .about:
             return "settings.section.about".localized
-        case .info:
-            return "settings.section.info".localized
         case .follow:
             return "settings.section.follow".localized
-        case .product:
-            return "settings.section.product".localized
         }
     }
     
@@ -572,28 +309,12 @@ fileprivate extension SettingsViewController {
             return "settings.row.bug.title".localized
         case .contactUs:
             return "settings.row.contact.title".localized
-        case .tutorialVideo:
-            return "settings.row.tutorial.title".localized
-        case .name:
-            return UserDefaults.standard.string(forKey: UserDefaultsKeys.name) ?? ""
-        case .email:
-            return UserDefaults.standard.string(forKey: UserDefaultsKeys.email) ?? ""
-        case .pushPermission:
-            return "settings.row.push_permission.title".localized
-        case .photoPermission:
-            return "settings.row.photo_permission.title".localized
         case .version:
             return "settings.row.version.title".localized
-        case .coins:
-            return "settings.row.coins.title".localized
-        case .productGender:
-            return "settings.row.gender.title".localized
-        case .productSize:
-            return "settings.row.size.title".localized
-        case .openIn:
-            return "settings.row.open_in.title".localized
-        case .currency:
-            return "settings.row.currency.title".localized
+        case .termsOfService:
+            return "legal.terms_of_service".localized
+        case .privacyPolicy:
+            return "legal.privacy_policy".localized
         case .followInstagram:
             return "settings.row.instagram.title".localized
         case .followFacebook:
@@ -602,19 +323,11 @@ fileprivate extension SettingsViewController {
             return "settings.row.partners.title".localized
         case .region:
             return "settings.row.region.title".localized
-        case .payment:
-            return "settings.row.payment.title".localized
-        case .address:
-            return "settings.row.address.title".localized
         }
     }
     
     func cellDetailedText(for row: Row) -> String? {
         switch (row) {
-        case .photoPermission, .pushPermission:
-            return cellEnabledText(for: row)
-        case .openIn:
-            return OpenWebPage.fromSystemInfo().localizedDisplayString()
         case .usageStreak:
             let streak = UserDefaults.standard.integer(forKey: UserDefaultsKeys.dailyStreak)
             if streak == 1 {
@@ -625,14 +338,6 @@ fileprivate extension SettingsViewController {
             }
         case .version:
             return "\(Bundle.displayVersionBuild)\(Constants.buildEnvironmentSuffix)"
-        case .name:
-            return "settings.row.name.detail".localized
-        case .email:
-            return "settings.row.email.detail".localized
-        case .coins:
-            return "\(UserDefaults.standard.integer(forKey: UserDefaultsKeys.gameScore))"
-        case .currency:
-            return CurrencyViewController.currentCurrency
         case .region:
             if UserDefaults.standard.object(forKey: UserDefaultsKeys.isUSC) == nil {
                 return "settings.region.unknown".localized
@@ -649,104 +354,12 @@ fileprivate extension SettingsViewController {
         }
     }
     
-    func cellDetailedAttributedText(for row: Row) -> NSAttributedString? {
-        switch (row) {
-        case .address:
-            let textAttachment = NSTextAttachment()
-            textAttachment.image = UIImage(named: "SettingsTruck")
-            return NSAttributedString(attachment: textAttachment)
-            
-        case .payment:
-            let textAttachment = NSTextAttachment()
-            textAttachment.image = UIImage(named: "SettingsCreditCard")
-            return NSAttributedString(attachment: textAttachment)
-            
-        default:
-            return nil
-        }
-    }
-    
-    func cellEnabledText(for row: Row) -> String? {
-        guard let permissionType = row.permissionType else {
-            return nil
-        }
-        
-        if PermissionsManager.shared.hasPermission(for: permissionType) {
-            return "generic.enabled".localized
-        }
-        else {
-            return "generic.disabled".localized
-        }
-    }
-    
     func cellAccessoryType(for row: Row) -> UITableViewCellAccessoryType {
         switch row {
-        case .currency, .partners, .address, .payment:
+        case .partners:
             return .disclosureIndicator
         default:
             return .none
-        }
-    }
-    
-    func cellAccessoryView(for row: Row) -> UIView? {
-        switch (row) {
-        case .photoPermission, .pushPermission:
-            if let permissionType = row.permissionType, !PermissionsManager.shared.hasPermission(for: permissionType) {
-                let size = CGFloat(18)
-                
-                let label = UILabel(frame: CGRect(x: 0, y: 0, width: size, height: size))
-                label.backgroundColor = .crazeRed
-                label.text = "!"
-                label.textAlignment = .center
-                label.font = UIFont(name: "Optima-ExtraBlack", size: 14)
-                label.textColor = .white
-                label.layer.cornerRadius = size / 2
-                label.layer.masksToBounds = true
-                return label
-                
-            } else {
-                return nil
-            }
-            
-        case .productGender:
-            let integer = UserDefaults.standard.integer(forKey: UserDefaultsKeys.productGender)
-            let control: UISegmentedControl
-            
-            if productsOptionsControls.genderControl != nil {
-                control = productsOptionsControls.genderControl!
-                
-            } else {
-                control = productsOptionsControls.createGenderControl()
-                control.tintColor = .crazeGreen
-                control.isExclusiveTouch = true
-                control.addTarget(self, action: #selector(genderControlAction(_:)), for: .valueChanged)
-            }
-            
-            control.selectedSegmentIndex = ProductsOptionsGender(intValue: integer).offsetValue
-            productsOptionsControls.sync()
-            
-            return control
-            
-        case .productSize:
-            let integer = UserDefaults.standard.integer(forKey: UserDefaultsKeys.productSize)
-            let control: UISegmentedControl
-            
-            if productsOptionsControls.sizeControl != nil {
-                control = productsOptionsControls.sizeControl!
-                
-            } else {
-                control = productsOptionsControls.createSizeControl()
-                control.tintColor = .crazeGreen
-                control.isExclusiveTouch = true
-                control.addTarget(self, action: #selector(sizeControlAction(_:)), for: .valueChanged)
-            }
-            
-            control.selectedSegmentIndex = ProductsOptionsSize(intValue: integer).offsetValue
-            productsOptionsControls.sync()
-            return control
-            
-        default:
-            return nil
         }
     }
     
@@ -766,103 +379,43 @@ fileprivate extension SettingsViewController {
             }
         }
         
-        func sectionIndexPaths(_ section: Section) -> [IndexPath] {
-            var indexPaths: [IndexPath] = []
-            
-            data[section]?.forEach { row in
-                append(section: section, row: row, to: &indexPaths)
-            }
-            
-            return indexPaths
-        }
-        
-        var indexPaths = sectionIndexPaths(.permission)
+        var indexPaths: [IndexPath] = []
         append(section: .about, row: .usageStreak, to: &indexPaths)
-        append(section: .about, row: .coins, to: &indexPaths)
-
+        
         tableView.reloadRows(at: indexPaths, with: .none)
     }
 }
 
-// MARK: - Text Field
+// MARK: - Debug
 
-extension SettingsViewController : UITextFieldDelegate {
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        if textField.returnKeyType == .done {
-            textField.resignFirstResponder()
-        }
-        return true
-    }
-    
-    func textFieldDidEndEditing(_ textField: UITextField) {
-        if let key = userDefaultsKey(for: textField) {
-            let trimmedText = textField.text?.trimmingCharacters(in: .whitespaces)
-            var canContinue = false
-            
-            if key == UserDefaultsKeys.email {
-                canContinue = textField.text?.isValidEmail ?? false
+extension SettingsViewController {
+    @objc func didTripleTapTableView(_ tapper:UITapGestureRecognizer){
+        if tapper.state == .recognized {
+            if let index = self.indexPath(for: .version, in: .about), let cell = self.tableView.cellForRow(at: index) {
+                let point = tapper.location(in: cell)
+                if cell.bounds.contains(point) {
+                    let enabled = UserDefaults.standard.bool(forKey: UserDefaultsKeys.showsDebugAnalyticsUI)
+                    if enabled {
+                        UserDefaults.standard.set(false, forKey: UserDefaultsKeys.showsDebugAnalyticsUI)
+                    }else{
+                        UserDefaults.standard.set(true, forKey: UserDefaultsKeys.showsDebugAnalyticsUI)
+                    }
+                    if let viewController = AppDelegate.shared.window?.rootViewController {
+                        let announcement = Announcement(title: "Analytics debug UI", subtitle: (enabled ? "Disabled":"Enabled"), image: nil, duration:10.0, action:{
+                        })
+                        Whisper.show(shout: announcement, to: viewController, completion: {
+                        })
+                    }
+                }
                 
-            } else if key == UserDefaultsKeys.name {
-                canContinue = (trimmedText?.count ?? 0) > 0
-            }
-            
-            if (canContinue) {
-                self.previousTexts[key] = trimmedText
-                textField.text = trimmedText
-                
-                UserDefaults.standard.set(trimmedText, forKey: key)
-                UserDefaults.standard.synchronize()
-                
-                reidentify()
-                
-            } else {
-                textField.text = self.previousTexts[key]
             }
         }
-    }
-    
-    fileprivate func userDefaultsKey(for textField: UITextField) -> String? {
-        if textField == self.emailTextField {
-            return UserDefaultsKeys.email
-            
-        } else if textField == self.nameTextField {
-            return UserDefaultsKeys.name
-        }
-        
-        return nil
-    }
-    
-    fileprivate func reidentify() {
-        let name = nameTextField?.text?.trimmingCharacters(in: .whitespaces)
-        let email = emailTextField?.text?.trimmingCharacters(in: .whitespaces)
-        let user = AnalyticsUser(name: name, email: email)
-        
-        user.sendToServers()
-        
-    }
-    
-    fileprivate func dismissKeyboard() {
-        tableView.endEditing(true)
-    }
-}
-
-// MARK: - Tutorial
-
-extension SettingsViewController : VideoDisplayingViewControllerDelegate {
-    func videoDisplayingViewControllerDidTapDone(_ viewController: UIViewController) {
-        dismiss(animated: true, completion: nil)
-    }
-    
-    func videoDisplayingViewControllerDidEnd(_ viewController: UIViewController) {
-        dismiss(animated: true, completion: nil)
-        Analytics.trackAutomaticallyExitedTutorialVideo()
     }
 }
 
 // MARK: - Mail
 
-extension SettingsViewController  {
-  
+extension SettingsViewController :
     func presentMailComposerForContactUs(){
         let recipient = "Info+\(Bundle.displayVersionBuild)@screenshopit.com"
         self.presentMail(recipient: recipient, gmailMessage: "", subject: "To Screenshop:", message: "")
@@ -883,19 +436,4 @@ extension SettingsViewController  {
         self.presentMail(recipient: recipient, gmailMessage: gmailMessage, subject: subject, message: message)
     }
     
-}
-
-// MARK: - Permissions
-
-fileprivate extension SettingsViewController.Row {
-    var permissionType: PermissionType? {
-        switch self {
-        case .photoPermission:
-            return PermissionType.photo
-        case .pushPermission:
-            return PermissionType.push
-        default:
-            return nil
-        }
-    }
 }

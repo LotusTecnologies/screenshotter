@@ -56,11 +56,7 @@ class NetworkingPromise : NSObject {
         }
     }
 
-    func uploadToSyteWorkhorse(imageData: Data?, orImageUrlString:String?, imageClassification: ClarifaiModel.ImageClassification, isUsc: Bool) -> Promise<NSDictionary> {
-        guard imageClassification != .unrecognized else {
-                let emptyError = NSError(domain: "Craze", code: 3, userInfo: [NSLocalizedDescriptionKey : "Empty image passed to Syte"])
-                return Promise(error: emptyError)
-        }
+    func uploadToSyteWorkhorse(imageData: Data?, orImageUrlString:String?) -> Promise<NSDictionary> {
         var httpBody:Data?
         var payloadType:String = ""
         if let url = orImageUrlString {
@@ -74,10 +70,7 @@ class NetworkingPromise : NSObject {
             return Promise(error: emptyError)
         }
         
-        let isUSCFeed = isUsc || UserDefaults.standard.bool(forKey: UserDefaultsKeys.abUSC)
-        let urlString = imageClassification == .human
-            ? "https://syteapi.com/v1.1/offers/bb?account_id=\(Constants.syteAccountId)&sig=\(Constants.syteAccountSignature)&features=related_looks,validate&feed=\(isUSCFeed ? Constants.syteUscFeed : Constants.syteNonUscFeed)\(payloadType)"
-            : "https://homedecor.syteapi.com/v1.1/offers/bb?account_id=\(Constants.furnitureAccountId)&sig=\(Constants.furnitureAccountSignature)&features=related_looks,validate&feed=craze_home\(payloadType)"
+        let urlString = "https://syteapi.com/v1.1/offers/bb?account_id=\(Constants.syteAccountId)&sig=\(Constants.syteAccountSignature)&features=related_looks,validate&catalog=fashion\(payloadType)"
 
         guard let url = URL(string: urlString) else {
             let malformedError = NSError(domain: "Craze", code: 3, userInfo: [NSLocalizedDescriptionKey : "Malformed upload url from: \(urlString)"])
@@ -95,9 +88,10 @@ class NetworkingPromise : NSObject {
         return promise
     }
 
-    func uploadToSyte(imageData: Data?, orImageUrlString:String?, imageClassification: ClarifaiModel.ImageClassification, isUsc: Bool) -> Promise<(String, [[String : Any]])> {
-        return uploadToSyteWorkhorse(imageData: imageData, orImageUrlString:orImageUrlString, imageClassification: imageClassification, isUsc: isUsc)
-            .then { dict -> Promise<(String, [[String : Any]])> in
+    func uploadToSyte(imageData: Data?, orImageUrlString:String?) -> Promise<(String, [[String : Any]])> {
+        return firstly {// _ -> Promise<NSDictionary> in
+                return self.uploadToSyteWorkhorse(imageData: imageData, orImageUrlString:orImageUrlString)
+            }.then { dict -> Promise<(String, [[String : Any]])> in
                 guard let responseObjectDict = dict as? [String : Any],
                     let uploadedURLString = responseObjectDict.keys.first,
                     let segments = responseObjectDict[uploadedURLString] as? [[String : Any]],

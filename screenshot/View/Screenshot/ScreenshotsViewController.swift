@@ -115,6 +115,16 @@ class ScreenshotsViewController: BaseViewController {
         }
     }
     
+    @objc func contentSizeCategoryDidChange(_ notification:Notification) {
+        if self.isViewLoaded && self.view.window != nil {
+            let notificationSection = self.indexFor(section: .notification )
+            if self.collectionView.numberOfItems(inSection: notificationSection ) > 0 {
+                self.collectionView.reloadItems(at: [IndexPath(item: 0, section: notificationSection )])
+                
+            }
+        }
+    }
+    
     deinit {
         self.collectionView?.delegate = nil
         self.collectionView?.dataSource = nil
@@ -145,22 +155,6 @@ extension ScreenshotsViewController{
                 if collectionView.numberOfItems(inSection: self.indexFor(section: .image) ) > 0 {
                     collectionView.contentOffset = CGPoint.init(x: collectionView.contentInset.left, y: -collectionView.contentInset.top)
                 }
-            }
-        }
-    }
-}
-
-extension ScreenshotsViewController: VideoDisplayingViewControllerDelegate {
-    func videoDisplayingViewControllerDidTapDone(_ viewController: UIViewController) {
-        self.dismiss(animated: true, completion: nil)
-    }
-    
-    @objc func contentSizeCategoryDidChange(_ notification:Notification) {
-        if self.isViewLoaded && self.view.window != nil {
-            let notificationSection = self.indexFor(section: .notification )
-            if self.collectionView.numberOfItems(inSection: notificationSection ) > 0 {
-                self.collectionView.reloadItems(at: [IndexPath(item: 0, section: notificationSection )])
-                
             }
         }
     }
@@ -302,7 +296,7 @@ extension ScreenshotsViewController {
     
     @objc fileprivate func emptyListViewDiscoverAction() {
         if let tabBarController = tabBarController as? MainTabBarController {
-            tabBarController.selectedIndex = MainTabBarController.TabIndex.discover.rawValue
+            tabBarController.goTo(tab: .discover)
         }
     }
 }
@@ -557,7 +551,7 @@ extension ScreenshotsViewController {
         setEditing(false, animated: true)
         
         if deleteScreenshotObjectIDs.count + toHideFromProductBarObjectIDs.count > 0 {
-            DataModel.sharedInstance.hide(screenshotOIDArray: deleteScreenshotObjectIDs)
+            DataModel.sharedInstance.hide(screenshotOIDArray: deleteScreenshotObjectIDs, kind: .multi)
             DataModel.sharedInstance.hideFromProductBar(toHideFromProductBarObjectIDs)
         }
         self.deleteScreenshotObjectIDs.removeAll()

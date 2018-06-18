@@ -12,7 +12,6 @@ PODS:
     - Branch/Core (= 0.25.0)
   - Branch/Core (0.25.0)
   - CardIO (5.4.1)
-  - Clarifai-Apple-SDK (3.0.0-beta14)
   - CreditCardValidator (0.4)
   - EggRating (0.1.5):
     - RateView
@@ -76,7 +75,6 @@ DEPENDENCIES:
   - Appsee
   - Branch
   - CardIO
-  - Clarifai-Apple-SDK (= 3.0.0-beta14)
   - CreditCardValidator
   - EggRating
   - FBSDKLoginKit
@@ -100,7 +98,6 @@ SPEC REPOS:
     - Bolts
     - Branch
     - CardIO
-    - Clarifai-Apple-SDK
     - CreditCardValidator
     - EggRating
     - FBSDKCoreKit
@@ -130,7 +127,6 @@ SPEC CHECKSUMS:
   Bolts: ac6567323eac61e203f6a9763667d0f711be34c8
   Branch: 127d29ab0a8866025eece1cf9e950ddb6f7d4070
   CardIO: 56983b39b62f495fc6dae9ad7cf875143df06443
-  Clarifai-Apple-SDK: 19a638c697dc7701dbb5edcfbfbf1750bf1507a3
   CreditCardValidator: 9f0814dd61682c004071a250d89327ca83514a48
   EggRating: 7f892b9b8da758689525caf9dcb1c9475f9d5139
   FBSDKCoreKit: 572b047a7e029bc44542bcf8a59414e7ff2b543e
@@ -153,6 +149,6 @@ SPEC CHECKSUMS:
   SwiftKeychainWrapper: 38952a3636320ae61bad3513cadd870929de7a4a
   Whisper: 169760fc4bab0abf24d5529f9276f95c25cf1025
 
-PODFILE CHECKSUM: 7ea2d3264e2d4c711e27aeda919f8da940c073d1
+PODFILE CHECKSUM: 3d51e87f0fa10ecce0aa72ec01d10aa6b527704e
 
 COCOAPODS: 1.5.3

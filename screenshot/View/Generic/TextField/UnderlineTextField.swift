@@ -19,6 +19,7 @@ class UnderlineTextField: UITextField {
             errorLabel.isHidden = (errorText == nil)
         }
     }
+
     var isInvalid: Bool = false {
         didSet {
             syncColors()
@@ -38,6 +39,7 @@ class UnderlineTextField: UITextField {
         
         syncColors()
         addSubview(underlineView)
+
         errorLabel.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(errorLabel)
         errorLabel.textColor = .red
@@ -78,6 +80,8 @@ class UnderlineTextField: UITextField {
     
     @objc fileprivate func textDidChange() {
         isInvalid = false
+
         self.errorText = nil
+
     }
 }

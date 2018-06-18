@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 
 class UpdatePromptHandler  {
-    private let appStoreURL = URL(string: "itms-apps://itunes.apple.com/app/id1254964391")!
+    private let appStoreURL = URL(string: Constants.itunesConnectApp)!
     
     private var rootViewController: UIViewController? {
         return UIApplication.shared.keyWindow?.rootViewController
