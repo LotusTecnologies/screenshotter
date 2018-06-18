@@ -320,14 +320,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
     }
     
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        let sectionType = productSectionType(forSection: section)
-        if sectionType == .product {
-            return self.products.count
-            
-        } else {
-            return self.relatedLooksManager.numberOfItems()
-        }
-        return 0
+        return productSectionType(forSection: section) == .product ? self.products.count : self.relatedLooksManager.numberOfItems()
     }
     
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
