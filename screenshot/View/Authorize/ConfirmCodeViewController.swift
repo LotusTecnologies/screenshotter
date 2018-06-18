@@ -37,7 +37,7 @@ class ConfirmCodeView: UIScrollView {
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.text = "authorize.confirm.title".localized
         titleLabel.textColor = .gray3
-        titleLabel.font = .screenshopFont(.hindSemibold, textStyle: .title1, staticSize: true)
+        titleLabel.font = .screenshopFont(.quicksandMedium, textStyle: .title1, staticSize: true)
         titleLabel.adjustsFontSizeToFitWidth = true
         titleLabel.minimumScaleFactor = 0.7
         addSubview(titleLabel)
@@ -54,6 +54,14 @@ class ConfirmCodeView: UIScrollView {
         contentView.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
         contentView.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
         
+        
+        let emailImageView = UIImageView(image: UIImage(named: "AuthorizeEmailSent"))
+        emailImageView.translatesAutoresizingMaskIntoConstraints = false
+        emailImageView.contentMode = .scaleAspectFit
+        contentView.addSubview(emailImageView)
+        emailImageView.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor).isActive = true
+        emailImageView.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
+
         
         let explainLabel = UILabel()
         explainLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -72,7 +80,7 @@ class ConfirmCodeView: UIScrollView {
         explainLabel.minimumScaleFactor = 0.7
         explainLabel.numberOfLines = -1
         contentView.addSubview(explainLabel)
-        explainLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: .extendedPadding).isActive = true
+        explainLabel.topAnchor.constraint(equalTo: emailImageView.bottomAnchor, constant: .extendedPadding).isActive = true
         explainLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant:.padding).isActive = true
         explainLabel.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor,constant:.padding).isActive = true
         contentView.bottomAnchor.constraint(equalTo: explainLabel.bottomAnchor, constant: .extendedPadding).isActive = true
@@ -82,15 +90,23 @@ class ConfirmCodeView: UIScrollView {
         addLayoutGuide(skipLayoutGuide)
         skipLayoutGuide.topAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
         
+        
+        let skipImage = UIImage(named: "OnboardingArrow")?.withHorizontallyFlippedOrientation()
+        
         cancelButton.translatesAutoresizingMaskIntoConstraints = false
         cancelButton.contentEdgeInsets = UIEdgeInsets(top: 6, left: .padding, bottom: 6, right: .padding)
         cancelButton.setTitle("generic.cancel".localized, for: .normal)
         cancelButton.setTitleColor(.gray3, for: .normal)
         cancelButton.setTitleColor(.gray5, for: .highlighted)
+        cancelButton.setImage(skipImage, for: .normal)
+        cancelButton.setImage(skipImage?.withRenderingMode(.alwaysTemplate), for: .highlighted)
+        cancelButton.tintColor = cancelButton.titleColor(for: .highlighted)
+        cancelButton.adjustInsetsForImage(withPadding: 6)
         addSubview(cancelButton)
         cancelButton.topAnchor.constraint(equalTo: skipLayoutGuide.bottomAnchor, constant: .padding).isActive = true
         cancelButton.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -_layoutMargins.bottom).isActive = true
         cancelButton.centerXAnchor.constraint(equalTo: layoutMarginsGuide.centerXAnchor).isActive = true
+
     }
 }
 
