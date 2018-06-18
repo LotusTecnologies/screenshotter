@@ -769,19 +769,22 @@ extension AssetSyncModel {
         }))
     }
   
-    
-    
-    func currencyParam() -> String {
-        guard let productCurrency = UserDefaults.standard.string(forKey: UserDefaultsKeys.productCurrency),
-            (!productCurrency.isEmpty && productCurrency != CurrencyMap.autoCode) else {
-                return ""
-        }
-        return "&force_currency=\(productCurrency)"
-    }
-    
     func augmentedUrl(offersURL: String, optionsMask: ProductsOptionsMask) -> URL? {
+        guard var components = URLComponents(string: offersURL) else {
+            return nil
+        }
+        if components.scheme == nil || !components.scheme!.hasPrefix("http") {
+            components.scheme = "https"
+        }
+        // Strip out any existing currency, feed or gender query parameters.
+        let filterOutNames = Set<String>(arrayLiteral: "currency", "feed", "gender")
+        var fixedQueryitems: [URLQueryItem] = components.queryItems?.filter { !filterOutNames.contains($0.name) } ?? []
         let isChild = optionsMask.rawValue & ProductsOptionsMask.sizeChild.rawValue > 0
         let isPlus = optionsMask.rawValue & ProductsOptionsMask.sizePlus.rawValue > 0
+        if let productCurrency = UserDefaults.standard.string(forKey: UserDefaultsKeys.productCurrency),
+          (!productCurrency.isEmpty && productCurrency != CurrencyMap.autoCode) {
+            fixedQueryitems.append(URLQueryItem(name: "force_currency", value: productCurrency))
+        }
 //        let userDefaults = UserDefaults.standard
 //        if userDefaults.object(forKey: UserDefaultsKeys.isUSC) == nil {
 //            return self.geoLocateIsUSC()
@@ -790,15 +793,16 @@ extension AssetSyncModel {
 //            return Promise(value: isUsc)
 //        }
         // Revert to never use USC.
-        // let sizeParamString = isPlus ? "&feed=craze_plus_size" : isChild ? "&feed=kids_craze" : isUsc ? "&feed=\(Constants.syteUscFeed)" : "&feed=\(Constants.syteNonUscFeed)"
-        let sizeParamString = isPlus ? "&feed=craze_plus_size" : isChild ? "&feed=kids_craze" : "&feed=\(Constants.syteNonUscFeed)"
-        var genderParamString = ""
+        // let sizeValue = isPlus ? "craze_plus_size" : isChild ? "kids_craze" : isUsc ? Constants.syteUscFeed : Constants.syteNonUscFeed
+        let sizeValue = isPlus ? "craze_plus_size" : isChild ? "kids_craze" : Constants.syteNonUscFeed
+        fixedQueryitems.append(URLQueryItem(name: "feed", value: sizeValue))
         if optionsMask.rawValue & ProductsOptionsMask.genderMale.rawValue > 0 {
-            genderParamString = isChild ? "&force_gender=boy" : "&force_gender=male"
+            fixedQueryitems.append(URLQueryItem(name: "force_gender", value: isChild ? "boy" : "male"))
         } else if optionsMask.rawValue & ProductsOptionsMask.genderFemale.rawValue > 0 {
-            genderParamString = isChild ? "&force_gender=girl" : "&force_gender=female"
+            fixedQueryitems.append(URLQueryItem(name: "force_gender", value: isChild ? "girl" : "female"))
         }
-        return URL(string: (offersURL.hasPrefix("//") ? "https:" : "") + offersURL + currencyParam() + sizeParamString + genderParamString)
+        components.queryItems = fixedQueryitems
+        return components.url
     }
     
     func saveShoppables(assetId: String, uploadedURLString: String, segments: [[String : Any]], optionsMask: ProductsOptionsMask = ProductsOptionsMask.global) { //-> Promise<[String]> {
@@ -847,6 +851,8 @@ extension AssetSyncModel {
                                          offersURL: offersURL,
                                          url: url,
                                          optionsMask: optionsMask)
+                } else {
+                    print("AssetSyncModel saveShoppables error forming augmentedUrl for shoppable offersURL:\(String(describing: segment["offers"]))")
                 }
             }
         }
