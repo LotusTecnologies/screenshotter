@@ -51,7 +51,7 @@
 "authorize.register.skipConfirm" = "Are you sure you want to skip? Your account won’t be created.";
 "authorize.confirm.title" = "Confirm Email";
 "authorize.confirm.code" = "Enter Code";
-"authorize.confirm.explaination" = "An email was sent to %@.\nPlease enter the code that you recieved in the email.";
+"authorize.confirm.explaination" = "An email was sent to %@.\nPlease click on the link that you recieved in the email.";
 
 "authorize.reset_password.enter" = "Enter new password";
 "authorize.reset_password.failed_alert.title" = "Passwords Don’t Match";

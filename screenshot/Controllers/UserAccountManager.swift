@@ -10,7 +10,8 @@ import Foundation
 import PromiseKit
 import Firebase
 import FBSDKLoginKit
-
+import FirebaseStorage
+import SDWebImage
 
 class FacebookProxy : NSObject, FBSDKLoginButtonDelegate {
     let (promise, fulfill, reject) = Promise<FBSDKLoginManagerLoginResult>.pending()
@@ -46,9 +47,19 @@ class UserAccountManager : NSObject {
         case unconfirmed
     }
     
-    
-    
+    var userFromLogin:User?
+    var user:User? {
+        get {
+            if let user = userFromLogin {
+                return user
+            }
+            return Auth.auth().currentUser
+            
+        }
+    }
     var email:String?
+    lazy var databaseRef:DatabaseReference = Database.database().reference()
+
     static let shared = UserAccountManager()
 
     var facebookProxy:FacebookProxy?
@@ -72,8 +83,7 @@ class UserAccountManager : NSObject {
         if let _ = mode?.value, let code = code?.value{
             
             if let confirmVC = AppDelegate.shared.window?.rootViewController?.childViewControllers.last as? ConfirmCodeViewController {
-                confirmVC._view.codeTextField.text = code
-                confirmVC.continueAction()
+                confirmVC.applyCode(code: code)
             }
             if let resetVC = AppDelegate.shared.window?.rootViewController?.childViewControllers.last as? ResetPasswordViewController {
                 resetVC._view.codeTextField.text = code
@@ -84,11 +94,7 @@ class UserAccountManager : NSObject {
         return handled
     }
     
-//    func downloadUserFiles() -> Promise<Void> {
-//
-//    }
-    
-    public func loginWithFacebook()  -> Promise<Void>{
+    public func loginWithFacebook(sendMeEmails:Bool)  -> Promise<Void>{
 
         return Promise<Void>.init(resolvers: { (fulfil, reject) in
             let proxy = FacebookProxy.init()
@@ -98,8 +104,14 @@ class UserAccountManager : NSObject {
                 Auth.auth().signInAndRetrieveData(with: credential, completion: { (result, error) in
                     if let error = error{
                         reject(error)
-                    }else {
+                    }else if let user = result?.user {
+                        self.userFromLogin = user
+                        self.databaseRef.child("users").child(user.uid).child("sendMeEmail").setValue(NSNumber.init(value: sendMeEmails))
+                        self.downloadAndReplaceUserData()
                         fulfil(())
+                    }else {
+                        reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+
                     }
                 })
             }).catch(execute: { (error) in
@@ -114,7 +126,7 @@ class UserAccountManager : NSObject {
         return createAccount(email:email.lowercased(), password: password, sendMeEmails:sendMeEmails).recover(execute: { (error) -> Promise<UserAccountManager.LoginOrCreateAccountResult> in
             let nsError = error as NSError
             if nsError.code == AuthErrorCode.emailAlreadyInUse.rawValue && nsError.domain == AuthErrorDomain {
-                return self.login(email: email.lowercased(), password: password)
+                return self.login(email: email.lowercased(), password: password, sendMeEmails:sendMeEmails)
             }
             return Promise.init(error: error)
         })
@@ -122,30 +134,33 @@ class UserAccountManager : NSObject {
     }
     
     
-    private func login(email:String, password:String) -> Promise<LoginOrCreateAccountResult>{
+    private func login(email:String, password:String, sendMeEmails:Bool) -> Promise<LoginOrCreateAccountResult>{
         return Promise<LoginOrCreateAccountResult>.init(resolvers: { (fulfil, reject) in
             
             Auth.auth().signIn(withEmail: email, password: password) { (authResult, error) in
                 
                 if let error = error {
                     reject(error)
-                }else{
-                    if let authResult = authResult {
-                        if authResult.user.isEmailVerified {
-                            fulfil(LoginOrCreateAccountResult.confirmed)
-                        }else{
-                            authResult.user.sendEmailVerification(completion: { (error) in
-                                if let error = error {
-                                    reject(error)
-                                }else{
-                                    fulfil(LoginOrCreateAccountResult.unconfirmed)
-                                }
-                            })
-                        }
+                }else if let authResult = authResult {
+                    let user = authResult.user
+                    self.userFromLogin = user
+                    self.databaseRef.child("users").child(user.uid).child("sendMeEmail").setValue(NSNumber.init(value: sendMeEmails))
+                    self.downloadAndReplaceUserData()
+                    if user.isEmailVerified {
+                        fulfil(LoginOrCreateAccountResult.confirmed)
                     }else{
-                        reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+                        user.sendEmailVerification(completion: { (error) in
+                            if let error = error {
+                                reject(error)
+                            }else{
+                                fulfil(LoginOrCreateAccountResult.unconfirmed)
+                            }
+                        })
                     }
+                }else{
+                    reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
                 }
+                
             }
         })
     }
@@ -155,9 +170,16 @@ class UserAccountManager : NSObject {
             Auth.auth().signInAnonymously() { (authResult, error) in
                 if let error = error {
                     reject(error)
-                }else{
+                }else  if let authResult = authResult {
+                    let user = authResult.user
+                    self.userFromLogin = user
+                    self.databaseRef.child("users").child(user.uid).child("sendMeEmail").setValue(NSNumber.init(value: sendMeEmails))
+                    self.downloadAndReplaceUserData()
                     fulfil(())
+                }else{
+                    reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
                 }
+                
             }
 
         })
@@ -167,35 +189,39 @@ class UserAccountManager : NSObject {
             Auth.auth().createUser(withEmail: email, password: password) { (authResult, error) in
                 if let error = error {
                     reject(error)
-                }else{
-                    if let authResult = authResult {
-                        if authResult.user.isEmailVerified {
-                            fulfil(LoginOrCreateAccountResult.confirmed)
-                        }else{
-                            authResult.user.sendEmailVerification(completion: { (error) in
-                                if let error = error {
-                                    reject(error)
-                                }else{
-                                    fulfil(LoginOrCreateAccountResult.unconfirmed)
-                                }
-                            })
-                        }
+                }else  if let authResult = authResult {
+                    let user = authResult.user
+                    self.userFromLogin = user
+                    self.databaseRef.child("users").child(user.uid).child("sendMeEmail").setValue(NSNumber.init(value: sendMeEmails))
+                    self.downloadAndReplaceUserData()
+                    if authResult.user.isEmailVerified {
+                        fulfil(LoginOrCreateAccountResult.confirmed)
                     }else{
-                        reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+                        authResult.user.sendEmailVerification(completion: { (error) in
+                            if let error = error {
+                                reject(error)
+                            }else{
+                                fulfil(LoginOrCreateAccountResult.unconfirmed)
+                            }
+                        })
                     }
+                }else{
+                    reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
                 }
+                
             }
         })
     }
     
     func confirmSignup(code:String) -> Promise<Void>{
         return Promise { fulfill, reject in
-            Auth.auth().verifyPasswordResetCode(code) { (string, error) in
-                
-            }
-            reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
-
-            
+            Auth.auth().applyActionCode(code, completion: { (error) in
+                if let error = error {
+                    reject(error)
+                }else{
+                    fulfill(())
+                }
+            })
         }
     }
     
@@ -349,6 +375,208 @@ extension UserAccountManager {
         alert.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .cancel, handler: nil))
         
         return alert
+    }
+}
+
+
+
+extension UserAccountManager {
+    private func favoriteToDictionary(favorite:Product){
+        
+    }
+    private func screenshotToDictionary(screenshot:Screenshot){
+        
+    }
+    func downloadAndReplaceUserData(){
+        if let user = self.user{
+            self.databaseRef.child("users").child(user.uid).child("screenshots").observeSingleEvent(of: .value) { (snapshot) in
+                for child in snapshot.children {
+                    if let child = child as? DataSnapshot,
+                        let dict = child.value as? NSDictionary,
+                        let assetId = dict["assetId"] as? String,
+                        let createdAtNumber = dict["createdAt"] as? NSNumber,
+                        let sourceString = dict["source"] as? String,
+                        let source = ScreenshotSource.init(rawValue: sourceString),
+                        let uploadedImageURL = dict["uploadedImageURL"] as? String
+                    {
+                        SDWebImageManager.shared().loadImage(with: URL.init(string: uploadedImageURL), options: [], progress: nil, completed: { (image, data, error, cache, bool, url) in
+                            DataModel.sharedInstance.performBackgroundTask({ (context) in
+                                let imageData:Data? =  {
+                                    if let data = data {
+                                        return data
+                                    }else if let i = image {
+                                        return AssetSyncModel.sharedInstance.data(for: i)
+                                    }
+                                    return nil
+                                }()
+                                if imageData != nil {
+                                    let createdAt = Date.init(timeIntervalSince1970: createdAtNumber.doubleValue)
+                                    let s = DataModel.sharedInstance.saveScreenshot(managedObjectContext: context,
+                                                                                    assetId: assetId,
+                                                                                    createdAt: createdAt,
+                                                                                    isRecognized: true,
+                                                                                    source:source ,
+                                                                                    isHidden: false,
+                                                                                    imageData: imageData,
+                                                                                    uploadedImageURL: uploadedImageURL,
+                                                                                    syteJsonString: nil)
+                                    if let trackingInfo = dict["trackingInfo"] as? String, trackingInfo.lengthOfBytes(using: .utf8) > 0 {
+                                        s.trackingInfo = trackingInfo
+                                    }
+                                    
+                                    AssetSyncModel.sharedInstance.processingQ.async {
+                                        AssetSyncModel.sharedInstance.syteProcessing(imageData: nil, orImageUrlString: uploadedImageURL, assetId: assetId, optionsMask: ProductsOptionsMask.global)
+                                        
+                                    }
+                                    context.saveIfNeeded()
+                                }
+                                
+                                
+                            })
+                        })
+                    }
+                    
+                }
+            }
+            
+            self.databaseRef.child("users").child(user.uid).child("favorite").observeSingleEvent(of: .value) { (snapshot) in
+                for child in snapshot.children {
+                    if let child = child as? DataSnapshot,
+                        let dict = child.value as? NSDictionary,
+                        let price = dict["price"] as? String,
+                        let imageURL = dict["imageURL"] as? String,
+                        let productDescription = dict["productDescription"] as? String,
+                        let offer = dict["offer"] as? String,
+                        let floatPriceNumber = dict["floatPrice"] as? NSNumber
+                        
+                    {
+                        let floatPrice = floatPriceNumber.floatValue
+                        let originalPrice = dict["originalPrice"] as? String
+                        var floatOriginalPrice:Float =  0
+                        if let p =  dict["floatOriginalPrice"] as? NSNumber {
+                            floatOriginalPrice = p.floatValue
+                        }
+                        let categories = dict["categories"] as? String
+                        let brand = dict["brand"] as? String
+                        let merchant = dict["merchant"] as? String
+                        let partNumber = dict["partNumber"] as? String
+                        let color = dict["color"] as? String
+                        let sku = dict["sku"] as? String
+                        let fallbackPriceNumber =  dict["fallbackPrice"] as? NSNumber
+                        let fallbackPrice = fallbackPriceNumber?.floatValue ?? 0.0
+                        var optionsMask = ProductsOptionsMask.global.rawValue
+                        if let option = dict["optionsMask"] as? NSNumber {
+                            optionsMask = option.intValue
+                        }
+                        DataModel.sharedInstance.performBackgroundTask({ (context) in
+                            let product = DataModel.sharedInstance.saveProduct(managedObjectContext: context,
+                                                                               shoppable: nil, order: 0,
+                                                                               productDescription: productDescription,
+                                                                               price: price,
+                                                                               originalPrice: originalPrice,
+                                                                               floatPrice: floatPrice,
+                                                                               floatOriginalPrice: floatOriginalPrice,
+                                                                               categories: categories,
+                                                                               brand: brand,
+                                                                               offer: offer,
+                                                                               imageURL: imageURL,
+                                                                               merchant: merchant,
+                                                                               partNumber:  partNumber,
+                                                                               color:  color,
+                                                                               sku: sku,
+                                                                               fallbackPrice: fallbackPrice,
+                                                                               optionsMask: Int32(optionsMask))
+                            
+                            
+                            context.saveIfNeeded()
+                            DataModel.sharedInstance.favorite(toFavorited: true, productOIDs: [product.objectID])
+                        })
+                    }
+                }
+            }
+        }
+    }
+    
+    func uploadFavorites(product:Product){
+        if let user = self.user,
+        let price = product.price,
+           let imageURL = product.imageURL,
+            let offer = product.offer,
+            let productDescription = product.productDescription
+        {
+            let floatPrice = product.floatPrice
+            let floatOriginalPrice = product.floatOriginalPrice
+            var dict:[String:Any] = ["price":price,
+                                     "imageURL":imageURL,
+                                     "floatPrice":floatPrice,
+                                     "floatOriginalPrice":floatOriginalPrice,
+                                     "offer":offer,
+                                     "productDescription":productDescription]
+            
+            if let merchant = product.merchant {
+                dict["merchant"] = merchant
+            }
+            if let categories = product.categories {
+                dict["categories"] = categories
+            }
+            if let originalPrice = product.originalPrice {
+                dict["originalPrice"] = originalPrice
+            }
+
+            if let brand = product.brand {
+                dict["brand"] = brand
+            }
+            
+            if let partNumber = product.partNumber {
+                dict["partNumber"] = partNumber
+            }
+            
+            if let color = product.color {
+                dict["color"] = color
+                
+            }
+            if let sku = product.sku {
+                dict["sku"] = sku
+                
+            }
+            dict["optionsMask"] = product.optionsMask
+            dict["fallbackPrice"] = NSNumber.init(value: product.fallbackPrice)
+            self.databaseRef.child("users").child(user.uid).child("favorites").child(offer).setValue(dict)
+        }
+    }
+    func deleteFavorite(product:Product){
+        if let user = self.user {
+            if let offer = product.offer {
+                self.databaseRef.child("users").child(user.uid).child("favorites").child(offer).removeValue()
+            }
+        }
+    }
+    
+    func deleteScreenshot(screenshot:Screenshot) {
+        if let assetId = screenshot.assetId, let user = self.user {
+            self.databaseRef.child("users").child(user.uid).child("screenshots").child(assetId).removeValue()
+        }
+        
+    }
+    func uploadScreenshots(screenshot:Screenshot){
+        
+        if let user = self.user,
+            let assetId = screenshot.assetId,
+            let createdAtNumber = screenshot.createdAt?.timeIntervalSince1970,
+            let uploadedImageURL = screenshot.uploadedImageURL {
+            let trackingInfo = screenshot.trackingInfo ?? ""
+            let source = screenshot.source.rawValue
+            let dict:[String:Any] = [
+                "assetId":assetId,
+                "createdAt":NSNumber.init(value: createdAtNumber as Double),
+                "source":source,
+                "uploadedImageURL":uploadedImageURL,
+                "trackingInfo" :trackingInfo
+                        ]
+            
+            self.databaseRef.child("users").child(user.uid).child("screenshots").child(assetId).setValue(dict)
+        }
+
     }
 }
 

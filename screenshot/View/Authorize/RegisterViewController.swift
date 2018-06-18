@@ -549,14 +549,14 @@ class RegisterViewController: UIViewController {
     // MARK: Facebook
     
     @objc fileprivate func facebookLoginAction() {
-       
-        UserAccountManager.shared.loginWithFacebook().then { (result) -> Void in
+        let sendMeEmails = self._view.dealsSwitch.isOn
+
+        UserAccountManager.shared.loginWithFacebook(sendMeEmails:sendMeEmails).then { (result) -> Void in
             let isExistingUser = false
             
             if isExistingUser {
                 self.delegate?.registerViewControllerDidFacebookLogin(self)
-            }
-            else {
+            } else {
                 self.delegate?.registerViewControllerDidFacebookSignup(self)
             }
             

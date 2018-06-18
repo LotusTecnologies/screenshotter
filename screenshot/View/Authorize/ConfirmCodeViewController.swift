@@ -14,8 +14,6 @@ protocol ConfirmCodeViewControllerDelegate: NSObjectProtocol {
 }
 
 class ConfirmCodeView: UIScrollView {
-    let codeTextField = UnderlineTextField()
-    let continueButton = MainButton()
     let cancelButton = UIButton()
     let _layoutMargins = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
     
@@ -48,6 +46,15 @@ class ConfirmCodeView: UIScrollView {
         titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: layoutMarginsGuide.trailingAnchor).isActive = true
         
         
+        
+        let contentView = ContentContainerView()
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(contentView)
+        contentView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: .padding).isActive = true
+        contentView.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
+        contentView.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
+        
+        
         let explainLabel = UILabel()
         explainLabel.translatesAutoresizingMaskIntoConstraints = false
         let text = "authorize.confirm.explaination".localized(withFormat: email)
@@ -59,60 +66,17 @@ class ConfirmCodeView: UIScrollView {
         if range.location != NSNotFound{
             attributedString.addAttribute(NSAttributedStringKey.foregroundColor, value: UIColor.gray2, range: range)
             attributedString.addAttribute(NSAttributedStringKey.font, value: UIFont.screenshopFont(.hindMedium, textStyle: .headline, staticSize: true), range: range)
-
+            
         }
         explainLabel.attributedText = attributedString
         explainLabel.minimumScaleFactor = 0.7
         explainLabel.numberOfLines = -1
-        addSubview(explainLabel)
-        explainLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: .padding).isActive = true
-        explainLabel.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
-        explainLabel.trailingAnchor.constraint(lessThanOrEqualTo: layoutMarginsGuide.trailingAnchor).isActive = true
-        
-        
-        
-        let contentView = ContentContainerView()
-        contentView.translatesAutoresizingMaskIntoConstraints = false
-        addSubview(contentView)
-        contentView.topAnchor.constraint(equalTo: explainLabel.bottomAnchor, constant: .padding).isActive = true
-        contentView.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
-        contentView.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
-        
-        let codeLabel = UILabel()
-        codeLabel.translatesAutoresizingMaskIntoConstraints = false
-        codeLabel.text = "authorize.confirm.code".localized
-        codeLabel.textColor = .gray2
-        codeLabel.font = .screenshopFont(.hindLight, textStyle: .body, staticSize: true)
-        codeLabel.adjustsFontSizeToFitWidth = true
-        codeLabel.minimumScaleFactor = 0.7
-        codeLabel.baselineAdjustment = .alignCenters
-        contentView.addSubview(codeLabel)
-        codeLabel.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor).isActive = true
-        codeLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
-        codeLabel.trailingAnchor.constraint(lessThanOrEqualTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
-        
-        codeTextField.translatesAutoresizingMaskIntoConstraints = false
-        codeTextField.placeholder = ""
-        codeTextField.autocorrectionType = .no
-        codeTextField.autocapitalizationType = .none
-        codeTextField.spellCheckingType = .no
-        codeTextField.returnKeyType = .next
-        codeTextField.textColor = .gray2
-        codeTextField.keyboardType = .numbersAndPunctuation
-        contentView.addSubview(codeTextField)
-        codeTextField.topAnchor.constraint(equalTo: codeLabel.bottomAnchor).isActive = true
-        codeTextField.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
-        codeTextField.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
-        
-      
-        continueButton.translatesAutoresizingMaskIntoConstraints = false
-        continueButton.backgroundColor = .crazeGreen
-        continueButton.setTitle("generic.submit".localized, for: .normal)
-        contentView.addSubview(continueButton)
-        continueButton.topAnchor.constraint(equalTo: codeTextField.bottomAnchor, constant: .extendedPadding).isActive = true
-        continueButton.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
-        continueButton.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor).isActive = true
-        continueButton.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
+        contentView.addSubview(explainLabel)
+        explainLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: .extendedPadding).isActive = true
+        explainLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant:.padding).isActive = true
+        explainLabel.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor,constant:.padding).isActive = true
+        contentView.bottomAnchor.constraint(equalTo: explainLabel.bottomAnchor, constant: .extendedPadding).isActive = true
+
         
         let skipLayoutGuide = UILayoutGuide()
         addLayoutGuide(skipLayoutGuide)
@@ -157,54 +121,36 @@ class ConfirmCodeViewController: UIViewController {
         
         inputViewAdjustsScrollViewController.scrollView = _view
         
-        _view.codeTextField.delegate = self
-        
-        _view.continueButton.addTarget(self, action: #selector(continueAction), for: .touchUpInside)
         _view.cancelButton.addTarget(self, action: #selector(cancelAction), for: .touchUpInside)
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         _view.addGestureRecognizer(tapGesture)
     }
-    
-    deinit {
-        _view.codeTextField.delegate = nil
-    }
-    
+
     // MARK: Actions
     
-    @objc func continueAction() {
-        if let code = _view.codeTextField.text {
-            _view.codeTextField.resignFirstResponder()
-            _view.continueButton.isLoading = true
-            _view.continueButton.isUserInteractionEnabled = false
-            _view.codeTextField.isUserInteractionEnabled = false
-            UserAccountManager.shared.confirmSignup(code: code).then(on: .main) { () -> Void in
-                    self.delegate?.confirmCodeViewControllerDidConfirm(self)
-                }.catch { (error) in
-                    DispatchQueue.main.async {
-                        let error = error as NSError
-                        if UserAccountManager.shared.isNoInternetError(error: error) {
-                            let alert = UserAccountManager.shared.alertViewForNoInternet()
-                            self.present(alert, animated: true, completion: nil)
-                        }else if UserAccountManager.shared.isBadCodeError(error: error) {
-                            let alert = UserAccountManager.shared.alertViewForBadCode()
-                            self.present(alert, animated: true, completion: nil)
-                        }else if UserAccountManager.shared.isCantSendEmailError(error: error), let email = self.email {
-                            let alert = UserAccountManager.shared.alertViewForCantSendEmail(email: email)
-                            self.present(alert, animated: true, completion: nil)
-                        }else {
-                            let alert = UserAccountManager.shared.alertViewForUndefinedError(error: error, viewController: self)
-                            self.present(alert, animated: true, completion: nil)
-                        }
+    func applyCode(code:String){
+        UserAccountManager.shared.confirmSignup(code: code).then(on: .main) { () -> Void in
+            self.delegate?.confirmCodeViewControllerDidConfirm(self)
+            }.catch { (error) in
+                DispatchQueue.main.async {
+                    let error = error as NSError
+                    if UserAccountManager.shared.isNoInternetError(error: error) {
+                        let alert = UserAccountManager.shared.alertViewForNoInternet()
+                        self.present(alert, animated: true, completion: nil)
+                    }else if UserAccountManager.shared.isBadCodeError(error: error) {
+                        let alert = UserAccountManager.shared.alertViewForBadCode()
+                        self.present(alert, animated: true, completion: nil)
+                    }else if UserAccountManager.shared.isCantSendEmailError(error: error), let email = self.email {
+                        let alert = UserAccountManager.shared.alertViewForCantSendEmail(email: email)
+                        self.present(alert, animated: true, completion: nil)
+                    }else {
+                        let alert = UserAccountManager.shared.alertViewForUndefinedError(error: error, viewController: self)
+                        self.present(alert, animated: true, completion: nil)
                     }
-                }.always {
-                    DispatchQueue.main.async {
-                        self._view.continueButton.isLoading = false
-                        self._view.continueButton.isUserInteractionEnabled = true
-                        self._view.codeTextField.isUserInteractionEnabled = true
-                    }
+                }
             }
-        }
+        
     }
     
     @objc private func cancelAction() {
@@ -220,14 +166,5 @@ class ConfirmCodeViewController: UIViewController {
     
     @objc fileprivate func dismissKeyboard() {
         view.endEditing(true)
-    }
-}
-
-extension ConfirmCodeViewController: UITextFieldDelegate {
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        if textField == _view.codeTextField {
-            _view.codeTextField.becomeFirstResponder()
-        }
-        return true
     }
 }
