@@ -769,7 +769,7 @@ extension ProductsViewControllerNoItemsHelperView{
             helperView.topAnchor.constraint(equalTo: self.topLayoutGuide.bottomAnchor).isActive = true
         }
         helperView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
-        helperView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
+        helperView.bottomAnchor.constraint(equalTo: self.bottomLayoutGuide.topAnchor).isActive = true
         helperView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
         
     }
