@@ -769,19 +769,22 @@ extension AssetSyncModel {
         }))
     }
   
-    
-    
-    func currencyParam() -> String {
-        guard let productCurrency = UserDefaults.standard.string(forKey: UserDefaultsKeys.productCurrency),
-            (!productCurrency.isEmpty && productCurrency != CurrencyMap.autoCode) else {
-                return ""
-        }
-        return "&force_currency=\(productCurrency)"
-    }
-    
     func augmentedUrl(offersURL: String, optionsMask: ProductsOptionsMask) -> URL? {
+        guard var components = URLComponents(string: offersURL) else {
+            return nil
+        }
+        if components.scheme == nil || !components.scheme!.hasPrefix("http") {
+            components.scheme = "https"
+        }
+        // Strip out any existing currency, feed or gender query parameters.
+        let filterOutNames = Set<String>(arrayLiteral: "currency", "feed", "gender")
+        var fixedQueryitems: [URLQueryItem] = components.queryItems?.filter { !filterOutNames.contains($0.name) } ?? []
         let isChild = optionsMask.rawValue & ProductsOptionsMask.sizeChild.rawValue > 0
         let isPlus = optionsMask.rawValue & ProductsOptionsMask.sizePlus.rawValue > 0
+        if let productCurrency = UserDefaults.standard.string(forKey: UserDefaultsKeys.productCurrency),
+          (!productCurrency.isEmpty && productCurrency != CurrencyMap.autoCode) {
+            fixedQueryitems.append(URLQueryItem(name: "force_currency", value: productCurrency))
+        }
 //        let userDefaults = UserDefaults.standard
 //        if userDefaults.object(forKey: UserDefaultsKeys.isUSC) == nil {
 //            return self.geoLocateIsUSC()
@@ -790,46 +793,68 @@ extension AssetSyncModel {
 //            return Promise(value: isUsc)
 //        }
         // Revert to never use USC.
-        // let sizeParamString = isPlus ? "&feed=craze_plus_size" : isChild ? "&feed=kids_craze" : isUsc ? "&feed=\(Constants.syteUscFeed)" : "&feed=\(Constants.syteNonUscFeed)"
-        let sizeParamString = isPlus ? "&feed=craze_plus_size" : isChild ? "&feed=kids_craze" : "&feed=\(Constants.syteNonUscFeed)"
-        var genderParamString = ""
+        // let sizeValue = isPlus ? "craze_plus_size" : isChild ? "kids_craze" : isUsc ? Constants.syteUscFeed : Constants.syteNonUscFeed
+        let sizeValue = isPlus ? "craze_plus_size" : isChild ? "kids_craze" : Constants.syteNonUscFeed
+        fixedQueryitems.append(URLQueryItem(name: "feed", value: sizeValue))
         if optionsMask.rawValue & ProductsOptionsMask.genderMale.rawValue > 0 {
-            genderParamString = isChild ? "&force_gender=boy" : "&force_gender=male"
+            fixedQueryitems.append(URLQueryItem(name: "force_gender", value: isChild ? "boy" : "male"))
         } else if optionsMask.rawValue & ProductsOptionsMask.genderFemale.rawValue > 0 {
-            genderParamString = isChild ? "&force_gender=girl" : "&force_gender=female"
+            fixedQueryitems.append(URLQueryItem(name: "force_gender", value: isChild ? "girl" : "female"))
         }
-        return URL(string: (offersURL.hasPrefix("//") ? "https:" : "") + offersURL + currencyParam() + sizeParamString + genderParamString)
+        components.queryItems = fixedQueryitems
+        return components.url
     }
     
     func saveShoppables(assetId: String, uploadedURLString: String, segments: [[String : Any]], optionsMask: ProductsOptionsMask = ProductsOptionsMask.global) { //-> Promise<[String]> {
-        for segment in segments {
-            guard let offersURL = segment["offers"] as? String,
-                let url = augmentedUrl(offersURL: offersURL, optionsMask: optionsMask),
-                let b0 = segment["b0"] as? [Any],
-                b0.count >= 2,
-                let b1 = segment["b1"] as? [Any],
-                b1.count >= 2,
-                let b0x = b0[0] as? Double,
-                let b0y = b0[1] as? Double,
-                let b1x = b1[0] as? Double,
-                let b1y = b1[1] as? Double else {
-                    print("AssetSyncModel error parsing offers, b0, b1")
-                    continue
+        let dataModel = DataModel.sharedInstance
+        self.performBackgroundTask(assetId: assetId, shoppableId: nil) { (managedObjectContext) in
+            guard let screenshot = dataModel.retrieveScreenshot(managedObjectContext: managedObjectContext, assetId: assetId) else {
+                print("AssetSyncModel saveShoppables error retreiving screenshot:\(assetId) to which to add shoppable and products")
+                return
             }
-            let relatedImagesURL = segment["related_looks"] as? String
-            let label = segment["label"] as? String
-            self.extractProducts(assetId: assetId,
-                                 uploadedURLString: uploadedURLString,
-                                 segments: segments,
-                                 offersURL: offersURL,
-                                 relatedImagesURL: relatedImagesURL,
-                                 optionsMask: optionsMask,
-                                 url: url,
-                                 label: label,
-                                 b0x: b0x,
-                                 b0y: b0y,
-                                 b1x: b1x,
-                                 b1y: b1y)
+            for segment in segments {
+                guard let offersURL = segment["offers"] as? String,
+                    let b0 = segment["b0"] as? [Any],
+                    b0.count >= 2,
+                    let b1 = segment["b1"] as? [Any],
+                    b1.count >= 2,
+                    let b0x = b0[0] as? Double,
+                    let b0y = b0[1] as? Double,
+                    let b1x = b1[0] as? Double,
+                    let b1y = b1[1] as? Double else {
+                        print("AssetSyncModel error parsing offers, b0, b1")
+                        continue
+                }
+                let relatedImagesURL = segment["related_looks"] as? String
+                let label = segment["label"] as? String
+                let _ = dataModel.saveShoppable(managedObjectContext: managedObjectContext,
+                                                screenshot: screenshot,
+                                                label: label,
+                                                offersURL: offersURL,
+                                                relatedImagesURL: relatedImagesURL,
+                                                b0x: b0x,
+                                                b0y: b0y,
+                                                b1x: b1x,
+                                                b1y: b1y,
+                                                optionsMask: optionsMask)
+                screenshot.shoppablesCount += 1
+                if screenshot.shoppablesCount == 1 {
+                    screenshot.syteJson = NetworkingPromise.sharedInstance.jsonStringify(object: segments)
+                    screenshot.uploadedImageURL = uploadedURLString
+                }
+            }
+            managedObjectContext.saveIfNeeded()
+            for segment in segments {
+                if let offersURL = segment["offers"] as? String,
+                  let url = self.augmentedUrl(offersURL: offersURL, optionsMask: optionsMask) {
+                    self.extractProducts(assetId: assetId,
+                                         offersURL: offersURL,
+                                         url: url,
+                                         optionsMask: optionsMask)
+                } else {
+                    print("AssetSyncModel saveShoppables error forming augmentedUrl for shoppable offersURL:\(String(describing: segment["offers"]))")
+                }
+            }
         }
     }
 
@@ -865,85 +890,63 @@ extension AssetSyncModel {
                                       fallbackPrice: fallbackPrice,
                                       optionsMask: optionsMask)
     }
-    
-    func extractProducts(assetId: String,
-                         uploadedURLString: String,
-                         segments: [[String : Any]],
-                         offersURL: String,
-                         relatedImagesURL: String?,
-                         optionsMask: ProductsOptionsMask,
-                         url: URL,
-                         label: String?,
-                         b0x: Double,
-                         b0y: Double,
-                         b1x: Double,
-                         b1y: Double) {
-        let optionsMask32 = Int32(optionsMask.rawValue)
+
+    func embeddedSaveShoppableWithProducts(assetId: String,
+                                           offersURL: String,
+                                           optionsMask: ProductsOptionsMask,
+                                           productsArray: [[String : Any]]) {
         let dataModel = DataModel.sharedInstance
-        
-        func embeddedSaveShoppableWithProducts(productsArray: [[String : Any]]) {
-            self.performBackgroundTask(assetId: assetId, shoppableId: offersURL) { (managedObjectContext) in
-                guard let screenshot = dataModel.retrieveScreenshot(managedObjectContext: managedObjectContext, assetId: assetId) else {
-                    print("AssetSyncModel extractProducts error retreiving screenshot:\(assetId) to which to add shoppable and products")
+        self.performBackgroundTask(assetId: assetId, shoppableId: offersURL) { (managedObjectContext) in
+            guard let screenshot = dataModel.retrieveScreenshot(managedObjectContext: managedObjectContext, assetId: assetId),
+                let shoppablesSet = screenshot.shoppables as? Set<Shoppable>,
+                let shoppable = shoppablesSet.first(where: { $0.offersURL == offersURL }) else {
+                    print("AssetSyncModel embeddedSaveShoppableWithProducts error retreiving screenshot:\(assetId) shoppable:\(offersURL) to which to add products")
                     return
-                }
-                let shoppable = dataModel.saveShoppable(managedObjectContext: managedObjectContext,
-                                                        screenshot: screenshot,
-                                                        label: label,
-                                                        offersURL: offersURL,
-                                                        relatedImagesURL: relatedImagesURL,
-                                                        b0x: b0x,
-                                                        b0y: b0y,
-                                                        b1x: b1x,
-                                                        b1y: b1y,
-                                                        optionsMask: optionsMask)
-                var productOrder: Int16 = 0
-                for prod in productsArray {
-                    self.saveProduct(managedObjectContext: managedObjectContext,
-                                     shoppable: shoppable,
-                                     productOrder: productOrder,
-                                     prod: prod,
-                                     optionsMask: optionsMask32)
-                    productOrder += 1
-                }
-                shoppable.productCount = productOrder
-                if productOrder == 0 {
-                    productOrder = -1
-                }
-                shoppable.productFilterCount = productOrder
-                if let productFilter = shoppable.productFilters?.anyObject() as? ProductFilter {
-                    productFilter.productCount = productOrder
-                } else {
-                    print("AssetSyncModel extractProducts no productFilter, productCount:\(productOrder)")
-                }
-                screenshot.shoppablesCount += 1
-                if screenshot.shoppablesCount == 1 {
-                    screenshot.syteJson = NetworkingPromise.sharedInstance.jsonStringify(object: segments)
-                    screenshot.uploadedImageURL = uploadedURLString
-                }
-                managedObjectContext.saveIfNeeded()
             }
-            Analytics.trackReceivedProductsFromSyte(productCount: productsArray.count, optionsMask: optionsMask.rawValue)
+            var productOrder: Int16 = 0
+            for prod in productsArray {
+                self.saveProduct(managedObjectContext: managedObjectContext,
+                                 shoppable: shoppable,
+                                 productOrder: productOrder,
+                                 prod: prod,
+                                 optionsMask: Int32(optionsMask.rawValue))
+                productOrder += 1
+            }
+            shoppable.productCount = productOrder
+            if productOrder == 0 {
+                productOrder = -1
+            }
+            shoppable.productFilterCount = productOrder
+            if let productFilter = shoppable.productFilters?.anyObject() as? ProductFilter {
+                productFilter.productCount = productOrder
+            } else {
+                print("AssetSyncModel extractProducts no productFilter, productCount:\(productOrder)")
+            }
+            managedObjectContext.saveIfNeeded()
         }
-        
+        Analytics.trackReceivedProductsFromSyte(productCount: productsArray.count, optionsMask: optionsMask.rawValue)
+    }
+
+    func extractProducts(assetId: String,
+                         offersURL: String,
+                         url: URL,
+                         optionsMask: ProductsOptionsMask) {
         self.downloadProductQueue.addOperation(AsyncOperation.init(timeout: 90, assetId: assetId, shoppableId: offersURL, completion: { (completion) in
-            
             NetworkingPromise.sharedInstance.downloadProductsWithRetry(url: url)
             .then(on: self.processingQ) { productsDict -> Void in
                 if let adsArray = productsDict["ads"] as? [[String : Any]],
                   adsArray.count > 0 {
-                    embeddedSaveShoppableWithProducts(productsArray: adsArray)
+                    self.embeddedSaveShoppableWithProducts(assetId: assetId, offersURL: offersURL, optionsMask: optionsMask, productsArray: adsArray)
                 } else {
                     print("AssetSyncModel extractProducts no products in ads, when NetworkPromise checks. productsDict:\(productsDict)")
-                    embeddedSaveShoppableWithProducts(productsArray: [])
+                    self.embeddedSaveShoppableWithProducts(assetId: assetId, offersURL: offersURL, optionsMask: optionsMask, productsArray: [])
                 }
             }.catch { error in
                 print("AssetSyncModel extractProducts parsing products error:\(error)")
-                embeddedSaveShoppableWithProducts(productsArray: [])
+                self.embeddedSaveShoppableWithProducts(assetId: assetId, offersURL: offersURL, optionsMask: optionsMask, productsArray: [])
             }.always {
                 completion()
             }
-            
         }))
     }
     

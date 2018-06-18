@@ -51,6 +51,11 @@ class ProductsViewController: BaseViewController {
             self.syncViewsAfterStateChange()
         }
     }
+    var productLoadingState:ProductsViewControllerState = .unknown {
+        didSet {
+            self.syncViewsAfterStateChange()
+        }
+    }
 
     var selectedShoppable:Shoppable?
 
@@ -71,6 +76,7 @@ class ProductsViewController: BaseViewController {
     fileprivate var shoppablesToolbar: ShoppablesToolbar?
     
     var loadingMonitor:AsyncOperationMonitor?
+    var productsLoadingMonitor:AsyncOperationMonitor?
 
     init(screenshot: Screenshot) {
         self.screenshot = screenshot
@@ -270,6 +276,12 @@ extension ProductsViewController: ShoppablesToolbarDelegate {
                 }else{
                     self.reloadProductsFor(shoppable: selectedShoppable)
                 }
+                if let p = self.productsLoadingMonitor {
+                    p.delegate = nil
+                }
+                self.productsLoadingMonitor = AsyncOperationMonitor.init(assetId: nil, shoppableId: selectedShoppable.offersURL, queues: AssetSyncModel.sharedInstance.queues, delegate: self)
+                self.updateLoadingState()
+                
             }else{
                 clearProductListAndStateLoading()
             }
@@ -566,7 +578,8 @@ extension ProductsViewControllerProducts{
         self.products = []
         self.relatedLooksManager.relatedLooks = nil
         self.scrollRevealController?.resetViewOffset()
-        
+        self.productLoadingState = .unknown
+
         self.products = self.productCollectionViewManager.productsForShoppable(shoppable, productsOptions: self.productsOptions)
 
         
@@ -736,7 +749,16 @@ extension ProductsViewController {
             self.productCollectionViewManager.stopAndRemoveLoader()
             self.hideNoItemsHelperView()
             self.rateView.isHidden = false
-        
+            
+            switch self.productLoadingState {
+            case .products, .unknown:
+                break;
+            case .loading:
+                self.productCollectionViewManager.startAndAddLoader(view: self.view)
+            case .retry:
+                self.productCollectionViewManager.stopAndRemoveLoader()
+                self.showNoItemsHelperView()
+            }
             
         case .retry:
             if #available(iOS 11.0, *) {} else {
@@ -780,7 +802,13 @@ extension ProductsViewControllerNoItemsHelperView{
     }
     
     @objc func noItemsRetryAction() {
-        AssetSyncModel.sharedInstance.refetchShoppables(screenshot: self.screenshot)
+        if self.screenshotLoadingState == .retry {
+            AssetSyncModel.sharedInstance.refetchShoppables(screenshot: self.screenshot)
+        } else if self.productLoadingState == .retry {
+            if let selectedShoppable = self.getSelectedShoppable(), let offersURL = selectedShoppable.offersURL {
+                AssetSyncModel.sharedInstance.reExtractProducts(assetId: self.screenshot.assetId, shoppableId: selectedShoppable.objectID, optionsMask: ProductsOptionsMask.global, offersURL: offersURL)
+            }
+        }
     }
 }
 
@@ -817,6 +845,24 @@ extension ProductsViewController : AsyncOperationMonitorDelegate {
             if state != self.screenshotLoadingState {
                 self.screenshotLoadingState = state
             }
+            
+            
+            let isProductLoading = self.productsLoadingMonitor?.didStart ?? false
+            let productState:ProductsViewControllerState = {
+                if self.products.count > 0 {
+                    return .products
+                }else{
+                    if isProductLoading {
+                        return .loading
+                    }else{
+                        return .retry
+                    }
+                }
+            }()
+            if productState != self.productLoadingState {
+                self.productLoadingState = productState
+            }
+            
         }
     }
     
