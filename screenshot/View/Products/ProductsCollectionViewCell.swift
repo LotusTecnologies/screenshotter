@@ -107,7 +107,6 @@ class ProductsCollectionViewCell : UICollectionViewCell {
             productView.translatesAutoresizingMaskIntoConstraints = false
             productView.placeholderImage = UIImage.init(named:"DefaultProduct")
             productView.contentMode = .scaleAspectFit
-            
             self.contentView.addSubview(productView)
             productView.topAnchor.constraint(equalTo: self.contentView.topAnchor).isActive = true
             productView.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor).isActive = true
@@ -124,7 +123,7 @@ class ProductsCollectionViewCell : UICollectionViewCell {
         let labelBackground = UIView()
         labelBackground.backgroundColor = .white
         labelBackground.translatesAutoresizingMaskIntoConstraints = false
-        productView.addSubview(labelBackground)
+        productView.contentView.addSubview(labelBackground)
         
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.numberOfLines = ProductsCollectionViewCell.titleLabelNumberOfLines
@@ -230,7 +229,7 @@ class ProductsCollectionViewCell : UICollectionViewCell {
             view.isHidden = true
             productView.addSubview(view)
             view.leadingAnchor.constraint(equalTo: productView.leadingAnchor).isActive = true
-            view.bottomAnchor.constraint(equalTo: productView.bottomAnchor, constant: -6).isActive = true
+            view.bottomAnchor.constraint(equalTo: productView.bottomAnchor, constant: -6 - ProductsCollectionViewCell.titleLabelHeight - ProductsCollectionViewCell.priceLabelHeight).isActive = true
             return view
         }()
         self.saleView = saleView
