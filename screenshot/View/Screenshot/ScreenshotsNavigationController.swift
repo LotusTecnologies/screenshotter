@@ -22,9 +22,8 @@ class ScreenshotsNavigationController: UINavigationController {
     
     init() {
         super.init(nibName: nil, bundle: nil)
-        screenshotsViewController.navigationItem.leftBarButtonItem = screenshotsViewController.editButtonItem
-        screenshotsViewController.navigationItem.rightBarButtonItem?.tintColor = .crazeRed
-        screenshotsViewController.navigationItem.rightBarButtonItem = UIBarButtonItem.init(image: UIImage.init(named: "NavigationBarAddPhotos"), style: .plain, target: self, action: #selector(pickerButtonPresses(_:)))
+        
+        screenshotsViewController.navigationItem.rightBarButtonItem = screenshotsViewController.editButtonItem
         screenshotsViewController.delegate = self
         
         self.restorationIdentifier = "ScreenshotsNavigationController"
@@ -80,9 +79,6 @@ extension ScreenshotsNavigationController {
         self.present(picker, animated: true, completion: nil)
         
         Analytics.trackOpenedPicker()
-    }
-    @objc func pickerButtonPresses(_ sender:Any) {
-        self.presentPickerViewController(openScreenshots: false)
     }
     
     @objc func pickerViewControllerDidCancel() {
@@ -228,16 +224,14 @@ extension ScreenshotsNavigationControllerPushPermission {
 
 extension ScreenshotsNavigationController : NetworkingIndicatorProtocol {
     func networkingIndicatorDidStart(type: NetworkingIndicatorType) {
-        if (self.activityBarButtonItem == nil) {
+        if self.activityBarButtonItem == nil {
             let activityView = UIActivityIndicatorView.init(activityIndicatorStyle: .white)
             activityView.color = .crazeRed
             activityView.startAnimating()
+            
             let barButtonItem = UIBarButtonItem(customView: activityView)
             self.activityBarButtonItem = barButtonItem
-            
-            if let currentItem = self.screenshotsViewController.navigationItem.leftBarButtonItems?.first {
-                self.screenshotsViewController.navigationItem.leftBarButtonItems = [currentItem, barButtonItem]
-            }
+            self.screenshotsViewController.navigationItem.leftBarButtonItem = barButtonItem
         }
         
         self.activityBarButtonItem?.tag += 1
@@ -246,11 +240,8 @@ extension ScreenshotsNavigationController : NetworkingIndicatorProtocol {
     func networkingIndicatorDidComplete(type: NetworkingIndicatorType) {
         self.activityBarButtonItem?.tag -= 1
         
-        if (self.activityBarButtonItem?.tag == 0) {
-            if let currentItem = self.screenshotsViewController.navigationItem.leftBarButtonItems?.first {
-                self.screenshotsViewController.navigationItem.leftBarButtonItems = [currentItem]
-            }
-            
+        if self.activityBarButtonItem?.tag == 0 {
+            self.screenshotsViewController.navigationItem.leftBarButtonItem = nil
             self.activityBarButtonItem = nil
         }
     }

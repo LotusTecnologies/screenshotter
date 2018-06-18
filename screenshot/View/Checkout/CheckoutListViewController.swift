@@ -31,7 +31,7 @@ class CheckoutListViewController: BaseViewController {
         addButton.imageView?.contentMode = .scaleAspectFit
         addButton.setTitleColor(.gray3, for: .normal)
         addButton.setTitleColor(.black, for: .highlighted)
-        addButton.adjustInsetsForImage(withPadding: 6)
+        addButton.adjustInsetsForImage()
         addButton.sizeToFit()
         tableView.tableFooterView = addButton
         

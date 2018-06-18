@@ -71,7 +71,7 @@ class ProfileViewController: UITableViewController {
         button.setTitle("profile.tell_friend".localized, for: .normal)
         button.addTarget(self, action: #selector(inviteAction), for: .touchUpInside)
         button.clipsToBounds = true
-        button.adjustInsetsForImage(withPadding: 6)
+        button.adjustInsetsForImage()
         view.addSubview(button)
         button.sizeToFit()
         button.setContentHuggingPriority(.required, for: .vertical)

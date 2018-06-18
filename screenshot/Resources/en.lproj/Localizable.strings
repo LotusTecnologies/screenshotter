@@ -310,6 +310,9 @@
 "screenshot.permission.push.message" = "Open your favorite apps and take screenshots of photos with clothes, then come back here to shop them!";
 "screenshot.permission.push.title" = "Start Screenshotting";
 
+"screenshots.actions.discover" = "Find New Looks";
+"screenshots.actions.upload" = "Upload Photo";
+
 "screenshots.delete.placeholder" = "Delete Items";
 "screenshots.delete.plural" = "Delete %d Items";
 "screenshots.delete.single" = "Delete %d Item";
