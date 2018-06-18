@@ -2,21 +2,6 @@ PODS:
   - Amplitude-iOS (4.2.1)
   - Analytics (3.6.9)
   - Appsee (2.4.1)
-  - AWSAuthCore (2.6.21):
-    - AWSCore (= 2.6.21)
-  - AWSCognito (2.6.21):
-    - AWSCore (= 2.6.21)
-  - AWSCognitoAuth (2.6.21):
-    - AWSCognitoIdentityProviderASF (= 1.0.1)
-  - AWSCognitoIdentityProvider (2.6.21):
-    - AWSCognitoIdentityProviderASF (= 1.0.1)
-    - AWSCore (= 2.6.21)
-  - AWSCognitoIdentityProviderASF (1.0.1)
-  - AWSCore (2.6.21)
-  - AWSFacebookSignIn (2.6.21):
-    - AWSAuthCore (= 2.6.21)
-    - FBSDKCoreKit (~> 4.0)
-    - FBSDKLoginKit (~> 4.0)
   - Bolts (1.9.0):
     - Bolts/AppLinks (= 1.9.0)
     - Bolts/Tasks (= 1.9.0)
@@ -35,9 +20,38 @@ PODS:
     - Bolts (~> 1.7)
   - FBSDKLoginKit (4.33.0):
     - FBSDKCoreKit
+  - Firebase/Auth (5.2.0):
+    - Firebase/CoreOnly
+    - FirebaseAuth (= 5.0.1)
+  - Firebase/Core (5.2.0):
+    - Firebase/CoreOnly
+    - FirebaseAnalytics (= 5.0.1)
+  - Firebase/CoreOnly (5.2.0):
+    - FirebaseCore (= 5.0.3)
+  - FirebaseAnalytics (5.0.1):
+    - FirebaseCore (~> 5.0)
+    - FirebaseInstanceID (~> 3.0)
+    - "GoogleToolboxForMac/NSData+zlib (~> 2.1)"
+    - nanopb (~> 0.3)
+  - FirebaseAuth (5.0.1):
+    - FirebaseCore (~> 5.0)
+    - GTMSessionFetcher/Core (~> 1.1)
+  - FirebaseCore (5.0.3):
+    - "GoogleToolboxForMac/NSData+zlib (~> 2.1)"
+  - FirebaseInstanceID (3.1.0):
+    - FirebaseCore (~> 5.0)
+  - GoogleToolboxForMac/Defines (2.1.4)
+  - "GoogleToolboxForMac/NSData+zlib (2.1.4)":
+    - GoogleToolboxForMac/Defines (= 2.1.4)
+  - GTMSessionFetcher/Core (1.1.15)
   - Hero (1.2.0)
   - KochavaTrackeriOS (3.5.0)
   - lottie-ios (2.5.0)
+  - nanopb (0.3.8):
+    - nanopb/decode (= 0.3.8)
+    - nanopb/encode (= 0.3.8)
+  - nanopb/decode (0.3.8)
+  - nanopb/encode (0.3.8)
   - PhoneNumberKit (2.1.0):
     - PhoneNumberKit/PhoneNumberKitCore (= 2.1.0)
     - PhoneNumberKit/UIKit (= 2.1.0)
@@ -60,16 +74,14 @@ DEPENDENCIES:
   - Amplitude-iOS (~> 4.2.1)
   - Analytics (~> 3.0)
   - Appsee
-  - AWSCognito
-  - AWSCognitoAuth
-  - AWSCognitoIdentityProvider
-  - AWSCore
-  - AWSFacebookSignIn
   - Branch
   - CardIO
   - Clarifai-Apple-SDK (= 3.0.0-beta14)
   - CreditCardValidator
   - EggRating
+  - FBSDKLoginKit
+  - Firebase/Auth
+  - Firebase/Core
   - Hero
   - KochavaTrackeriOS
   - lottie-ios
@@ -85,13 +97,6 @@ SPEC REPOS:
     - Amplitude-iOS
     - Analytics
     - Appsee
-    - AWSAuthCore
-    - AWSCognito
-    - AWSCognitoAuth
-    - AWSCognitoIdentityProvider
-    - AWSCognitoIdentityProviderASF
-    - AWSCore
-    - AWSFacebookSignIn
     - Bolts
     - Branch
     - CardIO
@@ -100,9 +105,17 @@ SPEC REPOS:
     - EggRating
     - FBSDKCoreKit
     - FBSDKLoginKit
+    - Firebase
+    - FirebaseAnalytics
+    - FirebaseAuth
+    - FirebaseCore
+    - FirebaseInstanceID
+    - GoogleToolboxForMac
+    - GTMSessionFetcher
     - Hero
     - KochavaTrackeriOS
     - lottie-ios
+    - nanopb
     - PhoneNumberKit
     - PromiseKit
     - RateView
@@ -114,13 +127,6 @@ SPEC CHECKSUMS:
   Amplitude-iOS: 84da24ca8557fa3741888502c30c0b8b365acd7d
   Analytics: 6541ce337e99d9f7a2240a8b3953940a7be5f998
   Appsee: ab8b0317b0a5217d08637f61dbddaba2c9748f2a
-  AWSAuthCore: f912e4f032092818ee21860a44386c485329a92b
-  AWSCognito: ddd3d4cb90dc0adb47acd199ca9bbe48ea1d18a7
-  AWSCognitoAuth: cf6bcf6613fc074f3fde7df8073d423cd43ddbae
-  AWSCognitoIdentityProvider: 1f724c5e43528580cd9f60f0a1290888793ed473
-  AWSCognitoIdentityProviderASF: f94f1a502e72ef3d0a1de93e10bf7a79c8698118
-  AWSCore: a1ff1d32ea7af235fe64be301c204b34cb1f9f83
-  AWSFacebookSignIn: b18b9e83eb6b117f94c11c4a4e014bbb58b07bfa
   Bolts: ac6567323eac61e203f6a9763667d0f711be34c8
   Branch: 127d29ab0a8866025eece1cf9e950ddb6f7d4070
   CardIO: 56983b39b62f495fc6dae9ad7cf875143df06443
@@ -129,9 +135,17 @@ SPEC CHECKSUMS:
   EggRating: 7f892b9b8da758689525caf9dcb1c9475f9d5139
   FBSDKCoreKit: 572b047a7e029bc44542bcf8a59414e7ff2b543e
   FBSDKLoginKit: 88cb456349cfb3b554427ce4f8b43729d85dfb40
+  Firebase: 25ed0412036d7d008568d1fb4d2e9d81ea8a0a2c
+  FirebaseAnalytics: b3628aea54c50464c32c393fb2ea032566e7ecc2
+  FirebaseAuth: 463b8ce33bd5d05f706dcd4615499e3212b4132b
+  FirebaseCore: a3c87242451633fff8490183898075ce77d168d2
+  FirebaseInstanceID: 05d779cbb97bd5bd5c51a38a903fc9cfe1b2454a
+  GoogleToolboxForMac: 91c824d21e85b31c2aae9bb011c5027c9b4e738f
+  GTMSessionFetcher: 5fa5b80fd20e439ef5f545fb2cb3ca6c6714caa2
   Hero: 33dadf2cd1c98af71e213dcbc2902e6e03622a4e
   KochavaTrackeriOS: b612efe2ddaead7e9aa8faf54e0ed96fb027a0ee
   lottie-ios: d699fdee68d7b63e721d949388b015fef1aaa4ac
+  nanopb: 5601e6bca2dbf1ed831b519092ec110f66982ca3
   PhoneNumberKit: 62003f40ff75315fd3738286558bc365365ac222
   PromiseKit: 743e497a5f505a470d3bbbf4ce0663c1268af0a4
   RateView: d4d12e9bb76dc23a77a56f4e5c5fb530a3f3f998
@@ -139,6 +153,6 @@ SPEC CHECKSUMS:
   SwiftKeychainWrapper: 38952a3636320ae61bad3513cadd870929de7a4a
   Whisper: 169760fc4bab0abf24d5529f9276f95c25cf1025
 
-PODFILE CHECKSUM: 465967bfa06c25dc323d420c6e4b610b66233d5c
+PODFILE CHECKSUM: 7ea2d3264e2d4c711e27aeda919f8da940c073d1
 
 COCOAPODS: 1.5.3

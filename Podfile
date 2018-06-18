@@ -21,12 +21,10 @@ target 'screenshot' do
     pod 'Whisper'
     pod 'PhoneNumberKit'
     pod 'CardIO'
-    pod 'AWSCore'
-    pod 'AWSCognito'
-    pod 'AWSCognitoAuth'
-    pod 'AWSCognitoIdentityProvider'
-    pod 'AWSFacebookSignIn'
     pod 'Hero'
+    pod 'Firebase/Core'
+    pod 'Firebase/Auth'
+    pod 'FBSDKLoginKit'
 end
 
 post_install do |installer|

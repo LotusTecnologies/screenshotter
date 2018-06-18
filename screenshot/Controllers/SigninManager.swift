@@ -8,17 +8,13 @@
 
 import Foundation
 import PromiseKit
-import AWSCognito
-import AWSCognitoIdentityProviderASF
-import AWSCore
-import AWSCognitoIdentityProvider
-import AWSFacebookSignIn
+import Firebase
+import FBSDKLoginKit
 
 class SigninManager : NSObject {
     enum LoginOrCreateAccountResult {
         case login
-        case createAccountUnconfirmed
-        case createAccountConfirmed
+        case createAccount
     }
     
     enum UserAttribute : String{
@@ -33,62 +29,43 @@ class SigninManager : NSObject {
 
     }
     
+    var email:String?
     static let shared = SigninManager()
 
-    var userAccountsCreatedByApp:[String] = UserDefaults.standard.object(forKey: UserDefaultsKeys.userAccountsCreatedByDevice) as? [String] ?? [] {
-        didSet{
-            UserDefaults.standard.setValue(userAccountsCreatedByApp, forKey: UserDefaultsKeys.userAccountsCreatedByDevice)
-        }
-    }
-    var user:AWSCognitoIdentityUser?
-    
-    var email:String? {
-        didSet{
-            UserDefaults.standard.set(email, forKey: UserDefaultsKeys.email)
-        }
-    }
-    var userAttributes:[AWSCognitoIdentityProviderAttributeType]?
-    var pool:AWSCognitoIdentityUserPool?
-
-    var facebook = AWSFacebookSignInProvider.sharedInstance()
-    private var userCredential:AWSCredentials? {
-        didSet {
-            let secretKey = userCredential?.secretKey ?? ""
-            let accessKey = userCredential?.accessKey ?? ""
-            let sessionKey = userCredential?.sessionKey ?? ""
-            let expiration = userCredential?.expiration ?? Date.init(timeIntervalSince1970: 0)
-            UserDefaults.standard.set(["secretKey":secretKey,"accessKey":accessKey,"sessionKey":sessionKey,"expiration":expiration  ], forKey: UserDefaultsKeys.awsCred)
-        }
-    }
-    
     override init() {
         
-        let credentialsProvider = AWSCognitoCredentialsProvider.init(regionType: .USEast1, identityPoolId: "us-east-1:dfdfa4f8-0991-4af5-9cc7-999eeb98a6b5")
-        
-        let serviseConfig = AWSServiceConfiguration.init(region: .USEast1, credentialsProvider: credentialsProvider)
-        let cognitoIdentityUserPoolConfiguration = AWSCognitoIdentityUserPoolConfiguration.init(clientId: "2g32lvnd3iui7nnul4k4qs8lh3", clientSecret: "of5kkq70mvo4f1i4k7j7b4n8k4imfseed83pd9ia8e6f5i7uuek", poolId: "us-east-1_AqZGFLzds", shouldProvideCognitoValidationData: true, pinpointAppId: "screenshop", migrationEnabled: true)
-        AWSCognitoIdentityUserPool.register(with: serviseConfig, userPoolConfiguration: cognitoIdentityUserPoolConfiguration, forKey: "craze")
-        self.pool = AWSCognitoIdentityUserPool.init(forKey: "craze")
-        
-        AWSSignInManager.sharedInstance().register(signInProvider: self.facebook)
+       
         super.init()
-        
-        self.pool?.delegate = self
 
     }
     
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        self.facebook.interceptApplication(application, didFinishLaunchingWithOptions: launchOptions)
+        FirebaseApp.configure()
+
+//        self.facebookLogin.interceptApplication(application, didFinishLaunchingWithOptions: launchOptions)
         return true
     }
     
     func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any]) -> Bool {
         var handled = false
-        if !handled{
-            let source = options[.sourceApplication] as? String
-            let annotation = options[.annotation]
-            handled = self.facebook.interceptApplication(app, open: url, sourceApplication: source, annotation: annotation ?? "")
+        let source = options[.sourceApplication] as? String
+        let annotation = options[.annotation]
+
+        let queryParams = URLComponents.init(string: url.absoluteString)
+        let mode = queryParams?.queryItems?.first(where: {$0.name == "mode"})
+        let code = queryParams?.queryItems?.first(where: {$0.name == "oobCode"})
+        if let _ = mode?.value, let code = code?.value{
+            
+            if let confirmVC = AppDelegate.shared.window?.rootViewController?.childViewControllers.last as? ConfirmCodeViewController {
+                confirmVC._view.codeTextField.text = code
+                confirmVC.continueAction()
+            }
+            if let resetVC = AppDelegate.shared.window?.rootViewController?.childViewControllers.last as? ResetPasswordViewController {
+                resetVC._view.codeTextField.text = code
+            }
+            
+            return true
         }
         return handled
     }
@@ -98,20 +75,12 @@ class SigninManager : NSObject {
     
     public func loginWithFacebook()  -> Promise<Void>{
         return Promise<Void>.init(resolvers: { (fulfil, reject) in
-            AWSSignInManager.sharedInstance().login(signInProviderKey: self.facebook.identityProviderName, completionHandler: { (result, error) in
-                if let error = error {
-                    reject(error)
-                }else if let result = result{
-                    if let credentials = result as? AWSCredentials {
-                        self.userCredential = credentials
-                        fulfil(())
-                    }else{
-                        reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
-                    }
-                }else{
-                    reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
-                }
-            })
+            let loginButton = FBSDKLoginButton()
+            loginButton.delegate = self
+            loginButton.sendActions(for: .touchUpInside)
+            
+            reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+            
         })
     }
     
@@ -120,140 +89,70 @@ class SigninManager : NSObject {
         
         return createAccount(email:email.lowercased(), password: password, sendMeEmails:sendMeEmails).recover(execute: { (error) -> Promise<SigninManager.LoginOrCreateAccountResult> in
             let nsError = error as NSError
-            let usernameExistsException = 37
-            if nsError.code == usernameExistsException && nsError.domain == AWSCognitoIdentityProviderErrorDomain {
-                return self.login(email: email.lowercased(), password: password).recover(execute: { (error) -> Promise<SigninManager.LoginOrCreateAccountResult> in
-                    let nsError = error as NSError
-                    let userNotConfirmedException = 33
-                    if nsError.code == userNotConfirmedException && nsError.domain == AWSCognitoIdentityProviderErrorDomain {
-                        if self.userAccountsCreatedByApp.contains(email.lowercased()) {
-                            return self.resendConfirmCode(email: email.lowercased()).then(execute: { () -> (Promise<LoginOrCreateAccountResult>) in
-                                return Promise.init(value: .createAccountUnconfirmed)
-                            })
-                        }else{
-                            return self.deleteUnconfirmedAccount(email: email.lowercased()).then(execute: { () -> Promise<LoginOrCreateAccountResult> in
-                                return self.createAccount(email: email.lowercased(), password: password, sendMeEmails: sendMeEmails)
-                            })
-                        }
-                    }
-                    return Promise.init(error: nsError)
-                })
+            if nsError.code == AuthErrorCode.emailAlreadyInUse.rawValue && nsError.domain == AuthErrorDomain {
+                return self.login(email: email.lowercased(), password: password)
             }
-            return Promise.init(error: nsError)
+            return Promise.init(error: error)
         })
         
     }
-    private func deleteUnconfirmedAccount(email:String) -> Promise<Void>{
-        let poolId = self.pool?.userPoolConfiguration.poolId ?? ""
-        return NetworkingPromise.sharedInstance.deleteAccount(email: email, poolId: poolId)
-    }
+    
     
     private func login(email:String, password:String) -> Promise<LoginOrCreateAccountResult>{
         return Promise<LoginOrCreateAccountResult>.init(resolvers: { (fulfil, reject) in
             
-            if let pool = self.pool, let userName = email.sha1() {
-                let emailAttribute = AWSCognitoIdentityUserAttributeType.init(name: "email", value: email)
+            Auth.auth().signIn(withEmail: email, password: password) { (user, error) in
                 
-                let user = pool.getUser(userName)
-                self.user = user
-                self.email = email.lowercased()
-
-                user.getSession(userName, password: password, validationData: [emailAttribute]).continueWith { (task) -> Any? in
-                    if let error = task.error {
-                        reject(error)
-                    }else{
-                        user.getDetails().continueWith(block: { (task) -> Any? in
-                            if let result = task.result, let userAttributes = result.userAttributes {
-                                self.userAttributes = userAttributes
-                                userAttributes.forEach({ (attr) in
-                                    if attr.name == UserAttribute.name.rawValue, let value = attr.value {
-                                        UserDefaults.standard.set(value, forKey: UserDefaultsKeys.name)
-                                    }
-                                })
-                            }
-                            return nil
-                        })
-                        fulfil(LoginOrCreateAccountResult.login)
-                    }
-                    return task
+                if let error = error {
+                    reject(error)
+                }else{
+                    fulfil(LoginOrCreateAccountResult.login)
                 }
-                
-                
-            }else{
-                reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
             }
+
         })
     }
     @discardableResult func makeAnonAccount(sendMeEmails:Bool) -> Promise<Void> {
         return Promise<Void>.init(resolvers: { (fulfil, reject) in
-//            let anon = awsanonsign.init()
-//            AWSSignInManager
-//            AWSSignInManager.sharedInstance().login(signInProviderKey: , completionHandler: { (result, error) in
-//                
-//            })
-//            
-            
-            if let user = pool?.getUser() {
-                self.user = user
-                user.getSession().continueWith(block: { (task) -> Any? in
-                    if let error = task.error {
-                        reject(error)
-                    }else{
-                       let _ = self.set(attribute: UserAttribute.sendMeEmails, value: sendMeEmails)
-                        fulfil(())
-                    }
-                    return task
-                })
-            }else{
-                reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+            Auth.auth().signInAnonymously() { (authResult, error) in
+                if let error = error {
+                    reject(error)
+                }else{
+                    fulfil(())
+                }
             }
+
         })
     }
     private func createAccount(email:String, password:String, sendMeEmails:Bool) -> Promise<LoginOrCreateAccountResult>{
         return Promise<LoginOrCreateAccountResult>.init(resolvers: { (fulfil, reject) in
-            let email = email.lowercased()
-            let emailAttribute = AWSCognitoIdentityUserAttributeType.init(name: "email", value: email)
-            let sendMeEmailsAttribute = AWSCognitoIdentityUserAttributeType.init(name: "custom:SendMeEmails", value: sendMeEmails.toStringLiteral())
-
-            if let pool = self.pool, let userName = email.sha1() {
-                pool.signUp(userName, password: password, userAttributes: [emailAttribute, sendMeEmailsAttribute], validationData: nil).continueWith(executor: AWSExecutor.mainThread(), block: { (task) -> Any? in
-                    if let error = task.error  {
-                        reject(error)
-                    }else if let user = task.result?.user {
-                        self.userAccountsCreatedByApp = self.userAccountsCreatedByApp + [email]
-                        self.user = user
-                        self.email = email.lowercased()
-                        if user.confirmedStatus == .confirmed {
-                            fulfil(LoginOrCreateAccountResult.createAccountConfirmed)
-                        }else {
-                            fulfil(LoginOrCreateAccountResult.createAccountUnconfirmed)
+            Auth.auth().createUser(withEmail: email, password: password) { (authResult, error) in
+                if let error = error {
+                    reject(error)
+                }else{
+                    let settings = ActionCodeSettings.init()
+                    settings.handleCodeInApp = true
+                    Auth.auth().sendSignInLink(toEmail: email.lowercased(), actionCodeSettings:settings , completion: { (error) in
+                        if let error = error {
+                            reject(error)
+                        }else{
+                            fulfil(LoginOrCreateAccountResult.createAccount)
                         }
-                    }else{
-                        reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
-                    }
-                    return nil
-                })
-            }else{
-                reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+                    })
+                    
+                }
             }
+
         })
     }
     
     func confirmSignup(code:String) -> Promise<Void>{
         return Promise { fulfill, reject in
-            if let user = self.user{
-                user.confirmSignUp(code, forceAliasCreation: true).continueWith(executor: AWSExecutor.mainThread(), block: { (task) -> Any? in
-                    if let error = task.error  {
-                        let nserror = error as NSError
-                        reject(nserror)
-                    }else{
-                        fulfill(())
-                    }
-                    return nil
-                })
-            }else{
-                reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+            Auth.auth().verifyPasswordResetCode(code) { (string, error) in
+                
             }
+            reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+
             
         }
     }
@@ -261,22 +160,8 @@ class SigninManager : NSObject {
     func resendConfirmCode(email:String) -> Promise<Void>{
        
         return Promise { fulfill, reject in
-            if let userName = email.lowercased().sha1(), let pool = self.pool{
-                
-                let user = pool.getUser(userName)
-                self.user = user
-                self.email = email.lowercased()
-                user.resendConfirmationCode().continueWith(executor: AWSExecutor.mainThread(), block: { (task) -> Any? in
-                    if let error = task.error  {
-                        reject(error)
-                    }else{
-                        fulfill(())
-                    }
-                    return nil
-                })
-            }else{
-                reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
-            }
+            reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+
         }
     }
     
@@ -289,53 +174,35 @@ class SigninManager : NSObject {
     
     func forgotPassword(email:String) ->Promise<Void> {
         return Promise { fulfill, reject in
-            if self.user == nil {
-                self.user = self.pool?.getUser(email)
-                self.email = email.lowercased()
-            }
-            if let user = self.user  {
-                user.forgotPassword().continueWith(executor: AWSExecutor.mainThread(), block: { (task) -> Any? in
-                    if let error = task.error {
-                        let nserror = error as NSError
-                        reject(nserror)
-                    }else{
-                        fulfill(())
-                    }
-                    return nil
-                })
-            }else{
-                reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
-            }            
+            Auth.auth().sendPasswordReset(withEmail: email, completion: { (error) in
+                if let error = error {
+                    reject(error)
+                }else{
+                    fulfill(())
+                }
+            })
+
         }
     }
     
     func confirmForgotPassword(code:String, password:String) ->Promise<Void> {
         return Promise { fulfill, reject in
-            if let user = self.user {
-                user.confirmForgotPassword(code, password: password).continueWith(executor: AWSExecutor.mainThread(), block: { (task) -> Any? in
-                    if let error = task.error {
-                        reject(error)
-                    }else{
-                        fulfill(())
-                    }
-                    return nil
-                })
-            }else{
-                reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
-            }
+            Auth.auth().confirmPasswordReset(withCode: code, newPassword: password, completion: { (error) in
+                if let error = error {
+                    reject(error)
+                }else{
+                    fulfill(())
+                }
+            })
+            reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+
         }
     }
     
     func signOut() -> Promise<Void>{
         return Promise { fulfill, reject in
-            AWSSignInManager.sharedInstance().logout(completionHandler: { (result, error) in
-                if let error = error {
-                    let nserror = error as NSError
-                    reject(nserror)
-                }else{
-                    fulfill(())
-                }
-            })
+            reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+
         }
     }
     
@@ -344,34 +211,26 @@ class SigninManager : NSObject {
     }
     func set(attribute:UserAttribute, value:String) -> Promise<Void> {
         return Promise { fulfill, reject in
-            if let user = self.user {
-                user.update([AWSCognitoIdentityUserAttributeType.init(name: attribute.rawValue, value: value)]).continueWith { (task) -> Any? in
-                    if let error = task.error {
-                        reject(error)
-                    }else{
-                        fulfill(())
-                    }
-                    return nil
-                }
-            }else{
-                reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
-                
-            }
+            reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
         }
 
     }
 
 }
-
+extension SigninManager :FBSDKLoginButtonDelegate {
+    func loginButton(_ loginButton: FBSDKLoginButton!, didCompleteWith result: FBSDKLoginManagerLoginResult!, error: Error!) {
+        
+    }
+    
+    func loginButtonDidLogOut(_ loginButton: FBSDKLoginButton!) {
+        
+    }
+    
+    
+}
 extension SigninManager {
     public func isNoInternetError( error:NSError) ->Bool {
-        if error.domain == AWSCognitoErrorDomain{
-            if let code = AWSCognitoErrorType.init(rawValue: error.code) {
-                if code == .errorTimedOutWaitingForInFlightSync || code == .errorWiFiNotAvailable {
-                    return true
-                }
-            }
-        }else if error.domain == NSURLErrorDomain {
+        if error.domain == NSURLErrorDomain {
             return true
         }
         return  false
@@ -401,11 +260,7 @@ extension SigninManager {
         return alert
     }
     public func isBadCodeError( error:NSError) ->Bool {
-        if error.code == AWSCognitoIdentityProviderErrorType.codeMismatch.rawValue && error.domain == AWSCognitoIdentityProviderErrorDomain {
-            return true
-        }else if error.code == AWSCognitoIdentityProviderErrorType.expiredCode.rawValue && error.domain == AWSCognitoIdentityProviderErrorDomain {
-            return true
-        }
+        
         return  false
     }
     func alertViewForBadCode()  -> UIAlertController {
@@ -414,9 +269,7 @@ extension SigninManager {
         return alert
     }
     public func isNoAccountWithEmailError( error:NSError) ->Bool {
-        if error.code == AWSCognitoIdentityProviderErrorType.userNotFound.rawValue, error.domain == AWSCognitoIdentityProviderErrorDomain {
-            return true
-        }
+       
         return  false
     }
     func alertViewForNoAccountWithEmail() -> UIAlertController  {
@@ -426,11 +279,7 @@ extension SigninManager {
         return alert
     }
     public func isCantSendEmailError( error:NSError) ->Bool {
-        if error.code == AWSCognitoIdentityProviderErrorType.invalidParameter.rawValue, error.domain == AWSCognitoIdentityProviderErrorDomain,  let message = error.userInfo["message"] as? String, message == "Invalid email address format." {
-            return true
-        }else if error.code == AWSCognitoIdentityProviderErrorType.codeDeliveryFailure.rawValue && error.domain == AWSCognitoIdentityProviderErrorDomain {
-               return true
-        }
+       
 
         return  false
     }
@@ -442,11 +291,7 @@ extension SigninManager {
     }
     
     public func isWrongPasswordError( error:NSError) ->Bool {
-        if error.code == AWSCognitoIdentityProviderErrorType.invalidPassword.rawValue && error.domain == AWSCognitoIdentityProviderErrorDomain {
-            return true
-        }else if error.code == AWSCognitoIdentityProviderErrorType.invalidParameter.rawValue, error.domain == AWSCognitoIdentityProviderErrorDomain, let message = error.userInfo["message"] as? String, message.contains("password") {
-            return true
-        }
+        
         return  false
     }
     func alertViewForWrongPassword() -> UIAlertController  {
@@ -457,6 +302,3 @@ extension SigninManager {
     }
 }
 
-extension SigninManager: AWSCognitoIdentityInteractiveAuthenticationDelegate {
-    
-}

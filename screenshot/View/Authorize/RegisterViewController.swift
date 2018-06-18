@@ -457,14 +457,8 @@ class RegisterViewController: UIViewController {
             let sendMeEmails = self._view.dealsSwitch.isOn
             SigninManager.shared.loginOrCreatAccountAsNeeded(email: email, password: password, sendMeEmails:sendMeEmails)
             .then { result -> Void in
-                
-                switch result {
-                case .login, .createAccountConfirmed:
-                    self.delegate?.registerViewControllerDidSignup(self)
-                case .createAccountUnconfirmed:
-                    self.delegate?.registerViewControllerNeedEmailConfirmation(self)
+                self.delegate?.registerViewControllerDidSignup(self)
                 }
-            }
             .catch { error in
                 DispatchQueue.main.async {
                  

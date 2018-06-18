@@ -15,6 +15,8 @@ import Branch
 import PromiseKit
 import Amplitude_iOS
 import AdSupport
+import Firebase
+
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
