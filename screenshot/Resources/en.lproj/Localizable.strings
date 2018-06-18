@@ -287,6 +287,7 @@
 "profile.header.logged_out.continue" = "Log In or Sign Up";
 "profile.header.logged_out.title" = "Log in for exclusive benefits!";
 "profile.row.currency.title" = "Currency";
+"profile.row.gdpr.title" = "Email & Image detection";
 "profile.row.logout.title" = "Logout";
 "profile.row.open_in.title" = "Open Products In";
 "profile.row.photo_permission.title" = "Camera Roll";

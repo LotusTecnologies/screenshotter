@@ -27,6 +27,7 @@ class ProfileViewController: UITableViewController {
         
         case permissionPhoto
         case permissionPush
+        case permissionGDRP
         
         case logout
         
@@ -51,7 +52,8 @@ class ProfileViewController: UITableViewController {
         ],
         .permissions: [
             .permissionPhoto,
-            .permissionPush
+            .permissionPush,
+            .permissionGDRP
         ]
     ]
     
@@ -421,6 +423,9 @@ extension ProfileViewController {
                 })
             }
             
+        case .permissionGDRP:
+            navigationController?.pushViewController(GDPRViewController(), animated: true)
+            
         case .logout:
             // TODO:
             syncLoggedIn()
@@ -446,6 +451,8 @@ extension ProfileViewController {
             return "profile.row.push_permission.title".localized
         case .permissionPhoto:
             return "profile.row.photo_permission.title".localized
+        case .permissionGDRP:
+            return "profile.row.gdpr.title".localized
         case .logout:
             return "profile.row.logout.title".localized
         }
@@ -511,7 +518,7 @@ extension ProfileViewController {
     
     private func cellAccessoryType(for row: Row) -> UITableViewCellAccessoryType {
         switch row {
-        case .optionCurrency:
+        case .optionCurrency, .permissionGDRP:
             return .disclosureIndicator
         default:
             return .none
