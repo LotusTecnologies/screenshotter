@@ -508,11 +508,9 @@ extension ScreenshotsViewController {
                 }
             }
             
-            if (self.hasNewScreenshotSection) {
-                self.collectionView.reloadSections(IndexSet(integer: self.indexFor(section: .notification)))
-            }
+            self.collectionView.collectionViewLayout.invalidateLayout()
             
-            self.deleteButton?.alpha = editing ? 1.0: 0.0
+            self.deleteButton?.alpha = editing ? 1 : 0
         }
         
         if (animated) {
@@ -990,7 +988,7 @@ extension ScreenshotsViewController: UICollectionViewDataSource {
                     return 0
                 }
             case .notification:
-                return self.hasNewScreenshotSection ? 1 :0 
+                return self.hasNewScreenshotSection ? 1 : 0 
             case .image:
                 return self.screenshotFrcManager?.fetchedObjectsCount ?? 0
             }
