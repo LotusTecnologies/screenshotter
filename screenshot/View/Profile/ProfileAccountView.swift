@@ -214,6 +214,8 @@ class ProfileAccountView: UIView {
         avatarButton.isSelected = !hasAvatar
         avatarButton.layer.borderColor = UIColor.gray6.cgColor
         avatarButton.layer.borderWidth = 2
+        avatarButton.layoutIfNeeded()
+        avatarButton.subviews.first?.contentMode = .scaleAspectFill
         loggedInContainerView.addSubview(avatarButton)
         avatarButton.widthAnchor.constraint(equalToConstant: 90).isActive = true
         avatarButton.heightAnchor.constraint(equalTo: avatarButton.widthAnchor).isActive = true
@@ -346,6 +348,8 @@ class ProfileAccountView: UIView {
         guard let viewController = delegate?.profileAccountViewPresentImagePickerInViewController(self) else {
             return
         }
+        
+        loggedInContainerView.endEditing(true)
         
         let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         alertController.addAction(UIAlertAction(title: "onboarding.details.avatar.camera".localized, style: .default, handler: { alertAction in
