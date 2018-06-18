@@ -379,7 +379,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
             let cell = self.productCollectionViewManager.collectionView(collectionView, cellForItemAt: indexPath, with: product)
             if let cell = cell as? ProductsCollectionViewCell {
                 cell.favoriteControl.addTarget(self, action: #selector(productCollectionViewCellFavoriteAction(_:event:)), for: .touchUpInside)
-                cell.actionButton.addTarget(self, action: #selector(productCollectionViewCellBuyAction(_:event:)), for: .touchUpInside)
+                cell.actionButton.addTarget(self, action: #selector(productCollectionViewCellBurrowAction(_:event:)), for: .touchUpInside)
                 return cell
             }
             return cell
@@ -426,9 +426,9 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
 
         if sectionType == .product {
             let product = self.productAtIndex(indexPath.item)
-            if let cell = collectionView.cellForItem(at: indexPath) as? ProductsCollectionViewCell {
-                self.productCollectionViewManager.burrow(cell: cell, product: product, fromVC: self)
-            }
+            if let productViewController = presentProduct(product, atLocation: .products) {
+                productViewController.similarProducts = products
+            }            
         }
         else if sectionType == .relatedLooks {
             if let url = self.relatedLooksManager.relatedLook(at:indexPath.row) {
@@ -465,7 +465,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
     }
     
 
-    @objc func productCollectionViewCellBuyAction(_ control: UIControl, event: UIEvent) {
+    @objc func productCollectionViewCellBurrowAction(_ control: UIControl, event: UIEvent) {
         guard let indexPath = collectionView?.indexPath(for: event) else {
             return
         }
@@ -473,8 +473,8 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         let product = self.productAtIndex(indexPath.item)
         product.recordViewedProduct()
         
-        if let productViewController = presentProduct(product, atLocation: .products) {
-            productViewController.similarProducts = products
+        if let cell = collectionView?.cellForItem(at: indexPath) as? ProductsCollectionViewCell {
+            self.productCollectionViewManager.burrow(cell: cell, product: product, fromVC: self)
         }
     }
 }

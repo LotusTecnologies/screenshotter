@@ -100,7 +100,6 @@ class ProductCollectionViewManager {
         cell.imageUrl = product.imageURL
         cell.isSale = product.isSale()
         cell.favoriteControl.isSelected = product.isFavorite
-        cell.actionType = .buy
     }
     
     
