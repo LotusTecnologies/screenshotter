@@ -863,12 +863,12 @@ extension ProductsViewControllerNoItemsHelperView{
     }
     
     @objc func noItemsRetryAction() {
-        if self.productLoadingState == .retry {
+        if self.screenshotLoadingState == .retry {
+            AssetSyncModel.sharedInstance.refetchShoppables(screenshot: self.screenshot)
+        } else if self.productLoadingState == .retry {
             if let selectedShoppable = self.getSelectedShoppable(), let offersURL = selectedShoppable.offersURL {
                 AssetSyncModel.sharedInstance.reExtractProducts(assetId: self.screenshot.assetId, shoppableId: selectedShoppable.objectID, optionsMask: ProductsOptionsMask.global, offersURL: offersURL)
             }
-        }else{
-            AssetSyncModel.sharedInstance.refetchShoppables(screenshot: self.screenshot)
         }
     }
 }
