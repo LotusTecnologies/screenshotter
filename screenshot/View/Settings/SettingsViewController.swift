@@ -415,7 +415,7 @@ extension SettingsViewController {
 
 // MARK: - Mail
 
-extension SettingsViewController :
+extension SettingsViewController {
     func presentMailComposerForContactUs(){
         let recipient = "Info+\(Bundle.displayVersionBuild)@screenshopit.com"
         self.presentMail(recipient: recipient, gmailMessage: "", subject: "To Screenshop:", message: "")
