@@ -407,7 +407,8 @@ extension AppDelegate : KochavaTrackerDelegate {
         Appsee.addEvent("App Launched", withProperties: ["version": Bundle.displayVersionBuild])
         
         Amplitude.instance().initializeApiKey(Constants.amplitudeApiKey)
-        
+        Amplitude.instance().trackingSessionEvents = true
+
         var trackerParametersDictionary: [AnyHashable: Any] = [:]
         trackerParametersDictionary[kKVAParamAppGUIDStringKey] = Constants.kocchavaGUIDKey
         trackerParametersDictionary[kKVAParamLogLevelEnumKey] = kKVALogLevelEnumInfo
