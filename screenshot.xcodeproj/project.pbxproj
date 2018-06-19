@@ -161,6 +161,7 @@
 		C572FF00205C00070046BFEB /* Hind-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C572FEFB205C00060046BFEB /* Hind-Regular.ttf */; };
 		C572FF01205C00070046BFEB /* Hind-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C572FEFC205C00060046BFEB /* Hind-SemiBold.ttf */; };
 		C572FF02205C00070046BFEB /* Hind-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C572FEFD205C00070046BFEB /* Hind-Medium.ttf */; };
+		C57ACE8220D7CAC90094F784 /* ScreenshotsActionsCollectionReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C57ACE8120D7CAC90094F784 /* ScreenshotsActionsCollectionReusableView.swift */; };
 		C57E93A9204BEE4E0069C378 /* OpenWebPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C57E93A8204BEE4E0069C378 /* OpenWebPage.swift */; };
 		C5847EF81F7A53F60024DCAB /* CredentialHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */; };
 		C58FA0F120A95FC300072966 /* TutorialTrySlideViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0E520A95FC200072966 /* TutorialTrySlideViewController.swift */; };
@@ -426,6 +427,7 @@
 		C572FEFB205C00060046BFEB /* Hind-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Hind-Regular.ttf"; sourceTree = "<group>"; };
 		C572FEFC205C00060046BFEB /* Hind-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Hind-SemiBold.ttf"; sourceTree = "<group>"; };
 		C572FEFD205C00070046BFEB /* Hind-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Hind-Medium.ttf"; sourceTree = "<group>"; };
+		C57ACE8120D7CAC90094F784 /* ScreenshotsActionsCollectionReusableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotsActionsCollectionReusableView.swift; sourceTree = "<group>"; };
 		C57E93A8204BEE4E0069C378 /* OpenWebPage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpenWebPage.swift; sourceTree = "<group>"; };
 		C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialHelper.swift; sourceTree = "<group>"; };
 		C58FA0E520A95FC200072966 /* TutorialTrySlideViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialTrySlideViewController.swift; sourceTree = "<group>"; };
@@ -908,6 +910,7 @@
 				31CE1114203BF0BC000156EE /* ScreenshotProductBarCollectionViewCell.swift */,
 				C54088081FE90C8E00198955 /* ScreenshotCollectionViewCell.swift */,
 				C54088091FE90C8E00198955 /* ScreenshotNotificationCollectionViewCell.swift */,
+				C57ACE8120D7CAC90094F784 /* ScreenshotsActionsCollectionReusableView.swift */,
 				31CE110320396194000156EE /* ScreenshotsViewController.swift */,
 				31A3374F203D9A9F00FFD2F2 /* ScreenshotsNavigationController.swift */,
 				C540880C1FE90C8E00198955 /* ScreenshotsHelperView.swift */,
@@ -1573,6 +1576,7 @@
 				C54369642046B4E800599134 /* ProductCartBarButtonItem.swift in Sources */,
 				529A36661FCC99B300BCA798 /* SilentPushSubscriptionManager.swift in Sources */,
 				C54369672046D6FD00599134 /* BaseViewController.swift in Sources */,
+				C57ACE8220D7CAC90094F784 /* ScreenshotsActionsCollectionReusableView.swift in Sources */,
 				C50DBB7F207B4A8B00BB206E /* AutoresizingTableView.swift in Sources */,
 				C56F889C1FE9478D0006914C /* TappableTextView.swift in Sources */,
 				C5A1922D2057AD520046303C /* IntrinsicContentSizePresentationController.swift in Sources */,

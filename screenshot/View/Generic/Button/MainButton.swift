@@ -81,6 +81,6 @@ class MainButton: LoadingButton {
     
     override func setImage(_ image: UIImage?, for state: UIControlState) {
         super.setImage(image, for: state)
-        adjustInsetsForImage(withPadding: 6)
+        adjustInsetsForImage()
     }
 }
