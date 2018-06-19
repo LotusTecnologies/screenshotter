@@ -226,6 +226,7 @@
 		E4139D501F09083B00E8A53B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E4139D4F1F09083B00E8A53B /* Assets.xcassets */; };
 		E42AC3911F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E42AC3901F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift */; };
 		E4351D702031957800193657 /* MainTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4351D6F2031957800193657 /* MainTabBarController.swift */; };
+		E437A65120D9384E0047246E /* LocalNotificationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E437A65020D9384E0047246E /* LocalNotificationModel.swift */; };
 		E44CA6FC1F41E608001CB493 /* NetworkingPromise.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44CA6FB1F41E608001CB493 /* NetworkingPromise.swift */; };
 		E44D6108203EC5CB00039CCB /* ShoppingCartModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44D6107203EC5CB00039CCB /* ShoppingCartModel.swift */; };
 		E4859E19203044E100A26985 /* ScreenshotDisplayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4859E18203044E100A26985 /* ScreenshotDisplayViewController.swift */; };
@@ -499,6 +500,7 @@
 		E42AC3901F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenshotActivityItemProvider.swift; sourceTree = "<group>"; };
 		E42AC3921F60340B0035A07C /* Model 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 2.xcdatamodel"; sourceTree = "<group>"; };
 		E4351D6F2031957800193657 /* MainTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarController.swift; sourceTree = "<group>"; };
+		E437A65020D9384E0047246E /* LocalNotificationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalNotificationModel.swift; sourceTree = "<group>"; };
 		E44CA6FB1F41E608001CB493 /* NetworkingPromise.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkingPromise.swift; sourceTree = "<group>"; };
 		E44D6107203EC5CB00039CCB /* ShoppingCartModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShoppingCartModel.swift; sourceTree = "<group>"; };
 		E47B02F01FF0EF1E0070F515 /* Model 7.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 7.xcdatamodel"; sourceTree = "<group>"; };
@@ -659,6 +661,7 @@
 				31CE11012039570B000156EE /* FetchedResultsControllerManager.swift */,
 				E44D6107203EC5CB00039CCB /* ShoppingCartModel.swift */,
 				C5E6C315208F22BF006E9C54 /* CheckoutSupportedLocationModel.swift */,
+				E437A65020D9384E0047246E /* LocalNotificationModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -1642,6 +1645,7 @@
 				C501412E20623DFD00ABFB5C /* UICollectionView.swift in Sources */,
 				C5E6C316208F22C0006E9C54 /* CheckoutSupportedLocationModel.swift in Sources */,
 				31CEA0B720C91A4B00058ECC /* ProductCollectionViewManager.swift in Sources */,
+				E437A65120D9384E0047246E /* LocalNotificationModel.swift in Sources */,
 				C50D200E1FEBE6CD005CFA4F /* ScrollRevealController.swift in Sources */,
 				31C0C81A20A2CD14002EE95B /* SectionBackgroundCollectionViewFlowLayout.swift in Sources */,
 				C537F39E2004A20E00287360 /* DiscoverScreenshotCollectionViewCell.swift in Sources */,
