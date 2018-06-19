@@ -203,9 +203,7 @@ final class PermissionsManager : NSObject, CLLocationManagerDelegate {
             
             if granted {
                 DispatchQueue.main.async {
-                    if let pushWoosh = AppDelegate.shared.pushWoosh as? PushNotificationManager {
-                        pushWoosh.registerForPushNotifications()
-                    }
+                    PushNotificationManager.push().registerForPushNotifications()
                 }
             }
             

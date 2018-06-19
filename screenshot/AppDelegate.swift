@@ -27,12 +27,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var shouldLoadDiscoverNextLoad = false
     let appSettings: AppSettings = AppSettings()
     
-    let pushWoosh:PushNotificationManager = {
-        PushNotificationManager.initialize(withAppCode: Constants.pushWooshAppCode, appName: Constants.pushWooshAppName)
-
-        let pushwoosh = PushNotificationManager.push()
-        return pushwoosh!
-    }()
     fileprivate var frameworkSetupLaunchOptions: [UIApplicationLaunchOptionsKey : Any]?
     
     fileprivate lazy var mainTabBarController: MainTabBarController = {
@@ -77,7 +71,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UIApplication.migrateUserDefaultsKeys()
         UIApplication.appearanceSetup()
         UserFeedback.shared.applicationDidFinishLaunching() // only setups notificationCenter observing. does nothing now
-        pushWoosh.sendAppOpen()
         PWInAppManager.shared().setUserId(AnalyticsUser.current.identifier)
         return true
     }
@@ -131,8 +124,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         }
 
-        pushWoosh.delegate = self
-        pushWoosh.sendAppOpen()
         if PermissionsManager.shared.permissionStatus(for: .push) == .authorized {
             PermissionsManager.shared.requestPermission(for: .push)
         }
@@ -282,37 +273,50 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         print("open url: \(url.absoluteString)")
         return handled
     }
+    
     func handleDeepLink(application:UIApplication, url:URL, options:[UIApplicationOpenURLOptionsKey : Any] ) -> Bool {
         let urlString = url.absoluteString
         if urlString.hasPrefix("screenshop://openTab/") {
             if let mainTabBarController = self.window?.rootViewController as? MainTabBarController {
                 let page = urlString.components(separatedBy: "/").last?.lowercased()
-                var tab:MainTabBarController.TabIndex? = nil
-                if page == "favorites"  || page == "favorite" {
+                var tab: MainTabBarController.TabIndex? = nil
+                switch page {
+                case "favorites", "favorite":
                     tab = .favorites
-                }else if page == "discover" || page == "matchstick" {
+                case "discover", "matchstick":
                     tab = .discover
-                }else if page == "screenshots" ||  page == "main"{
+                case "screenshots", "main":
                     tab = .screenshots
-                }else if page == "settings" {
+                case "settings":
                     tab = .settings
-                }else if page == "cart" {
-                    tab = .cart
+//                case "cart":
+//                    tab = .cart
+                default:
+                    tab = nil
                 }
                 if let tab = tab {
                     mainTabBarController.goTo(page: tab)
                     return true
-
                 }
             }
-        }else if urlString.hasPrefix("screenshop://openWebLink/") {
-            let link = ...
-            let browser = ...
-            
+        } else if urlString.hasPrefix("screenshop://openWebLink/") {
+            let pathComponents = url.pathComponents
+            if pathComponents.count >= 4 {
+                let browser = pathComponents[1]
+                let link = String(urlString.suffix(from: "screenshop://openWebLink/\(browser)/".endIndex))
+                print("GMK  browser:\(browser)  link:\(link)")
+                if browser == "default" {
+                    if let vc = AppDelegate.shared.window?.rootViewController {
+                        OpenWebPage.present(urlString: link, fromViewController: vc)
+                        return true
+                    }
+                }
+            }
+            return false
         }
-
         return false
     }
+    
     func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([Any]?) -> Void) -> Bool {
         let handled = Branch.getInstance().continue(userActivity)
         return handled
@@ -497,6 +501,13 @@ extension AppDelegate : KochavaTrackerDelegate {
         
     
         FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
+        
+        // Pushwoosh
+        PushNotificationManager.push().delegate = self
+        UNUserNotificationCenter.current().delegate = PushNotificationManager.push().notificationCenterDelegate // TODO: GMK already set to self in willFinishLaunching
+        PushNotificationManager.push().sendAppOpen()
+        PushNotificationManager.push().registerForPushNotifications()
+        
     }
     
     fileprivate func frameworkSetupMainViewDidLoad() {
@@ -586,7 +597,7 @@ extension AppDelegate: PushNotificationDelegate {
     }
     
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        pushWoosh.handlePushRegistration(deviceToken)
+        PushNotificationManager.push().handlePushRegistration(deviceToken)
         
         UserDefaults.standard.set(deviceToken, forKey: UserDefaultsKeys.deviceToken)
         UserDefaults.standard.synchronize()
@@ -597,16 +608,15 @@ extension AppDelegate: PushNotificationDelegate {
     }
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
-        pushWoosh.handlePushRegistrationFailure(error)
-
-         let e = error as NSError
+        PushNotificationManager.push().handlePushRegistrationFailure(error)
+        
+        let e = error as NSError
         Analytics.trackError(type: nil, domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
     }
 
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         ApplicationStateModel.sharedInstance.applicationState = application.applicationState
-        
-        pushWoosh.handlePushReceived(userInfo)
+        print("GMK AppDelegate application didReceiveRemoteNotification userInfo:\(userInfo)")
 
         if let aps = userInfo["aps"] as? NSDictionary, let category = aps["category"] as? String, category == "MATCHSTICK_LIKES", let likeUpdates = userInfo["likeUpdates"] as? [[String:Any]]{
             DataModel.sharedInstance.performBackgroundTask { (context) in
@@ -654,11 +664,14 @@ extension AppDelegate: PushNotificationDelegate {
                    completionHandler(.newData)
                 }
             }
-        }else{
-            if let aps = userInfo["aps"] as? NSDictionary, let category = aps["category"] as? String, category == "PRICE_ALERT",  let partNumber = userInfo["partNumber"] as? String{
-                let product = DataModel.sharedInstance.retrieveProduct(managedObjectContext: DataModel.sharedInstance.mainMoc(), partNumber: partNumber)
-                Analytics.trackProductPriceAlertRecieved(product: product)
-            }
+        } else if let aps = userInfo["aps"] as? NSDictionary, let category = aps["category"] as? String, category == "PRICE_ALERT",  let partNumber = userInfo["partNumber"] as? String{
+            let product = DataModel.sharedInstance.retrieveProduct(managedObjectContext: DataModel.sharedInstance.mainMoc(), partNumber: partNumber)
+            Analytics.trackProductPriceAlertRecieved(product: product)
+            completionHandler(.noData)
+        } else {
+            PushNotificationManager.push().handlePushReceived(userInfo)  // pushwoosh
+            Branch.getInstance().handlePushNotification(userInfo)
+
             // Only spin up a background task if we are already in the background
             if application.applicationState == .background {
                 if bgTask != UIBackgroundTaskInvalid {
@@ -676,8 +689,6 @@ extension AppDelegate: PushNotificationDelegate {
             } else {
                 completionHandler(.noData)
             }
-            
-            Branch.getInstance().handlePushNotification(userInfo)
         }
     }
     
@@ -701,6 +712,7 @@ extension AppDelegate {
 extension AppDelegate : UNUserNotificationCenterDelegate {
     
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        print("GMK AppDelegate userNotificationCenter didReceive response:\(response)")
         if let userInfo = response.notification.request.content.userInfo as? [String : Any] {
             if let openingScreen = userInfo[Constants.openingScreenKey] as? String,
                 openingScreen == Constants.openingScreenValueScreenshot,
@@ -722,6 +734,7 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
     }
     
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        print("GMK AppDelegate userNotificationCenter willPresent notification:\(notification)")
         let category = notification.request.content.categoryIdentifier
         let options: UNNotificationPresentationOptions = category == "PRICE_ALERT" ? [.alert, .badge, .sound] : []
         completionHandler(options)
