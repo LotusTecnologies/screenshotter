@@ -43,6 +43,8 @@ class FacebookProxy : NSObject, FBSDKLoginButtonDelegate {
 
 class UserAccountManager : NSObject {
     enum LoginOrCreateAccountResult {
+        case facebookNew
+        case facebookOld
         case confirmed
         case unconfirmed
     }
@@ -94,9 +96,9 @@ class UserAccountManager : NSObject {
         return handled
     }
     
-    public func loginWithFacebook(sendMeEmails:Bool)  -> Promise<Void>{
+    public func loginWithFacebook()  -> Promise<LoginOrCreateAccountResult>{
 
-        return Promise<Void>.init(resolvers: { (fulfil, reject) in
+        return Promise<LoginOrCreateAccountResult>.init(resolvers: { (fulfil, reject) in
             let proxy = FacebookProxy.init()
             self.facebookProxy = proxy
             proxy.promise.then(execute: { (result) -> Void in
@@ -105,10 +107,31 @@ class UserAccountManager : NSObject {
                     if let error = error{
                         reject(error)
                     }else if let user = result?.user {
+                        if let name = user.displayName {
+                            self.databaseRef.child("users").child(user.uid).child("displayName").setValue(name)
+                        }
+                        if let email =  user.email {
+                            self.databaseRef.child("users").child(user.uid).child("email").setValue(email)
+                        }
+                        if let phone = user.providerData.first?.phoneNumber {
+                            self.databaseRef.child("users").child(user.uid).child("phone").setValue(phone)
+                        }
+                        if let photoURL = user.providerData.first?.photoURL {
+                            self.databaseRef.child("users").child(user.uid).child("photoURL").setValue(photoURL)
+                        }
+                        
                         self.userFromLogin = user
-                        self.databaseRef.child("users").child(user.uid).child("sendMeEmail").setValue(NSNumber.init(value: sendMeEmails))
                         self.downloadAndReplaceUserData()
-                        fulfil(())
+                        self.databaseRef.child("users").child(user.uid).child("createdAt").observeSingleEvent(of: .value) { (snapshot) in
+                            if let _ = snapshot.value as? NSNumber {
+                                fulfil(.facebookOld)
+                            }else{
+                                let now = NSNumber.init(value: (Date().timeIntervalSince1970 as Double) )
+                                self.databaseRef.child("users").child(user.uid).child("createdAt").setValue(now)
+                                fulfil(.facebookNew)
+                            }
+                        }
+                        
                     }else {
                         reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
 
@@ -121,12 +144,12 @@ class UserAccountManager : NSObject {
     }
     
     
-    public func loginOrCreatAccountAsNeeded(email:String, password:String, sendMeEmails:Bool) -> Promise<LoginOrCreateAccountResult> {
+    public func loginOrCreatAccountAsNeeded(email:String, password:String) -> Promise<LoginOrCreateAccountResult> {
         
-        return createAccount(email:email.lowercased(), password: password, sendMeEmails:sendMeEmails).recover(execute: { (error) -> Promise<UserAccountManager.LoginOrCreateAccountResult> in
+        return createAccount(email:email.lowercased(), password: password).recover(execute: { (error) -> Promise<UserAccountManager.LoginOrCreateAccountResult> in
             let nsError = error as NSError
             if nsError.code == AuthErrorCode.emailAlreadyInUse.rawValue && nsError.domain == AuthErrorDomain {
-                return self.login(email: email.lowercased(), password: password, sendMeEmails:sendMeEmails)
+                return self.login(email: email.lowercased(), password: password)
             }
             return Promise.init(error: error)
         })
@@ -134,7 +157,7 @@ class UserAccountManager : NSObject {
     }
     
     
-    private func login(email:String, password:String, sendMeEmails:Bool) -> Promise<LoginOrCreateAccountResult>{
+    private func login(email:String, password:String) -> Promise<LoginOrCreateAccountResult>{
         return Promise<LoginOrCreateAccountResult>.init(resolvers: { (fulfil, reject) in
             
             Auth.auth().signIn(withEmail: email, password: password) { (authResult, error) in
@@ -144,7 +167,6 @@ class UserAccountManager : NSObject {
                 }else if let authResult = authResult {
                     let user = authResult.user
                     self.userFromLogin = user
-                    self.databaseRef.child("users").child(user.uid).child("sendMeEmail").setValue(NSNumber.init(value: sendMeEmails))
                     self.downloadAndReplaceUserData()
                     if user.isEmailVerified {
                         fulfil(LoginOrCreateAccountResult.confirmed)
@@ -164,27 +186,31 @@ class UserAccountManager : NSObject {
             }
         })
     }
-    
-    @discardableResult func makeAnonAccount(sendMeEmails:Bool) -> Promise<Void> {
-        return Promise<Void>.init(resolvers: { (fulfil, reject) in
-            Auth.auth().signInAnonymously() { (authResult, error) in
-                if let error = error {
-                    reject(error)
-                }else  if let authResult = authResult {
-                    let user = authResult.user
-                    self.userFromLogin = user
-                    self.databaseRef.child("users").child(user.uid).child("sendMeEmail").setValue(NSNumber.init(value: sendMeEmails))
-                    self.downloadAndReplaceUserData()
-                    fulfil(())
-                }else{
-                    reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+    var makeAnonAccountPromise: Promise<Void>?
+    @discardableResult func makeAnonAccount() -> Promise<Void>{
+        if let promise = self.makeAnonAccountPromise {
+            return promise
+        }else{
+            let promise = Promise<Void>.init(resolvers: { (fulfil, reject) in
+                Auth.auth().signInAnonymously() { (authResult, error) in
+                    if let error = error {
+                         ///automatic retry?
+                        reject(error)
+                    }else  if let authResult = authResult {
+                        let user = authResult.user
+                        self.userFromLogin = user
+                        self.downloadAndReplaceUserData()
+                        fulfil(())
+                    }else{
+                        reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+                    }
+                    
                 }
-                
-            }
-
-        })
+            })
+            return promise
+        }
     }
-    private func createAccount(email:String, password:String, sendMeEmails:Bool) -> Promise<LoginOrCreateAccountResult>{
+    private func createAccount(email:String, password:String) -> Promise<LoginOrCreateAccountResult>{
         return Promise<LoginOrCreateAccountResult>.init(resolvers: { (fulfil, reject) in
             Auth.auth().createUser(withEmail: email, password: password) { (authResult, error) in
                 if let error = error {
@@ -192,7 +218,6 @@ class UserAccountManager : NSObject {
                 }else  if let authResult = authResult {
                     let user = authResult.user
                     self.userFromLogin = user
-                    self.databaseRef.child("users").child(user.uid).child("sendMeEmail").setValue(NSNumber.init(value: sendMeEmails))
                     self.downloadAndReplaceUserData()
                     if authResult.user.isEmailVerified {
                         fulfil(LoginOrCreateAccountResult.confirmed)
@@ -226,10 +251,8 @@ class UserAccountManager : NSObject {
     }
     
     func resendConfirmCode(email:String) -> Promise<Void>{
-       
         return Promise { fulfill, reject in
             reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
-
         }
     }
     
@@ -274,6 +297,23 @@ class UserAccountManager : NSObject {
         }
     }
     
+    @discardableResult func setGDRP(agreeToEmail:Bool, agreedToImageDetection:Bool) -> Promise<Void>{
+        return Promise { fulfill, reject in
+            let promise = makeAnonAccountPromise ?? Promise.init(value:())
+            promise.then(execute: { () -> Void in
+                if let user = self.user {
+                    self.databaseRef.child("users").child(user.uid).child("GDRP-agreeToEmail").setValue(NSNumber.init(value: agreeToEmail))
+                    self.databaseRef.child("users").child(user.uid).child("GDRP-agreedToImageDetection").setValue(NSNumber.init(value: agreedToImageDetection))
+                    fulfill(())
+                }else{
+                    reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+                }
+            }).catch(execute: { (error) in
+                reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+            })
+        }
+    }
+
     
 }
 extension UserAccountManager {

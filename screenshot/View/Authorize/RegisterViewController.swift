@@ -12,7 +12,7 @@ import Appsee
 protocol RegisterViewControllerDelegate: NSObjectProtocol {
     func registerViewControllerDidSkip(_ viewController: RegisterViewController)
     func registerViewControllerNeedEmailConfirmation(_ viewController: RegisterViewController)
-    func registerViewControllerDidSignup(_ viewController: RegisterViewController)
+    func registerViewControllerDidSignin(_ viewController: RegisterViewController)
     func registerViewControllerDidFacebookLogin(_ viewController: RegisterViewController)
     func registerViewControllerDidFacebookSignup(_ viewController: RegisterViewController)
 }
@@ -25,9 +25,7 @@ class RegisterView: UIScrollView {
     let passwordTextField = UnderlineTextField()
     let forgotPasswordButton = UIButton()
     let continueButton = MainButton()
-    let dealsSwitch = UISwitch()
     let skipButton = UIButton()
-    let legalTextView = TappableTextView()
     
     private var showForgotPasswordConstraints: [NSLayoutConstraint] = []
     private var hideForgotPasswordConstraints: [NSLayoutConstraint] = []
@@ -126,9 +124,40 @@ class RegisterView: UIScrollView {
         verticalLayoutView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
         verticalLayoutView.heightAnchor.constraint(greaterThanOrEqualTo: layoutMarginsGuide.heightAnchor, constant: verticalLayoutHeightConstant).isActive = true
         
+        
+        let welcomeTo = UILabel.init()
+        welcomeTo.text = "authorize.register.welcome_to".localized
+        welcomeTo.textAlignment = .center
+        welcomeTo.translatesAutoresizingMaskIntoConstraints = false
+        welcomeTo.font = UIFont.screenshopFont(.quicksand, size: 15)
+        welcomeTo.textColor = UIColor.gray3
+        addSubview(welcomeTo)
+        welcomeTo.topAnchor.constraint(equalTo: topAnchor, constant: _layoutMargins.top).isActive = true
+        welcomeTo.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
+        welcomeTo.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
+
+        let screenshopImageView = UIImageView.init(image: UIImage.init(named: "LaunchLogo"))
+        screenshopImageView.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(screenshopImageView)
+        
+        screenshopImageView.topAnchor.constraint(equalTo: welcomeTo.bottomAnchor, constant: .padding ).isActive = true
+        screenshopImageView.centerXAnchor.constraint(equalTo: welcomeTo.centerXAnchor).isActive = true
+
+        let byLine = UILabel.init()
+        byLine.text = "authorize.register.byline".localized
+        byLine.textAlignment = .center
+        byLine.translatesAutoresizingMaskIntoConstraints = false
+        byLine.font = UIFont.screenshopFont(.quicksandMedium, size: 20)
+        byLine.textColor = UIColor.gray3
+        addSubview(byLine)
+        byLine.topAnchor.constraint(equalTo: screenshopImageView.bottomAnchor, constant: .padding ).isActive = true
+        byLine.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
+        byLine.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
+
+        
         facebookLoginButton.translatesAutoresizingMaskIntoConstraints = false
         addSubview(facebookLoginButton)
-        facebookLoginButton.topAnchor.constraint(equalTo: topAnchor, constant: _layoutMargins.top).isActive = true
+        facebookLoginButton.topAnchor.constraint(equalTo: byLine.bottomAnchor, constant: .extendedPadding).isActive = true
         facebookLoginButton.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
         facebookLoginButton.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
         
@@ -141,8 +170,8 @@ class RegisterView: UIScrollView {
         horizontalLinesView.leftLine.backgroundColor = .gray6
         horizontalLinesView.rightLine.backgroundColor = .gray6
         addSubview(horizontalLinesView)
-        horizontalLinesView.topAnchor.constraint(greaterThanOrEqualTo: horizontalLinesLayoutGuide.topAnchor).isActive = true
-        horizontalLinesView.bottomAnchor.constraint(lessThanOrEqualTo: horizontalLinesLayoutGuide.bottomAnchor).isActive = true
+        horizontalLinesView.topAnchor.constraint(equalTo: horizontalLinesLayoutGuide.topAnchor).isActive = true
+        horizontalLinesView.bottomAnchor.constraint(equalTo: horizontalLinesLayoutGuide.bottomAnchor).isActive = true
         horizontalLinesView.centerXAnchor.constraint(equalTo: layoutMarginsGuide.centerXAnchor).isActive = true
         horizontalLinesView.centerYAnchor.constraint(equalTo: horizontalLinesLayoutGuide.centerYAnchor).isActive = true
         horizontalLinesView.widthAnchor.constraint(equalToConstant: 170).isActive = true
@@ -230,49 +259,7 @@ class RegisterView: UIScrollView {
         skipButton.bottomAnchor.constraint(lessThanOrEqualTo: skipLayoutGuide.bottomAnchor).isActive = true
         skipButton.centerXAnchor.constraint(equalTo: layoutMarginsGuide.centerXAnchor).isActive = true
         skipButton.centerYAnchor.constraint(equalTo: skipLayoutGuide.centerYAnchor).isActive = true
-        
-        let dealsLayoutGuide = UILayoutGuide()
-        addLayoutGuide(dealsLayoutGuide)
-        dealsLayoutGuide.centerXAnchor.constraint(equalTo: contentView.layoutMarginsGuide.centerXAnchor).isActive = true
-        dealsLayoutGuide.widthAnchor.constraint(lessThanOrEqualToConstant: 320 - (.padding * 2)).isActive = true
-        
-        let dealsLabel = UILabel()
-        dealsLabel.translatesAutoresizingMaskIntoConstraints = false
-        dealsLabel.text = "authorize.register.offers".localized
-        dealsLabel.textColor = .gray3
-        dealsLabel.numberOfLines = 0
-        dealsLabel.font = .screenshopFont(.hindLight, size: 16)
-        addSubview(dealsLabel)
-        dealsLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
-        dealsLabel.topAnchor.constraint(equalTo: skipLayoutGuide.bottomAnchor, constant: .padding).isActive = true
-        dealsLabel.leadingAnchor.constraint(equalTo: dealsLayoutGuide.leadingAnchor).isActive = true
-        
-        dealsSwitch.translatesAutoresizingMaskIntoConstraints = false
-        dealsSwitch.isOn = true
-        dealsSwitch.onTintColor = .crazeGreen
-        addSubview(dealsSwitch)
-        dealsSwitch.leadingAnchor.constraint(equalTo: dealsLabel.trailingAnchor, constant: .padding).isActive = true
-        dealsSwitch.trailingAnchor.constraint(equalTo: dealsLayoutGuide.trailingAnchor).isActive = true
-        dealsSwitch.centerYAnchor.constraint(equalTo: dealsLabel.centerYAnchor).isActive = true
-        
-        legalTextView.translatesAutoresizingMaskIntoConstraints = false
-        legalTextView.backgroundColor = .clear
-        legalTextView.adjustsFontForContentSizeCategory = true
-        legalTextView.isEditable = false
-        legalTextView.isScrollEnabled = false
-        legalTextView.scrollsToTop = false
-        legalTextView.linkTextAttributes = [
-            NSAttributedStringKey.foregroundColor.rawValue: UIColor.crazeGreen,
-            NSAttributedStringKey.underlineStyle.rawValue: NSUnderlineStyle.styleSingle.rawValue,
-            NSAttributedStringKey.underlineColor.rawValue: UIColor.crazeGreen
-        ]
-        legalTextView.attributedText = legalAttributedText()
-        addSubview(legalTextView)
-        legalTextView.setContentCompressionResistancePriority(.required, for: .vertical)
-        legalTextView.topAnchor.constraint(equalTo: dealsLabel.lastBaselineAnchor, constant: .padding).isActive = true
-        legalTextView.leadingAnchor.constraint(equalTo: dealsLayoutGuide.leadingAnchor).isActive = true
-        legalTextView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
-        legalTextView.trailingAnchor.constraint(equalTo: dealsLayoutGuide.trailingAnchor).isActive = true
+      
     }
     
     override func layoutSubviews() {
@@ -392,7 +379,6 @@ class RegisterViewController: UIViewController {
         
         _view.emailTextField.delegate = self
         _view.passwordTextField.delegate = self
-        _view.legalTextView.delegate = self
         
         _view.forgotPasswordButton.addTarget(self, action: #selector(forgotPasswordAction), for: .touchUpInside)
         _view.continueButton.addTarget(self, action: #selector(registerAction), for: .touchUpInside)
@@ -420,7 +406,6 @@ class RegisterViewController: UIViewController {
         inputViewAdjustsScrollViewController.delegate = nil
         _view.emailTextField.delegate = nil
         _view.passwordTextField.delegate = nil
-        _view.legalTextView.delegate = nil
     }
     
     // MARK: Keyboard
@@ -454,18 +439,14 @@ class RegisterViewController: UIViewController {
             self._view.passwordTextField.isUserInteractionEnabled = false
             self.continueButton.isLoading = true
             self.continueButton.isEnabled = false
-            let sendMeEmails = self._view.dealsSwitch.isOn
-            UserAccountManager.shared.loginOrCreatAccountAsNeeded(email: email, password: password, sendMeEmails:sendMeEmails)
+            UserAccountManager.shared.loginOrCreatAccountAsNeeded(email: email, password: password)
             .then { result -> Void in
-                switch result {
-                case .unconfirmed:
+                if  result  == .unconfirmed {
                     self.delegate?.registerViewControllerNeedEmailConfirmation(self)
-                case .confirmed:
-                    self.delegate?.registerViewControllerDidSignup(self)
+                } else {
+                    self.delegate?.registerViewControllerDidSignin(self)
                 }
-                
-                }
-            .catch { error in
+            }.catch { error in
                 DispatchQueue.main.async {
                  
                     self._view.emailTextField.isInvalid = true
@@ -515,9 +496,7 @@ class RegisterViewController: UIViewController {
     
     @objc fileprivate func skipRegistration() {
         func skip() {
-            let sendMeEmails = self._view.dealsSwitch.isOn
-
-            UserAccountManager.shared.makeAnonAccount(sendMeEmails: sendMeEmails)
+            UserAccountManager.shared.makeAnonAccount()
             Analytics.trackSubmittedBlankEmail()
             delegate?.registerViewControllerDidSkip(self)
 
@@ -549,19 +528,20 @@ class RegisterViewController: UIViewController {
     // MARK: Facebook
     
     @objc fileprivate func facebookLoginAction() {
-        let sendMeEmails = self._view.dealsSwitch.isOn
-
-        UserAccountManager.shared.loginWithFacebook(sendMeEmails:sendMeEmails).then { (result) -> Void in
-            let isExistingUser = false
+        
+        UserAccountManager.shared.loginWithFacebook().then
+            { (result) -> Void in
+            
+            let isExistingUser = (result == .facebookOld)
             
             if isExistingUser {
                 self.delegate?.registerViewControllerDidFacebookLogin(self)
             } else {
                 self.delegate?.registerViewControllerDidFacebookSignup(self)
             }
-            
-            }.catch { (error) in
-                print("facebook login error: \(error)")
+                
+        }.catch { (error) in
+            print("facebook login error: \(error)")
         }
         
         
@@ -661,7 +641,7 @@ extension RegisterViewController: InitiateResetPasswordViewControllerDelegate {
 }
 extension RegisterViewController: ResetPasswordViewControllerDelegate {
     func resetPasswordViewControllerDidReset(_ viewController: ResetPasswordViewController) {
-        self.delegate?.registerViewControllerDidSignup(self)
+        self.delegate?.registerViewControllerDidSignin(self)
     }
     
     func resetPasswordViewControllerDidCancel(_ viewController: ResetPasswordViewController) {

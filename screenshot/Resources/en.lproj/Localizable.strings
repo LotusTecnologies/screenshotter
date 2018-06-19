@@ -49,6 +49,9 @@
 "authorize.register.confirmation.message" = "You are now a\nScreenshop user.";
 "authorize.register.confirmation.title" = "Welcome!";
 "authorize.register.skipConfirm" = "Are you sure you want to skip? Your account won’t be created.";
+"authorize.register.welcome_to" = "Welcome to";
+"authorize.register.byline" = "Take a screenshot. Shop it.";
+
 "authorize.confirm.title" = "Confirm Email";
 "authorize.confirm.code" = "Enter Code";
 "authorize.confirm.explaination" = "An email was sent to %@.\nPlease click on the link that you recieved in the email.";

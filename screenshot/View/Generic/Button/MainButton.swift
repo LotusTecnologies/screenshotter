@@ -73,7 +73,7 @@ class MainButton: LoadingButton {
     
     fileprivate func setBackgroundColor(to state: UIControlState) {
         isSettingBackgroundColor = true
-        backgroundColor = backgroundColorStates[state.rawValue]
+        backgroundColor = backgroundColorStates[state.rawValue] ?? backgroundColor
         isSettingBackgroundColor = false
     }
     

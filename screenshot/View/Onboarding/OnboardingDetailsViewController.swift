@@ -46,7 +46,7 @@ class OnboardingDetailsView: UIView {
     }
     
     let scrollView = UIScrollView()
-    let avatarButton = RoundButton()
+//    let avatarButton = RoundButton()
     let nameTextField = UnderlineTextField()
     private let preferenceLabel = UILabel()
     let genderControl = SegmentedDropDownControl()
@@ -93,21 +93,21 @@ class OnboardingDetailsView: UIView {
         contentView.leadingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.leadingAnchor).isActive = true
         contentView.trailingAnchor.constraint(equalTo: scrollView.layoutMarginsGuide.trailingAnchor).isActive = true
         
-        let defaultUserImage = UIImage(named: "DefaultUser")
-        
-        avatarButton.translatesAutoresizingMaskIntoConstraints = false
-        avatarButton.setBackgroundImage(defaultUserImage, for: .selected)
-        avatarButton.setBackgroundImage(defaultUserImage, for: [.selected, .highlighted])
-        avatarButton.setImage(UIImage(named: "UserCamera"), for: .selected)
-        avatarButton.isSelected = true
-        avatarButton.layer.borderColor = UIColor.gray6.cgColor
-        avatarButton.layer.borderWidth = 2
-        scrollView.addSubview(avatarButton)
-        avatarButton.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: .extendedPadding).isActive = true
-        avatarButton.widthAnchor.constraint(equalToConstant: 90).isActive = true
-        avatarButton.heightAnchor.constraint(equalTo: avatarButton.widthAnchor).isActive = true
-        avatarButton.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
-        avatarButton.centerYAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
+//        let defaultUserImage = UIImage(named: "DefaultUser")
+//
+//        avatarButton.translatesAutoresizingMaskIntoConstraints = false
+//        avatarButton.setBackgroundImage(defaultUserImage, for: .selected)
+//        avatarButton.setBackgroundImage(defaultUserImage, for: [.selected, .highlighted])
+//        avatarButton.setImage(UIImage(named: "UserCamera"), for: .selected)
+//        avatarButton.isSelected = true
+//        avatarButton.layer.borderColor = UIColor.gray6.cgColor
+//        avatarButton.layer.borderWidth = 2
+//        scrollView.addSubview(avatarButton)
+//        avatarButton.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: .extendedPadding).isActive = true
+//        avatarButton.widthAnchor.constraint(equalToConstant: 90).isActive = true
+//        avatarButton.heightAnchor.constraint(equalTo: avatarButton.widthAnchor).isActive = true
+//        avatarButton.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
+//        avatarButton.centerYAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
         
         nameTextField.translatesAutoresizingMaskIntoConstraints = false
         nameTextField.placeholder = "onboarding.details.name".localized
@@ -115,7 +115,7 @@ class OnboardingDetailsView: UIView {
         nameTextField.autocapitalizationType = .words
         nameTextField.spellCheckingType = .no
         contentView.addSubview(nameTextField)
-        nameTextField.topAnchor.constraint(equalTo: avatarButton.bottomAnchor, constant: UIDevice.is320w ? 0 : .padding).isActive = true
+        nameTextField.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: UIDevice.is320w ? 0 : .padding).isActive = true
         nameTextField.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
         nameTextField.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
         
@@ -258,7 +258,7 @@ class OnboardingDetailsViewController: UIViewController {
         navigationBar.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         navigationBar.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
         
-        _view.avatarButton.addTarget(self, action: #selector(avatarAction), for: .touchUpInside)
+//        _view.avatarButton.addTarget(self, action: #selector(avatarAction), for: .touchUpInside)
         
         _view.nameTextField.delegate = self
         
@@ -296,17 +296,17 @@ class OnboardingDetailsViewController: UIViewController {
     
     // MARK: Actions
     
-    @objc private func avatarAction() {
-        let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        alertController.addAction(UIAlertAction(title: "onboarding.details.avatar.camera".localized, style: .default, handler: { alertAction in
-            self.presentImagePickerController(.camera)
-        }))
-        alertController.addAction(UIAlertAction(title: "onboarding.details.avatar.gallery".localized, style: .default, handler: { alertAction in
-            self.presentImagePickerController(.photoLibrary)
-        }))
-        alertController.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
-        present(alertController, animated: true)
-    }
+//    @objc private func avatarAction() {
+//        let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+//        alertController.addAction(UIAlertAction(title: "onboarding.details.avatar.camera".localized, style: .default, handler: { alertAction in
+//            self.presentImagePickerController(.camera)
+//        }))
+//        alertController.addAction(UIAlertAction(title: "onboarding.details.avatar.gallery".localized, style: .default, handler: { alertAction in
+//            self.presentImagePickerController(.photoLibrary)
+//        }))
+//        alertController.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
+//        present(alertController, animated: true)
+//    }
     
     func syncGenderAndSizeOptions() {
         if let genderString = self.gender, let gender = ProductsOptionsGender.from(string: genderString) {
@@ -346,26 +346,26 @@ class OnboardingDetailsViewController: UIViewController {
     }
 }
 
-extension OnboardingDetailsViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-    private func presentImagePickerController(_ sourceType: UIImagePickerControllerSourceType) {
-        let imagePicker = UIImagePickerController()
-        imagePicker.delegate = self
-        imagePicker.sourceType = sourceType
-        present(imagePicker, animated: true)
-    }
-    
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
-        if let pickedImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
-            // TODO: save image
-        }
-        
-        picker.presentingViewController?.dismiss(animated: true)
-    }
-    
-    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-        picker.presentingViewController?.dismiss(animated: true)
-    }
-}
+//extension OnboardingDetailsViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+//    private func presentImagePickerController(_ sourceType: UIImagePickerControllerSourceType) {
+//        let imagePicker = UIImagePickerController()
+//        imagePicker.delegate = self
+//        imagePicker.sourceType = sourceType
+//        present(imagePicker, animated: true)
+//    }
+//    
+//    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+//        if let pickedImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
+//            // TODO: save image
+//        }
+//        
+//        picker.presentingViewController?.dismiss(animated: true)
+//    }
+//    
+//    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+//        picker.presentingViewController?.dismiss(animated: true)
+//    }
+//}
 
 extension OnboardingDetailsViewController: UINavigationBarDelegate {
     func position(for bar: UIBarPositioning) -> UIBarPosition {
