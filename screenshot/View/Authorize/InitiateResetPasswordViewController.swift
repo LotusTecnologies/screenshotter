@@ -37,7 +37,7 @@ class InitiateResetPasswordView: UIScrollView {
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.text = "authorize.initiate_reset_password.title".localized
         titleLabel.textColor = .gray3
-        titleLabel.font = .screenshopFont(.quicksandBold, textStyle: .title1, staticSize: true)
+        titleLabel.font = .screenshopFont(.quicksandMedium, textStyle: .title1, staticSize: true)
         titleLabel.adjustsFontSizeToFitWidth = true
         titleLabel.minimumScaleFactor = 0.7
         addSubview(titleLabel)
@@ -169,6 +169,7 @@ class InitiateResetPasswordViewController: UIViewController {
         if let email = validateEmail(_view.emailTextField.text) {
             self.continueButton.isLoading = true
             self.continueButton.isEnabled = false
+            self._view.backButton.isUserInteractionEnabled = false
             self._view.emailTextField.isUserInteractionEnabled = false
             
             UserAccountManager.shared.forgotPassword(email: email)
@@ -195,7 +196,7 @@ class InitiateResetPasswordViewController: UIViewController {
                     self.continueButton.isLoading = false
                     self.continueButton.isEnabled = true
                     self._view.emailTextField.isUserInteractionEnabled = true
-                    
+                    self._view.backButton.isUserInteractionEnabled = true
             }
         }
         else {

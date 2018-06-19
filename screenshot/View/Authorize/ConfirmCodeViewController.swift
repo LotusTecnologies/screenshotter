@@ -146,6 +146,7 @@ class ConfirmCodeViewController: UIViewController {
     // MARK: Actions
     
     func applyCode(code:String){
+        self._view.cancelButton.isUserInteractionEnabled = false
         UserAccountManager.shared.confirmSignup(code: code).then(on: .main) { () -> Void in
             self.delegate?.confirmCodeViewControllerDidConfirm(self)
             }.catch { (error) in
@@ -165,7 +166,9 @@ class ConfirmCodeViewController: UIViewController {
                         self.present(alert, animated: true, completion: nil)
                     }
                 }
-            }
+            }.always {
+                self._view.cancelButton.isUserInteractionEnabled = true
+        }
         
     }
     

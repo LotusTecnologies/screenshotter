@@ -41,7 +41,7 @@ class ResetPasswordView: UIScrollView {
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.text = "authorize.reset_password.title".localized
         titleLabel.textColor = .gray3
-        titleLabel.font = .screenshopFont(.hindSemibold, textStyle: .title1, staticSize: true)
+        titleLabel.font = .screenshopFont(.quicksandMedium, textStyle: .title1, staticSize: true)
         titleLabel.adjustsFontSizeToFitWidth = true
         titleLabel.minimumScaleFactor = 0.7
         addSubview(titleLabel)
@@ -187,6 +187,7 @@ class ResetPasswordViewController: UIViewController {
             dismissKeyboard()
             self._view.continueButton.isEnabled = false
             self._view.continueButton.isLoading = true
+            self._view.cancelButton.isUserInteractionEnabled = false
             self._view.newPasswordTextField.isUserInteractionEnabled = false
             UserAccountManager.shared.confirmForgotPassword(code: code, password: password)
                 .then(on: .main) { () -> Void in
@@ -212,6 +213,7 @@ class ResetPasswordViewController: UIViewController {
                     self._view.continueButton.isEnabled = (self.code != nil)
                     self._view.continueButton.isLoading = false
                     self._view.newPasswordTextField.isUserInteractionEnabled = true
+                    self._view.cancelButton.isUserInteractionEnabled = true
             }
 
         }

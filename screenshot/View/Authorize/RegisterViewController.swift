@@ -439,6 +439,8 @@ class RegisterViewController: UIViewController {
             self._view.passwordTextField.isUserInteractionEnabled = false
             self.continueButton.isLoading = true
             self.continueButton.isEnabled = false
+            self.skipButton.isUserInteractionEnabled = false
+            self.facebookLoginButton.isUserInteractionEnabled = false
             UserAccountManager.shared.loginOrCreatAccountAsNeeded(email: email, password: password)
             .then { result -> Void in
                 if  result  == .unconfirmed {
@@ -479,6 +481,9 @@ class RegisterViewController: UIViewController {
                 self._view.passwordTextField.isUserInteractionEnabled = true
                 self.continueButton.isLoading = false
                 self.continueButton.isEnabled = true
+                self.skipButton.isUserInteractionEnabled = true
+                self.facebookLoginButton.isUserInteractionEnabled = true
+
             }
         }
         else {
