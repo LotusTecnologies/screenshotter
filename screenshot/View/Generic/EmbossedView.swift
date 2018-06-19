@@ -30,6 +30,7 @@ class EmbossedView : UIView {
         layer.shadowOpacity = 1
         
         contentView.translatesAutoresizingMaskIntoConstraints = false
+        contentView.layoutMargins = .zero
         contentView.layer.cornerRadius = .defaultCornerRadius
         contentView.layer.masksToBounds = true
         addSubview(contentView)
@@ -42,10 +43,10 @@ class EmbossedView : UIView {
         imageView.backgroundColor = .white
         imageView.contentMode = .scaleAspectFit
         contentView.addSubview(imageView)
-        imageView.topAnchor.constraint(equalTo: topAnchor).isActive = true
-        imageView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-        imageView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
-        imageView.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
+        imageView.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor).isActive = true
+        imageView.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
+        imageView.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor).isActive = true
+        imageView.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
     }
     
     override func layoutSubviews() {

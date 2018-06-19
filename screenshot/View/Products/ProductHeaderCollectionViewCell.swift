@@ -72,13 +72,12 @@ class ProductHeaderCollectionViewCell: UICollectionViewCell {
         
         productImageView.translatesAutoresizingMaskIntoConstraints = false
         productImageView.contentMode = .scaleAspectFit
-        productImageView.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: -.padding)
         contentView.addSubview(productImageView)
         productImageView.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
         productImageView.widthAnchor.constraint(equalToConstant: 120).isActive = true
         productImageView.heightAnchor.constraint(equalTo: productImageView.widthAnchor).isActive = true
         productImageView.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor).isActive = true
-        productImageView.trailingAnchor.constraint(equalTo: titleLabel.leadingAnchor, constant: productImageView.layoutMargins.right).isActive = true
+        productImageView.trailingAnchor.constraint(equalTo: titleLabel.leadingAnchor, constant: -.padding).isActive = true
         
         productControl.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(productControl)
@@ -108,7 +107,7 @@ class ProductHeaderCollectionViewCell: UICollectionViewCell {
         buyNowButton.setTitle("product.buy_now".localized, for: .normal)
         buyNowButton.setTitleColor(.crazeGreen, for: .normal)
         contentView.addSubview(buyNowButton)
-        buyNowButton.leadingAnchor.constraint(equalTo: productImageView.layoutMarginsGuide.trailingAnchor).isActive = true
+        buyNowButton.leadingAnchor.constraint(equalTo: productImageView.trailingAnchor, constant: .padding).isActive = true
         buyNowButton.bottomAnchor.constraint(lessThanOrEqualTo: contentView.layoutMarginsGuide.bottomAnchor).isActive = true
         buyNowButton.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
         buyNowButton.topAnchor.constraint(equalTo: labelsContainerView.bottomAnchor, constant: halfPadding).isActive = true
