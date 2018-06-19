@@ -44,7 +44,6 @@ class UserDefaultsKeys  {
     static let openWebPage = "OpenProductPageInSetting"  //open in safari, SFSafiriViewController, chrome, etc
     
     // Onboarding
-    static let userAccountsCreatedByDevice = "userAccountsCreatedByDevice"
     static let onboardingCompleted = "OnboardingCompleted"
     static let onboardingPresentedScreenshotHelper = "OnboardingPresentedScreenshotHelper"
     static let onboardingPresentedPushAlert = "OnboardingPresentedPushAlert"
@@ -53,7 +52,6 @@ class UserDefaultsKeys  {
     enum CampaignCompleted : String {
         case campaign_2018_04_20 // A kim video to encourage users to submit to discover
     }
-    static let awsCred = "awsCred"
 
     
     // Gift Card
