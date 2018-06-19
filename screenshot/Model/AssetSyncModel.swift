@@ -14,15 +14,6 @@ import PromiseKit
 import UserNotifications
 import SDWebImage
 
-class BackgroundScreenshotData { // Is class, not struct, to save copying around the non-trivial imageData
-    let assetId: String
-    var imageData: Data?
-    init(assetId: String, imageData: Data?) {
-        self.assetId = assetId
-        self.imageData = imageData
-    }
-}
-
 class AssetSyncModel: NSObject {
 
     public static let sharedInstance = AssetSyncModel()
@@ -512,7 +503,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                             DispatchQueue.main.async {
                                 // The accumulator updates the count in an async block.
                                 // Without a delay the count is wrong when setting the content.badge.
-                                self.sendScreenshotAddedLocalNotification(backgroundScreenshotData: [BackgroundScreenshotData(assetId: asset.localIdentifier, imageData: imageData)])
+                                self.sendScreenshotAddedLocalNotification(assetId: asset.localIdentifier, imageData: imageData)
                             }
                         }
                     }
@@ -588,7 +579,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                                 self.processingQ.async {
                                     if self.shouldSendPushWhenFindFashionWithoutUserScreenshotAction && ApplicationStateModel.sharedInstance.isBackground(){  //need to check twice due to async craziness
                                         self.shouldSendPushWhenFindFashionWithoutUserScreenshotAction = false
-                                        self.sendScreenshotAddedLocalNotification(backgroundScreenshotData: [BackgroundScreenshotData.init(assetId: asset.localIdentifier, imageData: imageData)])
+                                        self.sendScreenshotAddedLocalNotification(assetId: asset.localIdentifier, imageData: imageData)
                                     }
                                 }
                             }
@@ -610,7 +601,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
         }))
     }
     
-    func sendScreenshotAddedLocalNotification(backgroundScreenshotData: [BackgroundScreenshotData]) {
+    func sendScreenshotAddedLocalNotification(assetId: String, imageData: Data?) {
         guard PermissionsManager.shared.hasPermission(for: .push) else {
             return
         }
@@ -628,13 +619,12 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
         content.userInfo = [Constants.openingScreenKey  : Constants.openingScreenValueScreenshot]
         
         var identifier = "CrazeLocal"
-        if let representativeScreenshotData = backgroundScreenshotData.reversed().first(where: { $0.imageData != nil }), // Last taken screenshot that has imageData.
-            let representativeImageData = representativeScreenshotData.imageData {
+        if let representativeImageData = imageData {
             
             content.userInfo = [Constants.openingScreenKey  : Constants.openingScreenValueScreenshot,
-                                Constants.openingAssetIdKey : representativeScreenshotData.assetId]
+                                Constants.openingAssetIdKey : assetId]
             
-            identifier += representativeScreenshotData.assetId.replacingOccurrences(of: "/", with: "-")
+            identifier += assetId.replacingOccurrences(of: "/", with: "-")
             // Add image url
             let tmpImageFileUrl = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(identifier).appendingPathExtension("jpg")
             do {
