@@ -734,7 +734,7 @@ extension ScreenshotsViewController:UICollectionViewDelegateFlowLayout {
             case .product:
                 return .zero
             case .notification:
-                if self.hasNewScreenshotSection {
+                if self.hasNewScreenshotSection && !isEditing {
                     return defaultInset
                 }
                 
@@ -777,7 +777,7 @@ extension ScreenshotsViewController:UICollectionViewDelegateFlowLayout {
             case .notification:
                 let minimumSpacing = self.collectionViewInteritemOffset()
                 size.width = floor(collectionView.bounds.size.width - (minimumSpacing.x * 2))
-                size.height = ScreenshotNotificationCollectionViewCell.height(withCellWidth: size.width, contentText: self.notificationContentText(), contentType: .labelWithButtons)
+                size.height = isEditing ? 0.1 : ScreenshotNotificationCollectionViewCell.height(withCellWidth: size.width, contentText: self.notificationContentText(), contentType: .labelWithButtons)
                 
             case .image :
                 let minimumSpacing = self.collectionViewInteritemOffset()
@@ -902,7 +902,7 @@ extension ScreenshotsViewController: UICollectionViewDataSource {
     
     private func collectionViewImageReferenceSize(section: Int, isFooter: Bool = false) -> CGSize {
         if isEditing {
-            return CGSize(width: view.bounds.size.width, height: 1)
+            return CGSize(width: view.bounds.size.width, height: 0.1)
         }
         else {
             var canProgress = true
@@ -988,7 +988,7 @@ extension ScreenshotsViewController: UICollectionViewDataSource {
                     return 0
                 }
             case .notification:
-                return self.hasNewScreenshotSection ? 1 : 0 
+                return self.hasNewScreenshotSection ? 1 : 0
             case .image:
                 return self.screenshotFrcManager?.fetchedObjectsCount ?? 0
             }
