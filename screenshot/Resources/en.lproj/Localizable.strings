@@ -308,6 +308,7 @@
 "product.buy" = "Buy";
 "product.buy_now" = "Buy Now";
 "product.color.default" = "Color";
+"product.burrow" = "Shop Similar";
 "product.next_step.cancel" = "Continue Shopping";
 "product.next_step.continue" = "Go to Cart";
 "product.next_step.added" = "Product was added to your cart!";
@@ -353,6 +354,7 @@
 "profile.header.logged_out.continue" = "Log In or Sign Up";
 "profile.header.logged_out.title" = "Log in for exclusive benefits!";
 "profile.row.currency.title" = "Currency";
+"profile.row.gdpr.title" = "Email & Image detection";
 "profile.row.logout.title" = "Logout";
 "profile.row.open_in.title" = "Open Products In";
 "profile.row.photo_permission.title" = "Camera Roll";
@@ -375,6 +377,9 @@
 "screenshot.permission.photo.title" = "Shop With Screenshop";
 "screenshot.permission.push.message" = "Open your favorite apps and take screenshots of photos with clothes, then come back here to shop them!";
 "screenshot.permission.push.title" = "Start Screenshotting";
+
+"screenshots.actions.discover" = "Find New Looks";
+"screenshots.actions.upload" = "Upload Photo";
 
 "screenshots.delete.placeholder" = "Delete Items";
 "screenshots.delete.plural" = "Delete %d Items";

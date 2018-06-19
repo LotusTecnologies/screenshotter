@@ -9,7 +9,7 @@
 import UIKit
 
 extension UIButton {
-    func adjustInsetsForImage(withPadding padding: CGFloat) {
+    func adjustInsetsForImage(withPadding padding: CGFloat = 6) {
         var contentInsets = contentEdgeInsets
         
         if semanticContentAttribute == .forceRightToLeft {

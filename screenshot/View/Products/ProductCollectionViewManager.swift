@@ -100,7 +100,6 @@ class ProductCollectionViewManager {
         cell.imageUrl = product.imageURL
         cell.isSale = product.isSale()
         cell.favoriteControl.isSelected = product.isFavorite
-        cell.actionType = .buy
     }
     
     
@@ -133,7 +132,7 @@ class ProductCollectionViewManager {
         let verPadding: CGFloat = .extendedPadding
         let horPadding: CGFloat = .padding
 
-       let helperView = HelperView()
+        let helperView = HelperView()
         helperView.translatesAutoresizingMaskIntoConstraints = false
         helperView.layoutMargins = UIEdgeInsets(top: verPadding, left: horPadding, bottom: verPadding, right: horPadding)
         helperView.titleLabel.text = "products.helper.title".localized

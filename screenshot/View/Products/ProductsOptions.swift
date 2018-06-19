@@ -94,12 +94,9 @@ class ProductsOptions : NSObject {
     
     private(set) lazy var viewController: ProductsOptionsViewController = {
         let viewController = ProductsOptionsViewController()
+        viewController.dismissalControl.addTarget(self, action: #selector(cancelAction), for: .touchUpInside)
         viewController.continueButton.addTarget(self, action: #selector(continueAction), for: .touchUpInside)
         self.syncOptions(with: viewController)
-        
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(cancelAction))
-        viewController.view.addGestureRecognizer(tapGesture)
-        
         return viewController
     }()
     
@@ -342,7 +339,8 @@ class ProductsOptionsControls : NSObject {
 class ProductsOptionsViewController: UIViewController {
     private let transitioning = ViewControllerTransitioningDelegate(presentation: .dimmed, transition: .modal)
     private let controls = ProductsOptionsControls()
-
+    
+    fileprivate let dismissalControl = UIControl()
     private let containerView = UIView()
     private let titleLabel = UILabel()
     private(set) lazy var genderControl: UISegmentedControl = {
@@ -380,12 +378,20 @@ class ProductsOptionsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        dismissalControl.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(dismissalControl)
+        dismissalControl.setContentHuggingPriority(.defaultLow, for: .vertical)
+        dismissalControl.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        dismissalControl.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        dismissalControl.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        
         let verticalPadding: CGFloat = .padding * 1.5
         
         containerView.translatesAutoresizingMaskIntoConstraints = false
         containerView.backgroundColor = .white
         containerView.layoutMargins = UIEdgeInsets(top: verticalPadding, left: .padding, bottom: verticalPadding, right: .padding)
         view.addSubview(containerView)
+        containerView.topAnchor.constraint(equalTo: dismissalControl.bottomAnchor).isActive = true
         containerView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         containerView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         containerView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
@@ -441,7 +447,7 @@ class ProductsOptionsViewController: UIViewController {
         containerView.addSubview(continueButton)
         continueButton.topAnchor.constraint(equalTo: sizeControl.bottomAnchor, constant: verticalPadding).isActive = true
         continueButton.leadingAnchor.constraint(equalTo: containerView.leadingAnchor).isActive = true
-        continueButton.bottomAnchor.constraint(equalTo: containerView.bottomAnchor).isActive = true
+        continueButton.bottomAnchor.constraint(equalTo: view.layoutMarginsGuide.bottomAnchor).isActive = true
         continueButton.trailingAnchor.constraint(equalTo: containerView.trailingAnchor).isActive = true
     }
     

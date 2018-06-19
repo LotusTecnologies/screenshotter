@@ -21,7 +21,7 @@ class ProfileAccountView: UIView {
     let contentView = UIView()
     private let loggedInContainerView = UIImageView()
     private let loggedInControl = UIControl()
-    private let avatarButton = RoundButton()
+    private let avatarButton = AvatarButton()
     private let nameLabel = UILabel()
     private let nameTextField = UnderlineTextField()
     private let emailLabel = UILabel()
@@ -206,14 +206,8 @@ class ProfileAccountView: UIView {
         let hasAvatar = avatar != nil
         
         avatarButton.translatesAutoresizingMaskIntoConstraints = false
-        avatarButton.setBackgroundImage(UIImage(named: "DefaultUser"), for: .selected)
-        avatarButton.setBackgroundImage(UIImage(named: "DefaultUser"), for: [.selected, .highlighted])
-        avatarButton.setImage(UIImage(named: "UserCamera"), for: .selected)
-        avatarButton.setImage(UIImage(named: "UserCamera"), for: [.selected, .highlighted])
         avatarButton.addTarget(self, action: #selector(avatarAction), for: .touchUpInside)
         avatarButton.isSelected = !hasAvatar
-        avatarButton.layer.borderColor = UIColor.gray6.cgColor
-        avatarButton.layer.borderWidth = 2
         loggedInContainerView.addSubview(avatarButton)
         avatarButton.widthAnchor.constraint(equalToConstant: 90).isActive = true
         avatarButton.heightAnchor.constraint(equalTo: avatarButton.widthAnchor).isActive = true
@@ -346,6 +340,8 @@ class ProfileAccountView: UIView {
         guard let viewController = delegate?.profileAccountViewPresentImagePickerInViewController(self) else {
             return
         }
+        
+        loggedInContainerView.endEditing(true)
         
         let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         alertController.addAction(UIAlertAction(title: "onboarding.details.avatar.camera".localized, style: .default, handler: { alertAction in

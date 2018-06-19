@@ -740,6 +740,21 @@ extension DataModel {
         return []
     }
     
+    func deleteMatchstick(managedObjectContext: NSManagedObjectContext, imageUrl: String) {
+        let fetchRequest: NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "imageUrl == %@", imageUrl)
+        fetchRequest.sortDescriptors = nil
+        
+        do {
+            let results = try managedObjectContext.fetch(fetchRequest)
+            results.forEach { managedObjectContext.delete($0) }
+            managedObjectContext.saveIfNeeded()
+        } catch {
+            self.receivedCoreDataError(error: error)
+            print("deleteMatchstick imageUrl:\(imageUrl) results with error:\(error)")
+        }
+    }
+    
     // Returns a Promise of the saved Card that should be used only on the main thread.
     func saveCard(fullName: String,
                   number: String,

@@ -21,6 +21,8 @@ class ShadowCollectionViewCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
+        contentView.clipsToBounds = true
+        
         shadowView.translatesAutoresizingMaskIntoConstraints = false
         shadowView.layoutMargins = Shadow.basic.layoutMargins
         shadowView.notifySizeChange = { size in

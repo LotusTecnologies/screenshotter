@@ -254,8 +254,7 @@ class OnboardingDetailsViewController: UIViewController {
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
-        _view.scrollView.contentInset = contentInset
-        _view.scrollView.scrollIndicatorInsets = scrollIndicatorInsets
+        
     }
     
     deinit {

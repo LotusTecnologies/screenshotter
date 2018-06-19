@@ -27,6 +27,7 @@ class ProfileViewController: UITableViewController {
         
         case permissionPhoto
         case permissionPush
+        case permissionGDRP
         
         case logout
         
@@ -51,7 +52,8 @@ class ProfileViewController: UITableViewController {
         ],
         .permissions: [
             .permissionPhoto,
-            .permissionPush
+            .permissionPush,
+            .permissionGDRP
         ]
     ]
     
@@ -71,7 +73,7 @@ class ProfileViewController: UITableViewController {
         button.setTitle("profile.tell_friend".localized, for: .normal)
         button.addTarget(self, action: #selector(inviteAction), for: .touchUpInside)
         button.clipsToBounds = true
-        button.adjustInsetsForImage(withPadding: 6)
+        button.adjustInsetsForImage()
         view.addSubview(button)
         button.sizeToFit()
         button.setContentHuggingPriority(.required, for: .vertical)
@@ -134,8 +136,10 @@ class ProfileViewController: UITableViewController {
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         
-        UIView.performWithoutAnimation {
-            self.animateProfileAccountView(isExpanded: false)
+        if presentedViewController == nil {
+            UIView.performWithoutAnimation {
+                self.animateProfileAccountView(isExpanded: false)
+            }
         }
     }
     
@@ -419,6 +423,9 @@ extension ProfileViewController {
                 })
             }
             
+        case .permissionGDRP:
+            navigationController?.pushViewController(GDPRViewController(), animated: true)
+            
         case .logout:
             // TODO:
             syncLoggedIn()
@@ -444,6 +451,8 @@ extension ProfileViewController {
             return "profile.row.push_permission.title".localized
         case .permissionPhoto:
             return "profile.row.photo_permission.title".localized
+        case .permissionGDRP:
+            return "profile.row.gdpr.title".localized
         case .logout:
             return "profile.row.logout.title".localized
         }
@@ -509,7 +518,7 @@ extension ProfileViewController {
     
     private func cellAccessoryType(for row: Row) -> UITableViewCellAccessoryType {
         switch row {
-        case .optionCurrency:
+        case .optionCurrency, .permissionGDRP:
             return .disclosureIndicator
         default:
             return .none

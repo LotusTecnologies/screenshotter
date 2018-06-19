@@ -51,6 +51,11 @@ class ProductsViewController: BaseViewController {
             self.syncViewsAfterStateChange()
         }
     }
+    var productLoadingState:ProductsViewControllerState = .unknown {
+        didSet {
+            self.syncViewsAfterStateChange()
+        }
+    }
 
     var selectedShoppable:Shoppable?
 
@@ -71,6 +76,7 @@ class ProductsViewController: BaseViewController {
     fileprivate var shoppablesToolbar: ShoppablesToolbar?
     
     var loadingMonitor:AsyncOperationMonitor?
+    var productsLoadingMonitor:AsyncOperationMonitor?
 
     init(screenshot: Screenshot) {
         self.screenshot = screenshot
@@ -270,6 +276,12 @@ extension ProductsViewController: ShoppablesToolbarDelegate {
                 }else{
                     self.reloadProductsFor(shoppable: selectedShoppable)
                 }
+                if let p = self.productsLoadingMonitor {
+                    p.delegate = nil
+                }
+                self.productsLoadingMonitor = AsyncOperationMonitor.init(assetId: nil, shoppableId: selectedShoppable.offersURL, queues: AssetSyncModel.sharedInstance.queues, delegate: self)
+                self.updateLoadingState()
+                
             }else{
                 clearProductListAndStateLoading()
             }
@@ -308,14 +320,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
     }
     
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        let sectionType = productSectionType(forSection: section)
-        if sectionType == .product {
-            return self.products.count
-            
-        } else {
-            return self.relatedLooksManager.numberOfItems()
-        }
-        return 0
+        return productSectionType(forSection: section) == .product ? self.products.count : self.relatedLooksManager.numberOfItems()
     }
     
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
@@ -374,7 +379,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
             let cell = self.productCollectionViewManager.collectionView(collectionView, cellForItemAt: indexPath, with: product)
             if let cell = cell as? ProductsCollectionViewCell {
                 cell.favoriteControl.addTarget(self, action: #selector(productCollectionViewCellFavoriteAction(_:event:)), for: .touchUpInside)
-                cell.actionButton.addTarget(self, action: #selector(productCollectionViewCellBuyAction(_:event:)), for: .touchUpInside)
+                cell.actionButton.addTarget(self, action: #selector(productCollectionViewCellBurrowAction(_:event:)), for: .touchUpInside)
                 return cell
             }
             return cell
@@ -421,9 +426,9 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
 
         if sectionType == .product {
             let product = self.productAtIndex(indexPath.item)
-            if let cell = collectionView.cellForItem(at: indexPath) as? ProductsCollectionViewCell {
-                self.productCollectionViewManager.burrow(cell: cell, product: product, fromVC: self)
-            }
+            if let productViewController = presentProduct(product, atLocation: .products) {
+                productViewController.similarProducts = products
+            }            
         }
         else if sectionType == .relatedLooks {
             if let url = self.relatedLooksManager.relatedLook(at:indexPath.row) {
@@ -460,7 +465,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
     }
     
 
-    @objc func productCollectionViewCellBuyAction(_ control: UIControl, event: UIEvent) {
+    @objc func productCollectionViewCellBurrowAction(_ control: UIControl, event: UIEvent) {
         guard let indexPath = collectionView?.indexPath(for: event) else {
             return
         }
@@ -468,8 +473,8 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         let product = self.productAtIndex(indexPath.item)
         product.recordViewedProduct()
         
-        if let productViewController = presentProduct(product, atLocation: .products) {
-            productViewController.similarProducts = products
+        if let cell = collectionView?.cellForItem(at: indexPath) as? ProductsCollectionViewCell {
+            self.productCollectionViewManager.burrow(cell: cell, product: product, fromVC: self)
         }
     }
 }
@@ -566,7 +571,8 @@ extension ProductsViewControllerProducts{
         self.products = []
         self.relatedLooksManager.relatedLooks = nil
         self.scrollRevealController?.resetViewOffset()
-        
+        self.productLoadingState = .unknown
+
         self.products = self.productCollectionViewManager.productsForShoppable(shoppable, productsOptions: self.productsOptions)
 
         
@@ -736,7 +742,16 @@ extension ProductsViewController {
             self.productCollectionViewManager.stopAndRemoveLoader()
             self.hideNoItemsHelperView()
             self.rateView.isHidden = false
-        
+            
+            switch self.productLoadingState {
+            case .products, .unknown:
+                break;
+            case .loading:
+                self.productCollectionViewManager.startAndAddLoader(view: self.view)
+            case .retry:
+                self.productCollectionViewManager.stopAndRemoveLoader()
+                self.showNoItemsHelperView()
+            }
             
         case .retry:
             if #available(iOS 11.0, *) {} else {
@@ -769,7 +784,7 @@ extension ProductsViewControllerNoItemsHelperView{
             helperView.topAnchor.constraint(equalTo: self.topLayoutGuide.bottomAnchor).isActive = true
         }
         helperView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
-        helperView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
+        helperView.bottomAnchor.constraint(equalTo: self.bottomLayoutGuide.topAnchor).isActive = true
         helperView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
         
     }
@@ -780,7 +795,13 @@ extension ProductsViewControllerNoItemsHelperView{
     }
     
     @objc func noItemsRetryAction() {
-        AssetSyncModel.sharedInstance.refetchShoppables(screenshot: self.screenshot)
+        if self.screenshotLoadingState == .retry {
+            AssetSyncModel.sharedInstance.refetchShoppables(screenshot: self.screenshot)
+        } else if self.productLoadingState == .retry {
+            if let selectedShoppable = self.getSelectedShoppable(), let offersURL = selectedShoppable.offersURL {
+                AssetSyncModel.sharedInstance.reExtractProducts(assetId: self.screenshot.assetId, shoppableId: selectedShoppable.objectID, optionsMask: ProductsOptionsMask.global, offersURL: offersURL)
+            }
+        }
     }
 }
 
@@ -817,6 +838,24 @@ extension ProductsViewController : AsyncOperationMonitorDelegate {
             if state != self.screenshotLoadingState {
                 self.screenshotLoadingState = state
             }
+            
+            
+            let isProductLoading = self.productsLoadingMonitor?.didStart ?? false
+            let productState:ProductsViewControllerState = {
+                if self.products.count > 0 {
+                    return .products
+                }else{
+                    if isProductLoading {
+                        return .loading
+                    }else{
+                        return .retry
+                    }
+                }
+            }()
+            if productState != self.productLoadingState {
+                self.productLoadingState = productState
+            }
+            
         }
     }
     

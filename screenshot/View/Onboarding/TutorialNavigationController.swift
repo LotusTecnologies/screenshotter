@@ -22,11 +22,9 @@ class TutorialNavigationController : UINavigationController {
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
-//        let registerVC = RegisterViewController.init()
-//        registerVC.delegate = self
-        self.isNavigationBarHidden = true
-        let onboardingDetailsViewController = OnboardingDetailsViewController()
-        viewControllers = [onboardingDetailsViewController]
+        let registerVC = RegisterViewController.init()
+        registerVC.delegate = self
+        viewControllers = [registerVC]
         
         view.backgroundColor = .white
         self.isNavigationBarHidden = true
@@ -153,7 +151,7 @@ extension TutorialNavigationController: OnboardingDetailsViewControllerDelegate 
         let size = viewController.size
         
         func saveData() {
-            // TODO: save info
+//            UserAccountManager.shared.setProfile
         }
         
         if name != nil && gender != nil && size != nil {
