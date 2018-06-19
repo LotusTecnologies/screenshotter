@@ -88,7 +88,7 @@ class UserAccountManager : NSObject {
                 confirmVC.applyCode(code: code)
             }
             if let resetVC = AppDelegate.shared.window?.rootViewController?.childViewControllers.last as? ResetPasswordViewController {
-                resetVC._view.codeTextField.text = code
+                resetVC.code = code
             }
             
             handled = true
@@ -285,8 +285,6 @@ class UserAccountManager : NSObject {
                     fulfill(())
                 }
             })
-            reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
-
         }
     }
     

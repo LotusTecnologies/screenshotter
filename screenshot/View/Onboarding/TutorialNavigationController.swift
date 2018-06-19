@@ -126,7 +126,7 @@ extension TutorialNavigationController : ConfirmCodeViewControllerDelegate {
             !viewController.isBeingDismissed
         {
             dismiss(animated: true)
-            pushOnboardingDetailsViewController()
+            pushGDPRViewController()
         }
     }
     

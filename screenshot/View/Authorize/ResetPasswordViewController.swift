@@ -14,7 +14,6 @@ protocol ResetPasswordViewControllerDelegate: NSObjectProtocol {
 }
 
 class ResetPasswordView: UIScrollView {
-    let codeTextField = UnderlineTextField()
     let newPasswordTextField = UnderlineTextField()
     let continueButton = MainButton()
     let cancelButton = UIButton()
@@ -82,31 +81,7 @@ class ResetPasswordView: UIScrollView {
         contentView.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
         contentView.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
         
-        let codeLabel = UILabel()
-        codeLabel.translatesAutoresizingMaskIntoConstraints = false
-        codeLabel.text = "authorize.confirm.code".localized
-        codeLabel.textColor = .gray2
-        codeLabel.font = .screenshopFont(.hindLight, textStyle: .body, staticSize: true)
-        codeLabel.adjustsFontSizeToFitWidth = true
-        codeLabel.minimumScaleFactor = 0.7
-        codeLabel.baselineAdjustment = .alignCenters
-        contentView.addSubview(codeLabel)
-        codeLabel.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor).isActive = true
-        codeLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
-        codeLabel.trailingAnchor.constraint(lessThanOrEqualTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
-        
-        codeTextField.translatesAutoresizingMaskIntoConstraints = false
-        codeTextField.autocorrectionType = .no
-        codeTextField.autocapitalizationType = .none
-        codeTextField.spellCheckingType = .no
-        codeTextField.returnKeyType = .next
-        codeTextField.textColor = .gray2
-        codeTextField.keyboardType = .numbersAndPunctuation
-        contentView.addSubview(codeTextField)
-        codeTextField.topAnchor.constraint(equalTo: codeLabel.bottomAnchor).isActive = true
-        codeTextField.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
-        codeTextField.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
-        
+
         let newPasswordLabel = UILabel()
         newPasswordLabel.translatesAutoresizingMaskIntoConstraints = false
         newPasswordLabel.text = "authorize.reset_password.enter".localized
@@ -116,7 +91,7 @@ class ResetPasswordView: UIScrollView {
         newPasswordLabel.minimumScaleFactor = 0.7
         newPasswordLabel.baselineAdjustment = .alignCenters
         contentView.addSubview(newPasswordLabel)
-        newPasswordLabel.topAnchor.constraint(equalTo: codeTextField.bottomAnchor, constant: .extendedPadding).isActive = true
+        newPasswordLabel.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor).isActive = true
         newPasswordLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
         newPasswordLabel.trailingAnchor.constraint(lessThanOrEqualTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
         
@@ -133,6 +108,7 @@ class ResetPasswordView: UIScrollView {
         
         continueButton.translatesAutoresizingMaskIntoConstraints = false
         continueButton.backgroundColor = .crazeGreen
+        
         continueButton.setTitle("generic.save".localized, for: .normal)
         contentView.addSubview(continueButton)
         continueButton.topAnchor.constraint(equalTo: newPasswordTextField.bottomAnchor, constant: .extendedPadding).isActive = true
@@ -159,7 +135,12 @@ class ResetPasswordView: UIScrollView {
 class ResetPasswordViewController: UIViewController {
     weak var delegate: ResetPasswordViewControllerDelegate?
     var email:String?
-
+    var code:String? {
+        didSet {
+            _view.continueButton.isEnabled = ( code != nil )
+        }
+    }
+    
     private let inputViewAdjustsScrollViewController = InputViewAdjustsScrollViewController()
     
     // MARK: View
@@ -183,8 +164,7 @@ class ResetPasswordViewController: UIViewController {
         super.viewDidLoad()
         
         inputViewAdjustsScrollViewController.scrollView = _view
-        
-        _view.codeTextField.delegate = self
+        _view.continueButton.isEnabled = false
         _view.newPasswordTextField.delegate = self
         
         _view.continueButton.addTarget(self, action: #selector(continueAction), for: .touchUpInside)
@@ -195,21 +175,18 @@ class ResetPasswordViewController: UIViewController {
     }
     
     deinit {
-        _view.codeTextField.delegate = nil
         _view.newPasswordTextField.delegate = nil
     }
     
     // MARK: Actions
     
     @objc private func continueAction() {
-        let code = validateCode(_view.codeTextField.text)
         let password =  UserAccountManager.shared.validatePassword(_view.newPasswordTextField.text)
         
         if let password = password, let code = code {
             dismissKeyboard()
             self._view.continueButton.isEnabled = false
             self._view.continueButton.isLoading = true
-            self._view.codeTextField.isUserInteractionEnabled = false
             self._view.newPasswordTextField.isUserInteractionEnabled = false
             UserAccountManager.shared.confirmForgotPassword(code: code, password: password)
                 .then(on: .main) { () -> Void in
@@ -223,23 +200,23 @@ class ResetPasswordViewController: UIViewController {
                         }else if UserAccountManager.shared.isBadCodeError(error: error){
                             let alert = UserAccountManager.shared.alertViewForBadCode()
                             self.present(alert, animated: true, completion: nil)
+                        }else if UserAccountManager.shared.isWeakPasswordError(error: error) {
+                            self._view.newPasswordTextField.isInvalid = true
+                            self._view.newPasswordTextField.errorText = "authorize.error.passwordInvalid.server".localized
                        }else {
                             let alert = UserAccountManager.shared.alertViewForUndefinedError(error: error, viewController: self)
                             self.present(alert, animated: true, completion: nil)
                         }
                     }
                 }.always(on: .main) {
-                    self._view.continueButton.isEnabled = true
+                    self._view.continueButton.isEnabled = (self.code != nil)
                     self._view.continueButton.isLoading = false
-                    self._view.codeTextField.isUserInteractionEnabled = true
                     self._view.newPasswordTextField.isUserInteractionEnabled = true
             }
 
         }
         else {
-            if code == nil {
-                _view.codeTextField.isInvalid = true
-            }
+
             if password == nil {
                 _view.newPasswordTextField.isInvalid = true
                 _view.newPasswordTextField.errorText = "authorize.error.passwordInvalid".localized
@@ -269,14 +246,8 @@ class ResetPasswordViewController: UIViewController {
     }
     
     private func resetPassword() {
-        _view.codeTextField.text = nil
-        _view.codeTextField.isInvalid = false
         _view.newPasswordTextField.text = nil
         _view.newPasswordTextField.isInvalid = false
-    }
-    
-    private func savePassword(_ password: String) {
-        // TODO:
     }
     
     // MARK: Keyboard
@@ -288,10 +259,8 @@ class ResetPasswordViewController: UIViewController {
 
 extension ResetPasswordViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        if textField == _view.codeTextField {
-            _view.newPasswordTextField.becomeFirstResponder()
-        }
-        else if textField == _view.newPasswordTextField {
+
+        if textField == _view.newPasswordTextField {
             textField.resignFirstResponder()
         }
         return true

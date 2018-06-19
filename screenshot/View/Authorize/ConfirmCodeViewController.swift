@@ -82,7 +82,7 @@ class ConfirmCodeView: UIScrollView {
         contentView.addSubview(explainLabel)
         explainLabel.topAnchor.constraint(equalTo: emailImageView.bottomAnchor, constant: .extendedPadding).isActive = true
         explainLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant:.padding).isActive = true
-        explainLabel.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor,constant:.padding).isActive = true
+        explainLabel.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor,constant:-.padding).isActive = true
         contentView.bottomAnchor.constraint(equalTo: explainLabel.bottomAnchor, constant: .extendedPadding).isActive = true
 
         

@@ -37,7 +37,7 @@ class InitiateResetPasswordView: UIScrollView {
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.text = "authorize.initiate_reset_password.title".localized
         titleLabel.textColor = .gray3
-        titleLabel.font = .screenshopFont(.hindSemibold, textStyle: .title1, staticSize: true)
+        titleLabel.font = .screenshopFont(.quicksandBold, textStyle: .title1, staticSize: true)
         titleLabel.adjustsFontSizeToFitWidth = true
         titleLabel.minimumScaleFactor = 0.7
         addSubview(titleLabel)

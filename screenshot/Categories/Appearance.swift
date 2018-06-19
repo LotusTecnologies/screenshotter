@@ -29,6 +29,8 @@ extension UIColor {
     static let gray8 = UIColor(white: 0.8, alpha: 1) // 204
     static let gray9 = UIColor(white: 0.9, alpha: 1) // 229.5
     
+    static let disabledButton = UIColor.gray4
+    
     func lighter(by percentage: CGFloat = 8) -> UIColor {
         return adjust(rgbBy: abs(percentage))
     }
