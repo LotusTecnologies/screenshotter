@@ -319,14 +319,20 @@ class UserAccountManager : NSObject {
         }
     }
     
-    @discardableResult func setProfile(displayName:String, gender:String, size:String) -> Promise<Void>{
+    @discardableResult func setProfile(displayName:String?, gender:String?, size:String?) -> Promise<Void>{
         return Promise { fulfill, reject in
             let promise = makeAnonAccountPromise ?? Promise.init(value:())
             promise.then(execute: { () -> Void in
                 if let user = self.user {
-                    self.databaseRef.child("users").child(user.uid).child("displayName").setValue(displayName)
-                    self.databaseRef.child("users").child(user.uid).child("gender").setValue(gender)
-                    self.databaseRef.child("users").child(user.uid).child("size").setValue(size)
+                    if let displayName = displayName {
+                        self.databaseRef.child("users").child(user.uid).child("displayName").setValue(displayName)
+                    }
+                    if let gender = gender {
+                        self.databaseRef.child("users").child(user.uid).child("gender").setValue(gender)
+                    }
+                    if let size = size {
+                        self.databaseRef.child("users").child(user.uid).child("size").setValue(size)
+                    }
                     fulfill(())
                 }else{
                     reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))

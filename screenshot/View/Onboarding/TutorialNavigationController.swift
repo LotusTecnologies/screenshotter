@@ -151,7 +151,7 @@ extension TutorialNavigationController: OnboardingDetailsViewControllerDelegate 
         let size = viewController.size
         
         func saveData() {
-//            UserAccountManager.shared.setProfile
+            UserAccountManager.shared.setProfile(displayName: name, gender: gender, size: size)
         }
         
         if name != nil && gender != nil && size != nil {
