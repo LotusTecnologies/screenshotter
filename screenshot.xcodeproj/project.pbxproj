@@ -161,6 +161,7 @@
 		C572FF00205C00070046BFEB /* Hind-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C572FEFB205C00060046BFEB /* Hind-Regular.ttf */; };
 		C572FF01205C00070046BFEB /* Hind-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C572FEFC205C00060046BFEB /* Hind-SemiBold.ttf */; };
 		C572FF02205C00070046BFEB /* Hind-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C572FEFD205C00070046BFEB /* Hind-Medium.ttf */; };
+		C57ACE8620D90DC60094F784 /* HiddenLogoController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C57ACE8520D90DC60094F784 /* HiddenLogoController.swift */; };
 		C57E93A9204BEE4E0069C378 /* OpenWebPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C57E93A8204BEE4E0069C378 /* OpenWebPage.swift */; };
 		C5847EF81F7A53F60024DCAB /* CredentialHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */; };
 		C58FA0F120A95FC300072966 /* TutorialTrySlideViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58FA0E520A95FC200072966 /* TutorialTrySlideViewController.swift */; };
@@ -426,6 +427,7 @@
 		C572FEFB205C00060046BFEB /* Hind-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Hind-Regular.ttf"; sourceTree = "<group>"; };
 		C572FEFC205C00060046BFEB /* Hind-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Hind-SemiBold.ttf"; sourceTree = "<group>"; };
 		C572FEFD205C00070046BFEB /* Hind-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Hind-Medium.ttf"; sourceTree = "<group>"; };
+		C57ACE8520D90DC60094F784 /* HiddenLogoController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HiddenLogoController.swift; sourceTree = "<group>"; };
 		C57E93A8204BEE4E0069C378 /* OpenWebPage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpenWebPage.swift; sourceTree = "<group>"; };
 		C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialHelper.swift; sourceTree = "<group>"; };
 		C58FA0E520A95FC200072966 /* TutorialTrySlideViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialTrySlideViewController.swift; sourceTree = "<group>"; };
@@ -1125,6 +1127,7 @@
 			isa = PBXGroup;
 			children = (
 				C5D57935203F044B00A076FE /* EmptyListController.swift */,
+				C57ACE8520D90DC60094F784 /* HiddenLogoController.swift */,
 				C50E2616207F6703003C8D24 /* TextFieldFormatter.swift */,
 			);
 			path = Controller;
@@ -1549,6 +1552,7 @@
 				C553563C1F8369DF00849E64 /* DeviceHelper.swift in Sources */,
 				C540880D1FE90C8E00198955 /* Loader.swift in Sources */,
 				C5709E451FC57B4500AB2D04 /* EnumProtocol.swift in Sources */,
+				C57ACE8620D90DC60094F784 /* HiddenLogoController.swift in Sources */,
 				318FE266204C09C500277DD4 /* AsyncOperation.swift in Sources */,
 				C540881D1FE90C8E00198955 /* CurrencyViewController.swift in Sources */,
 				C50DBB8E207CC56000BB206E /* CardTableViewCell.swift in Sources */,

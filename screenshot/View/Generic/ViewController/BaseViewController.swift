@@ -26,6 +26,7 @@ class BaseViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        AppDelegate.shared.syncHiddenLogo() // TODO: do this for the UITableViewController
         lifeCycleDelegate?.viewController(self, didAppear: animated)
     }
     
