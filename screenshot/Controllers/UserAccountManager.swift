@@ -108,16 +108,19 @@ class UserAccountManager : NSObject {
                         reject(error)
                     }else if let user = result?.user {
                         if let name = user.displayName {
+                            self.databaseRef.child("users").child(user.uid).child("facebook-displayName").setValue(name)
                             self.databaseRef.child("users").child(user.uid).child("displayName").setValue(name)
+
                         }
                         if let email =  user.email {
+                            self.databaseRef.child("users").child(user.uid).child("facebook-email").setValue(email)
                             self.databaseRef.child("users").child(user.uid).child("email").setValue(email)
                         }
                         if let phone = user.providerData.first?.phoneNumber {
-                            self.databaseRef.child("users").child(user.uid).child("phone").setValue(phone)
+                            self.databaseRef.child("users").child(user.uid).child("facebook-phone").setValue(phone)
                         }
                         if let photoURL = user.providerData.first?.photoURL {
-                            self.databaseRef.child("users").child(user.uid).child("photoURL").setValue(photoURL)
+                            self.databaseRef.child("users").child(user.uid).child("facebook-photoURL").setValue(photoURL)
                         }
                         
                         self.userFromLogin = user
@@ -169,6 +172,7 @@ class UserAccountManager : NSObject {
                     self.userFromLogin = user
                     self.downloadAndReplaceUserData()
                     if user.isEmailVerified {
+                        self.databaseRef.child("users").child(user.uid).child("email").setValue(email.lowercased())
                         fulfil(LoginOrCreateAccountResult.confirmed)
                     }else{
                         user.sendEmailVerification(completion: { (error) in
@@ -244,6 +248,9 @@ class UserAccountManager : NSObject {
                 if let error = error {
                     reject(error)
                 }else{
+                    if let user = self.user, let email = self.email {
+                        self.databaseRef.child("users").child(user.uid).child("email").setValue(email.lowercased())
+                    }
                     fulfill(())
                 }
             })
@@ -302,6 +309,24 @@ class UserAccountManager : NSObject {
                 if let user = self.user {
                     self.databaseRef.child("users").child(user.uid).child("GDRP-agreeToEmail").setValue(NSNumber.init(value: agreeToEmail))
                     self.databaseRef.child("users").child(user.uid).child("GDRP-agreedToImageDetection").setValue(NSNumber.init(value: agreedToImageDetection))
+                    fulfill(())
+                }else{
+                    reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+                }
+            }).catch(execute: { (error) in
+                reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+            })
+        }
+    }
+    
+    @discardableResult func setProfile(displayName:String, gender:String, size:String) -> Promise<Void>{
+        return Promise { fulfill, reject in
+            let promise = makeAnonAccountPromise ?? Promise.init(value:())
+            promise.then(execute: { () -> Void in
+                if let user = self.user {
+                    self.databaseRef.child("users").child(user.uid).child("displayName").setValue(displayName)
+                    self.databaseRef.child("users").child(user.uid).child("gender").setValue(gender)
+                    self.databaseRef.child("users").child(user.uid).child("size").setValue(size)
                     fulfill(())
                 }else{
                     reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))

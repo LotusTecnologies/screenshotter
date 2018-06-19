@@ -22,9 +22,11 @@ class TutorialNavigationController : UINavigationController {
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
-        let registerVC = RegisterViewController.init()
-        registerVC.delegate = self
-        viewControllers = [registerVC]
+//        let registerVC = RegisterViewController.init()
+//        registerVC.delegate = self
+        self.isNavigationBarHidden = true
+        let onboardingDetailsViewController = OnboardingDetailsViewController()
+        viewControllers = [onboardingDetailsViewController]
         
         view.backgroundColor = .white
         self.isNavigationBarHidden = true
