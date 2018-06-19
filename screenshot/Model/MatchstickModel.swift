@@ -107,7 +107,39 @@ class MatchstickModel: NSObject {
                         completed()
                     }
                 }.catch(on: self.processingQ) { error in
-                    print("fetchImageData catch error:\(error)")
+                    if let err = error as? PMKURLError {
+                        switch err {
+                        case let .badResponse(request, data, response):
+                            let errorString: String
+                            let dataCount: Int
+                            if let data = data {
+                                errorString = String(data: data, encoding: .utf8) ?? "-"
+                                dataCount = data.count
+                            } else {
+                                errorString = "-"
+                                dataCount = 0
+                            }
+                            let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
+                            print("fetchImageData specific catch badResponse data count:\(dataCount)  statusCode:\(statusCode)  errorString:\(errorString)  request:\(request)")
+                            let dataModel = DataModel.sharedInstance
+                            dataModel.performBackgroundTask { (managedObjectContext) in
+                                dataModel.deleteMatchstick(managedObjectContext: managedObjectContext, imageUrl: imageUrl)
+                            }
+                        case let .invalidImageData(request, data):
+                            print("fetchImageData specific catch invalidImageData data count:\(data.count)  request:\(request)")
+                        case let .stringEncoding(request, data, response):
+                            let errorString: String
+                            if let dataString = String(data: data, encoding: .utf8) {
+                                errorString = dataString
+                            } else {
+                                errorString = "-"
+                            }
+                            let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
+                            print("fetchImageData specific catch stringEncoding data count:\(data.count)  statusCode:\(statusCode)  errorString:\(errorString)  request:\(request)")
+                        }
+                    } else {
+                        print("fetchImageData catch error:\(error)")
+                    }
                     completed()
             }
             
