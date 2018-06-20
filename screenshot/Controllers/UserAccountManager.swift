@@ -115,6 +115,7 @@ class UserAccountManager : NSObject {
                         if let email =  user.email {
                             self.databaseRef.child("users").child(user.uid).child("facebook-email").setValue(email)
                             self.databaseRef.child("users").child(user.uid).child("email").setValue(email)
+                            UserDefaults.standard.set(email, forKey: UserDefaultsKeys.email)
                         }
                         if let phone = user.providerData.first?.phoneNumber {
                             self.databaseRef.child("users").child(user.uid).child("facebook-phone").setValue(phone)
@@ -173,6 +174,7 @@ class UserAccountManager : NSObject {
                     self.downloadAndReplaceUserData()
                     if user.isEmailVerified {
                         self.databaseRef.child("users").child(user.uid).child("email").setValue(email.lowercased())
+                        UserDefaults.standard.set(email, forKey: UserDefaultsKeys.email)
                         fulfil(LoginOrCreateAccountResult.confirmed)
                     }else{
                         user.sendEmailVerification(completion: { (error) in
@@ -250,6 +252,7 @@ class UserAccountManager : NSObject {
                 }else{
                     if let user = self.user, let email = self.email {
                         self.databaseRef.child("users").child(user.uid).child("email").setValue(email.lowercased())
+                        UserDefaults.standard.set(email, forKey: UserDefaultsKeys.email)
                     }
                     fulfill(())
                 }

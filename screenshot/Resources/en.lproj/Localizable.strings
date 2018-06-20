@@ -36,7 +36,6 @@
 
 "authorize.register.continue" = "Start Shopping";
 "authorize.register.continue.login" = "Log In";
-"authorize.register.continue.register" = "Sign Up";
 "authorize.register.email" = "Email Address";
 "authorize.register.forgot" = "Forgot Password?";
 "authorize.register.legal.0" = "By tapping \"Sign Up\" above, you agree to our ";
