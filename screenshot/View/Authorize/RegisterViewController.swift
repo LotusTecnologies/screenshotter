@@ -27,56 +27,6 @@ class RegisterView: UIScrollView {
     let continueButton = MainButton()
     let skipButton = UIButton()
     
-    private var showForgotPasswordConstraints: [NSLayoutConstraint] = []
-    private var hideForgotPasswordConstraints: [NSLayoutConstraint] = []
-    
-    var isForgotPasswordButtonHidden = true {
-        didSet {
-            let duration: TimeInterval = .defaultAnimationDuration
-            let curve: String
-            let startTime: TimeInterval
-            
-            if isForgotPasswordButtonHidden {
-                startTime = 0
-                curve = kCAMediaTimingFunctionEaseIn
-                
-                NSLayoutConstraint.deactivate(showForgotPasswordConstraints)
-                NSLayoutConstraint.activate(hideForgotPasswordConstraints)
-            }
-            else {
-                startTime = 0.5
-                curve = kCAMediaTimingFunctionEaseOut
-                
-                NSLayoutConstraint.deactivate(hideForgotPasswordConstraints)
-                NSLayoutConstraint.activate(showForgotPasswordConstraints)
-            }
-            
-            if self.window == nil {
-                self.forgotPasswordButton.alpha = self.isForgotPasswordButtonHidden ? 0 : 1
-                self.layoutSubviews()
-            }else{
-                CATransaction.begin()
-                CATransaction.setAnimationDuration(duration)
-                CATransaction.setAnimationTimingFunction(CAMediaTimingFunction(name: curve))
-                
-                UIView.animateKeyframes(withDuration: duration, delay: 0, options: .init(rawValue: 0), animations: {
-                    UIView.addKeyframe(withRelativeStartTime: startTime, relativeDuration: 0.5, animations: {
-                        self.forgotPasswordButton.alpha = self.isForgotPasswordButtonHidden ? 0 : 1
-                    })
-                    UIView.addKeyframe(withRelativeStartTime: 0, relativeDuration: 1, animations: {
-                        self.layoutSubviews()
-                    })
-                })
-                
-                let animation = CABasicAnimation(keyPath: "shadowPath")
-                contentView.layer.add(animation, forKey: animation.keyPath)
-                
-                CATransaction.commit()
-            }
-           
-        }
-    }
-    
     var activeTextFieldTopOffset: CGFloat {
         return horizontalLinesView.frame.maxY
     }
@@ -89,7 +39,6 @@ class RegisterView: UIScrollView {
         let verticalInset: CGFloat = UIDevice.is320w ? .padding : .padding * 2
         return UIEdgeInsets(top: verticalInset, left: .padding, bottom: verticalInset, right: .padding)
     }()
-    
     
     // MARK: Life Cycle
     
@@ -213,10 +162,6 @@ class RegisterView: UIScrollView {
         continueButton.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
         continueButton.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
         
-        hideForgotPasswordConstraints += [
-            continueButton.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor, constant: verticalNegativeMargin)
-        ]
-        
         let color: UIColor = .crazeRed
         
         // TODO: underline
@@ -225,17 +170,11 @@ class RegisterView: UIScrollView {
         forgotPasswordButton.setTitleColor(color, for: .normal)
         forgotPasswordButton.setTitleColor(color.darker(), for: .highlighted)
         forgotPasswordButton.contentEdgeInsets = UIEdgeInsets(top: 6 + .padding, left: .padding, bottom: 6, right: .padding)
-        forgotPasswordButton.alpha = 0
         contentView.addSubview(forgotPasswordButton)
         forgotPasswordButton.topAnchor.constraint(equalTo: continueButton.bottomAnchor).isActive = true
         forgotPasswordButton.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
+        forgotPasswordButton.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor, constant: verticalNegativeMargin).isActive = true
         forgotPasswordButton.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
-        
-        showForgotPasswordConstraints += [
-            forgotPasswordButton.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor, constant: verticalNegativeMargin)
-        ]
-        
-        NSLayoutConstraint.activate(hideForgotPasswordConstraints)
         
         let skipLayoutGuide = UILayoutGuide()
         addLayoutGuide(skipLayoutGuide)
@@ -307,7 +246,6 @@ class RegisterViewController: UIViewController {
     private enum ContinueCopy {
         case `default`
         case login
-        case register
     }
     
     weak var delegate: RegisterViewControllerDelegate?
@@ -322,8 +260,6 @@ class RegisterViewController: UIViewController {
             copy = "authorize.register.continue".localized
         case .login:
             copy = "authorize.register.continue.login".localized
-        case .register:
-            copy = "authorize.register.continue.register".localized
         }
         
         _view.continueButton.setTitle(copy, for: .normal)
@@ -395,8 +331,6 @@ class RegisterViewController: UIViewController {
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         _view.addGestureRecognizer(tapGesture)
-        
-        self._view.isForgotPasswordButtonHidden = false
     }
     
     deinit {
@@ -457,7 +391,6 @@ class RegisterViewController: UIViewController {
                  
                     self._view.emailTextField.isInvalid = true
                     self._view.passwordTextField.isInvalid = true
-                    self._view.isForgotPasswordButtonHidden = false
                     ActionFeedbackGenerator().actionOccurred(.nope)
                     let error = error as NSError
                     if UserAccountManager.shared.isNoInternetError(error: error) {
