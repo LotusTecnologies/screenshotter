@@ -208,10 +208,10 @@ class ProfileViewController: UITableViewController {
 
 extension ProfileViewController: ProfileAccountViewDelegate {
     func profileAccountViewAuthorize(_ view: ProfileAccountView) {
-        // TODO: do login
-        view.isLoggedIn = true
-        
-        syncLoggedIn()
+        let vc = RegisterViewController.init()
+        vc.delegate = self
+        self.present(vc, animated: true, completion: nil)
+
     }
     
     func profileAccountViewWantsToContract(_ view: ProfileAccountView) {
@@ -248,6 +248,29 @@ extension ProfileViewController: ProfileAccountViewDelegate {
     }
 }
 
+extension ProfileViewController : RegisterViewControllerDelegate {
+    func registerViewControllerDidSkip(_ viewController: RegisterViewController) {
+        self.dismiss(animated: true, completion: nil)
+    }
+    
+    func registerViewControllerNeedEmailConfirmation(_ viewController: RegisterViewController) {
+        self.dismiss(animated: true, completion: nil)
+    }
+    
+    func registerViewControllerDidSignin(_ viewController: RegisterViewController) {
+        self.dismiss(animated: true, completion: nil)
+    }
+    
+    func registerViewControllerDidFacebookLogin(_ viewController: RegisterViewController) {
+        self.dismiss(animated: true, completion: nil)
+    }
+    
+    func registerViewControllerDidFacebookSignup(_ viewController: RegisterViewController) {
+        self.dismiss(animated: true, completion: nil)
+    }
+    
+    
+}
 // MARK: - Table View
 
 extension ProfileViewController {
