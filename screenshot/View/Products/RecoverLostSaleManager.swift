@@ -30,6 +30,7 @@ class RecoverLostSaleManager: NSObject {
         if let data = timeLeftApp, abs(data.timeIntervalSinceNow) < timeout {
             if let objectId = clickOnProductObjectId {
                 if let product = DataModel.sharedInstance.mainMoc().productWith(objectId: objectId) {
+                    clickOnProductObjectId = nil
                     self.delegate?.recoverLostSaleManager(self, returnedFrom: product)
                 }
             }
