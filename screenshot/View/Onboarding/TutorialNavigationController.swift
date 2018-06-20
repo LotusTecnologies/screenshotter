@@ -24,6 +24,7 @@ class TutorialNavigationController : UINavigationController {
         
         let registerVC = RegisterViewController.init()
         registerVC.delegate = self
+        registerVC.isOnboardingLayout = true
         viewControllers = [registerVC]
         
         view.backgroundColor = .white
