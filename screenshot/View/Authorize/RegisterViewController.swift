@@ -21,7 +21,7 @@ class RegisterView: UIScrollView {
     let facebookLoginButton = FacebookButton()
     private let horizontalLinesView = HorizontalLinesView()
     let contentView = ContentContainerView()
-    let emailTextField = RegisterExistingTextField()
+    let emailTextField = UnderlineTextField()
     let passwordTextField = UnderlineTextField()
     let forgotPasswordButton = UIButton()
     let continueButton = MainButton()
@@ -385,7 +385,6 @@ class RegisterViewController: UIViewController {
         
         if let email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email) {
             self.email = email
-            _view.emailTextField.exists = .yes
             setContinueCopy(.login)
         }
         
@@ -595,14 +594,11 @@ extension RegisterViewController: UITextFieldDelegate {
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
-        if textField == _view.emailTextField {
-            if let email = self.email, emailFormRow.isValid() {
-                _view.emailTextField.exists = .unknown
-                
+        if textField == _view.emailTextField, let email = self.email, !email.isEmpty {
+            if emailFormRow.isValid() {
                 previousEmail = email
             }
             else {
-                _view.emailTextField.exists = .unknown
                 _view.emailTextField.isInvalid = true
                 ActionFeedbackGenerator().actionOccurred(.nope)
             }
