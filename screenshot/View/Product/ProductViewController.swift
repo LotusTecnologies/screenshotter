@@ -284,19 +284,12 @@ fileprivate extension ProductViewControllerProductView {
     }
     
     @objc fileprivate func nextStepContinueAction() {
-        presentCart { [weak self] in
-            if let navigationController = self?.navigationController as? ScreenshotsNavigationController {
-                navigationController.presentGiftCardCampaignIfNeeded()
-            }
-        }
+        presentCart(completion: nil)
     }
     
     @objc fileprivate func nextStepCancelAction() {
         dismiss(animated: true, completion: nil)
         
-        if let navigationController = navigationController as? ScreenshotsNavigationController {
-            navigationController.presentGiftCardCampaignIfNeeded()
-        }
     }
     
     // MARK: Favorite / Stock

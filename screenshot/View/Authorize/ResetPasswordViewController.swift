@@ -193,6 +193,9 @@ class ResetPasswordViewController: UIViewController {
                 .then(on: .main) { () -> Void in
                     self.delegate?.resetPasswordViewControllerDidReset(self)
                 }.catch { (error) in
+                    let e = error as NSError
+                    Analytics.trackOnboardingError(domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
+
                     DispatchQueue.main.async {
                         let error = error as NSError
                         if UserAccountManager.shared.isNoInternetError(error: error) {

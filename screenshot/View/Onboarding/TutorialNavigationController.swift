@@ -33,7 +33,7 @@ class TutorialNavigationController : UINavigationController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        Analytics.trackStartedTutorial()
+        Analytics.trackStartedOnboarding()
     }
     
     private func tutorialCompleted() {
@@ -60,6 +60,7 @@ extension TutorialNavigationController : UINavigationControllerDelegate {
 extension TutorialNavigationController: RegisterViewControllerDelegate {
     func registerViewControllerDidSkip(_ viewController: RegisterViewController) {
         pushGDPRViewController()
+        Analytics.trackOnboardingSkipped()
     }
     
     func registerViewControllerNeedEmailConfirmation(_ viewController: RegisterViewController) {
@@ -67,18 +68,23 @@ extension TutorialNavigationController: RegisterViewControllerDelegate {
         confirm.email = viewController.email
         confirm.delegate = self
         self.pushViewController(confirm, animated: true)
+        Analytics.trackOnboardingRegisterEmailSent()
     }
     
     func registerViewControllerDidSignin(_ viewController: RegisterViewController) {
         pushGDPRViewController()
+        Analytics.trackOnboardingLoginSucess()
     }
     
     func registerViewControllerDidFacebookLogin(_ viewController: RegisterViewController) {
-        pushGDPRViewController()    }
+        pushGDPRViewController()
+        Analytics.trackOnboardingFacebookSuccess(isReturning: true)
+    }
     
     func registerViewControllerDidFacebookSignup(_ viewController: RegisterViewController) {
         showProfilePage = true
         self.presentRegisterConfirmationViewController()
+        Analytics.trackOnboardingFacebookSuccess(isReturning: false)
         
     }
     private func pushGDPRViewController() {
@@ -90,6 +96,7 @@ extension TutorialNavigationController: RegisterViewControllerDelegate {
 
 extension TutorialNavigationController : OnboardingGDPRViewControllerDelegate {
     func onboardingGDPRViewController(agreedToEmail: Bool, agreedToImageDetection: Bool) {
+        Analytics.trackOnboardingGdpr(agreedToEmail: agreedToEmail, agreedToImageDetection: agreedToImageDetection)
         UserAccountManager.shared.setGDPR(agreedToEmail: agreedToEmail, agreedToImageDetection: agreedToImageDetection)
         if showProfilePage {
             pushOnboardingDetailsViewController()
@@ -103,10 +110,12 @@ extension TutorialNavigationController : OnboardingGDPRViewControllerDelegate {
 extension TutorialNavigationController : ConfirmCodeViewControllerDelegate {
     
     func confirmCodeViewControllerDidConfirm(_ viewController: ConfirmCodeViewController){
+        Analytics.trackOnboardingRegisterSucess()
         showProfilePage = true
         self.presentRegisterConfirmationViewController()
     }
     func confirmCodeViewControllerDidCancel(_ viewController: ConfirmCodeViewController){
+        Analytics.trackOnboardingRegisterEmailCancel()
         self.popViewController(animated: true)
     }
     
@@ -142,6 +151,7 @@ extension TutorialNavigationController: OnboardingDetailsViewControllerDelegate 
     }
     
     func onboardingDetailsViewControllerDidSkip(_ viewController: OnboardingDetailsViewController) {
+        Analytics.trackOnboardingProfileSkip()
         tutorialCompleted()
     }
     
@@ -152,6 +162,7 @@ extension TutorialNavigationController: OnboardingDetailsViewControllerDelegate 
         
         func saveData() {
             UserAccountManager.shared.setProfile(displayName: name, gender: gender, size: size)
+            Analytics.trackOnboardingProfileSubmit(name: name, gender: gender, size: size)
         }
         
         if name != nil && gender != nil && size != nil {
