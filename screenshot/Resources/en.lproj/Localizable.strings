@@ -209,6 +209,8 @@
 "notification.screenshot.shoppable" = "Your screenshot is shoppable in the screenshot tab";
 "notification.title" = "Ready to shop?";
 
+"notification.inactivity.discover.message" = "Check out the latest fashion trends on Discover!";
+
 "onboarding.details.avatar.camera" = "Take a Photo";
 "onboarding.details.avatar.gallery" = "Upload From Gallery";
 

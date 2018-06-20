@@ -102,7 +102,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         frameworkSetup(application, didFinishLaunchingWithOptions: launchOptions)
         
         SilentPushSubscriptionManager.sharedInstance.updateSubscriptionsIfNeeded()
-        
+        LocalNotificationModel.setup()
+
         NotificationCenter.default.addObserver(self, selector: #selector(badgeNumberDidChange(_:)), name: .ScreenshotUninformedAccumulatorModelDidChange, object: nil)
         
         if application.applicationState == .background,
@@ -639,11 +640,16 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
     
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         if let userInfo = response.notification.request.content.userInfo as? [String : Any] {
-            if let openingScreen = userInfo[Constants.openingScreenKey] as? String,
-                openingScreen == Constants.openingScreenValueScreenshot,
-                let openingAssetId = userInfo[Constants.openingAssetIdKey] as? String {
-                AssetSyncModel.sharedInstance.importPhotosToScreenshot(assetIds: [openingAssetId], source: .screenshot)
-                showScreenshotListTop()
+            if let openingScreen = userInfo[Constants.openingScreenKey] as? String {
+                if openingScreen == Constants.openingScreenValueScreenshot,
+                  let openingAssetId = userInfo[Constants.openingAssetIdKey] as? String {
+                    AssetSyncModel.sharedInstance.importPhotosToScreenshot(assetIds: [openingAssetId], source: .screenshot)
+                    showScreenshotListTop()
+                } else if openingScreen == Constants.openingScreenValueDiscover {
+                    if let mainTabBarController = self.window?.rootViewController as? MainTabBarController {
+                        mainTabBarController.goTo(tab: .discover)
+                    }
+                }
             } else if let aps = userInfo["aps"] as? [String : Any],
                 let category = aps["category"] as? String,
                 category == "PRICE_ALERT",

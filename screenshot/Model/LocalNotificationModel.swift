@@ -13,6 +13,28 @@ import UserNotifications
 class LocalNotificationModel {
     
     static let shared = LocalNotificationModel()
+    static func setup() {
+        let _ = LocalNotificationModel.shared
+    }
+    
+    let inactivityDiscoverId = "CrazeInactivityDiscover"
+
+    init() {
+        NotificationCenter.default.addObserver(self, selector: #selector(applicationWillEnterForeground), name: .UIApplicationWillEnterForeground, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(applicationDidEnterBackground), name: .UIApplicationDidEnterBackground, object: nil)
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    @objc func applicationWillEnterForeground() {
+        cancelInactivityDiscoverLocalNotification()
+    }
+    
+    @objc func applicationDidEnterBackground() {
+        scheduleInactivityDiscoverLocalNotification()
+    }
     
     func sendScreenshotAddedLocalNotification(assetId: String, imageData: Data?) {
         guard PermissionsManager.shared.hasPermission(for: .push) else {
@@ -66,4 +88,33 @@ class LocalNotificationModel {
         })
     }
 
+    func scheduleInactivityDiscoverLocalNotification() {
+        guard PermissionsManager.shared.hasPermission(for: .push) else {
+            return
+        }
+
+        let content = UNMutableNotificationContent()
+        content.body = "notification.inactivity.discover.message".localized
+        content.sound = UNNotificationSound.default()
+        content.userInfo = [Constants.openingScreenKey  : Constants.openingScreenValueDiscover]
+        
+//        let threeDays: TimeInterval = 3 * Constants.secondsInDay
+        let threeMinutes: TimeInterval = 3 * 60
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: threeMinutes, repeats: false)
+        let request = UNNotificationRequest(identifier: inactivityDiscoverId,
+                                            content: content,
+                                            trigger: trigger)
+        UNUserNotificationCenter.current().add(request, withCompletionHandler: { (error) in
+            if let error = error {
+                print("scheduleInactivityDiscoverLocalNotification identifier:\(self.inactivityDiscoverId)  error:\(error)")
+            } else {
+                Analytics.trackAppSentLocalPushNotification()  // TODO: GMK Track inactivity push
+            }
+        })
+    }
+
+    func cancelInactivityDiscoverLocalNotification() {
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [inactivityDiscoverId])
+    }
+    
 }
