@@ -229,7 +229,7 @@ extension OnboardingGDPRViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        var isSelected = true // TODO:
+        var isSelected = true
         
         if indexPath.row == GDPRViewController.Rows.notification.rawValue {
             isSelected = agreeToEmail
