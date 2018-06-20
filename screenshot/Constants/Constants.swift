@@ -27,7 +27,7 @@ class Constants {
     static let currentMomVersion = 18
     
     // Cart
-//    static let cartItemMaxQuantity = 10
+    static let cartItemMaxQuantity = 10
     
     // Calculation
     static let secondsInHour: TimeInterval = 3600
