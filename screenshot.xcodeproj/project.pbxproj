@@ -233,6 +233,9 @@
 		C57ACEC720DA37F00094F784 /* CheckoutSupportedLocationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C57ACEAF20DA37EF0094F784 /* CheckoutSupportedLocationModel.swift */; };
 		C57ACEC820DA37F00094F784 /* FetchedResultsControllerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C57ACEB020DA37EF0094F784 /* FetchedResultsControllerManager.swift */; };
 		C57ACEC920DA37F00094F784 /* CurrencyModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C57ACEB120DA37EF0094F784 /* CurrencyModel.swift */; };
+		C57ACECB20DA40E00094F784 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C57ACECA20DA40DF0094F784 /* libz.tbd */; };
+		C57ACECD20DA40ED0094F784 /* libstdc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C57ACECC20DA40ED0094F784 /* libstdc++.tbd */; };
+		C57ACECF20DA413D0094F784 /* Pushwoosh.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C57ACECE20DA413D0094F784 /* Pushwoosh.framework */; };
 		C5847EF81F7A53F60024DCAB /* CredentialHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */; };
 		C5CAF27A1FCC0EFD006F37DC /* ISO4217.plist in Resources */ = {isa = PBXBuildFile; fileRef = C5CAF2791FCC0EFD006F37DC /* ISO4217.plist */; };
 		C5CC3E391F94A85900DA3425 /* NetworkingIndicatorProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CC3E381F94A85900DA3425 /* NetworkingIndicatorProtocol.swift */; };
@@ -524,6 +527,9 @@
 		C57ACEAF20DA37EF0094F784 /* CheckoutSupportedLocationModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CheckoutSupportedLocationModel.swift; sourceTree = "<group>"; };
 		C57ACEB020DA37EF0094F784 /* FetchedResultsControllerManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FetchedResultsControllerManager.swift; sourceTree = "<group>"; };
 		C57ACEB120DA37EF0094F784 /* CurrencyModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CurrencyModel.swift; sourceTree = "<group>"; };
+		C57ACECA20DA40DF0094F784 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
+		C57ACECC20DA40ED0094F784 /* libstdc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libstdc++.tbd"; path = "usr/lib/libstdc++.tbd"; sourceTree = SDKROOT; };
+		C57ACECE20DA413D0094F784 /* Pushwoosh.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Pushwoosh.framework; path = Pods/Pushwoosh/Framework/Pushwoosh.framework; sourceTree = "<group>"; };
 		C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialHelper.swift; sourceTree = "<group>"; };
 		C5CAF2791FCC0EFD006F37DC /* ISO4217.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = ISO4217.plist; sourceTree = "<group>"; };
 		C5CC3E381F94A85900DA3425 /* NetworkingIndicatorProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkingIndicatorProtocol.swift; sourceTree = "<group>"; };
@@ -559,6 +565,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C57ACECF20DA413D0094F784 /* Pushwoosh.framework in Frameworks */,
+				C57ACECD20DA40ED0094F784 /* libstdc++.tbd in Frameworks */,
+				C57ACECB20DA40E00094F784 /* libz.tbd in Frameworks */,
 				5BCAB697F3F2E7E51098066C /* Pods_screenshot.framework in Frameworks */,
 				31EF9B092029D542006D3B35 /* StoreKit.framework in Frameworks */,
 			);
@@ -1309,6 +1318,9 @@
 		EED5E55462B98A9C783AC0F5 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C57ACECE20DA413D0094F784 /* Pushwoosh.framework */,
+				C57ACECC20DA40ED0094F784 /* libstdc++.tbd */,
+				C57ACECA20DA40DF0094F784 /* libz.tbd */,
 				31EF9B082029D542006D3B35 /* StoreKit.framework */,
 				46992D2723222F954C7B60D7 /* Pods_screenshot.framework */,
 			);
@@ -1947,6 +1959,10 @@
 				CURRENT_PROJECT_VERSION = 155;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/dev/;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Pods/Pushwoosh/Framework",
+				);
 				INFOPLIST_FILE = screenshot/dev/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" -Xfrontend -warn-long-function-bodies=200";
@@ -1977,6 +1993,10 @@
 				CURRENT_PROJECT_VERSION = 155;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/dev/;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Pods/Pushwoosh/Framework",
+				);
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INFOPLIST_FILE = screenshot/dev/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -2065,6 +2085,10 @@
 				CURRENT_PROJECT_VERSION = 155;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/prd/;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Pods/Pushwoosh/Framework",
+				);
 				INFOPLIST_FILE = screenshot/prd/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" -Xfrontend -warn-long-function-bodies=200";
@@ -2148,6 +2172,10 @@
 				CURRENT_PROJECT_VERSION = 155;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/prd/;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Pods/Pushwoosh/Framework",
+				);
 				INFOPLIST_FILE = screenshot/prd/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" -Xfrontend -warn-long-function-bodies=200";
