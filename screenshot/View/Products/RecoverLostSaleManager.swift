@@ -8,13 +8,18 @@
 
 import UIKit
 import CoreData
+import MessageUI
+
 protocol RecoverLostSaleManagerDelegate:class {
     func recoverLostSaleManager(_ manager:RecoverLostSaleManager, returnedFrom product:Product)
 }
-class RecoverLostSaleManager: NSObject {
+
+class RecoverLostSaleManager: NSObject, MFMailComposeViewControllerDelegate {
     private var timeLeftApp:Date?
     private var clickOnProductObjectId:NSManagedObjectID?
     weak var delegate:RecoverLostSaleManagerDelegate?
+    weak var presentingVC:UIViewController?
+
     private let timeout:TimeInterval = 30
     override init() {
         super.init()
@@ -41,22 +46,36 @@ class RecoverLostSaleManager: NSObject {
         timeLeftApp = Date.init()
     }
     public func presetRecoverAlertViewFor(product:Product, in viewController:UIViewController){
-        let alert = UIAlertController.init(title: nil, message: "Would you like an email so you can purchase this on your computer?", preferredStyle: .alert)
+        let alert = UIAlertController.init(title: "product.sale_recovery.alert.title".localized, message: "product.sale_recovery.alert.message".localized, preferredStyle: .alert)
         let body =  self.htmlEmailForProducts(products: [product])
 
-
-        alert.addAction(UIAlertAction.init(title: "Email Me", style: .default, handler: { (a) in
+        Analytics.trackFeatureRecoveryAppeared()
+        self.presentingVC = viewController
+        alert.addAction(UIAlertAction.init(title: "product.sale_recovery.alert.email_me".localized, style: .default, handler: { (a) in
+            Analytics.trackFeatureRecoveryEmailPresented()
             let recipient = AnalyticsUser.current.email ?? ""
             let dateFormatter = DateFormatter.init()
             dateFormatter.timeStyle = .none
             dateFormatter.dateStyle = .medium
-            let subject = "Screenshop Wishlist - \(dateFormatter.string(from: Date()))"
-            viewController.presentMail(recipient: recipient, gmailMessage: body, subject: subject, message: body, isHTML:true)            
+            let subject = "product.sale_recovery.email.subject".localized(withFormat: dateFormatter.string(from: Date()))
+            viewController.presentMail(recipient: recipient, gmailMessage: body, subject: subject, message: body, isHTML:true, delegate:self)
         }))
-        alert.addAction(UIAlertAction.init(title: "generic.later".localized, style: .cancel, handler: { (a) in
+        alert.addAction(UIAlertAction.init(title: "generic.no_thanks".localized, style: .cancel, handler: { (a) in
             
         }))
         viewController.present(alert, animated: true, completion: nil)
+    }
+    
+    public func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
+        if result == .sent {
+            Analytics.trackFeatureRecoveryEmailSent()
+        }
+        
+        if let presentingVC  = self.presentingVC {
+            presentingVC.dismiss(animated: true, completion: nil)
+        }else{
+            controller.dismiss(animated: true, completion: nil)
+        }
     }
     
     func stringFromFile(named:String) -> String?{

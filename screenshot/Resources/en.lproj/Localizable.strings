@@ -320,6 +320,10 @@
 "product.variants.quantity" = "Quantity";
 "product.variants.size" = "Size";
 "product.website" = "Go To %@";
+"product.sale_recovery.alert.title" = "Buy From Email";
+"product.sale_recovery.alert.message" = "Do you want an email with the item you just looked at so you can buy it on your computer?";
+"product.sale_recovery.alert.email_me" = "Email Me";
+"product.sale_recovery.email.subject" = "Screenshop Wishlist - %@";
 
 "products.details.similar" = "Similar Items";
 "products.helper.message" = "No visually similar products were detected";
