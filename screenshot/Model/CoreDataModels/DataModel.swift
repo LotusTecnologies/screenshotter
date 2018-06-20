@@ -410,6 +410,55 @@ extension DataModel {
         return nil
     }
     
+    func retrieveLatestFavorite() -> Promise<(String?, String?)> {
+        return Promise { fulfill, reject in
+            self.performBackgroundTask { managedObjectContext in
+                let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
+                fetchRequest.predicate = NSPredicate(format: "isFavorite == TRUE")
+                fetchRequest.sortDescriptors = [NSSortDescriptor(key: "dateFavorited", ascending: false)]
+                fetchRequest.fetchLimit = 1
+                
+                do {
+                    let results = try managedObjectContext.fetch(fetchRequest)
+                    if let latest = results.first {
+                        fulfill((latest.imageURL, latest.categories))
+                    } else {
+                        reject(NSError(domain: "Craze", code: 93, userInfo: [NSLocalizedDescriptionKey : "no latest favorite"]))
+                    }
+                } catch {
+                    self.receivedCoreDataError(error: error)
+                    print("retrieveLatestFavorite results with error:\(error)")
+                    reject(error)
+                }
+            }
+        }
+    }
+    
+    func retrieveLatestTapped() -> Promise<(String?, String?)> {
+        return Promise { fulfill, reject in
+            self.performBackgroundTask { managedObjectContext in
+                let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
+                let aWeekAgo = NSDate(timeIntervalSinceNow: -7 * Constants.secondsInDay)
+                fetchRequest.predicate = NSPredicate(format: "dateViewed > %@", aWeekAgo)
+                fetchRequest.sortDescriptors = [NSSortDescriptor(key: "floatPrice", ascending: true)]
+                fetchRequest.fetchLimit = 1
+                
+                do {
+                    let results = try managedObjectContext.fetch(fetchRequest)
+                    if let latest = results.first {
+                        fulfill((latest.imageURL, latest.name))
+                    } else {
+                        reject(NSError(domain: "Craze", code: 94, userInfo: [NSLocalizedDescriptionKey : "no latest tapped"]))
+                    }
+                } catch {
+                    self.receivedCoreDataError(error: error)
+                    print("retrieveLatestTapped results with error:\(error)")
+                    reject(error)
+                }
+            }
+        }
+    }
+    
     func deleteVariants(managedObjectContext: NSManagedObjectContext, product: Product, shouldUpdateDateChecked: Bool = true) {
         if shouldUpdateDateChecked {
             product.dateCheckedStock = Date()
