@@ -393,18 +393,21 @@ extension UserAccountManager {
         alert.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .cancel, handler: nil))
         return alert
     }
+    
     public func isNoAccountWithEmailError( error:NSError) ->Bool {
         if error.domain == AuthErrorDomain && error.code == AuthErrorCode.userNotFound.rawValue {
             return true
         }
         return  false
     }
+    
     func alertViewForNoAccountWithEmail() -> UIAlertController  {
         let alert = UIAlertController.init(title: nil, message: "authorize.error.NoAccountWithEmail".localized, preferredStyle: .alert)
         alert.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .cancel, handler: nil))
 
         return alert
     }
+    
     public func isCantSendEmailError( error:NSError) ->Bool {
        
         if error.domain == AuthErrorDomain && error.code == AuthErrorCode.invalidEmail.rawValue {
@@ -422,8 +425,8 @@ extension UserAccountManager {
 
         return  false
     }
+    
     public func isWeakPasswordError( error:NSError) -> Bool {
-        
         if error.domain == AuthErrorDomain && error.code == AuthErrorCode.weakPassword.rawValue {
             return true
         }
@@ -443,6 +446,7 @@ extension UserAccountManager {
         }
         return  false
     }
+    
     func alertViewForWrongPassword() -> UIAlertController  {
         let alert = UIAlertController.init(title: nil, message: "authorize.error.wrongPassword".localized, preferredStyle: .alert)
         alert.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .cancel, handler: nil))
@@ -512,8 +516,6 @@ extension UserAccountManager {
                                     }
                                     context.saveIfNeeded()
                                 }
-                                
-                                
                             })
                         })
                     }
@@ -626,6 +628,7 @@ extension UserAccountManager {
             self.databaseRef.child("users").child(user.uid).child("favorites").child(offer).setValue(dict)
         }
     }
+    
     func deleteFavorite(product:Product){
         if let user = self.user {
             if let offer = product.offer {
@@ -638,8 +641,8 @@ extension UserAccountManager {
         if let assetId = screenshot.assetId, let user = self.user {
             self.databaseRef.child("users").child(user.uid).child("screenshots").child(assetId).removeValue()
         }
-        
     }
+    
     func uploadScreenshots(screenshot:Screenshot){
         
         if let user = self.user,

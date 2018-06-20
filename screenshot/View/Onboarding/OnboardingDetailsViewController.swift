@@ -224,12 +224,6 @@ class OnboardingDetailsViewController: UIViewController {
         view = classForView.self.init()
     }
     
-    // MARK: Life Cycle
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
