@@ -189,33 +189,34 @@ class RegisterView: UIScrollView {
         forgotPasswordButton.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor, constant: verticalNegativeMargin).isActive = true
         forgotPasswordButton.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
         
+        let skipLayoutGuide = UILayoutGuide()
+        addLayoutGuide(skipLayoutGuide)
+        skipLayoutGuide.topAnchor.constraint(equalTo: contentView.bottomAnchor, constant: .padding).isActive = true
+        skipLayoutGuide.bottomAnchor.constraint(equalTo: verticalCenterLayoutGuide.bottomAnchor).isActive = true
+        skipLayoutGuide.heightAnchor.constraint(equalTo: horizontalLinesLayoutGuide.heightAnchor).isActive = true
+        
+        
+        skipButton.translatesAutoresizingMaskIntoConstraints = false
+        skipButton.contentEdgeInsets = UIEdgeInsets(top: 6, left: .padding, bottom: 6, right: .padding)
+        skipButton.setTitleColor(.gray3, for: .normal)
+        skipButton.setTitleColor(.gray5, for: .highlighted)
+        skipButton.alignImageRight()
+        skipButton.adjustInsetsForImage(withPadding: 6)
+        addSubview(skipButton)
+        skipButton.topAnchor.constraint(greaterThanOrEqualTo: skipLayoutGuide.topAnchor).isActive = true
+        skipButton.bottomAnchor.constraint(lessThanOrEqualTo: skipLayoutGuide.bottomAnchor).isActive = true
+        skipButton.centerXAnchor.constraint(equalTo: layoutMarginsGuide.centerXAnchor).isActive = true
+        skipButton.centerYAnchor.constraint(equalTo: skipLayoutGuide.centerYAnchor).isActive = true
         if isOnboardingLayout {
-            let skipLayoutGuide = UILayoutGuide()
-            addLayoutGuide(skipLayoutGuide)
-            skipLayoutGuide.topAnchor.constraint(equalTo: contentView.bottomAnchor, constant: .padding).isActive = true
-            skipLayoutGuide.bottomAnchor.constraint(equalTo: verticalCenterLayoutGuide.bottomAnchor).isActive = true
-            skipLayoutGuide.heightAnchor.constraint(equalTo: horizontalLinesLayoutGuide.heightAnchor).isActive = true
-            
             let skipImage = UIImage(named: "OnboardingArrow")
-            
-            skipButton.translatesAutoresizingMaskIntoConstraints = false
-            skipButton.contentEdgeInsets = UIEdgeInsets(top: 6, left: .padding, bottom: 6, right: .padding)
-            skipButton.setTitle("generic.skip".localized, for: .normal)
-            skipButton.setTitleColor(.gray3, for: .normal)
-            skipButton.setTitleColor(.gray5, for: .highlighted)
             skipButton.setImage(skipImage, for: .normal)
             skipButton.setImage(skipImage?.withRenderingMode(.alwaysTemplate), for: .highlighted)
             skipButton.tintColor = skipButton.titleColor(for: .highlighted)
-            skipButton.alignImageRight()
-            skipButton.adjustInsetsForImage(withPadding: 6)
-            addSubview(skipButton)
-            skipButton.topAnchor.constraint(greaterThanOrEqualTo: skipLayoutGuide.topAnchor).isActive = true
-            skipButton.bottomAnchor.constraint(lessThanOrEqualTo: skipLayoutGuide.bottomAnchor).isActive = true
-            skipButton.centerXAnchor.constraint(equalTo: layoutMarginsGuide.centerXAnchor).isActive = true
-            skipButton.centerYAnchor.constraint(equalTo: skipLayoutGuide.centerYAnchor).isActive = true
+            skipButton.setTitle("generic.skip".localized, for: .normal)
         }
         else {
-            contentView.bottomAnchor.constraint(equalTo: verticalCenterLayoutGuide.bottomAnchor).isActive = true
+            skipButton.setTitle("generic.cancel".localized, for: .normal)
+
         }
     }
     
