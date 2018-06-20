@@ -387,6 +387,7 @@ class UserAccountManager : NSObject {
     func logout() -> Promise<Void>{
         return Promise { fulfill, reject in
             do {
+                FBSDKLoginManager().logOut()
                 try Auth.auth().signOut()
                 fulfill(())
                 
