@@ -251,28 +251,29 @@ class ResetPasswordViewController: UIViewController {
     }
     @objc private func resendCodeAction() {
         resendCodeManager.start(with: self._view.resendButton)
-        if let email = self.email
-        UserAccountManager.shared.forgotPassword(email: email)
-            .then(on: .main) { () -> Void in
-
-            }.catch { (error) in
-                DispatchQueue.main.async {
-                    let error = error as NSError
-                    if UserAccountManager.shared.isNoInternetError(error: error) {
-                        let alert = UserAccountManager.shared.alertViewForNoInternet()
-                        self.present(alert, animated: true, completion: nil)
-                    }else if UserAccountManager.shared.isNoAccountWithEmailError(error: error) {
-                        let alert = UserAccountManager.shared.alertViewForNoAccountWithEmail()
-                        self.present(alert, animated: true, completion: nil)
-                    }else if UserAccountManager.shared.isCantSendEmailError(error: error) {
-                        let alert = UserAccountManager.shared.alertViewForCantSendEmail(email: email)
-                        self.present(alert, animated: true, completion: nil)
-                    }else {
-                        let alert = UserAccountManager.shared.alertViewForUndefinedError(error: error, viewController: self)
-                        self.present(alert, animated: true, completion: nil)
+        if let email = self.email {
+            UserAccountManager.shared.forgotPassword(email: email)
+                .then(on: .main) { () -> Void in
+                    
+                }.catch { (error) in
+                    DispatchQueue.main.async {
+                        let error = error as NSError
+                        if UserAccountManager.shared.isNoInternetError(error: error) {
+                            let alert = UserAccountManager.shared.alertViewForNoInternet()
+                            self.present(alert, animated: true, completion: nil)
+                        }else if UserAccountManager.shared.isNoAccountWithEmailError(error: error) {
+                            let alert = UserAccountManager.shared.alertViewForNoAccountWithEmail()
+                            self.present(alert, animated: true, completion: nil)
+                        }else if UserAccountManager.shared.isCantSendEmailError(error: error) {
+                            let alert = UserAccountManager.shared.alertViewForCantSendEmail(email: email)
+                            self.present(alert, animated: true, completion: nil)
+                        }else {
+                            let alert = UserAccountManager.shared.alertViewForUndefinedError(error: error, viewController: self)
+                            self.present(alert, animated: true, completion: nil)
+                        }
                     }
-                }
             }
+        }
     }
     
     

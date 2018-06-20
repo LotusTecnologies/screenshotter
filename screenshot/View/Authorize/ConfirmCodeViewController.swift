@@ -132,6 +132,11 @@ class ResendCodeManager : NSObject {
         })
         self.updateButton()
     }
+    
+    deinit{
+        self.timer?.invalidate()
+    }
+    
     private func updateButton(){
         let time = abs(startTime.timeIntervalSinceNow)
         var attributes:[NSAttributedStringKey:Any] = [:]
