@@ -454,14 +454,23 @@ extension UserAccountManager {
 
 
 extension UserAccountManager {
-    private func favoriteToDictionary(favorite:Product){
-        
-    }
-    private func screenshotToDictionary(screenshot:Screenshot){
-        
-    }
+    
+    
     func downloadAndReplaceUserData(){
         if let user = self.user{
+            self.databaseRef.child("users").child(user.uid).child("GDRP-agreedToEmail").observeSingleEvent(of: .value) { (snapshot) in
+                if let agreedToEmailNumber = snapshot.value as? NSNumber  {
+                    let agreedToEmail = agreedToEmailNumber.boolValue
+                    UserDefaults.standard.setValue(agreedToEmail, forKey: UserDefaultsKeys.gdpr_agreedToEmail)
+                }
+            }
+            self.databaseRef.child("users").child(user.uid).child("GDRP-agreedToImageDetection").observeSingleEvent(of: .value) { (snapshot) in
+                if let agreedToImageDetectionNumber = snapshot.value as? NSNumber  {
+                    let agreedToImageDetection = agreedToImageDetectionNumber.boolValue
+                    UserDefaults.standard.setValue(agreedToImageDetection, forKey: UserDefaultsKeys.gdpr_agreedToImageDetection)
+                }
+            }
+            
             self.databaseRef.child("users").child(user.uid).child("screenshots").observeSingleEvent(of: .value) { (snapshot) in
                 for child in snapshot.children {
                     if let child = child as? DataSnapshot,
