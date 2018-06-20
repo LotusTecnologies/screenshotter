@@ -208,9 +208,12 @@ class ProfileViewController: UITableViewController {
 
 extension ProfileViewController: ProfileAccountViewDelegate {
     func profileAccountViewAuthorize(_ view: ProfileAccountView) {
+        
         let vc = RegisterViewController.init()
         vc.delegate = self
-        self.present(vc, animated: true, completion: nil)
+        let navVC = UINavigationController.init(rootViewController: vc)
+        navVC.isNavigationBarHidden = true
+        self.present(navVC, animated: true, completion: nil)
 
     }
     
@@ -248,25 +251,44 @@ extension ProfileViewController: ProfileAccountViewDelegate {
     }
 }
 
-extension ProfileViewController : RegisterViewControllerDelegate {
+extension ProfileViewController : RegisterViewControllerDelegate, ConfirmCodeViewControllerDelegate {
+    func confirmCodeViewControllerDidConfirm(_ viewController: ConfirmCodeViewController) {
+        self.dismiss(animated: true, completion: nil)
+        self.didLogin()
+    }
+    
+    func confirmCodeViewControllerDidCancel(_ viewController: ConfirmCodeViewController) {
+        viewController.navigationController?.popViewController(animated: true)
+    }
+    
     func registerViewControllerDidSkip(_ viewController: RegisterViewController) {
         self.dismiss(animated: true, completion: nil)
     }
     
     func registerViewControllerNeedEmailConfirmation(_ viewController: RegisterViewController) {
-        self.dismiss(animated: true, completion: nil)
+        let confirm = ConfirmCodeViewController()
+        confirm.email = viewController.email
+        confirm.delegate = self
+        viewController.navigationController?.pushViewController(confirm, animated: true)
+    }
+    
+    func didLogin(){
+        
     }
     
     func registerViewControllerDidSignin(_ viewController: RegisterViewController) {
         self.dismiss(animated: true, completion: nil)
+        self.didLogin()
     }
     
     func registerViewControllerDidFacebookLogin(_ viewController: RegisterViewController) {
         self.dismiss(animated: true, completion: nil)
+        self.didLogin()
     }
     
     func registerViewControllerDidFacebookSignup(_ viewController: RegisterViewController) {
         self.dismiss(animated: true, completion: nil)
+        self.didLogin()
     }
     
     

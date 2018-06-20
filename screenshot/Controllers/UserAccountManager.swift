@@ -28,7 +28,11 @@ class FacebookProxy : NSObject, FBSDKLoginButtonDelegate {
         if let error = error {
             reject(error)
         }else if let result = result {
-            fulfill(result)
+            if result.isCancelled  || result.token == nil{
+                reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+            }else{
+                fulfill(result)
+            }
         }else{
             reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
         }
@@ -83,11 +87,16 @@ class UserAccountManager : NSObject {
         let mode = queryParams?.queryItems?.first(where: {$0.name == "mode"})
         let code = queryParams?.queryItems?.first(where: {$0.name == "oobCode"})
         if let _ = mode?.value, let code = code?.value{
-            
             if let confirmVC = AppDelegate.shared.window?.rootViewController?.childViewControllers.last as? ConfirmCodeViewController {
                 confirmVC.applyCode(code: code)
             }
             if let resetVC = AppDelegate.shared.window?.rootViewController?.childViewControllers.last as? ResetPasswordViewController {
+                resetVC.code = code
+            }
+            if let confirmVC = AppDelegate.shared.window?.rootViewController?.childViewControllers.last?.childViewControllers.first?.presentedViewController?.childViewControllers.last as? ConfirmCodeViewController{
+                confirmVC.applyCode(code: code)
+            }
+            if let resetVC = AppDelegate.shared.window?.rootViewController?.childViewControllers.last?.childViewControllers.first?.presentedViewController?.childViewControllers.last as? ResetPasswordViewController {
                 resetVC.code = code
             }
             
