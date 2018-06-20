@@ -20,9 +20,14 @@ class OnboardingGDPRView: UIView {
     var editButtonShownConstraints:[NSLayoutConstraint] = []
     var editButtonHidden: Bool = false {
         didSet {
-            editButtonHiddenConstraints.forEach{$0.isActive = editButtonHidden }
-            editButtonShownConstraints.forEach{$0.isActive = !editButtonHidden }
+            if editButtonHidden {
+                NSLayoutConstraint.deactivate(editButtonShownConstraints)
+                NSLayoutConstraint.activate(editButtonHiddenConstraints)
+            }else{
+                NSLayoutConstraint.deactivate(editButtonHiddenConstraints)
+                NSLayoutConstraint.activate(editButtonShownConstraints)
 
+            }
         }
     }
     override init(frame: CGRect) {
