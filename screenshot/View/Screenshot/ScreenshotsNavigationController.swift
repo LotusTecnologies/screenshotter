@@ -115,68 +115,7 @@ extension ScreenshotsNavigationController :ScreenshotsViewControllerDelegate{
     }
 }
 
-extension ScreenshotsNavigationController: GiftCardCampaignViewControllerDelegate {
-    fileprivate var giftCardActiveViewController: UIViewController {
-        if let presentedViewController = presentedViewController, !presentedViewController.isBeingDismissed {
-            return presentedViewController
-        }
-        
-        return self
-    }
-    
-    func presentGiftCardCampaignIfNeeded() {
-        if UIApplication.isUSC && !UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingPresentedGiftCard) {
-            UserDefaults.standard.set(true, forKey: UserDefaultsKeys.onboardingPresentedGiftCard)
-            UserDefaults.standard.synchronize()
-            
-            let viewController = GiftCardCampaignViewController()
-            viewController.delegate = self
-        
-            giftCardActiveViewController.present(viewController, animated: true, completion: nil)
-        }
-    }
-    
-    func giftCardCampaignViewControllerDidSkip(_ viewController: GiftCardCampaignViewController) {
-        Analytics.trackOnboardingCampainCreditCardSkip()
-        UserDefaults.standard.set(true, forKey: UserDefaultsKeys.isGiftCardHidden)
-        UserDefaults.standard.synchronize()
-        
-        giftCardActiveViewController.dismiss(animated: true, completion: nil)
-    }
-    
-    func giftCardCampaignViewControllerDidContinue(_ viewController: GiftCardCampaignViewController) {
-        Analytics.trackOnboardingCampainCreditCardLetsGo()
-        
-        giftCardActiveViewController.dismiss(animated: true, completion: nil)
-        
-        let viewController = CheckoutPaymentFormViewController(withCard: nil, isEditLayout: true, confirmBeforeSave: false, autoSaveBillAddressAsShippingAddress:true)
-        viewController.title = "2018_05_01_campaign.payment".localized
-        viewController.delegate = self
-        
-        let modalNavigationController = ModalNavigationController(rootViewController: viewController)
-        giftCardActiveViewController.present(modalNavigationController, animated: true, completion: nil)
-    }
-}
 
-extension ScreenshotsNavigationController: GiftCardDoneViewControllerDelegate {
-    func giftCardDoneViewControllerDidPressDone(_ viewController: GiftCardDoneViewController) {
-        let frc = DataModel.sharedInstance.cardFrc(delegate: nil).fetchedObjects.first
-        Analytics.trackOnboardingCampainCreditCardDone(email: frc?.email, phone: frc?.phone)
-        
-        giftCardActiveViewController.dismiss(animated: true, completion: nil)
-    }
-}
-
-extension ScreenshotsNavigationController: CheckoutFormViewControllerDelegate {
-    func checkoutFormViewControllerDidAdd(_ viewController: CheckoutFormViewController) {
-        Analytics.trackOnboardingCampainCreditCardEnteredCard()
-        
-        let doneViewController = GiftCardDoneViewController()
-        doneViewController.delegate = self
-        doneViewController.navigationItem.hidesBackButton = true
-        viewController.navigationController?.pushViewController(doneViewController, animated: true)
-    }
-}
 
 typealias ScreenshotsNavigationControllerProducts = ScreenshotsNavigationController
 extension ScreenshotsNavigationControllerProducts {

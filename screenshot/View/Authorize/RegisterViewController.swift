@@ -425,6 +425,8 @@ class RegisterViewController: UIViewController {
     }
     
     @objc fileprivate func registerAction() {
+        Analytics.trackOnboardingLoginStarted()
+        
         let hasValidEmail = emailFormRow.isValid()
         let hasValidPassword = isPasswordValid(_view.passwordTextField.text)
         
@@ -448,6 +450,10 @@ class RegisterViewController: UIViewController {
                     self.delegate?.registerViewControllerDidSignin(self)
                 }
             }.catch { error in
+                
+                let e = error as NSError
+                Analytics.trackOnboardingError(domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
+
                 DispatchQueue.main.async {
                  
                     self._view.emailTextField.isInvalid = true
@@ -487,9 +493,11 @@ class RegisterViewController: UIViewController {
         }
         else {
             if !hasValidEmail {
+                Analytics.trackOnboardingLoginBadEmail(email: _view.emailTextField.text)
                 _view.emailTextField.isInvalid = true
             }
             if !hasValidPassword {
+                Analytics.trackOnboardingLoginBadPassword()
                 _view.passwordTextField.isInvalid = true
                 _view.passwordTextField.errorText = "authorize.error.passwordInvalid".localized
             }
@@ -501,7 +509,6 @@ class RegisterViewController: UIViewController {
     @objc fileprivate func skipRegistration() {
         func skip() {
             UserAccountManager.shared.makeAnonAccount()
-            Analytics.trackSubmittedBlankEmail()
             delegate?.registerViewControllerDidSkip(self)
 
         }
@@ -523,6 +530,7 @@ class RegisterViewController: UIViewController {
     // MARK: Forgot
     
     @objc private func forgotPasswordAction() {
+        Analytics.trackOnboardingForgotStarted(email: self.email)
         let resetPasswordViewController = InitiateResetPasswordViewController()
         resetPasswordViewController.delegate = self
         resetPasswordViewController._view.emailTextField.text = self.email
@@ -532,7 +540,7 @@ class RegisterViewController: UIViewController {
     // MARK: Facebook
     
     @objc fileprivate func facebookLoginAction() {
-        
+        Analytics.trackOnboardingFacebookStarted()
         UserAccountManager.shared.loginWithFacebook().then
             { (result) -> Void in
             
@@ -545,6 +553,8 @@ class RegisterViewController: UIViewController {
             }
                 
         }.catch { (error) in
+            let e = error as NSError
+            Analytics.trackOnboardingError(domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
             print("facebook login error: \(error)")
         }
         
@@ -632,6 +642,7 @@ extension RegisterViewController: UITextViewDelegate {
 
 extension RegisterViewController: InitiateResetPasswordViewControllerDelegate {
     func initiateResetPasswordViewControllerDidReset(_ viewController: InitiateResetPasswordViewController, email:String) {
+        Analytics.trackOnboardingForgotEmailSend()
         let resetPasswordViewController = ResetPasswordViewController()
         resetPasswordViewController.delegate = self
         self.email = email
@@ -645,6 +656,7 @@ extension RegisterViewController: InitiateResetPasswordViewControllerDelegate {
 }
 extension RegisterViewController: ResetPasswordViewControllerDelegate {
     func resetPasswordViewControllerDidReset(_ viewController: ResetPasswordViewController) {
+        Analytics.trackOnboardingForgotSuccess()
         self.delegate?.registerViewControllerDidSignin(self)
     }
     

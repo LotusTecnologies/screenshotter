@@ -366,6 +366,7 @@ extension UserAccountManager {
         return alert
     }
     func alertViewForUndefinedError(error:NSError, viewController:UIViewController) -> UIAlertController {
+        Analytics.trackOnboardingUnsupportedError(domain: error.domain, code: error.code, localizedDescription: error.localizedDescription)
         let alert = UIAlertController.init(title: "generic.error".localized, message: "authorize.error.undefined".localized, preferredStyle: .alert)
         alert.addAction(UIAlertAction.init(title: "authorize.error.undefined.contactSupport".localized, style: .default, handler: { (a) in
             let recipient = "support@screenshopit.com"
