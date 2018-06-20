@@ -56,6 +56,9 @@
 "authorize.confirm.code" = "Enter Code";
 "authorize.confirm.explaination" = "An email was sent to %@.\nPlease click on the link that you recieved in the email.";
 
+"authorize.confirm.resend_code_in" = "Resend code in %@ seconds...";
+"authorize.confirm.resend_code" = "Resend Code";
+
 "authorize.reset_password.enter" = "Enter new password";
 "authorize.reset_password.failed_alert.title" = "Passwords Don’t Match";
 "authorize.reset_password.reenter" = "Re-enter password";
@@ -75,6 +78,8 @@
 "authorize.error.cantSendMail" = "We were unable to send an email to the address %@. Please make sure you entered it correctly.";
 "authorize.error.NoAccountWithEmail" = "No account associated with that email address";
 "authorize.error.wrongPassword" = "Password and email address don’t match";
+
+
 
 "cart.checkout.button" = "Checkout";
 "cart.checkout.total" = "Total: %@";

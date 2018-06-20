@@ -15,6 +15,8 @@ protocol ConfirmCodeViewControllerDelegate: NSObjectProtocol {
 
 class ConfirmCodeView: UIScrollView {
     let cancelButton = UIButton()
+    let resendButton = UIButton()
+
     let _layoutMargins = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
     
     // MARK: Life Cycle
@@ -85,12 +87,19 @@ class ConfirmCodeView: UIScrollView {
         explainLabel.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor,constant:-.padding).isActive = true
         contentView.bottomAnchor.constraint(equalTo: explainLabel.bottomAnchor, constant: .extendedPadding).isActive = true
 
+        resendButton.translatesAutoresizingMaskIntoConstraints = false
+        resendButton.contentEdgeInsets = UIEdgeInsets(top: 6, left: .padding, bottom: 6, right: .padding)
+        addSubview(resendButton)
+        resendButton.topAnchor.constraint(equalTo: contentView.bottomAnchor, constant: .padding).isActive = true
+        resendButton.centerXAnchor.constraint(equalTo: layoutMarginsGuide.centerXAnchor).isActive = true
+        
         
         let skipLayoutGuide = UILayoutGuide()
         addLayoutGuide(skipLayoutGuide)
-        skipLayoutGuide.topAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
+        skipLayoutGuide.topAnchor.constraint(equalTo: resendButton.bottomAnchor).isActive = true
         
         
+      
         let skipImage = UIImage(named: "OnboardingArrow")?.withHorizontallyFlippedOrientation()
         
         cancelButton.translatesAutoresizingMaskIntoConstraints = false
@@ -109,12 +118,57 @@ class ConfirmCodeView: UIScrollView {
 
     }
 }
+class ResendCodeManager : NSObject {
+    weak var button:UIButton?
+    private var startTime:Date = Date()
+    private let countDownTime:TimeInterval = 60
+    var timer:Timer?
+    func start(with button:UIButton){
+        self.button = button
+        self.startTime = Date()
+        weak var weakself = self
+        self.timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true, block: { (t) in
+            weakself?.updateButton()
+        })
+        self.updateButton()
+    }
+    private func updateButton(){
+        let time = abs(startTime.timeIntervalSinceNow)
+        var attributes:[NSAttributedStringKey:Any] = [:]
+        attributes[.underlineStyle] = NSUnderlineStyle.styleSingle.rawValue
+        if time < countDownTime {
+            let secondString =  String(Int(ceil(countDownTime - time)))
+            let text = "authorize.confirm.resend_code_in".localized(withFormat: secondString)
+            attributes[.foregroundColor] = UIColor.gray5
+            attributes[.underlineColor] = UIColor.gray5
+            attributes[.font] = UIFont.systemFont(ofSize: 16)
+            let attributedText = NSMutableAttributedString.init(string: text, attributes: attributes)
+            let range = NSString(string: text).range(of: secondString)
+            if range.location != NSNotFound{
+                if let font = UIFont.init(name: "Menlo", size: 16){
+                    attributedText.addAttribute(NSAttributedStringKey.font, value: font, range: range)
+                }
+            }
+            
+            self.button?.setAttributedTitle(attributedText, for: .normal)
+            self.button?.isUserInteractionEnabled = false
+
+        }else{
+            let text = "authorize.confirm.resend_code".localized
+            attributes[.foregroundColor] = UIColor.crazeRed
+            attributes[.underlineColor] = UIColor.crazeRed
+            let attributedText = NSAttributedString.init(string: text, attributes: attributes)
+            self.button?.setAttributedTitle(attributedText, for: .normal)
+            self.button?.isUserInteractionEnabled = true
+        }
+    }
+}
 
 class ConfirmCodeViewController: UIViewController {
     weak var delegate: ConfirmCodeViewControllerDelegate?
     var email:String?
     private let inputViewAdjustsScrollViewController = InputViewAdjustsScrollViewController()
-    
+    private var resendCodeManager = ResendCodeManager()
     // MARK: View
     
     var classForView: ConfirmCodeView.Type {
@@ -141,6 +195,8 @@ class ConfirmCodeViewController: UIViewController {
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         _view.addGestureRecognizer(tapGesture)
+        _view.resendButton.addTarget(self, action: #selector(resendCodeAction), for: .touchUpInside)
+        resendCodeManager.start(with: _view.resendButton)
     }
 
     // MARK: Actions
@@ -173,6 +229,19 @@ class ConfirmCodeViewController: UIViewController {
                 self._view.cancelButton.isUserInteractionEnabled = true
         }
         
+    }
+    @objc private func resendCodeAction() {
+        resendCodeManager.start(with: self._view.resendButton)
+        UserAccountManager.shared.resendConfirmCode().catch { (error) in
+            let error = error as NSError
+            if UserAccountManager.shared.isNoAccountWithEmailError(error: error) {
+                let alert = UserAccountManager.shared.alertViewForNoInternet()
+                self.present(alert, animated: true, completion: nil)
+            }else{
+                let alert = UserAccountManager.shared.alertViewForUndefinedError(error: error, viewController: self)
+                self.present(alert, animated: true, completion: nil)
+            }
+        }
     }
     
     @objc private func cancelAction() {
