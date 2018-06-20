@@ -302,12 +302,16 @@ class UserAccountManager : NSObject {
         }
     }
     
-    @discardableResult func setGDRP(agreeToEmail:Bool, agreedToImageDetection:Bool) -> Promise<Void>{
+    @discardableResult func setGDPR(agreedToEmail:Bool, agreedToImageDetection:Bool) -> Promise<Void>{
         return Promise { fulfill, reject in
+            
+            UserDefaults.standard.setValue(agreedToEmail, forKey: UserDefaultsKeys.gdpr_agreedToEmail)
+            UserDefaults.standard.setValue(agreedToImageDetection, forKey: UserDefaultsKeys.gdpr_agreedToImageDetection)
+            
             let promise = makeAnonAccountPromise ?? Promise.init(value:())
             promise.then(execute: { () -> Void in
                 if let user = self.user {
-                    self.databaseRef.child("users").child(user.uid).child("GDRP-agreeToEmail").setValue(NSNumber.init(value: agreeToEmail))
+                    self.databaseRef.child("users").child(user.uid).child("GDRP-agreedToEmail").setValue(NSNumber.init(value: agreedToEmail))
                     self.databaseRef.child("users").child(user.uid).child("GDRP-agreedToImageDetection").setValue(NSNumber.init(value: agreedToImageDetection))
                     fulfill(())
                 }else{
