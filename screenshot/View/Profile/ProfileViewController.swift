@@ -215,6 +215,7 @@ extension ProfileViewController: ProfileAccountViewDelegate {
     func profileAccountViewAuthorize(_ view: ProfileAccountView) {
         
         let vc = RegisterViewController.init()
+        vc.isOnboardingLayout = false
         vc.delegate = self
         let navVC = UINavigationController.init(rootViewController: vc)
         navVC.isNavigationBarHidden = true

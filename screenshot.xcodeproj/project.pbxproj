@@ -87,7 +87,6 @@
 		311A506D20D90B780001D463 /* ResetPasswordViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A4FB320D90B760001D463 /* ResetPasswordViewController.swift */; };
 		311A506E20D90B780001D463 /* RegisterConfirmationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A4FB420D90B760001D463 /* RegisterConfirmationViewController.swift */; };
 		311A506F20D90B780001D463 /* RegisterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A4FB520D90B760001D463 /* RegisterViewController.swift */; };
-		311A507020D90B780001D463 /* RegisterExistingTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A4FB620D90B760001D463 /* RegisterExistingTextField.swift */; };
 		311A507120D90B780001D463 /* AutoresizingTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A4FB920D90B760001D463 /* AutoresizingTableView.swift */; };
 		311A507220D90B780001D463 /* TableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A4FBA20D90B760001D463 /* TableView.swift */; };
 		311A507320D90B780001D463 /* ErrorCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A4FBC20D90B760001D463 /* ErrorCollectionViewCell.swift */; };
@@ -356,7 +355,6 @@
 		311A4FB320D90B760001D463 /* ResetPasswordViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResetPasswordViewController.swift; sourceTree = "<group>"; };
 		311A4FB420D90B760001D463 /* RegisterConfirmationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegisterConfirmationViewController.swift; sourceTree = "<group>"; };
 		311A4FB520D90B760001D463 /* RegisterViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegisterViewController.swift; sourceTree = "<group>"; };
-		311A4FB620D90B760001D463 /* RegisterExistingTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegisterExistingTextField.swift; sourceTree = "<group>"; };
 		311A4FB920D90B760001D463 /* AutoresizingTableView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoresizingTableView.swift; sourceTree = "<group>"; };
 		311A4FBA20D90B760001D463 /* TableView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableView.swift; sourceTree = "<group>"; };
 		311A4FBC20D90B760001D463 /* ErrorCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ErrorCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -795,7 +793,6 @@
 				311A4FB320D90B760001D463 /* ResetPasswordViewController.swift */,
 				311A4FB420D90B760001D463 /* RegisterConfirmationViewController.swift */,
 				311A4FB520D90B760001D463 /* RegisterViewController.swift */,
-				311A4FB620D90B760001D463 /* RegisterExistingTextField.swift */,
 			);
 			path = Authorize;
 			sourceTree = "<group>";
@@ -1660,7 +1657,6 @@
 				311A508E20D90B780001D463 /* DimmedPresentationController.swift in Sources */,
 				311A505920D90B780001D463 /* FavoriteControl.swift in Sources */,
 				311A506320D90B780001D463 /* ScreenshotCollectionViewCell.swift in Sources */,
-				311A507020D90B780001D463 /* RegisterExistingTextField.swift in Sources */,
 				E49261D6206A704C006FE84E /* UIImage+craze.swift in Sources */,
 				311A504D20D90B780001D463 /* RelatedLooksManager.swift in Sources */,
 				311A509B20D90B780001D463 /* BorderButton.swift in Sources */,

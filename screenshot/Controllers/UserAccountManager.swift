@@ -128,7 +128,6 @@ class UserAccountManager : NSObject {
                             self.databaseRef.child("users").child(user.uid).child("facebook-email").setValue(email)
                             self.databaseRef.child("users").child(user.uid).child("email").setValue(email)
                             UserDefaults.standard.set(email, forKey: UserDefaultsKeys.email)
-
                         }
                         if let phone = user.providerData.first?.phoneNumber{
                             self.databaseRef.child("users").child(user.uid).child("facebook-phone").setValue(phone)
@@ -279,7 +278,6 @@ class UserAccountManager : NSObject {
                     if let user = self.user, let email = self.email {
                         self.databaseRef.child("users").child(user.uid).child("email").setValue(email.lowercased())
                         UserDefaults.standard.set(email.lowercased(), forKey: UserDefaultsKeys.email)
-
                     }
                     fulfill(())
                 }
