@@ -26,7 +26,7 @@ class ConfirmCodeView: UIScrollView {
         self.init(frame: frame, email: "")
     }
     
-    init(frame: CGRect, email:String) {
+    required init(frame: CGRect, email:String) {
         super.init(frame: frame)
         
         if let backgroundImage = UIImage(named: "BrandConfettiFullBackground") {
@@ -127,7 +127,7 @@ class ConfirmCodeViewController: UIViewController {
     
     override func loadView() {
         let email = self.email ?? ""
-        view = ConfirmCodeView.init(frame: .zero, email: email)
+        view = classForView.self.init(frame: .zero, email: email)
     }
     
     // MARK: Life Cycle

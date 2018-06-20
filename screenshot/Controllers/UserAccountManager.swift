@@ -373,7 +373,7 @@ extension UserAccountManager {
                 return "{}"
             }()
 
-            let body = "Please help me. I’m getting this weirdo error: \(String.init(describing: viewController)) Domain: \(error.domain) Code: \(error.code) \(userInfoJson). I don’t know what this means, because I am not a programmer. But ya’ll should be able to help me."
+            let body = "Please help me. I’m getting this weirdo error: \(String.init(describing: viewController)) Domain: \(error.domain) Code: \(error.code) \(userInfoJson) -  \(Bundle.displayVersionBuild). I don’t know what this means, because I am not a programmer. But ya’ll should be able to help me."
             let gmailMessage = body
             viewController.presentMail(recipient: recipient, gmailMessage: gmailMessage, subject: subject, message: body)
         }))
