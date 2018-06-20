@@ -45,7 +45,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         UNUserNotificationCenter.current().delegate = self
         
-        
+        let _ = UserAccountManager.shared.application(application, didFinishLaunchingWithOptions: launchOptions)
+
         window = UIWindow(frame: UIScreen.main.bounds)
         
         if DataModel.sharedInstance.storeNeedsMigration() {
@@ -422,7 +423,6 @@ extension AppDelegate : KochavaTrackerDelegate {
         
         KochavaTracker.shared.configure(withParametersDictionary: trackerParametersDictionary, delegate: self)
                 
-        let _ = UserAccountManager.shared.application(application, didFinishLaunchingWithOptions: launchOptions)
         
         if UIApplication.isDev {
             Branch.setUseTestBranchKey(true)

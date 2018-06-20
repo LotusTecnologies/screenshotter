@@ -7,6 +7,9 @@
 //
 
 import UIKit
+import Firebase
+import FBSDKLoginKit
+import FirebaseStorage
 
 @objc protocol ProfileViewControllerDelegate: NSObjectProtocol {
     func profileViewControllerDidGrantPermission(_ viewController: ProfileViewController)
@@ -129,7 +132,7 @@ class ProfileViewController: UITableViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         reloadChangeableIndexPaths()
-        
+        syncLoggedIn()
         super.viewWillAppear(animated)
     }
     
@@ -175,8 +178,10 @@ class ProfileViewController: UITableViewController {
     // MARK: Login
     
     private func syncLoggedIn() {
-        let isLoggedIn = true // TODO:
-        
+        let isLoggedIn = (UserAccountManager.shared.user?.isAnonymous == false)
+        profileAccountView.isLoggedIn = isLoggedIn
+        profileAccountView.name = UserDefaults.standard.value(forKey: UserDefaultsKeys.name) as? String
+        profileAccountView.email = UserDefaults.standard.value(forKey: UserDefaultsKeys.email)  as? String
         if isLoggedIn {
             data[.logout] = [.logout]
         }
@@ -273,7 +278,7 @@ extension ProfileViewController : RegisterViewControllerDelegate, ConfirmCodeVie
     }
     
     func didLogin(){
-        
+        self.syncLoggedIn()
     }
     
     func registerViewControllerDidSignin(_ viewController: RegisterViewController) {
@@ -472,7 +477,7 @@ extension ProfileViewController {
             navigationController?.pushViewController(GDPRViewController(), animated: true)
             
         case .logout:
-            // TODO:
+            UserAccountManager.shared.logout()
             syncLoggedIn()
         }
     }

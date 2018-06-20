@@ -378,6 +378,7 @@ class ProfileAccountView: UIView {
             return
         }
         
+        UserAccountManager.shared.setProfile(displayName: name, gender: nil, size: nil, unverifiedEmail: email)
         let user = AnalyticsUser(name: name, email: email)
         user.sendToServers()
     }

@@ -553,6 +553,7 @@ class RegisterViewController: UIViewController {
             }
                 
         }.catch { (error) in
+            
             let e = error as NSError
             Analytics.trackOnboardingError(domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
             print("facebook login error: \(error)")
