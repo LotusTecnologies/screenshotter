@@ -115,7 +115,7 @@ class UserAccountManager : NSObject {
                     if let error = error{
                         let e = error as NSError
                         if   e.domain == AuthErrorDomain && e.code == 17025 {
-                            "This credential is already associated with a different user account."
+                            //This credential is already associated with a different user account.
                             reject(error)
                         }
                     }else if let user = result?.user {
@@ -325,13 +325,6 @@ class UserAccountManager : NSObject {
         }
     }
     
-    func signOut() -> Promise<Void>{
-        return Promise { fulfill, reject in
-            reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
-
-        }
-    }
-    
     @discardableResult func setGDPR(agreedToEmail:Bool, agreedToImageDetection:Bool) -> Promise<Void>{
         return Promise { fulfill, reject in
             
@@ -388,10 +381,20 @@ class UserAccountManager : NSObject {
         return Promise { fulfill, reject in
             do {
                 FBSDKLoginManager().logOut()
-                try Auth.auth().signOut()
-                fulfill(())
+                if self.user?.isAnonymous == false || self.user?.providerData.first(where: {$0.providerID == "facebook.com"}) != nil {
+                    try Auth.auth().signOut()
+                    makeAnonAccountPromise = nil
+                    makeAnonAccount().then(execute: { () -> () in
+                        fulfill(())
+                    }).catch(execute: { (e) in
+                        fulfill(()) // not a bug.  you did logout - even if a new accout was not created.
+                    })
+                    
+                }else{
+                    fulfill(())
+                }
                 
-            }catch {
+            }catch let error {
                 reject(error)
             }
             

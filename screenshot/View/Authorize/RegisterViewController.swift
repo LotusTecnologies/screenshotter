@@ -541,6 +541,10 @@ class RegisterViewController: UIViewController {
     
     @objc fileprivate func facebookLoginAction() {
         Analytics.trackOnboardingFacebookStarted()
+        self.continueButton.isUserInteractionEnabled = false
+        self.skipButton.isUserInteractionEnabled = false
+        self.facebookLoginButton.isUserInteractionEnabled = false
+
         UserAccountManager.shared.loginWithFacebook().then
             { (result) -> Void in
             
@@ -557,6 +561,11 @@ class RegisterViewController: UIViewController {
             let e = error as NSError
             Analytics.trackOnboardingError(domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
             print("facebook login error: \(error)")
+        }.always {
+            self.continueButton.isUserInteractionEnabled = true
+            self.skipButton.isUserInteractionEnabled = true
+            self.facebookLoginButton.isUserInteractionEnabled = true
+
         }
         
         

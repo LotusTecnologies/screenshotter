@@ -477,7 +477,9 @@ extension ProfileViewController {
             navigationController?.pushViewController(GDPRViewController(), animated: true)
             
         case .logout:
-            UserAccountManager.shared.logout()
+            UserAccountManager.shared.logout().then(on: .main, execute: { () -> () in
+                self.syncLoggedIn()
+            })
             syncLoggedIn()
         }
     }
