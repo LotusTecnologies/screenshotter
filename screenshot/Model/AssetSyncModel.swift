@@ -728,9 +728,21 @@ extension AssetSyncModel {
             self.networkingIndicatorDelegate?.networkingIndicatorDidStart(type: .Product)
         }
         self.syteProcessingQueue.addOperation(AsyncOperation(timeout: 90, assetId: assetId, shoppableId: nil, completion: { (completion) in
-            firstly {
+            Promise<(Data?, String?)>.init(resolvers: { (fulfil, reject) in
+                if let data = localImageData {
+                    UserAccountManager.shared.uploadImage(data: data).then(execute: { (url) -> () in
+                        fulfil((nil, url.absoluteString))
+                    }).catch{_ in
+                        fulfil((data, orImageUrlString))
+                    }
+                }else {
+                    fulfil((localImageData, orImageUrlString))
+                }
+            }).then(on: self.processingQ) { (arg) -> Promise<(String, [[String : Any]])> in
+                
+                let (localImageData, orImageUrlString) = arg
                 return (gottenUploadedURLString != nil && gottenSegments != nil) ? Promise(value: (gottenUploadedURLString!, gottenSegments!)) : NetworkingPromise.sharedInstance.uploadToSyte(imageData: localImageData, orImageUrlString:orImageUrlString)
-                }.then(on: self.processingQ) { uploadedURLString, segments -> Void in
+            }.then(on: self.processingQ) { uploadedURLString, segments -> Void in
                     let categories = segments.map({ (segment: [String : Any]) -> String? in segment["label"] as? String}).compactMap({$0}).joined(separator: ",")
                     Analytics.trackReceivedResponseFromSyte(imageUrl: uploadedURLString, segmentCount: segments.count, categories: categories)
 
