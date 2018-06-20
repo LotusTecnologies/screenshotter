@@ -230,11 +230,6 @@ class OnboardingDetailsViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-        
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -251,11 +246,6 @@ class OnboardingDetailsViewController: UIViewController {
         _view.addGestureRecognizer(tapGesture)
     }
     
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        
-        
-    }
     
     deinit {
         inputViewAdjustsScrollViewController.delegate = nil
