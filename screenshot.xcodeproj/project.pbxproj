@@ -166,6 +166,7 @@
 		311A50C320D90B780001D463 /* FormTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A501F20D90B770001D463 /* FormTableViewCell.swift */; };
 		311A50C420D90B780001D463 /* FormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A502020D90B770001D463 /* FormView.swift */; };
 		311A50C520D90B780001D463 /* Form.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A502120D90B770001D463 /* Form.swift */; };
+		311A50C720DA9A900001D463 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 311A50C620DA9A900001D463 /* GoogleService-Info.plist */; };
 		3125446B2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		3125446C2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		3125446D2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
@@ -435,6 +436,7 @@
 		311A501F20D90B770001D463 /* FormTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FormTableViewCell.swift; sourceTree = "<group>"; };
 		311A502020D90B770001D463 /* FormView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FormView.swift; sourceTree = "<group>"; };
 		311A502120D90B770001D463 /* Form.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Form.swift; sourceTree = "<group>"; };
+		311A50C620DA9A900001D463 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		31254460209079C7009410D5 /* screenshot-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "screenshot-Bridging-Header.h"; sourceTree = "<group>"; };
 		3125448E209871B4009410D5 /* Analytics+api.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Analytics+api.swift"; sourceTree = "<group>"; };
 		314C4889205E86E700B8381D /* PHAsset+craze.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PHAsset+craze.swift"; sourceTree = "<group>"; };
@@ -1269,6 +1271,7 @@
 		E42AC3941F61442C0035A07C /* prd */ = {
 			isa = PBXGroup;
 			children = (
+				311A50C620DA9A900001D463 /* GoogleService-Info.plist */,
 				E41BB9341F61BDD900A74F04 /* Info.plist */,
 				E4D6D8A51F61AF3A009DD999 /* screenshot.entitlements */,
 			);
@@ -1413,6 +1416,7 @@
 				C572FF00205C00070046BFEB /* Hind-Regular.ttf in Resources */,
 				C572FEFF205C00070046BFEB /* Hind-Bold.ttf in Resources */,
 				E4DB2B7C1F7E1D4600320BE5 /* LaunchScreen.storyboard in Resources */,
+				311A50C720DA9A900001D463 /* GoogleService-Info.plist in Resources */,
 				C53B15BA1FDD638C00658A78 /* Localizable.strings in Resources */,
 				311A4F5320D90AED0001D463 /* GoogleService-Info.plist in Resources */,
 				C5E6C318208F23AA006E9C54 /* CheckoutSupportedStates.plist in Resources */,
