@@ -30,7 +30,7 @@ class ResetPasswordView: UIScrollView {
         self.init(frame: frame, email: "")
     }
     
-    init(frame: CGRect, email:String) {
+    required init(frame: CGRect, email:String) {
         super.init(frame: frame)
         
         if let backgroundImage = UIImage(named: "BrandConfettiFullBackground") {
@@ -66,7 +66,7 @@ class ResetPasswordView: UIScrollView {
         
         explainLabel.attributedText = attributedString
         explainLabel.minimumScaleFactor = 0.7
-        explainLabel.numberOfLines = -1
+        explainLabel.numberOfLines = 0
         addSubview(explainLabel)
         explainLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: .padding).isActive = true
         explainLabel.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
@@ -155,7 +155,7 @@ class ResetPasswordViewController: UIViewController {
     
     override func loadView() {
         let email = self.email ?? ""
-        view = ResetPasswordView.init(frame: .zero, email: email)
+        view = classForView.self.init(frame: .zero, email: email)
     }
     
     // MARK: Life Cycle

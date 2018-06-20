@@ -78,7 +78,7 @@ class ConfirmCodeView: UIScrollView {
         }
         explainLabel.attributedText = attributedString
         explainLabel.minimumScaleFactor = 0.7
-        explainLabel.numberOfLines = -1
+        explainLabel.numberOfLines = 0
         contentView.addSubview(explainLabel)
         explainLabel.topAnchor.constraint(equalTo: emailImageView.bottomAnchor, constant: .extendedPadding).isActive = true
         explainLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant:.padding).isActive = true
@@ -174,11 +174,6 @@ class ConfirmCodeViewController: UIViewController {
     
     @objc private func cancelAction() {
         delegate?.confirmCodeViewControllerDidCancel(self)
-    }
-    
-    
-    private func savePassword(_ password: String) {
-        // TODO:
     }
     
     // MARK: Keyboard

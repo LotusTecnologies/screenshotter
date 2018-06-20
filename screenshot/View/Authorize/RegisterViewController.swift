@@ -342,8 +342,7 @@ class RegisterViewController: UIViewController {
         }
     }
     
-    // MARK: View
-    
+
     var classForView: RegisterView.Type {
         return RegisterView.self
     }
@@ -632,11 +631,11 @@ extension RegisterViewController: UITextViewDelegate {
 }
 
 extension RegisterViewController: InitiateResetPasswordViewControllerDelegate {
-    func initiateResetPasswordViewControllerDidReset(_ viewController: InitiateResetPasswordViewController) {
+    func initiateResetPasswordViewControllerDidReset(_ viewController: InitiateResetPasswordViewController, email:String) {
         let resetPasswordViewController = ResetPasswordViewController()
         resetPasswordViewController.delegate = self
-        self.email = viewController._view.emailTextField.text
-        resetPasswordViewController.email = self.email
+        self.email = email
+        resetPasswordViewController.email = email
         self.navigationController?.pushViewController(resetPasswordViewController, animated: true)
     }
     

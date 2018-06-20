@@ -9,7 +9,7 @@
 import UIKit
 
 protocol InitiateResetPasswordViewControllerDelegate: NSObjectProtocol {
-    func initiateResetPasswordViewControllerDidReset(_ viewController: InitiateResetPasswordViewController)
+    func initiateResetPasswordViewControllerDidReset(_ viewController: InitiateResetPasswordViewController, email:String)
     func initiateResetPasswordViewControllerDidCancel(_ viewController: InitiateResetPasswordViewController)
 }
 
@@ -174,7 +174,7 @@ class InitiateResetPasswordViewController: UIViewController {
             
             UserAccountManager.shared.forgotPassword(email: email)
                 .then(on: .main) { () -> Void in
-                    self.delegate?.initiateResetPasswordViewControllerDidReset(self)
+                    self.delegate?.initiateResetPasswordViewControllerDidReset(self, email:email)
                 }.catch { (error) in
                     DispatchQueue.main.async {
                         let error = error as NSError
