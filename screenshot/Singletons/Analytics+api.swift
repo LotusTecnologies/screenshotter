@@ -1,8 +1,8 @@
 // STOP!  DO not edit the file below
 // only create by auto generting
 // created by: Jonathan Rose(rose@screenshopit.com) on computer -jonathanrose
-// created on: Wed Jun 20 10:58:07 IDT 2018
-// created from: onboardingAnalytics -  - 0e273e6 
+// created on: Wed Jun 20 17:47:01 IDT 2018
+// created from: master -  - b4ebf14 
 //  Copyright (c) 2018 crazeapp. All rights reserved.
 
 
@@ -3013,11 +3013,11 @@ extension AnalyticsProductUnfavorited {
 }
 
  
-typealias AnalyticsUserReceivedSharedScreenshots = Analytics
-extension AnalyticsUserReceivedSharedScreenshots {
+typealias AnalyticsScreenshotCreated = Analytics
+extension AnalyticsScreenshotCreated {
     
-  static func trackUserReceivedSharedScreenshots(screenshot:Screenshot? ) {
-      let key = "user received shared screenshots"
+  static func trackScreenshotCreated(screenshot:Screenshot? ) {
+      let key = "screenshot-created"
       var properties:[String:Any] = [:]
       if let screenshot = screenshot {
           propertiesFor(screenshot).forEach { properties[$0] = $1 }
