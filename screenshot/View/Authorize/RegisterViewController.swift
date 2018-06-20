@@ -369,7 +369,7 @@ class RegisterViewController: UIViewController {
     // MARK: Register
     
     private func isPasswordValid(_ password: String?) -> Bool {
-        if let password = password, !password.isEmpty, password.lengthOfBytes(using: .utf8) >= 8 {
+        if let _ = UserAccountManager.shared.validatePassword(password) {
             return true
         }
         else {
