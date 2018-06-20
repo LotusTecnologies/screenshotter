@@ -385,7 +385,9 @@ extension UserAccountManager {
         return alert
     }
     public func isBadCodeError( error:NSError) ->Bool {
-        
+        if error.domain == AuthErrorDomain && error.code == AuthErrorCode.invalidActionCode.rawValue {
+            return true
+        }
         return  false
     }
     func alertViewForBadCode()  -> UIAlertController {
