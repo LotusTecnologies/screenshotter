@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Jonathan Rose on 2/18/18.
-//  Copyright © 2018 crazeapp. All rights reserved.
+//  Copyright (c) 2018 crazeapp. All rights reserved.
 //
 
 import Foundation
@@ -115,6 +115,16 @@ class ScreenshotsViewController: BaseViewController {
         }
     }
     
+    @objc func contentSizeCategoryDidChange(_ notification:Notification) {
+        if self.isViewLoaded && self.view.window != nil {
+            let notificationSection = self.indexFor(section: .notification )
+            if self.collectionView.numberOfItems(inSection: notificationSection ) > 0 {
+                self.collectionView.reloadItems(at: [IndexPath(item: 0, section: notificationSection )])
+                
+            }
+        }
+    }
+    
     deinit {
         self.collectionView?.delegate = nil
         self.collectionView?.dataSource = nil
@@ -145,22 +155,6 @@ extension ScreenshotsViewController{
                 if collectionView.numberOfItems(inSection: self.indexFor(section: .image) ) > 0 {
                     collectionView.contentOffset = CGPoint.init(x: collectionView.contentInset.left, y: -collectionView.contentInset.top)
                 }
-            }
-        }
-    }
-}
-
-extension ScreenshotsViewController: VideoDisplayingViewControllerDelegate {
-    func videoDisplayingViewControllerDidTapDone(_ viewController: UIViewController) {
-        self.dismiss(animated: true, completion: nil)
-    }
-    
-    @objc func contentSizeCategoryDidChange(_ notification:Notification) {
-        if self.isViewLoaded && self.view.window != nil {
-            let notificationSection = self.indexFor(section: .notification )
-            if self.collectionView.numberOfItems(inSection: notificationSection ) > 0 {
-                self.collectionView.reloadItems(at: [IndexPath(item: 0, section: notificationSection )])
-                
             }
         }
     }
@@ -240,7 +234,10 @@ extension ScreenshotsViewController {
             collectionView.register(ScreenshotProductBarCollectionViewCell.self, forCellWithReuseIdentifier: "product")
             collectionView.register(ScreenshotNotificationCollectionViewCell.self, forCellWithReuseIdentifier: "notification")
             collectionView.register(ScreenshotCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
-
+            
+            collectionView.register(ScreenshotsActionsCollectionReusableView.self, forSupplementaryViewOfKind: UICollectionElementKindSectionHeader, withReuseIdentifier: "header")
+            collectionView.register(ScreenshotsActionsCollectionReusableView.self, forSupplementaryViewOfKind: UICollectionElementKindSectionFooter, withReuseIdentifier: "footer")
+            
             self.view.addSubview(collectionView)
             collectionView.topAnchor.constraint( equalTo: self.view.topAnchor).isActive = true
             collectionView.bottomAnchor.constraint( equalTo: self.view.bottomAnchor).isActive = true
@@ -302,7 +299,17 @@ extension ScreenshotsViewController {
     
     @objc fileprivate func emptyListViewDiscoverAction() {
         if let tabBarController = tabBarController as? MainTabBarController {
-            tabBarController.selectedIndex = MainTabBarController.TabIndex.discover.rawValue
+            tabBarController.goTo(tab: .discover)
+        }
+    }
+    
+    @objc private func headerFooterUploadAction() {
+        self.delegate?.screenshotsViewControllerWantsToPresentPicker(self, openScreenshots: false)
+    }
+    
+    @objc private func headerFooterDiscoverAction() {
+        if let tabBarController = tabBarController as? MainTabBarController {
+            tabBarController.goTo(tab: .discover)
         }
     }
 }
@@ -501,11 +508,9 @@ extension ScreenshotsViewController {
                 }
             }
             
-            if (self.hasNewScreenshotSection) {
-                self.collectionView.reloadSections(IndexSet(integer: self.indexFor(section: .notification )))
-            }
+            self.collectionView.collectionViewLayout.invalidateLayout()
             
-            self.deleteButton?.alpha = editing ? 1.0: 0.0
+            self.deleteButton?.alpha = editing ? 1 : 0
         }
         
         if (animated) {
@@ -524,8 +529,6 @@ extension ScreenshotsViewController {
             cellEditing()
             removeDeleteButton()
         }
-        
-        self.navigationItem.rightBarButtonItem?.isEnabled = !editing
         
         if (editing) {
             self.editButtonItem.title = "generic.cancel".localized
@@ -557,7 +560,7 @@ extension ScreenshotsViewController {
         setEditing(false, animated: true)
         
         if deleteScreenshotObjectIDs.count + toHideFromProductBarObjectIDs.count > 0 {
-            DataModel.sharedInstance.hide(screenshotOIDArray: deleteScreenshotObjectIDs)
+            DataModel.sharedInstance.hide(screenshotOIDArray: deleteScreenshotObjectIDs, kind: .multi)
             DataModel.sharedInstance.hideFromProductBar(toHideFromProductBarObjectIDs)
         }
         self.deleteScreenshotObjectIDs.removeAll()
@@ -731,7 +734,7 @@ extension ScreenshotsViewController:UICollectionViewDelegateFlowLayout {
             case .product:
                 return .zero
             case .notification:
-                if self.hasNewScreenshotSection {
+                if self.hasNewScreenshotSection && !isEditing {
                     return defaultInset
                 }
                 
@@ -774,7 +777,7 @@ extension ScreenshotsViewController:UICollectionViewDelegateFlowLayout {
             case .notification:
                 let minimumSpacing = self.collectionViewInteritemOffset()
                 size.width = floor(collectionView.bounds.size.width - (minimumSpacing.x * 2))
-                size.height = ScreenshotNotificationCollectionViewCell.height(withCellWidth: size.width, contentText: self.notificationContentText(), contentType: .labelWithButtons)
+                size.height = isEditing ? 0.1 : ScreenshotNotificationCollectionViewCell.height(withCellWidth: size.width, contentText: self.notificationContentText(), contentType: .labelWithButtons)
                 
             case .image :
                 let minimumSpacing = self.collectionViewInteritemOffset()
@@ -883,6 +886,69 @@ extension ScreenshotsViewController: UICollectionViewDataSource {
         
     }
     
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        if section == Section.image.rawValue {
+            return collectionViewImageReferenceSize(section: section)
+        }
+        return .zero
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
+        if section == Section.image.rawValue {
+            return collectionViewImageReferenceSize(section: section, isFooter: true)
+        }
+        return .zero
+    }
+    
+    private func collectionViewImageReferenceSize(section: Int, isFooter: Bool = false) -> CGSize {
+        if isEditing {
+            return CGSize(width: view.bounds.size.width, height: 0.1)
+        }
+        else {
+            var canProgress = true
+            
+            if isFooter {
+                let numberOfImages = self.collectionView(collectionView, numberOfItemsInSection: section)
+                canProgress = numberOfImages > 2
+            }
+            
+            if canProgress {
+                let height = ScreenshotsActionsCollectionReusableView.contentHeight
+                let minimumSpacing = collectionViewInteritemOffset()
+                return CGSize(width: view.bounds.size.width, height: height + minimumSpacing.y)
+            }
+        }
+        return .zero
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        if indexPath.section == Section.image.rawValue {
+            var identifier: String? = nil
+            
+            if kind == UICollectionElementKindSectionHeader {
+                identifier = "header"
+            }
+            else if kind == UICollectionElementKindSectionFooter {
+                identifier = "footer"
+            }
+            
+            if let identifier = identifier,
+                let view = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: identifier, for: indexPath) as? ScreenshotsActionsCollectionReusableView
+            {
+                view.uploadButton.addTarget(self, action: #selector(headerFooterUploadAction), for: .touchUpInside)
+                view.discoverButton.addTarget(self, action: #selector(headerFooterDiscoverAction), for: .touchUpInside)
+                
+                var layoutMargins: UIEdgeInsets = .zero
+                layoutMargins.top = collectionViewInteritemOffset().y
+                view.layoutMargins = layoutMargins
+                
+                return view
+            }
+        }
+        
+        return UICollectionReusableView()
+    }
+    
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if let sectionType =  self.sectionFor(index: indexPath.section) {
             switch sectionType {
@@ -922,7 +988,7 @@ extension ScreenshotsViewController: UICollectionViewDataSource {
                     return 0
                 }
             case .notification:
-                return self.hasNewScreenshotSection ? 1 :0 
+                return self.hasNewScreenshotSection ? 1 : 0
             case .image:
                 return self.screenshotFrcManager?.fetchedObjectsCount ?? 0
             }

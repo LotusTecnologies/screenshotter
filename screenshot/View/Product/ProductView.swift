@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Corey Werner on 2/27/18.
-//  Copyright © 2018 crazeapp. All rights reserved.
+//  Copyright (c) 2018 crazeapp. All rights reserved.
 //
 
 import UIKit
@@ -180,7 +180,7 @@ class ProductView: UIView {
         stockButton.setTitleColor(.crazeGreen, for: .selected)
         stockButton.setTitleColor(UIColor.crazeGreen.darker(), for: [.selected, .highlighted])
         stockButton.setImage(UIImage(named: "FavoriteBell")?.withRenderingMode(.alwaysTemplate), for: .normal)
-        stockButton.adjustInsetsForImage(withPadding: 6)
+        stockButton.adjustInsetsForImage()
         stockButton.alpha = 0
         scrollView.addSubview(stockButton)
         stockButton.topAnchor.constraint(equalTo: favoriteButton.topAnchor).isActive = true

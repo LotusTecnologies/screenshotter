@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Gershon Kagan on 2/11/18.
-//  Copyright © 2018 crazeapp. All rights reserved.
+//  Copyright (c) 2018 crazeapp. All rights reserved.
 //
 
 import UIKit
@@ -59,6 +59,17 @@ class ScreenshotDisplayViewController: BaseViewController, UIScrollViewDelegate 
         }
         
         #endif
+    }
+    
+    override var previewActionItems: [UIPreviewActionItem] {
+        guard let screenshot = screenshot else {
+            return []
+        }
+        
+        let deleteAction = UIPreviewAction(title: "generic.delete".localized, style: .destructive) { (action, viewController) in
+            DataModel.sharedInstance.hide(screenshotOIDArray: [screenshot.objectID], kind:.single)
+        }
+        return [deleteAction]
     }
     
     // MARK: Screenshot

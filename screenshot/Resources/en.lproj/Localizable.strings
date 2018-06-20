@@ -29,6 +29,53 @@
 "application.error.no_disk_space.message" = "Free up some space on your phone for a better Screenshop experience.";
 "application.error.no_disk_space.title" = "Out Of Space!";
 
+"authorize.initiate_reset_password.alert.message" = "Tap the link in the email we sent you to set a new password";
+"authorize.initiate_reset_password.alert.title" = "Emailed!";
+"authorize.initiate_reset_password.message" = "Enter the email you signed up with and we’ll send you a link to reset your password";
+"authorize.initiate_reset_password.title" = "Reset Password";
+
+"authorize.register.continue" = "Start Shopping";
+"authorize.register.continue.login" = "Log In";
+"authorize.register.continue.register" = "Sign Up";
+"authorize.register.email" = "Email Address";
+"authorize.register.forgot" = "Forgot Password?";
+"authorize.register.legal.0" = "By tapping \"Sign Up\" above, you agree to our ";
+"authorize.register.legal.1" = "Terms of Service";
+"authorize.register.legal.2" = " and ";
+"authorize.register.legal.3" = "Privacy Policy";
+"authorize.register.legal.4" = " ";
+"authorize.register.offers" = "Send me emails about exclusive offers, sales and new features.";
+"authorize.register.password" = "Password";
+"authorize.register.confirmation.message" = "You are now a\nScreenshop user.";
+"authorize.register.confirmation.title" = "Welcome!";
+"authorize.register.skipConfirm" = "Are you sure you want to skip? Your account won’t be created.";
+"authorize.register.welcome_to" = "Welcome to";
+"authorize.register.byline" = "Take a screenshot. Shop it.";
+
+"authorize.confirm.title" = "Confirm Email";
+"authorize.confirm.code" = "Enter Code";
+"authorize.confirm.explaination" = "An email was sent to %@.\nPlease click on the link that you recieved in the email.";
+
+"authorize.reset_password.enter" = "Enter new password";
+"authorize.reset_password.failed_alert.title" = "Passwords Don’t Match";
+"authorize.reset_password.reenter" = "Re-enter password";
+"authorize.reset_password.success_alert.message" = "Your password was changed. Now log in to your account with your new password";
+"authorize.reset_password.success_alert.title" = "Success!";
+"authorize.reset_password.title" = "Set New Password";
+"authorize.reset_password.explanation" = "An email was sent to %@.\nPlease click on the link that you recieved in the email to continue.";
+
+"authorize.error.passwordInvalid" = "password must be at least 8 characters long.";
+"authorize.error.passwordInvalid.server" = "use a better password";
+
+"authorize.error.noInternet" = "Unable to login. Check your connection and try again.";
+"authorize.error.undefined" = "Something weird happened. Sorry about that, try again.";
+"authorize.error.undefined.contactSupport" = "Contact Support";
+"authorize.error.badCode" = "The link you tapped is invalid. This can happen if the link is expired, or has already been used.";
+"authorize.error.badPassword" = "No account associated with that email address";
+"authorize.error.cantSendMail" = "We were unable to send an email to the address %@. Please make sure you entered it correctly.";
+"authorize.error.NoAccountWithEmail" = "No account associated with that email address";
+"authorize.error.wrongPassword" = "Password and email address don’t match";
+
 "cart.checkout.button" = "Checkout";
 "cart.checkout.total" = "Total: %@";
 "cart.empty.button" = "Find your next outfit!";
@@ -55,17 +102,21 @@
 "checkout.card.expired" = "EXPIRED";
 "checkout.card.expires" = "EXPIRES %@";
 "checkout.card.temporary" = "This card will not be saved after purchase";
+
 "checkout.confirmation.detail" = "Thanks for shopping with us!";
 "checkout.confirmation.email" = "A confirmation email will be sent to %@";
 "checkout.confirmation.orderNumber" = "Save your order number:";
 "checkout.confirmation.orderNumber2" = "Order Number: %@";
 "checkout.confirmation.orderNumber.savedToClipBoard" = "Your order number has been copied to the clipboard";
 "checkout.confirmation.title" = "Order Placed";
+
 "checkout.confirm.payment.cvv" = "CVV";
 "checkout.confirm.payment.enter_cvv" = "Enter your CVV";
 "checkout.confirm.payment.what" = "what's this?";
+
 "checkout.error.message" = "We were unable to complete your transaction. Please check your connection and try again.";
 "checkout.error.title" = "Something Went Wrong";
+
 "checkout.form.address.add" = "Add Address";
 "checkout.form.address.edit" = "Edit Address";
 "checkout.form.card.add" = "Add Card";
@@ -73,10 +124,12 @@
 "checkout.form.card.edit" = "Edit Card";
 "checkout.form.card.save.message" = "You can use this for future purchases. Your information is saved securely on your device.";
 "checkout.form.card.save.title" = "Save Card?";
+
 "checkout.list.payment.add_card" = "Add a new card";
 "checkout.list.payment.title" = "Payment Methods";
 "checkout.list.shipping.add_address" = "Add a new shipping address";
 "checkout.list.shipping.title" = "Shipping Addresses";
+
 "checkout.order.address_title" = "Shipping to:";
 "checkout.order.cancel" = "Cancel and Continue Shopping";
 "checkout.order.description.color" = "Color: %@";
@@ -92,7 +145,6 @@
 "checkout.order.legal.0" = "Your payment details are securely processed. Your personal information is kept confidential. By placing an order you agree to the ";
 "checkout.order.legal.1" = "Terms of Service";
 "checkout.order.legal.2" = " provided by the retail merchants associated with your purchase.";
-"checkout.order.or" = "or";
 "checkout.order.payment_title" = "Payment Method:";
 "checkout.order.shipping_handling" = "Shipping & handling:";
 "checkout.order.title" = "Place Your Order";
@@ -136,6 +188,8 @@
 "error.database_cant_load.button.reset_app.message" = "Are you sure? You'll lose all your screenshots.";
 "error.database_cant_load.button.reset_app.button.reset" = "Reset";
 
+"facebook.register" = "Continue With Facebook";
+
 "favorites.empty.detail" = "Tap the heart icon on products to add them to your favorites";
 "favorites.empty.title" = "No Favorites";
 "favorites.items.title" = "Favorited Items";
@@ -161,11 +215,17 @@
 "form.personal.email" = "Email";
 "form.personal.phone" = "Phone Number";
 
-"game.enter" = "Get More Coins";
-"game.restart" = "Tap to play again";
-"game.score" = "My coins: %d";
-"game.start" = "Tap to get more coins";
+"gdpr.image.message" = "When this setting is turned on, we send screenshots you take in and outside of the app to our server to detect whether there are clothing items in the photo and allow you to shop relevant photos quickly. This happens in the background and is not shown to you. We do not save any photos that are not detected as fashion.";
+"gdpr.image.title" = "Image Detection";
+"gdpr.notification.message" = "When this setting is turned on, we will send you personalized push notifications and emails with sales, availability updates and information about products in the app you looked at and favorited. Your email will also be used to retarget ads to you and to provide brands and retailers with anonymous data about your shopping habits.";
+"gdpr.notification.title" = "Email & Push Notifications";
+"gdpr.onboarding.title" = "Your Privacy Settings";
+"gdpr.onboarding.subtitle" = "You can change these any time in the settings page of the app";
+"gdpr.onboarding.edit" = "Manage Settings";
+"gdpr.onboarding.continue" = "Accept and Continue";
+"gdpr.title" = "Privacy Settings";
 
+"generic.back" = "Back";
 "generic.buy" = "BUY";
 "generic.cancel" = "Cancel";
 "generic.close" = "Close";
@@ -176,16 +236,19 @@
 "generic.done" = "Done";
 "generic.dont_save" = "Don't Save";
 "generic.edit" = "Edit";
+"generic.error" = "Error";
 "generic.enabled" = "Enabled";
 "generic.later" = "Later";
 "generic.no" = "No";
 "generic.no_thanks" = "No Thanks";
 "generic.ok" = "OK";
+"generic.or" = "or";
 "generic.retry" = "Try Again";
 "generic.sale" = "SALE";
 "generic.save" = "Save";
+"generic.send" = "Send";
 "generic.setup" = "Setup";
-"generic.skip" = "skip";
+"generic.skip" = "Skip";
 "generic.submit" = "Submit";
 "generic.update" = "Update";
 "generic.yes" = "Yes";
@@ -203,6 +266,17 @@
 "notification.screenshot.recent" = "Tap to import your new screenshots";
 "notification.screenshot.shoppable" = "Your screenshot is shoppable in the screenshot tab";
 "notification.title" = "Ready to shop?";
+
+"onboarding.details.avatar.camera" = "Take a Photo";
+"onboarding.details.avatar.gallery" = "Upload From Gallery";
+"onboarding.details.save_alert.message" = "You haven’t filled out all your information. Do you want to continue anyway?";
+"onboarding.details.save_alert.title" = "Missing Info";
+"onboarding.details.gender" = "Gender";
+"onboarding.details.name" = "Your Name";
+"onboarding.details.preferences" = "PREFERENCES";
+"onboarding.details.size" = "Size";
+"onboarding.details.title" = "Your Details";
+
 
 "onboarding.welcome.content" = "Take a screenshot.\nShop it.";
 "onboarding.welcome.continue" = "Get Started";
@@ -231,13 +305,13 @@
 "product.alert.price" = "Price alert: Your fav just dropped to %@, get it quick!!";
 "product.alert.price_stock" = "In-stock alert: Your fav just dropped to %@, get it quick!!";
 "product.alert.stock" = "In-stock alert: Your fav just became available, get it quick!!";
-"product.buy" = "BUY";
+"product.buy" = "Buy";
 "product.buy_now" = "Buy Now";
 "product.color.default" = "Color";
+"product.burrow" = "Shop Similar";
 "product.next_step.cancel" = "Continue Shopping";
 "product.next_step.continue" = "Go to Cart";
 "product.next_step.added" = "Product was added to your cart!";
-"product.out_of_stock" = "OUT OF STOCK";
 "product.price_alert_on" = "NOTIFY ME WHEN IN STOCK";
 "product.price_alert_off" = "IN-STOCK ALERT ON";
 "product.similar_items" = "Related Items";
@@ -248,15 +322,10 @@
 "product.variants.size" = "Size";
 "product.website" = "Go To %@";
 
+"products.details.similar" = "Similar Items";
 "products.helper.message" = "No visually similar products were detected";
 "products.helper.retry" = "Try Again";
-"products.helper.retry.fashion" = "Fashion";
-"products.helper.retry.furniture" = "Furniture";
-"products.helper.retry.title" = "Try again as";
 "products.helper.title" = "No Items Found";
-"products.options.category.auto" = "Auto";
-"products.options.category.fashion" = "Fashion";
-"products.options.category.furniture" = "Furniture";
 "products.options.gender.auto" = "All";
 "products.options.gender.female" = "Female";
 "products.options.gender.male" = "Male";
@@ -270,6 +339,7 @@
 "products.options.sort.price_des" = "Price (highest first)";
 "products.options.sort.similar" = "Similar";
 "products.options.sort.title" = "Sort by";
+"products.options.title" = "FILTER YOUR RESULTS";
 "products.rate.negative.help_finding_outfit" = "I need help finding this outfit... %@";
 "products.rate.negative.popup.message" =  "What were you expecting to see and what did you see instead?";
 "products.rate.negative.popup.title" =  "What’s Wrong Here?";
@@ -280,6 +350,19 @@
 "products.related_looks.headline" = "Similar Looks";
 "products.related_looks.error.connection" = "Please check your connection and try again.";
 "products.related_looks.error.no_looks" = "No similar looks found";
+
+"profile.header.logged_out.continue" = "Log In or Sign Up";
+"profile.header.logged_out.title" = "Log in for exclusive benefits!";
+"profile.row.currency.title" = "Currency";
+"profile.row.gdpr.title" = "Email & Image detection";
+"profile.row.logout.title" = "Logout";
+"profile.row.open_in.title" = "Open Products In";
+"profile.row.photo_permission.title" = "Camera Roll";
+"profile.row.push_permission.title" = "Push Notifications";
+"profile.row.tutorial.title" = "Play Tutorial";
+"profile.section.permission" = "Permissions";
+"profile.tell_friend" = "Tell a Friend!";
+"profile.title" = "Profile";
 
 "screenshot.empty.detail" = "Upload a photo or add a look from the Discover tab";
 "screenshot.empty.discover" = "Browse Looks";
@@ -294,6 +377,9 @@
 "screenshot.permission.photo.title" = "Shop With Screenshop";
 "screenshot.permission.push.message" = "Open your favorite apps and take screenshots of photos with clothes, then come back here to shop them!";
 "screenshot.permission.push.title" = "Start Screenshotting";
+
+"screenshots.actions.discover" = "Find New Looks";
+"screenshots.actions.upload" = "Upload Photo";
 
 "screenshots.delete.placeholder" = "Delete Items";
 "screenshots.delete.plural" = "Delete %d Items";
@@ -326,34 +412,25 @@
 "settings.region.other" = "Other";
 "settings.region.unknown" = "Unknown";
 "settings.region.us" = "United States";
-"settings.row.address.title" = "Shipping Addresses";
 "settings.row.bug.title" = "Submit a Bug";
-"settings.row.coins.title" = "Coins Collected";
 "settings.row.contact.title" = "Contact Us";
-"settings.row.currency.title" = "Currency";
 "settings.row.email.detail" = "Enter Your Email";
 "settings.row.facebook.title" = "Facebook";
-"settings.row.gender.title" = "Gender";
 "settings.row.instagram.title" = "Instagram";
 "settings.row.name.detail" = "Enter Your Name";
-"settings.row.open_in.title" = "Open Products In";
 "settings.row.partners.title" = "Our Technology";
-"settings.row.payment.title" = "Payment Methods";
-"settings.row.photo_permission.title" = "Camera Roll";
-"settings.row.push_permission.title" = "Push Notifications";
 "settings.row.region.title" = "Region";
-"settings.row.size.title" = "Size";
-"settings.row.tutorial.title" = "Play Tutorial";
 "settings.row.usage_streak.detail.plural" = "%d days";
 "settings.row.usage_streak.detail.single" = "%d day";
 "settings.row.usage_streak.title" = "Daily Streak";
 "settings.row.version.title" = "App Version";
 "settings.section.about" = "About";
 "settings.section.follow" = "Follow Us";
-"settings.section.info" = "Your Info";
-"settings.section.permission" = "Permissions";
-"settings.section.product" = "Product Options";
 "settings.title" = "Settings";
+
+
+"text_explanation.disabled" = "disabled";
+"text_explanation.enabled" = "enabled";
 
 "tutorial.email.detail" = "Fill out your info below";
 "tutorial.email.email" = "Email";
@@ -364,6 +441,7 @@
 "tutorial.email.legal.4" = " ";
 "tutorial.email.name" = "Name";
 "tutorial.email.title" = "Sign Up";
+
 "tutorial.try.detail.0" = "Press the home & power buttons";
 "tutorial.try.detail.1" = " on your phone";
 "tutorial.try.detail.2" = " to take a screenshot";
@@ -372,6 +450,8 @@
 "tutorial.try.detail.x.2" = " to take a screenshot";
 "tutorial.try.skip" = "Skip";
 "tutorial.try.title" = "Try It Out";
+
+
 "tutorial.video.mute.detail" = "In order to hear the sound in the video, please turn up the volume on your phone!";
 "tutorial.video.mute.title" = "Turn up the volume!";
 

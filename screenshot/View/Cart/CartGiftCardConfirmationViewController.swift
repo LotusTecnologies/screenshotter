@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Corey Werner on 5/9/18.
-//  Copyright © 2018 crazeapp. All rights reserved.
+//  Copyright (c) 2018 crazeapp. All rights reserved.
 //
 
 import UIKit
@@ -28,6 +28,7 @@ class CartGiftCardConfirmationViewController: UIViewController {
         super.viewDidLoad()
         
         view.backgroundColor = .white
+        view.clipsToBounds = true
         
         let layoutGuide = UIView()
         layoutGuide.translatesAutoresizingMaskIntoConstraints = false
@@ -48,14 +49,14 @@ class CartGiftCardConfirmationViewController: UIViewController {
         topBorderImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         topBorderImageView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
-        let graffitiImageView = UIImageView(image: UIImage(named: "BrandGraffitiColorTop"))
-        graffitiImageView.translatesAutoresizingMaskIntoConstraints = false
-        graffitiImageView.contentMode = .scaleAspectFill
-        view.addSubview(graffitiImageView)
-        graffitiImageView.setContentHuggingPriority(.required, for: .vertical)
-        graffitiImageView.topAnchor.constraint(equalTo: topBorderImageView.bottomAnchor).isActive = true
-        graffitiImageView.leadingAnchor.constraint(equalTo: topBorderImageView.leadingAnchor).isActive = true
-        graffitiImageView.trailingAnchor.constraint(equalTo: topBorderImageView.trailingAnchor).isActive = true
+        let confettiImageView = UIImageView(image: UIImage(named: "BrandConfettiColorTop"))
+        confettiImageView.translatesAutoresizingMaskIntoConstraints = false
+        confettiImageView.contentMode = .scaleAspectFill
+        view.addSubview(confettiImageView)
+        confettiImageView.setContentHuggingPriority(.required, for: .vertical)
+        confettiImageView.topAnchor.constraint(equalTo: topBorderImageView.bottomAnchor).isActive = true
+        confettiImageView.leadingAnchor.constraint(equalTo: topBorderImageView.leadingAnchor).isActive = true
+        confettiImageView.trailingAnchor.constraint(equalTo: topBorderImageView.trailingAnchor).isActive = true
         
         let giftCardImageView = UIImageView(image: UIImage(named: "giftCard25USD"))
         giftCardImageView.translatesAutoresizingMaskIntoConstraints = false

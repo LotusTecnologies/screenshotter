@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Gershon Kagan on 2/11/18.
-//  Copyright © 2018 crazeapp. All rights reserved.
+//  Copyright (c) 2018 crazeapp. All rights reserved.
 //
 
 import UIKit
@@ -53,11 +53,5 @@ class BaseViewController: UIViewController {
     
     override var prefersStatusBarHidden: Bool {
         return isStatusBarHidden
-    }
-    
-    // MARK: - Extra
-    
-    func addNavigationItemLogo() {
-        self.navigationItem.titleView = UIImageView(image: UIImage(named: "BrandLogo20h"))
     }
 }

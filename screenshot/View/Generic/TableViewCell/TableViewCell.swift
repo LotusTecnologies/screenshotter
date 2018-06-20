@@ -3,23 +3,13 @@
 //  screenshot
 //
 //  Created by Corey Werner on 4/24/18.
-//  Copyright © 2018 crazeapp. All rights reserved.
+//  Copyright (c) 2018 crazeapp. All rights reserved.
 //
 
 import UIKit
 
 class TableViewCell: UITableViewCell {
     private var _next: UIResponder?
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
-        
-        
-    }
     
     override func didMoveToSuperview() {
         super.didMoveToSuperview()

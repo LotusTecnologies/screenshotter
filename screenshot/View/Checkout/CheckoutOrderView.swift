@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Corey Werner on 4/10/18.
-//  Copyright © 2018 crazeapp. All rights reserved.
+//  Copyright (c) 2018 crazeapp. All rights reserved.
 //
 
 import UIKit
@@ -278,7 +278,7 @@ class CheckoutOrderView: UIScrollView, DynamicTypeAccessibilityLayout {
         
         let dividerLabel = UILabel()
         dividerLabel.translatesAutoresizingMaskIntoConstraints = false
-        dividerLabel.text = "checkout.order.or".localized
+        dividerLabel.text = "generic.or".localized
         dividerLabel.textColor = .gray3
         dividerLabel.font = .screenshopFont(.hindMedium, size: 16)
         dividerLabel.textAlignment = .center

@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Corey Werner on 9/4/17.
-//  Copyright © 2017 crazeapp. All rights reserved.
+//  Copyright (c) 2017 crazeapp. All rights reserved.
 //
 
 import UIKit
@@ -22,7 +22,7 @@ class MainButton: LoadingButton {
         super.init(frame: frame)
         
         backgroundColor = .crazeRed
-        contentEdgeInsets = UIEdgeInsets(top: .padding / 1.4, left: .padding, bottom: .padding / 1.4, right: .padding)
+        contentEdgeInsets = UIEdgeInsets(top: 0, left: .padding, bottom: 0, right: .padding)
         adjustsImageWhenHighlighted = false
         titleLabel?.font = UIFont(screenshopName: .hindMedium, size: UIFont.buttonFontSize)
         layer.cornerRadius = 9
@@ -41,6 +41,7 @@ class MainButton: LoadingButton {
     override var intrinsicContentSize: CGSize {
         var size = super.intrinsicContentSize
         size.width = max(size.width, 160)
+        size.height = 50
         return size
     }
     
@@ -65,14 +66,14 @@ class MainButton: LoadingButton {
             if !isSettingBackgroundColor {
                 backgroundColorStates[UIControlState.normal.rawValue] = backgroundColor
                 backgroundColorStates[UIControlState.highlighted.rawValue] = backgroundColor?.darker()
-                backgroundColorStates[UIControlState.disabled.rawValue] = backgroundColor?.lighter()
+                backgroundColorStates[UIControlState.disabled.rawValue] = .disabledButton
             }
         }
     }
     
     fileprivate func setBackgroundColor(to state: UIControlState) {
         isSettingBackgroundColor = true
-        backgroundColor = backgroundColorStates[state.rawValue]
+        backgroundColor = backgroundColorStates[state.rawValue] ?? backgroundColor
         isSettingBackgroundColor = false
     }
     
@@ -80,6 +81,6 @@ class MainButton: LoadingButton {
     
     override func setImage(_ image: UIImage?, for state: UIControlState) {
         super.setImage(image, for: state)
-        adjustInsetsForImage(withPadding: 6)
+        adjustInsetsForImage()
     }
 }

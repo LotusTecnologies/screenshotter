@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Corey Werner on 9/4/17.
-//  Copyright © 2017 crazeapp. All rights reserved.
+//  Copyright (c) 2017 crazeapp. All rights reserved.
 //
 
 import UIKit
@@ -52,7 +52,9 @@ class FavoriteControl: UIControl {
     
     override var isSelected: Bool {
         didSet {
-            heartSwitch.setOn(isSelected, animated: animate)
+            if isSelected != heartSwitch.isOn {
+                heartSwitch.setOn(isSelected, animated: animate)
+            }
         }
     }
     

@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Corey Werner on 1/25/18.
-//  Copyright © 2018 crazeapp. All rights reserved.
+//  Copyright (c) 2018 crazeapp. All rights reserved.
 //
 
 import UIKit
@@ -371,7 +371,7 @@ extension ProductViewController: UICollectionViewDelegate {
                     return
             }
             
-            if let productViewController = presentProduct(products[indexPath.item], atLocation: .productSimilar) {
+            if let productViewController = presentProduct(products[indexPath.item], atLocation: .products) {
                 productViewController.similarProducts = products
                 
                 let rootItem = UIBarButtonItem(image: UIImage(named: "NavigationBarDoubleArrow"), style: .plain, target: self, action: #selector(navigateToProductsViewController))

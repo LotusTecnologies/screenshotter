@@ -3,18 +3,62 @@
 //  screenshot
 //
 //  Created by Jacob Relkin on 10/22/17.
-//  Copyright © 2017 crazeapp. All rights reserved.
+//  Copyright (c) 2017 crazeapp. All rights reserved.
 //
 
 import UIKit
 
 extension CGFloat {
     static let padding: CGFloat = 16
-    static let extendedPadding: CGFloat = UIDevice.is480h ? 20 : 40
+    static let extendedPadding: CGFloat = {
+        if UIDevice.is480h {
+            return 20
+        }
+        else if UIDevice.is568h {
+            return 30
+        }
+        else {
+            return 40
+        }
+    }()
+    
+    private static func x(is320w: CGFloat, is375w: CGFloat, isGreater: CGFloat) -> CGFloat {
+        if UIDevice.is320w {
+            return is320w
+        }
+        else if UIDevice.is375w {
+            return is375w
+        }
+        else {
+            return isGreater
+        }
+    }
+    
+    private static func y(is480h: CGFloat, is568h: CGFloat, is667h: CGFloat, isGreater: CGFloat) -> CGFloat {
+        if UIDevice.is480h {
+            return is480h
+        }
+        else if UIDevice.is568h {
+            return is568h
+        }
+        else if UIDevice.is667h {
+            return is667h
+        }
+        else {
+            return isGreater
+        }
+    }
+    
+    static let containerPaddingX = x(is320w: 20, is375w: 28, isGreater: 32)
+    static let containerPaddingY = y(is480h: 20, is568h: 24, is667h: 28, isGreater: 32)
+    
+    static let marginX = x(is320w: 10, is375w: 16, isGreater: 22)
+    static let marginY = y(is480h: 10, is568h: 12, is667h: 16, isGreater: 22)
     
     static let halfPoint: CGFloat = UIScreen.main.scale > 1 ? 0.5 : 1
     
     static let defaultCornerRadius: CGFloat = 6
+    static let defaultViewHeight: CGFloat = 44
     
     var isValid:Bool {
         return !self.isNaN && self.isFinite
@@ -118,6 +162,7 @@ extension CGRect {
         return CGPoint.init(x: x, y: y)
     }
 }
+
 extension CGPoint {
     static func pointFrom(array:[Any]?) -> CGPoint? {
         if let array = array {

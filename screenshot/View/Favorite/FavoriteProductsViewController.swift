@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Corey Werner on 12/27/17.
-//  Copyright © 2017 crazeapp. All rights reserved.
+//  Copyright (c) 2017 crazeapp. All rights reserved.
 //
 
 import UIKit
@@ -223,7 +223,7 @@ extension FavoriteProductsViewController: ProductVariantsSelectorViewControllerD
             dismiss(animated: true, completion: nil)
         }
         if let tabBarController = self.tabBarController as? MainTabBarController {
-            tabBarController.goTo(page: .cart)
+            tabBarController.goTo(tab: .cart)
         }
         
     }

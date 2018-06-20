@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Jonathan Rose on 6/3/18.
-//  Copyright © 2018 crazeapp. All rights reserved.
+//  Copyright (c) 2018 crazeapp. All rights reserved.
 //
 
 import Foundation
@@ -115,7 +115,9 @@ extension Screenshot {
         if let shoppables = shoppables {
             for shoppable in shoppables {
                 if let shoppable = shoppable as? Shoppable {
-                    frame = frame.union(shoppable.frame(size: size))
+                    if shoppable.parentShoppable == nil {
+                        frame = frame.union(shoppable.frame(size: size))
+                    }
                 }
             }
         }
@@ -155,14 +157,10 @@ extension Screenshot {
                 if let imageData = imageData {
                     DataModel.sharedInstance.performBackgroundTask { (context) in
                         
-                        let screenshotToSave = DataModel.sharedInstance.saveScreenshot(managedObjectContext: context, assetId: imageUrl, createdAt: Date(), isRecognized: true, source: .burrow, isHidden: false, imageData: imageData, classification: nil)
-                        
-                        screenshotToSave.uploadedImageURL = imageUrl
-                        screenshotToSave.shoppablesCount = 0
-                        screenshotToSave.syteJson = "h"
+                        let _ = DataModel.sharedInstance.saveScreenshot(managedObjectContext: context, assetId: imageUrl, createdAt: Date(), isRecognized: true, source: .burrow, isHidden: false, imageData: imageData, uploadedImageURL: imageUrl, syteJsonString: nil)
                         
                         // download stye stuff for URL
-                        AssetSyncModel.sharedInstance.syteProcessing(imageClassification: .human, imageData: nil, orImageUrlString: imageUrl, assetId: imageUrl)
+                        AssetSyncModel.sharedInstance.syteProcessing(imageData: nil, orImageUrlString: imageUrl, assetId: imageUrl)
                         
                         context.saveIfNeeded()
                     }

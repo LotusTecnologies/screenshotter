@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Gershon Kagan on 8/14/17.
-//  Copyright © 2017 crazeapp. All rights reserved.
+//  Copyright (c) 2017 crazeapp. All rights reserved.
 //
 
 import UIKit
@@ -56,11 +56,7 @@ class NetworkingPromise : NSObject {
         }
     }
 
-    func uploadToSyteWorkhorse(imageData: Data?, orImageUrlString:String?, imageClassification: ClarifaiModel.ImageClassification, isUsc: Bool) -> Promise<NSDictionary> {
-        guard imageClassification != .unrecognized else {
-                let emptyError = NSError(domain: "Craze", code: 3, userInfo: [NSLocalizedDescriptionKey : "Empty image passed to Syte"])
-                return Promise(error: emptyError)
-        }
+    func uploadToSyteWorkhorse(imageData: Data?, orImageUrlString:String?) -> Promise<URLRequest> {
         var httpBody:Data?
         var payloadType:String = ""
         if let url = orImageUrlString {
@@ -74,10 +70,7 @@ class NetworkingPromise : NSObject {
             return Promise(error: emptyError)
         }
         
-        let isUSCFeed = isUsc || UserDefaults.standard.bool(forKey: UserDefaultsKeys.abUSC)
-        let urlString = imageClassification == .human
-            ? "https://syteapi.com/v1.1/offers/bb?account_id=\(Constants.syteAccountId)&sig=\(Constants.syteAccountSignature)&features=related_looks,validate&feed=\(isUSCFeed ? Constants.syteUscFeed : Constants.syteNonUscFeed)\(payloadType)"
-            : "https://homedecor.syteapi.com/v1.1/offers/bb?account_id=\(Constants.furnitureAccountId)&sig=\(Constants.furnitureAccountSignature)&features=related_looks,validate&feed=craze_home\(payloadType)"
+        let urlString = "https://syteapi.com/v1.1/offers/bb?account_id=\(Constants.syteAccountId)&sig=\(Constants.syteAccountSignature)&features=related_looks&catalog=fashion\(payloadType)"
 
         guard let url = URL(string: urlString) else {
             let malformedError = NSError(domain: "Craze", code: 3, userInfo: [NSLocalizedDescriptionKey : "Malformed upload url from: \(urlString)"])
@@ -88,25 +81,58 @@ class NetworkingPromise : NSObject {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.httpBody = httpBody
-        let sessionConfiguration = URLSessionConfiguration.default
-//        sessionConfiguration.timeoutIntervalForResource = 60  // On GPRS, even 60 seconds timeout.
-        sessionConfiguration.timeoutIntervalForRequest = 60
-        let promise = URLSession(configuration: sessionConfiguration).dataTask(with: request).asDictionary()
-        return promise
+        return Promise(value: request)
     }
 
-    func uploadToSyte(imageData: Data?, orImageUrlString:String?, imageClassification: ClarifaiModel.ImageClassification, isUsc: Bool) -> Promise<(String, [[String : Any]])> {
-        return uploadToSyteWorkhorse(imageData: imageData, orImageUrlString:orImageUrlString, imageClassification: imageClassification, isUsc: isUsc)
-            .then { dict -> Promise<(String, [[String : Any]])> in
-                guard let responseObjectDict = dict as? [String : Any],
-                    let uploadedURLString = responseObjectDict.keys.first,
-                    let segments = responseObjectDict[uploadedURLString] as? [[String : Any]],
-                    segments.count > 0 else {
-                        let emptyError = NSError(domain: "Craze", code: 4, userInfo: [NSLocalizedDescriptionKey : "Syte returned no segments"])
-                        print("Syte no segments. responseObject:\(dict)")
-                        return Promise(error: emptyError)
+    func uploadToSyte(imageData: Data?, orImageUrlString:String?) -> Promise<(String, [[String : Any]])> {
+        return firstly {// _ -> Promise<(Data, Foundation.URLResponse)> in
+            return self.uploadToSyteWorkhorse(imageData: imageData, orImageUrlString:orImageUrlString)
+            }.then { request -> Promise<(String, [[String : Any]])> in
+                return Promise { fulfill, reject in
+                    let sessionConfiguration = URLSessionConfiguration.default
+                    //        sessionConfiguration.timeoutIntervalForResource = 60  // On GPRS, even 60 seconds timeout.
+                    sessionConfiguration.timeoutIntervalForRequest = 60
+                    let dataTask = URLSession(configuration: sessionConfiguration).dataTask(with: request) { data, response, error in
+                        if let error = error {
+                            reject(error)
+                            return
+                        }
+                        guard let response = response as? HTTPURLResponse else {
+                            print("uploadToSyte invalid response")
+                            reject(NSError(domain: "Craze", code: 4, userInfo: [NSLocalizedDescriptionKey : "uploadToSyte invalid response"]))
+                            return
+                        }
+                        let statusCode = response.statusCode
+                        guard statusCode >= 200 && statusCode < 300 else {
+                            if let data = data, let dataString = String(data: data, encoding: .utf8) {
+                                print("uploadToSyte invalid status code:\(statusCode)   dataString:\(dataString)   url:\(String(describing: response.url))   headers:\(response.allHeaderFields)")
+                            } else {
+                                print("uploadToSyte invalid status code:\(statusCode)   no dataString   url:\(String(describing: response.url))   headers:\(response.allHeaderFields)")
+                            }
+                            reject(NSError(domain: "Craze", code: 4, userInfo: [NSLocalizedDescriptionKey : "uploadToSyte invalid status code:\(statusCode)"]))
+                            return
+                        }
+                        guard let data = data else {
+                            reject(NSError(domain: "Craze", code: 4, userInfo: [NSLocalizedDescriptionKey : "uploadToSyte no data"]))
+                            return
+                        }
+                        guard let responseObjectDict = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [String: Any] else {
+                            print("uploadToSyte invalid response object dictionary")
+                            reject(NSError(domain: "Craze", code: 4, userInfo: [NSLocalizedDescriptionKey : "uploadToSyte invalid response object dictionary"]))
+                            return
+                        }
+                        guard let uploadedURLString = responseObjectDict.keys.first,
+                            let segments = responseObjectDict[uploadedURLString] as? [[String : Any]],
+                            segments.count > 0 else {
+                                let emptyError = NSError(domain: "Craze", code: 4, userInfo: [NSLocalizedDescriptionKey : "uploadToSyte returned no segments"])
+                                print("uploadToSyte no segments. responseObjectDict:\(responseObjectDict)")
+                                reject(emptyError)
+                                return
+                        }
+                        fulfill((uploadedURLString, segments))
+                    }
+                    dataTask.resume()
                 }
-                return Promise(value: (uploadedURLString, segments))
         }
     }
     

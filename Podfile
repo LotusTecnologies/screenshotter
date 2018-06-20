@@ -7,15 +7,11 @@ target 'screenshot' do
     use_frameworks!
     pod 'KochavaTrackeriOS'
     pod 'Amplitude-iOS', '~> 4.2.1'
-    pod 'Clarifai-Apple-SDK', '3.0.0-beta14'
     pod 'PromiseKit/Foundation', '4.5.2'
     pod 'PromiseKit/StoreKit', '~> 4.0'
     pod 'SDWebImage', '~> 4.0'
     pod 'Analytics', '~> 3.0'
     pod 'Appsee'
-    pod 'FacebookCore'
-    pod 'FacebookLogin'
-    pod 'FacebookShare'
     pod 'Branch'
     pod 'EggRating'
     pod 'lottie-ios'
@@ -27,6 +23,12 @@ target 'screenshot' do
     pod 'PushwooshInboxUI'
     pod 'Pushwoosh'
     pod "MIBadgeButton-Swift", :git => 'https://github.com/mustafaibrahim989/MIBadgeButton-Swift.git', :branch => 'master'
+    pod 'Hero'
+    pod 'Firebase/Core'
+    pod 'Firebase/Auth'
+    pod 'Firebase/Database'
+    pod 'Firebase/Storage'
+    pod 'FBSDKLoginKit'
 end
 
 post_install do |installer|

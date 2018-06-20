@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Corey Werner on 4/26/18.
-//  Copyright © 2018 crazeapp. All rights reserved.
+//  Copyright (c) 2018 crazeapp. All rights reserved.
 //
 
 import UIKit
@@ -31,7 +31,7 @@ class CheckoutListViewController: BaseViewController {
         addButton.imageView?.contentMode = .scaleAspectFit
         addButton.setTitleColor(.gray3, for: .normal)
         addButton.setTitleColor(.black, for: .highlighted)
-        addButton.adjustInsetsForImage(withPadding: 6)
+        addButton.adjustInsetsForImage()
         addButton.sizeToFit()
         tableView.tableFooterView = addButton
         

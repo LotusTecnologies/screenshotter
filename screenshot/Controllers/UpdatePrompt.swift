@@ -3,14 +3,14 @@
 //  screenshot
 //
 //  Created by Jacob Relkin on 9/18/17.
-//  Copyright © 2017 crazeapp. All rights reserved.
+//  Copyright (c) 2017 crazeapp. All rights reserved.
 //
 
 import Foundation
 import UIKit
 
 class UpdatePromptHandler  {
-    private let appStoreURL = URL(string: "itms-apps://itunes.apple.com/app/id1254964391")!
+    private let appStoreURL = URL(string: Constants.itunesConnectApp)!
     
     private var rootViewController: UIViewController? {
         return UIApplication.shared.keyWindow?.rootViewController

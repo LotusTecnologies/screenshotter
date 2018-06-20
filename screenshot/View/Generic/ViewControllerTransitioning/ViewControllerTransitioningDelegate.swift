@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Corey Werner on 3/11/18.
-//  Copyright © 2018 crazeapp. All rights reserved.
+//  Copyright (c) 2018 crazeapp. All rights reserved.
 //
 
 import UIKit
@@ -11,6 +11,7 @@ import UIKit
 class ViewControllerTransitioningDelegate: NSObject, UIViewControllerTransitioningDelegate {
     enum Presentation {
         case none
+        case dimmed
         case intrinsicContentSize
     }
     
@@ -32,6 +33,8 @@ class ViewControllerTransitioningDelegate: NSObject, UIViewControllerTransitioni
         switch presentation {
         case .none:
             return nil
+        case .dimmed:
+            return DimmedPresentationController(presentedViewController: presented, presenting: presenting)
         case .intrinsicContentSize:
             return IntrinsicContentSizePresentationController(presentedViewController: presented, presenting: presenting)
         }

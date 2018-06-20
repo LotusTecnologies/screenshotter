@@ -3,26 +3,41 @@
 //  screenshot
 //
 //  Created by Gershon Kagan on 2/12/18.
-//  Copyright © 2018 crazeapp. All rights reserved.
+//  Copyright (c) 2018 crazeapp. All rights reserved.
 //
 
 import UIKit
 
-class MainTabBarController: UITabBarController, UITabBarControllerDelegate, ScreenshotsNavigationControllerDelegate, SettingsViewControllerDelegate, ScreenshotDetectionProtocol, ViewControllerLifeCycle {
-    enum TabIndex: Int {
-        case favorites   = 0
-        case discover    = 1
-        case screenshots = 2
-        case settings    = 3
-        case cart        = 4
+class MainTabBarController: UITabBarController, UITabBarControllerDelegate, ScreenshotsNavigationControllerDelegate, ProfileViewControllerDelegate, ScreenshotDetectionProtocol, ViewControllerLifeCycle {
+    enum TabIndex {
+        case favorites
+        case discover
+        case screenshots
+        case profile
+        case cart
+        
+        var tagValue: Int {
+            switch self {
+            case .favorites:
+                return 1
+            case .discover:
+                return 2
+            case .screenshots:
+                return 3
+            case .profile:
+                return 4
+            case .cart:
+                return 5
+            }
+        }
     }
     
     weak var lifeCycleDelegate: ViewControllerLifeCycle?
     
-    let favoritesNavigationController = FavoritesNavigationController()
     let screenshotsNavigationController = ScreenshotsNavigationController()
+    let favoritesNavigationController = FavoritesNavigationController()
     let discoverNavigationController = DiscoverNavigationController()
-    let settingsNavigationController = SettingsNavigationController()
+    let profileNavigationController = ProfileNavigationController()
     let cartNavigationController = CartNavigationController()
     
     fileprivate var settingsTabBarItem: UITabBarItem?
@@ -46,10 +61,14 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         super.init(nibName: nil, bundle: nil)
         
         func createTabBarItem(title: String?, imageNamed: String, tag: TabIndex) -> UITabBarItem {
-            let tabBarItem = UITabBarItem(title: title, image: UIImage(named: imageNamed), tag: tag.rawValue)
+            let tabBarItem = UITabBarItem(title: title, image: UIImage(named: imageNamed), tag: tag.tagValue)
             tabBarItem.badgeColor = .crazeRed
             return tabBarItem
         }
+        
+        screenshotsNavigationController.screenshotsNavigationControllerDelegate = self
+        screenshotsNavigationController.title = screenshotsNavigationController.screenshotsViewController.title
+        screenshotsNavigationController.tabBarItem = createTabBarItem(title: screenshotsNavigationController.title, imageNamed: "TabBarScreenshot", tag: .screenshots)
         
         favoritesNavigationController.title = favoritesNavigationController.favoritesViewController.title
         favoritesNavigationController.tabBarItem = createTabBarItem(title: favoritesNavigationController.title, imageNamed: "TabBarHeart", tag: .favorites)
@@ -57,14 +76,10 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         discoverNavigationController.title = discoverNavigationController.discoverScreenshotViewController.title
         discoverNavigationController.tabBarItem = createTabBarItem(title: discoverNavigationController.title, imageNamed: "TabBarGlobe", tag: .discover)
         
-        screenshotsNavigationController.screenshotsNavigationControllerDelegate = self
-        screenshotsNavigationController.title = screenshotsNavigationController.screenshotsViewController.title
-        screenshotsNavigationController.tabBarItem = createTabBarItem(title: screenshotsNavigationController.title, imageNamed: "TabBarScreenshot", tag: .screenshots)
-        
-        settingsNavigationController.settingsViewController.delegate = self
-        settingsNavigationController.title = settingsNavigationController.settingsViewController.title
-        settingsNavigationController.tabBarItem = createTabBarItem(title: settingsNavigationController.title, imageNamed: "TabBarUser", tag: .settings)
-        settingsTabBarItem = settingsNavigationController.tabBarItem
+        profileNavigationController.profileViewController.delegate = self
+        profileNavigationController.title = profileNavigationController.profileViewController.title
+        profileNavigationController.tabBarItem = createTabBarItem(title: profileNavigationController.title, imageNamed: "TabBarUser", tag: .profile)
+        settingsTabBarItem = profileNavigationController.tabBarItem
         
         cartNavigationController.title = cartNavigationController.cartViewController.title
         cartNavigationController.tabBarItem = createTabBarItem(title: cartNavigationController.title, imageNamed: "TabBarCart", tag: .cart)
@@ -73,10 +88,10 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         self.restorationIdentifier = String(describing: type(of: self))
     
         var viewControllerList =  [
+            screenshotsNavigationController,
             favoritesNavigationController,
             discoverNavigationController,
-            screenshotsNavigationController,
-            settingsNavigationController
+            profileNavigationController
         ]
         if UIApplication.isUSC {
             viewControllerList.append(cartNavigationController)
@@ -102,14 +117,15 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         syncCartTabBadgeCount()
     }
     
-    @objc public func syncShowingCart(){
+    @objc public func syncShowingCart() {
         DispatchQueue.mainAsyncIfNeeded {
             let index = self.selectedIndex
-            var viewControllerList =  [
+            var viewControllerList = [
+                self.screenshotsNavigationController,
                 self.favoritesNavigationController,
                 self.discoverNavigationController,
                 self.screenshotsNavigationController,
-                self.settingsNavigationController
+                self.profileNavigationController
             ]
             
             if UIApplication.isUSC {
@@ -159,7 +175,6 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
                 AccumulatorModel.favorite.resetUninformedCount()
             }
         }
-
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -212,7 +227,11 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
 
     // MARK: - Tab Bar
     
-    func goTo(page:TabIndex) {
+    func goToCart(){
+        goTo(tab: .cart)
+    }
+    
+    func goTo(tab: TabIndex) {
         func subViewControllers(_ vc:UIViewController) -> [UIViewController] {
             var subVC:[UIViewController] = vc.childViewControllers
             if let presentedViewController  = vc.presentedViewController{
@@ -220,8 +239,8 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
             }
             return subVC
         }
+        
         func dismissViewController(_ vc:UIViewController) {
-            
             let subViewController = subViewControllers(vc)
             for vc  in subViewController {
                 dismissViewController(vc)
@@ -237,35 +256,14 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         if let current = self.selectedViewController {
             dismissViewController(current)
         }
-        
-        switch page {
-        case .cart:
-            if let index = self.viewControllers?.index(of: cartNavigationController){
-                self.selectedIndex = index
-            }
-        case .discover:
-            if let index = self.viewControllers?.index(of: discoverNavigationController){
-                self.selectedIndex = index
-            }
-        case .favorites:
-            if let index = self.viewControllers?.index(of: favoritesNavigationController){
-                self.selectedIndex = index
-            }
-        case .screenshots:
-            if let index = self.viewControllers?.index(of: screenshotsNavigationController){
-                self.selectedIndex = index
-            }
-        case .settings:
-            if let index = self.viewControllers?.index(of: settingsNavigationController){
-                self.selectedIndex = index
-            }
+        if let toSelect = self.viewControllers?.first(where: { (vc) -> Bool in
+            return vc.tabBarItem.tag == tab.tagValue
+        }) {
+            self.selectedViewController = toSelect
         }
     }
+    
     func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
-        if self.selectedViewController == self.settingsNavigationController {
-            self.settingsNavigationController.popToRootViewController(animated: false)
-        }
-        
         if viewController == screenshotsNavigationController {
             AccumulatorModel.screenshotUninformed.resetUninformedCount()
         }
@@ -273,26 +271,23 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
             AccumulatorModel.favorite.resetUninformedCount()
         }
         
-
         return true
     }
     
     override func tabBar(_ tabBar: UITabBar, didSelect item: UITabBarItem) {
-        if let index = tabBar.items?.index(of: item) {
-            if  let vcs = self.viewControllers, vcs.count > index {
-                let viewcontroller = vcs[index]
-                if let tabTitle = viewcontroller.title {
-                    Analytics.trackTabBarTapped(tab: tabTitle)
-                }
-                if viewcontroller != screenshotsNavigationController {
-                    AccumulatorModel.screenshotUninformed.resetUninformedCount()
-                }
-                if viewcontroller != favoritesNavigationController {
-                    AccumulatorModel.favorite.resetUninformedCount()
-                }
+        if let index = tabBar.items?.index(of: item), let vcs = self.viewControllers, vcs.count > index {
+            let viewcontroller = vcs[index]
+            
+            if let tabTitle = viewcontroller.title {
+                Analytics.trackTabBarTapped(tab: tabTitle)
+            }
+            if viewcontroller != screenshotsNavigationController {
+                AccumulatorModel.screenshotUninformed.resetUninformedCount()
+            }
+            if viewcontroller != favoritesNavigationController {
+                AccumulatorModel.favorite.resetUninformedCount()
             }
         }
-    
     }
     
     func presentTabBarSettingsBadge() {
@@ -384,27 +379,23 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
             }
         }
         
-        func select(_ tabBarController: MainTabBarController) {
-            tabBarController.selectedIndex = tabIndex.rawValue
-        }
-        
         func dismiss(_ tabBarController: MainTabBarController) {
             tabBarController.dismiss(animated: true, completion: nil)
         }
         
         if let mainTabBarController = viewController.presentingViewController as? MainTabBarController {
             popToRoot(mainTabBarController)
-            select(mainTabBarController)
+            mainTabBarController.goTo(tab: tabIndex)
             dismiss(mainTabBarController)
         }
         else if let mainTabBarController = viewController.presentingViewController?.tabBarController as? MainTabBarController {
             popToRoot(mainTabBarController)
-            select(mainTabBarController)
+            mainTabBarController.goTo(tab: tabIndex)
             dismiss(mainTabBarController)
         }
         else if let mainTabBarController = viewController.tabBarController as? MainTabBarController {
             popToRoot(mainTabBarController)
-            select(mainTabBarController)
+            mainTabBarController.goTo(tab: tabIndex)
         }
     }
     
@@ -414,9 +405,9 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         self.refreshTabBarSettingsBadge()
     }
     
-    // MARK: - Settings View Controller
+    // MARK: - Profile View Controller
     
-    func settingsViewControllerDidGrantPermission(_ viewController: SettingsViewController) {
+    func profileViewControllerDidGrantPermission(_ viewController: ProfileViewController) {
         self.refreshTabBarSettingsBadge()
     }
     
