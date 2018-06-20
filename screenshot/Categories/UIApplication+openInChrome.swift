@@ -96,7 +96,7 @@ extension UIViewController :MFMailComposeViewControllerDelegate{
     func presentMail(recipient:String, gmailMessage:String, subject:String, message:String, isHTML:Bool = false, delegate:MFMailComposeViewControllerDelegate? = nil ){
         if MFMailComposeViewController.canSendMail() {
             let mail = MFMailComposeViewController()
-            mail.mailComposeDelegate = self
+            mail.mailComposeDelegate = delegate ?? self
             mail.setSubject(subject)
             mail.setMessageBody(message, isHTML: isHTML)
             mail.setToRecipients([recipient])
@@ -120,9 +120,6 @@ extension UIViewController :MFMailComposeViewControllerDelegate{
         
     }
     public func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
-        if result == .sent {
-            
-        }
         dismiss(animated: true, completion: nil)
     }
 }
