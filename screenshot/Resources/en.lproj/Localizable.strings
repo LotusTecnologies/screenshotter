@@ -70,7 +70,7 @@
 "authorize.error.noInternet" = "Unable to login. Check your connection and try again.";
 "authorize.error.undefined" = "Something weird happened. Sorry about that, try again.";
 "authorize.error.undefined.contactSupport" = "Contact Support";
-"authorize.error.badCode" = "Incorrect code";
+"authorize.error.badCode" = "The link you tapped is invalid. This can happen if the link is expired, or has already been used.";
 "authorize.error.badPassword" = "No account associated with that email address";
 "authorize.error.cantSendMail" = "We were unable to send an email to the address %@. Please make sure you entered it correctly.";
 "authorize.error.NoAccountWithEmail" = "No account associated with that email address";

@@ -89,8 +89,8 @@ extension TutorialNavigationController: RegisterViewControllerDelegate {
 }
 
 extension TutorialNavigationController : OnboardingGDPRViewControllerDelegate {
-    func onboardingGDPRViewController(agreeToEmail: Bool, agreedToImageDetection: Bool) {
-        UserAccountManager.shared.setGDRP(agreeToEmail: agreeToEmail, agreedToImageDetection: agreedToImageDetection)
+    func onboardingGDPRViewController(agreedToEmail: Bool, agreedToImageDetection: Bool) {
+        UserAccountManager.shared.setGDPR(agreedToEmail: agreedToEmail, agreedToImageDetection: agreedToImageDetection)
         if showProfilePage {
             pushOnboardingDetailsViewController()
         }else{

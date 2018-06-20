@@ -302,12 +302,16 @@ class UserAccountManager : NSObject {
         }
     }
     
-    @discardableResult func setGDRP(agreeToEmail:Bool, agreedToImageDetection:Bool) -> Promise<Void>{
+    @discardableResult func setGDPR(agreedToEmail:Bool, agreedToImageDetection:Bool) -> Promise<Void>{
         return Promise { fulfill, reject in
+            
+            UserDefaults.standard.setValue(agreedToEmail, forKey: UserDefaultsKeys.gdpr_agreedToEmail)
+            UserDefaults.standard.setValue(agreedToImageDetection, forKey: UserDefaultsKeys.gdpr_agreedToImageDetection)
+            
             let promise = makeAnonAccountPromise ?? Promise.init(value:())
             promise.then(execute: { () -> Void in
                 if let user = self.user {
-                    self.databaseRef.child("users").child(user.uid).child("GDRP-agreeToEmail").setValue(NSNumber.init(value: agreeToEmail))
+                    self.databaseRef.child("users").child(user.uid).child("GDRP-agreedToEmail").setValue(NSNumber.init(value: agreedToEmail))
                     self.databaseRef.child("users").child(user.uid).child("GDRP-agreedToImageDetection").setValue(NSNumber.init(value: agreedToImageDetection))
                     fulfill(())
                 }else{
@@ -381,7 +385,9 @@ extension UserAccountManager {
         return alert
     }
     public func isBadCodeError( error:NSError) ->Bool {
-        
+        if error.domain == AuthErrorDomain && error.code == AuthErrorCode.invalidActionCode.rawValue {
+            return true
+        }
         return  false
     }
     func alertViewForBadCode()  -> UIAlertController {
@@ -389,18 +395,21 @@ extension UserAccountManager {
         alert.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .cancel, handler: nil))
         return alert
     }
+    
     public func isNoAccountWithEmailError( error:NSError) ->Bool {
         if error.domain == AuthErrorDomain && error.code == AuthErrorCode.userNotFound.rawValue {
             return true
         }
         return  false
     }
+    
     func alertViewForNoAccountWithEmail() -> UIAlertController  {
         let alert = UIAlertController.init(title: nil, message: "authorize.error.NoAccountWithEmail".localized, preferredStyle: .alert)
         alert.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .cancel, handler: nil))
 
         return alert
     }
+    
     public func isCantSendEmailError( error:NSError) ->Bool {
        
         if error.domain == AuthErrorDomain && error.code == AuthErrorCode.invalidEmail.rawValue {
@@ -418,8 +427,8 @@ extension UserAccountManager {
 
         return  false
     }
+    
     public func isWeakPasswordError( error:NSError) -> Bool {
-        
         if error.domain == AuthErrorDomain && error.code == AuthErrorCode.weakPassword.rawValue {
             return true
         }
@@ -439,6 +448,7 @@ extension UserAccountManager {
         }
         return  false
     }
+    
     func alertViewForWrongPassword() -> UIAlertController  {
         let alert = UIAlertController.init(title: nil, message: "authorize.error.wrongPassword".localized, preferredStyle: .alert)
         alert.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .cancel, handler: nil))
@@ -450,14 +460,23 @@ extension UserAccountManager {
 
 
 extension UserAccountManager {
-    private func favoriteToDictionary(favorite:Product){
-        
-    }
-    private func screenshotToDictionary(screenshot:Screenshot){
-        
-    }
+    
+    
     func downloadAndReplaceUserData(){
         if let user = self.user{
+            self.databaseRef.child("users").child(user.uid).child("GDRP-agreedToEmail").observeSingleEvent(of: .value) { (snapshot) in
+                if let agreedToEmailNumber = snapshot.value as? NSNumber  {
+                    let agreedToEmail = agreedToEmailNumber.boolValue
+                    UserDefaults.standard.setValue(agreedToEmail, forKey: UserDefaultsKeys.gdpr_agreedToEmail)
+                }
+            }
+            self.databaseRef.child("users").child(user.uid).child("GDRP-agreedToImageDetection").observeSingleEvent(of: .value) { (snapshot) in
+                if let agreedToImageDetectionNumber = snapshot.value as? NSNumber  {
+                    let agreedToImageDetection = agreedToImageDetectionNumber.boolValue
+                    UserDefaults.standard.setValue(agreedToImageDetection, forKey: UserDefaultsKeys.gdpr_agreedToImageDetection)
+                }
+            }
+            
             self.databaseRef.child("users").child(user.uid).child("screenshots").observeSingleEvent(of: .value) { (snapshot) in
                 for child in snapshot.children {
                     if let child = child as? DataSnapshot,
@@ -499,8 +518,6 @@ extension UserAccountManager {
                                     }
                                     context.saveIfNeeded()
                                 }
-                                
-                                
                             })
                         })
                     }
@@ -613,6 +630,7 @@ extension UserAccountManager {
             self.databaseRef.child("users").child(user.uid).child("favorites").child(offer).setValue(dict)
         }
     }
+    
     func deleteFavorite(product:Product){
         if let user = self.user {
             if let offer = product.offer {
@@ -625,8 +643,8 @@ extension UserAccountManager {
         if let assetId = screenshot.assetId, let user = self.user {
             self.databaseRef.child("users").child(user.uid).child("screenshots").child(assetId).removeValue()
         }
-        
     }
+    
     func uploadScreenshots(screenshot:Screenshot){
         
         if let user = self.user,
