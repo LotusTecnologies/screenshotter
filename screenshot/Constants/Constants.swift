@@ -26,8 +26,12 @@ class Constants {
     static let currentMomVersion = 18
     
     // Cart
-    static let cartItemMaxQuantity = 10
+//    static let cartItemMaxQuantity = 10
     
+    // Calculation
+    static let secondsInHour: TimeInterval = 3600
+    static let secondsInDay: TimeInterval = 86400
+
     // Syte
     static let syteAccountId = 6677
     static let syteAccountSignature = "GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU="

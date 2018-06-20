@@ -432,7 +432,7 @@ extension DataModel {
                 fetchRequest.propertiesToFetch = ["partNumber"]
                 fetchRequest.fetchLimit = 600
                 let optionsMaskInt = ProductsOptionsMask.global.rawValue
-                let anHourAgo = NSDate(timeIntervalSinceNow: -60 * 60)
+                let anHourAgo = NSDate(timeIntervalSinceNow: -Constants.secondsInHour)
                 fetchRequest.predicate = NSPredicate(format: "shoppable.screenshot == %@ AND (optionsMask & %d) == %d AND ( dateCheckedStock == nil || dateCheckedStock < %@ )", screenshotOID, optionsMaskInt, optionsMaskInt, anHourAgo)
                 fetchRequest.sortDescriptors = nil
                 
