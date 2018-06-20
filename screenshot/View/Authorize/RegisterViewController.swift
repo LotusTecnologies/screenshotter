@@ -436,6 +436,8 @@ class RegisterViewController: UIViewController {
             let password = _view.passwordTextField.text,
             self.continueButton.isLoading == false
         {
+            self._view.emailTextField.resignFirstResponder()
+            self._view.passwordTextField.resignFirstResponder()
             self._view.emailTextField.isUserInteractionEnabled = false
             self._view.passwordTextField.isUserInteractionEnabled = false
             self.continueButton.isLoading = true
@@ -445,6 +447,7 @@ class RegisterViewController: UIViewController {
             UserAccountManager.shared.loginOrCreatAccountAsNeeded(email: email, password: password)
             .then { result -> Void in
                 if  result  == .unconfirmed {
+                    
                     self.delegate?.registerViewControllerNeedEmailConfirmation(self)
                 } else {
                     self.delegate?.registerViewControllerDidSignin(self)
