@@ -93,12 +93,12 @@ extension URL {
 }
 
 extension UIViewController :MFMailComposeViewControllerDelegate{
-    func presentMail(recipient:String, gmailMessage:String, subject:String, message:String ){
+    func presentMail(recipient:String, gmailMessage:String, subject:String, message:String, isHTML:Bool = false ){
         if MFMailComposeViewController.canSendMail() {
             let mail = MFMailComposeViewController()
             mail.mailComposeDelegate = self
             mail.setSubject(subject)
-            mail.setMessageBody(message, isHTML: false)
+            mail.setMessageBody(message, isHTML: isHTML)
             mail.setToRecipients([recipient])
             present(mail, animated: true, completion: nil)
             
