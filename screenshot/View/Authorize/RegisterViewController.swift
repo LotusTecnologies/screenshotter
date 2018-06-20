@@ -28,16 +28,21 @@ class RegisterView: UIScrollView {
     let skipButton = UIButton()
     
     var activeTextFieldTopOffset: CGFloat {
-        return horizontalLinesView.frame.maxY
+        return horizontalLinesView.frame.maxY - _layoutMargins.top
     }
     
     var verticalNegativeMargin: CGFloat {
         return contentView.layoutMargins.top * 0.4
     }
     
+    var isOnboardingLayout = false {
+        didSet {
+            
+        }
+    }
+    
     let _layoutMargins: UIEdgeInsets = {
-        let verticalInset: CGFloat = UIDevice.is320w ? .padding : .padding * 2
-        return UIEdgeInsets(top: verticalInset, left: .padding, bottom: verticalInset, right: .padding)
+        return UIEdgeInsets(top: .marginY, left: .padding, bottom: .marginY, right: .padding)
     }()
     
     // MARK: Life Cycle
@@ -73,6 +78,15 @@ class RegisterView: UIScrollView {
         verticalLayoutView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
         verticalLayoutView.heightAnchor.constraint(greaterThanOrEqualTo: layoutMarginsGuide.heightAnchor, constant: verticalLayoutHeightConstant).isActive = true
         
+        let verticalCenterContainerView = UIView()
+        verticalCenterContainerView.translatesAutoresizingMaskIntoConstraints = false
+        verticalCenterContainerView.backgroundColor = .yellow
+        addSubview(verticalCenterContainerView)
+        verticalCenterContainerView.topAnchor.constraint(greaterThanOrEqualTo: topAnchor).isActive = true
+        verticalCenterContainerView.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
+        verticalCenterContainerView.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor).isActive = true
+        verticalCenterContainerView.widthAnchor.constraint(equalTo: widthAnchor).isActive = true
+        verticalCenterContainerView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
         
         let welcomeTo = UILabel.init()
         welcomeTo.text = "authorize.register.welcome_to".localized
@@ -81,15 +95,13 @@ class RegisterView: UIScrollView {
         welcomeTo.font = UIFont.screenshopFont(.quicksand, size: 15)
         welcomeTo.textColor = UIColor.gray3
         addSubview(welcomeTo)
-        welcomeTo.topAnchor.constraint(equalTo: topAnchor, constant: _layoutMargins.top).isActive = true
-        welcomeTo.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
-        welcomeTo.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
+        welcomeTo.topAnchor.constraint(equalTo: verticalCenterContainerView.topAnchor).isActive = true
+        welcomeTo.centerXAnchor.constraint(equalTo: layoutMarginsGuide.centerXAnchor).isActive = true
 
         let screenshopImageView = UIImageView.init(image: UIImage.init(named: "LaunchLogo"))
         screenshopImageView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(screenshopImageView)
-        
-        screenshopImageView.topAnchor.constraint(equalTo: welcomeTo.bottomAnchor, constant: .padding ).isActive = true
+        screenshopImageView.topAnchor.constraint(equalTo: welcomeTo.lastBaselineAnchor, constant: .padding).isActive = true
         screenshopImageView.centerXAnchor.constraint(equalTo: welcomeTo.centerXAnchor).isActive = true
 
         let byLine = UILabel.init()
@@ -179,6 +191,7 @@ class RegisterView: UIScrollView {
         let skipLayoutGuide = UILayoutGuide()
         addLayoutGuide(skipLayoutGuide)
         skipLayoutGuide.topAnchor.constraint(equalTo: contentView.bottomAnchor, constant: .padding).isActive = true
+        skipLayoutGuide.bottomAnchor.constraint(equalTo: verticalCenterContainerView.bottomAnchor).isActive = true
         skipLayoutGuide.heightAnchor.constraint(equalTo: horizontalLinesLayoutGuide.heightAnchor).isActive = true
         
         let skipImage = UIImage(named: "OnboardingArrow")
@@ -198,7 +211,6 @@ class RegisterView: UIScrollView {
         skipButton.bottomAnchor.constraint(lessThanOrEqualTo: skipLayoutGuide.bottomAnchor).isActive = true
         skipButton.centerXAnchor.constraint(equalTo: layoutMarginsGuide.centerXAnchor).isActive = true
         skipButton.centerYAnchor.constraint(equalTo: skipLayoutGuide.centerYAnchor).isActive = true
-      
     }
     
     override func layoutSubviews() {
@@ -309,6 +321,8 @@ class RegisterViewController: UIViewController {
         super.viewDidLoad()
         
         NotificationCenter.default.addObserver(self, selector: #selector(textFieldTextDidChange(_:)), name: .UITextFieldTextDidChange, object: _view.emailTextField)
+        
+        automaticallyAdjustsScrollViewInsets = false
         
         _view.facebookLoginButton.addTarget(self, action: #selector(facebookLoginAction), for: .touchUpInside)
         
