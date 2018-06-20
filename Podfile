@@ -12,9 +12,6 @@ target 'screenshot' do
     pod 'SDWebImage', '~> 4.0'
     pod 'Analytics', '~> 3.0'
     pod 'Appsee'
-    pod 'FacebookCore'
-    pod 'FacebookLogin'
-    pod 'FacebookShare'
     pod 'Branch'
     pod 'EggRating'
     pod 'lottie-ios'
@@ -24,6 +21,11 @@ target 'screenshot' do
     pod 'PhoneNumberKit'
     pod 'CardIO'
     pod 'Hero'
+    pod 'Firebase/Core'
+    pod 'Firebase/Auth'
+    pod 'Firebase/Database'
+    pod 'Firebase/Storage'
+    pod 'FBSDKLoginKit'
 end
 
 post_install do |installer|

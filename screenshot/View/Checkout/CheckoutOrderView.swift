@@ -278,7 +278,7 @@ class CheckoutOrderView: UIScrollView, DynamicTypeAccessibilityLayout {
         
         let dividerLabel = UILabel()
         dividerLabel.translatesAutoresizingMaskIntoConstraints = false
-        dividerLabel.text = "checkout.order.or".localized
+        dividerLabel.text = "generic.or".localized
         dividerLabel.textColor = .gray3
         dividerLabel.font = .screenshopFont(.hindMedium, size: 16)
         dividerLabel.textAlignment = .center

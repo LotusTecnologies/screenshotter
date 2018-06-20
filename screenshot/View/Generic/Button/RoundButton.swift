@@ -2,7 +2,7 @@
 //  RoundButton.swift
 //  screenshot
 //
-//  Created by Corey Werner on 6/7/18.
+//  Created by Corey Werner on 5/27/18.
 //  Copyright © 2018 crazeapp. All rights reserved.
 //
 
@@ -12,6 +12,7 @@ class RoundButton: UIButton {
     override func layoutSubviews() {
         super.layoutSubviews()
         
+
         layer.cornerRadius = bounds.size.height * 0.5
         layer.masksToBounds = true
     }

@@ -8,11 +8,28 @@
 
 import UIKit
 
+protocol OnboardingGDPRViewControllerDelegate : class {
+    func onboardingGDPRViewController(agreeToEmail:Bool, agreedToImageDetection:Bool)
+}
+
 class OnboardingGDPRView: UIView {
     let tableView = UITableView(frame: .zero, style: .grouped)
     let editButton = BorderButton()
     let continueButton = MainButton()
-    
+    var editButtonHiddenConstraints:[NSLayoutConstraint] = []
+    var editButtonShownConstraints:[NSLayoutConstraint] = []
+    var editButtonHidden: Bool = false {
+        didSet {
+            if editButtonHidden {
+                NSLayoutConstraint.deactivate(editButtonShownConstraints)
+                NSLayoutConstraint.activate(editButtonHiddenConstraints)
+            }else{
+                NSLayoutConstraint.deactivate(editButtonHiddenConstraints)
+                NSLayoutConstraint.activate(editButtonShownConstraints)
+
+            }
+        }
+    }
     override init(frame: CGRect) {
         super.init(frame: frame)
         
@@ -68,7 +85,6 @@ class OnboardingGDPRView: UIView {
         headerImageView.addSubview(BorderView(edge: .bottom))
         
         tableView.translatesAutoresizingMaskIntoConstraints = false
-        tableView.allowsSelection = false
         tableView.backgroundColor = .background
         tableView.estimatedRowHeight = 200
         addSubview(tableView)
@@ -89,13 +105,25 @@ class OnboardingGDPRView: UIView {
         editButton.setTitleColor(.crazeGreen, for: .normal)
         editButton.setTitle("gdpr.onboarding.edit".localized, for: .normal)
         footerView.addSubview(editButton)
-        editButton.topAnchor.constraint(equalTo: footerView.layoutMarginsGuide.topAnchor).isActive = true
+        
+        let top = editButton.topAnchor.constraint(equalTo: footerView.layoutMarginsGuide.topAnchor)
+        self.editButtonShownConstraints.append(top)
+        top.isActive = true
+        let topNone = editButton.topAnchor.constraint(equalTo: footerView.topAnchor)
+        self.editButtonHiddenConstraints.append(topNone)
+        let noHeight = editButton.heightAnchor.constraint(equalToConstant: 0.0)
+        self.editButtonHiddenConstraints.append(noHeight)
+        
         editButton.leadingAnchor.constraint(equalTo: footerView.layoutMarginsGuide.leadingAnchor).isActive = true
         editButton.trailingAnchor.constraint(equalTo: footerView.layoutMarginsGuide.trailingAnchor).isActive = true
         
         continueButton.translatesAutoresizingMaskIntoConstraints = false
         continueButton.backgroundColor = .crazeGreen
         continueButton.setTitle("gdpr.onboarding.continue".localized, for: .normal)
+        continueButton.setTitle("gdpr.onboarding.continue".localized, for: .highlighted)
+        continueButton.setTitle("generic.continue".localized, for: .selected)
+        continueButton.setTitle("generic.continue".localized, for: [.selected, .highlighted])
+
         footerView.addSubview(continueButton)
         continueButton.topAnchor.constraint(equalTo: editButton.bottomAnchor, constant: .padding).isActive = true
         continueButton.leadingAnchor.constraint(equalTo: footerView.layoutMarginsGuide.leadingAnchor).isActive = true
@@ -112,8 +140,11 @@ class OnboardingGDPRView: UIView {
 
 class OnboardingGDPRViewController: UIViewController {
     
-    // MARK: View
-    
+    weak var delegate:OnboardingGDPRViewControllerDelegate?
+    var managingSettings = false
+    var agreeToEmail = true
+    var agreedToImageDetection = true
+
     var classForView: OnboardingGDPRView.Type {
         return OnboardingGDPRView.self
     }
@@ -148,6 +179,9 @@ class OnboardingGDPRViewController: UIViewController {
         tableView.register(TextExplanationTableViewCell.self, forCellReuseIdentifier: "cell")
         
         editButton.addTarget(self, action: #selector(editAction), for: .touchUpInside)
+        continueButton.isExclusiveTouch = true
+        continueButton.addTarget(self, action: #selector(continueAction), for: .touchUpInside)
+
     }
     
     deinit {
@@ -156,11 +190,21 @@ class OnboardingGDPRViewController: UIViewController {
     }
     
     // MARK: Edit
-    
     @objc private func editAction() {
-        let viewController = GDPRViewController()
-        let navigationController = ModalNavigationController(rootViewController: viewController)
-        present(navigationController, animated: true)
+        editButton.isHidden = true
+        UIView.animate(withDuration: .defaultAnimationDuration) {
+            self._view.editButtonHidden = true
+            self.view.layoutIfNeeded()
+        }
+        managingSettings = true
+        tableView.allowsSelection = true
+        tableView.allowsMultipleSelection = true
+        self.tableView.reloadData()
+    }
+    
+    @objc private func continueAction() {
+        print("agreeToEmail :\(agreeToEmail),agreedToImageDetection: \(agreedToImageDetection)" )
+        self.delegate?.onboardingGDPRViewController(agreeToEmail: agreeToEmail, agreedToImageDetection: agreedToImageDetection)
     }
 }
 
@@ -174,6 +218,9 @@ extension OnboardingGDPRViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         
+        cell.hasSelectableAppearance = self.managingSettings
+
+        
         if indexPath.row == GDPRViewController.Rows.notification.rawValue {
             cell.titleLabel.text = "gdpr.notification.title".localized
             cell.explanationLabel.text = "gdpr.notification.message".localized
@@ -184,6 +231,46 @@ extension OnboardingGDPRViewController: UITableViewDataSource {
         }
         
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        var isSelected = true
+        
+        if indexPath.row == GDPRViewController.Rows.notification.rawValue {
+            isSelected = agreeToEmail
+        }
+        else if indexPath.row == GDPRViewController.Rows.imageDetection.rawValue {
+            isSelected = agreedToImageDetection
+        }
+        
+        if isSelected {
+            tableView.selectRow(at: indexPath, animated: false, scrollPosition: .none)
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if self.managingSettings {
+            if indexPath.row == GDPRViewController.Rows.notification.rawValue {
+                agreeToEmail = true
+            }
+            else if indexPath.row == GDPRViewController.Rows.imageDetection.rawValue {
+                agreedToImageDetection = true
+            }
+            self.continueButton.isSelected = (!agreeToEmail && !agreedToImageDetection)
+        }
+    }
+    func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
+        if self.managingSettings {
+            if indexPath.row == GDPRViewController.Rows.notification.rawValue {
+                agreeToEmail = false
+            }
+            else if indexPath.row == GDPRViewController.Rows.imageDetection.rawValue {
+                agreedToImageDetection = false
+            }
+            
+            self.continueButton.isSelected = (!agreeToEmail && !agreedToImageDetection)
+        }
+        
     }
 }
 
