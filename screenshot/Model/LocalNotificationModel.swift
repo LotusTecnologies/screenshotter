@@ -226,7 +226,7 @@ class LocalNotificationModel {
         let identifier = LocalNotificationIdentifier.saleCount.rawValue
         DataModel.sharedInstance.retrieveSaleCount(from: sessionStart)
             .then { productCount -> Promise<URL> in
-                imageURLString = "https://images-na.ssl-images-amazon.com/images/I/71F2ZBXnwtL._SX679_.jpg" // collage
+                imageURLString = "https://images-na.ssl-images-amazon.com/images/I/71F2ZBXnwtL._SX679_.jpg" // TODO: GMK collage from first 4 images.
                 saleCount = productCount
                 return NetworkingPromise.sharedInstance.downloadTmp(from: imageURLString, identifier: identifier)
             }.then { copiedTmpURL -> Void in
