@@ -9,9 +9,6 @@
 import Foundation
 import PromiseKit
 import Whisper
-import PushwooshInboxUI
-import Pushwoosh
-import MIBadgeButton_Swift
 
 class SettingsViewController : BaseViewController {
     fileprivate enum Section : Int {
@@ -91,75 +88,6 @@ class SettingsViewController : BaseViewController {
         tapper.numberOfTapsRequired = 3
         tapper.numberOfTouchesRequired = 2
         tableView.addGestureRecognizer(tapper)
-        
-//        let mailIconImage = UIImage.init(named: "iconMail")
-//        let icon = MIBadgeButton.init(frame: CGRect.init(origin: .zero, size: mailIconImage?.size ?? .zero))
-//        icon.setImage(mailIconImage, for: .normal)
-//        icon.badgeString = "2"
-//        icon.badgeBackgroundColor = .crazeRed
-//        
-//        let mailIcon = UIBarButtonItem.init(customView: icon)
-//        mailIcon.target = self
-//        mailIcon.action = #selector(inboxAction(_:))
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem.init(title: "inbox", style: .plain, target: self, action: #selector(inboxAction(_:)))
-        
-        updateInboxBadgeCount()
-    }
-    @objc func inboxAction(_ sender:Any){
-                    let inboxStyle = PWIInboxStyle.customStyle(withDefaultImageIcon: UIImage.init(named: "BrandIcon110"),
-                                                               textColor: UIColor.darkText,
-                                                               accentColor: UIColor.crazeGreen,
-                                                               font: UIFont.screenshopFont(.hind, size: 17))
-        
-//                    inboxStyle?.backgroundColor = UIColor.init(white: 1, alpha: 1)
-//                    inboxStyle?.listErrorMessage = NSLocalizedString("Oh no! Something went wrong on the Internet. This is the worst thing that has ever happened! ", comment: "Custom error message")
-//                    inboxStyle?.listEmptyMessage = NSLocalizedString("You have no messages.  But we still love you.", comment: "Custom empty message")
-            if let vc = PWIInboxUI.createInboxController(with: inboxStyle){
-                let nav =  UINavigationController.init(rootViewController: vc)
-                vc.navigationItem.leftBarButtonItem = UIBarButtonItem.init(barButtonSystemItem: .done, target: self, action: #selector(dismissInboxAction(_:)))
-                self.present(nav, animated: true, completion: nil)
-                
-            }
-        
-    }
-    
-    func updateInboxBadgeCount() {
-        PWInbox.unreadMessagesCount(completion: { (count, error) in
-            DispatchQueue.mainAsyncIfNeeded {
-                if error == nil {
-                    if let badgeButton = self.navigationItem.rightBarButtonItem?.customView as? MIBadgeButton{
-                        badgeButton.badgeString = String(count)
-                    }
-                }
-            }
-        })
-    }
-    @objc func dismissInboxAction(_ sender:Any){
-        updateInboxBadgeCount()
-        self.dismiss(animated: true, completion: nil)
-    }
-
-    @objc func didTripleTapTableView(_ tapper:UITapGestureRecognizer){
-        if tapper.state == .recognized {
-            if let index = self.indexPath(for: .version, in: .about), let cell = self.tableView.cellForRow(at: index) {
-                let point = tapper.location(in: cell)
-                if cell.bounds.contains(point) {
-                    let enabled = UserDefaults.standard.bool(forKey: UserDefaultsKeys.showsDebugAnalyticsUI)
-                    if enabled {
-                        UserDefaults.standard.set(false, forKey: UserDefaultsKeys.showsDebugAnalyticsUI)
-                    }else{
-                        UserDefaults.standard.set(true, forKey: UserDefaultsKeys.showsDebugAnalyticsUI)
-                    }
-                    if let viewController = AppDelegate.shared.window?.rootViewController {
-                        let announcement = Announcement(title: "Analytics debug UI", subtitle: (enabled ? "Disabled":"Enabled"), image: nil, duration:10.0, action:{
-                        })
-                        Whisper.show(shout: announcement, to: viewController, completion: {
-                        })
-                    }
-                }
-                
-            }
-        }
     }
     
     override func viewDidLayoutSubviews() {
@@ -215,6 +143,30 @@ class SettingsViewController : BaseViewController {
             return nil
         }
         return IndexPath(row: rowValue, section: section.rawValue)
+    }
+    
+    // MARK: Debug
+    
+    @objc func didTripleTapTableView(_ tapper:UITapGestureRecognizer){
+        if tapper.state == .recognized {
+            if let index = self.indexPath(for: .version, in: .about), let cell = self.tableView.cellForRow(at: index) {
+                let point = tapper.location(in: cell)
+                if cell.bounds.contains(point) {
+                    let enabled = UserDefaults.standard.bool(forKey: UserDefaultsKeys.showsDebugAnalyticsUI)
+                    if enabled {
+                        UserDefaults.standard.set(false, forKey: UserDefaultsKeys.showsDebugAnalyticsUI)
+                    }else{
+                        UserDefaults.standard.set(true, forKey: UserDefaultsKeys.showsDebugAnalyticsUI)
+                    }
+                    if let viewController = AppDelegate.shared.window?.rootViewController {
+                        let announcement = Announcement(title: "Analytics debug UI", subtitle: (enabled ? "Disabled":"Enabled"), image: nil, duration:10.0, action:{
+                        })
+                        Whisper.show(shout: announcement, to: viewController, completion: {
+                        })
+                    }
+                }
+            }
+        }
     }
 }
 

@@ -59,7 +59,6 @@ PODS:
   - KochavaTrackeriOS (3.5.0)
   - leveldb-library (1.20)
   - lottie-ios (2.5.0)
-  - MIBadgeButton-Swift (0.5)
   - nanopb (0.3.8):
     - nanopb/decode (= 0.3.8)
     - nanopb/encode (= 0.3.8)
@@ -102,7 +101,6 @@ DEPENDENCIES:
   - Hero
   - KochavaTrackeriOS
   - lottie-ios
-  - MIBadgeButton-Swift (from `https://github.com/mustafaibrahim989/MIBadgeButton-Swift.git`, branch `master`)
   - PhoneNumberKit
   - PromiseKit/Foundation (= 4.5.2)
   - PromiseKit/StoreKit (~> 4.0)
@@ -147,16 +145,6 @@ SPEC REPOS:
     - SwiftKeychainWrapper
     - Whisper
 
-EXTERNAL SOURCES:
-  MIBadgeButton-Swift:
-    :branch: master
-    :git: https://github.com/mustafaibrahim989/MIBadgeButton-Swift.git
-
-CHECKOUT OPTIONS:
-  MIBadgeButton-Swift:
-    :commit: 3c2638d2e6e46ec2e6dd978d8ada8863df3df5e6
-    :git: https://github.com/mustafaibrahim989/MIBadgeButton-Swift.git
-
 SPEC CHECKSUMS:
   Amplitude-iOS: 84da24ca8557fa3741888502c30c0b8b365acd7d
   Analytics: 6541ce337e99d9f7a2240a8b3953940a7be5f998
@@ -181,7 +169,6 @@ SPEC CHECKSUMS:
   KochavaTrackeriOS: b612efe2ddaead7e9aa8faf54e0ed96fb027a0ee
   leveldb-library: 08cba283675b7ed2d99629a4bc5fd052cd2bb6a5
   lottie-ios: d699fdee68d7b63e721d949388b015fef1aaa4ac
-  MIBadgeButton-Swift: 9e57309b00b168d75ca8fecb45bc75124a8ffddf
   nanopb: 5601e6bca2dbf1ed831b519092ec110f66982ca3
   PhoneNumberKit: 62003f40ff75315fd3738286558bc365365ac222
   PromiseKit: 743e497a5f505a470d3bbbf4ce0663c1268af0a4
@@ -192,6 +179,6 @@ SPEC CHECKSUMS:
   SwiftKeychainWrapper: 38952a3636320ae61bad3513cadd870929de7a4a
   Whisper: 169760fc4bab0abf24d5529f9276f95c25cf1025
 
-PODFILE CHECKSUM: 60c2185ba445c00a023f21634196db1d77b39812
+PODFILE CHECKSUM: 75ad56a3e78ffcb8d204f87f8ac0d454df29dc84
 
 COCOAPODS: 1.5.3

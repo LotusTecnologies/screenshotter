@@ -8,6 +8,8 @@
 
 import UIKit
 import CoreData
+import PushwooshInboxUI
+import Pushwoosh
 
 protocol ScreenshotsNavigationControllerDelegate: NSObjectProtocol {
     func screenshotsNavigationControllerDidGrantPushPermissions(_ navigationController: ScreenshotsNavigationController)
@@ -17,11 +19,16 @@ class ScreenshotsNavigationController: UINavigationController {
     weak var screenshotsNavigationControllerDelegate:ScreenshotsNavigationControllerDelegate?
     var screenshotsViewController:ScreenshotsViewController = ScreenshotsViewController()
     var activityBarButtonItem:UIBarButtonItem?
-    
+    fileprivate var inboxBarButtonItem: BadgeBarButtonItem?
     fileprivate var restoredProductsViewController: ProductsViewController?
     
     init() {
         super.init(nibName: nil, bundle: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(pushWooshDidReceiveInPush(_:)), name: .PWInboxMessagesDidReceiveInPush, object: nil)
+        
+        inboxBarButtonItem = BadgeBarButtonItem(image: UIImage(named: "NavigationBarBell"), style: .plain, target: self, action: #selector(presentNotificationInbox))
+        screenshotsViewController.navigationItem.leftBarButtonItem = inboxBarButtonItem
         
         screenshotsViewController.navigationItem.rightBarButtonItem = screenshotsViewController.editButtonItem
         screenshotsViewController.delegate = self
@@ -37,14 +44,19 @@ class ScreenshotsNavigationController: UINavigationController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    deinit {
-        AssetSyncModel.sharedInstance.networkingIndicatorDelegate = self
-        NotificationCenter.default.removeObserver(self)
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = .background
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        updateInboxBadgeCount()
+    }
+    
+    deinit {
+        AssetSyncModel.sharedInstance.networkingIndicatorDelegate = self
+        NotificationCenter.default.removeObserver(self)
     }
 }
 
@@ -57,13 +69,12 @@ extension ScreenshotsNavigationController: ViewControllerLifeCycle {
             
             let screenshot = productsViewController.screenshot
             AssetSyncModel.sharedInstance.clearSubShoppables(screenshot: screenshot)
-            
-            
         }
     }
 }
 
-extension ScreenshotsNavigationController {
+typealias ScreenshotsNavigationControllerPicker = ScreenshotsNavigationController
+extension ScreenshotsNavigationControllerPicker {
     func createScreenshotPickerNavigationController()->ScreenshotPickerNavigationController{
         let navigationController = ScreenshotPickerNavigationController.init(nibName: nil, bundle: nil)
         navigationController.cancelButton.target = self
@@ -87,6 +98,41 @@ extension ScreenshotsNavigationController {
     
     @objc func pickerViewControllerDidFinish(){
         self.dismiss(animated: true, completion: nil)
+    }
+}
+
+typealias ScreenshotsNavigationControllerNotificationInbox = ScreenshotsNavigationController
+extension ScreenshotsNavigationControllerNotificationInbox {
+    @objc private func presentNotificationInbox() {
+        guard let inboxStyle = PWIInboxStyle.default() else {
+            return
+        }
+        
+        inboxStyle.backgroundColor = .background
+        inboxStyle.defaultTextColor = .gray3
+        inboxStyle.selectionColor = .gray9
+        inboxStyle.accentColor = .crazeGreen
+        inboxStyle.dateColor = .gray6
+        inboxStyle.separatorColor = .cellBorder
+        
+        if let inboxViewController = PWIInboxUI.createInboxController(with: inboxStyle) {
+            let navigationController = ModalNavigationController(rootViewController: inboxViewController)
+            present(navigationController, animated: true)
+        }
+    }
+    
+    private func updateInboxBadgeCount() {
+        PWInbox.unreadMessagesCount(completion: { (count, error) in
+            DispatchQueue.mainAsyncIfNeeded {
+                if error == nil {
+                    self.inboxBarButtonItem?.count = UInt(count)
+                }
+            }
+        })
+    }
+    
+    @objc private func pushWooshDidReceiveInPush(_ notification: Notification) {
+        updateInboxBadgeCount()
     }
 }
 

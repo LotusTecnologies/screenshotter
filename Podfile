@@ -22,7 +22,6 @@ target 'screenshot' do
     pod 'CardIO'
     pod 'PushwooshInboxUI'
     pod 'Pushwoosh'
-    pod "MIBadgeButton-Swift", :git => 'https://github.com/mustafaibrahim989/MIBadgeButton-Swift.git', :branch => 'master'
     pod 'Hero'
     pod 'Firebase/Core'
     pod 'Firebase/Auth'
