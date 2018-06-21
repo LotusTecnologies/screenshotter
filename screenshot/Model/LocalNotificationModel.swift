@@ -234,7 +234,7 @@ class LocalNotificationModel {
                                                     userInfo: [Constants.openingScreenKey : Constants.openingScreenValueScreenshot],
                                                     identifier: identifier,
                                                     body: saleCount == 1 ? "notification.sale.count.message.single".localized(withFormat: saleCount) : "notification.sale.count.message.plural".localized(withFormat: saleCount),
-                                                    interval: 5) // TODO: GMK Constants.secondsInDay
+                                                    interval: 4 * 60) // TODO: GMK 4 * Constants.secondsInDay
         }
     }
     
