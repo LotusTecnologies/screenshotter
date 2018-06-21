@@ -307,7 +307,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     return true
                 }
             }
-        } else if urlString.hasPrefix("screenshop://openWebLink/") {
+        }
+        else if urlString.hasPrefix("screenshop://openWebLink/") {
             let pathComponents = url.pathComponents
             if pathComponents.count >= 4 {
                 let browser = pathComponents[1]
@@ -320,7 +321,29 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     }
                 }
             }
-            return false
+        }
+        else if urlString.hasPrefix("screenshop://addScreenshot/") {
+            let prefix = "screenshop://addScreenshot/"
+            
+            if let prefixRange = urlString.range(of: prefix) {
+                var screenshotUrlString = urlString
+                screenshotUrlString.removeSubrange(prefixRange)
+                AssetSyncModel.sharedInstance.uploadPhoto(imageUrlString: screenshotUrlString, source: .pushWoosh)
+                
+                if let mainTabBarController = self.window?.rootViewController as? MainTabBarController {
+                    mainTabBarController.dismiss(animated: true)
+                }
+                
+                PWInbox.loadMessages { (messages, error) in
+                    let codes = messages?.compactMap({ message -> String? in
+                        return message.isActionPerformed ? message.code : nil
+                    })
+                    
+                    if let codes = codes {
+                        PWInbox.deleteMessages(withCodes: codes)
+                    }
+                }
+            }
         }
         return false
     }

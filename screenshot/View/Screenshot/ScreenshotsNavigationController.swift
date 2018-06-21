@@ -216,7 +216,10 @@ extension ScreenshotsNavigationController : NetworkingIndicatorProtocol {
             
             let barButtonItem = UIBarButtonItem(customView: activityView)
             self.activityBarButtonItem = barButtonItem
-            self.screenshotsViewController.navigationItem.leftBarButtonItem = barButtonItem
+           
+            if let currentItem = self.screenshotsViewController.navigationItem.leftBarButtonItems?.first {
+                self.screenshotsViewController.navigationItem.leftBarButtonItems = [currentItem, barButtonItem]
+            }
         }
         
         self.activityBarButtonItem?.tag += 1
@@ -226,7 +229,10 @@ extension ScreenshotsNavigationController : NetworkingIndicatorProtocol {
         self.activityBarButtonItem?.tag -= 1
         
         if self.activityBarButtonItem?.tag == 0 {
-            self.screenshotsViewController.navigationItem.leftBarButtonItem = nil
+            if let currentItem = self.screenshotsViewController.navigationItem.leftBarButtonItems?.first {
+                self.screenshotsViewController.navigationItem.leftBarButtonItems = [currentItem]
+            }
+            
             self.activityBarButtonItem = nil
         }
     }

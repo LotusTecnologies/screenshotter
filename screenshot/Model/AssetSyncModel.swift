@@ -229,7 +229,74 @@ extension AssetSyncModel {
                 
             }
         }))
-        
+    }
+    
+    func uploadPhoto(imageUrlString: String, source: ScreenshotSource) {
+        let assetLocalIdentifier = imageUrlString
+        self.userInitiatedQueue.addOperation(AsyncOperation.init(timeout: 5.0,  assetId: assetLocalIdentifier, shoppableId: nil, completion: { (completeOperation) in
+            AccumulatorModel.screenshot.removeAssetId(assetLocalIdentifier)
+            NetworkingPromise.sharedInstance.downloadImageData(urlString: assetLocalIdentifier)
+                .then(on: self.processingQ) { imageData -> Promise<(Data?, String?, String?)> in
+                    guard let image = UIImage(data: imageData) else {
+                        return Promise(error: NSError(domain: "Craze", code: 97, userInfo: [NSLocalizedDescriptionKey: "Failed resizing image data"]))
+                    }
+                    
+                    Analytics.trackBypassedClarifai()
+                    let imageData: Data? = self.data(for: image)
+                    return Promise { fulfill, reject in
+                        self.performBackgroundTask(assetId: assetLocalIdentifier, shoppableId: nil) { (managedObjectContext) in
+                            if let screenshot = managedObjectContext.screenshotWith(assetId: assetLocalIdentifier) {
+                                //this is retry screenshot
+                                if let classification = screenshot.syteJson,
+                                    classification.utf8.count == 1 { // Previously dual-purposed syteJson for imageClassification of "h" (human) or "f" (furniture)
+                                    screenshot.syteJson = nil
+                                }
+                                
+                                if screenshot.shoppablesCount > 0 {
+                                    screenshot.hideWorkhorse()
+                                }
+                                screenshot.shoppablesCount = 0
+                                screenshot.imageData = imageData
+                                screenshot.isHidden = false
+                                screenshot.isRecognized = true
+                                screenshot.lastModified = Date()
+                                screenshot.source = source
+                                screenshot.submittedDate = nil
+                                screenshot.submittedFeedbackCount = 0
+                                screenshot.submittedFeedbackCountDate = nil
+                                screenshot.submittedFeedbackCountGoal = 0
+                                screenshot.submittedFeedbackCountDate = nil
+                                
+                                managedObjectContext.saveIfNeeded()
+                                fulfill((imageData, screenshot.uploadedImageURL, screenshot.syteJson))
+                            }else{
+                                let screenshot = Screenshot(context: managedObjectContext)
+                                screenshot.assetId = assetLocalIdentifier
+                                let now = Date()
+                                screenshot.createdAt = now
+                                screenshot.isHidden = true
+                                screenshot.isNew = true
+                                screenshot.lastModified = now
+                                screenshot.isRecognized = true
+                                screenshot.isHidden = false
+                                screenshot.imageData = imageData
+                                screenshot.source = source
+                                
+                                managedObjectContext.saveIfNeeded()
+                                fulfill((imageData, nil, nil))
+                            }
+                        }
+                    }
+                }.then (on: self.processingQ) { imageData, uploadedImageURL, syteJsonString -> Promise<Bool> in
+                    let syteJson: [[String : Any]]? = (syteJsonString == nil ? nil : NetworkingPromise.sharedInstance.jsonDestringify(string: syteJsonString!))
+                    self.syteProcessing(imageData: imageData, orImageUrlString:nil, assetId: assetLocalIdentifier, optionsMask: ProductsOptionsMask.global, gottenUploadedURLString: uploadedImageURL, gottenSegments: syteJson)
+                    return Promise.init(value: true)
+                }.catch { error in
+                    print("uploadPhoto outer catch error:\(error)")
+                }.always(on: self.serialQ) {
+                    completeOperation()
+            }
+        }))
     }
     
     func uploadPhoto(asset: PHAsset, source:ScreenshotSource) {
