@@ -676,7 +676,18 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
         }
         
         completionHandler()
-        Analytics.trackAppOpenedFromLocalNotification()
+        switch response.notification.request.identifier {
+        case LocalNotificationIdentifier.inactivityDiscover.rawValue:
+            Analytics.trackAppOpenedFromTimedLocalNotification(source: .inactivityDiscover)
+        case LocalNotificationIdentifier.favoritedItem.rawValue:
+            Analytics.trackAppOpenedFromTimedLocalNotification(source: .favoritedItem)
+        case LocalNotificationIdentifier.tappedProduct.rawValue:
+            Analytics.trackAppOpenedFromTimedLocalNotification(source: .tappedProduct)
+        case LocalNotificationIdentifier.saleCount.rawValue:
+            Analytics.trackAppOpenedFromTimedLocalNotification(source: .saleCount)
+        default:
+            Analytics.trackAppOpenedFromLocalNotification()
+        }
     }
     
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {

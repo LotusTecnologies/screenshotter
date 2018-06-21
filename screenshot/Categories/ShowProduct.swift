@@ -51,7 +51,6 @@ extension ProductViewController {
         let dataModel = DataModel.sharedInstance
         
         if let product = dataModel.retrieveProduct(managedObjectContext: dataModel.mainMoc(), imageURL: imageURL) {
-//            Analytics.trackProductPriceAlertOpened(product: product) // TODO: GMK track present from local notification
             let burrowViewController = ProductDetailViewController()
             burrowViewController.product = product
             burrowViewController.shoppable = product.shoppable

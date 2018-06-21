@@ -46,9 +46,19 @@ class LocalNotificationModel {
             let toCancelSet = Set<String>(toCancel)
             notificationRequestArray.forEach { notificationRequest in
                 if toCancelSet.contains(notificationRequest.identifier) {
-                    // TODO: GMK implement trackCancelNotification
-                    // trackCancel(notificationRequest.identifier)
-                    print("Canceling notification notificationRequest.identifier")
+                    switch notificationRequest.identifier {
+                    case LocalNotificationIdentifier.inactivityDiscover.rawValue:
+                        Analytics.trackTimedLocalNotificationCancelled(source: .inactivityDiscover)
+                    case LocalNotificationIdentifier.favoritedItem.rawValue:
+                        Analytics.trackTimedLocalNotificationCancelled(source: .favoritedItem)
+                    case LocalNotificationIdentifier.tappedProduct.rawValue:
+                        Analytics.trackTimedLocalNotificationCancelled(source: .tappedProduct)
+                    case LocalNotificationIdentifier.saleCount.rawValue:
+                        Analytics.trackTimedLocalNotificationCancelled(source: .saleCount)
+                    default:
+                        print("Cancel unknown timedLocalNotification. WTF?")
+                    }
+                    print("Canceling notification \(notificationRequest.identifier)")
                 }
             }
             UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: toCancel)
@@ -127,7 +137,7 @@ class LocalNotificationModel {
         content.userInfo = [Constants.openingScreenKey  : Constants.openingScreenValueDiscover]
         
 //        let threeDays: TimeInterval = 3 * Constants.secondsInDay
-        let threeHours: TimeInterval = 3 * Constants.secondsInHour
+        let threeHours: TimeInterval = 3 * Constants.secondsInHour  // TODO: GMK 3 * Constants.secondsInDay
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: threeHours, repeats: false)
         let request = UNNotificationRequest(identifier: LocalNotificationIdentifier.inactivityDiscover.rawValue,
                                             content: content,
@@ -136,15 +146,11 @@ class LocalNotificationModel {
             if let error = error {
                 print("scheduleInactivityDiscoverLocalNotification identifier:\(LocalNotificationIdentifier.inactivityDiscover.rawValue)  error:\(error)")
             } else {
-//                Analytics.trackAppSentLocalPushNotification()  // TODO: GMK Track inactivity push
+                Analytics.trackTimedLocalNotificationScheduled(source: .inactivityDiscover)
             }
         })
     }
 
-    func cancelInactivityDiscoverLocalNotification() {
-        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [LocalNotificationIdentifier.inactivityDiscover.rawValue])
-    }
-    
     func scheduleImageLocalNotification(copiedTmpURL: URL, userInfo: [String : Any], identifier: String, body: String, interval: TimeInterval) {
         let content = UNMutableNotificationContent()
         content.body = body
@@ -167,7 +173,19 @@ class LocalNotificationModel {
             if let error = error {
                 print("scheduleImageLocalNotification identifier:\(identifier)  error:\(error)")
             } else {
-                //                Analytics.trackAppSentLocalPushNotification()  // TODO: GMK Track scheduleImageLocalNotification push
+                switch identifier {
+                case LocalNotificationIdentifier.inactivityDiscover.rawValue:
+                    Analytics.trackTimedLocalNotificationScheduled(source: .inactivityDiscover)
+                    print("Schedule timedLocalNotificationInactivityDiscover happens elsewhere. WTF?")
+                case LocalNotificationIdentifier.favoritedItem.rawValue:
+                    Analytics.trackTimedLocalNotificationScheduled(source: .favoritedItem)
+                case LocalNotificationIdentifier.tappedProduct.rawValue:
+                    Analytics.trackTimedLocalNotificationScheduled(source: .tappedProduct)
+                case LocalNotificationIdentifier.saleCount.rawValue:
+                    Analytics.trackTimedLocalNotificationScheduled(source: .saleCount)
+                default:
+                    print("Schedule unknown timedLocalNotification. WTF?")
+                }
             }
         })
     }
