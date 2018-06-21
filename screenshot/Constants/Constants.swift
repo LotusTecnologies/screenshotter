@@ -22,6 +22,7 @@ class Constants {
     static let openingScreenValueDiscover = "openingScreenValueDiscover"
     static let openingAssetIdKey = "openingAssetIdKey"
     static let tutorialScreenshotAssetId = "tutorialScreenshotAssetId"
+    static let openingProductKey = "openingProductKey"
     
     // DB
     static let currentMomVersion = 18

@@ -320,6 +320,24 @@ class NetworkingPromise : NSObject {
         }
     }
     
+    func downloadTmp(from urlString: String, identifier: String) -> Promise<URL> {
+        guard let url = URL(string: urlString) else {
+            return Promise(error: NSError(domain: "Craze", code: 95, userInfo: [NSLocalizedDescriptionKey: "downloadTmp failed to form url for urlString:\(urlString)"]))
+        }
+        let sessionConfiguration = URLSessionConfiguration.default
+        sessionConfiguration.timeoutIntervalForRequest = 60
+        return URLSession(configuration: sessionConfiguration).dataTask(with: URLRequest(url: url)).asDataAndResponse().then { (data, response) -> Promise<URL> in
+            let tmpImageFileUrl = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(identifier).appendingPathExtension("jpg")
+            do {
+                try data.write(to: tmpImageFileUrl)
+                return Promise(value: tmpImageFileUrl)
+            } catch {
+                print("downloadTmp error:\(error)")
+                return Promise(error: error)
+            }
+        }
+    }
+
     func getAvailableVariants(partNumber: String) -> Promise<NSDictionary> {
         guard let url = URL(string: Constants.shoppableDomain + "/product/" + partNumber) else {
             let error = NSError(domain: "Craze", code: 27, userInfo: [NSLocalizedDescriptionKey: "Cannot create shoppable url from shoppableDomain:\(Constants.shoppableDomain)"])

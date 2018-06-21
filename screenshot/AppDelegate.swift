@@ -650,6 +650,8 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
                         mainTabBarController.goTo(tab: .discover)
                     }
                 }
+            } else if let openingProductKey = userInfo[Constants.openingProductKey] as? String {
+                ProductViewController.present(imageURL: openingProductKey)
             } else if let aps = userInfo["aps"] as? [String : Any],
                 let category = aps["category"] as? String,
                 category == "PRICE_ALERT",

@@ -410,7 +410,23 @@ extension DataModel {
         return nil
     }
     
-    func retrieveLatestFavorite() -> Promise<(String?, String?)> {
+    func retrieveProduct(managedObjectContext: NSManagedObjectContext, imageURL: String) -> Product? {
+        let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "imageURL == %@", imageURL)
+        fetchRequest.sortDescriptors = nil //[NSSortDescriptor(key: "createdAt", ascending: false)]
+        fetchRequest.fetchLimit = 1
+        
+        do {
+            let results = try managedObjectContext.fetch(fetchRequest)
+            return results.first
+        } catch {
+            self.receivedCoreDataError(error: error)
+            print("retrieveProduct imageURL:\(imageURL) results with error:\(error)")
+        }
+        return nil
+    }
+    
+    func retrieveLatestFavorite() -> Promise<(String, String?)> {
         return Promise { fulfill, reject in
             self.performBackgroundTask { managedObjectContext in
                 let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
@@ -420,8 +436,9 @@ extension DataModel {
                 
                 do {
                     let results = try managedObjectContext.fetch(fetchRequest)
-                    if let latest = results.first {
-                        fulfill((latest.imageURL, latest.categories))
+                    if let latest = results.first,
+                      let imageURL = latest.imageURL {
+                        fulfill((imageURL, latest.categories))
                     } else {
                         reject(NSError(domain: "Craze", code: 93, userInfo: [NSLocalizedDescriptionKey : "no latest favorite"]))
                     }
@@ -434,7 +451,7 @@ extension DataModel {
         }
     }
     
-    func retrieveLatestTapped() -> Promise<(String?, String?)> {
+    func retrieveLatestTapped() -> Promise<(String, String?)> {
         return Promise { fulfill, reject in
             self.performBackgroundTask { managedObjectContext in
                 let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
@@ -445,8 +462,9 @@ extension DataModel {
                 
                 do {
                     let results = try managedObjectContext.fetch(fetchRequest)
-                    if let latest = results.first {
-                        fulfill((latest.imageURL, latest.name))
+                    if let latest = results.first,
+                      let imageURL = latest.imageURL {
+                        fulfill((imageURL, latest.productTitle()))
                     } else {
                         reject(NSError(domain: "Craze", code: 94, userInfo: [NSLocalizedDescriptionKey : "no latest tapped"]))
                     }

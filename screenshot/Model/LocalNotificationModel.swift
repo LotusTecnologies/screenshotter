@@ -9,6 +9,7 @@
 import UIKit
 import MobileCoreServices // kUTTypeImage
 import UserNotifications
+import PromiseKit
 
 enum LocalNotificationIdentifier: String {
     case screenshotAdded        = "CrazeLocal"
@@ -33,14 +34,20 @@ class LocalNotificationModel {
         NotificationCenter.default.removeObserver(self)
     }
     
+    // MARK: NotificationCenter Handlers
+
     @objc func applicationWillEnterForeground() {
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [LocalNotificationIdentifier.inactivityDiscover.rawValue, LocalNotificationIdentifier.favoritedItem.rawValue, LocalNotificationIdentifier.tappedProduct.rawValue])
     }
     
     @objc func applicationDidEnterBackground() {
         scheduleInactivityDiscoverLocalNotification()
+        postLatestFavorite()
+        postLatestTapped()
     }
     
+    // MARK: Local Notification
+
     func sendScreenshotAddedLocalNotification(assetId: String, imageData: Data?) {
         guard PermissionsManager.shared.hasPermission(for: .push) else {
             return
@@ -122,94 +129,74 @@ class LocalNotificationModel {
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [LocalNotificationIdentifier.inactivityDiscover.rawValue])
     }
     
-    func scheduleFavoritedItemLocalNotification(imageURL: String, category: String) {
-        guard PermissionsManager.shared.hasPermission(for: .push) else {
-            return
-        }
-        
+    func scheduleImageLocalNotification(copiedTmpURL: URL, imageURLString: String, identifier: String, body: String, interval: TimeInterval) {
         let content = UNMutableNotificationContent()
-        content.body = "notification.favorited.item.message".localized(withFormat: category)
+        content.body = body
         content.sound = UNNotificationSound.default()
-        //        content.userInfo = [Constants.openingScreenKey  : Constants.openingScreenValueDiscover] // TODO: GMK set favorited item userInfo
-
-        var identifier = LocalNotificationIdentifier.favoritedItem.rawValue
-        // Add image url
-        let tmpImageFileUrl = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(identifier).appendingPathExtension("jpg")
+        content.userInfo = [Constants.openingProductKey : imageURLString]
         do {
-            try representativeImageData.write(to: tmpImageFileUrl)
             let attachment = try UNNotificationAttachment(identifier: identifier,
-                                                          url: tmpImageFileUrl,
+                                                          url: copiedTmpURL,
                                                           options: [UNNotificationAttachmentOptionsTypeHintKey : kUTTypeImage])
             content.attachments = [attachment]
         } catch {
             print("Local notification attachment error:\(error)")
         }
 
-        //        let twoDays: TimeInterval = 2 * Constants.secondsInDay
-        let twoMinutes: TimeInterval = 2 * 60
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: twoMinutes, repeats: false)
-        let request = UNNotificationRequest(identifier: LocalNotificationIdentifier.favoritedItem.rawValue,
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: interval, repeats: false)
+        let request = UNNotificationRequest(identifier: identifier,
                                             content: content,
                                             trigger: trigger)
         UNUserNotificationCenter.current().add(request, withCompletionHandler: { (error) in
             if let error = error {
-                print("scheduleFavoritedItemLocalNotification identifier:\(identifier)  error:\(error)")
+                print("scheduleImageLocalNotification identifier:\(identifier)  error:\(error)")
             } else {
-                //                Analytics.trackAppSentLocalPushNotification()  // TODO: GMK Track inactivity push
+                //                Analytics.trackAppSentLocalPushNotification()  // TODO: GMK Track scheduleImageLocalNotification push
             }
         })
-    }
-    
-    func cancelFavoritedItemLocalNotification() {
-        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [LocalNotificationIdentifier.favoritedItem.rawValue])
-    }
-    
-    func scheduleTappedProductLocalNotification(imageURL: String, name: String) {
-        guard PermissionsManager.shared.hasPermission(for: .push) else {
-            return
-        }
-        
-        let content = UNMutableNotificationContent()
-        content.body = "notification.tapped.product.message".localized(withFormat: name)
-        content.sound = UNNotificationSound.default()
-        //        content.userInfo = [Constants.openingScreenKey  : Constants.openingScreenValueDiscover] // TODO: GMK set tapped product userInfo
-
-        //        let oneDay: TimeInterval = Constants.secondsInDay
-        let oneMinute: TimeInterval = 60
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: oneMinute, repeats: false)
-        let request = UNNotificationRequest(identifier: LocalNotificationIdentifier.tappedProduct.rawValue,
-                                            content: content,
-                                            trigger: trigger)
-        UNUserNotificationCenter.current().add(request, withCompletionHandler: { (error) in
-            if let error = error {
-                print("scheduleTappedProductLocalNotification identifier:\(LocalNotificationIdentifier.tappedProduct.rawValue)  error:\(error)")
-            } else {
-                //                Analytics.trackAppSentLocalPushNotification()  // TODO: GMK Track inactivity push
-            }
-        })
-    }
-    
-    func cancelTappedProductLocalNotification() {
-        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [LocalNotificationIdentifier.tappedProduct.rawValue])
     }
     
     func postLatestFavorite() {
-        DataModel.sharedInstance.retrieveLatestFavorite().then { imageURL, categories -> Void in
-            if let imageURL = imageURL {
-                self.scheduleFavoritedItemLocalNotification(imageURL: imageURL, category: categories ?? "fav")
-            } else {
-                print("postLatestFavorite empty imageURL")
-            }
+        guard PermissionsManager.shared.hasPermission(for: .push) else {
+            print("postLatestFavorite no push permission")
+            return
+        }
+        var imageURLString = ""
+        var category = "fav"
+        let identifier = LocalNotificationIdentifier.favoritedItem.rawValue
+        DataModel.sharedInstance.retrieveLatestFavorite()
+            .then { imageURL, categories -> Promise<URL> in
+                imageURLString = imageURL
+                category = categories ?? category
+                return NetworkingPromise.sharedInstance.downloadTmp(from: imageURLString, identifier: identifier)
+            }.then { copiedTmpURL -> Void in
+                self.scheduleImageLocalNotification(copiedTmpURL: copiedTmpURL,
+                                                    imageURLString: imageURLString,
+                                                    identifier: identifier,
+                                                    body: "notification.favorited.item.message".localized(withFormat: category),
+                                                    interval: 2 * 60) // TODO: GMK 2 * Constants.secondsInDay
         }
     }
     
     func postLatestTapped() {
-        DataModel.sharedInstance.retrieveLatestTapped().then { imageURL, name -> Void in
-            if let imageURL = imageURL {
-                self.scheduleTappedProductLocalNotification(imageURL: imageURL, name: name ?? "")
-            } else {
-                print("postLatestTapped empty imageURL")
-            }
+        guard PermissionsManager.shared.hasPermission(for: .push) else {
+            print("postLatestTapped no push permission")
+            return
+        }
+        var imageURLString = ""
+        var productTitle = ""
+        let identifier = LocalNotificationIdentifier.tappedProduct.rawValue
+        DataModel.sharedInstance.retrieveLatestTapped()
+            .then { imageURL, title -> Promise<URL> in
+                imageURLString = imageURL
+                productTitle = title ?? productTitle
+                return NetworkingPromise.sharedInstance.downloadTmp(from: imageURLString, identifier: identifier)
+            }.then { copiedTmpURL -> Void in
+                self.scheduleImageLocalNotification(copiedTmpURL: copiedTmpURL,
+                                                    imageURLString: imageURLString,
+                                                    identifier: identifier,
+                                                    body: "notification.tapped.product.message".localized(withFormat: productTitle),
+                                                    interval: 60) // TODO: GMK Constants.secondsInDay
         }
     }
     
