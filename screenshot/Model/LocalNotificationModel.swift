@@ -16,6 +16,7 @@ enum LocalNotificationIdentifier: String {
     case inactivityDiscover     = "CrazeInactivityDiscover"
     case favoritedItem          = "CrazeFavoritedItem"
     case tappedProduct          = "CrazeTappedProduct"
+    case saleCount              = "CrazeSaleCount"
 }
 
 class LocalNotificationModel {
@@ -24,6 +25,8 @@ class LocalNotificationModel {
     static func setup() {
         let _ = LocalNotificationModel.shared
     }
+    
+    var sessionStart = NSDate()
     
     init() {
         NotificationCenter.default.addObserver(self, selector: #selector(applicationWillEnterForeground), name: .UIApplicationWillEnterForeground, object: nil)
@@ -37,13 +40,26 @@ class LocalNotificationModel {
     // MARK: NotificationCenter Handlers
 
     @objc func applicationWillEnterForeground() {
-        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [LocalNotificationIdentifier.inactivityDiscover.rawValue, LocalNotificationIdentifier.favoritedItem.rawValue, LocalNotificationIdentifier.tappedProduct.rawValue])
+        sessionStart = NSDate()
+        UNUserNotificationCenter.current().getPendingNotificationRequests { notificationRequestArray in
+            let toCancel = [LocalNotificationIdentifier.inactivityDiscover.rawValue, LocalNotificationIdentifier.favoritedItem.rawValue, LocalNotificationIdentifier.tappedProduct.rawValue, LocalNotificationIdentifier.saleCount.rawValue]
+            let toCancelSet = Set<String>(toCancel)
+            notificationRequestArray.forEach { notificationRequest in
+                if toCancelSet.contains(notificationRequest.identifier) {
+                    // TODO: GMK implement trackCancelNotification
+                    // trackCancel(notificationRequest.identifier)
+                    print("Canceling notification notificationRequest.identifier")
+                }
+            }
+            UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: toCancel)
+        }
     }
     
     @objc func applicationDidEnterBackground() {
         scheduleInactivityDiscoverLocalNotification()
         postLatestFavorite()
         postLatestTapped()
+        postSaleCount()
     }
     
     // MARK: Local Notification
@@ -129,11 +145,11 @@ class LocalNotificationModel {
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [LocalNotificationIdentifier.inactivityDiscover.rawValue])
     }
     
-    func scheduleImageLocalNotification(copiedTmpURL: URL, imageURLString: String, identifier: String, body: String, interval: TimeInterval) {
+    func scheduleImageLocalNotification(copiedTmpURL: URL, userInfo: [String : Any], identifier: String, body: String, interval: TimeInterval) {
         let content = UNMutableNotificationContent()
         content.body = body
         content.sound = UNNotificationSound.default()
-        content.userInfo = [Constants.openingProductKey : imageURLString]
+        content.userInfo = userInfo
         do {
             let attachment = try UNNotificationAttachment(identifier: identifier,
                                                           url: copiedTmpURL,
@@ -171,7 +187,7 @@ class LocalNotificationModel {
                 return NetworkingPromise.sharedInstance.downloadTmp(from: imageURLString, identifier: identifier)
             }.then { copiedTmpURL -> Void in
                 self.scheduleImageLocalNotification(copiedTmpURL: copiedTmpURL,
-                                                    imageURLString: imageURLString,
+                                                    userInfo: [Constants.openingProductKey : imageURLString],
                                                     identifier: identifier,
                                                     body: "notification.favorited.item.message".localized(withFormat: category),
                                                     interval: 2 * 60) // TODO: GMK 2 * Constants.secondsInDay
@@ -193,10 +209,32 @@ class LocalNotificationModel {
                 return NetworkingPromise.sharedInstance.downloadTmp(from: imageURLString, identifier: identifier)
             }.then { copiedTmpURL -> Void in
                 self.scheduleImageLocalNotification(copiedTmpURL: copiedTmpURL,
-                                                    imageURLString: imageURLString,
+                                                    userInfo: [Constants.openingProductKey : imageURLString],
                                                     identifier: identifier,
                                                     body: "notification.tapped.product.message".localized(withFormat: productTitle),
                                                     interval: 60) // TODO: GMK Constants.secondsInDay
+        }
+    }
+    
+    func postSaleCount() {
+        guard PermissionsManager.shared.hasPermission(for: .push) else {
+            print("postSaleCount no push permission")
+            return
+        }
+        var imageURLString = ""
+        var saleCount = 0
+        let identifier = LocalNotificationIdentifier.saleCount.rawValue
+        DataModel.sharedInstance.retrieveSaleCount(from: sessionStart)
+            .then { productCount -> Promise<URL> in
+                imageURLString = "https://images-na.ssl-images-amazon.com/images/I/71F2ZBXnwtL._SX679_.jpg" // collage
+                saleCount = productCount
+                return NetworkingPromise.sharedInstance.downloadTmp(from: imageURLString, identifier: identifier)
+            }.then { copiedTmpURL -> Void in
+                self.scheduleImageLocalNotification(copiedTmpURL: copiedTmpURL,
+                                                    userInfo: [Constants.openingScreenKey : Constants.openingScreenValueScreenshot],
+                                                    identifier: identifier,
+                                                    body: saleCount == 1 ? "notification.sale.count.message.single".localized(withFormat: saleCount) : "notification.sale.count.message.plural".localized(withFormat: saleCount),
+                                                    interval: 5) // TODO: GMK Constants.secondsInDay
         }
     }
     

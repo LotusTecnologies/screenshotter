@@ -52,9 +52,10 @@ extension ProductViewController {
         
         if let product = dataModel.retrieveProduct(managedObjectContext: dataModel.mainMoc(), imageURL: imageURL) {
 //            Analytics.trackProductPriceAlertOpened(product: product) // TODO: GMK track present from local notification
-            
-            let productViewController = ProductViewController(product: product)
-            let navigationController = ModalNavigationController(rootViewController: productViewController)
+            let burrowViewController = ProductDetailViewController()
+            burrowViewController.product = product
+            burrowViewController.shoppable = product.shoppable
+            let navigationController = ModalNavigationController(rootViewController: burrowViewController)
             AppDelegate.shared.window?.rootViewController?.present(navigationController, animated: true, completion: nil)
         }
     }

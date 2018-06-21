@@ -641,9 +641,10 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         if let userInfo = response.notification.request.content.userInfo as? [String : Any] {
             if let openingScreen = userInfo[Constants.openingScreenKey] as? String {
-                if openingScreen == Constants.openingScreenValueScreenshot,
-                  let openingAssetId = userInfo[Constants.openingAssetIdKey] as? String {
-                    AssetSyncModel.sharedInstance.importPhotosToScreenshot(assetIds: [openingAssetId], source: .screenshot)
+                if openingScreen == Constants.openingScreenValueScreenshot {
+                    if let openingAssetId = userInfo[Constants.openingAssetIdKey] as? String {
+                        AssetSyncModel.sharedInstance.importPhotosToScreenshot(assetIds: [openingAssetId], source: .screenshot)
+                    }
                     showScreenshotListTop()
                 } else if openingScreen == Constants.openingScreenValueDiscover {
                     if let mainTabBarController = self.window?.rootViewController as? MainTabBarController {

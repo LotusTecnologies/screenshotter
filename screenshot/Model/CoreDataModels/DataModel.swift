@@ -438,7 +438,8 @@ extension DataModel {
                     let results = try managedObjectContext.fetch(fetchRequest)
                     if let latest = results.first,
                       let imageURL = latest.imageURL {
-                        fulfill((imageURL, latest.categories))
+                        let category = latest.shoppable?.label ?? latest.shoppable?.parentShoppable?.label ?? latest.categories
+                        fulfill((imageURL, category))
                     } else {
                         reject(NSError(domain: "Craze", code: 93, userInfo: [NSLocalizedDescriptionKey : "no latest favorite"]))
                     }
@@ -463,7 +464,7 @@ extension DataModel {
                 do {
                     let results = try managedObjectContext.fetch(fetchRequest)
                     if let latest = results.first,
-                      let imageURL = latest.imageURL {
+                        let imageURL = latest.imageURL {
                         fulfill((imageURL, latest.productTitle()))
                     } else {
                         reject(NSError(domain: "Craze", code: 94, userInfo: [NSLocalizedDescriptionKey : "no latest tapped"]))
@@ -471,6 +472,29 @@ extension DataModel {
                 } catch {
                     self.receivedCoreDataError(error: error)
                     print("retrieveLatestTapped results with error:\(error)")
+                    reject(error)
+                }
+            }
+        }
+    }
+    
+    func retrieveSaleCount(from startDate: NSDate) -> Promise<Int> {
+        return Promise { fulfill, reject in
+            self.performBackgroundTask { managedObjectContext in
+                let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
+                fetchRequest.predicate = NSPredicate(format: "floatPrice < floatOriginalPrice AND dateRetrieved > %@", startDate)
+                fetchRequest.sortDescriptors = [NSSortDescriptor(key: "dateRetrieved", ascending: false)]
+                
+                do {
+                    let results = try managedObjectContext.fetch(fetchRequest)
+                    if results.count > 0 {
+                        fulfill(results.count)
+                    } else {
+                        reject(NSError(domain: "Craze", code: 96, userInfo: [NSLocalizedDescriptionKey : "no recent sale count"]))
+                    }
+                } catch {
+                    self.receivedCoreDataError(error: error)
+                    print("retrieveSaleCount results with error:\(error)")
                     reject(error)
                 }
             }
