@@ -17,6 +17,7 @@ protocol RecoverLostSaleManagerDelegate:class {
 class RecoverLostSaleManager: NSObject, MFMailComposeViewControllerDelegate {
     private var timeLeftApp:Date?
     private var clickOnProductObjectId:NSManagedObjectID?
+
     weak var delegate:RecoverLostSaleManagerDelegate?
     weak var presentingVC:UIViewController?
 
@@ -35,12 +36,13 @@ class RecoverLostSaleManager: NSObject, MFMailComposeViewControllerDelegate {
         if let data = timeLeftApp, abs(data.timeIntervalSinceNow) < timeout {
             if let objectId = clickOnProductObjectId {
                 if let product = DataModel.sharedInstance.mainMoc().productWith(objectId: objectId) {
-                    clickOnProductObjectId = nil
+                    self.timeLeftApp = nil
                     self.delegate?.recoverLostSaleManager(self, returnedFrom: product)
                 }
             }
         }
     }
+    
     public func didClick(on product:Product){
         self.clickOnProductObjectId = product.objectID
         timeLeftApp = Date.init()
@@ -49,10 +51,10 @@ class RecoverLostSaleManager: NSObject, MFMailComposeViewControllerDelegate {
         let alert = UIAlertController.init(title: "product.sale_recovery.alert.title".localized, message: "product.sale_recovery.alert.message".localized, preferredStyle: .alert)
         let body =  self.htmlEmailForProducts(products: [product])
 
-        Analytics.trackFeatureRecoveryAppeared()
+        Analytics.trackFeatureRecoveryAppeared(product: product)
         self.presentingVC = viewController
         alert.addAction(UIAlertAction.init(title: "product.sale_recovery.alert.email_me".localized, style: .default, handler: { (a) in
-            Analytics.trackFeatureRecoveryEmailPresented()
+            Analytics.trackFeatureRecoveryEmailPresented(product: product)
             let recipient = AnalyticsUser.current.email ?? ""
             let dateFormatter = DateFormatter.init()
             dateFormatter.timeStyle = .none
@@ -61,16 +63,22 @@ class RecoverLostSaleManager: NSObject, MFMailComposeViewControllerDelegate {
             viewController.presentMail(recipient: recipient, gmailMessage: body, subject: subject, message: body, isHTML:true, delegate:self)
         }))
         alert.addAction(UIAlertAction.init(title: "generic.no_thanks".localized, style: .cancel, handler: { (a) in
-            
+            self.clickOnProductObjectId = nil
         }))
         viewController.present(alert, animated: true, completion: nil)
     }
     
     public func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
         if result == .sent {
-            Analytics.trackFeatureRecoveryEmailSent()
+            let product:Product? = {
+                if let clickOnProductObjectId = self.clickOnProductObjectId {
+                    return DataModel.sharedInstance.mainMoc().productWith(objectId:clickOnProductObjectId )
+                }
+                return nil
+            }()
+            Analytics.trackFeatureRecoveryEmailSent(product: product)
         }
-        
+        self.clickOnProductObjectId = nil
         if let presentingVC  = self.presentingVC {
             presentingVC.dismiss(animated: true, completion: nil)
         }else{
