@@ -127,8 +127,8 @@ class LocalNotificationModel {
         content.userInfo = [Constants.openingScreenKey  : Constants.openingScreenValueDiscover]
         
 //        let threeDays: TimeInterval = 3 * Constants.secondsInDay
-        let threeMinutes: TimeInterval = 3 * 60
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: threeMinutes, repeats: false)
+        let threeHours: TimeInterval = 3 * Constants.secondsInHour
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: threeHours, repeats: false)
         let request = UNNotificationRequest(identifier: LocalNotificationIdentifier.inactivityDiscover.rawValue,
                                             content: content,
                                             trigger: trigger)
@@ -190,7 +190,7 @@ class LocalNotificationModel {
                                                     userInfo: [Constants.openingProductKey : imageURLString],
                                                     identifier: identifier,
                                                     body: "notification.favorited.item.message".localized(withFormat: category),
-                                                    interval: 2 * 60) // TODO: GMK 2 * Constants.secondsInDay
+                                                    interval: 2 * Constants.secondsInHour) // TODO: GMK 2 * Constants.secondsInDay
         }
     }
     
@@ -212,7 +212,7 @@ class LocalNotificationModel {
                                                     userInfo: [Constants.openingProductKey : imageURLString],
                                                     identifier: identifier,
                                                     body: "notification.tapped.product.message".localized(withFormat: productTitle),
-                                                    interval: 60) // TODO: GMK Constants.secondsInDay
+                                                    interval: Constants.secondsInHour) // TODO: GMK Constants.secondsInDay
         }
     }
     
@@ -234,7 +234,7 @@ class LocalNotificationModel {
                                                     userInfo: [Constants.openingScreenKey : Constants.openingScreenValueScreenshot],
                                                     identifier: identifier,
                                                     body: saleCount == 1 ? "notification.sale.count.message.single".localized(withFormat: saleCount) : "notification.sale.count.message.plural".localized(withFormat: saleCount),
-                                                    interval: 4 * 60) // TODO: GMK 4 * Constants.secondsInDay
+                                                interval: 4 * Constants.secondsInHour) // TODO: GMK 4 * Constants.secondsInDay
         }
     }
     
