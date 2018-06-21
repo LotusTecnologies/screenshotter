@@ -700,6 +700,12 @@ extension AssetSyncModel {
                     print("uploadScreenshot inner uploadToSyte catch error:\(error)")
                 }.always {
                     self.networkingIndicatorDelegate?.networkingIndicatorDidComplete(type: .Product)
+                    
+                    self.performBackgroundTask(assetId: nil, shoppableId: nil) { (managedObjectContext) in
+                        if let screenshot = managedObjectContext.screenshotWith(assetId: assetId) {
+                            UserAccountManager.shared.uploadScreenshots(screenshot: screenshot)
+                        }
+                    }
                     completion()
             }
             

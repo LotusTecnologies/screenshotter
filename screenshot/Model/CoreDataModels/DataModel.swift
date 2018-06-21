@@ -256,6 +256,7 @@ extension DataModel {
                             try screenshot.validateForUpdate()
                             screenshot.isHidden = true
                             screenshot.hideWorkhorse()
+                            UserAccountManager.shared.deleteScreenshot(screenshot: screenshot)
                         } catch{
                             
                         }
@@ -355,7 +356,7 @@ extension DataModel {
     
     // Save a new Product to Core Data.
     func saveProduct(managedObjectContext: NSManagedObjectContext,
-                     shoppable: Shoppable,
+                     shoppable: Shoppable?,
                      order: Int16,
                      productDescription: String?,
                      price: String?,

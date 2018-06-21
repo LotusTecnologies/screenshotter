@@ -14,7 +14,7 @@ import UIKit
 
 class TutorialNavigationController : UINavigationController {
     weak var tutorialDelegate: TutorialNavigationControllerDelegate?
-    
+    var showProfilePage = false
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -22,9 +22,10 @@ class TutorialNavigationController : UINavigationController {
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
-        let welcomeViewController = OnboardingWelcomeViewController()
-        welcomeViewController.delegate = self
-        viewControllers = [welcomeViewController]
+        let registerVC = RegisterViewController.init()
+        registerVC.delegate = self
+        registerVC.isOnboardingLayout = true
+        viewControllers = [registerVC]
         
         view.backgroundColor = .white
         self.isNavigationBarHidden = true
@@ -33,7 +34,13 @@ class TutorialNavigationController : UINavigationController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        Analytics.trackStartedTutorial()
+        Analytics.trackStartedOnboarding()
+    }
+    
+    private func tutorialCompleted() {
+        AppDelegate.shared.shouldLoadDiscoverNextLoad = true
+        UserDefaults.standard.set(true, forKey: UserDefaultsKeys.onboardingCompleted)
+        tutorialDelegate?.tutorialNavigationControllerDidComplete(self)
     }
 }
 
@@ -43,6 +50,7 @@ extension TutorialNavigationController : UINavigationControllerDelegate {
             self.isNavigationBarHidden = !(viewController is CheckoutPaymentFormViewController)
         }
     }
+    
     func navigationController(_ navigationController: UINavigationController, didShow viewController: UIViewController, animated: Bool){
         if self.interactivePopGestureRecognizer?.state == UIGestureRecognizerState.possible {
             self.isNavigationBarHidden = !(viewController is CheckoutPaymentFormViewController)
@@ -50,53 +58,128 @@ extension TutorialNavigationController : UINavigationControllerDelegate {
     }
 }
 
-extension TutorialNavigationController: OnboardingWelcomeViewControllerDelegate {
-    func onboardingWelcomeViewControllerDidComplete(_ viewController: OnboardingWelcomeViewController) {
-        Analytics.trackOnboardingWelcome()
+extension TutorialNavigationController: RegisterViewControllerDelegate {
+    func registerViewControllerDidSkip(_ viewController: RegisterViewController) {
+        pushGDPRViewController()
+        Analytics.trackOnboardingSkipped()
+    }
+    
+    func registerViewControllerNeedEmailConfirmation(_ viewController: RegisterViewController) {
+        let confirm = ConfirmCodeViewController()
+        confirm.email = viewController.email
+        confirm.delegate = self
+        self.pushViewController(confirm, animated: true)
+        Analytics.trackOnboardingRegisterEmailSent()
+    }
+    
+    func registerViewControllerDidSignin(_ viewController: RegisterViewController) {
+        pushGDPRViewController()
+        Analytics.trackOnboardingLoginSucess()
+    }
+    
+    func registerViewControllerDidFacebookLogin(_ viewController: RegisterViewController) {
+        pushGDPRViewController()
+        Analytics.trackOnboardingFacebookSuccess(isReturning: true)
+    }
+    
+    func registerViewControllerDidFacebookSignup(_ viewController: RegisterViewController) {
+        showProfilePage = true
+        self.presentRegisterConfirmationViewController()
+        Analytics.trackOnboardingFacebookSuccess(isReturning: false)
         
-        let signup = TutorialEmailSlideViewController()
-        signup.delegate = self
-        self.pushViewController(signup, animated: true)
+    }
+    private func pushGDPRViewController() {
+        let vc = OnboardingGDPRViewController.init()
+        vc.delegate = self
+        self.pushViewController(vc, animated: true)
     }
 }
 
-extension TutorialNavigationController: TutorialEmailSlideViewControllerDelegate {
-    func tutorialEmailSlideViewDidComplete(_ slideView: TutorialEmailSlideViewController){
-        let tryItOut = TutorialTrySlideViewController()
-        tryItOut.delegate = self
-        self.pushViewController(tryItOut, animated: true)
-    }
-    func tutorialEmailSlideViewDidTapTermsOfService(_ slideView: TutorialEmailSlideViewController){
-        Analytics.trackOnboardingSubmittedEmailTOS()
-        if let viewController = LegalViewControllerFactory.termsOfServiceViewController() {
-            present(viewController, animated: true, completion: nil)
+extension TutorialNavigationController : OnboardingGDPRViewControllerDelegate {
+    func onboardingGDPRViewController(agreedToEmail: Bool, agreedToImageDetection: Bool) {
+        Analytics.trackOnboardingGdpr(agreedToEmail: agreedToEmail, agreedToImageDetection: agreedToImageDetection)
+        UserAccountManager.shared.setGDPR(agreedToEmail: agreedToEmail, agreedToImageDetection: agreedToImageDetection)
+        if showProfilePage {
+            pushOnboardingDetailsViewController()
+        }else{
+            tutorialCompleted()
         }
     }
     
-    func tutorialEmailSlideViewDidTapPrivacyPolicy(_ slideView: TutorialEmailSlideViewController){
-        Analytics.trackOnboardingSubmittedEmailPrivacy()
-        if let viewController = LegalViewControllerFactory.privacyPolicyViewController() {
-            present(viewController, animated: true, completion: nil)
+    
+}
+extension TutorialNavigationController : ConfirmCodeViewControllerDelegate {
+    
+    func confirmCodeViewControllerDidConfirm(_ viewController: ConfirmCodeViewController){
+        Analytics.trackOnboardingRegisterSucess()
+        showProfilePage = true
+        self.presentRegisterConfirmationViewController()
+    }
+    func confirmCodeViewControllerDidCancel(_ viewController: ConfirmCodeViewController){
+        Analytics.trackOnboardingRegisterEmailCancel()
+        self.popViewController(animated: true)
+    }
+    
+    private func presentRegisterConfirmationViewController() {
+        let selector = #selector(dismissRegisterNavigateToGDPR)
+        let tapGesture = UITapGestureRecognizer(target: self, action: selector)
+        
+        let registerConfirmationViewController = RegisterConfirmationViewController()
+        registerConfirmationViewController.view.addGestureRecognizer(tapGesture)
+        present(registerConfirmationViewController, animated: true)
+        
+        Timer.scheduledTimer(timeInterval: 3, target: self, selector: selector, userInfo: nil, repeats: false)
+    }
+    
+    @objc private func dismissRegisterNavigateToGDPR() {
+        if let viewController = presentedViewController as? RegisterConfirmationViewController,
+            !viewController.isBeingDismissed
+        {
+            dismiss(animated: true)
+            pushGDPRViewController()
         }
     }
+    
 
 }
 
-extension TutorialNavigationController : TutorialTrySlideViewControllerDelegate {
-    func tutorialTrySlideViewDidSkip(_ slideView: TutorialTrySlideViewController){
-        Analytics.trackOnboardingTryItOutSkipped()
-        tutorialTrySlideViewDidComplete(slideView)
-        AppDelegate.shared.shouldLoadDiscoverNextLoad = true
-
+extension TutorialNavigationController: OnboardingDetailsViewControllerDelegate {
+    private func pushOnboardingDetailsViewController() {
+        let onboardingDetailsViewController = OnboardingDetailsViewController()
+        onboardingDetailsViewController.delegate = self
+        onboardingDetailsViewController._view.nameTextField.text = UserAccountManager.shared.user?.displayName
+        pushViewController(onboardingDetailsViewController, animated: true)
     }
-    func tutorialTrySlideViewDidComplete(_ slideView: TutorialTrySlideViewController){
-        Analytics.trackOnboardingTryItOutScreenshot()
-
-        slideView.delegate = nil
+    
+    func onboardingDetailsViewControllerDidSkip(_ viewController: OnboardingDetailsViewController) {
+        Analytics.trackOnboardingProfileSkip()
+        tutorialCompleted()
+    }
+    
+    func onboardingDetailsViewControllerDidContinue(_ viewController: OnboardingDetailsViewController) {
+        let name = viewController.name
+        let gender = viewController.gender
+        let size = viewController.size
         
-        UserDefaults.standard.set(true, forKey: UserDefaultsKeys.onboardingCompleted)
+        func saveData() {
+            UserAccountManager.shared.setProfile(displayName: name, gender: gender, size: size)
+            Analytics.trackOnboardingProfileSubmit(name: name, gender: gender, size: size)
+        }
         
-        self.tutorialDelegate?.tutorialNavigationControllerDidComplete(self)
+        if name != nil && gender != nil && size != nil {
+            saveData()
+            tutorialCompleted()
+        }
+        else {
+            let alertController = UIAlertController(title: "onboarding.details.save_alert.title".localized, message: "onboarding.details.save_alert.message".localized, preferredStyle: .alert)
+            let continueAction = UIAlertAction(title: "generic.continue".localized, style: .default, handler: { alertAction in
+                saveData()
+                self.tutorialCompleted()
+            })
+            alertController.addAction(continueAction)
+            alertController.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
+            alertController.preferredAction = continueAction
+            present(alertController, animated: true)
+        }
     }
 }
-

@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Corey Werner on 4/12/18.
-//  Copyright (c) 2018 crazeapp. All rights reserved.
+//  Copyright © 2018 crazeapp. All rights reserved.
 //
 
 import UIKit

@@ -29,6 +29,8 @@ extension UIColor {
     static let gray8 = UIColor(white: 0.8, alpha: 1) // 204
     static let gray9 = UIColor(white: 0.9, alpha: 1) // 229.5
     
+    static let disabledButton = UIColor.gray4
+    
     func lighter(by percentage: CGFloat = 8) -> UIColor {
         return adjust(rgbBy: abs(percentage))
     }
@@ -126,6 +128,8 @@ struct Shadow {
     static let basic = Shadow(radius: 1, offset: CGSize(width: 0, height: 1), color: UIColor.black.withAlphaComponent(0.3))
     
     static let presentation = Shadow(radius: 3, offset: CGSize(width: 0, height: 4), color: UIColor.black.withAlphaComponent(0.4))
+    
+    static let content = Shadow(radius: 3, offset: .zero, color: UIColor.black.withAlphaComponent(0.15))
 }
 
 extension UIApplication {

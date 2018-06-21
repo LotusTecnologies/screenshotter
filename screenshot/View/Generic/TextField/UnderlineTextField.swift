@@ -11,6 +11,15 @@ import UIKit
 class UnderlineTextField: UITextField {
     fileprivate let underlineView = BorderView(edge: .bottom, height: 1)
     
+    fileprivate let errorLabel = UILabel()
+    
+    var errorText:String? = nil {
+        didSet {
+            errorLabel.text = errorText
+            errorLabel.isHidden = (errorText == nil)
+        }
+    }
+
     var isInvalid: Bool = false {
         didSet {
             syncColors()
@@ -30,6 +39,16 @@ class UnderlineTextField: UITextField {
         
         syncColors()
         addSubview(underlineView)
+
+        errorLabel.translatesAutoresizingMaskIntoConstraints = false
+        self.addSubview(errorLabel)
+        errorLabel.textColor = .red
+        errorLabel.leadingAnchor.constraint(equalTo: underlineView.leadingAnchor).isActive = true
+        errorLabel.trailingAnchor.constraint(equalTo: underlineView.trailingAnchor).isActive = true
+        errorLabel.topAnchor.constraint(equalTo: underlineView.bottomAnchor).isActive = true
+        errorLabel.isHidden = true
+        errorLabel.font = UIFont.screenshopFont(.hind, size: 10)
+        errorLabel.minimumScaleFactor = 0.5
     }
     
     deinit {
@@ -61,5 +80,8 @@ class UnderlineTextField: UITextField {
     
     @objc fileprivate func textDidChange() {
         isInvalid = false
+
+        self.errorText = nil
+
     }
 }

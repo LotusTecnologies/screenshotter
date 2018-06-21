@@ -1,8 +1,8 @@
 // STOP!  DO not edit the file below
 // only create by auto generting
-// created by: Jonathan Rose(rose@screenshopit.com) on computer -jonathanrose
-// created on: Thu Jun 21 19:29:22 IDT 2018
-// created from: master -  - 6e46952 
+// created by: Gershon Kagan(gershon@screenshopit.com) on computer -gershon
+// created on: Fri Jun 22 00:52:57 IDT 2018
+// created from: master -  - ba2e2e4 
 //  Copyright (c) 2018 crazeapp. All rights reserved.
 
 

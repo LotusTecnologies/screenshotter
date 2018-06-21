@@ -15,6 +15,8 @@ import Branch
 import PromiseKit
 import Amplitude_iOS
 import AdSupport
+import Firebase
+
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -95,7 +97,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         })
     }
-    
+   
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         ApplicationStateModel.sharedInstance.applicationState = application.applicationState
         
@@ -122,7 +124,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 self.sendDebugDataToDebugApp(url:url)
                 return true
             }
+            if UserAccountManager.shared.application(application, open: url, options: [:]) {
+                return true
+            }
         }
+        FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
 
         
         return true
@@ -262,9 +268,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         var handled = Branch.getInstance().application(app, open: url, options:options)
         
         if !handled {
+            handled = UserAccountManager.shared.application(app, open: url, options: options)
+        }
+        if !handled {
             handled = FBSDKApplicationDelegate.sharedInstance().application(app, open: url, options: options)
         }
-        
         return handled
     }
     
@@ -414,7 +422,8 @@ extension AppDelegate : KochavaTrackerDelegate {
         trackerParametersDictionary[kKVAParamLogLevelEnumKey] = kKVALogLevelEnumInfo
         
         KochavaTracker.shared.configure(withParametersDictionary: trackerParametersDictionary, delegate: self)
-        
+                
+        let _ = UserAccountManager.shared.application(application, didFinishLaunchingWithOptions: launchOptions)
         
         if UIApplication.isDev {
             Branch.setUseTestBranchKey(true)
@@ -436,7 +445,6 @@ extension AppDelegate : KochavaTrackerDelegate {
             }
             
             if let shareId = params["shareId"] as? String {
-
                 AssetSyncModel.sharedInstance.downloadScreenshot(shareId: shareId)
                 self.showScreenshotListTop()
             }
@@ -448,10 +456,14 @@ extension AppDelegate : KochavaTrackerDelegate {
             if let campaign = params["~campaign"] as? String {
                 UserDefaults.standard.set(campaign, forKey: UserDefaultsKeys.campaign)
             }
+            if let nonBranchLink = params["+non_branch_link"]  as? String {
+                if nonBranchLink.contains("validate"), let url = URL.init(string: nonBranchLink) {
+                    let _ = UserAccountManager.shared.application(application, open:url, options: [:])
+                }
+            }
         }
         
     
-        FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
     }
     
     fileprivate func frameworkSetupMainViewDidLoad() {

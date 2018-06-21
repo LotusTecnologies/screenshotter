@@ -52,6 +52,7 @@ class UserDefaultsKeys  {
     enum CampaignCompleted : String {
         case campaign_2018_04_20 // A kim video to encourage users to submit to discover
     }
+
     
     // Gift Card
     static let isGiftCardHidden = "IsGiftCardHidden"
@@ -90,6 +91,10 @@ class UserDefaultsKeys  {
     
     //Debug
     static let showsDebugAnalyticsUI = "ShowsDebugAnalyticsUI"
+    
+    //GDPR
+    static let gdpr_agreedToEmail = "gdpr_agreedToEmail"
+    static let gdpr_agreedToImageDetection = "gdpr_agreedToImageDetection"
 
 }
 
