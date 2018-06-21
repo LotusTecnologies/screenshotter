@@ -428,7 +428,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
             let product = self.productAtIndex(indexPath.item)
             if let productViewController = presentProduct(product, atLocation: .products) {
                 productViewController.similarProducts = products
-            }            
+            }
         }
         else if sectionType == .relatedLooks {
             if let url = self.relatedLooksManager.relatedLook(at:indexPath.row) {
