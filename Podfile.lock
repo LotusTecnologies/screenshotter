@@ -13,24 +13,24 @@ PODS:
   - Branch/Core (0.25.0)
   - CardIO (5.4.1)
   - CreditCardValidator (0.4)
-  - EggRating (0.1.5):
+  - EggRating (0.1.6):
     - RateView
   - FBSDKCoreKit (4.34.0):
     - Bolts (~> 1.7)
   - FBSDKLoginKit (4.34.0):
     - FBSDKCoreKit
-  - Firebase/Auth (5.2.0):
+  - Firebase/Auth (5.3.0):
     - Firebase/CoreOnly
     - FirebaseAuth (= 5.0.1)
-  - Firebase/Core (5.2.0):
+  - Firebase/Core (5.3.0):
     - Firebase/CoreOnly
     - FirebaseAnalytics (= 5.0.1)
-  - Firebase/CoreOnly (5.2.0):
-    - FirebaseCore (= 5.0.3)
-  - Firebase/Database (5.2.0):
+  - Firebase/CoreOnly (5.3.0):
+    - FirebaseCore (= 5.0.4)
+  - Firebase/Database (5.3.0):
     - Firebase/CoreOnly
     - FirebaseDatabase (= 5.0.1)
-  - Firebase/Storage (5.2.0):
+  - Firebase/Storage (5.3.0):
     - Firebase/CoreOnly
     - FirebaseStorage (= 3.0.0)
   - FirebaseAnalytics (5.0.1):
@@ -41,12 +41,12 @@ PODS:
   - FirebaseAuth (5.0.1):
     - FirebaseCore (~> 5.0)
     - GTMSessionFetcher/Core (~> 1.1)
-  - FirebaseCore (5.0.3):
+  - FirebaseCore (5.0.4):
     - "GoogleToolboxForMac/NSData+zlib (~> 2.1)"
   - FirebaseDatabase (5.0.1):
     - FirebaseCore (~> 5.0)
     - leveldb-library (~> 1.18)
-  - FirebaseInstanceID (3.1.0):
+  - FirebaseInstanceID (3.1.1):
     - FirebaseCore (~> 5.0)
   - FirebaseStorage (3.0.0):
     - FirebaseCore (~> 5.0)
@@ -165,15 +165,15 @@ SPEC CHECKSUMS:
   Branch: 127d29ab0a8866025eece1cf9e950ddb6f7d4070
   CardIO: 56983b39b62f495fc6dae9ad7cf875143df06443
   CreditCardValidator: 9f0814dd61682c004071a250d89327ca83514a48
-  EggRating: 7f892b9b8da758689525caf9dcb1c9475f9d5139
+  EggRating: 378f25f5ac0629e7edfb011f5c5177c63f135e6e
   FBSDKCoreKit: 0ff57f093b85c8c9d5aba697d3edf68a8960ce78
   FBSDKLoginKit: 8c78f57a145afb756e4755e69195ebe08a42466e
-  Firebase: 25ed0412036d7d008568d1fb4d2e9d81ea8a0a2c
+  Firebase: 68afeeb05461db02d7c9e3215cda28068670f4aa
   FirebaseAnalytics: b3628aea54c50464c32c393fb2ea032566e7ecc2
   FirebaseAuth: 463b8ce33bd5d05f706dcd4615499e3212b4132b
-  FirebaseCore: a3c87242451633fff8490183898075ce77d168d2
+  FirebaseCore: 62f1b792a49bb9e8b4073f24606d2c93ffc352f0
   FirebaseDatabase: 482bad9c2abd422bb2321194fb8c937e67426a89
-  FirebaseInstanceID: 05d779cbb97bd5bd5c51a38a903fc9cfe1b2454a
+  FirebaseInstanceID: f3f0657372592ecdfdfe2cac604a5a75758376a6
   FirebaseStorage: 7ca4bb7b58a25fa647b04f524033fc7cb7eb272b
   GoogleToolboxForMac: 91c824d21e85b31c2aae9bb011c5027c9b4e738f
   GTMSessionFetcher: 5fa5b80fd20e439ef5f545fb2cb3ca6c6714caa2
