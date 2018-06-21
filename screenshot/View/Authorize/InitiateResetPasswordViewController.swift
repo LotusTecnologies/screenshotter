@@ -167,6 +167,7 @@ class InitiateResetPasswordViewController: UIViewController {
         dismissKeyboard()
         
         if let email = validateEmail(_view.emailTextField.text) {
+            Analytics.trackOnboardingForgotSubmited(email: email)
             self.continueButton.isLoading = true
             self.continueButton.isEnabled = false
             self._view.backButton.isUserInteractionEnabled = false
@@ -200,6 +201,7 @@ class InitiateResetPasswordViewController: UIViewController {
             }
         }
         else {
+            Analytics.trackOnboardingError(domain: "craze", code: #line, localizedDescription: "Invalid email")
             _view.emailTextField.isInvalid = true
             
             ActionFeedbackGenerator().actionOccurred(.nope)

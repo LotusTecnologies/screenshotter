@@ -87,7 +87,6 @@
 		311A506D20D90B780001D463 /* ResetPasswordViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A4FB320D90B760001D463 /* ResetPasswordViewController.swift */; };
 		311A506E20D90B780001D463 /* RegisterConfirmationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A4FB420D90B760001D463 /* RegisterConfirmationViewController.swift */; };
 		311A506F20D90B780001D463 /* RegisterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A4FB520D90B760001D463 /* RegisterViewController.swift */; };
-		311A507020D90B780001D463 /* RegisterExistingTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A4FB620D90B760001D463 /* RegisterExistingTextField.swift */; };
 		311A507120D90B780001D463 /* AutoresizingTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A4FB920D90B760001D463 /* AutoresizingTableView.swift */; };
 		311A507220D90B780001D463 /* TableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A4FBA20D90B760001D463 /* TableView.swift */; };
 		311A507320D90B780001D463 /* ErrorCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A4FBC20D90B760001D463 /* ErrorCollectionViewCell.swift */; };
@@ -158,14 +157,10 @@
 		311A50B720D90B780001D463 /* CartGiftCardTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A501120D90B770001D463 /* CartGiftCardTableViewCell.swift */; };
 		311A50B820D90B780001D463 /* CartCheckoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A501220D90B770001D463 /* CartCheckoutView.swift */; };
 		311A50B920D90B780001D463 /* CartTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A501320D90B770001D463 /* CartTableViewCell.swift */; };
-		311A50BA20D90B780001D463 /* TutorialTrySlideViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A501520D90B770001D463 /* TutorialTrySlideViewController.swift */; };
 		311A50BB20D90B780001D463 /* OnboardingGDPRViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A501620D90B770001D463 /* OnboardingGDPRViewController.swift */; };
-		311A50BC20D90B780001D463 /* TutorialEmailSlideViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A501720D90B770001D463 /* TutorialEmailSlideViewController.swift */; };
 		311A50BD20D90B780001D463 /* OnboardingWelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A501820D90B770001D463 /* OnboardingWelcomeViewController.swift */; };
 		311A50BE20D90B780001D463 /* TutorialNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A501920D90B770001D463 /* TutorialNavigationController.swift */; };
-		311A50BF20D90B780001D463 /* GiftCardDoneViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A501A20D90B770001D463 /* GiftCardDoneViewController.swift */; };
 		311A50C020D90B780001D463 /* OnboardingDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A501B20D90B770001D463 /* OnboardingDetailsViewController.swift */; };
-		311A50C120D90B780001D463 /* GiftCardCampaignViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A501C20D90B770001D463 /* GiftCardCampaignViewController.swift */; };
 		311A50C220D90B780001D463 /* FormViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A501E20D90B770001D463 /* FormViewController.swift */; };
 		311A50C320D90B780001D463 /* FormTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A501F20D90B770001D463 /* FormTableViewCell.swift */; };
 		311A50C420D90B780001D463 /* FormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A502020D90B770001D463 /* FormView.swift */; };
@@ -363,7 +358,6 @@
 		311A4FB320D90B760001D463 /* ResetPasswordViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResetPasswordViewController.swift; sourceTree = "<group>"; };
 		311A4FB420D90B760001D463 /* RegisterConfirmationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegisterConfirmationViewController.swift; sourceTree = "<group>"; };
 		311A4FB520D90B760001D463 /* RegisterViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegisterViewController.swift; sourceTree = "<group>"; };
-		311A4FB620D90B760001D463 /* RegisterExistingTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegisterExistingTextField.swift; sourceTree = "<group>"; };
 		311A4FB920D90B760001D463 /* AutoresizingTableView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoresizingTableView.swift; sourceTree = "<group>"; };
 		311A4FBA20D90B760001D463 /* TableView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableView.swift; sourceTree = "<group>"; };
 		311A4FBC20D90B760001D463 /* ErrorCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ErrorCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -434,14 +428,10 @@
 		311A501120D90B770001D463 /* CartGiftCardTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CartGiftCardTableViewCell.swift; sourceTree = "<group>"; };
 		311A501220D90B770001D463 /* CartCheckoutView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CartCheckoutView.swift; sourceTree = "<group>"; };
 		311A501320D90B770001D463 /* CartTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CartTableViewCell.swift; sourceTree = "<group>"; };
-		311A501520D90B770001D463 /* TutorialTrySlideViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialTrySlideViewController.swift; sourceTree = "<group>"; };
 		311A501620D90B770001D463 /* OnboardingGDPRViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OnboardingGDPRViewController.swift; sourceTree = "<group>"; };
-		311A501720D90B770001D463 /* TutorialEmailSlideViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialEmailSlideViewController.swift; sourceTree = "<group>"; };
 		311A501820D90B770001D463 /* OnboardingWelcomeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OnboardingWelcomeViewController.swift; sourceTree = "<group>"; };
 		311A501920D90B770001D463 /* TutorialNavigationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TutorialNavigationController.swift; sourceTree = "<group>"; };
-		311A501A20D90B770001D463 /* GiftCardDoneViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GiftCardDoneViewController.swift; sourceTree = "<group>"; };
 		311A501B20D90B770001D463 /* OnboardingDetailsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OnboardingDetailsViewController.swift; sourceTree = "<group>"; };
-		311A501C20D90B770001D463 /* GiftCardCampaignViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GiftCardCampaignViewController.swift; sourceTree = "<group>"; };
 		311A501E20D90B770001D463 /* FormViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FormViewController.swift; sourceTree = "<group>"; };
 		311A501F20D90B770001D463 /* FormTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FormTableViewCell.swift; sourceTree = "<group>"; };
 		311A502020D90B770001D463 /* FormView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FormView.swift; sourceTree = "<group>"; };
@@ -814,7 +804,6 @@
 				311A4FB320D90B760001D463 /* ResetPasswordViewController.swift */,
 				311A4FB420D90B760001D463 /* RegisterConfirmationViewController.swift */,
 				311A4FB520D90B760001D463 /* RegisterViewController.swift */,
-				311A4FB620D90B760001D463 /* RegisterExistingTextField.swift */,
 			);
 			path = Authorize;
 			sourceTree = "<group>";
@@ -1048,14 +1037,10 @@
 		311A501420D90B770001D463 /* Onboarding */ = {
 			isa = PBXGroup;
 			children = (
-				311A501520D90B770001D463 /* TutorialTrySlideViewController.swift */,
 				311A501620D90B770001D463 /* OnboardingGDPRViewController.swift */,
-				311A501720D90B770001D463 /* TutorialEmailSlideViewController.swift */,
 				311A501820D90B770001D463 /* OnboardingWelcomeViewController.swift */,
 				311A501920D90B770001D463 /* TutorialNavigationController.swift */,
-				311A501A20D90B770001D463 /* GiftCardDoneViewController.swift */,
 				311A501B20D90B770001D463 /* OnboardingDetailsViewController.swift */,
-				311A501C20D90B770001D463 /* GiftCardCampaignViewController.swift */,
 			);
 			path = Onboarding;
 			sourceTree = "<group>";
@@ -1590,7 +1575,6 @@
 				C57ACEC020DA37F00094F784 /* Variant+craze.swift in Sources */,
 				C57ACEC220DA37F00094F784 /* Shoppable+craze.swift in Sources */,
 				311A503920D90B780001D463 /* CheckoutPaymentListViewController.swift in Sources */,
-				311A50BF20D90B780001D463 /* GiftCardDoneViewController.swift in Sources */,
 				311A506820D90B780001D463 /* ScreenshotsDeleteButton.swift in Sources */,
 				C57ACEB520DA37F00094F784 /* ShoppingCartModel.swift in Sources */,
 				311A509E20D90B780001D463 /* FloatingActionButton.swift in Sources */,
@@ -1618,7 +1602,6 @@
 				C57ACEB720DA37F00094F784 /* AsyncOperation.swift in Sources */,
 				311A50A920D90B780001D463 /* ModalNavigationController.swift in Sources */,
 				C50E25EA207DDFF1003C8D24 /* CreditCardValidator.swift in Sources */,
-				311A50C120D90B780001D463 /* GiftCardCampaignViewController.swift in Sources */,
 				311A508D20D90B780001D463 /* IntrinsicContentSizePresentationController.swift in Sources */,
 				31A0781B207E182100D70DC3 /* URL+craze.swift in Sources */,
 				311A505520D90B780001D463 /* ProductHeaderCollectionViewCell.swift in Sources */,
@@ -1684,7 +1667,6 @@
 				311A505220D90B780001D463 /* ProductsViewController.swift in Sources */,
 				3125448F209871B4009410D5 /* Analytics+api.swift in Sources */,
 				311A509620D90B780001D463 /* NotifyChangeView.swift in Sources */,
-				311A50BC20D90B780001D463 /* TutorialEmailSlideViewController.swift in Sources */,
 				311A506720D90B780001D463 /* ScreenshotsHelperView.swift in Sources */,
 				311A505720D90B780001D463 /* ProductsRateView.swift in Sources */,
 				311A503D20D90B780001D463 /* CheckoutOrderItemTableViewCell.swift in Sources */,
@@ -1714,7 +1696,6 @@
 				311A508E20D90B780001D463 /* DimmedPresentationController.swift in Sources */,
 				311A505920D90B780001D463 /* FavoriteControl.swift in Sources */,
 				311A506320D90B780001D463 /* ScreenshotCollectionViewCell.swift in Sources */,
-				311A507020D90B780001D463 /* RegisterExistingTextField.swift in Sources */,
 				E49261D6206A704C006FE84E /* UIImage+craze.swift in Sources */,
 				311A504D20D90B780001D463 /* RelatedLooksManager.swift in Sources */,
 				311A509B20D90B780001D463 /* BorderButton.swift in Sources */,
@@ -1744,7 +1725,6 @@
 				31CE11002035AC44000156EE /* UIApplication+openInChrome.swift in Sources */,
 				311A50B720D90B780001D463 /* CartGiftCardTableViewCell.swift in Sources */,
 				311A509C20D90B780001D463 /* MainButton.swift in Sources */,
-				311A50BA20D90B780001D463 /* TutorialTrySlideViewController.swift in Sources */,
 				311A506220D90B780001D463 /* ScreenshotsNavigationController.swift in Sources */,
 				311A508B20D90B780001D463 /* Label.swift in Sources */,
 				311A50B320D90B780001D463 /* CartViewController.swift in Sources */,

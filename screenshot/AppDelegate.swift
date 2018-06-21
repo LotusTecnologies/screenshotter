@@ -472,7 +472,7 @@ extension AppDelegate : KochavaTrackerDelegate {
         
         KochavaTracker.shared.configure(withParametersDictionary: trackerParametersDictionary, delegate: self)
                 
-        UserAccountManager.shared.application(application, didFinishLaunchingWithOptions: launchOptions)
+        let _ = UserAccountManager.shared.application(application, didFinishLaunchingWithOptions: launchOptions)
         
         if UIApplication.isDev {
             Branch.setUseTestBranchKey(true)
@@ -507,7 +507,7 @@ extension AppDelegate : KochavaTrackerDelegate {
             }
             if let nonBranchLink = params["+non_branch_link"]  as? String {
                 if nonBranchLink.contains("validate"), let url = URL.init(string: nonBranchLink) {
-                    UserAccountManager.shared.application(application, open:url, options: [:])
+                    let _ = UserAccountManager.shared.application(application, open:url, options: [:])
                 }
             }
         }

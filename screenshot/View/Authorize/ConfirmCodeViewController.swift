@@ -150,6 +150,8 @@ class ConfirmCodeViewController: UIViewController {
         UserAccountManager.shared.confirmSignup(code: code).then(on: .main) { () -> Void in
             self.delegate?.confirmCodeViewControllerDidConfirm(self)
             }.catch { (error) in
+                let e = error as NSError
+                Analytics.trackOnboardingError(domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
                 DispatchQueue.main.async {
                     let error = error as NSError
                     if UserAccountManager.shared.isNoInternetError(error: error) {
@@ -162,6 +164,7 @@ class ConfirmCodeViewController: UIViewController {
                         let alert = UserAccountManager.shared.alertViewForCantSendEmail(email: email)
                         self.present(alert, animated: true, completion: nil)
                     }else {
+
                         let alert = UserAccountManager.shared.alertViewForUndefinedError(error: error, viewController: self)
                         self.present(alert, animated: true, completion: nil)
                     }

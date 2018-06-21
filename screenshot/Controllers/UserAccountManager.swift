@@ -115,6 +115,7 @@ class UserAccountManager : NSObject {
                         if let email =  user.email {
                             self.databaseRef.child("users").child(user.uid).child("facebook-email").setValue(email)
                             self.databaseRef.child("users").child(user.uid).child("email").setValue(email)
+                            UserDefaults.standard.set(email, forKey: UserDefaultsKeys.email)
                         }
                         if let phone = user.providerData.first?.phoneNumber {
                             self.databaseRef.child("users").child(user.uid).child("facebook-phone").setValue(phone)
@@ -173,6 +174,7 @@ class UserAccountManager : NSObject {
                     self.downloadAndReplaceUserData()
                     if user.isEmailVerified {
                         self.databaseRef.child("users").child(user.uid).child("email").setValue(email.lowercased())
+                        UserDefaults.standard.set(email, forKey: UserDefaultsKeys.email)
                         fulfil(LoginOrCreateAccountResult.confirmed)
                     }else{
                         user.sendEmailVerification(completion: { (error) in
@@ -250,6 +252,7 @@ class UserAccountManager : NSObject {
                 }else{
                     if let user = self.user, let email = self.email {
                         self.databaseRef.child("users").child(user.uid).child("email").setValue(email.lowercased())
+                        UserDefaults.standard.set(email, forKey: UserDefaultsKeys.email)
                     }
                     fulfill(())
                 }
@@ -366,6 +369,7 @@ extension UserAccountManager {
         return alert
     }
     func alertViewForUndefinedError(error:NSError, viewController:UIViewController) -> UIAlertController {
+        Analytics.trackOnboardingUnsupportedError(domain: error.domain, code: error.code, localizedDescription: error.localizedDescription)
         let alert = UIAlertController.init(title: "generic.error".localized, message: "authorize.error.undefined".localized, preferredStyle: .alert)
         alert.addAction(UIAlertAction.init(title: "authorize.error.undefined.contactSupport".localized, style: .default, handler: { (a) in
             let recipient = "support@screenshopit.com"
