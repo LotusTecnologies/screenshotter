@@ -13,10 +13,10 @@ import PromiseKit
 
 enum LocalNotificationIdentifier: String {
     case screenshotAdded        = "CrazeLocal"
-    case inactivityDiscover     = "CrazeInactivityDiscover"
-    case favoritedItem          = "CrazeFavoritedItem"
-    case tappedProduct          = "CrazeTappedProduct"
     case saleCount              = "CrazeSaleCount"
+    case tappedProduct          = "CrazeTappedProduct"
+    case favoritedItem          = "CrazeFavoritedItem"
+    case inactivityDiscover     = "CrazeInactivityDiscover"
 }
 
 class LocalNotificationModel {
@@ -42,19 +42,19 @@ class LocalNotificationModel {
     @objc func applicationWillEnterForeground() {
         sessionStart = NSDate()
         UNUserNotificationCenter.current().getPendingNotificationRequests { notificationRequestArray in
-            let toCancel = [LocalNotificationIdentifier.inactivityDiscover.rawValue, LocalNotificationIdentifier.favoritedItem.rawValue, LocalNotificationIdentifier.tappedProduct.rawValue, LocalNotificationIdentifier.saleCount.rawValue]
+            let toCancel = [LocalNotificationIdentifier.saleCount.rawValue, LocalNotificationIdentifier.tappedProduct.rawValue, LocalNotificationIdentifier.favoritedItem.rawValue, LocalNotificationIdentifier.inactivityDiscover.rawValue]
             let toCancelSet = Set<String>(toCancel)
             notificationRequestArray.forEach { notificationRequest in
                 if toCancelSet.contains(notificationRequest.identifier) {
                     switch notificationRequest.identifier {
-                    case LocalNotificationIdentifier.inactivityDiscover.rawValue:
-                        Analytics.trackTimedLocalNotificationCancelled(source: .inactivityDiscover)
-                    case LocalNotificationIdentifier.favoritedItem.rawValue:
-                        Analytics.trackTimedLocalNotificationCancelled(source: .favoritedItem)
-                    case LocalNotificationIdentifier.tappedProduct.rawValue:
-                        Analytics.trackTimedLocalNotificationCancelled(source: .tappedProduct)
                     case LocalNotificationIdentifier.saleCount.rawValue:
                         Analytics.trackTimedLocalNotificationCancelled(source: .saleCount)
+                    case LocalNotificationIdentifier.tappedProduct.rawValue:
+                        Analytics.trackTimedLocalNotificationCancelled(source: .tappedProduct)
+                    case LocalNotificationIdentifier.favoritedItem.rawValue:
+                        Analytics.trackTimedLocalNotificationCancelled(source: .favoritedItem)
+                    case LocalNotificationIdentifier.inactivityDiscover.rawValue:
+                        Analytics.trackTimedLocalNotificationCancelled(source: .inactivityDiscover)
                     default:
                         print("Cancel unknown timedLocalNotification. WTF?")
                     }
@@ -66,10 +66,10 @@ class LocalNotificationModel {
     }
     
     @objc func applicationDidEnterBackground() {
-        scheduleInactivityDiscoverLocalNotification()
-        postLatestFavorite()
-        postLatestTapped()
         postSaleCount()
+        postLatestTapped()
+        postLatestFavorite()
+        scheduleInactivityDiscoverLocalNotification()
     }
     
     // MARK: Local Notification
@@ -126,31 +126,6 @@ class LocalNotificationModel {
         })
     }
 
-    func scheduleInactivityDiscoverLocalNotification() {
-        guard PermissionsManager.shared.hasPermission(for: .push) else {
-            return
-        }
-
-        let content = UNMutableNotificationContent()
-        content.body = "notification.inactivity.discover.message".localized
-        content.sound = UNNotificationSound.default()
-        content.userInfo = [Constants.openingScreenKey  : Constants.openingScreenValueDiscover]
-        
-//        let threeDays: TimeInterval = 3 * Constants.secondsInDay
-        let threeHours: TimeInterval = 3 * Constants.secondsInHour  // TODO: GMK 3 * Constants.secondsInDay
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: threeHours, repeats: false)
-        let request = UNNotificationRequest(identifier: LocalNotificationIdentifier.inactivityDiscover.rawValue,
-                                            content: content,
-                                            trigger: trigger)
-        UNUserNotificationCenter.current().add(request, withCompletionHandler: { (error) in
-            if let error = error {
-                print("scheduleInactivityDiscoverLocalNotification identifier:\(LocalNotificationIdentifier.inactivityDiscover.rawValue)  error:\(error)")
-            } else {
-                Analytics.trackTimedLocalNotificationScheduled(source: .inactivityDiscover)
-            }
-        })
-    }
-
     func scheduleImageLocalNotification(copiedTmpURL: URL, userInfo: [String : Any], identifier: String, body: String, interval: TimeInterval) {
         let content = UNMutableNotificationContent()
         content.body = body
@@ -190,25 +165,25 @@ class LocalNotificationModel {
         })
     }
     
-    func postLatestFavorite() {
+    func postSaleCount() {
         guard PermissionsManager.shared.hasPermission(for: .push) else {
-            print("postLatestFavorite no push permission")
+            print("postSaleCount no push permission")
             return
         }
         var imageURLString = ""
-        var category = "fav"
-        let identifier = LocalNotificationIdentifier.favoritedItem.rawValue
-        DataModel.sharedInstance.retrieveLatestFavorite()
-            .then { imageURL, categories -> Promise<URL> in
-                imageURLString = imageURL
-                category = categories ?? category
+        var saleCount = 0
+        let identifier = LocalNotificationIdentifier.saleCount.rawValue
+        DataModel.sharedInstance.retrieveSaleCount(from: sessionStart)
+            .then { productCount -> Promise<URL> in
+                imageURLString = "https://images-na.ssl-images-amazon.com/images/I/71F2ZBXnwtL._SX679_.jpg" // TODO: GMK collage from first 4 images.
+                saleCount = productCount
                 return NetworkingPromise.sharedInstance.downloadTmp(from: imageURLString, identifier: identifier)
             }.then { copiedTmpURL -> Void in
                 self.scheduleImageLocalNotification(copiedTmpURL: copiedTmpURL,
-                                                    userInfo: [Constants.openingProductKey : imageURLString],
+                                                    userInfo: [Constants.openingScreenKey : Constants.openingScreenValueScreenshot],
                                                     identifier: identifier,
-                                                    body: "notification.favorited.item.message".localized(withFormat: category),
-                                                    interval: 2 * Constants.secondsInHour) // TODO: GMK 2 * Constants.secondsInDay
+                                                    body: saleCount == 1 ? "notification.sale.count.message.single".localized(withFormat: saleCount) : "notification.sale.count.message.plural".localized(withFormat: saleCount),
+                                                    interval: Constants.secondsInHour) // TODO: GMK Constants.secondsInDay
         }
     }
     
@@ -230,30 +205,53 @@ class LocalNotificationModel {
                                                     userInfo: [Constants.openingProductKey : imageURLString],
                                                     identifier: identifier,
                                                     body: "notification.tapped.product.message".localized(withFormat: productTitle),
-                                                    interval: Constants.secondsInHour) // TODO: GMK Constants.secondsInDay
+                                                    interval: 2 * Constants.secondsInHour) // TODO: GMK 2 * Constants.secondsInDay
         }
     }
     
-    func postSaleCount() {
+    func postLatestFavorite() {
         guard PermissionsManager.shared.hasPermission(for: .push) else {
-            print("postSaleCount no push permission")
+            print("postLatestFavorite no push permission")
             return
         }
         var imageURLString = ""
-        var saleCount = 0
-        let identifier = LocalNotificationIdentifier.saleCount.rawValue
-        DataModel.sharedInstance.retrieveSaleCount(from: sessionStart)
-            .then { productCount -> Promise<URL> in
-                imageURLString = "https://images-na.ssl-images-amazon.com/images/I/71F2ZBXnwtL._SX679_.jpg" // TODO: GMK collage from first 4 images.
-                saleCount = productCount
+        var category = "fav"
+        let identifier = LocalNotificationIdentifier.favoritedItem.rawValue
+        DataModel.sharedInstance.retrieveLatestFavorite()
+            .then { imageURL, categories -> Promise<URL> in
+                imageURLString = imageURL
+                category = categories ?? category
                 return NetworkingPromise.sharedInstance.downloadTmp(from: imageURLString, identifier: identifier)
             }.then { copiedTmpURL -> Void in
                 self.scheduleImageLocalNotification(copiedTmpURL: copiedTmpURL,
-                                                    userInfo: [Constants.openingScreenKey : Constants.openingScreenValueScreenshot],
+                                                    userInfo: [Constants.openingProductKey : imageURLString],
                                                     identifier: identifier,
-                                                    body: saleCount == 1 ? "notification.sale.count.message.single".localized(withFormat: saleCount) : "notification.sale.count.message.plural".localized(withFormat: saleCount),
-                                                interval: 4 * Constants.secondsInHour) // TODO: GMK 4 * Constants.secondsInDay
+                                                    body: "notification.favorited.item.message".localized(withFormat: category),
+                                                    interval: 3 * Constants.secondsInHour) // TODO: GMK 3 * Constants.secondsInDay
         }
+    }
+    
+    func scheduleInactivityDiscoverLocalNotification() {
+        guard PermissionsManager.shared.hasPermission(for: .push) else {
+            return
+        }
+        
+        let content = UNMutableNotificationContent()
+        content.body = "notification.inactivity.discover.message".localized
+        content.sound = UNNotificationSound.default()
+        content.userInfo = [Constants.openingScreenKey  : Constants.openingScreenValueDiscover]
+        
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 4 * Constants.secondsInHour, repeats: false)  // TODO: GMK 4 * Constants.secondsInDay
+        let request = UNNotificationRequest(identifier: LocalNotificationIdentifier.inactivityDiscover.rawValue,
+                                            content: content,
+                                            trigger: trigger)
+        UNUserNotificationCenter.current().add(request, withCompletionHandler: { (error) in
+            if let error = error {
+                print("scheduleInactivityDiscoverLocalNotification identifier:\(LocalNotificationIdentifier.inactivityDiscover.rawValue)  error:\(error)")
+            } else {
+                Analytics.trackTimedLocalNotificationScheduled(source: .inactivityDiscover)
+            }
+        })
     }
     
 }
