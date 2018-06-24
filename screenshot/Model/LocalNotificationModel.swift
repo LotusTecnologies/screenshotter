@@ -183,7 +183,7 @@ class LocalNotificationModel {
                                                     userInfo: [Constants.openingScreenKey : Constants.openingScreenValueScreenshot],
                                                     identifier: identifier,
                                                     body: saleCount == 1 ? "notification.sale.count.message.single".localized(withFormat: saleCount) : "notification.sale.count.message.plural".localized(withFormat: saleCount),
-                                                    interval: Constants.secondsInHour) // TODO: GMK Constants.secondsInDay
+                                                    interval: Constants.secondsInDay)
         }
     }
     
@@ -205,7 +205,7 @@ class LocalNotificationModel {
                                                     userInfo: [Constants.openingProductKey : imageURLString],
                                                     identifier: identifier,
                                                     body: "notification.tapped.product.message".localized(withFormat: productTitle),
-                                                    interval: 2 * Constants.secondsInHour) // TODO: GMK 2 * Constants.secondsInDay
+                                                    interval: 2 * Constants.secondsInDay)
         }
     }
     
@@ -227,7 +227,7 @@ class LocalNotificationModel {
                                                     userInfo: [Constants.openingProductKey : imageURLString],
                                                     identifier: identifier,
                                                     body: "notification.favorited.item.message".localized(withFormat: category),
-                                                    interval: 3 * Constants.secondsInHour) // TODO: GMK 3 * Constants.secondsInDay
+                                                    interval: 3 * Constants.secondsInDay)
         }
     }
     
@@ -241,7 +241,7 @@ class LocalNotificationModel {
         content.sound = UNNotificationSound.default()
         content.userInfo = [Constants.openingScreenKey  : Constants.openingScreenValueDiscover]
         
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 4 * Constants.secondsInHour, repeats: false)  // TODO: GMK 4 * Constants.secondsInDay
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 4 * Constants.secondsInDay, repeats: false)
         let request = UNNotificationRequest(identifier: LocalNotificationIdentifier.inactivityDiscover.rawValue,
                                             content: content,
                                             trigger: trigger)
