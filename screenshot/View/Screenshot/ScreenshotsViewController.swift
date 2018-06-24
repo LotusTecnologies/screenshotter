@@ -903,7 +903,7 @@ extension ScreenshotsViewController: UICollectionViewDataSource {
     }
     
     private func collectionViewImageReferenceSize(section: Int, isFooter: Bool = false) -> CGSize {
-        if isEditing {
+        if isEditing || collectionView.numberOfItems(inSection: section) == 0 {
             return CGSize(width: view.bounds.size.width, height: 0.1)
         }
         else {
