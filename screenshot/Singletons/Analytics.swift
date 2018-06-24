@@ -385,6 +385,8 @@ class AnalyticsTrackers : NSObject {
     let branch = BranchAnalyticsTracker()
     let recombee = RecombeeAnalyticsTracker()
 
+
+    
     class RecombeeAnalyticsTracker : NSObject {
         enum RecombeeEvent:String {
             case addBookmark
@@ -453,6 +455,7 @@ class AnalyticsTrackers : NSObject {
     
     
     class AmplitudeAnalyticsTracker : NSObject, AnalyticsTracker {
+
         func track(_ event: String, properties: [AnyHashable : Any]?, sendEvenIfAdvertisingTrackingIsOptOut: Bool?) {
             if  ASIdentifierManager.shared().isAdvertisingTrackingEnabled || sendEvenIfAdvertisingTrackingIsOptOut == true {
                 DispatchQueue.mainAsyncIfNeeded {

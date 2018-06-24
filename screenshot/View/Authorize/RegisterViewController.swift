@@ -171,26 +171,26 @@ class RegisterView: UIScrollView {
         forgotPasswordButton.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor, constant: verticalNegativeMargin).isActive = true
         forgotPasswordButton.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
         
+        skipButton.translatesAutoresizingMaskIntoConstraints = false
+        skipButton.contentEdgeInsets = UIEdgeInsets(top: 6, left: .padding, bottom: 6, right: .padding)
+        skipButton.setTitleColor(.gray3, for: .normal)
+        skipButton.setTitleColor(.gray5, for: .highlighted)
+        skipButton.alignImageRight()
+        skipButton.adjustInsetsForImage(withPadding: 6)
+        addSubview(skipButton)
+        skipButton.topAnchor.constraint(equalTo: contentView.bottomAnchor, constant: .marginY).isActive = true
+        skipButton.bottomAnchor.constraint(equalTo: verticalCenterLayoutView.bottomAnchor).isActive = true
+        skipButton.centerXAnchor.constraint(equalTo: layoutMarginsGuide.centerXAnchor).isActive = true
+        
         if isOnboardingLayout {
             let skipImage = UIImage(named: "OnboardingArrow")
-            
-            skipButton.translatesAutoresizingMaskIntoConstraints = false
-            skipButton.contentEdgeInsets = UIEdgeInsets(top: 6, left: .padding, bottom: 6, right: .padding)
-            skipButton.setTitle("generic.skip".localized, for: .normal)
-            skipButton.setTitleColor(.gray3, for: .normal)
-            skipButton.setTitleColor(.gray5, for: .highlighted)
             skipButton.setImage(skipImage, for: .normal)
             skipButton.setImage(skipImage?.withRenderingMode(.alwaysTemplate), for: .highlighted)
             skipButton.tintColor = skipButton.titleColor(for: .highlighted)
-            skipButton.alignImageRight()
-            skipButton.adjustInsetsForImage(withPadding: 6)
-            addSubview(skipButton)
-            skipButton.topAnchor.constraint(equalTo: contentView.bottomAnchor, constant: .marginY).isActive = true
-            skipButton.bottomAnchor.constraint(equalTo: verticalCenterLayoutView.bottomAnchor).isActive = true
-            skipButton.centerXAnchor.constraint(equalTo: layoutMarginsGuide.centerXAnchor).isActive = true
+            skipButton.setTitle("generic.skip".localized, for: .normal)
         }
         else {
-            contentView.bottomAnchor.constraint(equalTo: verticalCenterLayoutView.bottomAnchor).isActive = true
+            skipButton.setTitle("generic.cancel".localized, for: .normal)
         }
     }
     
@@ -344,7 +344,7 @@ class RegisterViewController: UIViewController {
     // MARK: Register
     
     private func isPasswordValid(_ password: String?) -> Bool {
-        if let password = password, !password.isEmpty, password.lengthOfBytes(using: .utf8) >= 8 {
+        if let _ = UserAccountManager.shared.validatePassword(password) {
             return true
         }
         else {
@@ -364,6 +364,8 @@ class RegisterViewController: UIViewController {
             let password = _view.passwordTextField.text,
             self.continueButton.isLoading == false
         {
+            self._view.emailTextField.resignFirstResponder()
+            self._view.passwordTextField.resignFirstResponder()
             self._view.emailTextField.isUserInteractionEnabled = false
             self._view.passwordTextField.isUserInteractionEnabled = false
             self.continueButton.isLoading = true
@@ -373,6 +375,7 @@ class RegisterViewController: UIViewController {
             UserAccountManager.shared.loginOrCreatAccountAsNeeded(email: email, password: password)
             .then { result -> Void in
                 if  result  == .unconfirmed {
+                    
                     self.delegate?.registerViewControllerNeedEmailConfirmation(self)
                 } else {
                     self.delegate?.registerViewControllerDidSignin(self)
@@ -399,7 +402,7 @@ class RegisterViewController: UIViewController {
                         self.present(alert, animated: true, completion: nil)
                     }else if UserAccountManager.shared.isWeakPasswordError(error: error) {
                         self._view.passwordTextField.isInvalid = true
-                        self._view.passwordTextField.errorText = "authorize.error.passwordInvalid.server".localized
+                        self._view.passwordTextField.errorText = "authorize.error.password_invalid.server".localized
 
                     }else {
                         let alert = UserAccountManager.shared.alertViewForUndefinedError(error: error, viewController: self)
@@ -426,7 +429,12 @@ class RegisterViewController: UIViewController {
             if !hasValidPassword {
                 Analytics.trackOnboardingLoginBadPassword()
                 _view.passwordTextField.isInvalid = true
-                _view.passwordTextField.errorText = "authorize.error.passwordInvalid".localized
+                if _view.passwordTextField.text == "password" {
+                    Analytics.trackFeaturePasswordIsPassword()
+                    _view.passwordTextField.errorText = "authorize.error.password_invalid_password".localized
+                }else{
+                    _view.passwordTextField.errorText = "authorize.error.password_invalid".localized
+                }
             }
             
             ActionFeedbackGenerator().actionOccurred(.nope)
@@ -466,6 +474,10 @@ class RegisterViewController: UIViewController {
     
     @objc fileprivate func facebookLoginAction() {
         Analytics.trackOnboardingFacebookStarted()
+        self.continueButton.isUserInteractionEnabled = false
+        self.skipButton.isUserInteractionEnabled = false
+        self.facebookLoginButton.isUserInteractionEnabled = false
+
         UserAccountManager.shared.loginWithFacebook().then
             { (result) -> Void in
             
@@ -478,9 +490,15 @@ class RegisterViewController: UIViewController {
             }
                 
         }.catch { (error) in
+            
             let e = error as NSError
             Analytics.trackOnboardingError(domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
             print("facebook login error: \(error)")
+        }.always {
+            self.continueButton.isUserInteractionEnabled = true
+            self.skipButton.isUserInteractionEnabled = true
+            self.facebookLoginButton.isUserInteractionEnabled = true
+
         }
     }
 }
