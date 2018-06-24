@@ -383,8 +383,19 @@ class AnalyticsTrackers : NSObject {
     let kochava = KochavaAnalyticsTracker()
     let amplitude = AmplitudeAnalyticsTracker()
     let branch = BranchAnalyticsTracker()
+    let pushwoosh = PushwooshAnalyticsTracker()
     let recombee = RecombeeAnalyticsTracker()
 
+    
+    class PushwooshAnalyticsTracker : NSObject, AnalyticsTracker {
+        func track(_ event: String, properties: [AnyHashable : Any]? = nil, sendEvenIfAdvertisingTrackingIsOptOut:Bool? = false ){
+
+        }
+        
+        func identify(_ user: AnalyticsUser) {
+            
+        }
+    }
     
     class RecombeeAnalyticsTracker : NSObject {
         enum RecombeeEvent:String {
