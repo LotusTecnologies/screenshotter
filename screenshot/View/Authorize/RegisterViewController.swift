@@ -191,8 +191,6 @@ class RegisterView: UIScrollView {
         }
         else {
             skipButton.setTitle("generic.cancel".localized, for: .normal)
-            
-            contentView.bottomAnchor.constraint(equalTo: verticalCenterLayoutView.bottomAnchor).isActive = true
         }
     }
     

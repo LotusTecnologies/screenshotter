@@ -180,9 +180,18 @@ class ProfileViewController: UITableViewController {
     private func syncLoggedIn() {
         let isLoggedIn = (UserAccountManager.shared.user?.isAnonymous == false)
         profileAccountView.isLoggedIn = isLoggedIn
-        profileAccountView.name = UserDefaults.standard.value(forKey: UserDefaultsKeys.name) as? String
-        profileAccountView.email = UserDefaults.standard.value(forKey: UserDefaultsKeys.email)  as? String
+        
         if isLoggedIn {
+            profileAccountView.name = UserDefaults.standard.string(forKey: UserDefaultsKeys.name)
+            profileAccountView.email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email)
+            
+            if let avatar = UserDefaults.standard.object(forKey: UserDefaultsKeys.avatar) as? UIImage {
+                profileAccountView.avatar = avatar
+            }
+            else {
+                profileAccountView.avatarURL = UserDefaults.standard.url(forKey: UserDefaultsKeys.avatarURL)
+            }
+            
             data[.logout] = [.logout]
         }
         else {
@@ -481,7 +490,6 @@ extension ProfileViewController {
             UserAccountManager.shared.logout().then(on: .main, execute: { () -> () in
                 self.syncLoggedIn()
             })
-            syncLoggedIn()
         }
     }
     

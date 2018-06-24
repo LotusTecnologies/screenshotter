@@ -119,12 +119,12 @@ class UserAccountManager : NSObject {
                             reject(error)
                         }
                     }else if let user = result?.user {
-                        if let name = user.displayName{
+                        if let name = user.providerData.first?.displayName {
                             self.databaseRef.child("users").child(user.uid).child("facebook-displayName").setValue(name)
                             self.databaseRef.child("users").child(user.uid).child("displayName").setValue(name)
-                            
+                            UserDefaults.standard.set(name, forKey: UserDefaultsKeys.name)
                         }
-                        if let email =  user.email{
+                        if let email = user.providerData.first?.email {
                             self.databaseRef.child("users").child(user.uid).child("facebook-email").setValue(email)
                             self.databaseRef.child("users").child(user.uid).child("email").setValue(email)
                             UserDefaults.standard.set(email, forKey: UserDefaultsKeys.email)
@@ -134,6 +134,7 @@ class UserAccountManager : NSObject {
                         }
                         if let photoURLString = user.providerData.first?.photoURL?.absoluteString {
                             self.databaseRef.child("users").child(user.uid).child("facebook-photoURL").setValue(photoURLString)
+                            UserDefaults.standard.set(URL(string: photoURLString), forKey: UserDefaultsKeys.avatarURL)
                         }
                         
                         self.userFromLogin = user
