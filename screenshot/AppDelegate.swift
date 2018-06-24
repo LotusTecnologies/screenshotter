@@ -105,7 +105,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         frameworkSetup(application, didFinishLaunchingWithOptions: launchOptions)
         
         SilentPushSubscriptionManager.sharedInstance.updateSubscriptionsIfNeeded()
-        
+        LocalNotificationModel.setup()
+
         NotificationCenter.default.addObserver(self, selector: #selector(badgeNumberDidChange(_:)), name: .ScreenshotUninformedAccumulatorModelDidChange, object: nil)
         
         if application.applicationState == .background,
@@ -652,11 +653,19 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
     
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         if let userInfo = response.notification.request.content.userInfo as? [String : Any] {
-            if let openingScreen = userInfo[Constants.openingScreenKey] as? String,
-                openingScreen == Constants.openingScreenValueScreenshot,
-                let openingAssetId = userInfo[Constants.openingAssetIdKey] as? String {
-                AssetSyncModel.sharedInstance.importPhotosToScreenshot(assetIds: [openingAssetId], source: .screenshot)
-                showScreenshotListTop()
+            if let openingScreen = userInfo[Constants.openingScreenKey] as? String {
+                if openingScreen == Constants.openingScreenValueScreenshot {
+                    if let openingAssetId = userInfo[Constants.openingAssetIdKey] as? String {
+                        AssetSyncModel.sharedInstance.importPhotosToScreenshot(assetIds: [openingAssetId], source: .screenshot)
+                    }
+                    showScreenshotListTop()
+                } else if openingScreen == Constants.openingScreenValueDiscover {
+                    if let mainTabBarController = self.window?.rootViewController as? MainTabBarController {
+                        mainTabBarController.goTo(tab: .discover)
+                    }
+                }
+            } else if let openingProductKey = userInfo[Constants.openingProductKey] as? String {
+                ProductViewController.present(imageURL: openingProductKey)
             } else if let aps = userInfo["aps"] as? [String : Any],
                 let category = aps["category"] as? String,
                 category == "PRICE_ALERT",
@@ -668,7 +677,18 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
         }
         
         completionHandler()
-        Analytics.trackAppOpenedFromLocalNotification()
+        switch response.notification.request.identifier {
+        case LocalNotificationIdentifier.inactivityDiscover.rawValue:
+            Analytics.trackAppOpenedFromTimedLocalNotification(source: .inactivityDiscover)
+        case LocalNotificationIdentifier.favoritedItem.rawValue:
+            Analytics.trackAppOpenedFromTimedLocalNotification(source: .favoritedItem)
+        case LocalNotificationIdentifier.tappedProduct.rawValue:
+            Analytics.trackAppOpenedFromTimedLocalNotification(source: .tappedProduct)
+        case LocalNotificationIdentifier.saleCount.rawValue:
+            Analytics.trackAppOpenedFromTimedLocalNotification(source: .saleCount)
+        default:
+            Analytics.trackAppOpenedFromLocalNotification()
+        }
     }
     
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
