@@ -45,7 +45,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         UNUserNotificationCenter.current().delegate = self
         
-        
+        let _ = UserAccountManager.shared.application(application, didFinishLaunchingWithOptions: launchOptions)
+
         window = UIWindow(frame: UIScreen.main.bounds)
         
         if DataModel.sharedInstance.storeNeedsMigration() {
@@ -416,14 +417,14 @@ extension AppDelegate : KochavaTrackerDelegate {
         Appsee.addEvent("App Launched", withProperties: ["version": Bundle.displayVersionBuild])
         
         Amplitude.instance().initializeApiKey(Constants.amplitudeApiKey)
-        
+        Amplitude.instance().trackingSessionEvents = true
+
         var trackerParametersDictionary: [AnyHashable: Any] = [:]
         trackerParametersDictionary[kKVAParamAppGUIDStringKey] = Constants.kocchavaGUIDKey
         trackerParametersDictionary[kKVAParamLogLevelEnumKey] = kKVALogLevelEnumInfo
         
         KochavaTracker.shared.configure(withParametersDictionary: trackerParametersDictionary, delegate: self)
                 
-        let _ = UserAccountManager.shared.application(application, didFinishLaunchingWithOptions: launchOptions)
         
         if UIApplication.isDev {
             Branch.setUseTestBranchKey(true)

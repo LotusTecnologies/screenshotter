@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SDWebImage
 
 protocol ProfileAccountViewDelegate: NSObjectProtocol {
     func profileAccountViewAuthorize(_ view: ProfileAccountView)
@@ -44,12 +45,26 @@ class ProfileAccountView: UIView {
     }
     
     var avatar: UIImage? {
-        set {
-            avatarButton.setBackgroundImage(newValue, for: .normal)
-            avatarButton.isSelected = newValue == nil
+        didSet {
+            avatarButton.setBackgroundImage(avatar, for: .normal)
+            avatarButton.isSelected = avatar == nil
+            UserDefaults.standard.set(avatar, forKey: UserDefaultsKeys.avatar)
+            UserDefaults.standard.synchronize()
         }
-        get {
-            return avatarButton.backgroundImage(for: .normal)
+    }
+    var avatarURL: URL? {
+        didSet {
+            if let url = avatarURL {
+                avatarButton.sd_setBackgroundImage(with: url, for: .normal) { (image, error, cacheType, url) in
+                    self.avatarButton.isSelected = error != nil
+                }
+            }
+            else {
+                avatarButton.setBackgroundImage(nil, for: .normal)
+                avatarButton.isSelected = true
+            }
+            UserDefaults.standard.set(avatarURL, forKey: UserDefaultsKeys.avatarURL)
+            UserDefaults.standard.synchronize()
         }
     }
     var name: String? {
@@ -203,7 +218,7 @@ class ProfileAccountView: UIView {
         loggedInContainerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
         loggedInContainerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         
-        let hasAvatar = avatar != nil
+        let hasAvatar = avatarURL != nil
         
         avatarButton.translatesAutoresizingMaskIntoConstraints = false
         avatarButton.addTarget(self, action: #selector(avatarAction), for: .touchUpInside)
@@ -378,6 +393,7 @@ class ProfileAccountView: UIView {
             return
         }
         
+        UserAccountManager.shared.setProfile(displayName: name, gender: nil, size: nil, unverifiedEmail: email)
         let user = AnalyticsUser(name: name, email: email)
         user.sendToServers()
     }
@@ -420,7 +436,6 @@ extension ProfileAccountView: UIImagePickerControllerDelegate, UINavigationContr
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         if let pickedImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
             avatar = pickedImage
-            // TODO: save image
         }
         
         picker.presentingViewController?.dismiss(animated: true)

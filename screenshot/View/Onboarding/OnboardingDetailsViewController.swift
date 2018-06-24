@@ -259,6 +259,7 @@ class OnboardingDetailsViewController: UIViewController {
     
     func updateUserProperties() {
         UserDefaults.standard.set(name, forKey: UserDefaultsKeys.name)
+        UserDefaults.standard.synchronize()
         
         let user = AnalyticsUser(name: self.name, email: UserAccountManager.shared.email)
         user.sendToServers()
