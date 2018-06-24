@@ -36,7 +36,6 @@
 
 "authorize.register.continue" = "Start Shopping";
 "authorize.register.continue.login" = "Log In";
-"authorize.register.continue.register" = "Sign Up";
 "authorize.register.email" = "Email Address";
 "authorize.register.forgot" = "Forgot Password?";
 "authorize.register.legal.0" = "By tapping \"Sign Up\" above, you agree to our ";
@@ -56,6 +55,9 @@
 "authorize.confirm.code" = "Enter Code";
 "authorize.confirm.explaination" = "An email was sent to %@.\nPlease click on the link that you recieved in the email.";
 
+"authorize.confirm.resend_code_in" = "Resend code in %@ seconds...";
+"authorize.confirm.resend_code" = "Resend Code";
+
 "authorize.reset_password.enter" = "Enter new password";
 "authorize.reset_password.failed_alert.title" = "Passwords Don’t Match";
 "authorize.reset_password.reenter" = "Re-enter password";
@@ -64,8 +66,9 @@
 "authorize.reset_password.title" = "Set New Password";
 "authorize.reset_password.explanation" = "An email was sent to %@.\nPlease click on the link that you recieved in the email to continue.";
 
-"authorize.error.passwordInvalid" = "password must be at least 8 characters long.";
-"authorize.error.passwordInvalid.server" = "use a better password";
+"authorize.error.password_invalid" = "password must be at least 8 characters long.";
+"authorize.error.password_invalid_password" = "password cannot be \"password\"";
+"authorize.error.password_invalid.server" = "use a better password";
 
 "authorize.error.noInternet" = "Unable to login. Check your connection and try again.";
 "authorize.error.undefined" = "Something weird happened. Sorry about that, try again.";
@@ -75,6 +78,8 @@
 "authorize.error.cantSendMail" = "We were unable to send an email to the address %@. Please make sure you entered it correctly.";
 "authorize.error.NoAccountWithEmail" = "No account associated with that email address";
 "authorize.error.wrongPassword" = "Password and email address don’t match";
+
+
 
 "cart.checkout.button" = "Checkout";
 "cart.checkout.total" = "Total: %@";
@@ -321,6 +326,10 @@
 "product.variants.quantity" = "Quantity";
 "product.variants.size" = "Size";
 "product.website" = "Go To %@";
+"product.sale_recovery.alert.title" = "Buy From Email";
+"product.sale_recovery.alert.message" = "Do you want an email with the item you just looked at so you can buy it on your computer?";
+"product.sale_recovery.alert.email_me" = "Email Me";
+"product.sale_recovery.email.subject" = "Screenshop Wishlist - %@";
 
 "products.details.similar" = "Similar Items";
 "products.helper.message" = "No visually similar products were detected";

@@ -24,6 +24,7 @@ class TutorialNavigationController : UINavigationController {
         
         let registerVC = RegisterViewController.init()
         registerVC.delegate = self
+        registerVC.isOnboardingLayout = true
         viewControllers = [registerVC]
         
         view.backgroundColor = .white
@@ -161,7 +162,7 @@ extension TutorialNavigationController: OnboardingDetailsViewControllerDelegate 
         let size = viewController.size
         
         func saveData() {
-            UserAccountManager.shared.setProfile(displayName: name, gender: gender, size: size)
+            UserAccountManager.shared.setProfile(displayName: name, gender: gender, size: size, unverifiedEmail: nil)
             Analytics.trackOnboardingProfileSubmit(name: name, gender: gender, size: size)
         }
         

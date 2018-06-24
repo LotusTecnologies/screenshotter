@@ -164,4 +164,8 @@ extension RatingFlowController : EggRatingDelegate {
     func didIgnoreToRateOnAppStore() {
         delegate?.controllerDidCancel(self, inPhase: .AppStore)
     }
+    
+    func didDissmissThankYouDialog() {
+        
+    }
 }

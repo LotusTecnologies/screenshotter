@@ -87,7 +87,6 @@
 		311A506D20D90B780001D463 /* ResetPasswordViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A4FB320D90B760001D463 /* ResetPasswordViewController.swift */; };
 		311A506E20D90B780001D463 /* RegisterConfirmationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A4FB420D90B760001D463 /* RegisterConfirmationViewController.swift */; };
 		311A506F20D90B780001D463 /* RegisterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A4FB520D90B760001D463 /* RegisterViewController.swift */; };
-		311A507020D90B780001D463 /* RegisterExistingTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A4FB620D90B760001D463 /* RegisterExistingTextField.swift */; };
 		311A507120D90B780001D463 /* AutoresizingTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A4FB920D90B760001D463 /* AutoresizingTableView.swift */; };
 		311A507220D90B780001D463 /* TableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A4FBA20D90B760001D463 /* TableView.swift */; };
 		311A507320D90B780001D463 /* ErrorCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A4FBC20D90B760001D463 /* ErrorCollectionViewCell.swift */; };
@@ -166,6 +165,11 @@
 		311A50C320D90B780001D463 /* FormTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A501F20D90B770001D463 /* FormTableViewCell.swift */; };
 		311A50C420D90B780001D463 /* FormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A502020D90B770001D463 /* FormView.swift */; };
 		311A50C520D90B780001D463 /* Form.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A502120D90B770001D463 /* Form.swift */; };
+		311A50C920DAB2EF0001D463 /* RecoverLostSaleManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A50C820DAB2EF0001D463 /* RecoverLostSaleManager.swift */; };
+		311A50CD20DAB4CC0001D463 /* productEmailitem.html in Resources */ = {isa = PBXBuildFile; fileRef = 311A50CA20DAB4CB0001D463 /* productEmailitem.html */; };
+		311A50CE20DAB4CC0001D463 /* productEmailfooter.html in Resources */ = {isa = PBXBuildFile; fileRef = 311A50CB20DAB4CB0001D463 /* productEmailfooter.html */; };
+		311A50CF20DAB4CC0001D463 /* productEmailheader.html in Resources */ = {isa = PBXBuildFile; fileRef = 311A50CC20DAB4CC0001D463 /* productEmailheader.html */; };
+		311A50D120DBD9EE0001D463 /* ResendCodeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A50D020DBD9EE0001D463 /* ResendCodeManager.swift */; };
 		3125446B2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		3125446C2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		3125446D2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
@@ -356,7 +360,6 @@
 		311A4FB320D90B760001D463 /* ResetPasswordViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResetPasswordViewController.swift; sourceTree = "<group>"; };
 		311A4FB420D90B760001D463 /* RegisterConfirmationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegisterConfirmationViewController.swift; sourceTree = "<group>"; };
 		311A4FB520D90B760001D463 /* RegisterViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegisterViewController.swift; sourceTree = "<group>"; };
-		311A4FB620D90B760001D463 /* RegisterExistingTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegisterExistingTextField.swift; sourceTree = "<group>"; };
 		311A4FB920D90B760001D463 /* AutoresizingTableView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoresizingTableView.swift; sourceTree = "<group>"; };
 		311A4FBA20D90B760001D463 /* TableView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableView.swift; sourceTree = "<group>"; };
 		311A4FBC20D90B760001D463 /* ErrorCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ErrorCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -435,6 +438,11 @@
 		311A501F20D90B770001D463 /* FormTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FormTableViewCell.swift; sourceTree = "<group>"; };
 		311A502020D90B770001D463 /* FormView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FormView.swift; sourceTree = "<group>"; };
 		311A502120D90B770001D463 /* Form.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Form.swift; sourceTree = "<group>"; };
+		311A50C820DAB2EF0001D463 /* RecoverLostSaleManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoverLostSaleManager.swift; sourceTree = "<group>"; };
+		311A50CA20DAB4CB0001D463 /* productEmailitem.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = productEmailitem.html; sourceTree = "<group>"; };
+		311A50CB20DAB4CB0001D463 /* productEmailfooter.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = productEmailfooter.html; sourceTree = "<group>"; };
+		311A50CC20DAB4CC0001D463 /* productEmailheader.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = productEmailheader.html; sourceTree = "<group>"; };
+		311A50D020DBD9EE0001D463 /* ResendCodeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResendCodeManager.swift; sourceTree = "<group>"; };
 		31254460209079C7009410D5 /* screenshot-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "screenshot-Bridging-Header.h"; sourceTree = "<group>"; };
 		3125448E209871B4009410D5 /* Analytics+api.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Analytics+api.swift"; sourceTree = "<group>"; };
 		314C4889205E86E700B8381D /* PHAsset+craze.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PHAsset+craze.swift"; sourceTree = "<group>"; };
@@ -728,6 +736,7 @@
 				311A4F9420D90B740001D463 /* ProductsCollectionView.swift */,
 				311A4F9520D90B740001D463 /* ProductHeaderCollectionViewCell.swift */,
 				311A4F9620D90B740001D463 /* ProductCollectionViewManager.swift */,
+				311A50C820DAB2EF0001D463 /* RecoverLostSaleManager.swift */,
 				311A4F9720D90B740001D463 /* ProductsRateView.swift */,
 				311A4F9820D90B740001D463 /* SectionBackgroundCollectionViewFlowLayout.swift */,
 			);
@@ -792,10 +801,10 @@
 			children = (
 				311A4FB120D90B760001D463 /* InitiateResetPasswordViewController.swift */,
 				311A4FB220D90B760001D463 /* ConfirmCodeViewController.swift */,
+				311A50D020DBD9EE0001D463 /* ResendCodeManager.swift */,
 				311A4FB320D90B760001D463 /* ResetPasswordViewController.swift */,
 				311A4FB420D90B760001D463 /* RegisterConfirmationViewController.swift */,
 				311A4FB520D90B760001D463 /* RegisterViewController.swift */,
-				311A4FB620D90B760001D463 /* RegisterExistingTextField.swift */,
 			);
 			path = Authorize;
 			sourceTree = "<group>";
@@ -1076,6 +1085,9 @@
 				C50EE26D1FC406F1002B4259 /* Fonts */,
 				C5CAF2791FCC0EFD006F37DC /* ISO4217.plist */,
 				C53B15BC1FDD638C00658A78 /* Localizable.strings */,
+				311A50CB20DAB4CB0001D463 /* productEmailfooter.html */,
+				311A50CC20DAB4CC0001D463 /* productEmailheader.html */,
+				311A50CA20DAB4CB0001D463 /* productEmailitem.html */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -1406,10 +1418,13 @@
 				C572FF01205C00070046BFEB /* Hind-SemiBold.ttf in Resources */,
 				C5CAF27A1FCC0EFD006F37DC /* ISO4217.plist in Resources */,
 				C5DC531B20CD3F2100E90DB8 /* Quicksand-Regular.ttf in Resources */,
+				311A50CE20DAB4CC0001D463 /* productEmailfooter.html in Resources */,
 				C5DC531C20CD3F2100E90DB8 /* Quicksand-Light.ttf in Resources */,
 				C572FEFE205C00070046BFEB /* Hind-Light.ttf in Resources */,
 				C572FF02205C00070046BFEB /* Hind-Medium.ttf in Resources */,
+				311A50CF20DAB4CC0001D463 /* productEmailheader.html in Resources */,
 				E4139D501F09083B00E8A53B /* Assets.xcassets in Resources */,
+				311A50CD20DAB4CC0001D463 /* productEmailitem.html in Resources */,
 				C572FF00205C00070046BFEB /* Hind-Regular.ttf in Resources */,
 				C572FEFF205C00070046BFEB /* Hind-Bold.ttf in Resources */,
 				E4DB2B7C1F7E1D4600320BE5 /* LaunchScreen.storyboard in Resources */,
@@ -1542,6 +1557,7 @@
 				311A503920D90B780001D463 /* CheckoutPaymentListViewController.swift in Sources */,
 				311A506820D90B780001D463 /* ScreenshotsDeleteButton.swift in Sources */,
 				311A509E20D90B780001D463 /* FloatingActionButton.swift in Sources */,
+				311A50C920DAB2EF0001D463 /* RecoverLostSaleManager.swift in Sources */,
 				311A508720D90B780001D463 /* ScreenshotShareManager.swift in Sources */,
 				52E547441FE2487B00627D6D /* ScreenshotHelper.swift in Sources */,
 				316C831620C3AEBD0012A908 /* Shoppable+craze.swift in Sources */,
@@ -1660,7 +1676,6 @@
 				311A508E20D90B780001D463 /* DimmedPresentationController.swift in Sources */,
 				311A505920D90B780001D463 /* FavoriteControl.swift in Sources */,
 				311A506320D90B780001D463 /* ScreenshotCollectionViewCell.swift in Sources */,
-				311A507020D90B780001D463 /* RegisterExistingTextField.swift in Sources */,
 				E49261D6206A704C006FE84E /* UIImage+craze.swift in Sources */,
 				311A504D20D90B780001D463 /* RelatedLooksManager.swift in Sources */,
 				311A509B20D90B780001D463 /* BorderButton.swift in Sources */,
@@ -1698,6 +1713,7 @@
 				311A506C20D90B780001D463 /* ConfirmCodeViewController.swift in Sources */,
 				E44CA6FC1F41E608001CB493 /* NetworkingPromise.swift in Sources */,
 				311A502220D90B780001D463 /* ProductWebViewController.swift in Sources */,
+				311A50D120DBD9EE0001D463 /* ResendCodeManager.swift in Sources */,
 				311A506920D90B780001D463 /* PickerCollectionViewCell.swift in Sources */,
 				311A50B220D90B780001D463 /* ProfileViewController.swift in Sources */,
 				311A508F20D90B780001D463 /* InputViewAdjustsScrollViewController.swift in Sources */,
