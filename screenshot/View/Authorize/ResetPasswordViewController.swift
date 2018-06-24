@@ -206,7 +206,7 @@ class ResetPasswordViewController: UIViewController {
                             self.present(alert, animated: true, completion: nil)
                         }else if UserAccountManager.shared.isWeakPasswordError(error: error) {
                             self._view.newPasswordTextField.isInvalid = true
-                            self._view.newPasswordTextField.errorText = "authorize.error.passwordInvalid.server".localized
+                            self._view.newPasswordTextField.errorText = "authorize.error.password_invalid.server".localized
                        }else {
                             let alert = UserAccountManager.shared.alertViewForUndefinedError(error: error, viewController: self)
                             self.present(alert, animated: true, completion: nil)
@@ -224,7 +224,12 @@ class ResetPasswordViewController: UIViewController {
 
             if password == nil {
                 _view.newPasswordTextField.isInvalid = true
-                _view.newPasswordTextField.errorText = "authorize.error.passwordInvalid".localized
+                if _view.newPasswordTextField.text == "password" {
+                    Analytics.trackFeaturePasswordIsPassword()
+                    _view.newPasswordTextField.errorText = "authorize.error.password_invalid_password".localized
+                }else{
+                    _view.newPasswordTextField.errorText = "authorize.error.password_invalid".localized
+                }
             }
             
             ActionFeedbackGenerator().actionOccurred(.nope)

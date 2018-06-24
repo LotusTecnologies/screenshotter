@@ -344,7 +344,7 @@ class RegisterViewController: UIViewController {
     // MARK: Register
     
     private func isPasswordValid(_ password: String?) -> Bool {
-        if let password = password, !password.isEmpty, password.lengthOfBytes(using: .utf8) >= 8 {
+        if let _ = UserAccountManager.shared.validatePassword(password) {
             return true
         }
         else {
@@ -402,7 +402,7 @@ class RegisterViewController: UIViewController {
                         self.present(alert, animated: true, completion: nil)
                     }else if UserAccountManager.shared.isWeakPasswordError(error: error) {
                         self._view.passwordTextField.isInvalid = true
-                        self._view.passwordTextField.errorText = "authorize.error.passwordInvalid.server".localized
+                        self._view.passwordTextField.errorText = "authorize.error.password_invalid.server".localized
 
                     }else {
                         let alert = UserAccountManager.shared.alertViewForUndefinedError(error: error, viewController: self)
@@ -429,7 +429,12 @@ class RegisterViewController: UIViewController {
             if !hasValidPassword {
                 Analytics.trackOnboardingLoginBadPassword()
                 _view.passwordTextField.isInvalid = true
-                _view.passwordTextField.errorText = "authorize.error.passwordInvalid".localized
+                if _view.passwordTextField.text == "password" {
+                    Analytics.trackFeaturePasswordIsPassword()
+                    _view.passwordTextField.errorText = "authorize.error.password_invalid_password".localized
+                }else{
+                    _view.passwordTextField.errorText = "authorize.error.password_invalid".localized
+                }
             }
             
             ActionFeedbackGenerator().actionOccurred(.nope)

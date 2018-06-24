@@ -63,8 +63,9 @@
 "authorize.reset_password.title" = "Set New Password";
 "authorize.reset_password.explanation" = "An email was sent to %@.\nPlease click on the link that you recieved in the email to continue.";
 
-"authorize.error.passwordInvalid" = "password must be at least 8 characters long.";
-"authorize.error.passwordInvalid.server" = "use a better password";
+"authorize.error.password_invalid" = "password must be at least 8 characters long.";
+"authorize.error.password_invalid_password" = "password cannot be \"password\"";
+"authorize.error.password_invalid.server" = "use a better password";
 
 "authorize.error.noInternet" = "Unable to login. Check your connection and try again.";
 "authorize.error.undefined" = "Something weird happened. Sorry about that, try again.";

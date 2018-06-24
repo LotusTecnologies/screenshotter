@@ -293,7 +293,7 @@ class UserAccountManager : NSObject {
     }
     
     public func validatePassword(_ password: String?) -> String? {
-        if let password = password, !password.isEmpty, password.lengthOfBytes(using: .utf8) >= 8 {
+        if let password = password, !password.isEmpty, password.lengthOfBytes(using: .utf8) >= 8, password != "password" {
             return password
         }
         return nil
