@@ -63,6 +63,10 @@ class Analytics {
             properties["screenshot-imageURL"] = uploadedImageURL
         }
         
+        if let remoteId = matchstick.remoteId {
+            properties["screenshot-id"] = remoteId
+        }
+        
         self.addScreenshotProperitesFrom(trackingData: matchstick.trackingInfo, toProperties: &properties)
         
         return properties
@@ -379,8 +383,24 @@ class AnalyticsTrackers : NSObject {
     let kochava = KochavaAnalyticsTracker()
     let amplitude = AmplitudeAnalyticsTracker()
     let branch = BranchAnalyticsTracker()
+    let recombee = RecombeeAnalyticsTracker()
 
     
+    class RecombeeAnalyticsTracker : NSObject {
+        enum RecombeeEvent:String {
+            case addBookmark
+            case positiveRating
+            case negativeRating
+            case detailView    // burrow
+            case addToCart   //whent o safari
+        }
+        
+        func track(event:RecombeeEvent, itemId:String){
+            
+        }
+       
+    }
+
     class AppseeAnalyticsTracker : NSObject, AnalyticsTracker {
         func track(_ event: String, properties: [AnyHashable : Any]? = nil, sendEvenIfAdvertisingTrackingIsOptOut:Bool? = false ){
             if  ASIdentifierManager.shared().isAdvertisingTrackingEnabled || sendEvenIfAdvertisingTrackingIsOptOut == true {
