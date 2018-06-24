@@ -11,7 +11,7 @@ import SDWebImage
 import Hero
 class ProductDetailViewController: BaseViewController { 
     var productCollectionViewManager = ProductCollectionViewManager()
-
+    var recoverLostSaleManager = RecoverLostSaleManager()
     var collectionView:UICollectionView?
     var product:Product?
     var products:[Product] = []
@@ -42,7 +42,7 @@ class ProductDetailViewController: BaseViewController {
         self.title = product?.calculatedDisplayTitle
         self.relatedLooksManager.delegate = self
         self.productsOptions.delegate = self
-        
+        self.recoverLostSaleManager.delegate = self
         if let shoppable = self.shoppable {
             productsFRC = DataModel.sharedInstance.productFrc(delegate: self, shoppableOID: shoppable.objectID)
             
@@ -261,6 +261,7 @@ extension ProductDetailViewController : UICollectionViewDelegateFlowLayout, UICo
         if indexPath.section == 1{
             let product = self.productAtIndex(indexPath.item)
             product.recordViewedProduct()
+            self.recoverLostSaleManager.didClick(on: product)
             if let productViewController = presentProduct(product, atLocation: .burrowList) {
                 productViewController.similarProducts = products
             }
@@ -318,6 +319,7 @@ extension ProductDetailViewController : UICollectionViewDelegateFlowLayout, UICo
         }
 
         if  indexPath.section == 0, let product = self.product {
+            self.recoverLostSaleManager.didClick(on: product)
             if let productViewController = presentProduct(product, atLocation: .burrownMain) {
                 productViewController.similarProducts = products
             }
@@ -476,5 +478,13 @@ extension ProductDetailViewController: RelatedLooksManagerDelegate {
         
     }
     
+    
+}
+
+
+extension ProductDetailViewController: RecoverLostSaleManagerDelegate {
+    func recoverLostSaleManager(_ manager:RecoverLostSaleManager, returnedFrom product:Product){
+        self.recoverLostSaleManager.presetRecoverAlertViewFor(product: product, in: self)
+    }
     
 }
