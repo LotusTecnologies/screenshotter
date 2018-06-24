@@ -28,7 +28,7 @@ class RegisterView: UIScrollView {
     let skipButton = UIButton()
     
     var activeTextFieldTopOffset: CGFloat {
-        return horizontalLinesView.frame.maxY - _layoutMargins.top
+        return horizontalLinesView.frame.maxY - UIApplication.shared.statusBarFrame.height
     }
     
     var verticalNegativeMargin: CGFloat {
@@ -52,33 +52,18 @@ class RegisterView: UIScrollView {
             backgroundColor = UIColor(patternImage: backgroundImage)
         }
         
-        let verticalLayoutHeightConstant: CGFloat = {
-            let statusBarHeight = UIApplication.shared.statusBarFrame.height
-            
-            if #available(iOS 11.0, *) {
-                return statusBarHeight
-            }
-            else {
-                return -statusBarHeight
-            }
-        }()
-        
-        // Force the height to be at least that of the scroll view
-        let verticalLayoutView = UIView()
-        verticalLayoutView.translatesAutoresizingMaskIntoConstraints = false
-        verticalLayoutView.isHidden = true
-        addSubview(verticalLayoutView)
-        verticalLayoutView.topAnchor.constraint(equalTo: topAnchor).isActive = true
-        verticalLayoutView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
-        verticalLayoutView.heightAnchor.constraint(greaterThanOrEqualTo: layoutMarginsGuide.heightAnchor, constant: verticalLayoutHeightConstant).isActive = true
-        
-        let verticalCenterLayoutGuide = UILayoutGuide()
-        addLayoutGuide(verticalCenterLayoutGuide)
-        verticalCenterLayoutGuide.topAnchor.constraint(greaterThanOrEqualTo: topAnchor).isActive = true
-        verticalCenterLayoutGuide.leadingAnchor.constraint(equalTo: leadingAnchor).isActive = true
-        verticalCenterLayoutGuide.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor).isActive = true
-        verticalCenterLayoutGuide.widthAnchor.constraint(equalTo: widthAnchor).isActive = true
-        verticalCenterLayoutGuide.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
+        let verticalCenterLayoutView = UIView()
+        verticalCenterLayoutView.translatesAutoresizingMaskIntoConstraints = false
+        verticalCenterLayoutView.isHidden = true
+        verticalCenterLayoutView.setContentCompressionResistancePriority(.required, for: .vertical)
+        addSubview(verticalCenterLayoutView)
+        let verticalTopConstraint = verticalCenterLayoutView.topAnchor.constraint(greaterThanOrEqualTo: topAnchor)
+        verticalTopConstraint.priority = .defaultHigh
+        verticalTopConstraint.isActive = true
+        let verticalBottomConstraint = verticalCenterLayoutView.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor)
+        verticalBottomConstraint.priority = .defaultHigh
+        verticalBottomConstraint.isActive = true
+        verticalCenterLayoutView.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
         
         var onboardingByLine: UILabel?
         
@@ -90,14 +75,14 @@ class RegisterView: UIScrollView {
             welcomeTo.font = UIFont.screenshopFont(.quicksand, size: 15)
             welcomeTo.textColor = UIColor.gray3
             addSubview(welcomeTo)
-            welcomeTo.topAnchor.constraint(equalTo: verticalCenterLayoutGuide.topAnchor).isActive = true
+            welcomeTo.topAnchor.constraint(equalTo: verticalCenterLayoutView.topAnchor).isActive = true
             welcomeTo.centerXAnchor.constraint(equalTo: layoutMarginsGuide.centerXAnchor).isActive = true
             
             let screenshopImageView = UIImageView.init(image: UIImage.init(named: "LaunchLogo"))
             screenshopImageView.translatesAutoresizingMaskIntoConstraints = false
             addSubview(screenshopImageView)
-            screenshopImageView.topAnchor.constraint(equalTo: welcomeTo.lastBaselineAnchor, constant: .padding).isActive = true
-            screenshopImageView.centerXAnchor.constraint(equalTo: welcomeTo.centerXAnchor).isActive = true
+            screenshopImageView.topAnchor.constraint(equalTo: welcomeTo.bottomAnchor, constant: .marginY).isActive = true
+            screenshopImageView.centerXAnchor.constraint(equalTo: layoutMarginsGuide.centerXAnchor).isActive = true
             
             let byLine = UILabel.init()
             byLine.text = "authorize.register.byline".localized
@@ -105,10 +90,14 @@ class RegisterView: UIScrollView {
             byLine.translatesAutoresizingMaskIntoConstraints = false
             byLine.font = UIFont.screenshopFont(.quicksandMedium, size: 20)
             byLine.textColor = UIColor.gray3
+            byLine.adjustsFontSizeToFitWidth = true
+            byLine.minimumScaleFactor = 0.7
+            byLine.baselineAdjustment = .alignCenters
             addSubview(byLine)
-            byLine.topAnchor.constraint(equalTo: screenshopImageView.bottomAnchor, constant: .padding ).isActive = true
-            byLine.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
-            byLine.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
+            byLine.topAnchor.constraint(equalTo: screenshopImageView.bottomAnchor, constant: .marginY).isActive = true
+            byLine.leadingAnchor.constraint(greaterThanOrEqualTo: layoutMarginsGuide.leadingAnchor).isActive = true
+            byLine.trailingAnchor.constraint(lessThanOrEqualTo: layoutMarginsGuide.trailingAnchor).isActive = true
+            byLine.centerXAnchor.constraint(equalTo: layoutMarginsGuide.centerXAnchor).isActive = true
             onboardingByLine = byLine
         }
         
@@ -118,29 +107,23 @@ class RegisterView: UIScrollView {
             facebookLoginButton.topAnchor.constraint(equalTo: byLine.bottomAnchor, constant: .extendedPadding).isActive = true
         }
         else {
-            facebookLoginButton.topAnchor.constraint(equalTo: verticalCenterLayoutGuide.topAnchor).isActive = true
+            facebookLoginButton.topAnchor.constraint(equalTo: verticalCenterLayoutView.topAnchor).isActive = true
         }
         facebookLoginButton.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
         facebookLoginButton.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
-        
-        let horizontalLinesLayoutGuide = UILayoutGuide()
-        addLayoutGuide(horizontalLinesLayoutGuide)
-        horizontalLinesLayoutGuide.topAnchor.constraint(equalTo: facebookLoginButton.bottomAnchor, constant: .padding).isActive = true
         
         horizontalLinesView.translatesAutoresizingMaskIntoConstraints = false
         horizontalLinesView.label.text = "generic.or".localized
         horizontalLinesView.leftLine.backgroundColor = .gray6
         horizontalLinesView.rightLine.backgroundColor = .gray6
         addSubview(horizontalLinesView)
-        horizontalLinesView.topAnchor.constraint(equalTo: horizontalLinesLayoutGuide.topAnchor).isActive = true
-        horizontalLinesView.bottomAnchor.constraint(equalTo: horizontalLinesLayoutGuide.bottomAnchor).isActive = true
+        horizontalLinesView.topAnchor.constraint(equalTo: facebookLoginButton.bottomAnchor, constant: .marginY).isActive = true
         horizontalLinesView.centerXAnchor.constraint(equalTo: layoutMarginsGuide.centerXAnchor).isActive = true
-        horizontalLinesView.centerYAnchor.constraint(equalTo: horizontalLinesLayoutGuide.centerYAnchor).isActive = true
         horizontalLinesView.widthAnchor.constraint(equalToConstant: 170).isActive = true
         
         contentView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(contentView)
-        contentView.topAnchor.constraint(equalTo: horizontalLinesLayoutGuide.bottomAnchor, constant: .padding).isActive = true
+        contentView.topAnchor.constraint(equalTo: horizontalLinesView.bottomAnchor, constant: .marginY).isActive = true
         contentView.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
         contentView.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor, constant: -_layoutMargins.bottom).isActive = true
         contentView.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
@@ -177,45 +160,37 @@ class RegisterView: UIScrollView {
         
         let color: UIColor = .crazeRed
         
-        // TODO: underline
         forgotPasswordButton.translatesAutoresizingMaskIntoConstraints = false
         forgotPasswordButton.setTitle("authorize.register.forgot".localized, for: .normal)
         forgotPasswordButton.setTitleColor(color, for: .normal)
         forgotPasswordButton.setTitleColor(color.darker(), for: .highlighted)
-        forgotPasswordButton.contentEdgeInsets = UIEdgeInsets(top: 6 + .padding, left: .padding, bottom: 6, right: .padding)
+        forgotPasswordButton.contentEdgeInsets = UIEdgeInsets(top: 6, left: .padding, bottom: 6, right: .padding)
         contentView.addSubview(forgotPasswordButton)
-        forgotPasswordButton.topAnchor.constraint(equalTo: continueButton.bottomAnchor).isActive = true
+        forgotPasswordButton.topAnchor.constraint(equalTo: continueButton.bottomAnchor, constant: .marginY).isActive = true
         forgotPasswordButton.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
         forgotPasswordButton.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor, constant: verticalNegativeMargin).isActive = true
         forgotPasswordButton.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
         
+        skipButton.translatesAutoresizingMaskIntoConstraints = false
+        skipButton.contentEdgeInsets = UIEdgeInsets(top: 6, left: .padding, bottom: 6, right: .padding)
+        skipButton.setTitleColor(.gray3, for: .normal)
+        skipButton.setTitleColor(.gray5, for: .highlighted)
+        skipButton.alignImageRight()
+        skipButton.adjustInsetsForImage(withPadding: 6)
+        addSubview(skipButton)
+        skipButton.topAnchor.constraint(equalTo: contentView.bottomAnchor, constant: .marginY).isActive = true
+        skipButton.bottomAnchor.constraint(equalTo: verticalCenterLayoutView.bottomAnchor).isActive = true
+        skipButton.centerXAnchor.constraint(equalTo: layoutMarginsGuide.centerXAnchor).isActive = true
+        
         if isOnboardingLayout {
-            let skipLayoutGuide = UILayoutGuide()
-            addLayoutGuide(skipLayoutGuide)
-            skipLayoutGuide.topAnchor.constraint(equalTo: contentView.bottomAnchor, constant: .padding).isActive = true
-            skipLayoutGuide.bottomAnchor.constraint(equalTo: verticalCenterLayoutGuide.bottomAnchor).isActive = true
-            skipLayoutGuide.heightAnchor.constraint(equalTo: horizontalLinesLayoutGuide.heightAnchor).isActive = true
-            
             let skipImage = UIImage(named: "OnboardingArrow")
-            
-            skipButton.translatesAutoresizingMaskIntoConstraints = false
-            skipButton.contentEdgeInsets = UIEdgeInsets(top: 6, left: .padding, bottom: 6, right: .padding)
-            skipButton.setTitle("generic.skip".localized, for: .normal)
-            skipButton.setTitleColor(.gray3, for: .normal)
-            skipButton.setTitleColor(.gray5, for: .highlighted)
             skipButton.setImage(skipImage, for: .normal)
             skipButton.setImage(skipImage?.withRenderingMode(.alwaysTemplate), for: .highlighted)
             skipButton.tintColor = skipButton.titleColor(for: .highlighted)
-            skipButton.alignImageRight()
-            skipButton.adjustInsetsForImage(withPadding: 6)
-            addSubview(skipButton)
-            skipButton.topAnchor.constraint(greaterThanOrEqualTo: skipLayoutGuide.topAnchor).isActive = true
-            skipButton.bottomAnchor.constraint(lessThanOrEqualTo: skipLayoutGuide.bottomAnchor).isActive = true
-            skipButton.centerXAnchor.constraint(equalTo: layoutMarginsGuide.centerXAnchor).isActive = true
-            skipButton.centerYAnchor.constraint(equalTo: skipLayoutGuide.centerYAnchor).isActive = true
+            skipButton.setTitle("generic.skip".localized, for: .normal)
         }
         else {
-            contentView.bottomAnchor.constraint(equalTo: verticalCenterLayoutGuide.bottomAnchor).isActive = true
+            skipButton.setTitle("generic.cancel".localized, for: .normal)
         }
     }
     
@@ -369,7 +344,7 @@ class RegisterViewController: UIViewController {
     // MARK: Register
     
     private func isPasswordValid(_ password: String?) -> Bool {
-        if let password = password, !password.isEmpty, password.lengthOfBytes(using: .utf8) >= 8 {
+        if let _ = UserAccountManager.shared.validatePassword(password) {
             return true
         }
         else {
@@ -389,6 +364,8 @@ class RegisterViewController: UIViewController {
             let password = _view.passwordTextField.text,
             self.continueButton.isLoading == false
         {
+            self._view.emailTextField.resignFirstResponder()
+            self._view.passwordTextField.resignFirstResponder()
             self._view.emailTextField.isUserInteractionEnabled = false
             self._view.passwordTextField.isUserInteractionEnabled = false
             self.continueButton.isLoading = true
@@ -398,6 +375,7 @@ class RegisterViewController: UIViewController {
             UserAccountManager.shared.loginOrCreatAccountAsNeeded(email: email, password: password)
             .then { result -> Void in
                 if  result  == .unconfirmed {
+                    
                     self.delegate?.registerViewControllerNeedEmailConfirmation(self)
                 } else {
                     self.delegate?.registerViewControllerDidSignin(self)
@@ -424,7 +402,7 @@ class RegisterViewController: UIViewController {
                         self.present(alert, animated: true, completion: nil)
                     }else if UserAccountManager.shared.isWeakPasswordError(error: error) {
                         self._view.passwordTextField.isInvalid = true
-                        self._view.passwordTextField.errorText = "authorize.error.passwordInvalid.server".localized
+                        self._view.passwordTextField.errorText = "authorize.error.password_invalid.server".localized
 
                     }else {
                         let alert = UserAccountManager.shared.alertViewForUndefinedError(error: error, viewController: self)
@@ -451,7 +429,12 @@ class RegisterViewController: UIViewController {
             if !hasValidPassword {
                 Analytics.trackOnboardingLoginBadPassword()
                 _view.passwordTextField.isInvalid = true
-                _view.passwordTextField.errorText = "authorize.error.passwordInvalid".localized
+                if _view.passwordTextField.text == "password" {
+                    Analytics.trackFeaturePasswordIsPassword()
+                    _view.passwordTextField.errorText = "authorize.error.password_invalid_password".localized
+                }else{
+                    _view.passwordTextField.errorText = "authorize.error.password_invalid".localized
+                }
             }
             
             ActionFeedbackGenerator().actionOccurred(.nope)
@@ -477,8 +460,6 @@ class RegisterViewController: UIViewController {
         }
     }
     
-    
-    
     // MARK: Forgot
     
     @objc private func forgotPasswordAction() {
@@ -493,6 +474,10 @@ class RegisterViewController: UIViewController {
     
     @objc fileprivate func facebookLoginAction() {
         Analytics.trackOnboardingFacebookStarted()
+        self.continueButton.isUserInteractionEnabled = false
+        self.skipButton.isUserInteractionEnabled = false
+        self.facebookLoginButton.isUserInteractionEnabled = false
+
         UserAccountManager.shared.loginWithFacebook().then
             { (result) -> Void in
             
@@ -505,15 +490,18 @@ class RegisterViewController: UIViewController {
             }
                 
         }.catch { (error) in
+            
             let e = error as NSError
             Analytics.trackOnboardingError(domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
             print("facebook login error: \(error)")
+        }.always {
+            self.continueButton.isUserInteractionEnabled = true
+            self.skipButton.isUserInteractionEnabled = true
+            self.facebookLoginButton.isUserInteractionEnabled = true
+
         }
-        
-        
     }
 }
-    
 
 extension RegisterViewController: InputViewAdjustsScrollViewControllerDelegate {
     func inputViewAdjustsScrollViewControllerWillShow(_ controller: InputViewAdjustsScrollViewController) {
