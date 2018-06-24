@@ -398,7 +398,9 @@ extension ScreenshotsViewController {
                 contentView.translatesAutoresizingMaskIntoConstraints = false
                 backgroundView.addSubview(contentView)
                 
-                contentView.topAnchor.constraint(equalTo: self.topLayoutGuide.bottomAnchor, constant:layout.minimumLineSpacing).isActive = true
+                let topConstant = collectionViewImageReferenceSize(section: Section.image.rawValue).height + layout.minimumLineSpacing
+                    
+                contentView.topAnchor.constraint(equalTo: self.topLayoutGuide.bottomAnchor, constant: topConstant).isActive = true
                 contentView.trailingAnchor.constraint(equalTo: backgroundView.trailingAnchor, constant:-layout.minimumInteritemSpacing).isActive = true
                 contentView.widthAnchor.constraint(equalTo: backgroundView.widthAnchor,multiplier:0.5, constant:-layout.minimumInteritemSpacing * 1.5).isActive = true
                 contentView.heightAnchor.constraint(equalTo: backgroundView.widthAnchor,multiplier:Screenshot.ratio.height, constant:0).isActive = true
