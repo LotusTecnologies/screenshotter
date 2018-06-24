@@ -65,6 +65,7 @@ class UserAccountManager : NSObject {
     }
     var email:String?
     lazy var databaseRef:DatabaseReference = Database.database().reference()
+    lazy var storageRef:StorageReference = Storage.storage().reference()
 
     static let shared = UserAccountManager()
 
@@ -172,6 +173,8 @@ class UserAccountManager : NSObject {
             })
         })
     }
+    
+    
     
     
     public func loginOrCreatAccountAsNeeded(email:String, password:String) -> Promise<LoginOrCreateAccountResult> {
@@ -728,6 +731,35 @@ extension UserAccountManager {
             self.databaseRef.child("users").child(user.uid).child("screenshots").child(assetId).setValue(dict)
         }
 
+    }
+}
+
+extension UserAccountManager {
+    public func uploadImage(data:Data) -> Promise<URL> {
+        return Promise { fulfill, reject in
+            if let user = self.user {
+                let name = UUID().uuidString
+                let uploadRef = storageRef.child("user").child(user.uid).child("images").child("\(name).jpg")
+                
+                let uploadTask = uploadRef.putData(data, metadata: nil) { (metadata, error) in
+                    if let error = error {
+                        reject(error)
+                    }else{
+                        uploadRef.downloadURL { url, error in
+                            if let error = error {
+                                reject(error)
+                            } else if let url = url{
+                                fulfill(url)
+                            }else{
+                                reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+                            }
+                        }
+                    }
+                }
+            }else{
+                reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+            }
+        }
     }
 }
 
