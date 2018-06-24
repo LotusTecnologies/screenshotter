@@ -17,7 +17,8 @@ class ResetPasswordView: UIScrollView {
     let newPasswordTextField = UnderlineTextField()
     let continueButton = MainButton()
     let cancelButton = UIButton()
-    
+    let resendButton = UIButton()
+
     let _layoutMargins = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
     
     // MARK: Life Cycle
@@ -116,9 +117,17 @@ class ResetPasswordView: UIScrollView {
         continueButton.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor).isActive = true
         continueButton.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
         
+        
+        resendButton.translatesAutoresizingMaskIntoConstraints = false
+        resendButton.contentEdgeInsets = UIEdgeInsets(top: 6, left: .padding, bottom: 6, right: .padding)
+        addSubview(resendButton)
+        resendButton.topAnchor.constraint(equalTo: contentView.bottomAnchor, constant: .padding).isActive = true
+        resendButton.centerXAnchor.constraint(equalTo: layoutMarginsGuide.centerXAnchor).isActive = true
+        
+        
         let skipLayoutGuide = UILayoutGuide()
         addLayoutGuide(skipLayoutGuide)
-        skipLayoutGuide.topAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
+        skipLayoutGuide.topAnchor.constraint(equalTo: resendButton.bottomAnchor).isActive = true
         
         cancelButton.translatesAutoresizingMaskIntoConstraints = false
         cancelButton.contentEdgeInsets = UIEdgeInsets(top: 6, left: .padding, bottom: 6, right: .padding)
@@ -134,6 +143,8 @@ class ResetPasswordView: UIScrollView {
 
 class ResetPasswordViewController: UIViewController {
     weak var delegate: ResetPasswordViewControllerDelegate?
+    private var resendCodeManager = ResendCodeManager()
+
     var email:String?
     var code:String? {
         didSet {
@@ -172,6 +183,10 @@ class ResetPasswordViewController: UIViewController {
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         _view.addGestureRecognizer(tapGesture)
+        
+        _view.resendButton.addTarget(self, action: #selector(resendCodeAction), for: .touchUpInside)
+        resendCodeManager.start(with: _view.resendButton)
+
     }
     
     deinit {
@@ -239,6 +254,33 @@ class ResetPasswordViewController: UIViewController {
     @objc private func cancelAction() {
         delegate?.resetPasswordViewControllerDidCancel(self)
     }
+    @objc private func resendCodeAction() {
+        resendCodeManager.start(with: self._view.resendButton)
+        if let email = self.email {
+            UserAccountManager.shared.forgotPassword(email: email)
+                .then(on: .main) { () -> Void in
+                    
+                }.catch { (error) in
+                    DispatchQueue.main.async {
+                        let error = error as NSError
+                        if UserAccountManager.shared.isNoInternetError(error: error) {
+                            let alert = UserAccountManager.shared.alertViewForNoInternet()
+                            self.present(alert, animated: true, completion: nil)
+                        }else if UserAccountManager.shared.isNoAccountWithEmailError(error: error) {
+                            let alert = UserAccountManager.shared.alertViewForNoAccountWithEmail()
+                            self.present(alert, animated: true, completion: nil)
+                        }else if UserAccountManager.shared.isCantSendEmailError(error: error) {
+                            let alert = UserAccountManager.shared.alertViewForCantSendEmail(email: email)
+                            self.present(alert, animated: true, completion: nil)
+                        }else {
+                            let alert = UserAccountManager.shared.alertViewForUndefinedError(error: error, viewController: self)
+                            self.present(alert, animated: true, completion: nil)
+                        }
+                    }
+            }
+        }
+    }
+    
     
     // MARK: Password
     private func validatePassword(_ password: String?) -> String? {

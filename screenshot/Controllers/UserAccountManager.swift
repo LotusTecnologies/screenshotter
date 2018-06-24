@@ -286,9 +286,20 @@ class UserAccountManager : NSObject {
         }
     }
     
-    func resendConfirmCode(email:String) -> Promise<Void>{
+    func resendConfirmCode() -> Promise<Void>{
         return Promise { fulfill, reject in
-            reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+            if let user = self.user {
+                user.sendEmailVerification(completion: { (error) in
+                    if let error = error {
+                        reject(error)
+                    }else{
+                        fulfill(())
+                    }
+                })
+            }else{
+                reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+            }
+            
         }
     }
     
