@@ -126,18 +126,19 @@ class LocalNotificationModel {
         })
     }
 
-    func scheduleImageLocalNotification(copiedTmpURL: URL, userInfo: [String : Any], identifier: String, body: String, interval: TimeInterval) {
+    func scheduleImageLocalNotification(copiedTmpURL: URL?, userInfo: [String : Any], identifier: String, body: String, interval: TimeInterval) {
         let content = UNMutableNotificationContent()
         content.body = body
         content.sound = UNNotificationSound.default()
         content.userInfo = userInfo
-        do {
-            let attachment = try UNNotificationAttachment(identifier: identifier,
-                                                          url: copiedTmpURL,
-                                                          options: [UNNotificationAttachmentOptionsTypeHintKey : kUTTypeImage])
-            content.attachments = [attachment]
-        } catch {
-            print("Local notification attachment error:\(error)")
+        if let copiedTmpURL = copiedTmpURL {
+            do {
+                let attachment = try UNNotificationAttachment(identifier: identifier,
+                                                              url: copiedTmpURL)
+                content.attachments = [attachment]
+            } catch {
+                print("Local notification attachment error:\(error)")
+            }
         }
 
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: interval, repeats: false)
@@ -151,7 +152,6 @@ class LocalNotificationModel {
                 switch identifier {
                 case LocalNotificationIdentifier.inactivityDiscover.rawValue:
                     Analytics.trackTimedLocalNotificationScheduled(source: .inactivityDiscover)
-                    print("Schedule timedLocalNotificationInactivityDiscover happens elsewhere. WTF?")
                 case LocalNotificationIdentifier.favoritedItem.rawValue:
                     Analytics.trackTimedLocalNotificationScheduled(source: .favoritedItem)
                 case LocalNotificationIdentifier.tappedProduct.rawValue:
@@ -236,22 +236,11 @@ class LocalNotificationModel {
             return
         }
         
-        let content = UNMutableNotificationContent()
-        content.body = "notification.inactivity.discover.message".localized
-        content.sound = UNNotificationSound.default()
-        content.userInfo = [Constants.openingScreenKey  : Constants.openingScreenValueDiscover]
-        
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 4 * Constants.secondsInDay, repeats: false)
-        let request = UNNotificationRequest(identifier: LocalNotificationIdentifier.inactivityDiscover.rawValue,
-                                            content: content,
-                                            trigger: trigger)
-        UNUserNotificationCenter.current().add(request, withCompletionHandler: { (error) in
-            if let error = error {
-                print("scheduleInactivityDiscoverLocalNotification identifier:\(LocalNotificationIdentifier.inactivityDiscover.rawValue)  error:\(error)")
-            } else {
-                Analytics.trackTimedLocalNotificationScheduled(source: .inactivityDiscover)
-            }
-        })
+        self.scheduleImageLocalNotification(copiedTmpURL: nil,
+                                            userInfo: [Constants.openingScreenKey : Constants.openingScreenValueDiscover],
+                                            identifier: LocalNotificationIdentifier.inactivityDiscover.rawValue,
+                                            body: "notification.inactivity.discover.message".localized,
+                                            interval: 4 * Constants.secondsInDay)
     }
     
 }
