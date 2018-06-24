@@ -33,6 +33,7 @@ extension Matchstick {
                     managedObjectContext.delete(matchstick)
                 }
                 managedObjectContext.saveIfNeeded()
+                Analytics.trackScreenshotCreated(screenshot: addedScreenshot)
                 AssetSyncModel.sharedInstance.processingQ.async {
                     AssetSyncModel.sharedInstance.syteProcessing(imageData: nil, orImageUrlString: uploadedImageURL, assetId: assetId, optionsMask: ProductsOptionsMask.global)
                     

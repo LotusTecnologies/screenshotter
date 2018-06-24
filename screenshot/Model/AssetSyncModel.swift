@@ -177,9 +177,10 @@ extension AssetSyncModel {
                                                                                               syteJsonString: nil)
                                 addedScreenshot.isNew = false //Always entered immediatly when added
                                 
+                                
                                 // download stye stuff for URL
                                 AssetSyncModel.sharedInstance.syteProcessing(imageData: nil, orImageUrlString: urlString, assetId: urlString)
-                                
+                                Analytics.trackScreenshotCreated(screenshot: addedScreenshot)
                                 if let callback = callback {
                                     let addedScreenshotOID = addedScreenshot.objectID
                                     DispatchQueue.main.async {
@@ -226,6 +227,8 @@ extension AssetSyncModel {
                 
                 managedObjectContext.saveIfNeeded()
                 self.syteProcessing(imageData: smallImageData, orImageUrlString:nil, assetId: assetId)
+                Analytics.trackCreatedPhoto()
+                Analytics.trackScreenshotCreated(screenshot: screenshot)
 
             }
         }))
@@ -247,6 +250,7 @@ extension AssetSyncModel {
                                 classification.utf8.count == 1 { // Previously dual-purposed syteJson for imageClassification of "h" (human) or "f" (furniture)
                                 screenshot.syteJson = nil
                             }
+                            let wasHidden = screenshot.isHidden
                             
                             if screenshot.shoppablesCount > 0 {
                                 screenshot.hideWorkhorse()
@@ -264,6 +268,9 @@ extension AssetSyncModel {
                             screenshot.submittedFeedbackCountDate = nil
                             
                             managedObjectContext.saveIfNeeded()
+                            if wasHidden {
+                                Analytics.trackScreenshotCreated(screenshot: screenshot)
+                            }
                             fulfill((imageData, screenshot.uploadedImageURL, screenshot.syteJson))
                         }else{
                             let screenshot = Screenshot(context: managedObjectContext)
@@ -326,7 +333,7 @@ extension AssetSyncModel {
             }.then(on: self.processingQ) { (imageData, screenshotDict) -> Promise< [String : Any]> in
                 return Promise(resolvers: { (fulfil, reject) in
                     self.performBackgroundTask(assetId: shareId, shoppableId: nil) { (context) in
-                        let _ = DataModel.sharedInstance.saveScreenshot(managedObjectContext: context,
+                        let screenshot = DataModel.sharedInstance.saveScreenshot(managedObjectContext: context,
                                                                 assetId: shareId,
                                                                 createdAt: Date(),
                                                                 isRecognized: true,
@@ -335,6 +342,8 @@ extension AssetSyncModel {
                                                                 imageData: imageData,
                                                                 uploadedImageURL: nil,
                                                                 syteJsonString: nil)
+                        Analytics.trackScreenshotCreated(screenshot: screenshot)
+                        
                         fulfil(screenshotDict)
                     }
                 })
@@ -484,7 +493,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                             }else{
                                 let isHidden = ( !isRecognized || !isForeground)
                                 let syteJsonString = NetworkingPromise.sharedInstance.jsonStringify(object: syteJson)
-                                let _ = DataModel.sharedInstance.saveScreenshot(managedObjectContext: managedObjectContext,
+                                let screenshot = DataModel.sharedInstance.saveScreenshot(managedObjectContext: managedObjectContext,
                                                                                 assetId: asset.localIdentifier,
                                                                                 createdAt: asset.creationDate,
                                                                                 isRecognized: isRecognized,
@@ -493,6 +502,9 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                                                                                 imageData: imageData,
                                                                                 uploadedImageURL: uploadedImageURL,
                                                                                 syteJsonString: syteJsonString)
+                                if screenshot.isHidden == false {
+                                    Analytics.trackScreenshotCreated(screenshot: screenshot)
+                                }
 
                                 fulfill((imageData, uploadedImageURL, syteJson))
                             }
@@ -677,6 +689,7 @@ extension AssetSyncModel {
                         classification.utf8.count == 1 { // Previously dual-purposed syteJson for imageClassification of "h" (human) or "f" (furniture)
                         screenshot.syteJson = nil
                     }
+                    let wasHidden  = screenshot.isHidden
                     if screenshot.shoppablesCount > 0 {
                         screenshot.hideWorkhorse()
                     }
@@ -686,6 +699,9 @@ extension AssetSyncModel {
                     screenshot.isRecognized = true
                     screenshot.lastModified = Date()
                     managedObjectContext.saveIfNeeded()
+                    if wasHidden {
+                        Analytics.trackScreenshotCreated(screenshot: screenshot)
+                    }
                     fulfill(imageData)
                 } else {
                     let error = NSError(domain: "Craze", code: 18, userInfo: [NSLocalizedDescriptionKey : "Could not retreive screenshot with assetId:\(assetId)"])
@@ -1361,7 +1377,7 @@ extension AssetSyncModel {
                 getData.then(on: self.processingQ) { imageData -> Promise<Data?> in
                         return Promise { fulfill, reject in
                             self.performBackgroundTask(assetId: Constants.tutorialScreenshotAssetId, shoppableId: nil) { (managedObjectContext) in
-                                let _ = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
+                                let screenshot = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
                                                                  assetId: Constants.tutorialScreenshotAssetId,
                                                                  createdAt: Date(),
                                                                  isRecognized: true,
@@ -1370,6 +1386,7 @@ extension AssetSyncModel {
                                                                  imageData: imageData,
                                                                  uploadedImageURL: nil,
                                                                  syteJsonString: nil)
+                                Analytics.trackScreenshotCreated(screenshot: screenshot)
                                 fulfill(imageData)
                             }
                         }
