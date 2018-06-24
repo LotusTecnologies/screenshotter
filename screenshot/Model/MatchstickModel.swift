@@ -8,10 +8,37 @@
 
 import UIKit
 import PromiseKit
+protocol MatchstickModel {
+    func prepareMatchsticks()
+    func fetchNextIfBelowWatermark()
+}
 
-class MatchstickModel: NSObject {
+class RecombeeMatchstickModel: NSObject, MatchstickModel {
+    func prepareMatchsticks() {
+        
+    }
     
-    public static let shared = MatchstickModel()
+    func fetchNextIfBelowWatermark() {
+        
+    }
+    
+    public static let shared = RecombeeMatchstickModel()
+    var downloadMatchsitckQueue:OperationQueue = {
+        var queue = OperationQueue()
+        queue.name = "Download matchsticks Queue"
+        queue.maxConcurrentOperationCount = 2
+        return queue
+    }()
+    
+    let serialQ = DispatchQueue(label: "io.crazeapp.screenshot.matchsticks.serial")
+    let processingQ = DispatchQueue.global(qos: .utility)
+    private(set) var isFetchingNext = false
+
+}
+
+class AWSMatchstickModel: NSObject, MatchstickModel {
+    
+    public static let shared = AWSMatchstickModel()
     var downloadMatchsitckQueue:OperationQueue = {
         var queue = OperationQueue()
         queue.name = "Download matchsticks Queue"
@@ -24,6 +51,13 @@ class MatchstickModel: NSObject {
     private(set) var isFetchingNext = false
     
     public func prepareMatchsticks() {
+        NetworkingPromise.sharedInstance.createRecombeeUser(userId: AnalyticsUser.current.identifier).then { (dict) -> Void in
+            print("dict :\(dict)")
+            
+            
+            }.catch { (error) in
+                print("error :\(error)")
+        }
         serialQ.async {
             if self.isFetchingNext {
                 print("prepareMatchsticks is already fetching next matchsticks. What??")

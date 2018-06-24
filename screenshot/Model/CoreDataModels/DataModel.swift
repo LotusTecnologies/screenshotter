@@ -94,7 +94,7 @@ class DataModel: NSObject {
                         self.postDbMigration(from: lastDbVersionMigrated, to: Constants.currentMomVersion, container: self.persistentContainer)
                         UserDefaults.standard.set(Constants.currentMomVersion, forKey: UserDefaultsKeys.lastDbVersionMigrated)
                     }
-                    MatchstickModel.shared.prepareMatchsticks()
+                    AWSMatchstickModel.shared.prepareMatchsticks()
                     self.dbQ.isSuspended = false
                     
                     fulfill(true)
