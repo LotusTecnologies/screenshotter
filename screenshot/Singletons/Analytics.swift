@@ -394,6 +394,32 @@ class AnalyticsTrackers : NSObject {
             case negativeRating
             case detailView    // burrow
             case addToCart   //whent o safari
+            
+            func path() -> String{
+                switch self {
+                case .addBookmark:
+                    return "bookmarks"
+                case .positiveRating, .negativeRating:
+                    return "ratings"
+                case .detailView:
+                    return "detailviews"
+                case .addToCart:
+                    return "cartadditions"
+                }
+            }
+            func postData() -> [String:Any]? {
+                switch self {
+                case .addBookmark:
+                    return "bookmarks"
+                case .positiveRating:
+                case .negativeRating:
+                    return "ratings"
+                case .detailView:
+                    return "detailviews"
+                case .addToCart:
+                    return "cartadditions"
+                }
+            }
         }
         
         func track(event:RecombeeEvent, itemId:String){

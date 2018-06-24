@@ -301,32 +301,35 @@ class NetworkingPromise : NSObject {
         return promise
     }
     
-    func createRecombeeUser(userId:String) ->Promise<NSDictionary> {
-
+    private func recombeeRequest(path:String, method:String, postData:[String:Any]? ) -> Promise<NSDictionary> {
         let hostName = "rapi.recombee.com"
         let databaseId = "screenshop"
         let hmac_timestamp = String(Int(NSDate().timeIntervalSince1970))
-        let path = "/\(databaseId)/users/\(userId)?hmac_timestamp=\(hmac_timestamp)"
+        let partialPath = "/\(databaseId)/\(path)/?hmac_timestamp=\(hmac_timestamp)"
         let recombeeKey = "TJVMFkb5sq4aaIXJGTCrCzPKsjxuyV8RLZOBlXt9QhGQSVOLNgy4jp3lqdlOc8Gn"
-        let hmac_sign = path.hmac(algorithm: .SHA1, key: recombeeKey)
-        let urlString = "https://\(hostName)\(path)&hmac_sign=\(hmac_sign)"
+        let hmac_sign = partialPath.hmac(algorithm: .SHA1, key: recombeeKey)
+        let urlString = "https://\(hostName)\(partialPath)&hmac_sign=\(hmac_sign)"
         
-        let testKey = "gahpiev6eighaig1aek4ujietheiXeengae3Ohqu9iecutheof5rooxeigheel8G"
-        let hmacSignTest1 = "Hello world".hmac(algorithm: .SHA1, key: testKey)
-        let hmacSignTest2 = "/recombee/items/9346/recomms/?count=5&targetUserId=fb2fbe12-9f69-45a1-9fc0-df0c1592e4c7&hmac_timestamp=1398463889".hmac(algorithm: .SHA1, key: testKey)
-        print("hmac 1 :\(hmacSignTest1), test two: \(hmacSignTest2)")
         if let url = URL.init(string: urlString ) {
             var request = URLRequest.init(url: url )
-            request.httpMethod = "POST"
+            request.httpMethod = method
             request.addValue("application/json", forHTTPHeaderField: "Accept")
             request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            
+            if let postData = postData {
+                
+            }
             let sessionConfiguration = URLSessionConfiguration.default
             sessionConfiguration.timeoutIntervalForRequest = 60
             let promise = URLSession(configuration: sessionConfiguration).dataTask(with: request).asDictionary()
             return promise
         }
         return Promise.init(error: NSError.init(domain: #file, code: #line, userInfo: [NSLocalizedDescriptionKey:"unable to make url\(urlString)"]))
+        
+    }
+    
+    func createRecombeeUser(userId:String) ->Promise<NSDictionary> {
+        let path = "users/\(userId)"
+        return recombeeRequest(path: path, method: "PUT", postData: nil)
     }
     
     func downloadImageData(urlString: String) -> Promise<Data> {

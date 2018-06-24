@@ -74,18 +74,7 @@ enum HMACAlgorithm {
         return Int(result)
     }
 }
-extension NSData {
-    func base16EncodedString(uppercase uppercase: Bool = false) -> String {
-        let buffer = UnsafeBufferPointer<UInt8>(start: UnsafePointer(self.bytes),
-                                                count: self.length)
-        let hexFormat = uppercase ? "X" : "x"
-        let formatString = "%02\(hexFormat)"
-        let bytesAsHexStrings = buffer.map {
-            String(format: formatString, $0)
-        }
-        return bytesAsHexStrings.joinWithSeparator("")
-    }
-}
+
 extension String {
     func hmac(algorithm: HMACAlgorithm, key: String) -> String {
         let cKey = key.cString(using: .utf8)
@@ -93,7 +82,7 @@ extension String {
         var result = [CUnsignedChar](repeating: 0, count: Int(algorithm.digestLength()))
         CCHmac(algorithm.toCCHmacAlgorithm(), cKey!, strlen(cKey!), cData!, strlen(cData!), &result)
         let hmacData:NSData = NSData(bytes: result, length: (Int(algorithm.digestLength())))
-//        let hmacBase64 = hmacData.base64EncodedString(options: NSData.Base64EncodingOptions.lineLength76Characters)
-        return hmacData.base16EncodedString()
+        let dataString = (hmacData as Data).map { b in String(format: "%02X", b) }.joined().lowercased()
+        return dataString
     }
 }
