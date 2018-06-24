@@ -272,9 +272,6 @@ extension AssetSyncModel {
                                 Analytics.trackScreenshotCreated(screenshot: screenshot)
                             }
                             fulfill((imageData, screenshot.uploadedImageURL, screenshot.syteJson))
-                            if source == .gallery {
-                                
-                            }
                         }else{
                             let screenshot = Screenshot(context: managedObjectContext)
                             screenshot.assetId = assetLocalIdentifier
