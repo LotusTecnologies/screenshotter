@@ -344,6 +344,10 @@ class UserAccountManager : NSObject {
             UserDefaults.standard.setValue(agreedToEmail, forKey: UserDefaultsKeys.gdpr_agreedToEmail)
             UserDefaults.standard.setValue(agreedToImageDetection, forKey: UserDefaultsKeys.gdpr_agreedToImageDetection)
             
+            if agreedToImageDetection {
+                SilentPushSubscriptionManager.sharedInstance.updateSubscriptionsIfNeeded()
+            }
+            
             let promise = makeAnonAccountPromise ?? Promise.init(value:())
             promise.then(execute: { () -> Void in
                 if let user = self.user {
