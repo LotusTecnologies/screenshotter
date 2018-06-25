@@ -432,7 +432,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
             self.recoverLostSaleManager.didClick(on: product)
             if let productViewController = presentProduct(product, atLocation: .products) {
                 productViewController.similarProducts = products
-            }            
+            }
         }
         else if sectionType == .relatedLooks {
             if let url = self.relatedLooksManager.relatedLook(at:indexPath.row) {

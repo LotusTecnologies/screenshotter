@@ -15,8 +15,8 @@ import Branch
 import PromiseKit
 import Amplitude_iOS
 import AdSupport
+import Pushwoosh
 import Firebase
-
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -73,7 +73,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UIApplication.migrateUserDefaultsKeys()
         UIApplication.appearanceSetup()
         UserFeedback.shared.applicationDidFinishLaunching() // only setups notificationCenter observing. does nothing now
-
+        PWInAppManager.shared().setUserId(AnalyticsUser.current.identifier)
         return true
     }
     
@@ -131,6 +131,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
 
+        if PermissionsManager.shared.permissionStatus(for: .push) == .authorized {
+            PermissionsManager.shared.requestPermission(for: .push)
+        }
         
         return true
     }
@@ -274,7 +277,77 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if !handled {
             handled = FBSDKApplicationDelegate.sharedInstance().application(app, open: url, options: options)
         }
+        if !handled {
+            handled = self.handleDeepLink(application: app, url: url, options: options)
+        }
+        print("open url: \(url.absoluteString)")
         return handled
+    }
+    
+    func handleDeepLink(application:UIApplication, url:URL, options:[UIApplicationOpenURLOptionsKey : Any] ) -> Bool {
+        let urlString = url.absoluteString
+        if urlString.hasPrefix("screenshop://openTab/") {
+            if let mainTabBarController = self.window?.rootViewController as? MainTabBarController {
+                let page = urlString.components(separatedBy: "/").last?.lowercased()
+                var tab: MainTabBarController.TabIndex? = nil
+                switch page {
+                case "favorites", "favorite":
+                    tab = .favorites
+                case "discover", "matchstick":
+                    tab = .discover
+                case "screenshots", "main":
+                    tab = .screenshots
+                case "profile":
+                    tab = .profile
+//                case "cart":
+//                    tab = .cart
+                default:
+                    tab = nil
+                }
+                if let tab = tab {
+                    mainTabBarController.goTo(tab: tab)
+                    return true
+                }
+            }
+        }
+        else if urlString.hasPrefix("screenshop://openWebLink/") {
+            let pathComponents = url.pathComponents
+            if pathComponents.count >= 4 {
+                let browser = pathComponents[1]
+                let link = String(urlString.suffix(from: "screenshop://openWebLink/\(browser)/".endIndex))
+                print("GMK  browser:\(browser)  link:\(link)")
+                if browser == "default" {
+                    if let vc = AppDelegate.shared.window?.rootViewController {
+                        OpenWebPage.present(urlString: link, fromViewController: vc)
+                        return true
+                    }
+                }
+            }
+        }
+        else if urlString.hasPrefix("screenshop://addScreenshot/") {
+            let prefix = "screenshop://addScreenshot/"
+            
+            if let prefixRange = urlString.range(of: prefix) {
+                var screenshotUrlString = urlString
+                screenshotUrlString.removeSubrange(prefixRange)
+                AssetSyncModel.sharedInstance.uploadPhoto(imageUrlString: screenshotUrlString, source: .pushWoosh)
+                
+                if let mainTabBarController = self.window?.rootViewController as? MainTabBarController {
+                    mainTabBarController.dismiss(animated: true)
+                }
+                
+                PWInbox.loadMessages { (messages, error) in
+                    let codes = messages?.compactMap({ message -> String? in
+                        return message.isActionPerformed ? message.code : nil
+                    })
+                    
+                    if let codes = codes {
+                        PWInbox.deleteMessages(withCodes: codes)
+                    }
+                }
+            }
+        }
+        return false
     }
     
     func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([Any]?) -> Void) -> Bool {
@@ -472,7 +545,14 @@ extension AppDelegate : KochavaTrackerDelegate {
             }
         }
         
-    
+        FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
+        
+        // Pushwoosh
+        PushNotificationManager.push().delegate = self
+        UNUserNotificationCenter.current().delegate = PushNotificationManager.push().notificationCenterDelegate // TODO: GMK already set to self in willFinishLaunching
+        PushNotificationManager.push().sendAppOpen()
+        PushNotificationManager.push().registerForPushNotifications()
+        
     }
     
     fileprivate func frameworkSetupMainViewDidLoad() {
@@ -548,8 +628,21 @@ extension AppDelegate : TutorialNavigationControllerDelegate {
 
 // MARK: - Push Notifications
 
-extension AppDelegate {
+extension AppDelegate: PushNotificationDelegate {
+    
+    //this event is fired when the push gets received
+    func onPushReceived(_ pushManager: PushNotificationManager!, withNotification pushNotification: [AnyHashable : Any]!, onStart: Bool) {
+        print("pushwoosh notification received: \(pushNotification)")
+        // shows a push is received. Implement passive reaction to a push here, such as UI update or data download.
+    }
+    //this event is fired when user taps the notification
+    func onPushAccepted(_ pushManager: PushNotificationManager!, withNotification pushNotification: [AnyHashable : Any]!, onStart: Bool) {
+        print("pushwoosh notification accepted: \(pushNotification)")
+        // shows a user tapped the notification. Implement user interaction, such as showing push details
+    }
+    
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        PushNotificationManager.push().handlePushRegistration(deviceToken)
         
         UserDefaults.standard.set(deviceToken, forKey: UserDefaultsKeys.deviceToken)
         UserDefaults.standard.synchronize()
@@ -560,12 +653,15 @@ extension AppDelegate {
     }
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
-         let e = error as NSError
+        PushNotificationManager.push().handlePushRegistrationFailure(error)
+        
+        let e = error as NSError
         Analytics.trackError(type: nil, domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
     }
 
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         ApplicationStateModel.sharedInstance.applicationState = application.applicationState
+        print("GMK AppDelegate application didReceiveRemoteNotification userInfo:\(userInfo)")
 
         if let aps = userInfo["aps"] as? NSDictionary, let category = aps["category"] as? String, category == "MATCHSTICK_LIKES", let likeUpdates = userInfo["likeUpdates"] as? [[String:Any]]{
             DataModel.sharedInstance.performBackgroundTask { (context) in
@@ -613,11 +709,14 @@ extension AppDelegate {
                    completionHandler(.newData)
                 }
             }
-        }else{
-            if let aps = userInfo["aps"] as? NSDictionary, let category = aps["category"] as? String, category == "PRICE_ALERT",  let partNumber = userInfo["partNumber"] as? String{
-                let product = DataModel.sharedInstance.retrieveProduct(managedObjectContext: DataModel.sharedInstance.mainMoc(), partNumber: partNumber)
-                Analytics.trackProductPriceAlertRecieved(product: product)
-            }
+        } else if let aps = userInfo["aps"] as? NSDictionary, let category = aps["category"] as? String, category == "PRICE_ALERT",  let partNumber = userInfo["partNumber"] as? String{
+            let product = DataModel.sharedInstance.retrieveProduct(managedObjectContext: DataModel.sharedInstance.mainMoc(), partNumber: partNumber)
+            Analytics.trackProductPriceAlertRecieved(product: product)
+            completionHandler(.noData)
+        } else {
+            PushNotificationManager.push().handlePushReceived(userInfo)  // pushwoosh
+            Branch.getInstance().handlePushNotification(userInfo)
+
             // Only spin up a background task if we are already in the background
             if application.applicationState == .background {
                 if bgTask != UIBackgroundTaskInvalid {
@@ -635,8 +734,6 @@ extension AppDelegate {
             } else {
                 completionHandler(.noData)
             }
-            
-            Branch.getInstance().handlePushNotification(userInfo)
         }
     }
     
@@ -660,6 +757,7 @@ extension AppDelegate {
 extension AppDelegate : UNUserNotificationCenterDelegate {
     
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        print("GMK AppDelegate userNotificationCenter didReceive response:\(response)")
         if let userInfo = response.notification.request.content.userInfo as? [String : Any] {
             if let openingScreen = userInfo[Constants.openingScreenKey] as? String {
                 if openingScreen == Constants.openingScreenValueScreenshot {
@@ -700,6 +798,7 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
     }
     
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        print("GMK AppDelegate userNotificationCenter willPresent notification:\(notification)")
         let category = notification.request.content.categoryIdentifier
         let options: UNNotificationPresentationOptions = category == "PRICE_ALERT" ? [.alert, .badge, .sound] : []
         completionHandler(options)

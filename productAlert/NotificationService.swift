@@ -1,46 +1,66 @@
 //
 //  NotificationService.swift
-//  productAlert
-//
-//  Created by Gershon Kagan on 3/19/18.
-//  Copyright © 2018 crazeapp. All rights reserved.
+//  Pushwoosh SDK
+//  (c) Pushwoosh 2017
 //
 
 import UserNotifications
 
 class NotificationService: UNNotificationServiceExtension {
-
+    
     var contentHandler: ((UNNotificationContent) -> Void)?
     var bestAttemptContent: UNMutableNotificationContent?
-
+    
     override func didReceive(_ request: UNNotificationRequest, withContentHandler contentHandler: @escaping (UNNotificationContent) -> Void) {
         self.contentHandler = contentHandler
         bestAttemptContent = (request.content.mutableCopy() as? UNMutableNotificationContent)
         
-        if let bestAttemptContent = bestAttemptContent {
-            // Modify the notification content here...
-            
-            if let attachmentURLString = request.content.userInfo["media-url"] as? String,
-              let attachmentURL = URL(string: attachmentURLString) {
-                let uniqueId = UUID().uuidString
-                let tmpImageFileUrl = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(uniqueId).appendingPathExtension(attachmentURL.pathExtension)
-                print("NotificationService saving media from:\(attachmentURL)  to:\(tmpImageFileUrl)")
-                do {
-                    let imageData = try Data(contentsOf: attachmentURL)
-                    try imageData.write(to: tmpImageFileUrl)
-                    let attachment = try UNNotificationAttachment(identifier: uniqueId,
-                                                                  url: tmpImageFileUrl,
-                                                                  options: nil)
-                    bestAttemptContent.attachments = [attachment]
-                } catch {
-                    print("NotificationService attachment error:\(error)")
-                }
-            } else {
-                print("NotificationService failed to form attachmentURL from userInfo:\(String(describing: request.content.userInfo))")
+        guard let bestAttemptContent = bestAttemptContent else {
+            return
+        }
+        guard let attachmentUrlString = request.content.userInfo["attachment"] as? String else {
+            return
+        }
+        guard let url = URL(string: attachmentUrlString) else {
+            return
+        }
+        
+        URLSession.shared.downloadTask(with: url, completionHandler: { (optLocation: URL?, optResponse: URLResponse?, error: Error?) -> Void in
+            if error != nil {
+                print("Download file error: \(String(describing: error))")
+                return
+            }
+            guard let location = optLocation else {
+                return
+            }
+            guard let response = optResponse else {
+                return
             }
             
-            contentHandler(bestAttemptContent)
-        }
+            do {
+                let lastPathComponent = response.url?.lastPathComponent ?? ""
+                var attachmentID = UUID.init().uuidString + lastPathComponent
+                
+                if response.suggestedFilename != nil {
+                    attachmentID = UUID.init().uuidString + response.suggestedFilename!
+                }
+                
+                let tempDict = NSTemporaryDirectory()
+                let tempFilePath = tempDict + attachmentID
+                
+                try FileManager.default.moveItem(atPath: location.path, toPath: tempFilePath)
+                let attachment = try UNNotificationAttachment.init(identifier: attachmentID, url: URL.init(fileURLWithPath: tempFilePath))
+                
+                bestAttemptContent.attachments.append(attachment)
+            }
+            catch {
+                print("Download file error: \(String(describing: error))")
+            }
+            
+            OperationQueue.main.addOperation({() -> Void in
+                self.contentHandler?(bestAttemptContent);
+            })
+        }).resume()
     }
     
     override func serviceExtensionTimeWillExpire() {
@@ -50,5 +70,5 @@ class NotificationService: UNNotificationServiceExtension {
             contentHandler(bestAttemptContent)
         }
     }
-
+    
 }

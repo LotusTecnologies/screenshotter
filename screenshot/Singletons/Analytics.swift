@@ -13,6 +13,7 @@ import Branch
 import FBSDKCoreKit
 import Whisper
 import AdSupport
+import Pushwoosh
 import Amplitude_iOS
 
 extension Bool {
@@ -171,7 +172,11 @@ class Analytics {
     }
     static func propertiesFor(_ product:Product) -> [String:Any] {
         var properties:[String:Any] = [:]
+        if let title = product.productTitle() {
+            properties["product-title"] = title
+        }
         if let brand = product.brand {
+            
             properties["product-brand"] = brand
         }
         if let merchant = product.merchant {
@@ -381,21 +386,10 @@ class AnalyticsTrackers : NSObject {
 
     let appsee = AppseeAnalyticsTracker()
     let kochava = KochavaAnalyticsTracker()
-    let amplitude = AmplitudeAnalyticsTracker()
     let branch = BranchAnalyticsTracker()
     let pushwoosh = PushwooshAnalyticsTracker()
+    let amplitude = AmplitudeAnalyticsTracker()
     let recombee = RecombeeAnalyticsTracker()
-
-    
-    class PushwooshAnalyticsTracker : NSObject, AnalyticsTracker {
-        func track(_ event: String, properties: [AnyHashable : Any]? = nil, sendEvenIfAdvertisingTrackingIsOptOut:Bool? = false ){
-
-        }
-        
-        func identify(_ user: AnalyticsUser) {
-            
-        }
-    }
     
     class RecombeeAnalyticsTracker : NSObject {
         enum RecombeeEvent:String {
@@ -485,8 +479,24 @@ class AnalyticsTrackers : NSObject {
             Amplitude.instance().setUserId(user.identifier)
             Amplitude.instance().setUserProperties(user.analyticsProperties)
         }
+    }
+    
+    class PushwooshAnalyticsTracker : NSObject, AnalyticsTracker {
+        func track(_ event: String, properties: [AnyHashable : Any]? = nil, sendEvenIfAdvertisingTrackingIsOptOut:Bool? = false ){
+
+            if  ASIdentifierManager.shared().isAdvertisingTrackingEnabled || sendEvenIfAdvertisingTrackingIsOptOut == true {
+                PWInAppManager.shared().postEvent(event)
+            }
+        }
         
-        
+        func identify(_ user: AnalyticsUser) {
+            guard ASIdentifierManager.shared().isAdvertisingTrackingEnabled else {
+                return
+            }
+            
+            PWInAppManager.shared().setUserId(user.identifier)
+
+        }
     }
     
     class KochavaAnalyticsTracker : NSObject, AnalyticsTracker {
