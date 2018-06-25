@@ -744,7 +744,7 @@ extension UserAccountManager {
                 let name = UUID().uuidString
                 let uploadRef = storageRef.child("user").child(user.uid).child("images").child("\(name).jpg")
                 
-                let uploadTask = uploadRef.putData(data, metadata: nil) { (metadata, error) in
+                let _ = uploadRef.putData(data, metadata: nil) { (metadata, error) in
                     if let error = error {
                         reject(error)
                     }else{
