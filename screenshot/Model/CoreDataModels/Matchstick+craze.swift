@@ -51,7 +51,7 @@ extension Matchstick {
                 }
                 if callback == nil,
                     dataModel.isNextMatchsticksNeeded(matchstickCount: dataModel.countMatchsticks(managedObjectContext: managedObjectContext)) {
-                    AWSMatchstickModel.shared.fetchNextIfBelowWatermark()
+                    RecombeeMatchstickModel.shared.fetchNextIfBelowWatermark()
                 }
             } else {
                 print("matchstick add managedObjectID:\(managedObjectID) not found")
@@ -68,7 +68,7 @@ extension Matchstick {
                     managedObjectContext.delete(matchstick)
                     try managedObjectContext.save()
                     if dataModel.isNextMatchsticksNeeded(matchstickCount: dataModel.countMatchsticks(managedObjectContext: managedObjectContext)) {
-                        AWSMatchstickModel.shared.fetchNextIfBelowWatermark()
+                        RecombeeMatchstickModel.shared.fetchNextIfBelowWatermark()
                     }
                 } else {
                     print("matchstick pass managedObjectID:\(managedObjectID) not found")

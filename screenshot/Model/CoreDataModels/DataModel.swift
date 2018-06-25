@@ -94,7 +94,7 @@ class DataModel: NSObject {
                         self.postDbMigration(from: lastDbVersionMigrated, to: Constants.currentMomVersion, container: self.persistentContainer)
                         UserDefaults.standard.set(Constants.currentMomVersion, forKey: UserDefaultsKeys.lastDbVersionMigrated)
                     }
-                    AWSMatchstickModel.shared.prepareMatchsticks()
+                    RecombeeMatchstickModel.shared.prepareMatchsticks()
                     self.dbQ.isSuspended = false
                     
                     fulfill(true)
@@ -694,12 +694,20 @@ extension DataModel {
     func saveMatchstick(managedObjectContext: NSManagedObjectContext,
                         remoteId: String,
                         imageUrl: String,
-                        syteJson: String,
-                        trackingInfo: String?) -> Matchstick {
+                        syteJson: String?,
+                        trackingInfo: String?) -> Matchstick? {
+        let fetchRequest: NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "imageUrl == %@", imageUrl)
+        fetchRequest.sortDescriptors = nil
+        
+        let results = try? managedObjectContext.fetch(fetchRequest)
+        if let first = results?.first {
+            return first
+        }
         let matchstickToSave = Matchstick(context: managedObjectContext)
         matchstickToSave.remoteId = remoteId
         matchstickToSave.imageUrl = imageUrl
-        matchstickToSave.syteJson = syteJson
+        matchstickToSave.syteJson = syteJson ?? "[]"
         matchstickToSave.receivedAt = Date()
         matchstickToSave.trackingInfo = trackingInfo
         return matchstickToSave

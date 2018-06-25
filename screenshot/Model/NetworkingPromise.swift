@@ -305,7 +305,13 @@ class NetworkingPromise : NSObject {
         let hostName = "rapi.recombee.com"
         let databaseId = "screenshop"
         let hmac_timestamp = String(Int(NSDate().timeIntervalSince1970))
-        let partialPath = "/\(databaseId)/\(path)/?hmac_timestamp=\(hmac_timestamp)"
+        var partialPath = "/\(databaseId)/\(path)?hmac_timestamp=\(hmac_timestamp)"
+        if let params = params, method == "GET" {
+            params.forEach({ (key, value) in
+                partialPath += "&\(key)=\(value)"
+            })
+        }
+        
         let recombeeKey = "TJVMFkb5sq4aaIXJGTCrCzPKsjxuyV8RLZOBlXt9QhGQSVOLNgy4jp3lqdlOc8Gn"
         let hmac_sign = partialPath.hmac(algorithm: .SHA1, key: recombeeKey)
         let urlString = "https://\(hostName)\(partialPath)&hmac_sign=\(hmac_sign)"
@@ -315,8 +321,14 @@ class NetworkingPromise : NSObject {
             request.httpMethod = method
             request.addValue("application/json", forHTTPHeaderField: "Accept")
             request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            if let params = params {
-                
+            if let params = params, method == "POST" {
+                do{
+                    let parameterData = try JSONSerialization.data(withJSONObject: params, options: [])
+                    request.httpBody = parameterData
+                    request.setValue("\(parameterData.count)", forHTTPHeaderField: "Content-Length")
+                }catch{
+                    print("recombee request error:\(error)")
+                }
             }
             let sessionConfiguration = URLSessionConfiguration.default
             sessionConfiguration.timeoutIntervalForRequest = 60
@@ -325,11 +337,6 @@ class NetworkingPromise : NSObject {
         }
         return Promise.init(error: NSError.init(domain: #file, code: #line, userInfo: [NSLocalizedDescriptionKey:"unable to make url\(urlString)"]))
         
-    }
-    
-    func createRecombeeUser(userId:String) ->Promise<NSDictionary> {
-        let path = "users/\(userId)"
-        return recombeeRequest(path: path, method: "PUT", params: nil)
     }
     
     func downloadImageData(urlString: String) -> Promise<Data> {

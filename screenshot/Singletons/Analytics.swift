@@ -393,26 +393,25 @@ class AnalyticsTrackers : NSObject {
             case positiveRating
             case negativeRating
             case detailView    // burrow
-            case addToCart   //whent o safari
+            case addToCart     // went to safari
             
             func path() -> String{
                 switch self {
                 case .addBookmark:
-                    return "bookmarks"
+                    return "bookmarks/"
                 case .positiveRating, .negativeRating:
-                    return "ratings"
+                    return "ratings/"
                 case .detailView:
-                    return "detailviews"
+                    return "detailviews/"
                 case .addToCart:
-                    return "cartadditions"
+                    return "cartadditions/"
                 }
             }
             func postData(itemId:String) -> [String:Any]? {
                 var toReturn:[String:Any] = [:]
-                toReturn["databaseId"] = "screenshop"
                 toReturn["userId"] = AnalyticsUser.current.identifier
                 toReturn["itemId"] = itemId
-                toReturn["cascadeCreate"] = NSNumber.init(value: true)
+                toReturn["cascadeCreate"] = true
                 switch self {
                 case .addBookmark:
                     break;
