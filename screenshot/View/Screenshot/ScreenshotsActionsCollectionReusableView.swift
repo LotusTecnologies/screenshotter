@@ -66,7 +66,9 @@ class ScreenshotsActionsCollectionReusableView: UICollectionReusableView {
         borderView.isUserInteractionEnabled = false
         addSubview(borderView)
         borderView.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor).isActive = true
-        borderView.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor).isActive = true
+        let borderBottomConstraint = borderView.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor)
+        borderBottomConstraint.priority = .defaultHigh
+        borderBottomConstraint.isActive = true
         borderView.centerXAnchor.constraint(equalTo: layoutMarginsGuide.centerXAnchor).isActive = true
         borderView.widthAnchor.constraint(equalToConstant: 1).isActive = true
     }
