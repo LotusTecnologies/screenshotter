@@ -315,7 +315,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             if pathComponents.count >= 4 {
                 let browser = pathComponents[1]
                 let link = String(urlString.suffix(from: "screenshop://openWebLink/\(browser)/".endIndex))
-                print("GMK  browser:\(browser)  link:\(link)")
                 if browser == "default" {
                     if let vc = AppDelegate.shared.window?.rootViewController {
                         OpenWebPage.present(urlString: link, fromViewController: vc)
@@ -661,7 +660,6 @@ extension AppDelegate: PushNotificationDelegate {
 
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         ApplicationStateModel.sharedInstance.applicationState = application.applicationState
-        print("GMK AppDelegate application didReceiveRemoteNotification userInfo:\(userInfo)")
 
         if let aps = userInfo["aps"] as? NSDictionary, let category = aps["category"] as? String, category == "MATCHSTICK_LIKES", let likeUpdates = userInfo["likeUpdates"] as? [[String:Any]]{
             DataModel.sharedInstance.performBackgroundTask { (context) in
