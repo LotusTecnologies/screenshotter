@@ -431,6 +431,15 @@ extension ProfileAccountView: UIImagePickerControllerDelegate, UINavigationContr
             if let url = URL.init(string: urlString){
                 SDWebImageManager.shared().saveImage(toCache: pickedImage, for: url)
                 avatarURL = url
+
+                if let imageData = AssetSyncModel.sharedInstance.data(for: pickedImage) {
+                    UserAccountManager.shared.uploadImage(data: imageData).then { (url) -> (Void) in
+                        SDWebImageManager.shared().saveImage(toCache: pickedImage, for: url)
+                        self.avatarURL = url
+                        UserAccountManager.shared.setProfile(displayName: nil, gender: nil, size: nil, unverifiedEmail: nil, avatarURL:url.absoluteString)
+                    }
+                }
+                
             }
         }
         
