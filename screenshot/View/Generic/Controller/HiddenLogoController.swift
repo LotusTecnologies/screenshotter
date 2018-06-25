@@ -12,7 +12,9 @@ class HiddenLogoController {
     private lazy var imageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.backgroundColor = .red
+        imageView.image = UIImage(named: "BrandLogo20h")
+        imageView.contentMode = .scaleAspectFit
+        imageView.clipsToBounds = true
         return imageView
     }()
     
@@ -26,10 +28,11 @@ class HiddenLogoController {
         }
         
         statusBarView.addSubview(view)
-        view.topAnchor.constraint(equalTo: statusBarView.topAnchor).isActive = true
-        view.leadingAnchor.constraint(equalTo: statusBarView.leadingAnchor).isActive = true
-        view.trailingAnchor.constraint(equalTo: statusBarView.trailingAnchor).isActive = true
-        view.heightAnchor.constraint(equalToConstant: 10).isActive = true
+        view.leadingAnchor.constraint(greaterThanOrEqualTo: statusBarView.leadingAnchor, constant: 84).isActive = true
+        view.bottomAnchor.constraint(equalTo: statusBarView.topAnchor, constant: 30).isActive = true
+        view.trailingAnchor.constraint(lessThanOrEqualTo: statusBarView.trailingAnchor, constant: -84).isActive = true
+        view.heightAnchor.constraint(equalToConstant: 14).isActive = true
+        view.centerXAnchor.constraint(equalTo: statusBarView.centerXAnchor).isActive = true
     }
     
     func removeView() {

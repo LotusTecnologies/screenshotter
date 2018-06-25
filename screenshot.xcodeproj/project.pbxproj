@@ -228,6 +228,7 @@
 		C572FF02205C00070046BFEB /* Hind-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C572FEFD205C00070046BFEB /* Hind-Medium.ttf */; };
 		C5847EF81F7A53F60024DCAB /* CredentialHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */; };
 		C58BAE0420E0BAC10051394A /* HiddenLogoController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58BAE0320E0BAC10051394A /* HiddenLogoController.swift */; };
+		C58BAE0620E0BE810051394A /* BaseTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58BAE0520E0BE810051394A /* BaseTableViewController.swift */; };
 		C5CAF27A1FCC0EFD006F37DC /* ISO4217.plist in Resources */ = {isa = PBXBuildFile; fileRef = C5CAF2791FCC0EFD006F37DC /* ISO4217.plist */; };
 		C5CAF27C1FCC14C1006F37DC /* CurrencyModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CAF27B1FCC14C1006F37DC /* CurrencyModel.swift */; };
 		C5CC3E391F94A85900DA3425 /* NetworkingIndicatorProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CC3E381F94A85900DA3425 /* NetworkingIndicatorProtocol.swift */; };
@@ -510,6 +511,7 @@
 		C572FEFD205C00070046BFEB /* Hind-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Hind-Medium.ttf"; sourceTree = "<group>"; };
 		C5847EF71F7A53F60024DCAB /* CredentialHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialHelper.swift; sourceTree = "<group>"; };
 		C58BAE0320E0BAC10051394A /* HiddenLogoController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HiddenLogoController.swift; sourceTree = "<group>"; };
+		C58BAE0520E0BE810051394A /* BaseTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseTableViewController.swift; sourceTree = "<group>"; };
 		C5CAF2791FCC0EFD006F37DC /* ISO4217.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = ISO4217.plist; sourceTree = "<group>"; };
 		C5CAF27B1FCC14C1006F37DC /* CurrencyModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyModel.swift; sourceTree = "<group>"; };
 		C5CC3E381F94A85900DA3425 /* NetworkingIndicatorProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkingIndicatorProtocol.swift; sourceTree = "<group>"; };
@@ -996,8 +998,9 @@
 		311A4FFE20D90B760001D463 /* ViewController */ = {
 			isa = PBXGroup;
 			children = (
-				311A4FFF20D90B760001D463 /* ModalNavigationController.swift */,
+				C58BAE0520E0BE810051394A /* BaseTableViewController.swift */,
 				311A500020D90B760001D463 /* BaseViewController.swift */,
+				311A4FFF20D90B760001D463 /* ModalNavigationController.swift */,
 			);
 			path = ViewController;
 			sourceTree = "<group>";
@@ -1674,6 +1677,7 @@
 				311A508020D90B780001D463 /* UIViewController.swift in Sources */,
 				311A508320D90B780001D463 /* UIApplication.swift in Sources */,
 				311A50A520D90B780001D463 /* TextExplanationTableViewCell.swift in Sources */,
+				C58BAE0620E0BE810051394A /* BaseTableViewController.swift in Sources */,
 				311A508220D90B780001D463 /* Font.swift in Sources */,
 				311A502D20D90B780001D463 /* ProductVariantsSelectorViewController.swift in Sources */,
 				311A506B20D90B780001D463 /* InitiateResetPasswordViewController.swift in Sources */,
