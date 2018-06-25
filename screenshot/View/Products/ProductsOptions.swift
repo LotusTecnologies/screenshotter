@@ -489,6 +489,10 @@ enum ProductsOptionsGender : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol 
         return self.rawValue - 1
     }
     
+    static func from(string:String) -> ProductsOptionsGender? {
+        return [ProductsOptionsGender.male, ProductsOptionsGender.female].filter{$0.stringValue == string}.first
+    }
+    
     var stringValue: String {
         var string: String
         
@@ -530,6 +534,9 @@ enum ProductsOptionsSize : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol {
     
     var offsetValue: Int {
         return self.rawValue - 1
+    }
+    static func from(string:String) -> ProductsOptionsSize? {
+        return [ProductsOptionsSize.child, ProductsOptionsSize.adult, ProductsOptionsSize.plus].filter{$0.stringValue == string}.first
     }
     
     var stringValue: String {

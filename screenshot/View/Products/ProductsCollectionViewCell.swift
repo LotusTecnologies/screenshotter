@@ -107,11 +107,12 @@ class ProductsCollectionViewCell : UICollectionViewCell {
             productView.translatesAutoresizingMaskIntoConstraints = false
             productView.placeholderImage = UIImage.init(named:"DefaultProduct")
             productView.contentMode = .scaleAspectFit
+            productView.contentView.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: ProductsCollectionViewCell.titleLabelHeight + ProductsCollectionViewCell.priceLabelHeight, right: 0)
             self.contentView.addSubview(productView)
             productView.topAnchor.constraint(equalTo: self.contentView.topAnchor).isActive = true
             productView.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor).isActive = true
             productView.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor).isActive = true
-            let heightConstraint = productView.heightAnchor.constraint(equalTo: productView.widthAnchor, constant:ProductsCollectionViewCell.titleLabelHeight + ProductsCollectionViewCell.priceLabelHeight )
+            let heightConstraint = productView.heightAnchor.constraint(equalTo: productView.widthAnchor, constant: productView.contentView.layoutMargins.bottom)
             heightConstraint.priority = .defaultHigh
             heightConstraint.isActive = true
             return productView
@@ -208,16 +209,21 @@ class ProductsCollectionViewCell : UICollectionViewCell {
         
         actionButton.translatesAutoresizingMaskIntoConstraints = false
         actionButton.backgroundColor = .clear
-        actionButton.setTitleColor(.gray4, for: .normal)
         contentView.addSubview(actionButton)
-        actionButton.topAnchor.constraint(equalTo: productView.bottomAnchor, constant: 8).isActive = true
+        actionButton.topAnchor.constraint(equalTo: productView.bottomAnchor).isActive = true
         actionButton.leadingAnchor.constraint(equalTo: productView.leadingAnchor).isActive = true
         actionButton.trailingAnchor.constraint(equalTo: productView.trailingAnchor).isActive = true
         actionButton.heightAnchor.constraint(equalToConstant: ProductsCollectionViewCell.actionButtonHeight).isActive = true
-        let string = NSAttributedString.init(string: "product.more_like_this".localized, attributes: [.underlineStyle: NSUnderlineStyle.styleSingle.rawValue,.foregroundColor: UIColor.gray4 ])
-        actionButton.setAttributedTitle(string, for: .normal)
-        actionButton.setTitle("product.more_like_this".localized, for: .normal)
-
+        
+        let actionString = "product.burrow".localized
+        var actionAttributes: [NSAttributedStringKey: Any] = [
+            .underlineStyle: NSUnderlineStyle.styleSingle.rawValue,
+            .foregroundColor: UIColor.gray4
+        ]
+        actionButton.setAttributedTitle(NSAttributedString(string: actionString, attributes: actionAttributes), for: .normal)
+        actionAttributes[.foregroundColor] = UIColor.gray2
+        actionButton.setAttributedTitle(NSAttributedString(string: actionString, attributes: actionAttributes), for: .highlighted)
+        
         favoriteControl.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(favoriteControl)
         favoriteControl.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
@@ -234,8 +240,6 @@ class ProductsCollectionViewCell : UICollectionViewCell {
         }()
         self.saleView = saleView
     }
-
-    
     
     var productImageView: UIImageView? {
         return self.productView?.imageView

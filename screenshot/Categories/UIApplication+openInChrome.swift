@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import MessageUI
 
 extension UIApplication {
     
@@ -88,5 +89,37 @@ extension URL {
         }
         
         return components?.url
+    }
+}
+
+extension UIViewController :MFMailComposeViewControllerDelegate{
+    func presentMail(recipient:String, gmailMessage:String, subject:String, message:String, isHTML:Bool = false, delegate:MFMailComposeViewControllerDelegate? = nil ){
+        if MFMailComposeViewController.canSendMail() {
+            let mail = MFMailComposeViewController()
+            mail.mailComposeDelegate = delegate ?? self
+            mail.setSubject(subject)
+            mail.setMessageBody(message, isHTML: isHTML)
+            mail.setToRecipients([recipient])
+            present(mail, animated: true, completion: nil)
+            
+        } else if let url = URL.googleMailUrl(to: recipient, body: gmailMessage, subject: subject), UIApplication.shared.canOpenURL(url) {
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            
+        } else {
+            let alertController = UIAlertController(title: "email.setup.title".localized, message: "email.setup.message".localized, preferredStyle: .alert)
+            alertController.addAction(UIAlertAction(title: "generic.later".localized, style: .cancel, handler: nil))
+            
+            if let mailURL = URL(string: "message://"), UIApplication.shared.canOpenURL(mailURL) {
+                alertController.addAction(UIAlertAction(title: "generic.setup".localized, style: .default, handler: { action in
+                    UIApplication.shared.open(mailURL, options: [:], completionHandler: nil)
+                }))
+            }
+            
+            present(alertController, animated: true, completion: nil)
+        }
+        
+    }
+    public func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
+        dismiss(animated: true, completion: nil)
     }
 }

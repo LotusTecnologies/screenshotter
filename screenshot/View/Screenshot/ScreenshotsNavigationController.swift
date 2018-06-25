@@ -22,9 +22,8 @@ class ScreenshotsNavigationController: UINavigationController {
     
     init() {
         super.init(nibName: nil, bundle: nil)
-        screenshotsViewController.navigationItem.leftBarButtonItem = screenshotsViewController.editButtonItem
-        screenshotsViewController.navigationItem.rightBarButtonItem?.tintColor = .crazeRed
-        screenshotsViewController.navigationItem.rightBarButtonItem = UIBarButtonItem.init(image: UIImage.init(named: "NavigationBarAddPhotos"), style: .plain, target: self, action: #selector(pickerButtonPresses(_:)))
+        
+        screenshotsViewController.navigationItem.rightBarButtonItem = screenshotsViewController.editButtonItem
         screenshotsViewController.delegate = self
         
         self.restorationIdentifier = "ScreenshotsNavigationController"
@@ -81,9 +80,6 @@ extension ScreenshotsNavigationController {
         
         Analytics.trackOpenedPicker()
     }
-    @objc func pickerButtonPresses(_ sender:Any) {
-        self.presentPickerViewController(openScreenshots: false)
-    }
     
     @objc func pickerViewControllerDidCancel() {
         self.dismiss(animated: true)
@@ -119,68 +115,7 @@ extension ScreenshotsNavigationController :ScreenshotsViewControllerDelegate{
     }
 }
 
-extension ScreenshotsNavigationController: GiftCardCampaignViewControllerDelegate {
-    fileprivate var giftCardActiveViewController: UIViewController {
-        if let presentedViewController = presentedViewController, !presentedViewController.isBeingDismissed {
-            return presentedViewController
-        }
-        
-        return self
-    }
-    
-    func presentGiftCardCampaignIfNeeded() {
-        if UIApplication.isUSC && !UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingPresentedGiftCard) {
-            UserDefaults.standard.set(true, forKey: UserDefaultsKeys.onboardingPresentedGiftCard)
-            UserDefaults.standard.synchronize()
-            
-            let viewController = GiftCardCampaignViewController()
-            viewController.delegate = self
-        
-            giftCardActiveViewController.present(viewController, animated: true, completion: nil)
-        }
-    }
-    
-    func giftCardCampaignViewControllerDidSkip(_ viewController: GiftCardCampaignViewController) {
-        Analytics.trackOnboardingCampainCreditCardSkip()
-        UserDefaults.standard.set(true, forKey: UserDefaultsKeys.isGiftCardHidden)
-        UserDefaults.standard.synchronize()
-        
-        giftCardActiveViewController.dismiss(animated: true, completion: nil)
-    }
-    
-    func giftCardCampaignViewControllerDidContinue(_ viewController: GiftCardCampaignViewController) {
-        Analytics.trackOnboardingCampainCreditCardLetsGo()
-        
-        giftCardActiveViewController.dismiss(animated: true, completion: nil)
-        
-        let viewController = CheckoutPaymentFormViewController(withCard: nil, isEditLayout: true, confirmBeforeSave: false, autoSaveBillAddressAsShippingAddress:true)
-        viewController.title = "2018_05_01_campaign.payment".localized
-        viewController.delegate = self
-        
-        let modalNavigationController = ModalNavigationController(rootViewController: viewController)
-        giftCardActiveViewController.present(modalNavigationController, animated: true, completion: nil)
-    }
-}
 
-extension ScreenshotsNavigationController: GiftCardDoneViewControllerDelegate {
-    func giftCardDoneViewControllerDidPressDone(_ viewController: GiftCardDoneViewController) {
-        let frc = DataModel.sharedInstance.cardFrc(delegate: nil).fetchedObjects.first
-        Analytics.trackOnboardingCampainCreditCardDone(email: frc?.email, phone: frc?.phone)
-        
-        giftCardActiveViewController.dismiss(animated: true, completion: nil)
-    }
-}
-
-extension ScreenshotsNavigationController: CheckoutFormViewControllerDelegate {
-    func checkoutFormViewControllerDidAdd(_ viewController: CheckoutFormViewController) {
-        Analytics.trackOnboardingCampainCreditCardEnteredCard()
-        
-        let doneViewController = GiftCardDoneViewController()
-        doneViewController.delegate = self
-        doneViewController.navigationItem.hidesBackButton = true
-        viewController.navigationController?.pushViewController(doneViewController, animated: true)
-    }
-}
 
 typealias ScreenshotsNavigationControllerProducts = ScreenshotsNavigationController
 extension ScreenshotsNavigationControllerProducts {
@@ -228,16 +163,14 @@ extension ScreenshotsNavigationControllerPushPermission {
 
 extension ScreenshotsNavigationController : NetworkingIndicatorProtocol {
     func networkingIndicatorDidStart(type: NetworkingIndicatorType) {
-        if (self.activityBarButtonItem == nil) {
+        if self.activityBarButtonItem == nil {
             let activityView = UIActivityIndicatorView.init(activityIndicatorStyle: .white)
             activityView.color = .crazeRed
             activityView.startAnimating()
+            
             let barButtonItem = UIBarButtonItem(customView: activityView)
             self.activityBarButtonItem = barButtonItem
-            
-            if let currentItem = self.screenshotsViewController.navigationItem.leftBarButtonItems?.first {
-                self.screenshotsViewController.navigationItem.leftBarButtonItems = [currentItem, barButtonItem]
-            }
+            self.screenshotsViewController.navigationItem.leftBarButtonItem = barButtonItem
         }
         
         self.activityBarButtonItem?.tag += 1
@@ -246,11 +179,8 @@ extension ScreenshotsNavigationController : NetworkingIndicatorProtocol {
     func networkingIndicatorDidComplete(type: NetworkingIndicatorType) {
         self.activityBarButtonItem?.tag -= 1
         
-        if (self.activityBarButtonItem?.tag == 0) {
-            if let currentItem = self.screenshotsViewController.navigationItem.leftBarButtonItems?.first {
-                self.screenshotsViewController.navigationItem.leftBarButtonItems = [currentItem]
-            }
-            
+        if self.activityBarButtonItem?.tag == 0 {
+            self.screenshotsViewController.navigationItem.leftBarButtonItem = nil
             self.activityBarButtonItem = nil
         }
     }

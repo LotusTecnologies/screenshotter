@@ -66,14 +66,14 @@ class MainButton: LoadingButton {
             if !isSettingBackgroundColor {
                 backgroundColorStates[UIControlState.normal.rawValue] = backgroundColor
                 backgroundColorStates[UIControlState.highlighted.rawValue] = backgroundColor?.darker()
-                backgroundColorStates[UIControlState.disabled.rawValue] = backgroundColor?.lighter()
+                backgroundColorStates[UIControlState.disabled.rawValue] = .disabledButton
             }
         }
     }
     
     fileprivate func setBackgroundColor(to state: UIControlState) {
         isSettingBackgroundColor = true
-        backgroundColor = backgroundColorStates[state.rawValue]
+        backgroundColor = backgroundColorStates[state.rawValue] ?? backgroundColor
         isSettingBackgroundColor = false
     }
     
@@ -81,6 +81,6 @@ class MainButton: LoadingButton {
     
     override func setImage(_ image: UIImage?, for state: UIControlState) {
         super.setImage(image, for: state)
-        adjustInsetsForImage(withPadding: 6)
+        adjustInsetsForImage()
     }
 }

@@ -256,6 +256,7 @@ extension DataModel {
                             try screenshot.validateForUpdate()
                             screenshot.isHidden = true
                             screenshot.hideWorkhorse()
+                            UserAccountManager.shared.deleteScreenshot(screenshot: screenshot)
                         } catch{
                             
                         }
@@ -355,7 +356,7 @@ extension DataModel {
     
     // Save a new Product to Core Data.
     func saveProduct(managedObjectContext: NSManagedObjectContext,
-                     shoppable: Shoppable,
+                     shoppable: Shoppable?,
                      order: Int16,
                      productDescription: String?,
                      price: String?,
@@ -410,6 +411,97 @@ extension DataModel {
         return nil
     }
     
+    func retrieveProduct(managedObjectContext: NSManagedObjectContext, imageURL: String) -> Product? {
+        let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "imageURL == %@", imageURL)
+        fetchRequest.sortDescriptors = nil //[NSSortDescriptor(key: "createdAt", ascending: false)]
+        fetchRequest.fetchLimit = 1
+        
+        do {
+            let results = try managedObjectContext.fetch(fetchRequest)
+            return results.first
+        } catch {
+            self.receivedCoreDataError(error: error)
+            print("retrieveProduct imageURL:\(imageURL) results with error:\(error)")
+        }
+        return nil
+    }
+    
+    func retrieveLatestFavorite() -> Promise<(String, String?)> {
+        return Promise { fulfill, reject in
+            self.performBackgroundTask { managedObjectContext in
+                let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
+                fetchRequest.predicate = NSPredicate(format: "isFavorite == TRUE")
+                fetchRequest.sortDescriptors = [NSSortDescriptor(key: "dateFavorited", ascending: false)]
+                fetchRequest.fetchLimit = 1
+                
+                do {
+                    let results = try managedObjectContext.fetch(fetchRequest)
+                    if let latest = results.first,
+                      let imageURL = latest.imageURL {
+                        let category = latest.shoppable?.label ?? latest.shoppable?.parentShoppable?.label ?? latest.categories
+                        fulfill((imageURL, category))
+                    } else {
+                        reject(NSError(domain: "Craze", code: 93, userInfo: [NSLocalizedDescriptionKey : "no latest favorite"]))
+                    }
+                } catch {
+                    self.receivedCoreDataError(error: error)
+                    print("retrieveLatestFavorite results with error:\(error)")
+                    reject(error)
+                }
+            }
+        }
+    }
+    
+    func retrieveLatestTapped() -> Promise<(String, String?)> {
+        return Promise { fulfill, reject in
+            self.performBackgroundTask { managedObjectContext in
+                let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
+                let aWeekAgo = NSDate(timeIntervalSinceNow: -7 * Constants.secondsInDay)
+                fetchRequest.predicate = NSPredicate(format: "dateViewed > %@", aWeekAgo)
+                fetchRequest.sortDescriptors = [NSSortDescriptor(key: "floatPrice", ascending: true)]
+                fetchRequest.fetchLimit = 1
+                
+                do {
+                    let results = try managedObjectContext.fetch(fetchRequest)
+                    if let latest = results.first,
+                        let imageURL = latest.imageURL {
+                        fulfill((imageURL, latest.productTitle()))
+                    } else {
+                        reject(NSError(domain: "Craze", code: 94, userInfo: [NSLocalizedDescriptionKey : "no latest tapped"]))
+                    }
+                } catch {
+                    self.receivedCoreDataError(error: error)
+                    print("retrieveLatestTapped results with error:\(error)")
+                    reject(error)
+                }
+            }
+        }
+    }
+    
+    func retrieveSaleCount(from startDate: NSDate) -> Promise<Int> {
+        return Promise { fulfill, reject in
+            self.performBackgroundTask { managedObjectContext in
+                let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
+                fetchRequest.predicate = NSPredicate(format: "floatPrice < floatOriginalPrice AND dateRetrieved > %@", startDate)
+                fetchRequest.sortDescriptors = [NSSortDescriptor(key: "dateRetrieved", ascending: false)]
+                
+                do {
+                    let results = try managedObjectContext.fetch(fetchRequest)
+                    if results.count > 0 {
+                        fulfill(results.count)
+                    } else {
+                        reject(NSError(domain: "Craze", code: 96, userInfo: [NSLocalizedDescriptionKey : "no recent sale count"]))
+                    }
+                } catch {
+                    self.receivedCoreDataError(error: error)
+                    print("retrieveSaleCount results with error:\(error)")
+                    reject(error)
+                }
+            }
+        }
+    }
+    
     func deleteVariants(managedObjectContext: NSManagedObjectContext, product: Product, shouldUpdateDateChecked: Bool = true) {
         if shouldUpdateDateChecked {
             product.dateCheckedStock = Date()
@@ -432,7 +524,7 @@ extension DataModel {
                 fetchRequest.propertiesToFetch = ["partNumber"]
                 fetchRequest.fetchLimit = 600
                 let optionsMaskInt = ProductsOptionsMask.global.rawValue
-                let anHourAgo = NSDate(timeIntervalSinceNow: -60 * 60)
+                let anHourAgo = NSDate(timeIntervalSinceNow: -Constants.secondsInHour)
                 fetchRequest.predicate = NSPredicate(format: "shoppable.screenshot == %@ AND (optionsMask & %d) == %d AND ( dateCheckedStock == nil || dateCheckedStock < %@ )", screenshotOID, optionsMaskInt, optionsMaskInt, anHourAgo)
                 fetchRequest.sortDescriptors = nil
                 

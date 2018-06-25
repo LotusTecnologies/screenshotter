@@ -26,6 +26,7 @@ extension UIViewController {
 }
 
 extension ProductViewController {
+    
     static func present(with partNumber: String) {
         print("ProductViewController present partNumber:\(partNumber)")
         let dataModel = DataModel.sharedInstance
@@ -44,4 +45,18 @@ extension ProductViewController {
             }
         }
     }
+    
+    static func present(imageURL: String) {
+        print("ProductViewController present imageURL:\(imageURL)")
+        let dataModel = DataModel.sharedInstance
+        
+        if let product = dataModel.retrieveProduct(managedObjectContext: dataModel.mainMoc(), imageURL: imageURL) {
+            let burrowViewController = ProductDetailViewController()
+            burrowViewController.product = product
+            burrowViewController.shoppable = product.shoppable
+            let navigationController = ModalNavigationController(rootViewController: burrowViewController)
+            AppDelegate.shared.window?.rootViewController?.present(navigationController, animated: true, completion: nil)
+        }
+    }
+
 }
