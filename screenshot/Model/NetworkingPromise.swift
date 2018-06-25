@@ -301,7 +301,7 @@ class NetworkingPromise : NSObject {
         return promise
     }
     
-    private func recombeeRequest(path:String, method:String, postData:[String:Any]? ) -> Promise<NSDictionary> {
+    func recombeeRequest(path:String, method:String, params:[String:Any]? ) -> Promise<NSDictionary> {
         let hostName = "rapi.recombee.com"
         let databaseId = "screenshop"
         let hmac_timestamp = String(Int(NSDate().timeIntervalSince1970))
@@ -315,7 +315,7 @@ class NetworkingPromise : NSObject {
             request.httpMethod = method
             request.addValue("application/json", forHTTPHeaderField: "Accept")
             request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            if let postData = postData {
+            if let params = params {
                 
             }
             let sessionConfiguration = URLSessionConfiguration.default
@@ -329,7 +329,7 @@ class NetworkingPromise : NSObject {
     
     func createRecombeeUser(userId:String) ->Promise<NSDictionary> {
         let path = "users/\(userId)"
-        return recombeeRequest(path: path, method: "PUT", postData: nil)
+        return recombeeRequest(path: path, method: "PUT", params: nil)
     }
     
     func downloadImageData(urlString: String) -> Promise<Data> {

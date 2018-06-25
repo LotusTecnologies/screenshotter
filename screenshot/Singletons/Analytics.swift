@@ -407,23 +407,30 @@ class AnalyticsTrackers : NSObject {
                     return "cartadditions"
                 }
             }
-            func postData() -> [String:Any]? {
+            func postData(itemId:String) -> [String:Any]? {
+                var toReturn:[String:Any] = [:]
+                toReturn["databaseId"] = "screenshop"
+                toReturn["userId"] = AnalyticsUser.current.identifier
+                toReturn["itemId"] = itemId
+                toReturn["cascadeCreate"] = NSNumber.init(value: true)
                 switch self {
                 case .addBookmark:
-                    return "bookmarks"
+                    break;
                 case .positiveRating:
+                    toReturn["rating"] = NSNumber.init(value: 1.0)
                 case .negativeRating:
-                    return "ratings"
+                    toReturn["rating"] = NSNumber.init(value: -1.0)
                 case .detailView:
-                    return "detailviews"
+                    break;
                 case .addToCart:
-                    return "cartadditions"
+                    break;
                 }
+                return toReturn
             }
         }
         
         func track(event:RecombeeEvent, itemId:String){
-            
+        let _ = NetworkingPromise.sharedInstance.recombeeRequest(path: event.path(), method: "POST", params: event.postData(itemId: itemId))
         }
        
     }
