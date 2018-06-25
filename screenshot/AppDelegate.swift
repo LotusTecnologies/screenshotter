@@ -550,7 +550,6 @@ extension AppDelegate : KochavaTrackerDelegate {
         PushNotificationManager.push().delegate = self
         // UNUserNotificationCenter.current().delegate = PushNotificationManager.push().notificationCenterDelegate // Set to self in willFinishLaunching; forwards the calls to pushwoosh.
         PushNotificationManager.push().sendAppOpen()
-        PushNotificationManager.push().registerForPushNotifications()
         
     }
     
