@@ -96,18 +96,15 @@ extension TutorialNavigationController: RegisterViewControllerDelegate {
 }
 
 extension TutorialNavigationController : OnboardingGDPRViewControllerDelegate {
-    func onboardingGDPRViewController(agreedToEmail: Bool, agreedToImageDetection: Bool) {
-        Analytics.trackOnboardingGdpr(agreedToEmail: agreedToEmail, agreedToImageDetection: agreedToImageDetection)
-        UserAccountManager.shared.setGDPR(agreedToEmail: agreedToEmail, agreedToImageDetection: agreedToImageDetection)
+    func onboardingGDPRViewControllerDidComplete(_ viewController: OnboardingGDPRViewController) {
         if showProfilePage {
             pushOnboardingDetailsViewController()
         }else{
             tutorialCompleted()
         }
     }
-    
-    
 }
+
 extension TutorialNavigationController : ConfirmCodeViewControllerDelegate {
     
     func confirmCodeViewControllerDidConfirm(_ viewController: ConfirmCodeViewController){

@@ -165,7 +165,7 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         
         self.presentUpdatePromptIfNeeded()
         self.presentChangelogAlertIfNeeded()
-        
+        presentGDPRIfNeeded()
         
         if let viewcontroller = self.selectedViewController {
             if viewcontroller == screenshotsNavigationController {
@@ -416,5 +416,26 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
 extension MainTabBarController: FetchedResultsControllerManagerDelegate {
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
         syncCartTabBadgeCount()
+    }
+}
+
+typealias MainTabBarControllerGDPR = MainTabBarController
+extension MainTabBarControllerGDPR: OnboardingGDPRViewControllerDelegate {
+    private var needsToPresentGDPR: Bool {
+        return UserDefaults.standard.value(forKey: UserDefaultsKeys.gdpr_agreedToEmail) == nil
+    }
+    
+    private func presentGDPRIfNeeded() {
+        guard needsToPresentGDPR else {
+            return
+        }
+        
+        let gdprViewController = OnboardingGDPRViewController()
+        gdprViewController.delegate = self
+        present(gdprViewController, animated: true)
+    }
+    
+    func onboardingGDPRViewControllerDidComplete(_ viewController: OnboardingGDPRViewController) {
+        dismiss(animated: true)
     }
 }
