@@ -8,20 +8,9 @@
 
 import UIKit
 import Photos
-import MobileCoreServices // kUTTypeImage
 import CoreData // NSManagedObjectContext
 import PromiseKit
-import UserNotifications
 import SDWebImage
-
-class BackgroundScreenshotData { // Is class, not struct, to save copying around the non-trivial imageData
-    let assetId: String
-    var imageData: Data?
-    init(assetId: String, imageData: Data?) {
-        self.assetId = assetId
-        self.imageData = imageData
-    }
-}
 
 class AssetSyncModel: NSObject {
 
@@ -524,7 +513,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                             DispatchQueue.main.async {
                                 // The accumulator updates the count in an async block.
                                 // Without a delay the count is wrong when setting the content.badge.
-                                self.sendScreenshotAddedLocalNotification(backgroundScreenshotData: [BackgroundScreenshotData(assetId: asset.localIdentifier, imageData: imageData)])
+                                LocalNotificationModel.shared.sendScreenshotAddedLocalNotification(assetId: asset.localIdentifier, imageData: imageData)
                             }
                         }
                     }
@@ -600,7 +589,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                                 self.processingQ.async {
                                     if self.shouldSendPushWhenFindFashionWithoutUserScreenshotAction && ApplicationStateModel.sharedInstance.isBackground(){  //need to check twice due to async craziness
                                         self.shouldSendPushWhenFindFashionWithoutUserScreenshotAction = false
-                                        self.sendScreenshotAddedLocalNotification(backgroundScreenshotData: [BackgroundScreenshotData.init(assetId: asset.localIdentifier, imageData: imageData)])
+                                        LocalNotificationModel.shared.sendScreenshotAddedLocalNotification(assetId: asset.localIdentifier, imageData: imageData)
                                     }
                                 }
                             }
@@ -622,58 +611,6 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
         }))
     }
     
-    func sendScreenshotAddedLocalNotification(backgroundScreenshotData: [BackgroundScreenshotData]) {
-        guard PermissionsManager.shared.hasPermission(for: .push) else {
-            return
-        }
-        
-        let content = UNMutableNotificationContent()
-        content.title = "notification.title".localized
-        content.body = "notification.message".localized
-        if let lastNotificationSound = UserDefaults.standard.object(forKey: UserDefaultsKeys.dateLastSound) as? Date,
-            -lastNotificationSound.timeIntervalSinceNow < 60 { // 1 minute
-            content.sound = nil
-        } else {
-            content.sound = UNNotificationSound.default()
-        }
-        UserDefaults.standard.setValue(Date(), forKey: UserDefaultsKeys.dateLastSound)
-        content.userInfo = [Constants.openingScreenKey  : Constants.openingScreenValueScreenshot]
-        
-        var identifier = "CrazeLocal"
-        if let representativeScreenshotData = backgroundScreenshotData.reversed().first(where: { $0.imageData != nil }), // Last taken screenshot that has imageData.
-            let representativeImageData = representativeScreenshotData.imageData {
-            
-            content.userInfo = [Constants.openingScreenKey  : Constants.openingScreenValueScreenshot,
-                                Constants.openingAssetIdKey : representativeScreenshotData.assetId]
-            
-            identifier += representativeScreenshotData.assetId.replacingOccurrences(of: "/", with: "-")
-            // Add image url
-            let tmpImageFileUrl = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(identifier).appendingPathExtension("jpg")
-            do {
-                try representativeImageData.write(to: tmpImageFileUrl)
-                let attachment = try UNNotificationAttachment(identifier: identifier,
-                                                              url: tmpImageFileUrl,
-                                                              options: [UNNotificationAttachmentOptionsTypeHintKey : kUTTypeImage])
-                content.attachments = [attachment]
-            } catch {
-                print("Local notification attachment error:\(error)")
-            }
-        }
-        
-        content.badge = NSNumber(value: AccumulatorModel.screenshotUninformed.uninformedCount)
-        
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.1, repeats: false)
-        let request = UNNotificationRequest(identifier: identifier,
-                                            content: content,
-                                            trigger: trigger)
-        UNUserNotificationCenter.current().add(request, withCompletionHandler: { (error) in
-            if let error = error {
-                print("sendScreenshotAddedLocalNotification identifier:\(identifier)  error:\(error)")
-            } else {
-                Analytics.trackAppSentLocalPushNotification()
-            }
-        })
-    }
     
 }
 
