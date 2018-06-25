@@ -302,7 +302,7 @@ extension AssetSyncModel {
     }
     
     func uploadPhoto(asset: PHAsset, source:ScreenshotSource) {
-        uploadPhoto(assetId: asset.localIdentifier, source: source, photoPromise: asset.image(allowFromICloud: true), creationDate: asset.creationDate)
+        uploadPhoto(assetId: asset.localIdentifier, source: source, photoPromise: asset.image(allowFromICloud: true), creationDate: Date())
     }
     
     //From share
