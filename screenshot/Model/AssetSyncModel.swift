@@ -696,8 +696,8 @@ extension AssetSyncModel {
                 if let data = localImageData {
                     UserAccountManager.shared.uploadImage(data: data).then(execute: { (url) -> () in
                         fulfil((nil, url.absoluteString))
-                    }).catch{_ in
-                        fulfil((data, orImageUrlString))
+                    }).catch{error in
+                        reject(error)
                     }
                 }else {
                     fulfil((localImageData, orImageUrlString))
@@ -830,6 +830,7 @@ extension AssetSyncModel {
                 if screenshot.shoppablesCount == 1 {
                     screenshot.syteJson = NetworkingPromise.sharedInstance.jsonStringify(object: segments)
                     screenshot.uploadedImageURL = uploadedURLString
+                    UserAccountManager.shared.uploadScreenshots(screenshot: screenshot)
                 }
             }
             managedObjectContext.saveIfNeeded()

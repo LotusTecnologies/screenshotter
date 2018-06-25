@@ -362,7 +362,7 @@ class UserAccountManager : NSObject {
         }
     }
     
-    @discardableResult func setProfile(displayName:String?, gender:String?, size:String?, unverifiedEmail:String?) -> Promise<Void>{
+    @discardableResult func setProfile(displayName:String?, gender:String?, size:String?, unverifiedEmail:String?, avatarURL:String? = nil) -> Promise<Void>{
         return Promise { fulfill, reject in
             let promise = makeAnonAccountPromise ?? Promise.init(value:())
             promise.then(execute: { () -> Void in
@@ -382,6 +382,9 @@ class UserAccountManager : NSObject {
                             UserDefaults.standard.set(unverifiedEmail, forKey: UserDefaultsKeys.email)
                         }
                         self.databaseRef.child("users").child(user.uid).child("unverifiedEmail").setValue(unverifiedEmail)
+                    }
+                    if let avatarUrl = avatarURL {
+                        self.databaseRef.child("users").child(user.uid).child("avatarURL").setValue(avatarUrl)
                     }
                     fulfill(())
                 }else{
@@ -534,6 +537,20 @@ extension UserAccountManager {
     
     func downloadAndReplaceUserData(){
         if let user = self.user{
+            
+            self.databaseRef.child("users").child(user.uid).child("avatarURL").observeSingleEvent(of: .value) { (snapshot) in
+                if let url = snapshot.value as? String  {
+                    UserDefaults.standard.setValue(url, forKey: UserDefaultsKeys.avatarURL)
+                }
+            }
+            if UserDefaults.standard.string(forKey: UserDefaultsKeys.name) == nil {
+                self.databaseRef.child("users").child(user.uid).child("displayName").observeSingleEvent(of: .value) { (snapshot) in
+                    if let displayName = snapshot.value as? String  {
+                        UserDefaults.standard.setValue(displayName, forKey: UserDefaultsKeys.name)
+                    }
+                }
+            }
+            
             self.databaseRef.child("users").child(user.uid).child("GDRP-agreedToEmail").observeSingleEvent(of: .value) { (snapshot) in
                 if let agreedToEmailNumber = snapshot.value as? NSNumber  {
                     let agreedToEmail = agreedToEmailNumber.boolValue
@@ -723,8 +740,9 @@ extension UserAccountManager {
             let uploadedImageURL = screenshot.uploadedImageURL {
             let trackingInfo = screenshot.trackingInfo ?? ""
             let source = screenshot.source.rawValue
+            let escapedAssetId = assetId.replacingOccurrences(of: "\"", with: "")
             let dict:[String:Any] = [
-                "assetId":assetId,
+                "assetId":escapedAssetId,
                 "createdAt":NSNumber.init(value: createdAtNumber as Double),
                 "source":source,
                 "uploadedImageURL":uploadedImageURL,
