@@ -387,7 +387,8 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
     }
     
     @objc func scanPhotoGalleryForFashion() {
-        guard PermissionsManager.shared.hasPermission(for: .photo) else {
+        guard PermissionsManager.shared.hasPermission(for: .photo),
+          UserDefaults.standard.bool(forKey: UserDefaultsKeys.gdpr_agreedToImageDetection) else {
             return
         }
         
@@ -444,7 +445,8 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
     
     
     func registerForPhotoChanges() {
-        guard PermissionsManager.shared.hasPermission(for: .photo) else {
+        guard PermissionsManager.shared.hasPermission(for: .photo),
+          UserDefaults.standard.bool(forKey: UserDefaultsKeys.gdpr_agreedToImageDetection) else {
             return
         }
         if isRegistered == false {
