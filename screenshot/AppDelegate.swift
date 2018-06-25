@@ -551,7 +551,6 @@ extension AppDelegate : KochavaTrackerDelegate {
         PushNotificationManager.push().delegate = self
         UNUserNotificationCenter.current().delegate = PushNotificationManager.push().notificationCenterDelegate // TODO: GMK already set to self in willFinishLaunching
         PushNotificationManager.push().sendAppOpen()
-        PushNotificationManager.push().registerForPushNotifications()
         
     }
     

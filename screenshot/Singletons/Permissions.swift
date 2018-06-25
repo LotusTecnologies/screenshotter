@@ -196,6 +196,7 @@ final class PermissionsManager : NSObject, CLLocationManagerDelegate {
     }
     
     fileprivate func requestPushPermission(with response: PermissionBlock?) {
+        PushNotificationManager.push().registerForPushNotifications()
         let options: UNAuthorizationOptions = [.alert, .badge, .sound]
         
         UNUserNotificationCenter.current().requestAuthorization(options: options) { (granted, error) in
