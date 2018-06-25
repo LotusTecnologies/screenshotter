@@ -278,7 +278,6 @@ extension ScreenshotsViewController {
     }
     
     @objc func refreshControlAction(_ refreshControl:UIRefreshControl){
-        
         if (refreshControl.isRefreshing) {
             DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
                 refreshControl.endRefreshing()
@@ -318,7 +317,6 @@ extension ScreenshotsViewController : FetchedResultsControllerManagerDelegate {
         change.shiftIndexSections(by: 2)
         change.applyChanges(collectionView: collectionView)
         syncEmptyListView()
-        
     }
 }
 
@@ -782,7 +780,6 @@ extension ScreenshotsViewController:UICollectionViewDelegateFlowLayout {
                 
             case .image :
                 let minimumSpacing = self.collectionViewInteritemOffset()
-                
                 let columns = CGFloat(self.numberOfCollectionViewImageColumns())
                 size.width = floor((collectionView.bounds.size.width - (minimumSpacing.x * (columns + 1))) / columns)
                 size.height = ceil(size.width * Screenshot.ratio.height)
@@ -902,22 +899,31 @@ extension ScreenshotsViewController: UICollectionViewDataSource {
     }
     
     private func collectionViewImageReferenceSize(section: Int, isFooter: Bool = false) -> CGSize {
-        if isEditing || collectionView.numberOfItems(inSection: section) == 0 {
-            return CGSize(width: view.bounds.size.width, height: 0.1)
-        }
-        else {
-            var canProgress = true
+        if section == Section.image.rawValue {
+            var size: CGSize = .zero
+            size.width = view.bounds.size.width
             
-            if isFooter {
-                let numberOfImages = self.collectionView(collectionView, numberOfItemsInSection: section)
-                canProgress = numberOfImages > 2
+            if isEditing || collectionView.numberOfItems(inSection: section) == 0 {
+                size.height = 0.1
             }
-            
-            if canProgress {
-                let height = ScreenshotsActionsCollectionReusableView.contentHeight
-                let minimumSpacing = collectionViewInteritemOffset()
-                return CGSize(width: view.bounds.size.width, height: height + minimumSpacing.y)
+            else {
+                var canProgress = true
+                
+                if isFooter {
+                    let numberOfImages = self.collectionView(collectionView, numberOfItemsInSection: section)
+                    canProgress = numberOfImages > 2
+                }
+                
+                if canProgress {
+                    let height = ScreenshotsActionsCollectionReusableView.contentHeight
+                    let minimumSpacing = collectionViewInteritemOffset()
+                    size.height = height + minimumSpacing.y
+                }
+                else {
+                    size.height = 0.1
+                }
             }
+            return size
         }
         return .zero
     }
@@ -961,7 +967,6 @@ extension ScreenshotsViewController: UICollectionViewDataSource {
             case .notification:
                 if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "notification", for: indexPath) as? ScreenshotNotificationCollectionViewCell{
                     self.setupScreenshotNotification(cell: cell, collectionView: collectionView, indexPath: indexPath)
-                    
                     return cell
                 }
             case .image:
