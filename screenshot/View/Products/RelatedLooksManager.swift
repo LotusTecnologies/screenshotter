@@ -27,7 +27,7 @@ class RelatedLooksManager: NSObject {
                 return false
             }
         }
-        if let products =  self.delegate?.relatedLooksManagerGetProducts(self) {
+        if let products =  self.delegate?.relatedLooksManagerGetProducts(self),  let _ = products.first?.shoppable?.relatedImagesUrl()  {
             return products.count > 0
         }
         return false
