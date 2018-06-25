@@ -7,22 +7,11 @@
 //
 
 import UIKit
-import Pushwoosh.PWInAppManager
 
 extension UIViewController {
     @discardableResult func presentProduct(_ product: Product, atLocation location: Analytics.AnalyticsProductOpenedFromPage) -> ProductViewController? {
         Analytics.trackTappedOnProduct(product, atLocation: location)
         
-        // TODO: rose 
-        let attributes: [String: Any] = [
-            "screenshotUrl" : product.screenshot?.uploadedImageURL ?? "",
-            "productName" : product.calculatedDisplayTitle ?? "",
-            "listPrice" : product.originalPrice ?? "",
-            "salePrice" : product.price ?? "",
-            "onSale" : product.isSale(),
-            "category" : product.categories ?? ""
-            ]
-        PWInAppManager.shared().postEvent("product tapped", withAttributes: attributes)
         
         if product.isSupportingUSC {
             let productViewController = ProductViewController(product: product)

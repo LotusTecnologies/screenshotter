@@ -333,6 +333,10 @@ public class AnalyticsUser : NSObject {
             props["name"] = name
         }
         
+        if let firebaseId = UserAccountManager.shared.user?.uid {
+            props["firebaseId"] = firebaseId
+        }
+        
         if let channel = UserDefaults.standard.string(forKey: UserDefaultsKeys.referralChannel) {
             props["referringChannel"] = channel
         }
