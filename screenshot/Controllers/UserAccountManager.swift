@@ -28,7 +28,11 @@ class FacebookProxy : NSObject, FBSDKLoginButtonDelegate {
         if let error = error {
             reject(error)
         }else if let result = result {
-            fulfill(result)
+            if result.isCancelled  || result.token == nil{
+                reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+            }else{
+                fulfill(result)
+            }
         }else{
             reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
         }
@@ -36,7 +40,7 @@ class FacebookProxy : NSObject, FBSDKLoginButtonDelegate {
     }
     
     func loginButtonDidLogOut(_ loginButton: FBSDKLoginButton!) {
-        
+        reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
     }
 }
 
@@ -61,6 +65,7 @@ class UserAccountManager : NSObject {
     }
     var email:String?
     lazy var databaseRef:DatabaseReference = Database.database().reference()
+    lazy var storageRef:StorageReference = Storage.storage().reference()
 
     static let shared = UserAccountManager()
 
@@ -83,11 +88,16 @@ class UserAccountManager : NSObject {
         let mode = queryParams?.queryItems?.first(where: {$0.name == "mode"})
         let code = queryParams?.queryItems?.first(where: {$0.name == "oobCode"})
         if let _ = mode?.value, let code = code?.value{
-            
             if let confirmVC = AppDelegate.shared.window?.rootViewController?.childViewControllers.last as? ConfirmCodeViewController {
                 confirmVC.applyCode(code: code)
             }
             if let resetVC = AppDelegate.shared.window?.rootViewController?.childViewControllers.last as? ResetPasswordViewController {
+                resetVC.code = code
+            }
+            if let confirmVC = AppDelegate.shared.window?.rootViewController?.childViewControllers.last?.childViewControllers.first?.presentedViewController?.childViewControllers.last as? ConfirmCodeViewController{
+                confirmVC.applyCode(code: code)
+            }
+            if let resetVC = AppDelegate.shared.window?.rootViewController?.childViewControllers.last?.childViewControllers.first?.presentedViewController?.childViewControllers.last as? ResetPasswordViewController {
                 resetVC.code = code
             }
             
@@ -102,26 +112,30 @@ class UserAccountManager : NSObject {
             let proxy = FacebookProxy.init()
             self.facebookProxy = proxy
             proxy.promise.then(execute: { (result) -> Void in
-                let credential = FacebookAuthProvider.credential(withAccessToken: FBSDKAccessToken.current().tokenString)
-                Auth.auth().signInAndRetrieveData(with: credential, completion: { (result, error) in
+                let completion:AuthDataResultCallback =  { (result, error) in
                     if let error = error{
-                        reject(error)
+                        let e = error as NSError
+                        if   e.domain == AuthErrorDomain && e.code == 17025 {
+                            //This credential is already associated with a different user account.
+                            reject(error)
+                        }
                     }else if let user = result?.user {
-                        if let name = user.displayName {
+                        if let name = user.providerData.first?.displayName {
                             self.databaseRef.child("users").child(user.uid).child("facebook-displayName").setValue(name)
                             self.databaseRef.child("users").child(user.uid).child("displayName").setValue(name)
-
+                            UserDefaults.standard.set(name, forKey: UserDefaultsKeys.name)
                         }
-                        if let email =  user.email {
+                        if let email = user.providerData.first?.email {
                             self.databaseRef.child("users").child(user.uid).child("facebook-email").setValue(email)
                             self.databaseRef.child("users").child(user.uid).child("email").setValue(email)
                             UserDefaults.standard.set(email, forKey: UserDefaultsKeys.email)
                         }
-                        if let phone = user.providerData.first?.phoneNumber {
+                        if let phone = user.providerData.first?.phoneNumber{
                             self.databaseRef.child("users").child(user.uid).child("facebook-phone").setValue(phone)
                         }
-                        if let photoURL = user.providerData.first?.photoURL {
-                            self.databaseRef.child("users").child(user.uid).child("facebook-photoURL").setValue(photoURL)
+                        if let photoURLString = user.providerData.first?.photoURL?.absoluteString {
+                            self.databaseRef.child("users").child(user.uid).child("facebook-photoURL").setValue(photoURLString)
+                            UserDefaults.standard.set(URL(string: photoURLString), forKey: UserDefaultsKeys.avatarURL)
                         }
                         
                         self.userFromLogin = user
@@ -138,14 +152,29 @@ class UserAccountManager : NSObject {
                         
                     }else {
                         reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
-
+                        
                     }
-                })
+                }
+                let credential = FacebookAuthProvider.credential(withAccessToken: FBSDKAccessToken.current().tokenString)
+                if let user = self.user {
+                    user.linkAndRetrieveData(with: credential, completion: { (result, error) in
+                        if let e = error,  (e as NSError).domain == AuthErrorDomain, (e as NSError).code == 17025 {
+//                            "This credential is already associated with a different user account."
+                            Auth.auth().signInAndRetrieveData(with: credential, completion:completion)
+                        }else{
+                            completion(result, error)
+                        }
+                    })
+                }else{
+                    Auth.auth().signInAndRetrieveData(with: credential, completion:completion)
+                }
             }).catch(execute: { (error) in
                 reject(error)
             })
         })
     }
+    
+    
     
     
     public func loginOrCreatAccountAsNeeded(email:String, password:String) -> Promise<LoginOrCreateAccountResult> {
@@ -174,7 +203,7 @@ class UserAccountManager : NSObject {
                     self.downloadAndReplaceUserData()
                     if user.isEmailVerified {
                         self.databaseRef.child("users").child(user.uid).child("email").setValue(email.lowercased())
-                        UserDefaults.standard.set(email, forKey: UserDefaultsKeys.email)
+                        UserDefaults.standard.set(email.lowercased(), forKey: UserDefaultsKeys.email)
                         fulfil(LoginOrCreateAccountResult.confirmed)
                     }else{
                         user.sendEmailVerification(completion: { (error) in
@@ -252,7 +281,7 @@ class UserAccountManager : NSObject {
                 }else{
                     if let user = self.user, let email = self.email {
                         self.databaseRef.child("users").child(user.uid).child("email").setValue(email.lowercased())
-                        UserDefaults.standard.set(email, forKey: UserDefaultsKeys.email)
+                        UserDefaults.standard.set(email.lowercased(), forKey: UserDefaultsKeys.email)
                     }
                     fulfill(())
                 }
@@ -260,14 +289,25 @@ class UserAccountManager : NSObject {
         }
     }
     
-    func resendConfirmCode(email:String) -> Promise<Void>{
+    func resendConfirmCode() -> Promise<Void>{
         return Promise { fulfill, reject in
-            reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+            if let user = self.user {
+                user.sendEmailVerification(completion: { (error) in
+                    if let error = error {
+                        reject(error)
+                    }else{
+                        fulfill(())
+                    }
+                })
+            }else{
+                reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+            }
+            
         }
     }
     
     public func validatePassword(_ password: String?) -> String? {
-        if let password = password, !password.isEmpty, password.lengthOfBytes(using: .utf8) >= 8 {
+        if let password = password, !password.isEmpty, password.lengthOfBytes(using: .utf8) >= 8, password != "password" {
             return password
         }
         return nil
@@ -298,13 +338,6 @@ class UserAccountManager : NSObject {
         }
     }
     
-    func signOut() -> Promise<Void>{
-        return Promise { fulfill, reject in
-            reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
-
-        }
-    }
-    
     @discardableResult func setGDPR(agreedToEmail:Bool, agreedToImageDetection:Bool) -> Promise<Void>{
         return Promise { fulfill, reject in
             
@@ -326,12 +359,13 @@ class UserAccountManager : NSObject {
         }
     }
     
-    @discardableResult func setProfile(displayName:String?, gender:String?, size:String?) -> Promise<Void>{
+    @discardableResult func setProfile(displayName:String?, gender:String?, size:String?, unverifiedEmail:String?) -> Promise<Void>{
         return Promise { fulfill, reject in
             let promise = makeAnonAccountPromise ?? Promise.init(value:())
             promise.then(execute: { () -> Void in
                 if let user = self.user {
                     if let displayName = displayName {
+                        UserDefaults.standard.set(displayName, forKey: UserDefaultsKeys.name)
                         self.databaseRef.child("users").child(user.uid).child("displayName").setValue(displayName)
                     }
                     if let gender = gender {
@@ -339,6 +373,12 @@ class UserAccountManager : NSObject {
                     }
                     if let size = size {
                         self.databaseRef.child("users").child(user.uid).child("size").setValue(size)
+                    }
+                    if let unverifiedEmail = unverifiedEmail {
+                        if UserDefaults.standard.value(forKey: UserDefaultsKeys.email) == nil {
+                            UserDefaults.standard.set(unverifiedEmail, forKey: UserDefaultsKeys.email)
+                        }
+                        self.databaseRef.child("users").child(user.uid).child("unverifiedEmail").setValue(unverifiedEmail)
                     }
                     fulfill(())
                 }else{
@@ -350,6 +390,29 @@ class UserAccountManager : NSObject {
         }
     }
 
+    func logout() -> Promise<Void>{
+        return Promise { fulfill, reject in
+            do {
+                FBSDKLoginManager().logOut()
+                if self.user?.isAnonymous == false || self.user?.providerData.first(where: {$0.providerID == "facebook.com"}) != nil {
+                    try Auth.auth().signOut()
+                    makeAnonAccountPromise = nil
+                    makeAnonAccount().then(execute: { () -> () in
+                        fulfill(())
+                    }).catch(execute: { (e) in
+                        fulfill(()) // not a bug.  you did logout - even if a new accout was not created.
+                    })
+                    
+                }else{
+                    fulfill(())
+                }
+                
+            }catch let error {
+                reject(error)
+            }
+            
+        }
+    }
     
 }
 extension UserAccountManager {
@@ -668,6 +731,35 @@ extension UserAccountManager {
             self.databaseRef.child("users").child(user.uid).child("screenshots").child(assetId).setValue(dict)
         }
 
+    }
+}
+
+extension UserAccountManager {
+    public func uploadImage(data:Data) -> Promise<URL> {
+        return Promise { fulfill, reject in
+            if let user = self.user {
+                let name = UUID().uuidString
+                let uploadRef = storageRef.child("user").child(user.uid).child("images").child("\(name).jpg")
+                
+                let uploadTask = uploadRef.putData(data, metadata: nil) { (metadata, error) in
+                    if let error = error {
+                        reject(error)
+                    }else{
+                        uploadRef.downloadURL { url, error in
+                            if let error = error {
+                                reject(error)
+                            } else if let url = url{
+                                fulfill(url)
+                            }else{
+                                reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+                            }
+                        }
+                    }
+                }
+            }else{
+                reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+            }
+        }
     }
 }
 

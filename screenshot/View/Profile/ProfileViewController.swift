@@ -7,12 +7,15 @@
 //
 
 import UIKit
+import Firebase
+import FBSDKLoginKit
+import FirebaseStorage
 
 @objc protocol ProfileViewControllerDelegate: NSObjectProtocol {
     func profileViewControllerDidGrantPermission(_ viewController: ProfileViewController)
 }
 
-class ProfileViewController: UITableViewController {
+class ProfileViewController: BaseTableViewController {
     enum Section: Int {
         case account
         case invite
@@ -129,7 +132,7 @@ class ProfileViewController: UITableViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         reloadChangeableIndexPaths()
-        
+        syncLoggedIn()
         super.viewWillAppear(animated)
     }
     
@@ -175,9 +178,20 @@ class ProfileViewController: UITableViewController {
     // MARK: Login
     
     private func syncLoggedIn() {
-        let isLoggedIn = true // TODO:
+        let isLoggedIn = (UserAccountManager.shared.user?.isAnonymous == false)
+        profileAccountView.isLoggedIn = isLoggedIn
         
         if isLoggedIn {
+            profileAccountView.name = UserDefaults.standard.string(forKey: UserDefaultsKeys.name)
+            profileAccountView.email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email)
+            
+            if let avatar = UserDefaults.standard.object(forKey: UserDefaultsKeys.avatar) as? UIImage {
+                profileAccountView.avatar = avatar
+            }
+            else {
+                profileAccountView.avatarURL = UserDefaults.standard.url(forKey: UserDefaultsKeys.avatarURL)
+            }
+            
             data[.logout] = [.logout]
         }
         else {
@@ -208,10 +222,14 @@ class ProfileViewController: UITableViewController {
 
 extension ProfileViewController: ProfileAccountViewDelegate {
     func profileAccountViewAuthorize(_ view: ProfileAccountView) {
-        // TODO: do login
-        view.isLoggedIn = true
         
-        syncLoggedIn()
+        let vc = RegisterViewController.init()
+        vc.isOnboardingLayout = false
+        vc.delegate = self
+        let navVC = UINavigationController.init(rootViewController: vc)
+        navVC.isNavigationBarHidden = true
+        self.present(navVC, animated: true, completion: nil)
+
     }
     
     func profileAccountViewWantsToContract(_ view: ProfileAccountView) {
@@ -248,6 +266,48 @@ extension ProfileViewController: ProfileAccountViewDelegate {
     }
 }
 
+extension ProfileViewController : RegisterViewControllerDelegate, ConfirmCodeViewControllerDelegate {
+    func confirmCodeViewControllerDidConfirm(_ viewController: ConfirmCodeViewController) {
+        self.dismiss(animated: true, completion: nil)
+        self.didLogin()
+    }
+    
+    func confirmCodeViewControllerDidCancel(_ viewController: ConfirmCodeViewController) {
+        viewController.navigationController?.popViewController(animated: true)
+    }
+    
+    func registerViewControllerDidSkip(_ viewController: RegisterViewController) {
+        self.dismiss(animated: true, completion: nil)
+    }
+    
+    func registerViewControllerNeedEmailConfirmation(_ viewController: RegisterViewController) {
+        let confirm = ConfirmCodeViewController()
+        confirm.email = viewController.email
+        confirm.delegate = self
+        viewController.navigationController?.pushViewController(confirm, animated: true)
+    }
+    
+    func didLogin(){
+        self.syncLoggedIn()
+    }
+    
+    func registerViewControllerDidSignin(_ viewController: RegisterViewController) {
+        self.dismiss(animated: true, completion: nil)
+        self.didLogin()
+    }
+    
+    func registerViewControllerDidFacebookLogin(_ viewController: RegisterViewController) {
+        self.dismiss(animated: true, completion: nil)
+        self.didLogin()
+    }
+    
+    func registerViewControllerDidFacebookSignup(_ viewController: RegisterViewController) {
+        self.dismiss(animated: true, completion: nil)
+        self.didLogin()
+    }
+    
+    
+}
 // MARK: - Table View
 
 extension ProfileViewController {
@@ -427,8 +487,9 @@ extension ProfileViewController {
             navigationController?.pushViewController(GDPRViewController(), animated: true)
             
         case .logout:
-            // TODO:
-            syncLoggedIn()
+            UserAccountManager.shared.logout().then(on: .main, execute: { () -> () in
+                self.syncLoggedIn()
+            })
         }
     }
     

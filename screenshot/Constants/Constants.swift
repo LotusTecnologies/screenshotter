@@ -19,8 +19,10 @@ class Constants {
     // Local notification constants.
     static let openingScreenKey = "openingScreenKey"
     static let openingScreenValueScreenshot = "openingScreenValueScreenshot"
+    static let openingScreenValueDiscover = "openingScreenValueDiscover"
     static let openingAssetIdKey = "openingAssetIdKey"
     static let tutorialScreenshotAssetId = "tutorialScreenshotAssetId"
+    static let openingProductKey = "openingProductKey"
     
     // DB
     static let currentMomVersion = 18
@@ -28,6 +30,10 @@ class Constants {
     // Cart
     static let cartItemMaxQuantity = 10
     
+    // Calculation
+    static let secondsInHour: TimeInterval = 3600
+    static let secondsInDay: TimeInterval = 86400
+
     // Syte
     static let syteAccountId = 6677
     static let syteAccountSignature = "GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU="

@@ -64,6 +64,10 @@ class Analytics {
             properties["screenshot-imageURL"] = uploadedImageURL
         }
         
+        if let remoteId = matchstick.remoteId {
+            properties["screenshot-id"] = remoteId
+        }
+        
         self.addScreenshotProperitesFrom(trackingData: matchstick.trackingInfo, toProperties: &properties)
         
         return properties
@@ -385,8 +389,34 @@ class AnalyticsTrackers : NSObject {
     let branch = BranchAnalyticsTracker()
     let pushwoosh = PushwooshAnalyticsTracker()
     let amplitude = AmplitudeAnalyticsTracker()
+    let recombee = RecombeeAnalyticsTracker()
 
     
+    class PushwooshAnalyticsTracker : NSObject, AnalyticsTracker {
+        func track(_ event: String, properties: [AnyHashable : Any]? = nil, sendEvenIfAdvertisingTrackingIsOptOut:Bool? = false ){
+
+        }
+        
+        func identify(_ user: AnalyticsUser) {
+            
+        }
+    }
+    
+    class RecombeeAnalyticsTracker : NSObject {
+        enum RecombeeEvent:String {
+            case addBookmark
+            case positiveRating
+            case negativeRating
+            case detailView    // burrow
+            case addToCart   //whent o safari
+        }
+        
+        func track(event:RecombeeEvent, itemId:String){
+            
+        }
+       
+    }
+
     class AppseeAnalyticsTracker : NSObject, AnalyticsTracker {
         func track(_ event: String, properties: [AnyHashable : Any]? = nil, sendEvenIfAdvertisingTrackingIsOptOut:Bool? = false ){
             if  ASIdentifierManager.shared().isAdvertisingTrackingEnabled || sendEvenIfAdvertisingTrackingIsOptOut == true {
@@ -440,6 +470,7 @@ class AnalyticsTrackers : NSObject {
     
     
     class AmplitudeAnalyticsTracker : NSObject, AnalyticsTracker {
+
         func track(_ event: String, properties: [AnyHashable : Any]?, sendEvenIfAdvertisingTrackingIsOptOut: Bool?) {
             if  ASIdentifierManager.shared().isAdvertisingTrackingEnabled || sendEvenIfAdvertisingTrackingIsOptOut == true {
                 DispatchQueue.mainAsyncIfNeeded {

@@ -17,6 +17,8 @@ class UserDefaultsKeys  {
     // User
     static let email = "Email"
     static let name = "Name"
+    static let avatar = "Avatar"
+    static let avatarURL = "AvatarURL"
     static let userID = "UserID"
     static let referralChannel = "ReferralChannel"
     static let campaign = "Campaign"
@@ -70,9 +72,6 @@ class UserDefaultsKeys  {
 
     // DB
     static let lastDbVersionMigrated = "LastDbVersionMigrated"
-    
-    // Clarifai
-    static let isModelDownloaded = "IsModelDownloaded"
     
     // Discover
     static let discoverScreenshotPresentedHelper = "discoverScreenshotPresentedHelper"

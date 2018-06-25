@@ -34,7 +34,7 @@ class ProductsViewController: BaseViewController {
     var screenshot:Screenshot
     var screenshotController: FetchedResultsControllerManager<Screenshot>?
     fileprivate var productsFRC: FetchedResultsControllerManager<Product>?
-    
+    let recoverLostSaleManager = RecoverLostSaleManager()
     var products:[Product] = []
     var relatedLooksManager = RelatedLooksManager()
     
@@ -88,7 +88,7 @@ class ProductsViewController: BaseViewController {
         self.restorationIdentifier = "ProductsViewController"
         
         self.productsOptions.delegate = self
-        
+        recoverLostSaleManager.delegate = self
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "NavigationBarFilter"), style: .plain, target: self, action: #selector(presentOptions))
     }
     
@@ -229,7 +229,10 @@ class ProductsViewController: BaseViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        self.dismissOptions()
+        if let _ = self.presentedViewController as? ProductsOptionsViewController {
+            self.dismissOptions()
+        }
+        
         hideShareToDiscoverPrompt()
     }
     
@@ -426,6 +429,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
 
         if sectionType == .product {
             let product = self.productAtIndex(indexPath.item)
+            self.recoverLostSaleManager.didClick(on: product)
             if let productViewController = presentProduct(product, atLocation: .products) {
                 productViewController.similarProducts = products
             }
@@ -861,6 +865,12 @@ extension ProductsViewController : AsyncOperationMonitorDelegate {
     
     func asyncOperationMonitorDidChange(_ monitor: AsyncOperationMonitor) {
         self.updateLoadingState()
+    }
+
+}
+extension ProductsViewController: RecoverLostSaleManagerDelegate {
+    func recoverLostSaleManager(_ manager:RecoverLostSaleManager, returnedFrom product:Product){
+        self.recoverLostSaleManager.presetRecoverAlertViewFor(product: product, in: self)
     }
 
 }

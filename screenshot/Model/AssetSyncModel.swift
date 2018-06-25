@@ -8,20 +8,9 @@
 
 import UIKit
 import Photos
-import MobileCoreServices // kUTTypeImage
 import CoreData // NSManagedObjectContext
 import PromiseKit
-import UserNotifications
 import SDWebImage
-
-class BackgroundScreenshotData { // Is class, not struct, to save copying around the non-trivial imageData
-    let assetId: String
-    var imageData: Data?
-    init(assetId: String, imageData: Data?) {
-        self.assetId = assetId
-        self.imageData = imageData
-    }
-}
 
 class AssetSyncModel: NSObject {
     
@@ -177,9 +166,10 @@ extension AssetSyncModel {
                                                                                               syteJsonString: nil)
                                 addedScreenshot.isNew = false //Always entered immediatly when added
                                 
+                                
                                 // download stye stuff for URL
                                 AssetSyncModel.sharedInstance.syteProcessing(imageData: nil, orImageUrlString: urlString, assetId: urlString)
-                                
+                                Analytics.trackScreenshotCreated(screenshot: addedScreenshot)
                                 if let callback = callback {
                                     let addedScreenshotOID = addedScreenshot.objectID
                                     DispatchQueue.main.async {
@@ -227,6 +217,8 @@ extension AssetSyncModel {
                 managedObjectContext.saveIfNeeded()
                 self.syteProcessing(imageData: smallImageData, orImageUrlString:nil, assetId: assetId)
                 
+                Analytics.trackCreatedPhoto()
+                Analytics.trackScreenshotCreated(screenshot: screenshot)
             }
         }))
     }
@@ -246,6 +238,7 @@ extension AssetSyncModel {
                                     classification.utf8.count == 1 { // Previously dual-purposed syteJson for imageClassification of "h" (human) or "f" (furniture)
                                     screenshot.syteJson = nil
                                 }
+                                let wasHidden = screenshot.isHidden
                                 
                                 if screenshot.shoppablesCount > 0 {
                                     screenshot.hideWorkhorse()
@@ -263,6 +256,9 @@ extension AssetSyncModel {
                                 screenshot.submittedFeedbackCountDate = nil
                                 
                                 managedObjectContext.saveIfNeeded()
+                                if wasHidden {
+                                Analytics.trackScreenshotCreated(screenshot: screenshot)
+                                }
                                 fulfill((imageData, screenshot.uploadedImageURL, screenshot.syteJson))
                             }else{
                                 let screenshot = Screenshot(context: managedObjectContext)
@@ -344,6 +340,7 @@ extension AssetSyncModel {
                                                                             imageData: imageData,
                                                                             uploadedImageURL: nil,
                                                                             syteJsonString: nil)
+                            Analytics.trackScreenshotCreated(screenshot: screenshot)
                             fulfil(screenshotDict)
                         }
                     })
@@ -493,7 +490,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                             }else{
                                 let isHidden = ( !isRecognized || !isForeground)
                                 let syteJsonString = NetworkingPromise.sharedInstance.jsonStringify(object: syteJson)
-                                let _ = DataModel.sharedInstance.saveScreenshot(managedObjectContext: managedObjectContext,
+                                let screenshot = DataModel.sharedInstance.saveScreenshot(managedObjectContext: managedObjectContext,
                                                                                 assetId: asset.localIdentifier,
                                                                                 createdAt: asset.creationDate,
                                                                                 isRecognized: isRecognized,
@@ -502,6 +499,10 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                                                                                 imageData: imageData,
                                                                                 uploadedImageURL: uploadedImageURL,
                                                                                 syteJsonString: syteJsonString)
+                                
+                                if screenshot.isHidden == false {
+                                    Analytics.trackScreenshotCreated(screenshot: screenshot)
+                                }
                                 
                                 fulfill((imageData, uploadedImageURL, syteJson))
                             }
@@ -521,7 +522,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                             DispatchQueue.main.async {
                                 // The accumulator updates the count in an async block.
                                 // Without a delay the count is wrong when setting the content.badge.
-                                self.sendScreenshotAddedLocalNotification(backgroundScreenshotData: [BackgroundScreenshotData(assetId: asset.localIdentifier, imageData: imageData)])
+                                LocalNotificationModel.shared.sendScreenshotAddedLocalNotification(assetId: asset.localIdentifier, imageData: imageData)
                             }
                         }
                     }
@@ -597,7 +598,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                                 self.processingQ.async {
                                     if self.shouldSendPushWhenFindFashionWithoutUserScreenshotAction && ApplicationStateModel.sharedInstance.isBackground(){  //need to check twice due to async craziness
                                         self.shouldSendPushWhenFindFashionWithoutUserScreenshotAction = false
-                                        self.sendScreenshotAddedLocalNotification(backgroundScreenshotData: [BackgroundScreenshotData.init(assetId: asset.localIdentifier, imageData: imageData)])
+                                        LocalNotificationModel.shared.sendScreenshotAddedLocalNotification(assetId: asset.localIdentifier, imageData: imageData)
                                     }
                                 }
                             }
@@ -619,58 +620,6 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
         }))
     }
     
-    func sendScreenshotAddedLocalNotification(backgroundScreenshotData: [BackgroundScreenshotData]) {
-        guard PermissionsManager.shared.hasPermission(for: .push) else {
-            return
-        }
-        
-        let content = UNMutableNotificationContent()
-        content.title = "notification.title".localized
-        content.body = "notification.message".localized
-        if let lastNotificationSound = UserDefaults.standard.object(forKey: UserDefaultsKeys.dateLastSound) as? Date,
-            -lastNotificationSound.timeIntervalSinceNow < 60 { // 1 minute
-            content.sound = nil
-        } else {
-            content.sound = UNNotificationSound.default()
-        }
-        UserDefaults.standard.setValue(Date(), forKey: UserDefaultsKeys.dateLastSound)
-        content.userInfo = [Constants.openingScreenKey  : Constants.openingScreenValueScreenshot]
-        
-        var identifier = "CrazeLocal"
-        if let representativeScreenshotData = backgroundScreenshotData.reversed().first(where: { $0.imageData != nil }), // Last taken screenshot that has imageData.
-            let representativeImageData = representativeScreenshotData.imageData {
-            
-            content.userInfo = [Constants.openingScreenKey  : Constants.openingScreenValueScreenshot,
-                                Constants.openingAssetIdKey : representativeScreenshotData.assetId]
-            
-            identifier += representativeScreenshotData.assetId.replacingOccurrences(of: "/", with: "-")
-            // Add image url
-            let tmpImageFileUrl = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(identifier).appendingPathExtension("jpg")
-            do {
-                try representativeImageData.write(to: tmpImageFileUrl)
-                let attachment = try UNNotificationAttachment(identifier: identifier,
-                                                              url: tmpImageFileUrl,
-                                                              options: [UNNotificationAttachmentOptionsTypeHintKey : kUTTypeImage])
-                content.attachments = [attachment]
-            } catch {
-                print("Local notification attachment error:\(error)")
-            }
-        }
-        
-        content.badge = NSNumber(value: AccumulatorModel.screenshotUninformed.uninformedCount)
-        
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.1, repeats: false)
-        let request = UNNotificationRequest(identifier: identifier,
-                                            content: content,
-                                            trigger: trigger)
-        UNUserNotificationCenter.current().add(request, withCompletionHandler: { (error) in
-            if let error = error {
-                print("sendScreenshotAddedLocalNotification identifier:\(identifier)  error:\(error)")
-            } else {
-                Analytics.trackAppSentLocalPushNotification()
-            }
-        })
-    }
     
 }
 
@@ -686,6 +635,7 @@ extension AssetSyncModel {
                         classification.utf8.count == 1 { // Previously dual-purposed syteJson for imageClassification of "h" (human) or "f" (furniture)
                         screenshot.syteJson = nil
                     }
+                    let wasHidden  = screenshot.isHidden
                     if screenshot.shoppablesCount > 0 {
                         screenshot.hideWorkhorse()
                     }
@@ -695,6 +645,9 @@ extension AssetSyncModel {
                     screenshot.isRecognized = true
                     screenshot.lastModified = Date()
                     managedObjectContext.saveIfNeeded()
+                    if wasHidden {
+                        Analytics.trackScreenshotCreated(screenshot: screenshot)
+                    }
                     fulfill(imageData)
                 } else {
                     let error = NSError(domain: "Craze", code: 18, userInfo: [NSLocalizedDescriptionKey : "Could not retreive screenshot with assetId:\(assetId)"])
@@ -737,13 +690,38 @@ extension AssetSyncModel {
             self.networkingIndicatorDelegate?.networkingIndicatorDidStart(type: .Product)
         }
         self.syteProcessingQueue.addOperation(AsyncOperation(timeout: 90, assetId: assetId, shoppableId: nil, completion: { (completion) in
-            firstly {
+            Promise<(Data?, String?)>.init(resolvers: { (fulfil, reject) in
+                if let data = localImageData {
+                    UserAccountManager.shared.uploadImage(data: data).then(execute: { (url) -> () in
+                        fulfil((nil, url.absoluteString))
+                    }).catch{_ in
+                        fulfil((data, orImageUrlString))
+                    }
+                }else {
+                    fulfil((localImageData, orImageUrlString))
+                }
+            }).then(on: self.processingQ) { (arg) -> Promise<(String, [[String : Any]])> in
+                
+                let (localImageData, orImageUrlString) = arg
                 return (gottenUploadedURLString != nil && gottenSegments != nil) ? Promise(value: (gottenUploadedURLString!, gottenSegments!)) : NetworkingPromise.sharedInstance.uploadToSyte(imageData: localImageData, orImageUrlString:orImageUrlString)
+                
                 }.then(on: self.processingQ) { uploadedURLString, segments -> Void in
-                    let categories = segments.map({ (segment: [String : Any]) -> String? in segment["label"] as? String}).compactMap({$0}).joined(separator: ",")
+                    let categoriesArray = segments.map({ (segment: [String : Any]) -> String? in segment["label"] as? String}).compactMap({$0})
+                    let categories = categoriesArray.joined(separator: ",")
+                    
                     Analytics.trackReceivedResponseFromSyte(imageUrl: uploadedURLString, segmentCount: segments.count, categories: categories)
                     
+                    DataModel.sharedInstance.performBackgroundTask({ (context) in
+                        guard let screenshot = context.screenshotWith(assetId: assetId) else {
+                            return
+                        }
+                        categoriesArray.forEach({ category in
+                            Analytics.trackScreenshotCreatedPerCategory(screenshot: screenshot, category: category)
+                        })
+                    })
+                    
                     #if STORE_NEW_TUTORIAL_SCREENSHOT
+
                     print("uploadedURLString:\(uploadedURLString)\nsegments:\(segments)")
                     #endif
                     self.saveShoppables(assetId: assetId, uploadedURLString: uploadedURLString, segments: segments, optionsMask: optionsMask)
@@ -1373,6 +1351,7 @@ extension AssetSyncModel {
                                                              imageData: imageData,
                                                              uploadedImageURL: nil,
                                                              syteJsonString: nil)
+                            Analytics.trackScreenshotCreated(screenshot: screenshot)
                             fulfill(imageData)
                         }
                     }
