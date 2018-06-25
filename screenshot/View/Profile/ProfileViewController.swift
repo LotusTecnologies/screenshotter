@@ -15,7 +15,7 @@ import FirebaseStorage
     func profileViewControllerDidGrantPermission(_ viewController: ProfileViewController)
 }
 
-class ProfileViewController: UITableViewController {
+class ProfileViewController: BaseTableViewController {
     enum Section: Int {
         case account
         case invite

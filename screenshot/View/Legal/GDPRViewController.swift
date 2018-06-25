@@ -8,7 +8,7 @@
 
 import UIKit
 
-class GDPRViewController: UITableViewController {
+class GDPRViewController: BaseTableViewController {
     enum Rows: Int {
         case notification
         case imageDetection

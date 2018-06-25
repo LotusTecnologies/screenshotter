@@ -1,14 +1,14 @@
 //
-//  BaseViewController.swift
+//  BaseTableViewController.swift
 //  screenshot
 //
-//  Created by Gershon Kagan on 2/11/18.
-//  Copyright (c) 2018 crazeapp. All rights reserved.
+//  Created by Corey Werner on 6/25/18.
+//  Copyright © 2018 crazeapp. All rights reserved.
 //
 
 import UIKit
 
-class BaseViewController: UIViewController {
+class BaseTableViewController: UITableViewController {
     weak var lifeCycleDelegate: ViewControllerLifeCycle?
     var isStatusBarHidden = false
     

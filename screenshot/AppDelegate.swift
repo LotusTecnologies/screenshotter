@@ -46,7 +46,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UNUserNotificationCenter.current().delegate = self
         
         let _ = UserAccountManager.shared.application(application, didFinishLaunchingWithOptions: launchOptions)
-
+        
         window = UIWindow(frame: UIScreen.main.bounds)
         
         if DataModel.sharedInstance.storeNeedsMigration() {
@@ -396,6 +396,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
         return viewController
+    }
+    
+    // MARK: Hidden Logo
+    
+    private let hiddenLogoController = HiddenLogoController()
+    
+    func syncHiddenLogo() {
+        hiddenLogoController.syncView()
     }
 }
 
