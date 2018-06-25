@@ -696,9 +696,20 @@ extension AssetSyncModel {
                 let (localImageData, orImageUrlString) = arg
                 return (gottenUploadedURLString != nil && gottenSegments != nil) ? Promise(value: (gottenUploadedURLString!, gottenSegments!)) : NetworkingPromise.sharedInstance.uploadToSyte(imageData: localImageData, orImageUrlString:orImageUrlString)
             }.then(on: self.processingQ) { uploadedURLString, segments -> Void in
-                    let categories = segments.map({ (segment: [String : Any]) -> String? in segment["label"] as? String}).compactMap({$0}).joined(separator: ",")
-                    Analytics.trackReceivedResponseFromSyte(imageUrl: uploadedURLString, segmentCount: segments.count, categories: categories)
-
+                let categoriesArray = segments.map({ (segment: [String : Any]) -> String? in segment["label"] as? String}).compactMap({$0})
+                let categories = categoriesArray.joined(separator: ",")
+                
+                Analytics.trackReceivedResponseFromSyte(imageUrl: uploadedURLString, segmentCount: segments.count, categories: categories)
+                
+                DataModel.sharedInstance.performBackgroundTask({ (context) in
+                    guard let screenshot = context.screenshotWith(assetId: assetId) else {
+                        return
+                    }
+                    categoriesArray.forEach({ category in
+                        Analytics.trackScreenshotCreatedPerCategory(screenshot: screenshot, category: category)
+                    })
+                })
+                
 #if STORE_NEW_TUTORIAL_SCREENSHOT
                     print("uploadedURLString:\(uploadedURLString)\nsegments:\(segments)")
 #endif
