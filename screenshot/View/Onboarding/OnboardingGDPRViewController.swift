@@ -8,8 +8,8 @@
 
 import UIKit
 
-protocol OnboardingGDPRViewControllerDelegate : class {
-    func onboardingGDPRViewController(agreedToEmail:Bool, agreedToImageDetection:Bool)
+protocol OnboardingGDPRViewControllerDelegate: NSObjectProtocol {
+    func onboardingGDPRViewControllerDidComplete(_ viewController: OnboardingGDPRViewController)
 }
 
 class OnboardingGDPRView: UIView {
@@ -203,8 +203,11 @@ class OnboardingGDPRViewController: UIViewController {
     }
     
     @objc private func continueAction() {
+        Analytics.trackOnboardingGdpr(agreedToEmail: agreedToEmail, agreedToImageDetection: agreedToImageDetection)
+        UserAccountManager.shared.setGDPR(agreedToEmail: agreedToEmail, agreedToImageDetection: agreedToImageDetection)
+        
         print("agreedToEmail :\(agreedToEmail),agreedToImageDetection: \(agreedToImageDetection)" )
-        self.delegate?.onboardingGDPRViewController(agreedToEmail: agreedToEmail, agreedToImageDetection: agreedToImageDetection)
+        self.delegate?.onboardingGDPRViewControllerDidComplete(self)
     }
 }
 
