@@ -740,8 +740,9 @@ extension UserAccountManager {
             let uploadedImageURL = screenshot.uploadedImageURL {
             let trackingInfo = screenshot.trackingInfo ?? ""
             let source = screenshot.source.rawValue
+            let escapedAssetId = assetId.replacingOccurrences(of: "\"", with: "")
             let dict:[String:Any] = [
-                "assetId":assetId,
+                "assetId":escapedAssetId,
                 "createdAt":NSNumber.init(value: createdAtNumber as Double),
                 "source":source,
                 "uploadedImageURL":uploadedImageURL,
