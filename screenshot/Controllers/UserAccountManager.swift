@@ -139,6 +139,7 @@ class UserAccountManager : NSObject {
                         }
                         
                         self.userFromLogin = user
+                        self.databaseRef.child("users").child(user.uid).child("identifier").setValue(AnalyticsUser.current.identifier)
                         self.downloadAndReplaceUserData()
                         self.databaseRef.child("users").child(user.uid).child("createdAt").observeSingleEvent(of: .value) { (snapshot) in
                             if let _ = snapshot.value as? NSNumber {
@@ -200,6 +201,7 @@ class UserAccountManager : NSObject {
                 }else if let authResult = authResult {
                     let user = authResult.user
                     self.userFromLogin = user
+                    self.databaseRef.child("users").child(user.uid).child("identifier").setValue(AnalyticsUser.current.identifier)
                     self.downloadAndReplaceUserData()
                     if user.isEmailVerified {
                         self.databaseRef.child("users").child(user.uid).child("email").setValue(email.lowercased())
@@ -234,6 +236,7 @@ class UserAccountManager : NSObject {
                     }else  if let authResult = authResult {
                         let user = authResult.user
                         self.userFromLogin = user
+                        self.databaseRef.child("users").child(user.uid).child("identifier").setValue(AnalyticsUser.current.identifier)
                         self.downloadAndReplaceUserData()
                         fulfil(())
                     }else{
@@ -253,6 +256,7 @@ class UserAccountManager : NSObject {
                 }else  if let authResult = authResult {
                     let user = authResult.user
                     self.userFromLogin = user
+                    self.databaseRef.child("users").child(user.uid).child("identifier").setValue(AnalyticsUser.current.identifier)
                     self.downloadAndReplaceUserData()
                     if authResult.user.isEmailVerified {
                         fulfil(LoginOrCreateAccountResult.confirmed)
