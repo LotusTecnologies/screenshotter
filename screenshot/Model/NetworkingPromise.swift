@@ -327,11 +327,11 @@ class NetworkingPromise : NSObject {
         let sessionConfiguration = URLSessionConfiguration.default
         sessionConfiguration.timeoutIntervalForRequest = 60
         return URLSession(configuration: sessionConfiguration).dataTask(with: URLRequest(url: url)).asDataAndResponse().then { (data, response) -> Promise<URL> in
-            var tmpImageFileUrl = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(identifier)
-            let originalExtension = url.pathExtension
-            if !originalExtension.isEmpty {
-                tmpImageFileUrl.appendPathExtension(originalExtension)
+            var extensionToUse = url.pathExtension
+            if extensionToUse.isEmpty {
+                extensionToUse = "jpg"
             }
+            let tmpImageFileUrl = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(identifier).appendingPathExtension(extensionToUse)
             do {
                 try data.write(to: tmpImageFileUrl)
                 return Promise(value: tmpImageFileUrl)
