@@ -549,7 +549,7 @@ extension AppDelegate : KochavaTrackerDelegate {
         
         // Pushwoosh
         PushNotificationManager.push().delegate = self
-        UNUserNotificationCenter.current().delegate = PushNotificationManager.push().notificationCenterDelegate // TODO: GMK already set to self in willFinishLaunching
+        // UNUserNotificationCenter.current().delegate = PushNotificationManager.push().notificationCenterDelegate // Set to self in willFinishLaunching; forwards the calls to pushwoosh.
         PushNotificationManager.push().sendAppOpen()
         PushNotificationManager.push().registerForPushNotifications()
         
@@ -757,11 +757,13 @@ extension AppDelegate {
 extension AppDelegate : UNUserNotificationCenterDelegate {
     
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-        print("GMK AppDelegate userNotificationCenter didReceive response:\(response)")
+        var isHandled = false
         if let userInfo = response.notification.request.content.userInfo as? [String : Any] {
             if let openingScreen = userInfo[Constants.openingScreenKey] as? String {
+                isHandled = true
                 if openingScreen == Constants.openingScreenValueScreenshot {
                     if let openingAssetId = userInfo[Constants.openingAssetIdKey] as? String {
+                        Analytics.trackAppOpenedFromLocalNotification()
                         AssetSyncModel.sharedInstance.importPhotosToScreenshot(assetIds: [openingAssetId], source: .screenshot)
                     }
                     showScreenshotListTop()
@@ -771,15 +773,21 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
                     }
                 }
             } else if let openingProductKey = userInfo[Constants.openingProductKey] as? String {
+                isHandled = true
                 ProductViewController.present(imageURL: openingProductKey)
             } else if let aps = userInfo["aps"] as? [String : Any],
-                let category = aps["category"] as? String,
-                category == "PRICE_ALERT",
-                let partNumber = userInfo["partNumber"] as? String,
-                !partNumber.isEmpty {
-                
+              let category = aps["category"] as? String,
+              category == "PRICE_ALERT",
+              let partNumber = userInfo["partNumber"] as? String,
+              !partNumber.isEmpty {
+                isHandled = true
                 ProductViewController.present(with: partNumber)
             }
+        }
+        
+        guard isHandled else {
+            PushNotificationManager.push().notificationCenterDelegate.userNotificationCenter?(center, didReceive: response, withCompletionHandler: completionHandler)
+            return
         }
         
         completionHandler()
@@ -793,15 +801,16 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
         case LocalNotificationIdentifier.saleCount.rawValue:
             Analytics.trackAppOpenedFromTimedLocalNotification(source: .saleCount)
         default:
-            Analytics.trackAppOpenedFromLocalNotification()
+            break
         }
     }
     
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        print("GMK AppDelegate userNotificationCenter willPresent notification:\(notification)")
-        let category = notification.request.content.categoryIdentifier
-        let options: UNNotificationPresentationOptions = category == "PRICE_ALERT" ? [.alert, .badge, .sound] : []
-        completionHandler(options)
+        if notification.request.content.categoryIdentifier == "PRICE_ALERT" {
+            completionHandler([.alert, .badge, .sound])
+        } else {
+            PushNotificationManager.push().notificationCenterDelegate.userNotificationCenter?(center, willPresent: notification, withCompletionHandler: completionHandler)
+        }
     }
     
 }
