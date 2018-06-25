@@ -86,7 +86,6 @@ class ScreenshotsViewController: BaseViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
         syncEmptyListView()
         self.updateHasNewScreenshot()
     }

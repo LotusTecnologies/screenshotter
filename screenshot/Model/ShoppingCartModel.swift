@@ -363,7 +363,7 @@ class ShoppingCartModel {
                     return
                 }
                 if let dateModified = rootProduct.dateCheckedStock as Date?,
-                    -dateModified.timeIntervalSinceNow <= 60 * 60 {
+                    -dateModified.timeIntervalSinceNow <= Constants.secondsInHour {
                     fulfill("")
                 } else {
                     // Delete the old variants.

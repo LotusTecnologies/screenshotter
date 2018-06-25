@@ -73,9 +73,6 @@ class UserDefaultsKeys  {
     // DB
     static let lastDbVersionMigrated = "LastDbVersionMigrated"
     
-    // Clarifai
-    static let isModelDownloaded = "IsModelDownloaded"
-    
     // Discover
     static let discoverScreenshotPresentedHelper = "discoverScreenshotPresentedHelper"
     
