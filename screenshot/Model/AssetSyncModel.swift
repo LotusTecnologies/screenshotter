@@ -340,7 +340,7 @@ extension AssetSyncModel {
                                                                             imageData: imageData,
                                                                             uploadedImageURL: nil,
                                                                             syteJsonString: nil)
-                            Analytics.trackScreenshotCreated(screenshot: screenshot)
+                            Analytics.trackScreenshotCreated(screenshot: context.screenshotWith(assetId: shareId))
                             fulfil(screenshotDict)
                         }
                     })
@@ -1342,8 +1342,9 @@ extension AssetSyncModel {
                 getData.then(on: self.processingQ) { imageData -> Promise<Data?> in
                     return Promise { fulfill, reject in
                         self.performBackgroundTask(assetId: Constants.tutorialScreenshotAssetId, shoppableId: nil) { (managedObjectContext) in
+                            let assetId = Constants.tutorialScreenshotAssetId
                             let _ = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
-                                                             assetId: Constants.tutorialScreenshotAssetId,
+                                                             assetId: assetId,
                                                              createdAt: Date(),
                                                              isRecognized: true,
                                                              source: .tutorial,
@@ -1351,7 +1352,7 @@ extension AssetSyncModel {
                                                              imageData: imageData,
                                                              uploadedImageURL: nil,
                                                              syteJsonString: nil)
-                            Analytics.trackScreenshotCreated(screenshot: screenshot)
+                            Analytics.trackScreenshotCreated(screenshot: managedObjectContext.screenshotWith(assetId: assetId))
                             fulfill(imageData)
                         }
                     }
