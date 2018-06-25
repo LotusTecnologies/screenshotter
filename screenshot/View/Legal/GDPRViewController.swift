@@ -13,7 +13,9 @@ class GDPRViewController: BaseTableViewController {
         case notification
         case imageDetection
     }
-    
+    var agreedToEmail = UserDefaults.standard.bool(forKey: UserDefaultsKeys.gdpr_agreedToEmail)
+    var agreedToImageDetection = UserDefaults.standard.bool(forKey: UserDefaultsKeys.gdpr_agreedToImageDetection)
+
     override init(style: UITableViewStyle) {
         super.init(style: style)
         
@@ -80,13 +82,13 @@ extension GDPRViewControllerTableView {
     }
     
     override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        var isSelected = true // TODO:
+        var isSelected = true
         
         if indexPath.row == GDPRViewController.Rows.notification.rawValue {
-            
+            isSelected = self.agreedToEmail
         }
         else if indexPath.row == GDPRViewController.Rows.imageDetection.rawValue {
-            
+            isSelected = self.agreedToImageDetection
         }
         
         if isSelected {
@@ -94,12 +96,23 @@ extension GDPRViewControllerTableView {
         }
     }
     
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    override func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
         if indexPath.row == GDPRViewController.Rows.notification.rawValue {
-            
+            self.agreedToEmail = false
         }
         else if indexPath.row == GDPRViewController.Rows.imageDetection.rawValue {
-            
+            self.agreedToImageDetection = false
         }
+        UserAccountManager.shared.setGDPR(agreedToEmail: self.agreedToEmail, agreedToImageDetection: self.agreedToImageDetection)
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if indexPath.row == GDPRViewController.Rows.notification.rawValue {
+            self.agreedToEmail = true
+        }
+        else if indexPath.row == GDPRViewController.Rows.imageDetection.rawValue {
+            self.agreedToImageDetection = true
+        }
+        UserAccountManager.shared.setGDPR(agreedToEmail: self.agreedToEmail, agreedToImageDetection: self.agreedToImageDetection)
     }
 }
