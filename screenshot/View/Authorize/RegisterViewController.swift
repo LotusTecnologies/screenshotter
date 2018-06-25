@@ -447,7 +447,9 @@ class RegisterViewController: UIViewController {
             delegate?.registerViewControllerDidSkip(self)
 
         }
-        if let password = _view.passwordTextField.text, password.lengthOfBytes(using: .utf8) == 0, let email = _view.emailTextField.text, email.lengthOfBytes(using: .utf8) == 0{
+        self.resignFirstResponder()
+
+        if let password = _view.passwordTextField.text, password.lengthOfBytes(using: .utf8) == 0 {
             skip()
         }else{
             let alert = UIAlertController.init(title: nil, message: "authorize.register.skipConfirm".localized, preferredStyle: .alert)
