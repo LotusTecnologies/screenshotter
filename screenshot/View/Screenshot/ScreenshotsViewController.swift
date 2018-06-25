@@ -234,6 +234,7 @@ extension ScreenshotsViewController {
             collectionView.register(ScreenshotProductBarCollectionViewCell.self, forCellWithReuseIdentifier: "product")
             collectionView.register(ScreenshotNotificationCollectionViewCell.self, forCellWithReuseIdentifier: "notification")
             collectionView.register(ScreenshotCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
+            collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "blankCell")
             
             collectionView.register(ScreenshotsActionsCollectionReusableView.self, forSupplementaryViewOfKind: UICollectionElementKindSectionHeader, withReuseIdentifier: "header")
             collectionView.register(ScreenshotsActionsCollectionReusableView.self, forSupplementaryViewOfKind: UICollectionElementKindSectionFooter, withReuseIdentifier: "footer")
@@ -318,7 +319,13 @@ extension ScreenshotsViewController : FetchedResultsControllerManagerDelegate {
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
         change.shiftIndexSections(by: 2)
         change.applyChanges(collectionView: collectionView)
+        
+        if self.screenshotFrcManager?.fetchedObjectsCount == 0 {
+            collectionView.insertItems(at: [IndexPath(item: 2, section: 0)])
+        }
+        
         syncEmptyListView()
+        
         
     }
 }
@@ -904,7 +911,7 @@ extension ScreenshotsViewController: UICollectionViewDataSource {
     
     private func collectionViewImageReferenceSize(section: Int, isFooter: Bool = false) -> CGSize {
         if isEditing || collectionView.numberOfItems(inSection: section) == 0 {
-            return CGSize(width: view.bounds.size.width, height: 0.1)
+            return .zero //CGSize(width: view.bounds.size.width, height: 0.1)
         }
         else {
             var canProgress = true
@@ -966,7 +973,10 @@ extension ScreenshotsViewController: UICollectionViewDataSource {
                     return cell
                 }
             case .image:
-                if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as? ScreenshotCollectionViewCell{
+                if self.screenshotFrcManager?.fetchedObjectsCount == 0 {
+                    return collectionView.dequeueReusableCell(withReuseIdentifier: "blankCell", for: indexPath)
+                }
+                else if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as? ScreenshotCollectionViewCell{
                     self.setupScreenshot(cell: cell, collectionView: collectionView, indexPath: indexPath)
                     return cell
                 }
@@ -992,7 +1002,7 @@ extension ScreenshotsViewController: UICollectionViewDataSource {
             case .notification:
                 return self.hasNewScreenshotSection ? 1 : 0
             case .image:
-                return self.screenshotFrcManager?.fetchedObjectsCount ?? 0
+                return self.screenshotFrcManager?.fetchedObjectsCount ?? 1
             }
         }
         return 0
