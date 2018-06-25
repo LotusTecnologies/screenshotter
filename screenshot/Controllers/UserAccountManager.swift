@@ -178,7 +178,41 @@ class UserAccountManager : NSObject {
     
     
     public func loginOrCreatAccountAsNeeded(email:String, password:String) -> Promise<LoginOrCreateAccountResult> {
-        
+        if let user = self.user, user.isAnonymous{
+            return Promise.init(resolvers: { (fulfil, reject) in
+                user.updateEmail(to: email, completion: { (error) in
+                    if let error = error {
+                        reject(error)
+                    }else{
+                        user.sendEmailVerification(completion: { (error) in
+                            if let error = error {
+                                reject(error)
+                            }else{
+                                user.updatePassword(to: password, completion: { (error) in
+                                    if let error = error {
+                                        reject(error)
+                                    }else{
+                                        user.sendEmailVerification(completion: { (error) in
+                                            if let error = error {
+                                                reject(error)
+                                            }else{
+                                                fulfil(LoginOrCreateAccountResult.unconfirmed)
+                                            }
+                                        })
+                                    }
+                                })
+                            }
+                        })
+                    }
+                })
+            }).recover(execute: { (error) -> Promise<UserAccountManager.LoginOrCreateAccountResult> in
+                let nsError = error as NSError
+                if nsError.code == AuthErrorCode.emailAlreadyInUse.rawValue && nsError.domain == AuthErrorDomain {
+                    return self.login(email: email.lowercased(), password: password)
+                }
+                return Promise.init(error: error)
+            })
+        }
         return createAccount(email:email.lowercased(), password: password).recover(execute: { (error) -> Promise<UserAccountManager.LoginOrCreateAccountResult> in
             let nsError = error as NSError
             if nsError.code == AuthErrorCode.emailAlreadyInUse.rawValue && nsError.domain == AuthErrorDomain {
@@ -186,6 +220,7 @@ class UserAccountManager : NSObject {
             }
             return Promise.init(error: error)
         })
+        
         
     }
     
@@ -283,6 +318,7 @@ class UserAccountManager : NSObject {
                         self.databaseRef.child("users").child(user.uid).child("email").setValue(email.lowercased())
                         UserDefaults.standard.set(email.lowercased(), forKey: UserDefaultsKeys.email)
                     }
+                    
                     fulfill(())
                 }
             })
