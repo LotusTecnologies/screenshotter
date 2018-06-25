@@ -184,13 +184,13 @@ class ProfileViewController: BaseTableViewController {
         if isLoggedIn {
             profileAccountView.name = UserDefaults.standard.string(forKey: UserDefaultsKeys.name)
             profileAccountView.email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email)
+            if let string = UserDefaults.standard.string(forKey: UserDefaultsKeys.avatarURL), let url = URL.init(string: string) {
+                profileAccountView.avatarURL = url
+            }else{
+                profileAccountView.avatarURL = nil
+            }
             
-            if let avatar = UserDefaults.standard.object(forKey: UserDefaultsKeys.avatar) as? UIImage {
-                profileAccountView.avatar = avatar
-            }
-            else {
-                profileAccountView.avatarURL = UserDefaults.standard.url(forKey: UserDefaultsKeys.avatarURL)
-            }
+            
             
             data[.logout] = [.logout]
         }

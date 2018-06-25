@@ -44,14 +44,6 @@ class ProfileAccountView: UIView {
         }
     }
     
-    var avatar: UIImage? {
-        didSet {
-            avatarButton.setBackgroundImage(avatar, for: .normal)
-            avatarButton.isSelected = avatar == nil
-            UserDefaults.standard.set(avatar, forKey: UserDefaultsKeys.avatar)
-            UserDefaults.standard.synchronize()
-        }
-    }
     var avatarURL: URL? {
         didSet {
             if let url = avatarURL {
@@ -63,7 +55,7 @@ class ProfileAccountView: UIView {
                 avatarButton.setBackgroundImage(nil, for: .normal)
                 avatarButton.isSelected = true
             }
-            UserDefaults.standard.set(avatarURL, forKey: UserDefaultsKeys.avatarURL)
+            UserDefaults.standard.set(avatarURL?.absoluteString, forKey: UserDefaultsKeys.avatarURL)
             UserDefaults.standard.synchronize()
         }
     }
@@ -435,7 +427,11 @@ extension ProfileAccountView: UIImagePickerControllerDelegate, UINavigationContr
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         if let pickedImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
-            avatar = pickedImage
+            let urlString = "https://screenshopit.com/avatar.jpg"
+            if let url = URL.init(string: urlString){
+                SDWebImageManager.shared().saveImage(toCache: pickedImage, for: url)
+                avatarURL = url
+            }
         }
         
         picker.presentingViewController?.dismiss(animated: true)

@@ -135,7 +135,7 @@ class UserAccountManager : NSObject {
                         }
                         if let photoURLString = user.providerData.first?.photoURL?.absoluteString {
                             self.databaseRef.child("users").child(user.uid).child("facebook-photoURL").setValue(photoURLString)
-                            UserDefaults.standard.set(URL(string: photoURLString), forKey: UserDefaultsKeys.avatarURL)
+                            UserDefaults.standard.set( photoURLString, forKey: UserDefaultsKeys.avatarURL)
                         }
                         
                         self.userFromLogin = user
