@@ -52,11 +52,13 @@ extension ProductViewController {
         let dataModel = DataModel.sharedInstance
         
         if let product = dataModel.retrieveProduct(managedObjectContext: dataModel.mainMoc(), imageURL: imageURL) {
-            let burrowViewController = ProductDetailViewController()
-            burrowViewController.product = product
-            burrowViewController.shoppable = product.shoppable
-            let navigationController = ModalNavigationController(rootViewController: burrowViewController)
-            AppDelegate.shared.window?.rootViewController?.present(navigationController, animated: true, completion: nil)
+            AssetSyncModel.sharedInstance.addSubShoppable(fromProduct: product).then(on: .main) { (shoppable) -> Void in
+                let burrowViewController = ProductDetailViewController()
+                burrowViewController.product = product
+                burrowViewController.shoppable = product.shoppable
+                let navigationController = ModalNavigationController(rootViewController: burrowViewController)
+                AppDelegate.shared.window?.rootViewController?.present(navigationController, animated: true, completion: nil)
+            }
         }
     }
 

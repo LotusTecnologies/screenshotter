@@ -1213,7 +1213,7 @@ extension AssetSyncModel {
                                                     shopable.b1x = b1x
                                                     shopable.b1y = b1y
                                                 }
-                                                shoppable?.relatedImagesURLString = segment["related_looks"] as? String
+                                                shopable.relatedImagesURLString = segment["related_looks"] as? String
                                                 context.saveIfNeeded()
                                             }
                                         })
