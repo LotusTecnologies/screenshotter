@@ -427,11 +427,30 @@ extension DataModel {
         return nil
     }
     
+    func markProductNotInNotif(imageURL: String) {
+        self.performBackgroundTask { managedObjectContext in
+            let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
+            fetchRequest.predicate = NSPredicate(format: "imageURL == %@", imageURL)
+            fetchRequest.sortDescriptors = nil //[NSSortDescriptor(key: "createdAt", ascending: false)]
+            fetchRequest.fetchLimit = 1
+            
+            do {
+                let results = try managedObjectContext.fetch(fetchRequest)
+                results.forEach { $0.inNotif = false }
+                managedObjectContext.saveIfNeeded()
+            } catch {
+                self.receivedCoreDataError(error: error)
+                print("markProductNotInNotif imageURL:\(imageURL) results with error:\(error)")
+            }
+        }
+    }
+    
     func retrieveLatestFavorite() -> Promise<(String, String?)> {
         return Promise { fulfill, reject in
             self.performBackgroundTask { managedObjectContext in
                 let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
-                fetchRequest.predicate = NSPredicate(format: "isFavorite == TRUE")
+                let twoMonthsAgo = NSDate(timeIntervalSinceNow: -60 * Constants.secondsInDay)
+                fetchRequest.predicate = NSPredicate(format: "isFavorite == TRUE AND inNotif == FALSE AND imageURL != nil AND dateFavorited > %@", twoMonthsAgo)
                 fetchRequest.sortDescriptors = [NSSortDescriptor(key: "dateFavorited", ascending: false)]
                 fetchRequest.fetchLimit = 1
                 
@@ -439,6 +458,8 @@ extension DataModel {
                     let results = try managedObjectContext.fetch(fetchRequest)
                     if let latest = results.first,
                       let imageURL = latest.imageURL {
+                        latest.inNotif = true
+                        managedObjectContext.saveIfNeeded()
                         let category = latest.shoppable?.label ?? latest.shoppable?.parentShoppable?.label ?? latest.categories
                         fulfill((imageURL, category))
                     } else {
@@ -457,15 +478,17 @@ extension DataModel {
         return Promise { fulfill, reject in
             self.performBackgroundTask { managedObjectContext in
                 let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
-                let aWeekAgo = NSDate(timeIntervalSinceNow: -7 * Constants.secondsInDay)
-                fetchRequest.predicate = NSPredicate(format: "dateViewed > %@", aWeekAgo)
-                fetchRequest.sortDescriptors = [NSSortDescriptor(key: "floatPrice", ascending: true)]
+                let twoDaysAgo = NSDate(timeIntervalSinceNow: -2 * Constants.secondsInDay)
+                fetchRequest.predicate = NSPredicate(format: "isFavorite == FALSE AND inNotif == FALSE AND imageURL != nil AND dateViewed > %@", twoDaysAgo)
+                fetchRequest.sortDescriptors = [NSSortDescriptor(key: "dateViewed", ascending: false)]
                 fetchRequest.fetchLimit = 1
                 
                 do {
                     let results = try managedObjectContext.fetch(fetchRequest)
                     if let latest = results.first,
-                        let imageURL = latest.imageURL {
+                      let imageURL = latest.imageURL {
+                        latest.inNotif = true
+                        managedObjectContext.saveIfNeeded()
                         fulfill((imageURL, latest.productTitle()))
                     } else {
                         reject(NSError(domain: "Craze", code: 94, userInfo: [NSLocalizedDescriptionKey : "no latest tapped"]))
