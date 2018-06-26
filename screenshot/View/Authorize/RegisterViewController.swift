@@ -481,6 +481,7 @@ class RegisterViewController: UIViewController {
         self.continueButton.isUserInteractionEnabled = false
         self.skipButton.isUserInteractionEnabled = false
         self.facebookLoginButton.isUserInteractionEnabled = false
+        self.facebookLoginButton.isEnabled = false
         self._view.emailTextField.isUserInteractionEnabled = false
         self._view.passwordTextField.isUserInteractionEnabled = false
         self._view.forgotPasswordButton.isUserInteractionEnabled = false
@@ -501,14 +502,13 @@ class RegisterViewController: UIViewController {
             Analytics.trackOnboardingError(domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
             print("facebook login error: \(error)")
             
-            if UserAccountManager.shared.isIgnorableFacebookError(error: e) {
-                //ignore - user canceled or the something else that they should know about
-            }else{
+            if !UserAccountManager.shared.isIgnorableFacebookError(error: e) {
                 let alert = UserAccountManager.shared.alertViewForUndefinedError(error: e, viewController: self)
                 self.present(alert, animated: true, completion: nil)
             }
             
         }.always {
+            self.facebookLoginButton.isEnabled = true
             self.continueButton.isUserInteractionEnabled = true
             self.skipButton.isUserInteractionEnabled = true
             self.facebookLoginButton.isUserInteractionEnabled = true
