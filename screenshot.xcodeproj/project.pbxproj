@@ -545,6 +545,7 @@
 		E492CE3C2011051100060FB2 /* MatchstickModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchstickModel.swift; sourceTree = "<group>"; };
 		E4978C3B1F53610F0008B87F /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		E4A671621FA88AAA00250410 /* ScreenshotDetectionProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotDetectionProtocol.swift; sourceTree = "<group>"; };
+		E4AF5CC820E22EFD00C0155E /* Model 19.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 19.xcdatamodel"; sourceTree = "<group>"; };
 		E4CD8E681FA9E81B006F2CDA /* ApplicationStateModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationStateModel.swift; sourceTree = "<group>"; };
 		E4D495D11F49834900312614 /* upload_symbols.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = upload_symbols.sh; sourceTree = "<group>"; };
 		E4D5900D1F8367A3006A3C89 /* Model 4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 4.xcdatamodel"; sourceTree = "<group>"; };
@@ -2469,6 +2470,7 @@
 		C5278FBD1F3C38510090E422 /* Model.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				E4AF5CC820E22EFD00C0155E /* Model 19.xcdatamodel */,
 				31912DB220BFEFCD0098EE5B /* Model 18.xcdatamodel */,
 				31C0C82620A30A02002EE95B /* Model 17.xcdatamodel */,
 				31107DA92098B20C006E8B86 /* Model 16.xcdatamodel */,
@@ -2488,7 +2490,7 @@
 				E42AC3921F60340B0035A07C /* Model 2.xcdatamodel */,
 				C5278FBE1F3C38510090E422 /* Model.xcdatamodel */,
 			);
-			currentVersion = 31912DB220BFEFCD0098EE5B /* Model 18.xcdatamodel */;
+			currentVersion = E4AF5CC820E22EFD00C0155E /* Model 19.xcdatamodel */;
 			path = Model.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

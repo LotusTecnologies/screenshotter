@@ -25,7 +25,7 @@ class Constants {
     static let openingProductKey = "openingProductKey"
     
     // DB
-    static let currentMomVersion = 18
+    static let currentMomVersion = 19
     
     // Cart
     static let cartItemMaxQuantity = 10

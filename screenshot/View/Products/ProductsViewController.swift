@@ -430,6 +430,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
 
         if sectionType == .product {
             let product = self.productAtIndex(indexPath.item)
+            product.recordViewedProduct()
             self.recoverLostSaleManager.didClick(on: product)
             if let productViewController = presentProduct(product, atLocation: .products) {
                 productViewController.similarProducts = products
