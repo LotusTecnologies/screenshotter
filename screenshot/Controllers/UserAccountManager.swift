@@ -16,7 +16,11 @@ import SDWebImage
 class FacebookProxy : NSObject, FBSDKLoginButtonDelegate {
     let (promise, fulfill, reject) = Promise<FBSDKLoginManagerLoginResult>.pending()
     var facebookButton = FBSDKLoginButton()
-
+    enum FacebookError : Int {
+        case canceled = 1
+    }
+    static let FacebookProxyErrorDomain = "com.screenshopit.facebookProxy.errorDomain"
+    
     override init() {
         super.init()
         facebookButton.delegate = self
