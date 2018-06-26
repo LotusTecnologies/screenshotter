@@ -25,10 +25,14 @@ class FacebookProxy : NSObject, FBSDKLoginButtonDelegate {
     }
     
     func loginButton(_ loginButton: FBSDKLoginButton!, didCompleteWith result: FBSDKLoginManagerLoginResult!, error: Error!) {
+        print("delegate is \(self)")
+
         if let error = error {
             reject(error)
         }else if let result = result {
-            if result.isCancelled  || result.token == nil{
+            if result.isCancelled {
+                reject(NSError.init(domain: FacebookProxy.FacebookProxyErrorDomain, code: FacebookError.canceled.rawValue, userInfo: [:]))
+            }else if result.token == nil {
                 reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
             }else{
                 fulfill(result)
@@ -40,7 +44,12 @@ class FacebookProxy : NSObject, FBSDKLoginButtonDelegate {
     }
     
     func loginButtonDidLogOut(_ loginButton: FBSDKLoginButton!) {
+        print("delegate is \(self)")
+
         reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+    }
+    func loginButtonWillLogin(_ loginButton: FBSDKLoginButton!) -> Bool {
+        return true
     }
 }
 
@@ -462,6 +471,13 @@ class UserAccountManager : NSObject {
     
 }
 extension UserAccountManager {
+    
+    public func isIgnorableFacebookError( error:NSError) ->Bool {
+        if error.domain == FacebookProxy.FacebookProxyErrorDomain && error.code == FacebookProxy.FacebookError.canceled.rawValue {
+            return true
+        }
+        return  false
+    }
     public func isNoInternetError( error:NSError) ->Bool {
         if error.domain == NSURLErrorDomain {
             return true
