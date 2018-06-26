@@ -16,19 +16,29 @@ import SDWebImage
 class FacebookProxy : NSObject, FBSDKLoginButtonDelegate {
     let (promise, fulfill, reject) = Promise<FBSDKLoginManagerLoginResult>.pending()
     var facebookButton = FBSDKLoginButton()
-
+    enum FacebookError : Int {
+        case canceled = 1
+        case wasLogout = 2
+    }
+    static let FacebookProxyErrorDomain = "com.screenshopit.facebookProxy.errorDomain"
+    
     override init() {
         super.init()
+
         facebookButton.delegate = self
         facebookButton.sendActions(for: .touchUpInside)
 
     }
     
     func loginButton(_ loginButton: FBSDKLoginButton!, didCompleteWith result: FBSDKLoginManagerLoginResult!, error: Error!) {
+        print("delegate is \(self)")
+
         if let error = error {
             reject(error)
         }else if let result = result {
-            if result.isCancelled  || result.token == nil{
+            if result.isCancelled {
+                reject(NSError.init(domain: FacebookProxy.FacebookProxyErrorDomain, code: FacebookError.canceled.rawValue, userInfo: [:]))
+            }else if result.token == nil {
                 reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
             }else{
                 fulfill(result)
@@ -40,7 +50,11 @@ class FacebookProxy : NSObject, FBSDKLoginButtonDelegate {
     }
     
     func loginButtonDidLogOut(_ loginButton: FBSDKLoginButton!) {
-        reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+        print("delegate is \(self)")
+        reject(NSError.init(domain: FacebookProxy.FacebookProxyErrorDomain, code: FacebookError.wasLogout.rawValue, userInfo: [:]))
+    }
+    func loginButtonWillLogin(_ loginButton: FBSDKLoginButton!) -> Bool {
+        return true
     }
 }
 
@@ -105,74 +119,87 @@ class UserAccountManager : NSObject {
         }
         return handled
     }
-    
+    private func linkFirebaseStuffForFacebookFor(user:User ) {
+        if let name = user.providerData.first?.displayName {
+            self.databaseRef.child("users").child(user.uid).child("facebook-displayName").setValue(name)
+            self.databaseRef.child("users").child(user.uid).child("displayName").setValue(name)
+            UserDefaults.standard.set(name, forKey: UserDefaultsKeys.name)
+        }
+        if let email = user.providerData.first?.email {
+            self.databaseRef.child("users").child(user.uid).child("facebook-email").setValue(email)
+            self.databaseRef.child("users").child(user.uid).child("email").setValue(email)
+            UserDefaults.standard.set(email, forKey: UserDefaultsKeys.email)
+        }
+        if let phone = user.providerData.first?.phoneNumber{
+            self.databaseRef.child("users").child(user.uid).child("facebook-phone").setValue(phone)
+        }
+        if let photoURLString = user.providerData.first?.photoURL?.absoluteString {
+            self.databaseRef.child("users").child(user.uid).child("facebook-photoURL").setValue(photoURLString)
+            UserDefaults.standard.set( photoURLString, forKey: UserDefaultsKeys.avatarURL)
+        }
+        
+        self.userFromLogin = user
+        self.databaseRef.child("users").child(user.uid).child("identifier").setValue(AnalyticsUser.current.identifier)
+        self.downloadAndReplaceUserData()
+    }
+    var loginWithFacebookPromise: Promise<LoginOrCreateAccountResult>?
     public func loginWithFacebook()  -> Promise<LoginOrCreateAccountResult>{
-
-        return Promise<LoginOrCreateAccountResult>.init(resolvers: { (fulfil, reject) in
+        let completion =  { (result:AuthDataResult?, error:Error?,  fulfil: @escaping (LoginOrCreateAccountResult) -> Void, reject:@escaping (Error) -> Void) in
+            if let error = error{
+                let e = error as NSError
+                if e.domain == AuthErrorDomain && e.code == 17015{
+                    //Already linked
+                    if let user = self.user {
+                        self.linkFirebaseStuffForFacebookFor(user: user)
+                    }
+                    fulfil(.facebookOld)
+                }else{
+                    reject(error)
+                }
+            }else if let user = result?.user {
+               self.linkFirebaseStuffForFacebookFor(user: user)
+                self.databaseRef.child("users").child(user.uid).child("createdAt").observeSingleEvent(of: .value) { (snapshot) in
+                    if let _ = snapshot.value as? NSNumber {
+                        fulfil(.facebookOld)
+                    }else{
+                        let now = NSNumber.init(value: (Date().timeIntervalSince1970 as Double) )
+                        self.databaseRef.child("users").child(user.uid).child("createdAt").setValue(now)
+                        fulfil(.facebookNew)
+                    }
+                }
+            }else {
+                reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+                
+            }
+        }
+        let promise = Promise<LoginOrCreateAccountResult>.init(resolvers: { (fulfil, reject) in
             let proxy = FacebookProxy.init()
             self.facebookProxy = proxy
             proxy.promise.then(execute: { (result) -> Void in
-                let completion:AuthDataResultCallback =  { (result, error) in
-                    if let error = error{
-                        let e = error as NSError
-                        if   e.domain == AuthErrorDomain && e.code == 17025 {
-                            //This credential is already associated with a different user account.
-                            reject(error)
-                        }
-                    }else if let user = result?.user {
-                        if let name = user.providerData.first?.displayName {
-                            self.databaseRef.child("users").child(user.uid).child("facebook-displayName").setValue(name)
-                            self.databaseRef.child("users").child(user.uid).child("displayName").setValue(name)
-                            UserDefaults.standard.set(name, forKey: UserDefaultsKeys.name)
-                        }
-                        if let email = user.providerData.first?.email {
-                            self.databaseRef.child("users").child(user.uid).child("facebook-email").setValue(email)
-                            self.databaseRef.child("users").child(user.uid).child("email").setValue(email)
-                            UserDefaults.standard.set(email, forKey: UserDefaultsKeys.email)
-                        }
-                        if let phone = user.providerData.first?.phoneNumber{
-                            self.databaseRef.child("users").child(user.uid).child("facebook-phone").setValue(phone)
-                        }
-                        if let photoURLString = user.providerData.first?.photoURL?.absoluteString {
-                            self.databaseRef.child("users").child(user.uid).child("facebook-photoURL").setValue(photoURLString)
-                            UserDefaults.standard.set( photoURLString, forKey: UserDefaultsKeys.avatarURL)
-                        }
-                        
-                        self.userFromLogin = user
-                        self.databaseRef.child("users").child(user.uid).child("identifier").setValue(AnalyticsUser.current.identifier)
-                        self.downloadAndReplaceUserData()
-                        self.databaseRef.child("users").child(user.uid).child("createdAt").observeSingleEvent(of: .value) { (snapshot) in
-                            if let _ = snapshot.value as? NSNumber {
-                                fulfil(.facebookOld)
-                            }else{
-                                let now = NSNumber.init(value: (Date().timeIntervalSince1970 as Double) )
-                                self.databaseRef.child("users").child(user.uid).child("createdAt").setValue(now)
-                                fulfil(.facebookNew)
-                            }
-                        }
-                        
-                    }else {
-                        reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
-                        
-                    }
-                }
+               
                 let credential = FacebookAuthProvider.credential(withAccessToken: FBSDKAccessToken.current().tokenString)
                 if let user = self.user {
                     user.linkAndRetrieveData(with: credential, completion: { (result, error) in
                         if let e = error,  (e as NSError).domain == AuthErrorDomain, (e as NSError).code == 17025 {
-//                            "This credential is already associated with a different user account."
-                            Auth.auth().signInAndRetrieveData(with: credential, completion:completion)
+                            //"This credential is already associated with a different user account."
+                            Auth.auth().signInAndRetrieveData(with: credential, completion: { (result, error) in
+                                completion(result, error, fulfil, reject)
+                            })
                         }else{
-                            completion(result, error)
+                            completion(result, error, fulfil, reject)
                         }
                     })
                 }else{
-                    Auth.auth().signInAndRetrieveData(with: credential, completion:completion)
+                    Auth.auth().signInAndRetrieveData(with: credential, completion:{ (result, error) in
+                        completion(result, error, fulfil, reject)
+                    })
                 }
             }).catch(execute: { (error) in
                 reject(error)
             })
         })
+        self.loginWithFacebookPromise = promise
+        return promise
     }
     
     
@@ -462,6 +489,16 @@ class UserAccountManager : NSObject {
     
 }
 extension UserAccountManager {
+    
+    public func isIgnorableFacebookError( error:NSError) ->Bool {
+        if error.domain == FacebookProxy.FacebookProxyErrorDomain && error.code == FacebookProxy.FacebookError.canceled.rawValue {
+            return true
+        }
+        if error.domain == FacebookProxy.FacebookProxyErrorDomain && error.code == FacebookProxy.FacebookError.wasLogout.rawValue {
+            return true
+        }
+        return  false
+    }
     public func isNoInternetError( error:NSError) ->Bool {
         if error.domain == NSURLErrorDomain {
             return true
