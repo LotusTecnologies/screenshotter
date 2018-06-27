@@ -27,6 +27,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var bgTask: UIBackgroundTaskIdentifier = UIBackgroundTaskInvalid
     var shouldLoadDiscoverNextLoad = false
     let appSettings: AppSettings = AppSettings()
+    var appLaunchedForFirstTime = false
     
     fileprivate var frameworkSetupLaunchOptions: [UIApplicationLaunchOptionsKey : Any]?
     
@@ -48,6 +49,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let _ = UserAccountManager.shared.application(application, didFinishLaunchingWithOptions: launchOptions)
         
         window = UIWindow(frame: UIScreen.main.bounds)
+        if UserDefaults.standard.value(forKey: UserDefaultsKeys.lastDbVersionMigrated) == nil {
+            appLaunchedForFirstTime = true
+        }
         
         if DataModel.sharedInstance.storeNeedsMigration() {
             window?.rootViewController = LoadingViewController()
@@ -109,6 +113,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         NotificationCenter.default.addObserver(self, selector: #selector(badgeNumberDidChange(_:)), name: .ScreenshotUninformedAccumulatorModelDidChange, object: nil)
         
+        if self.appLaunchedForFirstTime == true {
+            Analytics.trackAppOpenedFirstTime()
+        }
+        
         if application.applicationState == .background,
             let remoteNotification = launchOptions?[.remoteNotification] as? [String: AnyObject],
             let aps = remoteNotification["aps"] as? [String : AnyObject],
@@ -116,6 +124,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             contentAvailable.intValue == 1 {
             Analytics.trackWokeFromSilentPush()
         } else {
+            
             Analytics.trackSessionStarted() // Roi Tal from AppSee suggested
         }
         
@@ -143,7 +152,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func isSendToDebugURL(_ url:URL) -> Bool{
-        //we use this uuid so we will never accidentently detect a wrong openURL even from branch or other thrid parties
+        //we use this uuid so we will never accidentently detect a wrong openURL even from branch or other third parties
         return url.absoluteString.contains("sendDebugInfo-b32963e7-ad86-4f80-8f2a-131d76ece793")
 
     }
