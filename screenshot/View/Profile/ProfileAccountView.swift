@@ -263,9 +263,16 @@ class ProfileAccountView: UIView {
         loggedInContainerView.addSubview(nameTextField)
         
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
-        nameLabel.text = name
+        if let name = name {
+            nameLabel.text = name
+            nameLabel.textColor = .gray2
+        }else{
+            nameLabel.text = "settings.row.name.detail".localized
+            nameLabel.textColor = .gray6
+        }
+        
+
         nameLabel.font = .screenshopFont(.quicksandMedium, size: 22)
-        nameLabel.textColor = .gray2
         nameLabel.adjustsFontSizeToFitWidth = true
         nameLabel.minimumScaleFactor = 0.5
         nameLabel.baselineAdjustment = .alignCenters
@@ -302,9 +309,15 @@ class ProfileAccountView: UIView {
         loggedInContainerView.addSubview(emailTextField)
         
         emailLabel.translatesAutoresizingMaskIntoConstraints = false
-        emailLabel.text = email
+        if let email = email {
+            emailLabel.text = email
+            emailLabel.textColor = .gray2
+        }else{
+            emailLabel.text = "settings.row.email.detail".localized
+            emailLabel.textColor = .gray5
+        }
         emailLabel.font = .screenshopFont(.quicksand, size: 18)
-        emailLabel.textColor = .gray2
+        
         emailLabel.adjustsFontSizeToFitWidth = true
         emailLabel.minimumScaleFactor = 0.5
         emailLabel.baselineAdjustment = .alignCenters

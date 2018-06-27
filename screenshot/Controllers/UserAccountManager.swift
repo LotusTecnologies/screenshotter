@@ -97,22 +97,49 @@ class UserAccountManager : NSObject {
 //        let source = options[.sourceApplication] as? String
 //        let annotation = options[.annotation]
 
-
+        func find(_ t:AnyClass, viewController:UIViewController? ) -> UIViewController?{
+            if let viewController = viewController {
+                if viewController.isKind(of: t) {
+                    return viewController
+                }
+                for vc in viewController.childViewControllers {
+                    if let found = find(t, viewController: vc) {
+                        return found
+                    }
+                }
+                
+                if let presented = viewController.presentedViewController{
+                    if let found = find(t, viewController: presented) {
+                        return found
+                    }
+                }
+            }
+            
+            return nil
+        }
+        
         let queryParams = URLComponents.init(string: url.absoluteString)
         let mode = queryParams?.queryItems?.first(where: {$0.name == "mode"})
         let code = queryParams?.queryItems?.first(where: {$0.name == "oobCode"})
         if let _ = mode?.value, let code = code?.value{
             if let confirmVC = AppDelegate.shared.window?.rootViewController?.childViewControllers.last as? ConfirmCodeViewController {
                 confirmVC.applyCode(code: code)
-            }
-            if let resetVC = AppDelegate.shared.window?.rootViewController?.childViewControllers.last as? ResetPasswordViewController {
+            }else if let resetVC = AppDelegate.shared.window?.rootViewController?.childViewControllers.last as? ResetPasswordViewController {
                 resetVC.code = code
-            }
-            if let confirmVC = AppDelegate.shared.window?.rootViewController?.childViewControllers.last?.childViewControllers.first?.presentedViewController?.childViewControllers.last as? ConfirmCodeViewController{
+            }else if let confirmVC = AppDelegate.shared.window?.rootViewController?.childViewControllers.last?.childViewControllers.first?.presentedViewController?.childViewControllers.last as? ConfirmCodeViewController{
                 confirmVC.applyCode(code: code)
-            }
-            if let resetVC = AppDelegate.shared.window?.rootViewController?.childViewControllers.last?.childViewControllers.first?.presentedViewController?.childViewControllers.last as? ResetPasswordViewController {
+            }else if let resetVC = AppDelegate.shared.window?.rootViewController?.childViewControllers.last?.childViewControllers.first?.presentedViewController?.childViewControllers.last as? ResetPasswordViewController {
                 resetVC.code = code
+
+            }else
+                if let confirmVC = find(ConfirmCodeViewController.self, viewController:AppDelegate.shared.window?.rootViewController) as? ConfirmCodeViewController {
+                confirmVC.applyCode(code: code)
+
+            }else if let resetVC =  find(ResetPasswordViewController.self, viewController:AppDelegate.shared.window?.rootViewController) as? ResetPasswordViewController {
+                resetVC.code = code
+            }else{
+                let debugInfo =  UIApplication.shared.keyWindow?.rootViewController?.value(forKey: "_printHierarchy") as? String
+                Analytics.trackOnboardingError(domain: "code pressed VC not found", code: #line, localizedDescription: "like \(url.absoluteString) pressed but cannot find view controller \(debugInfo)")
             }
             
             handled = true
@@ -212,6 +239,7 @@ class UserAccountManager : NSObject {
                     if let error = error {
                         reject(error)
                     }else{
+                        self.email = email
                         user.sendEmailVerification(completion: { (error) in
                             if let error = error {
                                 reject(error)
@@ -220,6 +248,7 @@ class UserAccountManager : NSObject {
                                     if let error = error {
                                         reject(error)
                                     }else{
+                                        self.email = email
                                         user.sendEmailVerification(completion: { (error) in
                                             if let error = error {
                                                 reject(error)
@@ -270,6 +299,7 @@ class UserAccountManager : NSObject {
                         UserDefaults.standard.set(email.lowercased(), forKey: UserDefaultsKeys.email)
                         fulfil(LoginOrCreateAccountResult.confirmed)
                     }else{
+                        self.email = email
                         user.sendEmailVerification(completion: { (error) in
                             if let error = error {
                                 reject(error)
@@ -323,6 +353,7 @@ class UserAccountManager : NSObject {
                     if authResult.user.isEmailVerified {
                         fulfil(LoginOrCreateAccountResult.confirmed)
                     }else{
+                        self.email = email
                         authResult.user.sendEmailVerification(completion: { (error) in
                             if let error = error {
                                 reject(error)
@@ -382,6 +413,7 @@ class UserAccountManager : NSObject {
     
     func forgotPassword(email:String) ->Promise<Void> {
         return Promise { fulfill, reject in
+            self.email = email
             Auth.auth().sendPasswordReset(withEmail: email, completion: { (error) in
                 if let error = error {
                     reject(error)
@@ -399,7 +431,15 @@ class UserAccountManager : NSObject {
                 if let error = error {
                     reject(error)
                 }else{
-                    fulfill(())
+                    if let email = self.email {
+                        self.login(email: email, password: password).then(execute: { (result) -> Void in
+                            fulfill(())
+                        }).catch(execute: { (error) in
+                            reject(error)
+                        })
+                    }else{
+                        reject(NSError.init(domain: #file, code: #line, userInfo: [:]))
+                    }
                 }
             })
         }
@@ -466,6 +506,8 @@ class UserAccountManager : NSObject {
     func logout() -> Promise<Void>{
         return Promise { fulfill, reject in
             do {
+                UserDefaults.standard.removeObject(forKey: UserDefaultsKeys.name)
+                UserDefaults.standard.removeObject(forKey: UserDefaultsKeys.email)
                 FBSDKLoginManager().logOut()
                 if self.user?.isAnonymous == false || self.user?.providerData.first(where: {$0.providerID == "facebook.com"}) != nil {
                     try Auth.auth().signOut()

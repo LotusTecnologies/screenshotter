@@ -149,6 +149,7 @@ class ResetPasswordViewController: UIViewController {
     var code:String? {
         didSet {
             _view.continueButton.isEnabled = ( code != nil )
+            _view.resendButton.isHidden = (code != nil)
         }
     }
     
@@ -210,13 +211,13 @@ class ResetPasswordViewController: UIViewController {
                 }.catch { (error) in
                     let e = error as NSError
                     Analytics.trackOnboardingError(domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
-
                     DispatchQueue.main.async {
                         let error = error as NSError
                         if UserAccountManager.shared.isNoInternetError(error: error) {
                             let alert = UserAccountManager.shared.alertViewForNoInternet()
                             self.present(alert, animated: true, completion: nil)
                         }else if UserAccountManager.shared.isBadCodeError(error: error){
+                            self.code = nil
                             let alert = UserAccountManager.shared.alertViewForBadCode()
                             self.present(alert, animated: true, completion: nil)
                         }else if UserAccountManager.shared.isWeakPasswordError(error: error) {
