@@ -432,7 +432,6 @@ extension DataModel {
             let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
             fetchRequest.predicate = NSPredicate(format: "imageURL == %@", imageURL)
             fetchRequest.sortDescriptors = nil //[NSSortDescriptor(key: "createdAt", ascending: false)]
-            fetchRequest.fetchLimit = 1
             
             do {
                 let results = try managedObjectContext.fetch(fetchRequest)
@@ -441,6 +440,23 @@ extension DataModel {
             } catch {
                 self.receivedCoreDataError(error: error)
                 print("markProductNotInNotif imageURL:\(imageURL) results with error:\(error)")
+            }
+        }
+    }
+    
+    func markScreenshotNotInNotif(assetId: String) {
+        self.performBackgroundTask { managedObjectContext in
+            let fetchRequest: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
+            fetchRequest.predicate = NSPredicate(format: "assetId == %@", assetId)
+            fetchRequest.sortDescriptors = nil //[NSSortDescriptor(key: "createdAt", ascending: false)]
+            
+            do {
+                let results = try managedObjectContext.fetch(fetchRequest)
+                results.forEach { $0.inNotif = false }
+                managedObjectContext.saveIfNeeded()
+            } catch {
+                self.receivedCoreDataError(error: error)
+                print("markScreenshotNotInNotif assetId:\(assetId) results with error:\(error)")
             }
         }
     }
@@ -502,23 +518,30 @@ extension DataModel {
         }
     }
     
-    func retrieveSaleCount(from startDate: NSDate) -> Promise<Int> {
+    func retrieveSaleScreenshot() -> Promise<(String, Data)> {
         return Promise { fulfill, reject in
             self.performBackgroundTask { managedObjectContext in
-                let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
-                fetchRequest.predicate = NSPredicate(format: "floatPrice < floatOriginalPrice AND dateRetrieved > %@", startDate)
-                fetchRequest.sortDescriptors = [NSSortDescriptor(key: "dateRetrieved", ascending: false)]
+                let fetchRequest: NSFetchRequest<Shoppable> = Shoppable.fetchRequest()
+                let twoMonthsAgo = NSDate(timeIntervalSinceNow: -60 * Constants.secondsInDay)
+                fetchRequest.predicate = NSPredicate(format: "screenshot.lastModified > %@ AND screenshot.inNotif == FALSE AND screenshot.isHidden == FALSE AND screenshot.imageData != nil AND (SUBQUERY(products, $x, ($x.order == 0 OR $x.order == 1) AND $x.floatPrice < $x.floatOriginalPrice).@count == 2)", twoMonthsAgo)
+                fetchRequest.sortDescriptors = [NSSortDescriptor(key: "screenshot.lastModified", ascending: false)]
+                fetchRequest.fetchLimit = 1
                 
                 do {
                     let results = try managedObjectContext.fetch(fetchRequest)
-                    if results.count > 0 {
-                        fulfill(results.count)
+                    if let latestShoppable = results.first,
+                      let latestScreenshot = latestShoppable.screenshot,
+                      let assetId = latestScreenshot.assetId,
+                      let imageData = latestScreenshot.imageData {
+                        latestScreenshot.inNotif = true
+                        managedObjectContext.saveIfNeeded()
+                        fulfill((assetId, imageData))
                     } else {
-                        reject(NSError(domain: "Craze", code: 96, userInfo: [NSLocalizedDescriptionKey : "no recent sale count"]))
+                        reject(NSError(domain: "Craze", code: 96, userInfo: [NSLocalizedDescriptionKey : "no recent sale screenshot"]))
                     }
                 } catch {
                     self.receivedCoreDataError(error: error)
-                    print("retrieveSaleCount results with error:\(error)")
+                    print("retrieveSaleScreenshot results with error:\(error)")
                     reject(error)
                 }
             }

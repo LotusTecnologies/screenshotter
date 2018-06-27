@@ -327,21 +327,22 @@ class NetworkingPromise : NSObject {
         let sessionConfiguration = URLSessionConfiguration.default
         sessionConfiguration.timeoutIntervalForRequest = 60
         return URLSession(configuration: sessionConfiguration).dataTask(with: URLRequest(url: url)).asDataAndResponse().then { (data, response) -> Promise<URL> in
-            var extensionToUse = url.pathExtension
-            if extensionToUse.isEmpty {
-                extensionToUse = "jpg"
-            }
-            let tmpImageFileUrl = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(identifier).appendingPathExtension(extensionToUse)
-            do {
-                try data.write(to: tmpImageFileUrl)
-                return Promise(value: tmpImageFileUrl)
-            } catch {
-                print("downloadTmp error:\(error)")
-                return Promise(error: error)
-            }
+            return self.saveToTmp(data: data, identifier: identifier, originalExtension: url.pathExtension)
         }
     }
 
+    func saveToTmp(data: Data, identifier: String, originalExtension: String) -> Promise<URL> {
+        let appendingExtension = originalExtension.isEmpty ? "jpg" : originalExtension
+        let tmpImageFileUrl = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(identifier).appendingPathExtension(appendingExtension)
+        do {
+            try data.write(to: tmpImageFileUrl)
+            return Promise(value: tmpImageFileUrl)
+        } catch {
+            print("saveToTmp error:\(error)")
+            return Promise(error: error)
+        }
+    }
+    
     func getAvailableVariants(partNumber: String) -> Promise<NSDictionary> {
         guard let url = URL(string: Constants.shoppableDomain + "/product/" + partNumber) else {
             let error = NSError(domain: "Craze", code: 27, userInfo: [NSLocalizedDescriptionKey: "Cannot create shoppable url from shoppableDomain:\(Constants.shoppableDomain)"])

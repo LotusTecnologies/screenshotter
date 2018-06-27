@@ -14,7 +14,7 @@ import PromiseKit
 enum LocalNotificationIdentifier: String {
     case screenshotAdded        = "CrazeLocal"
     case tappedProduct          = "CrazeTappedProduct"
-    case saleCount              = "CrazeSaleCount"
+    case saleScreenshot         = "CrazeSaleScreenshot"
     case favoritedItem          = "CrazeFavoritedItem"
     case inactivityDiscover     = "CrazeInactivityDiscover"
 }
@@ -42,7 +42,7 @@ class LocalNotificationModel {
     @objc func applicationWillEnterForeground() {
         sessionStart = NSDate()
         UNUserNotificationCenter.current().getPendingNotificationRequests { notificationRequestArray in
-            let toCancel = [LocalNotificationIdentifier.tappedProduct.rawValue, LocalNotificationIdentifier.saleCount.rawValue, LocalNotificationIdentifier.favoritedItem.rawValue, LocalNotificationIdentifier.inactivityDiscover.rawValue]
+            let toCancel = [LocalNotificationIdentifier.tappedProduct.rawValue, LocalNotificationIdentifier.saleScreenshot.rawValue, LocalNotificationIdentifier.favoritedItem.rawValue, LocalNotificationIdentifier.inactivityDiscover.rawValue]
             let toCancelSet = Set<String>(toCancel)
             notificationRequestArray.forEach { notificationRequest in
                 if toCancelSet.contains(notificationRequest.identifier) {
@@ -50,8 +50,9 @@ class LocalNotificationModel {
                     case LocalNotificationIdentifier.tappedProduct.rawValue:
                         Analytics.trackTimedLocalNotificationCancelled(source: .tappedProduct)
                         self.cancelProductInNotif(productKey: notificationRequest.content.userInfo[Constants.openingProductKey] as? String)
-                    case LocalNotificationIdentifier.saleCount.rawValue:
+                    case LocalNotificationIdentifier.saleScreenshot.rawValue:
                         Analytics.trackTimedLocalNotificationCancelled(source: .saleCount)
+                        self.cancelScreenshotInNotif(assetId: notificationRequest.content.userInfo[Constants.openingAssetIdKey] as? String)
                     case LocalNotificationIdentifier.favoritedItem.rawValue:
                         Analytics.trackTimedLocalNotificationCancelled(source: .favoritedItem)
                         self.cancelProductInNotif(productKey: notificationRequest.content.userInfo[Constants.openingProductKey] as? String)
@@ -69,7 +70,7 @@ class LocalNotificationModel {
     
     @objc func applicationDidEnterBackground() {
         postLatestTapped()
-        postSaleCount()
+        postSaleScreenshot()
         postLatestFavorite()
         scheduleInactivityDiscoverLocalNotification()
     }
@@ -154,7 +155,7 @@ class LocalNotificationModel {
                 switch identifier {
                 case LocalNotificationIdentifier.tappedProduct.rawValue:
                     Analytics.trackTimedLocalNotificationScheduled(source: .tappedProduct)
-                case LocalNotificationIdentifier.saleCount.rawValue:
+                case LocalNotificationIdentifier.saleScreenshot.rawValue:
                     Analytics.trackTimedLocalNotificationScheduled(source: .saleCount)
                 case LocalNotificationIdentifier.favoritedItem.rawValue:
                     Analytics.trackTimedLocalNotificationScheduled(source: .favoritedItem)
@@ -189,24 +190,23 @@ class LocalNotificationModel {
         }
     }
 
-    func postSaleCount() {
+    func postSaleScreenshot() {
         guard PermissionsManager.shared.hasPermission(for: .push) else {
-            print("postSaleCount no push permission")
+            print("postSaleScreenshot no push permission")
             return
         }
-        var imageURLString = ""
-        var saleCount = 0
-        let identifier = LocalNotificationIdentifier.saleCount.rawValue
-        DataModel.sharedInstance.retrieveSaleCount(from: sessionStart)
-            .then { productCount -> Promise<URL> in
-                imageURLString = "https://images-na.ssl-images-amazon.com/images/I/71F2ZBXnwtL._SX679_.jpg" // TODO: GMK collage from first 4 images.
-                saleCount = productCount
-                return NetworkingPromise.sharedInstance.downloadTmp(from: imageURLString, identifier: identifier)
+        var assetIdString = ""
+        let identifier = LocalNotificationIdentifier.saleScreenshot.rawValue
+        DataModel.sharedInstance.retrieveSaleScreenshot()
+            .then { assetId, imageData -> Promise<URL> in
+                assetIdString = assetId
+                return NetworkingPromise.sharedInstance.saveToTmp(data: imageData, identifier: identifier, originalExtension: "")
             }.then { copiedTmpURL -> Void in
                 self.scheduleImageLocalNotification(copiedTmpURL: copiedTmpURL,
-                                                    userInfo: [Constants.openingScreenKey : Constants.openingScreenValueScreenshot],
+                                                    userInfo: [Constants.openingScreenKey  : Constants.openingScreenValueScreenshot,
+                                                               Constants.openingAssetIdKey : assetIdString],
                                                     identifier: identifier,
-                                                    body: saleCount == 1 ? "notification.sale.count.message.single".localized(withFormat: saleCount) : "notification.sale.count.message.plural".localized(withFormat: saleCount),
+                                                    body: "notification.sale.screenshot.message".localized,
                                                     interval: 2 * Constants.secondsInDay)
         }
     }
@@ -250,6 +250,13 @@ class LocalNotificationModel {
             return
         }
         DataModel.sharedInstance.markProductNotInNotif(imageURL: productKey)
+    }
+    
+    func cancelScreenshotInNotif(assetId: String?) {
+        guard let assetId = assetId else {
+            return
+        }
+        DataModel.sharedInstance.markScreenshotNotInNotif(assetId: assetId)
     }
     
 }
