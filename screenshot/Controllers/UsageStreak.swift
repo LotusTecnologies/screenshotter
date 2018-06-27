@@ -15,7 +15,7 @@ final class UsageStreakManager {
     init() {
         observers.append(NotificationCenter.default.addObserver(forName: Notification.Name.UIApplicationDidFinishLaunching, object: nil, queue: nil, using: appEntry(with:)))
         observers.append(NotificationCenter.default.addObserver(forName: Notification.Name.UIApplicationWillEnterForeground, object: nil, queue: nil, using: appEntry(with:)))
-        observers.append(NotificationCenter.default.addObserver(forName: Notification.Name.UIApplicationDidEnterBackground, object: nil, queue: nil, using: appExit(with:)))
+        observers.append(NotificationCenter.default.addObserver(forName: Notification.Name.UIApplicationWillResignActive, object: nil, queue: nil, using: appExit(with:)))
     }
     
     deinit {
@@ -23,13 +23,13 @@ final class UsageStreakManager {
     }
     
     private func appExit(with notification: Notification) {
-        guard UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingCompleted) else {
-            // Don't record streaks when we haven't completed onboarding.
-            return
+
+        if UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingCompleted) {
+            updateStreak()
         }
         
-        updateStreak()
-        
+        let now = Date()
+        UserDefaults.standard.set(now, forKey: UserDefaultsKeys.dateLastAppSession)
     }
     
     private func appEntry(with notification: Notification) {
@@ -38,6 +38,12 @@ final class UsageStreakManager {
             application.applicationState == .background {
             // Don't record streaks when we're launched into the background.
             return
+        }
+        
+        if notification.name == Notification.Name.UIApplicationWillEnterForeground, let lastSessionDate = UserDefaults.standard.object(forKey: UserDefaultsKeys.dateLastAppSession) as? Date, abs(lastSessionDate.timeIntervalSinceNow) > 10*60  {
+                var sessionCount = UserDefaults.standard.integer(forKey: UserDefaultsKeys.sessionCount)
+                sessionCount += 1
+                UserDefaults.standard.set(sessionCount, forKey: UserDefaultsKeys.sessionCount)
         }
         
         guard UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingCompleted) else {
@@ -61,7 +67,10 @@ final class UsageStreakManager {
     private func updateStreak() {
         if let streakDate = UserDefaults.standard.object(forKey: UserDefaultsKeys.dateLastAppSession) as? Date {
             if Calendar.current.isDateInToday(streakDate) {
-                //streak not updated
+                let lastStreak = UserDefaults.standard.integer(forKey: UserDefaultsKeys.dailyStreak)
+                if lastStreak == 0 {
+                    updateStreakTo(streak: 1)
+                }
             }else if Calendar.current.isDateInYesterday(streakDate) {
                 // increaement streak
                 let lastStreak = UserDefaults.standard.integer(forKey: UserDefaultsKeys.dailyStreak)

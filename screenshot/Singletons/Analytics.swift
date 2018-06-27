@@ -57,6 +57,21 @@ class Analytics {
         return "non-usc"
     }
     
+    static func propertiesForAllEvents() -> [String:Any] {
+        var properties:[String:Any] = [:]
+        
+        let dateInstalled = (UserDefaults.standard.object(forKey:  UserDefaultsKeys.dateInstalled) as? Date ) ?? Date()
+        let timeSinceInstall:Double = abs(dateInstalled.timeIntervalSinceNow)
+        let secondsInDay:Double = 60*60*24
+        let daysSinceInstall = Int(round(timeSinceInstall / secondsInDay))
+        
+        properties["user-age"] = daysSinceInstall
+        
+        properties["user-sessionCount"] = UserDefaults.standard.integer(forKey: UserDefaultsKeys.sessionCount)
+        
+        return properties
+    }
+    
     static func propertiesFor(_ matchstick:Matchstick) -> [String:Any] {
         var properties:[String:Any] = [:]
         
