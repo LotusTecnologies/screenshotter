@@ -97,22 +97,49 @@ class UserAccountManager : NSObject {
 //        let source = options[.sourceApplication] as? String
 //        let annotation = options[.annotation]
 
-
+        func find(_ t:AnyClass, viewController:UIViewController? ) -> UIViewController?{
+            if let viewController = viewController {
+                if viewController.isKind(of: t) {
+                    return viewController
+                }
+                for vc in viewController.childViewControllers {
+                    if let found = find(t, viewController: vc) {
+                        return found
+                    }
+                }
+                
+                if let presented = viewController.presentedViewController{
+                    if let found = find(t, viewController: presented) {
+                        return found
+                    }
+                }
+            }
+            
+            return nil
+        }
+        
         let queryParams = URLComponents.init(string: url.absoluteString)
         let mode = queryParams?.queryItems?.first(where: {$0.name == "mode"})
         let code = queryParams?.queryItems?.first(where: {$0.name == "oobCode"})
         if let _ = mode?.value, let code = code?.value{
             if let confirmVC = AppDelegate.shared.window?.rootViewController?.childViewControllers.last as? ConfirmCodeViewController {
                 confirmVC.applyCode(code: code)
-            }
-            if let resetVC = AppDelegate.shared.window?.rootViewController?.childViewControllers.last as? ResetPasswordViewController {
+            }else if let resetVC = AppDelegate.shared.window?.rootViewController?.childViewControllers.last as? ResetPasswordViewController {
                 resetVC.code = code
-            }
-            if let confirmVC = AppDelegate.shared.window?.rootViewController?.childViewControllers.last?.childViewControllers.first?.presentedViewController?.childViewControllers.last as? ConfirmCodeViewController{
+            }else if let confirmVC = AppDelegate.shared.window?.rootViewController?.childViewControllers.last?.childViewControllers.first?.presentedViewController?.childViewControllers.last as? ConfirmCodeViewController{
                 confirmVC.applyCode(code: code)
-            }
-            if let resetVC = AppDelegate.shared.window?.rootViewController?.childViewControllers.last?.childViewControllers.first?.presentedViewController?.childViewControllers.last as? ResetPasswordViewController {
+            }else if let resetVC = AppDelegate.shared.window?.rootViewController?.childViewControllers.last?.childViewControllers.first?.presentedViewController?.childViewControllers.last as? ResetPasswordViewController {
                 resetVC.code = code
+
+            }else
+                if let confirmVC = find(ConfirmCodeViewController.self, viewController:AppDelegate.shared.window?.rootViewController) as? ConfirmCodeViewController {
+                confirmVC.applyCode(code: code)
+
+            }else if let resetVC =  find(ResetPasswordViewController.self, viewController:AppDelegate.shared.window?.rootViewController) as? ResetPasswordViewController {
+                resetVC.code = code
+            }else{
+                let debugInfo =  UIApplication.shared.keyWindow?.rootViewController?.value(forKey: "_printHierarchy") as? String
+                Analytics.trackOnboardingError(domain: "code pressed VC not found", code: #line, localizedDescription: "like \(url.absoluteString) pressed but cannot find view controller \(debugInfo)")
             }
             
             handled = true
@@ -212,6 +239,7 @@ class UserAccountManager : NSObject {
                     if let error = error {
                         reject(error)
                     }else{
+                        self.email = email
                         user.sendEmailVerification(completion: { (error) in
                             if let error = error {
                                 reject(error)
@@ -220,6 +248,7 @@ class UserAccountManager : NSObject {
                                     if let error = error {
                                         reject(error)
                                     }else{
+                                        self.email = email
                                         user.sendEmailVerification(completion: { (error) in
                                             if let error = error {
                                                 reject(error)
@@ -270,6 +299,7 @@ class UserAccountManager : NSObject {
                         UserDefaults.standard.set(email.lowercased(), forKey: UserDefaultsKeys.email)
                         fulfil(LoginOrCreateAccountResult.confirmed)
                     }else{
+                        self.email = email
                         user.sendEmailVerification(completion: { (error) in
                             if let error = error {
                                 reject(error)
@@ -299,8 +329,9 @@ class UserAccountManager : NSObject {
                         let user = authResult.user
                         self.userFromLogin = user
                         self.databaseRef.child("users").child(user.uid).child("identifier").setValue(AnalyticsUser.current.identifier)
-                        self.downloadAndReplaceUserData()
-                        fulfil(())
+                        self.downloadAndReplaceUserData().always {
+                            fulfil(())
+                        }
                     }else{
                         reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
                     }
@@ -319,15 +350,20 @@ class UserAccountManager : NSObject {
                     let user = authResult.user
                     self.userFromLogin = user
                     self.databaseRef.child("users").child(user.uid).child("identifier").setValue(AnalyticsUser.current.identifier)
-                    self.downloadAndReplaceUserData()
+                    let downloadPromise = self.downloadAndReplaceUserData()
                     if authResult.user.isEmailVerified {
-                        fulfil(LoginOrCreateAccountResult.confirmed)
+                        downloadPromise.always {
+                            fulfil(LoginOrCreateAccountResult.confirmed)
+                        }
                     }else{
+                        self.email = email
                         authResult.user.sendEmailVerification(completion: { (error) in
-                            if let error = error {
-                                reject(error)
-                            }else{
-                                fulfil(LoginOrCreateAccountResult.unconfirmed)
+                            downloadPromise.always {
+                                if let error = error {
+                                    reject(error)
+                                }else{
+                                    fulfil(LoginOrCreateAccountResult.unconfirmed)
+                                }
                             }
                         })
                     }
@@ -382,6 +418,7 @@ class UserAccountManager : NSObject {
     
     func forgotPassword(email:String) ->Promise<Void> {
         return Promise { fulfill, reject in
+            self.email = email
             Auth.auth().sendPasswordReset(withEmail: email, completion: { (error) in
                 if let error = error {
                     reject(error)
@@ -399,7 +436,15 @@ class UserAccountManager : NSObject {
                 if let error = error {
                     reject(error)
                 }else{
-                    fulfill(())
+                    if let email = self.email {
+                        self.login(email: email, password: password).then(execute: { (result) -> Void in
+                            fulfill(())
+                        }).catch(execute: { (error) in
+                            reject(error)
+                        })
+                    }else{
+                        reject(NSError.init(domain: #file, code: #line, userInfo: [:]))
+                    }
                 }
             })
         }
@@ -466,6 +511,9 @@ class UserAccountManager : NSObject {
     func logout() -> Promise<Void>{
         return Promise { fulfill, reject in
             do {
+                UserDefaults.standard.removeObject(forKey: UserDefaultsKeys.name)
+                UserDefaults.standard.removeObject(forKey: UserDefaultsKeys.email)
+                UserDefaults.standard.removeObject(forKey: UserDefaultsKeys.avatarURL)
                 FBSDKLoginManager().logOut()
                 if self.user?.isAnonymous == false || self.user?.providerData.first(where: {$0.providerID == "facebook.com"}) != nil {
                     try Auth.auth().signOut()
@@ -612,35 +660,50 @@ extension UserAccountManager {
 extension UserAccountManager {
     
     
-    func downloadAndReplaceUserData(){
+    func downloadAndReplaceUserData()->Promise<Void>{
+        var promiseArray:[Promise<Void>] = []
         if let user = self.user{
             
-            self.databaseRef.child("users").child(user.uid).child("avatarURL").observeSingleEvent(of: .value) { (snapshot) in
-                if let url = snapshot.value as? String  {
-                    UserDefaults.standard.setValue(url, forKey: UserDefaultsKeys.avatarURL)
-                }
-            }
-            if UserDefaults.standard.string(forKey: UserDefaultsKeys.name) == nil {
-                self.databaseRef.child("users").child(user.uid).child("displayName").observeSingleEvent(of: .value) { (snapshot) in
-                    if let displayName = snapshot.value as? String  {
-                        UserDefaults.standard.setValue(displayName, forKey: UserDefaultsKeys.name)
+            promiseArray.append(Promise<Void>.init(resolvers: { (fulfil, reject) in
+                self.databaseRef.child("users").child(user.uid).child("avatarURL").observeSingleEvent(of: .value) { (snapshot) in
+                    if let url = snapshot.value as? String  {
+                        UserDefaults.standard.setValue(url, forKey: UserDefaultsKeys.avatarURL)
                     }
+                    fulfil(())
                 }
-            }
+            }))
             
-            self.databaseRef.child("users").child(user.uid).child("GDRP-agreedToEmail").observeSingleEvent(of: .value) { (snapshot) in
-                if let agreedToEmailNumber = snapshot.value as? NSNumber  {
-                    let agreedToEmail = agreedToEmailNumber.boolValue
-                    UserDefaults.standard.setValue(agreedToEmail, forKey: UserDefaultsKeys.gdpr_agreedToEmail)
-                }
+            if UserDefaults.standard.string(forKey: UserDefaultsKeys.name) == nil {
+                promiseArray.append(Promise<Void>.init(resolvers: { (fulfil, reject) in
+
+                    self.databaseRef.child("users").child(user.uid).child("displayName").observeSingleEvent(of: .value) { (snapshot) in
+                        if let displayName = snapshot.value as? String  {
+                            UserDefaults.standard.setValue(displayName, forKey: UserDefaultsKeys.name)
+                        }
+                        fulfil(())
+                    }
+                }))
             }
-            self.databaseRef.child("users").child(user.uid).child("GDRP-agreedToImageDetection").observeSingleEvent(of: .value) { (snapshot) in
-                if let agreedToImageDetectionNumber = snapshot.value as? NSNumber  {
-                    let agreedToImageDetection = agreedToImageDetectionNumber.boolValue
-                    UserDefaults.standard.setValue(agreedToImageDetection, forKey: UserDefaultsKeys.gdpr_agreedToImageDetection)
+            promiseArray.append(Promise<Void>.init(resolvers: { (fulfil, reject) in
+                self.databaseRef.child("users").child(user.uid).child("GDRP-agreedToEmail").observeSingleEvent(of: .value) { (snapshot) in
+                    if let agreedToEmailNumber = snapshot.value as? NSNumber  {
+                        let agreedToEmail = agreedToEmailNumber.boolValue
+                        UserDefaults.standard.setValue(agreedToEmail, forKey: UserDefaultsKeys.gdpr_agreedToEmail)
+                    }
+                    fulfil(())
+                    
                 }
-            }
-            
+            }))
+            promiseArray.append(Promise<Void>.init(resolvers: { (fulfil, reject) in
+                self.databaseRef.child("users").child(user.uid).child("GDRP-agreedToImageDetection").observeSingleEvent(of: .value) { (snapshot) in
+                    if let agreedToImageDetectionNumber = snapshot.value as? NSNumber  {
+                        let agreedToImageDetection = agreedToImageDetectionNumber.boolValue
+                        UserDefaults.standard.setValue(agreedToImageDetection, forKey: UserDefaultsKeys.gdpr_agreedToImageDetection)
+                    }
+                    fulfil(())
+                }
+            }))
+
             self.databaseRef.child("users").child(user.uid).child("screenshots").observeSingleEvent(of: .value) { (snapshot) in
                 for child in snapshot.children {
                     if let child = child as? DataSnapshot,
@@ -685,7 +748,6 @@ extension UserAccountManager {
                             })
                         })
                     }
-                    
                 }
             }
             
@@ -745,6 +807,8 @@ extension UserAccountManager {
                 }
             }
         }
+        
+        return when(fulfilled: promiseArray)
     }
     
     func uploadFavorites(product:Product){

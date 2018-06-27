@@ -445,6 +445,7 @@ class RegisterViewController: UIViewController {
     
     @objc fileprivate func skipRegistration() {
         func skip() {
+            
             UserAccountManager.shared.makeAnonAccount()
             delegate?.registerViewControllerDidSkip(self)
 
