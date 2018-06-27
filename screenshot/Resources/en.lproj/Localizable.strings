@@ -272,6 +272,12 @@
 "notification.screenshot.shoppable" = "Your screenshot is shoppable in the screenshot tab";
 "notification.title" = "Ready to shop?";
 
+"notification.favorited.item.message" = "We have items similar to the %@ you checked out recently that you’ll LOVE!";
+"notification.inactivity.discover.message" = "Check out the latest fashion trends on Discover!";
+"notification.sale.count.message.plural" = "%d products from your recent screenshots are on sale!";
+"notification.sale.count.message.single" = "%d product from your recent screenshots is on sale!";
+"notification.tapped.product.message" = "Grab this before it sells out -  %@";
+
 "onboarding.details.avatar.camera" = "Take a Photo";
 "onboarding.details.avatar.gallery" = "Upload From Gallery";
 "onboarding.details.save_alert.message" = "You haven’t filled out all your information. Do you want to continue anyway?";
@@ -360,7 +366,9 @@
 "products.related_looks.error.connection" = "Please check your connection and try again.";
 "products.related_looks.error.no_looks" = "No similar looks found";
 
-"profile.header.logged_out.continue" = "Log In or Sign Up";
+"profile.header.logged_out.continue.0" = "Log In";
+"profile.header.logged_out.continue.1" = " or ";
+"profile.header.logged_out.continue.2" = "Sign Up";
 "profile.header.logged_out.title" = "Log in for exclusive benefits!";
 "profile.row.currency.title" = "Currency";
 "profile.row.gdpr.title" = "Email & Image detection";

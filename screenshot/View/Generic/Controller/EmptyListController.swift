@@ -47,9 +47,9 @@ class EmptyListController: NSObject {
     
     private var previousContentHeight: CGFloat = 0
     
-    // Note: This doesn't work work table views with a grouped style.
+    // Note: This doesn't work for table views with a grouped style.
     func didSetContentSize(scrollView: UIScrollView, emptyView: UIView?) {
-        let height = max(0, scrollView.contentSize.height - scrollView.contentInset.top - scrollView.contentInset.bottom)
+        let height = floor(max(0, scrollView.contentSize.height - scrollView.contentInset.top - scrollView.contentInset.bottom))
         
         if height != previousContentHeight {
             if Int(height) == 0 && previousContentHeight > 0 {

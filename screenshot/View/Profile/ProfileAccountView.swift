@@ -44,14 +44,6 @@ class ProfileAccountView: UIView {
         }
     }
     
-    var avatar: UIImage? {
-        didSet {
-            avatarButton.setBackgroundImage(avatar, for: .normal)
-            avatarButton.isSelected = avatar == nil
-            UserDefaults.standard.set(avatar, forKey: UserDefaultsKeys.avatar)
-            UserDefaults.standard.synchronize()
-        }
-    }
     var avatarURL: URL? {
         didSet {
             if let url = avatarURL {
@@ -63,7 +55,7 @@ class ProfileAccountView: UIView {
                 avatarButton.setBackgroundImage(nil, for: .normal)
                 avatarButton.isSelected = true
             }
-            UserDefaults.standard.set(avatarURL, forKey: UserDefaultsKeys.avatarURL)
+            UserDefaults.standard.set(avatarURL?.absoluteString, forKey: UserDefaultsKeys.avatarURL)
             UserDefaults.standard.synchronize()
         }
     }
@@ -193,8 +185,6 @@ class ProfileAccountView: UIView {
         let loggedOutButton = MainButton()
         loggedOutButton.translatesAutoresizingMaskIntoConstraints = false
         loggedOutButton.backgroundColor = .white
-        loggedOutButton.setTitle("profile.header.logged_out.continue".localized, for: .normal)
-        loggedOutButton.setTitleColor(.gray2, for: .normal)
         loggedOutButton.addTarget(self, action: #selector(authorizeAction), for: .touchUpInside)
         loggedOutButton.layer.borderColor = UIColor.crazeGreen.cgColor
         loggedOutButton.layer.borderWidth = 2
@@ -202,6 +192,24 @@ class ProfileAccountView: UIView {
         loggedOutButton.topAnchor.constraint(equalTo: loggedOutLabel.bottomAnchor, constant: .padding).isActive = true
         loggedOutButton.bottomAnchor.constraint(equalTo: loggedOutVerticalGuide.bottomAnchor).isActive = true
         loggedOutButton.centerXAnchor.constraint(equalTo: loggedOutContainerView.layoutMarginsGuide.centerXAnchor).isActive = true
+        
+        let loggedOutAttributedString: NSAttributedString = {
+            let attributes: [NSAttributedStringKey: Any] = [
+                .foregroundColor: UIColor.gray6,
+                .font: UIFont.screenshopFont(.quicksandMedium, size: UIFont.buttonFontSize)
+            ]
+            let darkAttributes: [NSAttributedStringKey: Any] = [
+                .foregroundColor: UIColor.gray2,
+                .font: UIFont.screenshopFont(.quicksandMedium, size: UIFont.buttonFontSize)
+            ]
+            return NSMutableAttributedString(segmentedString: "profile.header.logged_out.continue", attributes: [
+                    darkAttributes,
+                    attributes,
+                    darkAttributes
+                ])
+        }()
+        
+        loggedOutButton.setAttributedTitle(loggedOutAttributedString, for: .normal)
     }
     
     private func setupLoggedInViews() {
@@ -435,7 +443,20 @@ extension ProfileAccountView: UIImagePickerControllerDelegate, UINavigationContr
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         if let pickedImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
-            avatar = pickedImage
+            let urlString = "https://screenshopit.com/avatar.jpg"
+            if let url = URL.init(string: urlString){
+                SDWebImageManager.shared().saveImage(toCache: pickedImage, for: url)
+                avatarURL = url
+
+                if let imageData = AssetSyncModel.sharedInstance.data(for: pickedImage) {
+                    UserAccountManager.shared.uploadImage(data: imageData).then { (url) -> (Void) in
+                        SDWebImageManager.shared().saveImage(toCache: pickedImage, for: url)
+                        self.avatarURL = url
+                        UserAccountManager.shared.setProfile(displayName: nil, gender: nil, size: nil, unverifiedEmail: nil, avatarURL:url.absoluteString)
+                    }
+                }
+                
+            }
         }
         
         picker.presentingViewController?.dismiss(animated: true)

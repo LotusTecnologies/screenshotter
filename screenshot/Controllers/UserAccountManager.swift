@@ -16,19 +16,29 @@ import SDWebImage
 class FacebookProxy : NSObject, FBSDKLoginButtonDelegate {
     let (promise, fulfill, reject) = Promise<FBSDKLoginManagerLoginResult>.pending()
     var facebookButton = FBSDKLoginButton()
-
+    enum FacebookError : Int {
+        case canceled = 1
+        case wasLogout = 2
+    }
+    static let FacebookProxyErrorDomain = "com.screenshopit.facebookProxy.errorDomain"
+    
     override init() {
         super.init()
+
         facebookButton.delegate = self
         facebookButton.sendActions(for: .touchUpInside)
 
     }
     
     func loginButton(_ loginButton: FBSDKLoginButton!, didCompleteWith result: FBSDKLoginManagerLoginResult!, error: Error!) {
+        print("delegate is \(self)")
+
         if let error = error {
             reject(error)
         }else if let result = result {
-            if result.isCancelled  || result.token == nil{
+            if result.isCancelled {
+                reject(NSError.init(domain: FacebookProxy.FacebookProxyErrorDomain, code: FacebookError.canceled.rawValue, userInfo: [:]))
+            }else if result.token == nil {
                 reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
             }else{
                 fulfill(result)
@@ -40,7 +50,11 @@ class FacebookProxy : NSObject, FBSDKLoginButtonDelegate {
     }
     
     func loginButtonDidLogOut(_ loginButton: FBSDKLoginButton!) {
-        reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+        print("delegate is \(self)")
+        reject(NSError.init(domain: FacebookProxy.FacebookProxyErrorDomain, code: FacebookError.wasLogout.rawValue, userInfo: [:]))
+    }
+    func loginButtonWillLogin(_ loginButton: FBSDKLoginButton!) -> Bool {
+        return true
     }
 }
 
@@ -65,6 +79,7 @@ class UserAccountManager : NSObject {
     }
     var email:String?
     lazy var databaseRef:DatabaseReference = Database.database().reference()
+    lazy var storageRef:StorageReference = Storage.storage().reference()
 
     static let shared = UserAccountManager()
 
@@ -104,78 +119,128 @@ class UserAccountManager : NSObject {
         }
         return handled
     }
-    
+    private func linkFirebaseStuffForFacebookFor(user:User ) {
+        if let name = user.providerData.first?.displayName {
+            self.databaseRef.child("users").child(user.uid).child("facebook-displayName").setValue(name)
+            self.databaseRef.child("users").child(user.uid).child("displayName").setValue(name)
+            UserDefaults.standard.set(name, forKey: UserDefaultsKeys.name)
+        }
+        if let email = user.providerData.first?.email {
+            self.databaseRef.child("users").child(user.uid).child("facebook-email").setValue(email)
+            self.databaseRef.child("users").child(user.uid).child("email").setValue(email)
+            UserDefaults.standard.set(email, forKey: UserDefaultsKeys.email)
+        }
+        if let phone = user.providerData.first?.phoneNumber{
+            self.databaseRef.child("users").child(user.uid).child("facebook-phone").setValue(phone)
+        }
+        if let photoURLString = user.providerData.first?.photoURL?.absoluteString {
+            self.databaseRef.child("users").child(user.uid).child("facebook-photoURL").setValue(photoURLString)
+            UserDefaults.standard.set( photoURLString, forKey: UserDefaultsKeys.avatarURL)
+        }
+        
+        self.userFromLogin = user
+        self.databaseRef.child("users").child(user.uid).child("identifier").setValue(AnalyticsUser.current.identifier)
+        self.downloadAndReplaceUserData()
+    }
+    var loginWithFacebookPromise: Promise<LoginOrCreateAccountResult>?
     public func loginWithFacebook()  -> Promise<LoginOrCreateAccountResult>{
-
-        return Promise<LoginOrCreateAccountResult>.init(resolvers: { (fulfil, reject) in
+        let completion =  { (result:AuthDataResult?, error:Error?,  fulfil: @escaping (LoginOrCreateAccountResult) -> Void, reject:@escaping (Error) -> Void) in
+            if let error = error{
+                let e = error as NSError
+                if e.domain == AuthErrorDomain && e.code == 17015{
+                    //Already linked
+                    if let user = self.user {
+                        self.linkFirebaseStuffForFacebookFor(user: user)
+                    }
+                    fulfil(.facebookOld)
+                }else{
+                    reject(error)
+                }
+            }else if let user = result?.user {
+               self.linkFirebaseStuffForFacebookFor(user: user)
+                self.databaseRef.child("users").child(user.uid).child("createdAt").observeSingleEvent(of: .value) { (snapshot) in
+                    if let _ = snapshot.value as? NSNumber {
+                        fulfil(.facebookOld)
+                    }else{
+                        let now = NSNumber.init(value: (Date().timeIntervalSince1970 as Double) )
+                        self.databaseRef.child("users").child(user.uid).child("createdAt").setValue(now)
+                        fulfil(.facebookNew)
+                    }
+                }
+            }else {
+                reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+                
+            }
+        }
+        let promise = Promise<LoginOrCreateAccountResult>.init(resolvers: { (fulfil, reject) in
             let proxy = FacebookProxy.init()
             self.facebookProxy = proxy
             proxy.promise.then(execute: { (result) -> Void in
-                let completion:AuthDataResultCallback =  { (result, error) in
-                    if let error = error{
-                        let e = error as NSError
-                        if   e.domain == AuthErrorDomain && e.code == 17025 {
-                            //This credential is already associated with a different user account.
-                            reject(error)
-                        }
-                    }else if let user = result?.user {
-                        if let name = user.providerData.first?.displayName {
-                            self.databaseRef.child("users").child(user.uid).child("facebook-displayName").setValue(name)
-                            self.databaseRef.child("users").child(user.uid).child("displayName").setValue(name)
-                            UserDefaults.standard.set(name, forKey: UserDefaultsKeys.name)
-                        }
-                        if let email = user.providerData.first?.email {
-                            self.databaseRef.child("users").child(user.uid).child("facebook-email").setValue(email)
-                            self.databaseRef.child("users").child(user.uid).child("email").setValue(email)
-                            UserDefaults.standard.set(email, forKey: UserDefaultsKeys.email)
-                        }
-                        if let phone = user.providerData.first?.phoneNumber{
-                            self.databaseRef.child("users").child(user.uid).child("facebook-phone").setValue(phone)
-                        }
-                        if let photoURLString = user.providerData.first?.photoURL?.absoluteString {
-                            self.databaseRef.child("users").child(user.uid).child("facebook-photoURL").setValue(photoURLString)
-                            UserDefaults.standard.set(URL(string: photoURLString), forKey: UserDefaultsKeys.avatarURL)
-                        }
-                        
-                        self.userFromLogin = user
-                        self.downloadAndReplaceUserData()
-                        self.databaseRef.child("users").child(user.uid).child("createdAt").observeSingleEvent(of: .value) { (snapshot) in
-                            if let _ = snapshot.value as? NSNumber {
-                                fulfil(.facebookOld)
-                            }else{
-                                let now = NSNumber.init(value: (Date().timeIntervalSince1970 as Double) )
-                                self.databaseRef.child("users").child(user.uid).child("createdAt").setValue(now)
-                                fulfil(.facebookNew)
-                            }
-                        }
-                        
-                    }else {
-                        reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
-                        
-                    }
-                }
+               
                 let credential = FacebookAuthProvider.credential(withAccessToken: FBSDKAccessToken.current().tokenString)
                 if let user = self.user {
                     user.linkAndRetrieveData(with: credential, completion: { (result, error) in
                         if let e = error,  (e as NSError).domain == AuthErrorDomain, (e as NSError).code == 17025 {
-//                            "This credential is already associated with a different user account."
-                            Auth.auth().signInAndRetrieveData(with: credential, completion:completion)
+                            //"This credential is already associated with a different user account."
+                            Auth.auth().signInAndRetrieveData(with: credential, completion: { (result, error) in
+                                completion(result, error, fulfil, reject)
+                            })
                         }else{
-                            completion(result, error)
+                            completion(result, error, fulfil, reject)
                         }
                     })
                 }else{
-                    Auth.auth().signInAndRetrieveData(with: credential, completion:completion)
+                    Auth.auth().signInAndRetrieveData(with: credential, completion:{ (result, error) in
+                        completion(result, error, fulfil, reject)
+                    })
                 }
             }).catch(execute: { (error) in
                 reject(error)
             })
         })
+        self.loginWithFacebookPromise = promise
+        return promise
     }
     
     
+    
+    
     public func loginOrCreatAccountAsNeeded(email:String, password:String) -> Promise<LoginOrCreateAccountResult> {
-        
+        if let user = self.user, user.isAnonymous{
+            return Promise.init(resolvers: { (fulfil, reject) in
+                user.updateEmail(to: email, completion: { (error) in
+                    if let error = error {
+                        reject(error)
+                    }else{
+                        user.sendEmailVerification(completion: { (error) in
+                            if let error = error {
+                                reject(error)
+                            }else{
+                                user.updatePassword(to: password, completion: { (error) in
+                                    if let error = error {
+                                        reject(error)
+                                    }else{
+                                        user.sendEmailVerification(completion: { (error) in
+                                            if let error = error {
+                                                reject(error)
+                                            }else{
+                                                fulfil(LoginOrCreateAccountResult.unconfirmed)
+                                            }
+                                        })
+                                    }
+                                })
+                            }
+                        })
+                    }
+                })
+            }).recover(execute: { (error) -> Promise<UserAccountManager.LoginOrCreateAccountResult> in
+                let nsError = error as NSError
+                if nsError.code == AuthErrorCode.emailAlreadyInUse.rawValue && nsError.domain == AuthErrorDomain {
+                    return self.login(email: email.lowercased(), password: password)
+                }
+                return Promise.init(error: error)
+            })
+        }
         return createAccount(email:email.lowercased(), password: password).recover(execute: { (error) -> Promise<UserAccountManager.LoginOrCreateAccountResult> in
             let nsError = error as NSError
             if nsError.code == AuthErrorCode.emailAlreadyInUse.rawValue && nsError.domain == AuthErrorDomain {
@@ -183,6 +248,7 @@ class UserAccountManager : NSObject {
             }
             return Promise.init(error: error)
         })
+        
         
     }
     
@@ -197,6 +263,7 @@ class UserAccountManager : NSObject {
                 }else if let authResult = authResult {
                     let user = authResult.user
                     self.userFromLogin = user
+                    self.databaseRef.child("users").child(user.uid).child("identifier").setValue(AnalyticsUser.current.identifier)
                     self.downloadAndReplaceUserData()
                     if user.isEmailVerified {
                         self.databaseRef.child("users").child(user.uid).child("email").setValue(email.lowercased())
@@ -231,6 +298,7 @@ class UserAccountManager : NSObject {
                     }else  if let authResult = authResult {
                         let user = authResult.user
                         self.userFromLogin = user
+                        self.databaseRef.child("users").child(user.uid).child("identifier").setValue(AnalyticsUser.current.identifier)
                         self.downloadAndReplaceUserData()
                         fulfil(())
                     }else{
@@ -250,6 +318,7 @@ class UserAccountManager : NSObject {
                 }else  if let authResult = authResult {
                     let user = authResult.user
                     self.userFromLogin = user
+                    self.databaseRef.child("users").child(user.uid).child("identifier").setValue(AnalyticsUser.current.identifier)
                     self.downloadAndReplaceUserData()
                     if authResult.user.isEmailVerified {
                         fulfil(LoginOrCreateAccountResult.confirmed)
@@ -280,6 +349,7 @@ class UserAccountManager : NSObject {
                         self.databaseRef.child("users").child(user.uid).child("email").setValue(email.lowercased())
                         UserDefaults.standard.set(email.lowercased(), forKey: UserDefaultsKeys.email)
                     }
+                    
                     fulfill(())
                 }
             })
@@ -337,9 +407,12 @@ class UserAccountManager : NSObject {
     
     @discardableResult func setGDPR(agreedToEmail:Bool, agreedToImageDetection:Bool) -> Promise<Void>{
         return Promise { fulfill, reject in
-            
             UserDefaults.standard.setValue(agreedToEmail, forKey: UserDefaultsKeys.gdpr_agreedToEmail)
             UserDefaults.standard.setValue(agreedToImageDetection, forKey: UserDefaultsKeys.gdpr_agreedToImageDetection)
+            
+            if agreedToImageDetection {
+                SilentPushSubscriptionManager.sharedInstance.updateSubscriptionsIfNeeded()
+            }
             
             let promise = makeAnonAccountPromise ?? Promise.init(value:())
             promise.then(execute: { () -> Void in
@@ -356,7 +429,7 @@ class UserAccountManager : NSObject {
         }
     }
     
-    @discardableResult func setProfile(displayName:String?, gender:String?, size:String?, unverifiedEmail:String?) -> Promise<Void>{
+    @discardableResult func setProfile(displayName:String?, gender:String?, size:String?, unverifiedEmail:String?, avatarURL:String? = nil) -> Promise<Void>{
         return Promise { fulfill, reject in
             let promise = makeAnonAccountPromise ?? Promise.init(value:())
             promise.then(execute: { () -> Void in
@@ -376,6 +449,9 @@ class UserAccountManager : NSObject {
                             UserDefaults.standard.set(unverifiedEmail, forKey: UserDefaultsKeys.email)
                         }
                         self.databaseRef.child("users").child(user.uid).child("unverifiedEmail").setValue(unverifiedEmail)
+                    }
+                    if let avatarUrl = avatarURL {
+                        self.databaseRef.child("users").child(user.uid).child("avatarURL").setValue(avatarUrl)
                     }
                     fulfill(())
                 }else{
@@ -413,6 +489,16 @@ class UserAccountManager : NSObject {
     
 }
 extension UserAccountManager {
+    
+    public func isIgnorableFacebookError( error:NSError) ->Bool {
+        if error.domain == FacebookProxy.FacebookProxyErrorDomain && error.code == FacebookProxy.FacebookError.canceled.rawValue {
+            return true
+        }
+        if error.domain == FacebookProxy.FacebookProxyErrorDomain && error.code == FacebookProxy.FacebookError.wasLogout.rawValue {
+            return true
+        }
+        return  false
+    }
     public func isNoInternetError( error:NSError) ->Bool {
         if error.domain == NSURLErrorDomain {
             return true
@@ -528,6 +614,20 @@ extension UserAccountManager {
     
     func downloadAndReplaceUserData(){
         if let user = self.user{
+            
+            self.databaseRef.child("users").child(user.uid).child("avatarURL").observeSingleEvent(of: .value) { (snapshot) in
+                if let url = snapshot.value as? String  {
+                    UserDefaults.standard.setValue(url, forKey: UserDefaultsKeys.avatarURL)
+                }
+            }
+            if UserDefaults.standard.string(forKey: UserDefaultsKeys.name) == nil {
+                self.databaseRef.child("users").child(user.uid).child("displayName").observeSingleEvent(of: .value) { (snapshot) in
+                    if let displayName = snapshot.value as? String  {
+                        UserDefaults.standard.setValue(displayName, forKey: UserDefaultsKeys.name)
+                    }
+                }
+            }
+            
             self.databaseRef.child("users").child(user.uid).child("GDRP-agreedToEmail").observeSingleEvent(of: .value) { (snapshot) in
                 if let agreedToEmailNumber = snapshot.value as? NSNumber  {
                     let agreedToEmail = agreedToEmailNumber.boolValue
@@ -717,8 +817,9 @@ extension UserAccountManager {
             let uploadedImageURL = screenshot.uploadedImageURL {
             let trackingInfo = screenshot.trackingInfo ?? ""
             let source = screenshot.source.rawValue
+            let escapedAssetId = assetId.replacingOccurrences(of: "\"", with: "")
             let dict:[String:Any] = [
-                "assetId":assetId,
+                "assetId":escapedAssetId,
                 "createdAt":NSNumber.init(value: createdAtNumber as Double),
                 "source":source,
                 "uploadedImageURL":uploadedImageURL,
@@ -728,6 +829,35 @@ extension UserAccountManager {
             self.databaseRef.child("users").child(user.uid).child("screenshots").child(assetId).setValue(dict)
         }
 
+    }
+}
+
+extension UserAccountManager {
+    public func uploadImage(data:Data) -> Promise<URL> {
+        return Promise { fulfill, reject in
+            if let user = self.user {
+                let name = UUID().uuidString
+                let uploadRef = storageRef.child("user").child(user.uid).child("images").child("\(name).jpg")
+                
+                let _ = uploadRef.putData(data, metadata: nil) { (metadata, error) in
+                    if let error = error {
+                        reject(error)
+                    }else{
+                        uploadRef.downloadURL { url, error in
+                            if let error = error {
+                                reject(error)
+                            } else if let url = url{
+                                fulfill(url)
+                            }else{
+                                reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+                            }
+                        }
+                    }
+                }
+            }else{
+                reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+            }
+        }
     }
 }
 

@@ -54,11 +54,12 @@ class SilentPushSubscriptionManager : NSObject {
     // MARK: -
     
     public func updateSubscriptionsIfNeeded() {
+        let agreedToImageDetection = UserDefaults.standard.bool(forKey: UserDefaultsKeys.gdpr_agreedToImageDetection)
         let hasDeviceToken = deviceToken != nil
         let hasARN = subscriptionARN != nil
         let enabledSilentPush = UserDefaults.standard.bool(forKey: UserDefaultsKeys.enabledSilentPush)
         
-        if hasDeviceToken && [hasARN, enabledSilentPush].contains(false) {
+        if agreedToImageDetection && hasDeviceToken && [hasARN, enabledSilentPush].contains(false) {
             updateSubscriptions().then { _ -> Void in
                 UserDefaults.standard.set(true, forKey: UserDefaultsKeys.enabledSilentPush)
             }

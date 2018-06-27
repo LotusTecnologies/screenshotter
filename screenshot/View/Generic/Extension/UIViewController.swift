@@ -9,7 +9,10 @@
 import UIKit
 
 extension UIViewController {
+    static let navigationBarLogoTag = 28
+    
     func addNavigationItemLogo() {
         self.navigationItem.titleView = UIImageView(image: UIImage(named: "BrandLogo20h"))
+        self.navigationItem.titleView?.tag = UIViewController.navigationBarLogoTag
     }
 }

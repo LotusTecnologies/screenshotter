@@ -21,6 +21,7 @@ enum ScreenshotSource : String {
     case tutorial
     case nativeShare = "native-share" //Andriod only - here for completment of analytics
     case burrow
+    case pushWoosh
     
     var isUserGenerated:Bool {
         return (self == .nativeShare || self == .gallery || self == .share || self == .unknown || self == .screenshot || self == .camera)

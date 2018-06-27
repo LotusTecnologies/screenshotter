@@ -11,6 +11,7 @@ import AVFoundation
 import CoreLocation
 import Photos
 import UserNotifications
+import Pushwoosh
 
 enum PermissionType {
     case camera
@@ -195,6 +196,7 @@ final class PermissionsManager : NSObject, CLLocationManagerDelegate {
     }
     
     fileprivate func requestPushPermission(with response: PermissionBlock?) {
+        PushNotificationManager.push().registerForPushNotifications()
         let options: UNAuthorizationOptions = [.alert, .badge, .sound]
         
         UNUserNotificationCenter.current().requestAuthorization(options: options) { (granted, error) in
@@ -202,7 +204,7 @@ final class PermissionsManager : NSObject, CLLocationManagerDelegate {
             
             if granted {
                 DispatchQueue.main.async {
-                    UIApplication.shared.registerForRemoteNotifications()
+                    PushNotificationManager.push().registerForPushNotifications()
                 }
             }
             

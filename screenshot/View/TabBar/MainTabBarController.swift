@@ -165,7 +165,7 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         
         self.presentUpdatePromptIfNeeded()
         self.presentChangelogAlertIfNeeded()
-        
+        presentGDPRIfNeeded()
         
         if let viewcontroller = self.selectedViewController {
             if viewcontroller == screenshotsNavigationController {
@@ -232,6 +232,30 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
     }
     
     func goTo(tab: TabIndex) {
+        func subViewControllers(_ vc:UIViewController) -> [UIViewController] {
+            var subVC:[UIViewController] = vc.childViewControllers
+            if let presentedViewController  = vc.presentedViewController{
+                subVC.append(presentedViewController)
+            }
+            return subVC
+        }
+        
+        func dismissViewController(_ vc:UIViewController) {
+            let subViewController = subViewControllers(vc)
+            for vc  in subViewController {
+                dismissViewController(vc)
+            }
+            if vc.presentedViewController != nil {
+                vc.dismiss(animated: false, completion: nil)
+            }
+            if let nav = vc.navigationController {
+                nav.popToRootViewController(animated: false)
+            }
+        }
+        
+        if let current = self.selectedViewController {
+            dismissViewController(current)
+        }
         if let toSelect = self.viewControllers?.first(where: { (vc) -> Bool in
             return vc.tabBarItem.tag == tab.tagValue
         }) {
@@ -416,5 +440,26 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
 extension MainTabBarController: FetchedResultsControllerManagerDelegate {
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
         syncCartTabBadgeCount()
+    }
+}
+
+typealias MainTabBarControllerGDPR = MainTabBarController
+extension MainTabBarControllerGDPR: OnboardingGDPRViewControllerDelegate {
+    private var needsToPresentGDPR: Bool {
+        return UserDefaults.standard.value(forKey: UserDefaultsKeys.gdpr_agreedToEmail) == nil
+    }
+    
+    private func presentGDPRIfNeeded() {
+        guard needsToPresentGDPR else {
+            return
+        }
+        
+        let gdprViewController = OnboardingGDPRViewController()
+        gdprViewController.delegate = self
+        present(gdprViewController, animated: true)
+    }
+    
+    func onboardingGDPRViewControllerDidComplete(_ viewController: OnboardingGDPRViewController) {
+        dismiss(animated: true)
     }
 }

@@ -19,15 +19,21 @@ class Constants {
     // Local notification constants.
     static let openingScreenKey = "openingScreenKey"
     static let openingScreenValueScreenshot = "openingScreenValueScreenshot"
+    static let openingScreenValueDiscover = "openingScreenValueDiscover"
     static let openingAssetIdKey = "openingAssetIdKey"
     static let tutorialScreenshotAssetId = "tutorialScreenshotAssetId"
+    static let openingProductKey = "openingProductKey"
     
     // DB
-    static let currentMomVersion = 18
+    static let currentMomVersion = 19
     
     // Cart
     static let cartItemMaxQuantity = 10
     
+    // Calculation
+    static let secondsInHour: TimeInterval = 3600
+    static let secondsInDay: TimeInterval = 86400
+
     // Syte
     static let syteAccountId = 6677
     static let syteAccountSignature = "GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU="
@@ -53,6 +59,9 @@ class Constants {
     static let shoppableToken = "F81iFWJ93by99pqC22c422189db74b52" //"gD1GV3cVFGC9hk8W5927b13e5e"
     static let syteUscFeed = "shoppable_production" //"shoppable"
     static let kocchavaGUIDKey = "koscreenshot-ios-dev-wiwhb"
+    static let pushWooshAppCode = "3D767-313B8"
+    static let pushWooshAppName = "Screenshop Dev"
+
 #else
     static let appSeeApiKey = "0ece18b50f7d4ef9aae3e473c28030bc"
     static let screenShotLambdaDomain = "https://q598b771ed.execute-api.us-east-1.amazonaws.com/production/"
@@ -65,6 +74,8 @@ class Constants {
     static let shoppableToken = "F81iFWJ93by99pqC22c422189db74b52"
     static let syteUscFeed = "shoppable_production"
     static let kocchavaGUIDKey = "koscreenshot-cq8h4"
+    static let pushWooshAppCode = "B9909-951E1"
+    static let pushWooshAppName = "Screenshop"
 #endif
 
 }

@@ -12,6 +12,7 @@ extension UIViewController {
     @discardableResult func presentProduct(_ product: Product, atLocation location: Analytics.AnalyticsProductOpenedFromPage) -> ProductViewController? {
         Analytics.trackTappedOnProduct(product, atLocation: location)
         
+        
         if product.isSupportingUSC {
             let productViewController = ProductViewController(product: product)
             navigationController?.pushViewController(productViewController, animated: true)
@@ -26,6 +27,7 @@ extension UIViewController {
 }
 
 extension ProductViewController {
+    
     static func present(with partNumber: String) {
         print("ProductViewController present partNumber:\(partNumber)")
         let dataModel = DataModel.sharedInstance
@@ -44,4 +46,20 @@ extension ProductViewController {
             }
         }
     }
+    
+    static func present(imageURL: String) {
+        print("ProductViewController present imageURL:\(imageURL)")
+        let dataModel = DataModel.sharedInstance
+        
+        if let product = dataModel.retrieveProduct(managedObjectContext: dataModel.mainMoc(), imageURL: imageURL) {
+            AssetSyncModel.sharedInstance.addSubShoppable(fromProduct: product).then(on: .main) { (shoppable) -> Void in
+                let burrowViewController = ProductDetailViewController()
+                burrowViewController.product = product
+                burrowViewController.shoppable = product.shoppable
+                let navigationController = ModalNavigationController(rootViewController: burrowViewController)
+                AppDelegate.shared.window?.rootViewController?.present(navigationController, animated: true, completion: nil)
+            }
+        }
+    }
+
 }

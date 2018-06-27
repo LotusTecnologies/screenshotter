@@ -48,6 +48,7 @@ class ProductsViewController: BaseViewController {
     var shamrockButton : FloatingActionButton?
     var screenshotLoadingState:ProductsViewControllerState = .unknown {
         didSet {
+            Analytics.trackDevLog(file: #file, line: #line, message: "from\(oldValue) to \(screenshotLoadingState)")            
             self.syncViewsAfterStateChange()
         }
     }
@@ -429,10 +430,11 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
 
         if sectionType == .product {
             let product = self.productAtIndex(indexPath.item)
+            product.recordViewedProduct()
             self.recoverLostSaleManager.didClick(on: product)
             if let productViewController = presentProduct(product, atLocation: .products) {
                 productViewController.similarProducts = products
-            }            
+            }
         }
         else if sectionType == .relatedLooks {
             if let url = self.relatedLooksManager.relatedLook(at:indexPath.row) {

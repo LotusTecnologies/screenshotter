@@ -372,6 +372,7 @@ class RegisterViewController: UIViewController {
             self.continueButton.isEnabled = false
             self.skipButton.isUserInteractionEnabled = false
             self.facebookLoginButton.isUserInteractionEnabled = false
+            self._view.forgotPasswordButton.isUserInteractionEnabled = false
             UserAccountManager.shared.loginOrCreatAccountAsNeeded(email: email, password: password)
             .then { result -> Void in
                 if  result  == .unconfirmed {
@@ -418,6 +419,7 @@ class RegisterViewController: UIViewController {
                 self.continueButton.isEnabled = true
                 self.skipButton.isUserInteractionEnabled = true
                 self.facebookLoginButton.isUserInteractionEnabled = true
+                self._view.forgotPasswordButton.isUserInteractionEnabled = true
 
             }
         }
@@ -447,7 +449,9 @@ class RegisterViewController: UIViewController {
             delegate?.registerViewControllerDidSkip(self)
 
         }
-        if let password = _view.passwordTextField.text, password.lengthOfBytes(using: .utf8) == 0, let email = _view.emailTextField.text, email.lengthOfBytes(using: .utf8) == 0{
+        self.resignFirstResponder()
+
+        if let password = _view.passwordTextField.text, password.lengthOfBytes(using: .utf8) == 0 {
             skip()
         }else{
             let alert = UIAlertController.init(title: nil, message: "authorize.register.skipConfirm".localized, preferredStyle: .alert)
@@ -477,7 +481,10 @@ class RegisterViewController: UIViewController {
         self.continueButton.isUserInteractionEnabled = false
         self.skipButton.isUserInteractionEnabled = false
         self.facebookLoginButton.isUserInteractionEnabled = false
-
+        self.facebookLoginButton.isEnabled = false
+        self._view.emailTextField.isUserInteractionEnabled = false
+        self._view.passwordTextField.isUserInteractionEnabled = false
+        self._view.forgotPasswordButton.isUserInteractionEnabled = false
         UserAccountManager.shared.loginWithFacebook().then
             { (result) -> Void in
             
@@ -494,10 +501,20 @@ class RegisterViewController: UIViewController {
             let e = error as NSError
             Analytics.trackOnboardingError(domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
             print("facebook login error: \(error)")
+            
+            if !UserAccountManager.shared.isIgnorableFacebookError(error: e) {
+                let alert = UserAccountManager.shared.alertViewForUndefinedError(error: e, viewController: self)
+                self.present(alert, animated: true, completion: nil)
+            }
+            
         }.always {
+            self.facebookLoginButton.isEnabled = true
             self.continueButton.isUserInteractionEnabled = true
             self.skipButton.isUserInteractionEnabled = true
             self.facebookLoginButton.isUserInteractionEnabled = true
+            self._view.emailTextField.isUserInteractionEnabled = true
+            self._view.passwordTextField.isUserInteractionEnabled = true
+            self._view.forgotPasswordButton.isUserInteractionEnabled = true
 
         }
     }
