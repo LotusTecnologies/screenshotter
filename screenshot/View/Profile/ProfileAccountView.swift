@@ -185,8 +185,6 @@ class ProfileAccountView: UIView {
         let loggedOutButton = MainButton()
         loggedOutButton.translatesAutoresizingMaskIntoConstraints = false
         loggedOutButton.backgroundColor = .white
-        loggedOutButton.setTitle("profile.header.logged_out.continue".localized, for: .normal)
-        loggedOutButton.setTitleColor(.gray2, for: .normal)
         loggedOutButton.addTarget(self, action: #selector(authorizeAction), for: .touchUpInside)
         loggedOutButton.layer.borderColor = UIColor.crazeGreen.cgColor
         loggedOutButton.layer.borderWidth = 2
@@ -194,6 +192,24 @@ class ProfileAccountView: UIView {
         loggedOutButton.topAnchor.constraint(equalTo: loggedOutLabel.bottomAnchor, constant: .padding).isActive = true
         loggedOutButton.bottomAnchor.constraint(equalTo: loggedOutVerticalGuide.bottomAnchor).isActive = true
         loggedOutButton.centerXAnchor.constraint(equalTo: loggedOutContainerView.layoutMarginsGuide.centerXAnchor).isActive = true
+        
+        let loggedOutAttributedString: NSAttributedString = {
+            let attributes: [NSAttributedStringKey: Any] = [
+                .foregroundColor: UIColor.gray6,
+                .font: UIFont.screenshopFont(.quicksandMedium, size: UIFont.buttonFontSize)
+            ]
+            let darkAttributes: [NSAttributedStringKey: Any] = [
+                .foregroundColor: UIColor.gray2,
+                .font: UIFont.screenshopFont(.quicksandMedium, size: UIFont.buttonFontSize)
+            ]
+            return NSMutableAttributedString(segmentedString: "profile.header.logged_out.continue", attributes: [
+                    darkAttributes,
+                    attributes,
+                    darkAttributes
+                ])
+        }()
+        
+        loggedOutButton.setAttributedTitle(loggedOutAttributedString, for: .normal)
     }
     
     private func setupLoggedInViews() {
