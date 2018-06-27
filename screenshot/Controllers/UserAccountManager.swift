@@ -329,8 +329,9 @@ class UserAccountManager : NSObject {
                         let user = authResult.user
                         self.userFromLogin = user
                         self.databaseRef.child("users").child(user.uid).child("identifier").setValue(AnalyticsUser.current.identifier)
-                        self.downloadAndReplaceUserData()
-                        fulfil(())
+                        self.downloadAndReplaceUserData().always {
+                            fulfil(())
+                        }
                     }else{
                         reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
                     }
@@ -349,16 +350,20 @@ class UserAccountManager : NSObject {
                     let user = authResult.user
                     self.userFromLogin = user
                     self.databaseRef.child("users").child(user.uid).child("identifier").setValue(AnalyticsUser.current.identifier)
-                    self.downloadAndReplaceUserData()
+                    let downloadPromise = self.downloadAndReplaceUserData()
                     if authResult.user.isEmailVerified {
-                        fulfil(LoginOrCreateAccountResult.confirmed)
+                        downloadPromise.always {
+                            fulfil(LoginOrCreateAccountResult.confirmed)
+                        }
                     }else{
                         self.email = email
                         authResult.user.sendEmailVerification(completion: { (error) in
-                            if let error = error {
-                                reject(error)
-                            }else{
-                                fulfil(LoginOrCreateAccountResult.unconfirmed)
+                            downloadPromise.always {
+                                if let error = error {
+                                    reject(error)
+                                }else{
+                                    fulfil(LoginOrCreateAccountResult.unconfirmed)
+                                }
                             }
                         })
                     }
@@ -508,6 +513,7 @@ class UserAccountManager : NSObject {
             do {
                 UserDefaults.standard.removeObject(forKey: UserDefaultsKeys.name)
                 UserDefaults.standard.removeObject(forKey: UserDefaultsKeys.email)
+                UserDefaults.standard.removeObject(forKey: UserDefaultsKeys.avatarURL)
                 FBSDKLoginManager().logOut()
                 if self.user?.isAnonymous == false || self.user?.providerData.first(where: {$0.providerID == "facebook.com"}) != nil {
                     try Auth.auth().signOut()
@@ -654,35 +660,50 @@ extension UserAccountManager {
 extension UserAccountManager {
     
     
-    func downloadAndReplaceUserData(){
+    func downloadAndReplaceUserData()->Promise<Void>{
+        var promiseArray:[Promise<Void>] = []
         if let user = self.user{
             
-            self.databaseRef.child("users").child(user.uid).child("avatarURL").observeSingleEvent(of: .value) { (snapshot) in
-                if let url = snapshot.value as? String  {
-                    UserDefaults.standard.setValue(url, forKey: UserDefaultsKeys.avatarURL)
-                }
-            }
-            if UserDefaults.standard.string(forKey: UserDefaultsKeys.name) == nil {
-                self.databaseRef.child("users").child(user.uid).child("displayName").observeSingleEvent(of: .value) { (snapshot) in
-                    if let displayName = snapshot.value as? String  {
-                        UserDefaults.standard.setValue(displayName, forKey: UserDefaultsKeys.name)
+            promiseArray.append(Promise<Void>.init(resolvers: { (fulfil, reject) in
+                self.databaseRef.child("users").child(user.uid).child("avatarURL").observeSingleEvent(of: .value) { (snapshot) in
+                    if let url = snapshot.value as? String  {
+                        UserDefaults.standard.setValue(url, forKey: UserDefaultsKeys.avatarURL)
                     }
+                    fulfil(())
                 }
-            }
+            }))
             
-            self.databaseRef.child("users").child(user.uid).child("GDRP-agreedToEmail").observeSingleEvent(of: .value) { (snapshot) in
-                if let agreedToEmailNumber = snapshot.value as? NSNumber  {
-                    let agreedToEmail = agreedToEmailNumber.boolValue
-                    UserDefaults.standard.setValue(agreedToEmail, forKey: UserDefaultsKeys.gdpr_agreedToEmail)
-                }
+            if UserDefaults.standard.string(forKey: UserDefaultsKeys.name) == nil {
+                promiseArray.append(Promise<Void>.init(resolvers: { (fulfil, reject) in
+
+                    self.databaseRef.child("users").child(user.uid).child("displayName").observeSingleEvent(of: .value) { (snapshot) in
+                        if let displayName = snapshot.value as? String  {
+                            UserDefaults.standard.setValue(displayName, forKey: UserDefaultsKeys.name)
+                        }
+                        fulfil(())
+                    }
+                }))
             }
-            self.databaseRef.child("users").child(user.uid).child("GDRP-agreedToImageDetection").observeSingleEvent(of: .value) { (snapshot) in
-                if let agreedToImageDetectionNumber = snapshot.value as? NSNumber  {
-                    let agreedToImageDetection = agreedToImageDetectionNumber.boolValue
-                    UserDefaults.standard.setValue(agreedToImageDetection, forKey: UserDefaultsKeys.gdpr_agreedToImageDetection)
+            promiseArray.append(Promise<Void>.init(resolvers: { (fulfil, reject) in
+                self.databaseRef.child("users").child(user.uid).child("GDRP-agreedToEmail").observeSingleEvent(of: .value) { (snapshot) in
+                    if let agreedToEmailNumber = snapshot.value as? NSNumber  {
+                        let agreedToEmail = agreedToEmailNumber.boolValue
+                        UserDefaults.standard.setValue(agreedToEmail, forKey: UserDefaultsKeys.gdpr_agreedToEmail)
+                    }
+                    fulfil(())
+                    
                 }
-            }
-            
+            }))
+            promiseArray.append(Promise<Void>.init(resolvers: { (fulfil, reject) in
+                self.databaseRef.child("users").child(user.uid).child("GDRP-agreedToImageDetection").observeSingleEvent(of: .value) { (snapshot) in
+                    if let agreedToImageDetectionNumber = snapshot.value as? NSNumber  {
+                        let agreedToImageDetection = agreedToImageDetectionNumber.boolValue
+                        UserDefaults.standard.setValue(agreedToImageDetection, forKey: UserDefaultsKeys.gdpr_agreedToImageDetection)
+                    }
+                    fulfil(())
+                }
+            }))
+
             self.databaseRef.child("users").child(user.uid).child("screenshots").observeSingleEvent(of: .value) { (snapshot) in
                 for child in snapshot.children {
                     if let child = child as? DataSnapshot,
@@ -727,7 +748,6 @@ extension UserAccountManager {
                             })
                         })
                     }
-                    
                 }
             }
             
@@ -787,6 +807,8 @@ extension UserAccountManager {
                 }
             }
         }
+        
+        return when(fulfilled: promiseArray)
     }
     
     func uploadFavorites(product:Product){
