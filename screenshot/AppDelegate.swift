@@ -49,7 +49,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let _ = UserAccountManager.shared.application(application, didFinishLaunchingWithOptions: launchOptions)
         
         window = UIWindow(frame: UIScreen.main.bounds)
-        if UserDefaults.standard.value(forKey: UserDefaultsKeys.lastDbVersionMigrated) {
+        if UserDefaults.standard.value(forKey: UserDefaultsKeys.lastDbVersionMigrated) == nil {
             appLaunchedForFirstTime = true
         }
         
