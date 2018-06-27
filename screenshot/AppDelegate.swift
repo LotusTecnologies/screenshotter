@@ -769,7 +769,6 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
                 isHandled = true
                 if openingScreen == Constants.openingScreenValueScreenshot {
                     if let openingAssetId = userInfo[Constants.openingAssetIdKey] as? String {
-                        Analytics.trackAppOpenedFromLocalNotification()
                         AssetSyncModel.sharedInstance.importPhotosToScreenshot(assetIds: [openingAssetId], source: .screenshot)
                     }
                     showScreenshotListTop()
@@ -804,8 +803,10 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
             Analytics.trackAppOpenedFromTimedLocalNotification(source: .favoritedItem)
         case LocalNotificationIdentifier.tappedProduct.rawValue:
             Analytics.trackAppOpenedFromTimedLocalNotification(source: .tappedProduct)
-        case LocalNotificationIdentifier.saleCount.rawValue:
+        case LocalNotificationIdentifier.saleScreenshot.rawValue:
             Analytics.trackAppOpenedFromTimedLocalNotification(source: .saleCount)
+        case let x where x.hasPrefix(LocalNotificationIdentifier.screenshotAdded.rawValue):
+            Analytics.trackAppOpenedFromLocalNotification()
         default:
             break
         }
