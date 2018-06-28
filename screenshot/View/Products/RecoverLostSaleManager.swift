@@ -37,7 +37,9 @@ class RecoverLostSaleManager: NSObject, MFMailComposeViewControllerDelegate {
             if let objectId = clickOnProductObjectId {
                 if let product = DataModel.sharedInstance.mainMoc().productWith(objectId: objectId) {
                     self.timeLeftApp = nil
-                    self.delegate?.recoverLostSaleManager(self, returnedFrom: product)
+                    if UIViewController.canPresentMail() {
+                        self.delegate?.recoverLostSaleManager(self, returnedFrom: product)
+                    }
                 }
             }
         }
@@ -60,7 +62,7 @@ class RecoverLostSaleManager: NSObject, MFMailComposeViewControllerDelegate {
             dateFormatter.timeStyle = .none
             dateFormatter.dateStyle = .medium
             let subject = "product.sale_recovery.email.subject".localized(withFormat: dateFormatter.string(from: Date()))
-            viewController.presentMail(recipient: recipient, gmailMessage: body, subject: subject, message: body, isHTML:true, delegate:self)
+            viewController.presentMail(recipient: recipient, gmailMessage: body, subject: subject, message: body, isHTML:true, delegate:self, noEmailErrorMessage: "email.setup.message.reminder".localized)
         }))
         alert.addAction(UIAlertAction.init(title: "generic.no_thanks".localized, style: .cancel, handler: { (a) in
             self.clickOnProductObjectId = nil
