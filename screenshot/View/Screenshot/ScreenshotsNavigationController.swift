@@ -27,7 +27,7 @@ class ScreenshotsNavigationController: UINavigationController {
         
         NotificationCenter.default.addObserver(self, selector: #selector(pushWooshDidReceiveInPush(_:)), name: .PWInboxMessagesDidReceiveInPush, object: nil)
         
-        inboxBarButtonItem = BadgeBarButtonItem(image: UIImage(named: "NavigationBarBell"), style: .plain, target: self, action: #selector(presentNotificationInbox))
+        inboxBarButtonItem = BadgeBarButtonItem(image: UIImage(named: "NavigationBarEmail"), style: .plain, target: self, action: #selector(presentNotificationInbox))
         screenshotsViewController.navigationItem.leftBarButtonItem = inboxBarButtonItem
         
         screenshotsViewController.navigationItem.rightBarButtonItem = screenshotsViewController.editButtonItem
