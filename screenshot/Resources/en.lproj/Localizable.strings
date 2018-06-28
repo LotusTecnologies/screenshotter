@@ -181,7 +181,10 @@
 "discover.screenshot.pass" = "Pass";
 "discover.title" = "Discover";
 
-"email.setup.message" = "You need to setup an email on your device in order to send a bug report.";
+"email.setup.message.bug" = "You need to setup an email on your device in order to send a bug report.";
+"email.setup.message.contactUs" = "To continue, setup an email on your device";
+"email.setup.message.reminder" = "You need to setup an email on your device in order for this feature to work.";
+
 "email.setup.title" = "Setup Email";
 
 "error.database_cant_load.title" = "Something Went Wrong";
