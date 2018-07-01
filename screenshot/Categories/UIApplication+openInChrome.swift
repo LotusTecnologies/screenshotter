@@ -9,6 +9,7 @@
 import Foundation
 import UIKit
 import MessageUI
+import SwiftLog
 
 extension UIApplication {
     
@@ -103,13 +104,24 @@ extension UIViewController :MFMailComposeViewControllerDelegate{
        return MFMailComposeViewController.canSendMail() || canSendGmail
     }
     
-    func presentMail(recipient:String, gmailMessage:String, subject:String, message:String, isHTML:Bool, delegate:MFMailComposeViewControllerDelegate?, noEmailErrorMessage:String ){
+    func presentMail(recipient:String, gmailMessage:String, subject:String, message:String, isHTML:Bool, delegate:MFMailComposeViewControllerDelegate?, noEmailErrorMessage:String, attachLogs:Bool ){
         if MFMailComposeViewController.canSendMail() {
             let mail = MFMailComposeViewController()
             mail.mailComposeDelegate = delegate ?? self
             mail.setSubject(subject)
             mail.setMessageBody(message, isHTML: isHTML)
             mail.setToRecipients([recipient])
+            
+            if attachLogs {
+                if let fileURLs = try? FileManager.default.contentsOfDirectory(at: URL.init(fileURLWithPath: Log.logger.directory), includingPropertiesForKeys: nil) {
+                    fileURLs.forEach{
+                        if let data = try? Data.init(contentsOf: $0) {
+                            mail.addAttachmentData(data, mimeType: "text/plain", fileName: $0.lastPathComponent)
+                        }
+                    }
+                }
+            }
+            
             present(mail, animated: true, completion: nil)
 
         } else if let url = URL.googleMailUrl(to: recipient, body: gmailMessage, subject: subject), UIApplication.shared.canOpenURL(url) {

@@ -364,6 +364,7 @@ class RegisterViewController: UIViewController {
             let password = _view.passwordTextField.text,
             self.continueButton.isLoading == false
         {
+
             self._view.emailTextField.resignFirstResponder()
             self._view.passwordTextField.resignFirstResponder()
             self._view.emailTextField.isUserInteractionEnabled = false

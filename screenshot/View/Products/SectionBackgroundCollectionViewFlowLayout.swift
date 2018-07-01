@@ -85,6 +85,17 @@ class SectionBackgroundCollectionViewFlowLayout: UICollectionViewFlowLayout {
         }
     }
     
+    override func layoutAttributesForSupplementaryView(ofKind elementKind: String, at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
+        if elementKind == SectionBackgroundCollectionViewFlowLayout.ElementKindSectionSectionBackground{
+            for a in self.decorationItems {
+                if a.indexPath == indexPath {
+                    return a
+                }
+            }
+        }
+        return super.layoutAttributesForSupplementaryView(ofKind: elementKind, at: indexPath)
+    }
+    
     override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
         var attributes = super.layoutAttributesForElements(in: rect)
         for a in self.decorationItems {

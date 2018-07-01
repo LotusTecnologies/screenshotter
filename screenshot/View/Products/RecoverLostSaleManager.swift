@@ -62,7 +62,7 @@ class RecoverLostSaleManager: NSObject, MFMailComposeViewControllerDelegate {
             dateFormatter.timeStyle = .none
             dateFormatter.dateStyle = .medium
             let subject = "product.sale_recovery.email.subject".localized(withFormat: dateFormatter.string(from: Date()))
-            viewController.presentMail(recipient: recipient, gmailMessage: body, subject: subject, message: body, isHTML:true, delegate:self, noEmailErrorMessage: "email.setup.message.reminder".localized)
+            viewController.presentMail(recipient: recipient, gmailMessage: body, subject: subject, message: body, isHTML:true, delegate:self, noEmailErrorMessage: "email.setup.message.reminder".localized, attachLogs:false)
         }))
         alert.addAction(UIAlertAction.init(title: "generic.no_thanks".localized, style: .cancel, handler: { (a) in
             self.clickOnProductObjectId = nil
