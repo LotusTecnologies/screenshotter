@@ -786,6 +786,7 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
               let partNumber = userInfo["partNumber"] as? String,
               !partNumber.isEmpty {
                 isHandled = true
+                LocalNotificationModel.shared.cancelPendingNotifications(within: Date(timeIntervalSinceNow: Constants.secondsInDay))
                 ProductViewController.present(with: partNumber)
             }
         }

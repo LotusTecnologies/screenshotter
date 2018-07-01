@@ -41,31 +41,7 @@ class LocalNotificationModel {
 
     @objc func applicationWillEnterForeground() {
         sessionStart = NSDate()
-        UNUserNotificationCenter.current().getPendingNotificationRequests { notificationRequestArray in
-            let toCancel = [LocalNotificationIdentifier.tappedProduct.rawValue, LocalNotificationIdentifier.saleScreenshot.rawValue, LocalNotificationIdentifier.favoritedItem.rawValue, LocalNotificationIdentifier.inactivityDiscover.rawValue]
-            let toCancelSet = Set<String>(toCancel)
-            notificationRequestArray.forEach { notificationRequest in
-                if toCancelSet.contains(notificationRequest.identifier) {
-                    switch notificationRequest.identifier {
-                    case LocalNotificationIdentifier.tappedProduct.rawValue:
-                        Analytics.trackTimedLocalNotificationCancelled(source: .tappedProduct)
-                        self.cancelProductInNotif(productKey: notificationRequest.content.userInfo[Constants.openingProductKey] as? String)
-                    case LocalNotificationIdentifier.saleScreenshot.rawValue:
-                        Analytics.trackTimedLocalNotificationCancelled(source: .saleCount)
-                        self.cancelScreenshotInNotif(assetId: notificationRequest.content.userInfo[Constants.openingAssetIdKey] as? String)
-                    case LocalNotificationIdentifier.favoritedItem.rawValue:
-                        Analytics.trackTimedLocalNotificationCancelled(source: .favoritedItem)
-                        self.cancelProductInNotif(productKey: notificationRequest.content.userInfo[Constants.openingProductKey] as? String)
-                    case LocalNotificationIdentifier.inactivityDiscover.rawValue:
-                        Analytics.trackTimedLocalNotificationCancelled(source: .inactivityDiscover)
-                    default:
-                        print("Cancel unknown timedLocalNotification. WTF?")
-                    }
-                    print("Canceling notification \(notificationRequest.identifier)")
-                }
-            }
-            UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: toCancel)
-        }
+        cancelPendingNotifications()
     }
     
     @objc func applicationDidEnterBackground() {
@@ -243,6 +219,41 @@ class LocalNotificationModel {
                                             identifier: LocalNotificationIdentifier.inactivityDiscover.rawValue,
                                             body: "notification.inactivity.discover.message".localized,
                                             interval: 4 * Constants.secondsInDay)
+    }
+    
+    func cancelPendingNotifications(within: Date? = nil) {
+        UNUserNotificationCenter.current().getPendingNotificationRequests { notificationRequestArray in
+            let toCancel = [LocalNotificationIdentifier.tappedProduct.rawValue, LocalNotificationIdentifier.saleScreenshot.rawValue, LocalNotificationIdentifier.favoritedItem.rawValue, LocalNotificationIdentifier.inactivityDiscover.rawValue]
+            let toCancelSet = Set<String>(toCancel)
+            notificationRequestArray.forEach { notificationRequest in
+                var isInCancelDateRange = true
+                if let within = within,
+                  let trigger = notificationRequest.trigger as? UNCalendarNotificationTrigger,
+                  let triggerDate = trigger.nextTriggerDate(),
+                  triggerDate > within {
+                    isInCancelDateRange = false
+                }
+                if isInCancelDateRange && toCancelSet.contains(notificationRequest.identifier) {
+                    switch notificationRequest.identifier {
+                    case LocalNotificationIdentifier.tappedProduct.rawValue:
+                        Analytics.trackTimedLocalNotificationCancelled(source: .tappedProduct)
+                        self.cancelProductInNotif(productKey: notificationRequest.content.userInfo[Constants.openingProductKey] as? String)
+                    case LocalNotificationIdentifier.saleScreenshot.rawValue:
+                        Analytics.trackTimedLocalNotificationCancelled(source: .saleCount)
+                        self.cancelScreenshotInNotif(assetId: notificationRequest.content.userInfo[Constants.openingAssetIdKey] as? String)
+                    case LocalNotificationIdentifier.favoritedItem.rawValue:
+                        Analytics.trackTimedLocalNotificationCancelled(source: .favoritedItem)
+                        self.cancelProductInNotif(productKey: notificationRequest.content.userInfo[Constants.openingProductKey] as? String)
+                    case LocalNotificationIdentifier.inactivityDiscover.rawValue:
+                        Analytics.trackTimedLocalNotificationCancelled(source: .inactivityDiscover)
+                    default:
+                        print("Cancel unknown timedLocalNotification. WTF?")
+                    }
+                    print("Canceling notification \(notificationRequest.identifier)")
+                }
+            }
+            UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: toCancel)
+        }
     }
     
     func cancelProductInNotif(productKey: String?) {
