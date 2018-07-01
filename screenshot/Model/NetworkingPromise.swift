@@ -282,24 +282,7 @@ class NetworkingPromise : NSObject {
     func downloadProductsWithRetry(url: URL) -> Promise<[String : Any]> {
         return attempt(interdelay: .seconds(11), maxRepeat: 2, body: {self.downloadProducts(url: url)})
     }
-    
-    func nextMatchsticks() -> Promise<NSDictionary> {
-        let syncTokenParam: String
-        if let matchsticksSyncToken = UserDefaults.standard.string(forKey: UserDefaultsKeys.matchsticksSyncToken),
-          !matchsticksSyncToken.isEmpty {
-            syncTokenParam = "?start=\(matchsticksSyncToken)"
-        } else {
-            syncTokenParam = ""
-        }
-        guard let url = URL(string: Constants.screenShotLambdaDomain + "screenshots/matchsticks" + syncTokenParam) else {
-            let error = NSError(domain: "Craze", code: 21, userInfo: [NSLocalizedDescriptionKey: "Cannot create matchsticks url from screenShotLambdaDomain:\(Constants.screenShotLambdaDomain)"])
-            return Promise(error: error)
-        }
-        let sessionConfiguration = URLSessionConfiguration.default
-        sessionConfiguration.timeoutIntervalForRequest = 60
-        let promise = URLSession(configuration: sessionConfiguration).dataTask(with: URLRequest(url: url)).asDictionary()
-        return promise
-    }
+  
     struct RecombeeRecommendation{
         var imageURL:String
         var remoteId:String
@@ -311,18 +294,17 @@ class NetworkingPromise : NSObject {
         params["cascadeCreate"] = true
         params["includedProperties"] = true
         params["returnProperties"] = true
-        params["includedProperties"] = "image"
-        params["filter"] = "image!=null"
+        params["includedProperties"] = "index"
         params["rotationRate"] = 0.99
         params["rotationTime"] = 60*60*24*2 // 2 days rotation
         return NetworkingPromise.sharedInstance.recombeeRequest(path: "recomms/users/\(userId)/items/", method: "GET", params: params).then { (dict) -> Promise<[RecombeeRecommendation]> in
             var toReturn:[RecombeeRecommendation] = []
             if let recomms = dict["recomms"] as? [[String:Any]]{
                 recomms.forEach({ (matchstick) in
-                    if let remoteId = matchstick["id"] as? String,
+                    if
                         let values = matchstick["values"] as? [String:Any],
-                        let imageUrl = values["image"] as? String{
-                        toReturn.append(RecombeeRecommendation.init(imageURL: imageUrl, remoteId: remoteId))
+                        let index = values["index"] as? Int {
+                        toReturn.append(RecombeeRecommendation.init(imageURL: "https://s3.amazonaws.com/screenshop-ordered-discover/\(index).jpg", remoteId: "\(index)"))
                     }
                 })
             }

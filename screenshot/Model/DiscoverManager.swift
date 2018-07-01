@@ -11,11 +11,12 @@ import CoreData
 import PromiseKit
 
 class DiscoverManager {
+    public static let shared = DiscoverManager()
 
     var downloadMatchsitckQueue:OperationQueue = {
         var queue = AsyncOperationQueue()
         queue.name = "Download matchsticks Queue"
-        queue.maxConcurrentOperationCount = 2
+        queue.maxConcurrentOperationCount = 4
         return queue
     }()
     
@@ -49,7 +50,10 @@ class DiscoverManager {
                     AccumulatorModel.screenshotUninformed.incrementUninformedCount()
                 }
                 //fill up queues
-                self.fillQueues(in: context)
+                DataModel.sharedInstance.performBackgroundTask { (context) in
+                    self.fillQueues(in: context)
+                    context.saveIfNeeded()
+                }
                 
                 // 4) send recombee rating = 0.5 completion { request more recombee }
                 let event = AnalyticsTrackers.RecombeeAnalyticsTracker.RecombeeEvent.positiveRating
@@ -73,22 +77,28 @@ class DiscoverManager {
     }
     private func fillQueues(in context:NSManagedObjectContext){
         let displayingFetchRequest:NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
-        displayingFetchRequest.predicate = Matchstick.predicateForDisplayingMatchstick()
+        let displayingFetchRequestPredicate = Matchstick.predicateForDisplayingMatchstick()
+        displayingFetchRequest.predicate = displayingFetchRequestPredicate
         displayingFetchRequest.sortDescriptors = nil
         
         let queuedFetchRequest:NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
-        queuedFetchRequest.predicate = Matchstick.predicateForQueuedMatchstick()
+        let queuedFetchRequestPredicate = Matchstick.predicateForQueuedMatchstick()
+        queuedFetchRequest.predicate = queuedFetchRequestPredicate
         queuedFetchRequest.sortDescriptors = [NSSortDescriptor.init(key: "recombeeRecommended", ascending: false)]
         
-        if let displaying = try? context.fetch(displayingFetchRequest), let queued = try? context.fetch(queuedFetchRequest){
+        if let displaying = try? context.fetch(displayingFetchRequest), let queued = try? context.fetch(queuedFetchRequest) {
             let displayingMatchStickNeeded = (Matchstick.displayingSize - displaying.count)
             var itemsAdded = 0
             queued.forEach({ (item) in
                 if itemsAdded < displayingMatchStickNeeded {
                     if item.imageData != nil {
-                        item.isDisplaying = false
+                        item.isDisplaying = true
                         item.receivedAt = Date()
                         itemsAdded += 1
+                    }
+                }else{
+                    if item.imageData == nil,  let imageUrl = item.imageUrl {
+                        self.downloadIfNeeded(imageURL: imageUrl, priority: .low)
                     }
                 }
             })
@@ -109,7 +119,7 @@ class DiscoverManager {
                     newDiscover.insert("\(currentIndex+i)")
                 }
                 let existingFetchRequest:NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
-                existingFetchRequest.predicate = NSPredicate.init(format: "remoteId IN $@", newDiscover)
+                existingFetchRequest.predicate = NSPredicate.init(format: "remoteId IN %@", newDiscover)
                 if let existing = try? context.fetch(displayingFetchRequest){
                     queueItemsNeeded = existing.count
                     for matchstick in existing {
@@ -124,12 +134,11 @@ class DiscoverManager {
 
             newDiscover.forEach { (remoteId) in
                 let imageUrl = "https://s3.amazonaws.com/screenshop-ordered-discover/\(remoteId).jpg"
-                DataModel.sharedInstance.saveMatchstick(managedObjectContext: context, remoteId: remoteId, imageUrl: imageUrl, syteJson: nil, trackingInfo: nil)
+                let _ = DataModel.sharedInstance.saveMatchstick(managedObjectContext: context, remoteId: remoteId, imageUrl: imageUrl, syteJson: nil, trackingInfo: nil)
                 self.downloadIfNeeded(imageURL: imageUrl, priority: .low)
             }
             
             UserDefaults.standard.setValue(currentIndex, forKey: UserDefaultsKeys.discoverCurrentIndex)
-            context.saveIfNeeded()
 
             
         }
@@ -146,15 +155,21 @@ class DiscoverManager {
                 item.dateSkipped = Date()
                 item.isDisplaying = false
                 //fill up queues
-                self.fillQueues(in: context)
+                DataModel.sharedInstance.performBackgroundTask { (context) in
+                    self.fillQueues(in: context)
+                    context.saveIfNeeded()
+                }
                 
                 // 4) send recombee rating = 0.5 completion { request more recombee }
                 let event = AnalyticsTrackers.RecombeeAnalyticsTracker.RecombeeEvent.negativeRating
                 NetworkingPromise.sharedInstance.recombeeRequest(path: event.path(), method: "POST", params: event.postData(itemId: assetId)).always {
                     NetworkingPromise.sharedInstance.recombeeRecommendation().then(execute: { (recommendations) -> Void in
                         self.recombeeRecommendation(recommendations)
+                    }).catch(execute: { (error) in
+                        print("recombee error: \(error)")
                     })
                 }
+                context.saveIfNeeded()
             }
         }
     }
@@ -162,6 +177,7 @@ class DiscoverManager {
     func discoverViewDidAppear() {
         DataModel.sharedInstance.performBackgroundTask { (context) in
             self.fillQueues(in: context)
+            context.saveIfNeeded()
         }
     }
     func downloadIfNeeded(imageURL:String, priority:Operation.QueuePriority) {
@@ -170,14 +186,33 @@ class DiscoverManager {
                 op.queuePriority = priority
             }
         }else{
-            self.fetchImageData(imageUrl: imageURL, priority: priority).then { (data) -> Void in
-                DataModel.sharedInstance.performBackgroundTask { (context) in
-                    DataModel.sharedInstance.addImageDataToMatchstick(managedObjectContext: context, imageUrl: imageURL, imageData: data)
-                    self.fillQueues(in: context)
+            
+            let tag = AsyncOperationTag.init(type: .assetId, value: imageURL)
+            let operation = AsyncOperation.init(timeout: 90.0, tags: [tag], completion: { (completed) in
+                NetworkingPromise.sharedInstance.downloadImageData(urlString: imageURL)
+                    .then { imageData -> Void in
+                        DataModel.sharedInstance.performBackgroundTask { (context) in
+                            DataModel.sharedInstance.addImageDataToMatchstick(managedObjectContext: context, imageUrl: imageURL, imageData: imageData)
+                            context.saveIfNeeded()
+                            DataModel.sharedInstance.performBackgroundTask { (context) in
+                                self.fillQueues(in: context)
+                                context.saveIfNeeded()
+                                completed()
+                            }
+                            
+                        }
+                    }.catch { error in
+                        DataModel.sharedInstance.performBackgroundTask { (context) in
+                            // if 404 set as 404
+                            // TODO:
+                            context.saveIfNeeded()
+                            completed()
+
+                        }
                 }
-                }.catch { (error) in
-                    // if 404 set item as 404
-            }
+            })
+            operation.queuePriority = priority
+            downloadMatchsitckQueue.addOperation(operation)
         }
     }
     
@@ -233,21 +268,5 @@ class DiscoverManager {
         }
         return nil
     }
-    func fetchImageData(imageUrl: String, priority:Operation.QueuePriority) -> Promise<Data> {
-        return Promise.init(resolvers: { (fulfil, reject) in
-            let tag = AsyncOperationTag.init(type: .assetId, value: imageUrl)
-            let operation = AsyncOperation.init(timeout: 90.0, tags: [tag], completion: { (completed) in
-                NetworkingPromise.sharedInstance.downloadImageData(urlString: imageUrl)
-                    .then { imageData -> Void in
-                        fulfil(imageData)
-                        completed()
-                    }.catch { error in
-                        reject(error)
-                        completed()
-                }
-            })
-            operation.queuePriority = priority
-            downloadMatchsitckQueue.addOperation(operation)
-        })
-    }
+    
 }

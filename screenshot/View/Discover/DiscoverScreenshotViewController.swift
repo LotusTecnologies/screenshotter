@@ -130,6 +130,7 @@ class DiscoverScreenshotViewController : BaseViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
+        DiscoverManager.shared.discoverViewDidAppear()
         syncEmptyListViews()
     }
     

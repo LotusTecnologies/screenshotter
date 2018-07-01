@@ -111,7 +111,6 @@
 		311A50CE20DAB4CC0001D463 /* productEmailfooter.html in Resources */ = {isa = PBXBuildFile; fileRef = 311A50CB20DAB4CB0001D463 /* productEmailfooter.html */; };
 		311A50CF20DAB4CC0001D463 /* productEmailheader.html in Resources */ = {isa = PBXBuildFile; fileRef = 311A50CC20DAB4CC0001D463 /* productEmailheader.html */; };
 		311A50D120DBD9EE0001D463 /* ResendCodeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A50D020DBD9EE0001D463 /* ResendCodeManager.swift */; };
-		311A50D620E3E25A0001D463 /* Discover.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 311A50D420E3E25A0001D463 /* Discover.xcdatamodeld */; };
 		311A50D820E3E3570001D463 /* DiscoverManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A50D720E3E3560001D463 /* DiscoverManager.swift */; };
 		3125446B2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		3125446C2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
@@ -251,7 +250,6 @@
 		E44D6108203EC5CB00039CCB /* ShoppingCartModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44D6107203EC5CB00039CCB /* ShoppingCartModel.swift */; };
 		E45C7AFF20E0235700A8B4A9 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E45C7AFE20E0235600A8B4A9 /* GoogleService-Info.plist */; };
 		E49261D6206A704C006FE84E /* UIImage+craze.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49261D5206A704C006FE84E /* UIImage+craze.swift */; };
-		E492CE3D2011051100060FB2 /* MatchstickModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E492CE3C2011051100060FB2 /* MatchstickModel.swift */; };
 		E4978C3C1F53610F0008B87F /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4978C3B1F53610F0008B87F /* Constants.swift */; };
 		E4A671631FA88AAA00250410 /* ScreenshotDetectionProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4A671621FA88AAA00250410 /* ScreenshotDetectionProtocol.swift */; };
 		E4CD8E691FA9E81B006F2CDA /* ApplicationStateModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CD8E681FA9E81B006F2CDA /* ApplicationStateModel.swift */; };
@@ -391,7 +389,6 @@
 		311A50CB20DAB4CB0001D463 /* productEmailfooter.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = productEmailfooter.html; sourceTree = "<group>"; };
 		311A50CC20DAB4CC0001D463 /* productEmailheader.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = productEmailheader.html; sourceTree = "<group>"; };
 		311A50D020DBD9EE0001D463 /* ResendCodeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResendCodeManager.swift; sourceTree = "<group>"; };
-		311A50D520E3E25A0001D463 /* Discover.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Discover.xcdatamodel; sourceTree = "<group>"; };
 		311A50D720E3E3560001D463 /* DiscoverManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverManager.swift; sourceTree = "<group>"; };
 		311A50D920E4BE470001D463 /* Model 20.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 20.xcdatamodel"; sourceTree = "<group>"; };
 		31254460209079C7009410D5 /* screenshot-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "screenshot-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -547,7 +544,6 @@
 		E47B02F01FF0EF1E0070F515 /* Model 7.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 7.xcdatamodel"; sourceTree = "<group>"; };
 		E49261D5206A704C006FE84E /* UIImage+craze.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+craze.swift"; sourceTree = "<group>"; };
 		E492765B1FC6FADB009DD239 /* Model 5.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 5.xcdatamodel"; sourceTree = "<group>"; };
-		E492CE3C2011051100060FB2 /* MatchstickModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchstickModel.swift; sourceTree = "<group>"; };
 		E4978C3B1F53610F0008B87F /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		E4A671621FA88AAA00250410 /* ScreenshotDetectionProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotDetectionProtocol.swift; sourceTree = "<group>"; };
 		E4AF5CC820E22EFD00C0155E /* Model 19.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 19.xcdatamodel"; sourceTree = "<group>"; };
@@ -993,7 +989,6 @@
 			isa = PBXGroup;
 			children = (
 				316C830420C3AEBD0012A908 /* CoreDataModels */,
-				311A50D420E3E25A0001D463 /* Discover.xcdatamodeld */,
 				311A50D720E3E3560001D463 /* DiscoverManager.swift */,
 				C54124C120A8308600CA03DB /* AccumulatorModel.swift */,
 				C5278FB91F3C38510090E422 /* AssetSyncModel.swift */,
@@ -1002,7 +997,6 @@
 				318FE265204C09C500277DD4 /* AsyncOperation.swift */,
 				E4CD8E681FA9E81B006F2CDA /* ApplicationStateModel.swift */,
 				C5CAF27B1FCC14C1006F37DC /* CurrencyModel.swift */,
-				E492CE3C2011051100060FB2 /* MatchstickModel.swift */,
 				31EF9B0620299D15006D3B35 /* InAppPurchaseManager.swift */,
 				31CE11012039570B000156EE /* FetchedResultsControllerManager.swift */,
 				E44D6107203EC5CB00039CCB /* ShoppingCartModel.swift */,
@@ -1629,7 +1623,6 @@
 				C58BAE7720E101DD0051394A /* ErrorCollectionViewCell.swift in Sources */,
 				C5F73C9E1FE244C800E49F2B /* Permissions.swift in Sources */,
 				C50E25EA207DDFF1003C8D24 /* CreditCardValidator.swift in Sources */,
-				E492CE3D2011051100060FB2 /* MatchstickModel.swift in Sources */,
 				31A0781B207E182100D70DC3 /* URL+craze.swift in Sources */,
 				31CE11022039570B000156EE /* FetchedResultsControllerManager.swift in Sources */,
 				311A505520D90B780001D463 /* ProductHeaderCollectionViewCell.swift in Sources */,
@@ -1651,7 +1644,6 @@
 				311A503F20D90B780001D463 /* CheckoutConfirmationViewController.swift in Sources */,
 				318FE266204C09C500277DD4 /* AsyncOperation.swift in Sources */,
 				311A506620D90B780001D463 /* ScreenshotProductBarCollectionViewCell.swift in Sources */,
-				311A50D620E3E25A0001D463 /* Discover.xcdatamodeld in Sources */,
 				C58BAE7820E101DD0051394A /* SpinnerCollectionViewCell.swift in Sources */,
 				C58BAE7320E101DD0051394A /* ScreenshotShareManager.swift in Sources */,
 				311A504620D90B780001D463 /* CheckoutWhatIsCVVWebViewController.swift in Sources */,
@@ -2476,16 +2468,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCVersionGroup section */
-		311A50D420E3E25A0001D463 /* Discover.xcdatamodeld */ = {
-			isa = XCVersionGroup;
-			children = (
-				311A50D520E3E25A0001D463 /* Discover.xcdatamodel */,
-			);
-			currentVersion = 311A50D520E3E25A0001D463 /* Discover.xcdatamodel */;
-			path = Discover.xcdatamodeld;
-			sourceTree = "<group>";
-			versionGroupType = wrapper.xcdatamodel;
-		};
 		C5278FBD1F3C38510090E422 /* Model.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
