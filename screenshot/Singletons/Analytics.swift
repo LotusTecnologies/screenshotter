@@ -310,9 +310,12 @@ class Analytics {
                 }
             }
         }
-        let now = Date()
         if let jsonData = try? JSONSerialization.data(withJSONObject: properties, options: []), let propertiesString = String.init(data: jsonData, encoding: .utf8) {
-            logw("\(now): [\(eventName) - \( propertiesString )")
+            if eventName == "Log", let line = properties["line"] as? Int, let file = properties["file"] as? NSString, let message =  properties["message"] as? String {
+                logw("[\(eventName) - \(message)] - \( file.lastPathComponent ):\( line )")
+            }else{
+                logw("[\(eventName)] - \( propertiesString )")
+            }
         }
     }
     init() {
