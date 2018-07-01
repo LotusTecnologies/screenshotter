@@ -463,6 +463,23 @@ extension DataModel {
         }
     }
     
+    func markProductHasPriceAlerts(id: String) {
+        self.performBackgroundTask { managedObjectContext in
+            let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
+            fetchRequest.predicate = NSPredicate(format: "id == %@ AND hasPriceAlerts == FALSE", id)
+            fetchRequest.sortDescriptors = nil //[NSSortDescriptor(key: "createdAt", ascending: false)]
+            
+            do {
+                let results = try managedObjectContext.fetch(fetchRequest)
+                results.forEach { $0.hasPriceAlerts = true }
+                managedObjectContext.saveIfNeeded()
+            } catch {
+                self.receivedCoreDataError(error: error)
+                print("markProductHasPriceAlerts id:\(id) results with error:\(error)")
+            }
+        }
+    }
+    
     func retrieveLatestFavorite() -> Promise<(String, String?)> {
         return Promise { fulfill, reject in
             self.performBackgroundTask { managedObjectContext in

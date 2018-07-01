@@ -270,4 +270,55 @@ class LocalNotificationModel {
         DataModel.sharedInstance.markScreenshotNotInNotif(assetId: assetId)
     }
     
+    // MARK: Remote Notification
+
+    func registerCrazePriceAlert(id: String?, lastPrice: Float, hasPriceAlerts: Bool) {
+        guard let id = id else {
+            print("registerCrazePriceAlert no product id")
+            return
+        }
+        guard let firebaseId = UserAccountManager.shared.user?.uid else {
+            print("registerCrazePriceAlert no firebase id")
+            return
+        }
+        guard !hasPriceAlerts else {
+            print("registerCrazePriceAlert already has priceAlerts")
+            return
+        }
+        print("GMK variantId:\(id)")
+        NetworkingPromise.sharedInstance.registerCrazePriceAlert(id: id, lastPrice: lastPrice, firebaseId: firebaseId)
+            .then { data, response -> Void in
+                if let httpResponse = response as? HTTPURLResponse {
+                    print("GMK registerCrazePriceAlert http status code:\(httpResponse.statusCode)")
+                } else {
+                    print("GMK registerCrazePriceAlert no http status code")
+                }
+                if let dataString = String(data: data, encoding: .utf8) {
+                    print("GMK registerCrazePriceAlert returned dataString:\(dataString)")
+                } else {
+                    print("GMK registerCrazePriceAlert no returned dataString")
+                }
+                
+                DataModel.sharedInstance.markProductHasPriceAlerts(id: id)
+            }.catch { error in
+                if let err = error as? PMKURLError {
+                    switch err {
+                    case let .badResponse(request, data, response):
+                        var errorString: String = "-"
+                        var dataCount: Int = 0
+                        if let data = data {
+                            errorString = String(data: data, encoding: .utf8) ?? "-"
+                            dataCount = data.count
+                        }
+                        let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
+                        print("registerCrazePriceAlert specific catch badResponse data count:\(dataCount)  statusCode:\(statusCode)  errorString:\(errorString)  request:\(request)")
+                        return
+                    default:
+                    break
+                    }
+                }
+                print("GMK registerCrazePriceAlert caught error:\(error)")
+        }
+    }
+    
 }
