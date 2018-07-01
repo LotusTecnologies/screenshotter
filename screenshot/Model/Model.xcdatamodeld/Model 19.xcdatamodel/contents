@@ -69,6 +69,7 @@
         <attribute name="hasPriceAlerts" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="hasVariants" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="hideFromProductBar" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="id" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="imageURL" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="inNotif" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="isFavorite" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
@@ -161,7 +162,7 @@
         <element name="Cart" positionX="297" positionY="423" width="128" height="165"/>
         <element name="CartItem" positionX="475" positionY="639" width="128" height="225"/>
         <element name="Matchstick" positionX="-380" positionY="-117" width="128" height="135"/>
-        <element name="Product" positionX="-101" positionY="396" width="128" height="555"/>
+        <element name="Product" positionX="-101" positionY="396" width="128" height="570"/>
         <element name="ProductFilter" positionX="160" positionY="276" width="128" height="120"/>
         <element name="Screenshot" positionX="-191" positionY="-114" width="128" height="435"/>
         <element name="ShippingAddress" positionX="718" positionY="393" width="128" height="75"/>

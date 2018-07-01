@@ -855,12 +855,22 @@ extension AssetSyncModel {
                      optionsMask: Int32) {
         let dataModel = DataModel.sharedInstance
         let extractedCategories = prod["categories"] as? [String]
-        let originalData = prod["original_data"] as? [String : Any]
-        let fallbackPrice: Float = dataModel.parseFloat(originalData?["price"])
-            ?? dataModel.parseFloat(originalData?["sale_price"])
-            ?? dataModel.parseFloat(originalData?["discount_price"])
-            ?? dataModel.parseFloat(originalData?["retail_price"])
+        var fallbackPrice: Float = 0
+        var partNumber: String? = nil
+        var id: String? = nil
+        var color: String? = nil
+        var sku: String? = nil
+        if let originalData = prod["original_data"] as? [String : Any] {
+            fallbackPrice = dataModel.parseFloat(originalData["price"])
+            ?? dataModel.parseFloat(originalData["sale_price"])
+            ?? dataModel.parseFloat(originalData["discount_price"])
+            ?? dataModel.parseFloat(originalData["retail_price"])
             ?? 0
+            partNumber = originalData["part_number"] as? String
+            id = originalData["Product ID"] as? String ?? originalData["sku"] as? String ?? originalData["merchant_product_id"] as? String
+            color = originalData["color"] as? String
+            sku = originalData["id"] as? String
+        }
         let _ = dataModel.saveProduct(managedObjectContext: managedObjectContext,
                                       shoppable: shoppable,
                                       order: productOrder,
@@ -874,9 +884,10 @@ extension AssetSyncModel {
                                       offer: prod["offer"] as? String,
                                       imageURL: prod["imageUrl"] as? String,
                                       merchant: prod["merchant"] as? String,
-                                      partNumber: originalData?["part_number"] as? String,
-                                      color: originalData?["color"] as? String,
-                                      sku: originalData?["id"] as? String,
+                                      partNumber: partNumber,
+                                      id: id,
+                                      color: color,
+                                      sku: sku,
                                       fallbackPrice: fallbackPrice,
                                       optionsMask: optionsMask)
     }

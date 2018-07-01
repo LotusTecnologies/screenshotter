@@ -18,7 +18,8 @@ class NotificationService: UNNotificationServiceExtension {
         guard let bestAttemptContent = bestAttemptContent else {
             return
         }
-        guard let attachmentUrlString = request.content.userInfo["attachment"] as? String else {
+        let userInfo = request.content.userInfo
+        guard let attachmentUrlString = userInfo["media-url"] as? String ?? userInfo["attachment"] as? String else {
             return
         }
         guard let url = URL(string: attachmentUrlString) else {

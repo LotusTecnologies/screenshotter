@@ -369,6 +369,7 @@ extension DataModel {
                      imageURL: String?,
                      merchant: String?,
                      partNumber: String?,
+                     id: String?,
                      color: String?,
                      sku: String?,
                      fallbackPrice: Float,
@@ -387,6 +388,7 @@ extension DataModel {
         productToSave.imageURL = imageURL
         productToSave.merchant = merchant
         productToSave.partNumber = partNumber
+        productToSave.id = id
         productToSave.color = color
         productToSave.sku = sku
         productToSave.fallbackPrice = fallbackPrice
@@ -407,6 +409,22 @@ extension DataModel {
         } catch {
             self.receivedCoreDataError(error: error)
             print("retrieveProduct partNumber:\(partNumber) results with error:\(error)")
+        }
+        return nil
+    }
+    
+    func retrieveProduct(managedObjectContext: NSManagedObjectContext, id: String) -> Product? {
+        let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "id == %@", id)
+        fetchRequest.sortDescriptors = nil //[NSSortDescriptor(key: "createdAt", ascending: false)]
+        fetchRequest.fetchLimit = 1
+        
+        do {
+            let results = try managedObjectContext.fetch(fetchRequest)
+            return results.first
+        } catch {
+            self.receivedCoreDataError(error: error)
+            print("retrieveProduct id:\(id) results with error:\(error)")
         }
         return nil
     }
@@ -457,6 +475,23 @@ extension DataModel {
             } catch {
                 self.receivedCoreDataError(error: error)
                 print("markScreenshotNotInNotif assetId:\(assetId) results with error:\(error)")
+            }
+        }
+    }
+    
+    func markProductHasPriceAlerts(id: String) {
+        self.performBackgroundTask { managedObjectContext in
+            let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
+            fetchRequest.predicate = NSPredicate(format: "id == %@ AND hasPriceAlerts == FALSE", id)
+            fetchRequest.sortDescriptors = nil //[NSSortDescriptor(key: "createdAt", ascending: false)]
+            
+            do {
+                let results = try managedObjectContext.fetch(fetchRequest)
+                results.forEach { $0.hasPriceAlerts = true }
+                managedObjectContext.saveIfNeeded()
+            } catch {
+                self.receivedCoreDataError(error: error)
+                print("markProductHasPriceAlerts id:\(id) results with error:\(error)")
             }
         }
     }

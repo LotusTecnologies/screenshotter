@@ -692,6 +692,26 @@ class NetworkingPromise : NSObject {
         return priceAlertWorkhorse(parameterDict: parameterDict, actionName: "registerPriceAlert", serverActionName: "track")
     }
     
+    func registerCrazePriceAlert(id: String, lastPrice: Float, firebaseId: String) -> Promise<(Data, URLResponse)> {
+        guard let url = URL(string: "\(Constants.notificationsApiEndpoint)/users/\(firebaseId)/subscriptions") else {
+            let error = NSError(domain: "Craze", code: 9, userInfo: [NSLocalizedDescriptionKey: "Cannot create url from notificationsApiEndpoint:\(Constants.notificationsApiEndpoint)"])
+            return Promise(error: error)
+        }
+        let parameters = ["subscription" : ["priceAlert" : ["lastSeenPrice" : lastPrice, "variantId" : id]]]
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.addValue("application/json", forHTTPHeaderField: "Accept")
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: parameters, options: [])
+        } catch {
+            return Promise(error: error)
+        }
+        
+        return URLSession.shared.dataTask(with: request).asDataAndResponse()
+    }
+    
     func deregisterPriceAlert(partNumber: String, pushToken: String) -> Promise<Bool> {
         let parameterDict: [String : Any] =
             ["pushToken" : pushToken,

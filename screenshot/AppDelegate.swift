@@ -718,8 +718,8 @@ extension AppDelegate: PushNotificationDelegate {
                    completionHandler(.newData)
                 }
             }
-        } else if let aps = userInfo["aps"] as? NSDictionary, let category = aps["category"] as? String, category == "PRICE_ALERT",  let partNumber = userInfo["partNumber"] as? String{
-            let product = DataModel.sharedInstance.retrieveProduct(managedObjectContext: DataModel.sharedInstance.mainMoc(), partNumber: partNumber)
+        } else if let aps = userInfo["aps"] as? NSDictionary, let category = aps["category"] as? String, category == "PRICE_ALERT",  let id = userInfo["variantId"] as? String{
+            let product = DataModel.sharedInstance.retrieveProduct(managedObjectContext: DataModel.sharedInstance.mainMoc(), id: id)
             Analytics.trackProductPriceAlertRecieved(product: product)
             completionHandler(.noData)
         } else {
@@ -786,10 +786,12 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
             } else if let aps = userInfo["aps"] as? [String : Any],
               let category = aps["category"] as? String,
               category == "PRICE_ALERT",
-              let partNumber = userInfo["partNumber"] as? String,
-              !partNumber.isEmpty {
+              let dataDict = userInfo["data"] as? [String : Any],
+              let id = dataDict["variantId"] as? String,
+              !id.isEmpty {
                 isHandled = true
-                ProductViewController.present(with: partNumber)
+                LocalNotificationModel.shared.cancelPendingNotifications(within: Date(timeIntervalSinceNow: Constants.secondsInDay))
+                ProductViewController.present(with: id)
             }
         }
         
