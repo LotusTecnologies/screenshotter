@@ -285,20 +285,8 @@ class LocalNotificationModel {
             print("registerCrazePriceAlert already has priceAlerts")
             return
         }
-        print("GMK variantId:\(id)")
         NetworkingPromise.sharedInstance.registerCrazePriceAlert(id: id, lastPrice: lastPrice, firebaseId: firebaseId)
             .then { data, response -> Void in
-                if let httpResponse = response as? HTTPURLResponse {
-                    print("GMK registerCrazePriceAlert http status code:\(httpResponse.statusCode)")
-                } else {
-                    print("GMK registerCrazePriceAlert no http status code")
-                }
-                if let dataString = String(data: data, encoding: .utf8) {
-                    print("GMK registerCrazePriceAlert returned dataString:\(dataString)")
-                } else {
-                    print("GMK registerCrazePriceAlert no returned dataString")
-                }
-                
                 DataModel.sharedInstance.markProductHasPriceAlerts(id: id)
             }.catch { error in
                 if let err = error as? PMKURLError {
@@ -317,7 +305,7 @@ class LocalNotificationModel {
                     break
                     }
                 }
-                print("GMK registerCrazePriceAlert caught error:\(error)")
+                print("registerCrazePriceAlert caught error:\(error)")
         }
     }
     
