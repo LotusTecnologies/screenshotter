@@ -424,9 +424,9 @@ class AnalyticsTrackers : NSObject {
                 case .addBookmark:
                     break;
                 case .positiveRating:
-                    toReturn["rating"] = NSNumber.init(value: 1.0)
+                    toReturn["rating"] = NSNumber.init(value: 0.5)
                 case .negativeRating:
-                    toReturn["rating"] = NSNumber.init(value: -1.0)
+                    toReturn["rating"] = NSNumber.init(value: -0.5)
                 case .detailView:
                     break;
                 case .addToCart:

@@ -300,7 +300,35 @@ class NetworkingPromise : NSObject {
         let promise = URLSession(configuration: sessionConfiguration).dataTask(with: URLRequest(url: url)).asDictionary()
         return promise
     }
-    
+    struct RecombeeRecommendation{
+        var imageURL:String
+        var remoteId:String
+    }
+    func recombeeRecommendation() -> Promise<[RecombeeRecommendation]>{
+        let userId = AnalyticsUser.current.identifier
+        var params:[String:Any] = [:]
+        params["count"] = 1
+        params["cascadeCreate"] = true
+        params["includedProperties"] = true
+        params["returnProperties"] = true
+        params["includedProperties"] = "image"
+        params["filter"] = "image!=null"
+        params["rotationRate"] = 0.99
+        params["rotationTime"] = 60*60*24*2 // 2 days rotation
+        return NetworkingPromise.sharedInstance.recombeeRequest(path: "recomms/users/\(userId)/items/", method: "GET", params: params).then { (dict) -> Promise<[RecombeeRecommendation]> in
+            var toReturn:[RecombeeRecommendation] = []
+            if let recomms = dict["recomms"] as? [[String:Any]]{
+                recomms.forEach({ (matchstick) in
+                    if let remoteId = matchstick["id"] as? String,
+                        let values = matchstick["values"] as? [String:Any],
+                        let imageUrl = values["image"] as? String{
+                        toReturn.append(RecombeeRecommendation.init(imageURL: imageUrl, remoteId: remoteId))
+                    }
+                })
+            }
+            return Promise.init(value:toReturn)
+        }
+    }
     func recombeeRequest(path:String, method:String, params:[String:Any]? ) -> Promise<NSDictionary> {
         let hostName = "rapi.recombee.com"
         let databaseId = "screenshop"

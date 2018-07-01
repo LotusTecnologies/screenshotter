@@ -194,7 +194,7 @@ class AsyncOperation: Operation {
     
     private var executionBlock: ((@escaping() -> ()) -> ())?
     private let timeout:TimeInterval?
-    fileprivate let tags:[AsyncOperationTag]
+    let tags:[AsyncOperationTag]
     
     convenience init(timeout:TimeInterval?, completion:@escaping ((@escaping() -> ()) -> ())) {
         self.init(timeout: timeout, tags: [], completion: completion)

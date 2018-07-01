@@ -25,7 +25,7 @@ class Constants {
     static let openingProductKey = "openingProductKey"
     
     // DB
-    static let currentMomVersion = 19
+    static let currentMomVersion = 20
     
     // Cart
     static let cartItemMaxQuantity = 10
@@ -44,6 +44,10 @@ class Constants {
     static let furnitureHardcodedAuth = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmaW5nZXIiOiJ2L0NhY3YzREs5K0NxaVFTQXB1ZDFBPT0iLCJ0aW1lc3RhbXAiOjE1MTQzNjgxOTYxNzIsInV1aWQiOiI3OWIyNWJkZi1lMWI2LTVkOWEtOGJkZi1iZDMwNDkzZmE4NjYifQ.IUpV_u797rI0Asvog26y7cHG1mIuHMnDiPsJvLnIAc4"
     
     static let syteNonUscFeed = "craze_default"
+    
+    
+    //Discover
+    static let discoverTotal = 14930
     
     // Keys
 #if DEV

@@ -10,6 +10,33 @@ import Foundation
 import CoreData
 
 extension Matchstick {
+    static func predicateForDisplayingMatchstick() -> NSPredicate {
+        return NSPredicate.init(format: "isDisplaying == true")
+    }
+    static func predicateForQueuedMatchstick() -> NSPredicate {
+        return NSCompoundPredicate.init(andPredicateWithSubpredicates: [
+            NSPredicate.init(format: "dateSkipped == nil"),
+            NSPredicate.init(format: "was404 == false"),
+            NSPredicate.init(format: "wasAdded == false"),
+            NSPredicate.init(format: "isDisplaying == false"),
+            ])
+    }
+
+    static var skipRotationTime:TimeInterval = 7*24*60*60  // 1 week
+    static var displayingSize = 3
+    static var queueSize = 50
+    
+    var isInGarbage:Bool {
+        if self.wasAdded || self.was404 {
+            return true
+        }else if let date = self.dateSkipped {
+            if abs(date.timeIntervalSinceNow) < Matchstick.skipRotationTime {
+                return true
+            }
+        }
+        return false
+    }
+    
     
     public func add(callback: ((_ screenshot: Screenshot) -> Void)? = nil) {
         let managedObjectID = self.objectID
