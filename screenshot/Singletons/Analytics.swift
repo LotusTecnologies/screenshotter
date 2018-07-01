@@ -15,6 +15,7 @@ import Whisper
 import AdSupport
 import Pushwoosh
 import Amplitude_iOS
+import SwiftLog
 
 extension Bool {
     func toStringLiteral() -> String {
@@ -309,7 +310,13 @@ class Analytics {
                 }
             }
         }
-        
+        let now = Date()
+        if let jsonData = try? JSONSerialization.data(withJSONObject: properties, options: []), let propertiesString = String.init(data: jsonData, encoding: .utf8) {
+            logw("\(now): [\(eventName) - \( propertiesString )")
+        }
+    }
+    init() {
+        Log.logger.printToConsole = false
     }
 
 }

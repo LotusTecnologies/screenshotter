@@ -28,6 +28,7 @@ target 'screenshot' do
     pod 'Firebase/Database'
     pod 'Firebase/Storage'
     pod 'FBSDKLoginKit'
+    pod 'SwiftLog', '~> 1.0.0'
 end
 
 post_install do |installer|

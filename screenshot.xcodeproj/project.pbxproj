@@ -111,9 +111,9 @@
 		311A50CE20DAB4CC0001D463 /* productEmailfooter.html in Resources */ = {isa = PBXBuildFile; fileRef = 311A50CB20DAB4CB0001D463 /* productEmailfooter.html */; };
 		311A50CF20DAB4CC0001D463 /* productEmailheader.html in Resources */ = {isa = PBXBuildFile; fileRef = 311A50CC20DAB4CC0001D463 /* productEmailheader.html */; };
 		311A50D120DBD9EE0001D463 /* ResendCodeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A50D020DBD9EE0001D463 /* ResendCodeManager.swift */; };
-		3125446B2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
-		3125446C2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
-		3125446D2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
+		3125446B2091C3A0009410D5 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
+		3125446C2091C3A0009410D5 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
+		3125446D2091C3A0009410D5 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
 		3125448F209871B4009410D5 /* Analytics+api.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3125448E209871B4009410D5 /* Analytics+api.swift */; };
 		314C488A205E86E700B8381D /* PHAsset+craze.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314C4889205E86E700B8381D /* PHAsset+craze.swift */; };
 		316C831020C3AEBD0012A908 /* DataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316C830520C3AEBD0012A908 /* DataModel.swift */; };
@@ -1496,6 +1496,7 @@
 				"${BUILT_PRODUCTS_DIR}/RateView/RateView.framework",
 				"${BUILT_PRODUCTS_DIR}/SDWebImage/SDWebImage.framework",
 				"${BUILT_PRODUCTS_DIR}/SwiftKeychainWrapper/SwiftKeychainWrapper.framework",
+				"${BUILT_PRODUCTS_DIR}/SwiftLog/SwiftLog.framework",
 				"${BUILT_PRODUCTS_DIR}/Whisper/Whisper.framework",
 				"${BUILT_PRODUCTS_DIR}/leveldb-library/leveldb.framework",
 				"${BUILT_PRODUCTS_DIR}/lottie-ios/Lottie.framework",
@@ -1519,6 +1520,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RateView.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SDWebImage.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftKeychainWrapper.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftLog.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Whisper.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/leveldb.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Lottie.framework",
@@ -1598,7 +1600,7 @@
 				C58BAE7F20E101DD0051394A /* TextFieldTableViewCell.swift in Sources */,
 				311A50B920D90B780001D463 /* CartTableViewCell.swift in Sources */,
 				311A50B520D90B780001D463 /* CartGiftCardConfirmationViewController.swift in Sources */,
-				3125446C2091C3A0009410D5 /* (null) in Sources */,
+				3125446C2091C3A0009410D5 /* BuildFile in Sources */,
 				C58BAE6D20E101DD0051394A /* SaleView.swift in Sources */,
 				311A503920D90B780001D463 /* CheckoutPaymentListViewController.swift in Sources */,
 				311A506820D90B780001D463 /* ScreenshotsDeleteButton.swift in Sources */,
@@ -1717,7 +1719,7 @@
 				311A4F5520D90B020001D463 /* UserAccountManager.swift in Sources */,
 				311A502320D90B780001D463 /* WebView.swift in Sources */,
 				C58BAE5F20E101DD0051394A /* DynamicTypeAccessibilityLayout.swift in Sources */,
-				3125446D2091C3A0009410D5 /* (null) in Sources */,
+				3125446D2091C3A0009410D5 /* BuildFile in Sources */,
 				C58BAE8F20E101DD0051394A /* MainButton.swift in Sources */,
 				C58BAE7B20E101DD0051394A /* CollectionView.swift in Sources */,
 				C53B15BE1FDE585B00658A78 /* LocalizeHelper.swift in Sources */,
@@ -1748,7 +1750,7 @@
 				311A505C20D90B780001D463 /* FavoriteProductsViewController.swift in Sources */,
 				311A503E20D90B780001D463 /* CheckoutFormViewController.swift in Sources */,
 				311A506520D90B780001D463 /* ScreenshotsViewController.swift in Sources */,
-				3125446B2091C3A0009410D5 /* (null) in Sources */,
+				3125446B2091C3A0009410D5 /* BuildFile in Sources */,
 				311A50C520D90B780001D463 /* Form.swift in Sources */,
 				523C11391F5C195D001BD969 /* RatingFlow.swift in Sources */,
 				311A506E20D90B780001D463 /* RegisterConfirmationViewController.swift in Sources */,
