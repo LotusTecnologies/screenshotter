@@ -124,7 +124,7 @@ class DiscoverManager {
 
             newDiscover.forEach { (remoteId) in
                 let imageUrl = "https://s3.amazonaws.com/screenshop-ordered-discover/\(remoteId).jpg"
-                DataModel.sharedInstance.saveMatchstick(managedObjectContext: context, remoteId: remoteId, imageUrl: imageURL, syteJson: nil, trackingInfo: nil)
+                DataModel.sharedInstance.saveMatchstick(managedObjectContext: context, remoteId: remoteId, imageUrl: imageUrl, syteJson: nil, trackingInfo: nil)
                 self.downloadIfNeeded(imageURL: imageUrl, priority: .low)
             }
             
