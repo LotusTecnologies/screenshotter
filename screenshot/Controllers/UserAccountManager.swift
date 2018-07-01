@@ -772,6 +772,7 @@ extension UserAccountManager {
                         let brand = dict["brand"] as? String
                         let merchant = dict["merchant"] as? String
                         let partNumber = dict["partNumber"] as? String
+                        let id = dict["id"] as? String
                         let color = dict["color"] as? String
                         let sku = dict["sku"] as? String
                         let fallbackPriceNumber =  dict["fallbackPrice"] as? NSNumber
@@ -794,6 +795,7 @@ extension UserAccountManager {
                                                                                imageURL: imageURL,
                                                                                merchant: merchant,
                                                                                partNumber:  partNumber,
+                                                                               id: id,
                                                                                color:  color,
                                                                                sku: sku,
                                                                                fallbackPrice: fallbackPrice,
@@ -802,6 +804,7 @@ extension UserAccountManager {
                             
                             context.saveIfNeeded()
                             DataModel.sharedInstance.favorite(toFavorited: true, productOIDs: [product.objectID])
+                            LocalNotificationModel.shared.registerCrazePriceAlert(id: id, lastPrice: floatPrice, hasPriceAlerts: false)
                         })
                     }
                 }
@@ -843,6 +846,10 @@ extension UserAccountManager {
             
             if let partNumber = product.partNumber {
                 dict["partNumber"] = partNumber
+            }
+            
+            if let id = product.id {
+                dict["id"] = id
             }
             
             if let color = product.color {

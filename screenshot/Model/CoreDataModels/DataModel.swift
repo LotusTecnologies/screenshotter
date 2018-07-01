@@ -369,6 +369,7 @@ extension DataModel {
                      imageURL: String?,
                      merchant: String?,
                      partNumber: String?,
+                     id: String?,
                      color: String?,
                      sku: String?,
                      fallbackPrice: Float,
@@ -387,6 +388,7 @@ extension DataModel {
         productToSave.imageURL = imageURL
         productToSave.merchant = merchant
         productToSave.partNumber = partNumber
+        productToSave.id = id
         productToSave.color = color
         productToSave.sku = sku
         productToSave.fallbackPrice = fallbackPrice
