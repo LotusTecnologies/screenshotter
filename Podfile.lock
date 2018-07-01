@@ -83,6 +83,7 @@ PODS:
     - SDWebImage/Core (= 4.4.1)
   - SDWebImage/Core (4.4.1)
   - SwiftKeychainWrapper (3.0.1)
+  - SwiftLog (1.0.0)
   - Whisper (6.0.2)
 
 DEPENDENCIES:
@@ -108,6 +109,7 @@ DEPENDENCIES:
   - PushwooshInboxUI
   - SDWebImage (~> 4.0)
   - SwiftKeychainWrapper
+  - SwiftLog (~> 1.0.0)
   - Whisper
 
 SPEC REPOS:
@@ -143,6 +145,7 @@ SPEC REPOS:
     - RateView
     - SDWebImage
     - SwiftKeychainWrapper
+    - SwiftLog
     - Whisper
 
 SPEC CHECKSUMS:
@@ -177,8 +180,9 @@ SPEC CHECKSUMS:
   RateView: d4d12e9bb76dc23a77a56f4e5c5fb530a3f3f998
   SDWebImage: 47e9b5b925cbce75946c23f0c42dd19464189af4
   SwiftKeychainWrapper: 38952a3636320ae61bad3513cadd870929de7a4a
+  SwiftLog: f6c4f9a4ade06263555ab34b2c0f72025ffcda9e
   Whisper: 169760fc4bab0abf24d5529f9276f95c25cf1025
 
-PODFILE CHECKSUM: 75ad56a3e78ffcb8d204f87f8ac0d454df29dc84
+PODFILE CHECKSUM: 1eb60d3e67f77176cf66e93a7b9c08edf802c376
 
 COCOAPODS: 1.5.3

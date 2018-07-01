@@ -415,7 +415,7 @@ fileprivate extension SettingsViewController {
 extension SettingsViewController {
     func presentMailComposerForContactUs(){
         let recipient = "Info+\(Bundle.displayVersionBuild)@screenshopit.com"
-        self.presentMail(recipient: recipient, gmailMessage: "", subject: "To Screenshop:", message: "", isHTML: false, delegate: nil, noEmailErrorMessage: "email.setup.message.contactUs".localized)
+        self.presentMail(recipient: recipient, gmailMessage: "", subject: "To Screenshop:", message: "", isHTML: false, delegate: nil, noEmailErrorMessage: "email.setup.message.contactUs".localized, attachLogs:false)
         
     }
     
@@ -430,7 +430,10 @@ extension SettingsViewController {
         let subject = "Bug Report"
         let recipient = "support+\(Bundle.displayVersionBuild)@screenshopit.com"
         
-        self.presentMail(recipient: recipient, gmailMessage: gmailMessage, subject: subject, message: message, isHTML: false, delegate: nil, noEmailErrorMessage: "email.setup.message.bug".localized)
+        
+        
+        
+        self.presentMail(recipient: recipient, gmailMessage: gmailMessage, subject: subject, message: message, isHTML: false, delegate: nil, noEmailErrorMessage: "email.setup.message.bug".localized, attachLogs:true)
     }
     
 }

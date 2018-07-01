@@ -128,8 +128,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             Analytics.trackSessionStarted() // Roi Tal from AppSee suggested
         }
         
+        Analytics.trackDevLog(file: #file, line: #line, message: "application didFinishLaunchingWithOptions")
+
         if let launchOptions = launchOptions, let url = launchOptions[UIApplicationLaunchOptionsKey.url] as? URL {
-            
+            Analytics.trackDevLog(file: #file, line: #line, message: "application didFinishLaunchingWithOptions with url \(url)")
+
             if self.isSendToDebugURL(url) {
                 self.sendDebugDataToDebugApp(url:url)
                 return true
