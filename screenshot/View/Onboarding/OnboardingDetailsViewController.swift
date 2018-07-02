@@ -78,9 +78,6 @@ class OnboardingDetailsView: UIView {
             scrollView.backgroundColor = UIColor(patternImage: backgroundImage)
         }
         
-       
-        
-        
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.layoutMargins = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
         addSubview(scrollView)
@@ -153,6 +150,7 @@ class OnboardingDetailsView: UIView {
             Size.plus.localized
             ])
         sizeItem.placeholderTitle = "onboarding.details.size".localized
+        sizeItem.placeholderRow = Size.adult.localized
         
         sizeControl.translatesAutoresizingMaskIntoConstraints = false
         sizeControl.items = [sizeItem]
