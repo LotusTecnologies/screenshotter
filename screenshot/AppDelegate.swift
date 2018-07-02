@@ -560,7 +560,7 @@ extension AppDelegate : KochavaTrackerDelegate {
                 if referring_link.contains("validate"), let url = URL.init(string: referring_link){
                     let _ = UserAccountManager.shared.application(application, open:url, options: [:])
                 }
-            }else if let mode = params["mode"], let oobCode = params["oobCode"] {
+            }else if let mode = params["mode"] as? String, let oobCode = params["oobCode"] as? String {
                 let _ = UserAccountManager.shared.applicationOpenLinkedWith(mode: mode, code: oobCode)
             }
         }

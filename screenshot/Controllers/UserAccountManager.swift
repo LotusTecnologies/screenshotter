@@ -102,10 +102,10 @@ class UserAccountManager : NSObject {
     }
 
     func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any]) -> Bool {
-        Analytics.trackDevLog(file: #file, line: #line, message: "application didFinishLaunchingWithOptions with mode \(url) | mode \(String(describing: mode)) | code \(String(describing: code))")
+        Analytics.trackDevLog(file: #file, line: #line, message: "application didFinishLaunchingWithOptions with mode \(url)")
 
         let queryParams = URLComponents.init(string: url.absoluteString)
-        if let mode = queryParams?.queryItems?.first(where: {$0.name == "mode"}), let code = queryParams?.queryItems?.first(where: {$0.name == "oobCode"}) {
+        if let mode = queryParams?.queryItems?.first(where: {$0.name == "mode"})?.value, let code = queryParams?.queryItems?.first(where: {$0.name == "oobCode"})?.value {
             return applicationOpenLinkedWith(mode: mode, code: code)
         }
         return false
