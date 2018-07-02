@@ -100,8 +100,18 @@ class UserAccountManager : NSObject {
 //        self.facebookLogin.interceptApplication(application, didFinishLaunchingWithOptions: launchOptions)
         return true
     }
-    
+
     func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any]) -> Bool {
+        Analytics.trackDevLog(file: #file, line: #line, message: "application didFinishLaunchingWithOptions with mode \(url) | mode \(String(describing: mode)) | code \(String(describing: code))")
+
+        let queryParams = URLComponents.init(string: url.absoluteString)
+        if let mode = queryParams?.queryItems?.first(where: {$0.name == "mode"}), let code = queryParams?.queryItems?.first(where: {$0.name == "oobCode"}) {
+            return applicationOpenLinkedWith(mode: mode, code: code)
+        }
+        return false
+    }
+    func applicationOpenLinkedWith( mode:String, code:String) -> Bool {
+    
         var handled = false
 //        let source = options[.sourceApplication] as? String
 //        let annotation = options[.annotation]
@@ -127,37 +137,30 @@ class UserAccountManager : NSObject {
             return nil
         }
         
-        let queryParams = URLComponents.init(string: url.absoluteString)
-        let mode = queryParams?.queryItems?.first(where: {$0.name == "mode"})
-        let code = queryParams?.queryItems?.first(where: {$0.name == "oobCode"})
-        Analytics.trackDevLog(file: #file, line: #line, message: "application didFinishLaunchingWithOptions with url \(url) | mode \(String(describing: mode)) | code \(String(describing: code))")
-        if let _ = mode?.value, let code = code?.value{
-            if let confirmVC = AppDelegate.shared.window?.rootViewController?.childViewControllers.last as? ConfirmCodeViewController {
-                confirmVC.applyCode(code: code)
-            }else if let resetVC = AppDelegate.shared.window?.rootViewController?.childViewControllers.last as? ResetPasswordViewController {
-                resetVC.code = code
-            }else if let confirmVC = AppDelegate.shared.window?.rootViewController?.childViewControllers.last?.childViewControllers.first?.presentedViewController?.childViewControllers.last as? ConfirmCodeViewController{
-                confirmVC.applyCode(code: code)
-            }else if let resetVC = AppDelegate.shared.window?.rootViewController?.childViewControllers.last?.childViewControllers.first?.presentedViewController?.childViewControllers.last as? ResetPasswordViewController {
-                resetVC.code = code
-            }else
-                if let confirmVC = find(ConfirmCodeViewController.self, viewController:AppDelegate.shared.window?.rootViewController) as? ConfirmCodeViewController {
-                confirmVC.applyCode(code: code)
-
-            }else if let resetVC =  find(ResetPasswordViewController.self, viewController:AppDelegate.shared.window?.rootViewController) as? ResetPasswordViewController {
-                resetVC.code = code
-            }else{
-
-                let debugInfo =  UIApplication.shared.keyWindow?.rootViewController?.value(forKey: "_printHierarchy") as? String
-                    Analytics.trackDevLog(file: #file, line: #line, message: "could not find VC \(debugInfo ?? "?")")
-
-                    Analytics.trackOnboardingError(domain: "code pressed VC not found", code: #line, localizedDescription: "like \(url.absoluteString) pressed but cannot find view controller \(String(describing: debugInfo))")
-            }
+        // there are 6 here: 3 for confirm, 3 for reset. each one has one for onboarding and one for inapp, and one fallback to try to find VC anywhere it can.
+        if let confirmVC = AppDelegate.shared.window?.rootViewController?.childViewControllers.last as? ConfirmCodeViewController {
+            confirmVC.applyCode(code: code)
+        }else if let resetVC = AppDelegate.shared.window?.rootViewController?.childViewControllers.last as? ResetPasswordViewController {
+            resetVC.code = code
+        }else if let confirmVC = AppDelegate.shared.window?.rootViewController?.childViewControllers.last?.childViewControllers.first?.presentedViewController?.childViewControllers.last as? ConfirmCodeViewController{
+            confirmVC.applyCode(code: code)
+        }else if let resetVC = AppDelegate.shared.window?.rootViewController?.childViewControllers.last?.childViewControllers.first?.presentedViewController?.childViewControllers.last as? ResetPasswordViewController {
+            resetVC.code = code
+        }else if let confirmVC = find(ConfirmCodeViewController.self, viewController:AppDelegate.shared.window?.rootViewController) as? ConfirmCodeViewController {
+            confirmVC.applyCode(code: code)
+        }else if let resetVC =  find(ResetPasswordViewController.self, viewController:AppDelegate.shared.window?.rootViewController) as? ResetPasswordViewController {
+            resetVC.code = code
+        }else{
+            let debugInfo =  UIApplication.shared.keyWindow?.rootViewController?.value(forKey: "_printHierarchy") as? String
+            Analytics.trackDevLog(file: #file, line: #line, message: "could not find VC \(debugInfo ?? "?")")
             
-            handled = true
+            Analytics.trackOnboardingError(domain: "code pressed VC not found", code: #line, localizedDescription: "link pressed but cannot find view controller \(String(describing: debugInfo))")
         }
+        
+        handled = true
         return handled
     }
+    
     private func linkFirebaseStuffForFacebookFor(user:User ) {
         if let name = user.providerData.first?.displayName {
             self.databaseRef.child("users").child(user.uid).child("facebook-displayName").setValue(name)
