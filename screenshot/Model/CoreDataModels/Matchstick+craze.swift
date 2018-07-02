@@ -14,7 +14,7 @@ extension Matchstick {
         return NSPredicate.init(format: "isDisplaying == true")
     }
     static func predicateForQueuedMatchstick() -> NSPredicate {
-        return NSPredicate.init(format: "dateSkipped = nil  AND was404 != true AND wasAdded != true AND isDisplaying != true")
+        return NSPredicate.init(format: "dateSkipped = nil AND was404 != true AND wasAdded != true AND isDisplaying != true")
     }
 
     static var skipRotationTime:TimeInterval = 7*24*60*60  // 1 week

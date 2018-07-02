@@ -292,18 +292,13 @@ class NetworkingPromise : NSObject {
         var params:[String:Any] = [:]
         params["count"] = 1
         params["cascadeCreate"] = true
-        params["includedProperties"] = true
-        params["returnProperties"] = true
-        params["includedProperties"] = "index"
         params["rotationRate"] = 0.99
         params["rotationTime"] = 60*60*24*2 // 2 days rotation
         return NetworkingPromise.sharedInstance.recombeeRequest(path: "recomms/users/\(userId)/items/", method: "GET", params: params).then { (dict) -> Promise<[RecombeeRecommendation]> in
             var toReturn:[RecombeeRecommendation] = []
             if let recomms = dict["recomms"] as? [[String:Any]]{
                 recomms.forEach({ (matchstick) in
-                    if
-                        let values = matchstick["values"] as? [String:Any],
-                        let index = values["index"] as? Int {
+                    if let index = matchstick["id"] as? String {
                         toReturn.append(RecombeeRecommendation.init(imageURL: "https://s3.amazonaws.com/screenshop-ordered-discover/\(index).jpg", remoteId: "\(index)"))
                     }
                 })
