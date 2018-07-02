@@ -561,7 +561,7 @@ extension AppDelegate : KochavaTrackerDelegate {
                     let _ = UserAccountManager.shared.application(application, open:url, options: [:])
                 }
             }else if let mode = params["mode"], let oobCode = params["oobCode"] {
-                let _ UserAccountManager.shared.applicationOpenLinkedWith(mode: mode, code: oobCode)
+                let _ = UserAccountManager.shared.applicationOpenLinkedWith(mode: mode, code: oobCode)
             }
         }
         
