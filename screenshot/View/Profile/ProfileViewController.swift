@@ -215,6 +215,29 @@ class ProfileViewController: BaseTableViewController {
         ]
         present(activityViewController, animated: true)
     }
+    
+    // MARK: Permissions
+    
+    private func createExclamationLabel() -> UILabel {
+        let label = UILabel(frame: CGRect(x: 0, y: 0, width: 18, height: 18))
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.backgroundColor = .crazeRed
+        label.text = "!"
+        label.textAlignment = .center
+        label.font = UIFont(name: "Optima-ExtraBlack", size: 14)
+        label.textColor = .white
+        label.layer.cornerRadius = label.bounds.height / 2
+        label.layer.masksToBounds = true
+        return label
+    }
+    
+    private lazy var exclamationImage: UIImage = {
+        let label = createExclamationLabel()
+        let renderer = UIGraphicsImageRenderer(bounds: label.bounds)
+        return renderer.image { rendererContext in
+            label.layer.render(in: rendererContext.cgContext)
+        }
+    }()
 }
 
 extension ProfileViewController: ProfileAccountViewDelegate {
@@ -302,9 +325,8 @@ extension ProfileViewController : RegisterViewControllerDelegate, ConfirmCodeVie
         self.dismiss(animated: true, completion: nil)
         self.didLogin()
     }
-    
-    
 }
+
 // MARK: - Table View
 
 extension ProfileViewController {
@@ -550,11 +572,17 @@ extension ProfileViewController {
             
             return NSAttributedString(string: string, attributes: attributes)
             
+        case .permissionGDRP:
+            if UserDefaults.standard.bool(forKey: UserDefaultsKeys.gdpr_agreedToNotification) {
+                return nil
+            }
+            else {
+                let textAttachment = NSTextAttachment()
+                textAttachment.image = exclamationImage
+                return NSAttributedString(attachment: textAttachment)
+            }
+            
         default:
-            // Template code in case product creates another cell with an image and an arrow
-//            let textAttachment = NSTextAttachment()
-//            textAttachment.image = UIImage(named: "")
-//            return NSAttributedString(attachment: textAttachment)
             return nil
         }
     }
@@ -585,20 +613,12 @@ extension ProfileViewController {
         switch (row) {
         case .permissionPhoto:
             if let permissionType = row.permissionType, !PermissionsManager.shared.hasPermission(for: permissionType) {
-                let size: CGFloat = 18
-                let offset: CGFloat = 8
+                let label = createExclamationLabel()
                 
-                let view = UIView(frame: CGRect(x: 0, y: 0, width: size + offset, height: size))
+                var viewFrame = label.frame
+                viewFrame.size.width += 8 // offset
+                let view = UIView(frame: viewFrame)
                 
-                let label = UILabel()
-                label.translatesAutoresizingMaskIntoConstraints = false
-                label.backgroundColor = .crazeRed
-                label.text = "!"
-                label.textAlignment = .center
-                label.font = UIFont(name: "Optima-ExtraBlack", size: 14)
-                label.textColor = .white
-                label.layer.cornerRadius = size / 2
-                label.layer.masksToBounds = true
                 view.addSubview(label)
                 label.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
                 label.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
