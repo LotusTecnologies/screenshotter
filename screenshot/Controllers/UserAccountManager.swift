@@ -995,7 +995,8 @@ extension UserAccountManager {
             let uploadedImageURL = screenshot.uploadedImageURL {
             let trackingInfo = screenshot.trackingInfo ?? ""
             let source = screenshot.source.rawValue
-            let escapedAssetId = assetId.replacingOccurrences(of: "\"", with: "")
+            let forbiddenChacters = CharacterSet.init(charactersIn: "\\#$[]")
+            let escapedAssetId = assetId.components(separatedBy:forbiddenChacters).joined()
             let dict:[String:Any] = [
                 "assetId":escapedAssetId,
                 "createdAt":NSNumber.init(value: createdAtNumber as Double),
@@ -1004,7 +1005,7 @@ extension UserAccountManager {
                 "trackingInfo" :trackingInfo
                         ]
             
-            self.databaseRef.child("users").child(user.uid).child("screenshots").child(assetId).setValue(dict)
+            self.databaseRef.child("users").child(user.uid).child("screenshots").child(escapedAssetId).setValue(dict)
         }
 
     }
