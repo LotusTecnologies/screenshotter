@@ -223,8 +223,9 @@ class LocalNotificationModel {
     
     func cancelPendingNotifications(within: Date? = nil) {
         UNUserNotificationCenter.current().getPendingNotificationRequests { notificationRequestArray in
-            let toCancel = [LocalNotificationIdentifier.tappedProduct.rawValue, LocalNotificationIdentifier.saleScreenshot.rawValue, LocalNotificationIdentifier.favoritedItem.rawValue, LocalNotificationIdentifier.inactivityDiscover.rawValue]
-            let toCancelSet = Set<String>(toCancel)
+            var toCancel = [LocalNotificationIdentifier.tappedProduct.rawValue, LocalNotificationIdentifier.saleScreenshot.rawValue, LocalNotificationIdentifier.favoritedItem.rawValue, LocalNotificationIdentifier.inactivityDiscover.rawValue]
+            let toCancelPotentialSet = Set<String>(toCancel)
+            toCancel.removeAll()
             notificationRequestArray.forEach { notificationRequest in
                 var isInCancelDateRange = true
                 if let within = within,
@@ -233,7 +234,7 @@ class LocalNotificationModel {
                   triggerDate > within {
                     isInCancelDateRange = false
                 }
-                if isInCancelDateRange && toCancelSet.contains(notificationRequest.identifier) {
+                if isInCancelDateRange && toCancelPotentialSet.contains(notificationRequest.identifier) {
                     switch notificationRequest.identifier {
                     case LocalNotificationIdentifier.tappedProduct.rawValue:
                         Analytics.trackTimedLocalNotificationCancelled(source: .tappedProduct)
@@ -250,6 +251,7 @@ class LocalNotificationModel {
                         print("Cancel unknown timedLocalNotification. WTF?")
                     }
                     print("Canceling notification \(notificationRequest.identifier)")
+                    toCancel.append(notificationRequest.identifier)
                 }
             }
             UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: toCancel)
