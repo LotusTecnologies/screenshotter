@@ -38,6 +38,9 @@ class SegmentedDropDownItem : NSObject {
     }
     var placeholderTitle: String?
     
+    /// If the titleLabel.text is empty, this value will be used to select the current picker row.
+    var placeholderRow: String?
+    
     /// Value from 1 to 0 where 1 takes up the whole segmented control
     /// width. -1 uses auto calculate.
     var widthRatio: CGFloat = -1
@@ -201,6 +204,7 @@ class SegmentedDropDownControl : UIButton {
                     let dropDownControl = DropDownControl()
                     dropDownControl.pickerDataSource = self
                     dropDownControl.pickerDelegate = self
+                    dropDownControl.placeholderRow = item.placeholderRow
                     dropDownControl.titleLabel.text = item.title
                     dropDownControl.titleLabel.textColor = .gray3
                     dropDownControl.imageView.tintColor = dropDownControl.titleLabel.textColor
@@ -520,6 +524,8 @@ fileprivate class DropDownControl : UIControl {
         return PickerInputView(pickerView: self.pickerView)
     }()
     
+    var placeholderRow: String?
+    
     // MARK: Life Cycle
     
     required init?(coder aDecoder: NSCoder) {
@@ -653,9 +659,15 @@ fileprivate class DropDownControl : UIControl {
         for i in 0 ..< dataSource.pickerView(pickerView, numberOfRowsInComponent: 0) {
             let title = delegate.pickerView?(pickerView, titleForRow: i, forComponent: 0) ?? ""
             
-            if !title.isEmpty && title == titleLabel.text {
-                row = i
-                break
+            if !title.isEmpty {
+                if let text = titleLabel.text, title == text {
+                    row = i
+                    break
+                }
+                else if let text = placeholderRow, title == text {
+                    row = i
+                    break
+                }
             }
         }
         
