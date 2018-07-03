@@ -47,6 +47,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UNUserNotificationCenter.current().delegate = self
         
         let _ = UserAccountManager.shared.application(application, didFinishLaunchingWithOptions: launchOptions)
+        GDPRViewController.updateUserAccountGDPR()
         
         window = UIWindow(frame: UIScreen.main.bounds)
         if UserDefaults.standard.value(forKey: UserDefaultsKeys.lastDbVersionMigrated) == nil {

@@ -291,4 +291,29 @@ final class PermissionsManager : NSObject, CLLocationManagerDelegate {
             return nil
         }
     }
+    
+    func disableAlertController(for type: PermissionType, opened: PermissionBlock? = nil) -> UIAlertController? {
+        let message: String? = {
+            switch type {
+            case .push:
+                return "permission.push.disable.message".localized
+            default:
+                return nil
+            }
+        }()
+        
+        switch type {
+        case .push:
+            let alertController = UIAlertController(title: "permission.disable.title".localized, message: message, preferredStyle: .alert)
+            alertController.addAction(UIAlertAction(title: "generic.ok".localized, style: .default, handler: { action in
+                if let url = URL(string: UIApplicationOpenSettingsURLString) {
+                    UIApplication.shared.open(url, options: [:], completionHandler: opened)
+                }
+            }))
+            return alertController
+            
+        default:
+            return nil
+        }
+    }
 }
