@@ -196,19 +196,25 @@ class UserAccountManager : NSObject {
                     if let user = self.user {
                         self.linkFirebaseStuffForFacebookFor(user: user)
                     }
-                    fulfil(.facebookOld)
+                    self.downloadAndReplaceUserData().always {
+                        fulfil(.facebookOld)
+                    }
+                    
                 }else{
                     reject(error)
                 }
             }else if let user = result?.user {
                self.linkFirebaseStuffForFacebookFor(user: user)
+                let downloadAndReplaceUserDataTask = self.downloadAndReplaceUserData()
                 self.databaseRef.child("users").child(user.uid).child("createdAt").observeSingleEvent(of: .value) { (snapshot) in
-                    if let _ = snapshot.value as? NSNumber {
-                        fulfil(.facebookOld)
-                    }else{
-                        let now = NSNumber.init(value: (Date().timeIntervalSince1970 as Double) )
-                        self.databaseRef.child("users").child(user.uid).child("createdAt").setValue(now)
-                        fulfil(.facebookNew)
+                    downloadAndReplaceUserDataTask.always {
+                        if let _ = snapshot.value as? NSNumber {
+                            fulfil(.facebookOld)
+                        }else{
+                            let now = NSNumber.init(value: (Date().timeIntervalSince1970 as Double) )
+                            self.databaseRef.child("users").child(user.uid).child("createdAt").setValue(now)
+                            fulfil(.facebookNew)
+                        }
                     }
                 }
             }else {
@@ -543,7 +549,7 @@ class UserAccountManager : NSObject {
         Analytics.trackDevLog(file: #file, line: #line, message: "setGDPR")
 
         return Promise { fulfill, reject in
-            UserDefaults.standard.setValue(agreedToEmail, forKey: UserDefaultsKeys.gdpr_agreedToEmail)
+            UserDefaults.standard.setValue(agreedToEmail, forKey: UserDefaultsKeys.gdpr_agreedToNotification)
             UserDefaults.standard.setValue(agreedToImageDetection, forKey: UserDefaultsKeys.gdpr_agreedToImageDetection)
             
             if agreedToImageDetection {
@@ -795,7 +801,7 @@ extension UserAccountManager {
                 self.databaseRef.child("users").child(user.uid).child("GDRP-agreedToEmail").observeSingleEvent(of: .value) { (snapshot) in
                     if let agreedToEmailNumber = snapshot.value as? NSNumber  {
                         let agreedToEmail = agreedToEmailNumber.boolValue
-                        UserDefaults.standard.setValue(agreedToEmail, forKey: UserDefaultsKeys.gdpr_agreedToEmail)
+                        UserDefaults.standard.setValue(agreedToEmail, forKey: UserDefaultsKeys.gdpr_agreedToNotification)
                     }
                     fulfil(())
                     
@@ -995,7 +1001,8 @@ extension UserAccountManager {
             let uploadedImageURL = screenshot.uploadedImageURL {
             let trackingInfo = screenshot.trackingInfo ?? ""
             let source = screenshot.source.rawValue
-            let escapedAssetId = assetId.replacingOccurrences(of: "\"", with: "")
+            let forbiddenChacters = CharacterSet.init(charactersIn: "\\#$[]")
+            let escapedAssetId = assetId.components(separatedBy:forbiddenChacters).joined()
             let dict:[String:Any] = [
                 "assetId":escapedAssetId,
                 "createdAt":NSNumber.init(value: createdAtNumber as Double),
@@ -1004,7 +1011,7 @@ extension UserAccountManager {
                 "trackingInfo" :trackingInfo
                         ]
             
-            self.databaseRef.child("users").child(user.uid).child("screenshots").child(assetId).setValue(dict)
+            self.databaseRef.child("users").child(user.uid).child("screenshots").child(escapedAssetId).setValue(dict)
         }
 
     }

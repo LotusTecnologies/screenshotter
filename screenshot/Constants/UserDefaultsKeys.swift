@@ -95,7 +95,7 @@ class UserDefaultsKeys  {
     static let showsDebugAnalyticsUI = "ShowsDebugAnalyticsUI"
     
     //GDPR
-    static let gdpr_agreedToEmail = "gdpr_agreedToEmail"
+    static let gdpr_agreedToNotification = "gdpr_agreedToEmail"
     static let gdpr_agreedToImageDetection = "gdpr_agreedToImageDetection"
 
 }

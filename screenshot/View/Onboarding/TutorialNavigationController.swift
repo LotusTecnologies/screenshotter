@@ -73,12 +73,23 @@ extension TutorialNavigationController: RegisterViewControllerDelegate {
     }
     
     func registerViewControllerDidSignin(_ viewController: RegisterViewController) {
-        pushGDPRViewController()
+        let agreedToAllPermisions = (UserDefaults.standard.bool(forKey: UserDefaultsKeys.gdpr_agreedToNotification) && UserDefaults.standard.bool(forKey: UserDefaultsKeys.gdpr_agreedToImageDetection))
+        if ( !agreedToAllPermisions ) {
+            pushGDPRViewController()
+        }else{
+            tutorialCompleted()
+        }
         Analytics.trackOnboardingLoginSucess()
     }
     
     func registerViewControllerDidFacebookLogin(_ viewController: RegisterViewController) {
-        pushGDPRViewController()
+        let agreedToAllPermisions = (UserDefaults.standard.bool(forKey: UserDefaultsKeys.gdpr_agreedToNotification) && UserDefaults.standard.bool(forKey: UserDefaultsKeys.gdpr_agreedToImageDetection))
+        if ( !agreedToAllPermisions ) {
+            pushGDPRViewController()
+        }else{
+            tutorialCompleted()
+        }
+
         Analytics.trackOnboardingFacebookSuccess(isReturning: true)
     }
     
