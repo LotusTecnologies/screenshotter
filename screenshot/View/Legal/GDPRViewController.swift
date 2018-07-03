@@ -147,19 +147,14 @@ extension GDPRViewControllerTableView {
     override func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
         if indexPath.row == GDPRViewController.Rows.notification.rawValue {
             if PermissionsManager.shared.hasPermission(for: .push) {
-                let alertController = PermissionsManager.shared.disableAlertController(for: .push) { opened in
-                    print("||| opened? = \(opened)")
-                }
-                alertController?.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: { action in
-                    tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
-                }))
-                
-                if let alertController = alertController {
-                    present(alertController, animated: true)
-                }
-                else {
+                guard let alertController = PermissionsManager.shared.disableAlertController(for: .push) else {
                     fatalError("PermissionsManager is not supporting disableAlertController for .push")
                 }
+                
+                alertController.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: { action in
+                    tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
+                }))
+                present(alertController, animated: true)
             }
             else {
                 // This should not be possible if everything is synced correctly
