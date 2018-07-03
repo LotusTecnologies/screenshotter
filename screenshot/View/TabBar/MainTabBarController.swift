@@ -446,7 +446,7 @@ extension MainTabBarController: FetchedResultsControllerManagerDelegate {
 typealias MainTabBarControllerGDPR = MainTabBarController
 extension MainTabBarControllerGDPR: OnboardingGDPRViewControllerDelegate {
     private var needsToPresentGDPR: Bool {
-        return UserDefaults.standard.value(forKey: UserDefaultsKeys.gdpr_agreedToEmail) == nil
+        return UserDefaults.standard.value(forKey: UserDefaultsKeys.gdpr_agreedToNotification) == nil
     }
     
     private func presentGDPRIfNeeded() {

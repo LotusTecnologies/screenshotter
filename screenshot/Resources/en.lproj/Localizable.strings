@@ -290,7 +290,6 @@
 "onboarding.details.size" = "Size";
 "onboarding.details.title" = "Your Details";
 
-
 "onboarding.welcome.content" = "Take a screenshot.\nShop it.";
 "onboarding.welcome.continue" = "Get Started";
 "onboarding.welcome.header" = "Welcome to";
@@ -299,8 +298,12 @@
 "partners.title" = "Our Technology";
 
 "permission.denied.title" = "Allow Permissions To Continue";
+"permission.disable.title" = "Disabling Permissions";
+"permission.enable.title" = "Enabling Permissions";
 "permission.photo.denied.message" = "We need access to your photos in order to show you shoppable items.";
 "permission.push.denied.message" = "Turn on notifications to get updates from Screenshop";
+"permission.push.disable.message" = "Disabling push permissions can only be done in settings.";
+"permission.push.enable.message" = "Enabling push permissions again can only be done in settings.";
 
 "picker.empty.detail" = "Start taking screenshots of fashion items to fill up your gallery!";
 "picker.empty.title" = "No Photos!";
@@ -377,7 +380,6 @@
 "profile.row.logout.title" = "Logout";
 "profile.row.open_in.title" = "Open Products In";
 "profile.row.photo_permission.title" = "Camera Roll";
-"profile.row.push_permission.title" = "Push Notifications";
 "profile.row.tutorial.title" = "Play Tutorial";
 "profile.section.permission" = "Permissions";
 "profile.tell_friend" = "Tell a Friend!";
