@@ -170,11 +170,25 @@ extension GDPRViewControllerTableView {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.row == GDPRViewController.Rows.notification.rawValue {
-            PermissionsManager.shared.requestPermission(for: .push, openSettingsIfNeeded: true) { granted in
-                if granted {
-                    self.agreedToNotification = true
-                    self.updateUserAccountGDPR()
+            if PermissionsManager.shared.permissionStatus(for: .push) == .undetermined {
+                PermissionsManager.shared.requestPermission(for: .push, openSettingsIfNeeded: true) { granted in
+                    if granted {
+                        self.agreedToNotification = true
+                        self.updateUserAccountGDPR()
+                    }
                 }
+            }
+            else {
+                guard let alertController = PermissionsManager.shared.enableAlertController(for: .push) else {
+                    fatalError("PermissionsManager is not supporting enableAlertController for .push")
+                }
+                
+                alertController.preferredAction = alertController.actions.first
+                
+                alertController.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: { action in
+                    tableView.deselectRow(at: indexPath, animated: true)
+                }))
+                present(alertController, animated: true)
             }
         }
         else if indexPath.row == GDPRViewController.Rows.imageDetection.rawValue {

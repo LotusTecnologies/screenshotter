@@ -299,9 +299,11 @@
 
 "permission.denied.title" = "Allow Permissions To Continue";
 "permission.disable.title" = "Disabling Permissions";
+"permission.enable.title" = "Enabling Permissions";
 "permission.photo.denied.message" = "We need access to your photos in order to show you shoppable items.";
 "permission.push.denied.message" = "Turn on notifications to get updates from Screenshop";
 "permission.push.disable.message" = "Disabling push permissions can only be done in settings.";
+"permission.push.enable.message" = "Enabling push permissions again can only be done in settings.";
 
 "picker.empty.detail" = "Start taking screenshots of fashion items to fill up your gallery!";
 "picker.empty.title" = "No Photos!";
