@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Appsee
 
 protocol ResetPasswordViewControllerDelegate: NSObjectProtocol {
     func resetPasswordViewControllerDidReset(_ viewController: ResetPasswordViewController)
@@ -132,6 +133,7 @@ class ResetPasswordView: UIScrollView {
         newPasswordTextField.topAnchor.constraint(equalTo: newPasswordLabel.bottomAnchor).isActive = true
         newPasswordTextField.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
         newPasswordTextField.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
+        Appsee.markView(asSensitive: newPasswordTextField)
         
         continueButton.translatesAutoresizingMaskIntoConstraints = false
         continueButton.backgroundColor = .crazeGreen
@@ -142,9 +144,6 @@ class ResetPasswordView: UIScrollView {
         continueButton.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
         continueButton.bottomAnchor.constraint(lessThanOrEqualTo: contentView.layoutMarginsGuide.bottomAnchor).isActive = true
         continueButton.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
-
-        
-        
         
         resendButton.translatesAutoresizingMaskIntoConstraints = false
         resendButton.contentEdgeInsets = UIEdgeInsets(top: 6, left: .padding, bottom: 6, right: .padding)
