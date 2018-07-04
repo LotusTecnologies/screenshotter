@@ -23,10 +23,7 @@ class ResetPasswordView: UIScrollView {
     let newPasswordLabel = UILabel()
 
     let _layoutMargins = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
-    
-    
-    private var waitingForCodeConstriants:[NSLayoutConstraint] = []
-    private var hasCodeConstriants:[NSLayoutConstraint] = []
+        
     var hasCode:Bool = false {
         didSet{
             emailImageView.isHidden = hasCode
