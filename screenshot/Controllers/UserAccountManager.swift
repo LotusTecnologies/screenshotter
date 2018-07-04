@@ -549,7 +549,7 @@ class UserAccountManager : NSObject {
         Analytics.trackDevLog(file: #file, line: #line, message: "setGDPR")
 
         return Promise { fulfill, reject in
-            UserDefaults.standard.setValue(agreedToEmail, forKey: UserDefaultsKeys.gdpr_agreedToNotification)
+            UserDefaults.standard.setValue(agreedToEmail, forKey: UserDefaultsKeys.gdpr_agreedToEmail)
             UserDefaults.standard.setValue(agreedToImageDetection, forKey: UserDefaultsKeys.gdpr_agreedToImageDetection)
             
             if agreedToImageDetection {
@@ -801,7 +801,7 @@ extension UserAccountManager {
                 self.databaseRef.child("users").child(user.uid).child("GDRP-agreedToEmail").observeSingleEvent(of: .value) { (snapshot) in
                     if let agreedToEmailNumber = snapshot.value as? NSNumber  {
                         let agreedToEmail = agreedToEmailNumber.boolValue
-                        UserDefaults.standard.setValue(agreedToEmail, forKey: UserDefaultsKeys.gdpr_agreedToNotification)
+                        UserDefaults.standard.setValue(agreedToEmail, forKey: UserDefaultsKeys.gdpr_agreedToEmail)
                     }
                     fulfil(())
                     
@@ -917,7 +917,7 @@ extension UserAccountManager {
                             
                             context.saveIfNeeded()
                             DataModel.sharedInstance.favorite(toFavorited: true, productOIDs: [product.objectID])
-                            LocalNotificationModel.shared.registerCrazePriceAlert(id: id, lastPrice: floatPrice, hasPriceAlerts: false)
+                            LocalNotificationModel.shared.registerCrazeFavoritedPriceAlert(id: product.id, lastPrice: product.floatPrice)
                         })
                     }
                 }

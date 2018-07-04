@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>_Screenshop</string>
+	<string>Screenshop</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -23,6 +23,7 @@
 		<dict>
 			<key>CFBundleURLSchemes</key>
 			<array>
+				<string>io.crazeapp.screenshot</string>
 				<string>fb1960379067541863</string>
 			</array>
 		</dict>
@@ -33,7 +34,7 @@
 			<string>Bundle ID</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>io.crazeapp.screenshot.dev</string>
+				<string>io.crazeapp.screenshot</string>
 			</array>
 		</dict>
 		<dict>

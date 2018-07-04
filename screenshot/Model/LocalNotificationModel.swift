@@ -223,8 +223,9 @@ class LocalNotificationModel {
     
     func cancelPendingNotifications(within: Date? = nil) {
         UNUserNotificationCenter.current().getPendingNotificationRequests { notificationRequestArray in
-            let toCancel = [LocalNotificationIdentifier.tappedProduct.rawValue, LocalNotificationIdentifier.saleScreenshot.rawValue, LocalNotificationIdentifier.favoritedItem.rawValue, LocalNotificationIdentifier.inactivityDiscover.rawValue]
-            let toCancelSet = Set<String>(toCancel)
+            var toCancel = [LocalNotificationIdentifier.tappedProduct.rawValue, LocalNotificationIdentifier.saleScreenshot.rawValue, LocalNotificationIdentifier.favoritedItem.rawValue, LocalNotificationIdentifier.inactivityDiscover.rawValue]
+            let toCancelPotentialSet = Set<String>(toCancel)
+            toCancel.removeAll()
             notificationRequestArray.forEach { notificationRequest in
                 var isInCancelDateRange = true
                 if let within = within,
@@ -233,7 +234,7 @@ class LocalNotificationModel {
                   triggerDate > within {
                     isInCancelDateRange = false
                 }
-                if isInCancelDateRange && toCancelSet.contains(notificationRequest.identifier) {
+                if isInCancelDateRange && toCancelPotentialSet.contains(notificationRequest.identifier) {
                     switch notificationRequest.identifier {
                     case LocalNotificationIdentifier.tappedProduct.rawValue:
                         Analytics.trackTimedLocalNotificationCancelled(source: .tappedProduct)
@@ -250,6 +251,7 @@ class LocalNotificationModel {
                         print("Cancel unknown timedLocalNotification. WTF?")
                     }
                     print("Canceling notification \(notificationRequest.identifier)")
+                    toCancel.append(notificationRequest.identifier)
                 }
             }
             UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: toCancel)
@@ -272,23 +274,17 @@ class LocalNotificationModel {
     
     // MARK: Remote Notification
 
-    func registerCrazePriceAlert(id: String?, lastPrice: Float, hasPriceAlerts: Bool) {
+    func registerCrazeFavoritedPriceAlert(id: String?, lastPrice: Float) {
         guard let id = id else {
-            print("registerCrazePriceAlert no product id")
+            print("registerCrazeFavoritedPriceAlert no product id")
             return
         }
         guard let firebaseId = UserAccountManager.shared.user?.uid else {
-            print("registerCrazePriceAlert no firebase id")
+            print("registerCrazeFavoritedPriceAlert no firebase id")
             return
         }
-        guard !hasPriceAlerts else {
-            print("registerCrazePriceAlert already has priceAlerts")
-            return
-        }
-        NetworkingPromise.sharedInstance.registerCrazePriceAlert(id: id, lastPrice: lastPrice, firebaseId: firebaseId)
-            .then { data, response -> Void in
-                DataModel.sharedInstance.markProductHasPriceAlerts(id: id)
-            }.catch { error in
+        NetworkingPromise.sharedInstance.registerCrazePriceAlert(id: id, lastPrice: lastPrice, firebaseId: firebaseId, action: "favorited")
+            .catch { error in
                 if let err = error as? PMKURLError {
                     switch err {
                     case let .badResponse(request, data, response):
@@ -299,13 +295,75 @@ class LocalNotificationModel {
                             dataCount = data.count
                         }
                         let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
-                        print("registerCrazePriceAlert specific catch badResponse data count:\(dataCount)  statusCode:\(statusCode)  errorString:\(errorString)  request:\(request)")
+                        print("registerCrazeFavoritedPriceAlert specific catch badResponse data count:\(dataCount)  statusCode:\(statusCode)  errorString:\(errorString)  request:\(request)")
                         return
                     default:
-                    break
+                        break
                     }
                 }
-                print("registerCrazePriceAlert caught error:\(error)")
+                print("registerCrazeFavoritedPriceAlert caught error:\(error)")
+        }
+    }
+    
+    func deregisterCrazeFavoritedPriceAlert(id: String?) {
+        guard let id = id else {
+            print("deregisterCrazeFavoritedPriceAlert no product id")
+            return
+        }
+        guard let firebaseId = UserAccountManager.shared.user?.uid else {
+            print("deregisterCrazeFavoritedPriceAlert no firebase id")
+            return
+        }
+        NetworkingPromise.sharedInstance.registerCrazePriceAlert(id: id, lastPrice: 0, firebaseId: firebaseId, action: "disabled")
+            .catch { error in
+                if let err = error as? PMKURLError {
+                    switch err {
+                    case let .badResponse(request, data, response):
+                        var errorString: String = "-"
+                        var dataCount: Int = 0
+                        if let data = data {
+                            errorString = String(data: data, encoding: .utf8) ?? "-"
+                            dataCount = data.count
+                        }
+                        let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
+                        print("deregisterCrazeFavoritedPriceAlert specific catch badResponse data count:\(dataCount)  statusCode:\(statusCode)  errorString:\(errorString)  request:\(request)")
+                        return
+                    default:
+                        break
+                    }
+                }
+                print("deregisterCrazeFavoritedPriceAlert caught error:\(error)")
+        }
+    }
+
+    func registerCrazeTappedPriceAlert(id: String?, lastPrice: Float) {
+        guard let id = id else {
+            print("registerCrazeTappedPriceAlert no product id")
+            return
+        }
+        guard let firebaseId = UserAccountManager.shared.user?.uid else {
+            print("registerCrazeTappedPriceAlert no firebase id")
+            return
+        }
+        NetworkingPromise.sharedInstance.registerCrazePriceAlert(id: id, lastPrice: lastPrice, firebaseId: firebaseId, action: "tapped")
+            .catch { error in
+                if let err = error as? PMKURLError {
+                    switch err {
+                    case let .badResponse(request, data, response):
+                        var errorString: String = "-"
+                        var dataCount: Int = 0
+                        if let data = data {
+                            errorString = String(data: data, encoding: .utf8) ?? "-"
+                            dataCount = data.count
+                        }
+                        let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
+                        print("registerCrazeTappedPriceAlert specific catch badResponse data count:\(dataCount)  statusCode:\(statusCode)  errorString:\(errorString)  request:\(request)")
+                        return
+                    default:
+                        break
+                    }
+                }
+                print("registerCrazeTappedPriceAlert caught error:\(error)")
         }
     }
     

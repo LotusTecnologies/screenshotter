@@ -223,10 +223,10 @@
 "form.personal.email" = "Email";
 "form.personal.phone" = "Phone Number";
 
+"gdpr.email.message" = "When this setting is turned on, we will send you personalized emails with sales, availability updates and information about products in the app you looked at and favorited. Your email will also be used to retarget ads to you and to provide brands and retailers with anonymous data about your shopping habits.";
+"gdpr.email.title" = "Email";
 "gdpr.image.message" = "When this setting is turned on, we send screenshots you take in and outside of the app to our server to detect whether there are clothing items in the photo and allow you to shop relevant photos quickly. This happens in the background and is not shown to you. We do not save any photos that are not detected as fashion.";
 "gdpr.image.title" = "Image Detection";
-"gdpr.notification.message" = "When this setting is turned on, we will send you personalized push notifications and emails with sales, availability updates and information about products in the app you looked at and favorited. Your email will also be used to retarget ads to you and to provide brands and retailers with anonymous data about your shopping habits.";
-"gdpr.notification.title" = "Email & Push Notifications";
 "gdpr.onboarding.title" = "Your Privacy Settings";
 "gdpr.onboarding.subtitle" = "You can change these any time in the settings page of the app";
 "gdpr.onboarding.edit" = "Manage Settings";
@@ -298,12 +298,8 @@
 "partners.title" = "Our Technology";
 
 "permission.denied.title" = "Allow Permissions To Continue";
-"permission.disable.title" = "Disabling Permissions";
-"permission.enable.title" = "Enabling Permissions";
 "permission.photo.denied.message" = "We need access to your photos in order to show you shoppable items.";
 "permission.push.denied.message" = "Turn on notifications to get updates from Screenshop";
-"permission.push.disable.message" = "Disabling push permissions can only be done in settings.";
-"permission.push.enable.message" = "Enabling push permissions again can only be done in settings.";
 
 "picker.empty.detail" = "Start taking screenshots of fashion items to fill up your gallery!";
 "picker.empty.title" = "No Photos!";
@@ -318,6 +314,8 @@
 "picker.title" = "Add Photos";
 
 "product.add" = "Add to Cart";
+"product.alert.favorited.price" = "Price alert: Your fav just dropped to %@, get it quick!!";
+"product.alert.tapped.price" = "%@ off this item you looked at recently: %@";
 "product.alert.price" = "Price alert: Your fav just dropped to %@, get it quick!!";
 "product.alert.price_stock" = "In-stock alert: Your fav just dropped to %@, get it quick!!";
 "product.alert.stock" = "In-stock alert: Your fav just became available, get it quick!!";
@@ -380,6 +378,7 @@
 "profile.row.logout.title" = "Logout";
 "profile.row.open_in.title" = "Open Products In";
 "profile.row.photo_permission.title" = "Camera Roll";
+"profile.row.push_permission.title" = "Push Notifications";
 "profile.row.tutorial.title" = "Play Tutorial";
 "profile.section.permission" = "Permissions";
 "profile.tell_friend" = "Tell a Friend!";
