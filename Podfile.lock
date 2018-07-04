@@ -105,7 +105,6 @@ DEPENDENCIES:
   - PhoneNumberKit
   - PromiseKit/Foundation (= 4.5.2)
   - PromiseKit/StoreKit (~> 4.0)
-  - Pushwoosh
   - PushwooshInboxUI
   - SDWebImage (~> 4.0)
   - SwiftKeychainWrapper
@@ -183,6 +182,6 @@ SPEC CHECKSUMS:
   SwiftLog: f6c4f9a4ade06263555ab34b2c0f72025ffcda9e
   Whisper: 169760fc4bab0abf24d5529f9276f95c25cf1025
 
-PODFILE CHECKSUM: 1eb60d3e67f77176cf66e93a7b9c08edf802c376
+PODFILE CHECKSUM: 4201ed30a1b02bb3f29d9e0c34a4fca79a0734b2
 
 COCOAPODS: 1.5.3
