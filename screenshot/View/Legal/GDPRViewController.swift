@@ -20,8 +20,6 @@ class GDPRViewController: BaseTableViewController {
         super.init(style: style)
         
         title = "gdpr.title".localized
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(applicationWillEnterForeground(_:)), name: .UIApplicationWillEnterForeground, object: nil)
     }
     
     convenience init() {
@@ -39,48 +37,6 @@ class GDPRViewController: BaseTableViewController {
         tableView.estimatedRowHeight = 200
         tableView.allowsMultipleSelection = true
         tableView.register(TextExplanationTableViewCell.self, forCellReuseIdentifier: "cell")
-    }
-    
-    @objc private func applicationWillEnterForeground(_ notification: Notification) {
-        if view.window != nil {
-            syncGDPRWithSettings()
-        }
-    }
-    
-    // MARK: GDPR
-    
-    /// Insure the GDPR state is always in sync
-    static func updateUserAccountGDPR() {
-        let agreedToImageDetection = UserDefaults.standard.bool(forKey: UserDefaultsKeys.gdpr_agreedToImageDetection)
-        let hasPushPermissions = PermissionsManager.shared.hasPermission(for: .push)
-        UserDefaults.standard.set(hasPushPermissions, forKey: UserDefaultsKeys.gdpr_agreedToEmail)
-        
-        UserAccountManager.shared.setGDPR(agreedToEmail: hasPushPermissions, agreedToImageDetection: agreedToImageDetection)
-    }
-    
-    private func updateUserAccountGDPR() {
-        UserAccountManager.shared.setGDPR(agreedToEmail: self.agreedToEmail, agreedToImageDetection: self.agreedToImageDetection)
-    }
-    
-    private func syncGDPRWithSettings() {
-        let hasPushPermissions = PermissionsManager.shared.hasPermission(for: .push)
-        
-        if self.agreedToEmail != hasPushPermissions {
-            self.agreedToEmail = hasPushPermissions
-            updateUserAccountGDPR()
-        }
-        
-        let indexPath = indexPathFor(.email)
-        let isIndexPathSelected = tableView.indexPathsForSelectedRows?.contains(indexPath) ?? false
-        
-        if hasPushPermissions != isIndexPathSelected {
-            if isIndexPathSelected {
-                tableView.deselectRow(at: indexPath, animated: true)
-            }
-            else {
-                tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
-            }
-        }
     }
 }
 
@@ -146,54 +102,21 @@ extension GDPRViewControllerTableView {
     
     override func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
         if indexPath.row == GDPRViewController.Rows.email.rawValue {
-            if PermissionsManager.shared.hasPermission(for: .push) {
-                guard let alertController = PermissionsManager.shared.disableAlertController(for: .push) else {
-                    fatalError("PermissionsManager is not supporting disableAlertController for .push")
-                }
-                
-                alertController.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: { action in
-                    tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
-                }))
-                present(alertController, animated: true)
-            }
-            else {
-                // This should not be possible if everything is synced correctly
-                self.agreedToEmail = false
-                updateUserAccountGDPR()
-            }
+            self.agreedToEmail = false
         }
         else if indexPath.row == GDPRViewController.Rows.imageDetection.rawValue {
             self.agreedToImageDetection = false
-            updateUserAccountGDPR()
         }
+        UserAccountManager.shared.setGDPR(agreedToEmail: self.agreedToEmail, agreedToImageDetection: self.agreedToImageDetection)
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.row == GDPRViewController.Rows.email.rawValue {
-            if PermissionsManager.shared.permissionStatus(for: .push) == .undetermined {
-                PermissionsManager.shared.requestPermission(for: .push, openSettingsIfNeeded: true) { granted in
-                    if granted {
-                        self.agreedToEmail = true
-                        self.updateUserAccountGDPR()
-                    }
-                }
-            }
-            else {
-                guard let alertController = PermissionsManager.shared.enableAlertController(for: .push) else {
-                    fatalError("PermissionsManager is not supporting enableAlertController for .push")
-                }
-                
-                alertController.preferredAction = alertController.actions.first
-                
-                alertController.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: { action in
-                    tableView.deselectRow(at: indexPath, animated: true)
-                }))
-                present(alertController, animated: true)
-            }
+            self.agreedToEmail = true
         }
         else if indexPath.row == GDPRViewController.Rows.imageDetection.rawValue {
             self.agreedToImageDetection = true
-            updateUserAccountGDPR()
         }
+        UserAccountManager.shared.setGDPR(agreedToEmail: self.agreedToEmail, agreedToImageDetection: self.agreedToImageDetection)
     }
 }

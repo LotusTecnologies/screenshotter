@@ -181,7 +181,6 @@ class OnboardingGDPRViewController: UIViewController {
         editButton.addTarget(self, action: #selector(editAction), for: .touchUpInside)
         continueButton.isExclusiveTouch = true
         continueButton.addTarget(self, action: #selector(continueAction), for: .touchUpInside)
-
     }
     
     deinit {
@@ -207,14 +206,7 @@ class OnboardingGDPRViewController: UIViewController {
         UserAccountManager.shared.setGDPR(agreedToEmail: agreedToEmail, agreedToImageDetection: agreedToImageDetection)
         print("agreedToEmail :\(agreedToEmail),agreedToImageDetection: \(agreedToImageDetection)" )
         
-        if agreedToEmail && !PermissionsManager.shared.hasPermission(for: .push) {
-            PermissionsManager.shared.requestPermission(for: .push) { granted in
-                self.delegate?.onboardingGDPRViewControllerDidComplete(self)
-            }
-        }
-        else {
-            self.delegate?.onboardingGDPRViewControllerDidComplete(self)
-        }
+        self.delegate?.onboardingGDPRViewControllerDidComplete(self)
     }
 }
 

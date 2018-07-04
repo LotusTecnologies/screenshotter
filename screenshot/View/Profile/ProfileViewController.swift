@@ -431,7 +431,7 @@ extension ProfileViewController {
             cell.textLabel?.textColor = .gray4
             
             cell.detailTextLabel?.font = .preferredFont(forTextStyle: .body, symbolicTraits: .traitBold)
-            cell.detailTextLabel?.textColor = .gray5
+            cell.detailTextLabel?.textColor = .gray3
             cell.detailTextLabel?.text = nil
             cell.detailTextLabel?.attributedText = nil
             
@@ -578,17 +578,11 @@ extension ProfileViewController {
             
             return NSAttributedString(string: string, attributes: attributes)
             
-        case .permissionGDRP:
-            if UserDefaults.standard.bool(forKey: UserDefaultsKeys.gdpr_agreedToEmail) {
-                return nil
-            }
-            else {
-                let textAttachment = NSTextAttachment()
-                textAttachment.image = exclamationImage
-                return NSAttributedString(attachment: textAttachment)
-            }
-            
         default:
+            // Template code in case product creates another cell with an image and an arrow
+//            let textAttachment = NSTextAttachment()
+//            textAttachment.image = UIImage(named: "")
+//            return NSAttributedString(attachment: textAttachment)
             return nil
         }
     }
