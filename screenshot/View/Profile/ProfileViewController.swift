@@ -579,7 +579,7 @@ extension ProfileViewController {
             return NSAttributedString(string: string, attributes: attributes)
             
         case .permissionGDRP:
-            if UserDefaults.standard.bool(forKey: UserDefaultsKeys.gdpr_agreedToNotification) {
+            if UserDefaults.standard.bool(forKey: UserDefaultsKeys.gdpr_agreedToEmail) {
                 return nil
             }
             else {
