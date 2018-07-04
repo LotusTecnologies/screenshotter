@@ -314,6 +314,8 @@
 "picker.title" = "Add Photos";
 
 "product.add" = "Add to Cart";
+"product.alert.favorited.price" = "Price alert: Your fav just dropped to %@, get it quick!!";
+"product.alert.tapped.price" = "%@ off this item you looked at recently: %@";
 "product.alert.price" = "Price alert: Your fav just dropped to %@, get it quick!!";
 "product.alert.price_stock" = "In-stock alert: Your fav just dropped to %@, get it quick!!";
 "product.alert.stock" = "In-stock alert: Your fav just became available, get it quick!!";
