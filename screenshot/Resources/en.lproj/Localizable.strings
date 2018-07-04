@@ -380,6 +380,7 @@
 "profile.row.logout.title" = "Logout";
 "profile.row.open_in.title" = "Open Products In";
 "profile.row.photo_permission.title" = "Camera Roll";
+"profile.row.push_permission.title" = "Push Notifications";
 "profile.row.tutorial.title" = "Play Tutorial";
 "profile.section.permission" = "Permissions";
 "profile.tell_friend" = "Tell a Friend!";

@@ -29,6 +29,7 @@ class ProfileViewController: BaseTableViewController {
         case optionOpenIn
         
         case permissionPhoto
+        case permissionPush
         case permissionGDRP
         
         case logout
@@ -37,6 +38,8 @@ class ProfileViewController: BaseTableViewController {
             switch self {
             case .permissionPhoto:
                 return PermissionType.photo
+            case .permissionPush:
+                return PermissionType.push
             default:
                 return nil
             }
@@ -52,6 +55,7 @@ class ProfileViewController: BaseTableViewController {
         ],
         .permissions: [
             .permissionPhoto,
+            .permissionPush,
             .permissionGDRP
         ]
     ]
@@ -451,7 +455,7 @@ extension ProfileViewController {
         }
         
         switch (row) {
-        case .permissionPhoto:
+        case .permissionPush, .permissionPhoto:
             if let permissionType = row.permissionType, !PermissionsManager.shared.hasPermission(for: permissionType) {
                 return true
             }
@@ -492,7 +496,7 @@ extension ProfileViewController {
             }))
             present(alert, animated: true)
             
-        case .permissionPhoto:
+        case .permissionPhoto, .permissionPush:
             if let permissionType = row.permissionType {
                 PermissionsManager.shared.requestPermission(for: permissionType, openSettingsIfNeeded: true, response: { granted in
                     if granted {
@@ -527,6 +531,8 @@ extension ProfileViewController {
             return "profile.row.currency.title".localized
         case .optionOpenIn:
             return "profile.row.open_in.title".localized
+        case .permissionPush:
+            return "profile.row.push_permission.title".localized
         case .permissionPhoto:
             return "profile.row.photo_permission.title".localized
         case .permissionGDRP:
@@ -549,7 +555,7 @@ extension ProfileViewController {
     
     private func cellDetailedAttributedText(for row: Row) -> NSAttributedString? {
         switch (row) {
-        case .permissionPhoto:
+        case .permissionPhoto, .permissionPush:
             guard let permissionType = row.permissionType else {
                 return nil
             }
@@ -611,7 +617,7 @@ extension ProfileViewController {
     
     private func cellAccessoryView(for row: Row) -> UIView? {
         switch (row) {
-        case .permissionPhoto:
+        case .permissionPhoto, .permissionPush:
             if let permissionType = row.permissionType, !PermissionsManager.shared.hasPermission(for: permissionType) {
                 let label = createExclamationLabel()
                 
@@ -645,6 +651,7 @@ extension ProfileViewController {
         var indexPaths: [IndexPath] = []
         append(section: .options, row: .optionCurrency, to: &indexPaths)
         append(section: .permissions, row: .permissionPhoto, to: &indexPaths)
+        append(section: .permissions, row: .permissionPush, to: &indexPaths)
         
         let selectedIndexPath = indexPaths.first { indexPath -> Bool in
             return tableView.indexPathsForSelectedRows?.contains(indexPath) ?? false
