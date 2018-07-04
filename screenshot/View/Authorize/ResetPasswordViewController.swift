@@ -130,7 +130,7 @@ class ResetPasswordView: UIScrollView {
         newPasswordTextField.spellCheckingType = .no
         newPasswordTextField.textColor = .gray2
         contentView.addSubview(newPasswordTextField)
-        newPasswordTextField.topAnchor.constraint(equalTo: newPasswordLabel.bottomAnchor).isActive = true
+        newPasswordTextField.topAnchor.constraint(equalTo: newPasswordLabel.bottomAnchor, constant: .padding).isActive = true
         newPasswordTextField.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
         newPasswordTextField.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
         Appsee.markView(asSensitive: newPasswordTextField)
@@ -140,7 +140,7 @@ class ResetPasswordView: UIScrollView {
         
         continueButton.setTitle("generic.save".localized, for: .normal)
         contentView.addSubview(continueButton)
-        continueButton.topAnchor.constraint(equalTo: newPasswordTextField.bottomAnchor, constant: .extendedPadding + .padding).isActive = true
+        continueButton.topAnchor.constraint(equalTo: newPasswordTextField.bottomAnchor, constant: .extendedPadding).isActive = true
         continueButton.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
         continueButton.bottomAnchor.constraint(lessThanOrEqualTo: contentView.layoutMarginsGuide.bottomAnchor).isActive = true
         continueButton.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
@@ -179,8 +179,6 @@ class ResetPasswordViewController: UIViewController {
         }
     }
     
-    private let inputViewAdjustsScrollViewController = InputViewAdjustsScrollViewController()
-    
     // MARK: View
     
     var classForView: ResetPasswordView.Type {
@@ -201,7 +199,6 @@ class ResetPasswordViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        inputViewAdjustsScrollViewController.scrollView = _view
         _view.newPasswordTextField.delegate = self
         
         _view.continueButton.addTarget(self, action: #selector(continueAction), for: .touchUpInside)
