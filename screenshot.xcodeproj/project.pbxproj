@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		311A4F5320D90AED0001D463 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 311A4F5220D90AED0001D463 /* GoogleService-Info.plist */; };
 		311A4F5520D90B020001D463 /* UserAccountManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A4F5420D90B020001D463 /* UserAccountManager.swift */; };
 		311A502220D90B780001D463 /* ProductWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A4F5720D90B730001D463 /* ProductWebViewController.swift */; };
 		311A502320D90B780001D463 /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A4F5820D90B730001D463 /* WebView.swift */; };
@@ -111,9 +110,9 @@
 		311A50CE20DAB4CC0001D463 /* productEmailfooter.html in Resources */ = {isa = PBXBuildFile; fileRef = 311A50CB20DAB4CB0001D463 /* productEmailfooter.html */; };
 		311A50CF20DAB4CC0001D463 /* productEmailheader.html in Resources */ = {isa = PBXBuildFile; fileRef = 311A50CC20DAB4CC0001D463 /* productEmailheader.html */; };
 		311A50D120DBD9EE0001D463 /* ResendCodeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A50D020DBD9EE0001D463 /* ResendCodeManager.swift */; };
-		3125446B2091C3A0009410D5 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
-		3125446C2091C3A0009410D5 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
-		3125446D2091C3A0009410D5 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
+		3125446B2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
+		3125446C2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
+		3125446D2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		3125448F209871B4009410D5 /* Analytics+api.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3125448E209871B4009410D5 /* Analytics+api.swift */; };
 		314C488A205E86E700B8381D /* PHAsset+craze.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314C4889205E86E700B8381D /* PHAsset+craze.swift */; };
 		316C831020C3AEBD0012A908 /* DataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316C830520C3AEBD0012A908 /* DataModel.swift */; };
@@ -247,7 +246,6 @@
 		E42AC3911F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E42AC3901F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift */; };
 		E44CA6FC1F41E608001CB493 /* NetworkingPromise.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44CA6FB1F41E608001CB493 /* NetworkingPromise.swift */; };
 		E44D6108203EC5CB00039CCB /* ShoppingCartModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44D6107203EC5CB00039CCB /* ShoppingCartModel.swift */; };
-		E45C7AFF20E0235700A8B4A9 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E45C7AFE20E0235600A8B4A9 /* GoogleService-Info.plist */; };
 		E49261D6206A704C006FE84E /* UIImage+craze.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49261D5206A704C006FE84E /* UIImage+craze.swift */; };
 		E492CE3D2011051100060FB2 /* MatchstickModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E492CE3C2011051100060FB2 /* MatchstickModel.swift */; };
 		E4978C3C1F53610F0008B87F /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4978C3B1F53610F0008B87F /* Constants.swift */; };
@@ -1346,6 +1344,7 @@
 				AE7846E2803BA1055B53CB98 /* [CP] Check Pods Manifest.lock */,
 				E4139D3C1F09083B00E8A53B /* Sources */,
 				E4139D3D1F09083B00E8A53B /* Frameworks */,
+				E4C6C7CE20ED014D00525928 /* Setup Firebase Environment GoogleService-Info.plist */,
 				E4139D3E1F09083B00E8A53B /* Resources */,
 				E4D495D31F4987B100312614 /* Upload Symbols To AppSee */,
 				062DDE6A3EEF8844E9956F39 /* [CP] Embed Pods Frameworks */,
@@ -1454,11 +1453,9 @@
 				C572FEFF205C00070046BFEB /* Hind-Bold.ttf in Resources */,
 				E4DB2B7C1F7E1D4600320BE5 /* LaunchScreen.storyboard in Resources */,
 				C53B15BA1FDD638C00658A78 /* Localizable.strings in Resources */,
-				311A4F5320D90AED0001D463 /* GoogleService-Info.plist in Resources */,
 				C5E6C318208F23AA006E9C54 /* CheckoutSupportedStates.plist in Resources */,
 				C5DC531D20CD3F2100E90DB8 /* Quicksand-Bold.ttf in Resources */,
 				C5E6C31A208F2415006E9C54 /* CheckoutSupportedCountries.plist in Resources */,
-				E45C7AFF20E0235700A8B4A9 /* GoogleService-Info.plist in Resources */,
 				C5DC531A20CD3F2100E90DB8 /* Quicksand-Medium.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1567,6 +1564,20 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
+		E4C6C7CE20ED014D00525928 /* Setup Firebase Environment GoogleService-Info.plist */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Setup Firebase Environment GoogleService-Info.plist";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# See https://medium.com/rocket-fuel/using-multiple-firebase-environments-in-ios-12b204cfa6c0\n# Name of the resource we're selectively copying\nGOOGLESERVICE_INFO_PLIST=GoogleService-Info.plist\n\n# Get references to dev and prod versions of the GoogleService-Info.plist\n# NOTE: These should only live on the file system and should NOT be part of the target (since we'll be adding them to the target manually)\nGOOGLESERVICE_INFO_DEV=${PROJECT_DIR}/${TARGET_NAME}/dev/${GOOGLESERVICE_INFO_PLIST}\nGOOGLESERVICE_INFO_PROD=${PROJECT_DIR}/${TARGET_NAME}/prd/${GOOGLESERVICE_INFO_PLIST}\n\n# Make sure the dev version of GoogleService-Info.plist exists\necho \"Looking for ${GOOGLESERVICE_INFO_PLIST} in ${GOOGLESERVICE_INFO_DEV}\"\nif [ ! -f $GOOGLESERVICE_INFO_DEV ]\nthen\necho \"No Development GoogleService-Info.plist found. Please ensure it's in the proper directory.\"\nexit 1\nfi\n\n# Make sure the prod version of GoogleService-Info.plist exists\necho \"Looking for ${GOOGLESERVICE_INFO_PLIST} in ${GOOGLESERVICE_INFO_PROD}\"\nif [ ! -f $GOOGLESERVICE_INFO_PROD ]\nthen\necho \"No Production GoogleService-Info.plist found. Please ensure it's in the proper directory.\"\nexit 1\nfi\n\n# Get a reference to the destination location for the GoogleService-Info.plist\nPLIST_DESTINATION=${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app\necho \"Will copy ${GOOGLESERVICE_INFO_PLIST} to final destination: ${PLIST_DESTINATION}\"\n\n# Copy over the prod GoogleService-Info.plist for Release builds\nif [ \"${CONFIGURATION}\" == \"prdRelease\" ]\nthen\necho \"Using ${GOOGLESERVICE_INFO_PROD}\"\ncp \"${GOOGLESERVICE_INFO_PROD}\" \"${PLIST_DESTINATION}\"\nelse\necho \"Using ${GOOGLESERVICE_INFO_DEV}\"\ncp \"${GOOGLESERVICE_INFO_DEV}\" \"${PLIST_DESTINATION}\"\nfi\n";
+		};
 		E4D495D31F4987B100312614 /* Upload Symbols To AppSee */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1600,7 +1611,7 @@
 				C58BAE7F20E101DD0051394A /* TextFieldTableViewCell.swift in Sources */,
 				311A50B920D90B780001D463 /* CartTableViewCell.swift in Sources */,
 				311A50B520D90B780001D463 /* CartGiftCardConfirmationViewController.swift in Sources */,
-				3125446C2091C3A0009410D5 /* BuildFile in Sources */,
+				3125446C2091C3A0009410D5 /* (null) in Sources */,
 				C58BAE6D20E101DD0051394A /* SaleView.swift in Sources */,
 				311A503920D90B780001D463 /* CheckoutPaymentListViewController.swift in Sources */,
 				311A506820D90B780001D463 /* ScreenshotsDeleteButton.swift in Sources */,
@@ -1719,7 +1730,7 @@
 				311A4F5520D90B020001D463 /* UserAccountManager.swift in Sources */,
 				311A502320D90B780001D463 /* WebView.swift in Sources */,
 				C58BAE5F20E101DD0051394A /* DynamicTypeAccessibilityLayout.swift in Sources */,
-				3125446D2091C3A0009410D5 /* BuildFile in Sources */,
+				3125446D2091C3A0009410D5 /* (null) in Sources */,
 				C58BAE8F20E101DD0051394A /* MainButton.swift in Sources */,
 				C58BAE7B20E101DD0051394A /* CollectionView.swift in Sources */,
 				C53B15BE1FDE585B00658A78 /* LocalizeHelper.swift in Sources */,
@@ -1750,7 +1761,7 @@
 				311A505C20D90B780001D463 /* FavoriteProductsViewController.swift in Sources */,
 				311A503E20D90B780001D463 /* CheckoutFormViewController.swift in Sources */,
 				311A506520D90B780001D463 /* ScreenshotsViewController.swift in Sources */,
-				3125446B2091C3A0009410D5 /* BuildFile in Sources */,
+				3125446B2091C3A0009410D5 /* (null) in Sources */,
 				311A50C520D90B780001D463 /* Form.swift in Sources */,
 				523C11391F5C195D001BD969 /* RatingFlow.swift in Sources */,
 				311A506E20D90B780001D463 /* RegisterConfirmationViewController.swift in Sources */,
