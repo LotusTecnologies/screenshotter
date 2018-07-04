@@ -21,7 +21,6 @@ target 'screenshot' do
     pod 'PhoneNumberKit'
     pod 'CardIO'
     pod 'PushwooshInboxUI'
-    pod 'Pushwoosh'
     pod 'Hero'
     pod 'Firebase/Core'
     pod 'Firebase/Auth'
