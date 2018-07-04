@@ -73,7 +73,7 @@ extension TutorialNavigationController: RegisterViewControllerDelegate {
     }
     
     func registerViewControllerDidSignin(_ viewController: RegisterViewController) {
-        let agreedToAllPermisions = (UserDefaults.standard.bool(forKey: UserDefaultsKeys.gdpr_agreedToNotification) && UserDefaults.standard.bool(forKey: UserDefaultsKeys.gdpr_agreedToImageDetection))
+        let agreedToAllPermisions = (UserDefaults.standard.bool(forKey: UserDefaultsKeys.gdpr_agreedToEmail) && UserDefaults.standard.bool(forKey: UserDefaultsKeys.gdpr_agreedToImageDetection))
         if ( !agreedToAllPermisions ) {
             pushGDPRViewController()
         }else{
@@ -83,7 +83,7 @@ extension TutorialNavigationController: RegisterViewControllerDelegate {
     }
     
     func registerViewControllerDidFacebookLogin(_ viewController: RegisterViewController) {
-        let agreedToAllPermisions = (UserDefaults.standard.bool(forKey: UserDefaultsKeys.gdpr_agreedToNotification) && UserDefaults.standard.bool(forKey: UserDefaultsKeys.gdpr_agreedToImageDetection))
+        let agreedToAllPermisions = (UserDefaults.standard.bool(forKey: UserDefaultsKeys.gdpr_agreedToEmail) && UserDefaults.standard.bool(forKey: UserDefaultsKeys.gdpr_agreedToImageDetection))
         if ( !agreedToAllPermisions ) {
             pushGDPRViewController()
         }else{
