@@ -578,11 +578,19 @@ extension ProfileViewController {
             
             return NSAttributedString(string: string, attributes: attributes)
             
+        case .permissionGDRP:
+            if !UserDefaults.standard.bool(forKey: UserDefaultsKeys.gdpr_agreedToEmail) ||
+                !UserDefaults.standard.bool(forKey: UserDefaultsKeys.gdpr_agreedToImageDetection)
+            {
+                let textAttachment = NSTextAttachment()
+                textAttachment.image = exclamationImage
+                return NSAttributedString(attachment: textAttachment)
+            }
+            else {
+                return nil
+            }
+            
         default:
-            // Template code in case product creates another cell with an image and an arrow
-//            let textAttachment = NSTextAttachment()
-//            textAttachment.image = UIImage(named: "")
-//            return NSAttributedString(attachment: textAttachment)
             return nil
         }
     }
