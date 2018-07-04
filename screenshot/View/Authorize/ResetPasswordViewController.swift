@@ -18,8 +18,27 @@ class ResetPasswordView: UIScrollView {
     let continueButton = MainButton()
     let cancelButton = UIButton()
     let resendButton = UIButton()
+    let emailImageView = UIImageView()
+    let explainLabel = UILabel()
+    let newPasswordLabel = UILabel()
 
     let _layoutMargins = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
+    
+    
+    private var waitingForCodeConstriants:[NSLayoutConstraint] = []
+    private var hasCodeConstriants:[NSLayoutConstraint] = []
+    var hasCode:Bool = false {
+        didSet{
+            emailImageView.isHidden = hasCode
+            explainLabel.isHidden = hasCode
+            resendButton.isHidden = hasCode
+            
+            newPasswordLabel.isHidden = !hasCode
+            newPasswordTextField.isHidden = !hasCode
+            continueButton.isHidden = !hasCode
+            
+        }
+    }
     
     // MARK: Life Cycle
     
@@ -50,7 +69,24 @@ class ResetPasswordView: UIScrollView {
         titleLabel.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
         titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: layoutMarginsGuide.trailingAnchor).isActive = true
         
-        let explainLabel = UILabel()
+       
+        
+        let contentView = ContentContainerView()
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(contentView)
+        contentView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: .extendedPadding + .padding).isActive = true
+        contentView.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
+        contentView.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
+        
+        //Waiting for Code view:
+        emailImageView.image = UIImage(named: "AuthorizeEmailSent")
+        emailImageView.translatesAutoresizingMaskIntoConstraints = false
+        emailImageView.contentMode = .scaleAspectFit
+        contentView.addSubview(emailImageView)
+        emailImageView.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor).isActive = true
+        emailImageView.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
+        
+        
         explainLabel.translatesAutoresizingMaskIntoConstraints = false
         
         
@@ -68,22 +104,15 @@ class ResetPasswordView: UIScrollView {
         explainLabel.attributedText = attributedString
         explainLabel.minimumScaleFactor = 0.7
         explainLabel.numberOfLines = 0
-        addSubview(explainLabel)
-        explainLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: .padding).isActive = true
-        explainLabel.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
-        explainLabel.trailingAnchor.constraint(lessThanOrEqualTo: layoutMarginsGuide.trailingAnchor).isActive = true
-        
-        
-        
-        let contentView = ContentContainerView()
-        contentView.translatesAutoresizingMaskIntoConstraints = false
-        addSubview(contentView)
-        contentView.topAnchor.constraint(equalTo: explainLabel.bottomAnchor, constant: .padding).isActive = true
-        contentView.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor).isActive = true
-        contentView.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor).isActive = true
-        
+        contentView.addSubview(explainLabel)
+        explainLabel.topAnchor.constraint(equalTo: emailImageView.bottomAnchor, constant: .padding).isActive = true
+        explainLabel.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
+        explainLabel.trailingAnchor.constraint(lessThanOrEqualTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
+        explainLabel.bottomAnchor.constraint(lessThanOrEqualTo: contentView.layoutMarginsGuide.bottomAnchor).isActive = true
 
-        let newPasswordLabel = UILabel()
+        
+        // has code UI:
+
         newPasswordLabel.translatesAutoresizingMaskIntoConstraints = false
         newPasswordLabel.text = "authorize.reset_password.enter".localized
         newPasswordLabel.textColor = .gray2
@@ -112,10 +141,12 @@ class ResetPasswordView: UIScrollView {
         
         continueButton.setTitle("generic.save".localized, for: .normal)
         contentView.addSubview(continueButton)
-        continueButton.topAnchor.constraint(equalTo: newPasswordTextField.bottomAnchor, constant: .extendedPadding).isActive = true
+        continueButton.topAnchor.constraint(equalTo: newPasswordTextField.bottomAnchor, constant: .extendedPadding + .padding).isActive = true
         continueButton.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor).isActive = true
-        continueButton.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor).isActive = true
+        continueButton.bottomAnchor.constraint(lessThanOrEqualTo: contentView.layoutMarginsGuide.bottomAnchor).isActive = true
         continueButton.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
+
+        
         
         
         resendButton.translatesAutoresizingMaskIntoConstraints = false
@@ -148,8 +179,7 @@ class ResetPasswordViewController: UIViewController {
     var email:String?
     var code:String? {
         didSet {
-            _view.continueButton.isEnabled = ( code != nil )
-            _view.resendButton.isHidden = (code != nil)
+            _view.hasCode = ( code != nil)
         }
     }
     
@@ -176,7 +206,6 @@ class ResetPasswordViewController: UIViewController {
         super.viewDidLoad()
         
         inputViewAdjustsScrollViewController.scrollView = _view
-        _view.continueButton.isEnabled = false
         _view.newPasswordTextField.delegate = self
         
         _view.continueButton.addTarget(self, action: #selector(continueAction), for: .touchUpInside)
@@ -188,6 +217,7 @@ class ResetPasswordViewController: UIViewController {
         _view.resendButton.addTarget(self, action: #selector(resendCodeAction), for: .touchUpInside)
         resendCodeManager.start(with: _view.resendButton)
 
+        _view.hasCode = false
     }
     
     deinit {
@@ -218,6 +248,7 @@ class ResetPasswordViewController: UIViewController {
                             self.present(alert, animated: true, completion: nil)
                         }else if UserAccountManager.shared.isBadCodeError(error: error){
                             self.code = nil
+                            self._view.newPasswordTextField.text = nil
                             let alert = UserAccountManager.shared.alertViewForBadCode()
                             self.present(alert, animated: true, completion: nil)
                         }else if UserAccountManager.shared.isWeakPasswordError(error: error) {
@@ -229,7 +260,7 @@ class ResetPasswordViewController: UIViewController {
                         }
                     }
                 }.always(on: .main) {
-                    self._view.continueButton.isEnabled = (self.code != nil)
+                    self._view.continueButton.isEnabled = true
                     self._view.continueButton.isLoading = false
                     self._view.newPasswordTextField.isUserInteractionEnabled = true
                     self._view.cancelButton.isUserInteractionEnabled = true
