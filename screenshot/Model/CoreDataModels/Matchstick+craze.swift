@@ -19,7 +19,8 @@ extension Matchstick {
                 let assetId = matchstick.remoteId,
                 let uploadedImageURL = matchstick.imageUrl {
                 
-                let addedScreenshot = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
+                let addedScreenshot = dataModel.saveScreenshot(upsert:true,
+                                                               managedObjectContext: managedObjectContext,
                                                                assetId: assetId,
                                                                createdAt: Date(),
                                                                isRecognized: true,
@@ -33,7 +34,7 @@ extension Matchstick {
                     managedObjectContext.delete(matchstick)
                 }
                 managedObjectContext.saveIfNeeded()
-                Analytics.trackScreenshotCreated(screenshot: addedScreenshot)
+
                 AssetSyncModel.sharedInstance.processingQ.async {
                     AssetSyncModel.sharedInstance.syteProcessing(imageData: nil, orImageUrlString: uploadedImageURL, assetId: assetId, optionsMask: ProductsOptionsMask.global)
                     
