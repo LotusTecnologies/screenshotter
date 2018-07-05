@@ -299,18 +299,9 @@ extension DataModel {
                        b1x: Double,
                        b1y: Double,
                        optionsMask: ProductsOptionsMask) -> Shoppable {
-        var currentShoppable:Shoppable? = nil
-        if let shoppables = screenshot.shoppables {
-            shoppables.forEach { (s) in
-                if let s = s as? Shoppable {
-                    if s.offersURL == offersURL {
-                        currentShoppable = s
-                    }
-                }
-            }
-        }
-        if let s = currentShoppable {
-            return s
+        
+        if let current =  (screenshot.shoppables as? Set<Shoppable>)?.first(where: { $0.offersURL == offersURL } ){
+            return current
         }
         
         let shoppableToSave = Shoppable(context: managedObjectContext)
@@ -395,17 +386,7 @@ extension DataModel {
                      sku: String?,
                      fallbackPrice: Float,
                      optionsMask: Int32) -> Product {
-        var currentProduct:Product? = nil
-        if let products = shoppable?.products {
-            products.forEach { (p) in
-                if let p = p as? Product {
-                    if p.offer == offer {
-                        currentProduct = p
-                    }
-                }
-            }
-        }
-        if let current = currentProduct {
+        if let current =  (shoppable?.products as? Set<Product>)?.first(where: { $0.offer == offer } ){
             return current
         }
         
