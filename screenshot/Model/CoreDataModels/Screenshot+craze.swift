@@ -158,7 +158,7 @@ extension Screenshot {
                 if let imageData = imageData {
                     DataModel.sharedInstance.performBackgroundTask { (context) in
                         
-                        let _ = DataModel.sharedInstance.saveScreenshot(managedObjectContext: context, assetId: imageUrl, createdAt: Date(), isRecognized: true, source: .burrow, isHidden: false, imageData: imageData, uploadedImageURL: imageUrl, syteJsonString: nil)
+                        let _ = DataModel.sharedInstance.saveScreenshot(upsert:true, managedObjectContext: context, assetId: imageUrl, createdAt: Date(), isRecognized: true, source: .burrow, isHidden: false, imageData: imageData, uploadedImageURL: imageUrl, syteJsonString: nil)
                         
                         // download stye stuff for URL
                         AssetSyncModel.sharedInstance.syteProcessing(imageData: nil, orImageUrlString: imageUrl, assetId: imageUrl)

@@ -136,7 +136,8 @@ extension DataModel {
 extension DataModel {
     
     // Save a new Screenshot to Core Data.
-    func saveScreenshot(managedObjectContext: NSManagedObjectContext,
+    func saveScreenshot(upsert:Bool,
+                        managedObjectContext: NSManagedObjectContext,
                         assetId: String,
                         createdAt: Date?,
                         isRecognized: Bool,
@@ -145,7 +146,15 @@ extension DataModel {
                         imageData: Data?,
                         uploadedImageURL: String?,
                         syteJsonString: String?) -> Screenshot {
-        let screenshotToSave = Screenshot(context: managedObjectContext)
+        
+        var current:Screenshot? = nil;
+        var wasHidden:Bool? = nil
+        if upsert {
+            current = managedObjectContext.screenshotWith(assetId: assetId)
+            wasHidden = current?.isHidden
+        }
+        let screenshotToSave = current ?? Screenshot(context: managedObjectContext)
+        
         screenshotToSave.assetId = assetId
         screenshotToSave.createdAt = createdAt
         screenshotToSave.isRecognized = isRecognized
@@ -157,11 +166,9 @@ extension DataModel {
         screenshotToSave.syteJson = syteJsonString
 
         screenshotToSave.lastModified = Date()
-        do {
-            try managedObjectContext.save()
-        } catch {
-            self.receivedCoreDataError(error: error)
-            print("Failed to saveScreenshot")
+        
+        if current == nil || (wasHidden == true && isHidden == false) {
+            Analytics.trackScreenshotCreated(screenshot: screenshotToSave)
         }
         return screenshotToSave
     }
@@ -292,6 +299,11 @@ extension DataModel {
                        b1x: Double,
                        b1y: Double,
                        optionsMask: ProductsOptionsMask) -> Shoppable {
+        
+        if let current =  (screenshot.shoppables as? Set<Shoppable>)?.first(where: { $0.offersURL == offersURL } ){
+            return current
+        }
+        
         let shoppableToSave = Shoppable(context: managedObjectContext)
         shoppableToSave.screenshot = screenshot
         let spellingMap = ["Bodypart" : "Body Part",
@@ -374,6 +386,10 @@ extension DataModel {
                      sku: String?,
                      fallbackPrice: Float,
                      optionsMask: Int32) -> Product {
+        if let current =  (shoppable?.products as? Set<Product>)?.first(where: { $0.offer == offer } ){
+            return current
+        }
+        
         let productToSave = Product(context: managedObjectContext)
         productToSave.shoppable = shoppable
         productToSave.order = order
