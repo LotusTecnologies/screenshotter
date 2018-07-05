@@ -52,15 +52,30 @@ class RecoverLostSaleManager: NSObject, MFMailComposeViewControllerDelegate {
         timeLeftApp = Date.init()
     }
     public func presetRecoverAlertViewFor(product:Product, in viewController:UIViewController, rect:CGRect, view:UIView){
+        let body =  self.htmlEmailForProducts(products: [product])
         
-        let vc = UIViewController.init()
-        vc.view.backgroundColor = .red
+        Analytics.trackFeatureRecoveryAppeared(product: product)
+        self.presentingVC = viewController
+
+        let vc = RecoveryLostSalePopupViewController.init(emailProductAction: {
+            Analytics.trackFeatureRecoveryEmailPresented(product: product)
+            let recipient = AnalyticsUser.current.email ?? ""
+            let dateFormatter = DateFormatter.init()
+            dateFormatter.timeStyle = .none
+            dateFormatter.dateStyle = .medium
+            let subject = "product.sale_recovery.email.subject".localized(withFormat: dateFormatter.string(from: Date()))
+            viewController.dismiss(animated: true, completion: {
+                viewController.presentMail(recipient: recipient, gmailMessage: body, subject: subject, message: body, isHTML:true, delegate:self, noEmailErrorMessage: "email.setup.message.reminder".localized, attachLogs:false)
+            })
+        }, dismissAction: {
+            self.clickOnProductObjectId = nil
+            viewController.dismiss(animated: true, completion: nil)
+        })
+        vc.view.backgroundColor = .crazeRed
         vc.modalPresentationStyle = .popover
-        vc.preferredContentSize = CGSize.init(width: 300, height: 200)
 
-
-        vc.popoverPresentationController?.backgroundColor = .red
-        vc.popoverPresentationController?.permittedArrowDirections = .any
+        vc.popoverPresentationController?.backgroundColor = .crazeRed
+        vc.popoverPresentationController?.permittedArrowDirections = [.up, .down]
         vc.popoverPresentationController?.delegate = self
         vc.popoverPresentationController?.sourceRect = rect
         vc.popoverPresentationController?.sourceView = view
@@ -68,25 +83,6 @@ class RecoverLostSaleManager: NSObject, MFMailComposeViewControllerDelegate {
         viewController.present(vc, animated: true) {
             
         }
-        
-//        let alert = UIAlertController.init(title: "product.sale_recovery.alert.title".localized, message: "product.sale_recovery.alert.message".localized, preferredStyle: .alert)
-//        let body =  self.htmlEmailForProducts(products: [product])
-//
-//        Analytics.trackFeatureRecoveryAppeared(product: product)
-//        self.presentingVC = viewController
-//        alert.addAction(UIAlertAction.init(title: "product.sale_recovery.alert.email_me".localized, style: .default, handler: { (a) in
-//            Analytics.trackFeatureRecoveryEmailPresented(product: product)
-//            let recipient = AnalyticsUser.current.email ?? ""
-//            let dateFormatter = DateFormatter.init()
-//            dateFormatter.timeStyle = .none
-//            dateFormatter.dateStyle = .medium
-//            let subject = "product.sale_recovery.email.subject".localized(withFormat: dateFormatter.string(from: Date()))
-//            viewController.presentMail(recipient: recipient, gmailMessage: body, subject: subject, message: body, isHTML:true, delegate:self, noEmailErrorMessage: "email.setup.message.reminder".localized, attachLogs:false)
-//        }))
-//        alert.addAction(UIAlertAction.init(title: "generic.no_thanks".localized, style: .cancel, handler: { (a) in
-//            self.clickOnProductObjectId = nil
-//        }))
-//        viewController.present(alert, animated: true, completion: nil)
     }
     
     public func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
