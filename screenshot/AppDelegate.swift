@@ -801,16 +801,10 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
                 isHandled = true
                 LocalNotificationModel.shared.cancelPendingNotifications(within: Date(timeIntervalSinceNow: Constants.secondsInDay))
                 ProductViewController.present(with: id)
-                if let pushType = dataDict["type"] as? String {
-                    switch pushType {
-                    case Analytics.AnalyticsAppOpenedFromPushNotificationSource.favorited.rawValue:
-                        Analytics.trackAppOpenedFromPushNotification(source: Analytics.AnalyticsAppOpenedFromPushNotificationSource.favorited)
-                    case Analytics.AnalyticsAppOpenedFromPushNotificationSource.tapped.rawValue:
-                        Analytics.trackAppOpenedFromPushNotification(source: Analytics.AnalyticsAppOpenedFromPushNotificationSource.tapped)
-                    default:
-                        break
-                    }
-                }
+                
+                let pushTypeString = dataDict["type"] as? String
+                Analytics.trackAppOpenedFromPushNotification(source: pushTypeString)
+                
             }
         }
         
