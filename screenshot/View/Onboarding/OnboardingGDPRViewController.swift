@@ -188,7 +188,8 @@ class OnboardingGDPRViewController: UIViewController {
         tableView.delegate = nil
     }
     
-    // MARK: Edit
+    // MARK: Actions
+    
     @objc private func editAction() {
         editButton.isHidden = true
         UIView.animate(withDuration: .defaultAnimationDuration) {
@@ -206,7 +207,25 @@ class OnboardingGDPRViewController: UIViewController {
         UserAccountManager.shared.setGDPR(agreedToEmail: agreedToEmail, agreedToImageDetection: agreedToImageDetection)
         print("agreedToEmail :\(agreedToEmail),agreedToImageDetection: \(agreedToImageDetection)" )
         
-        self.delegate?.onboardingGDPRViewControllerDidComplete(self)
+        func requestPermissions(_ types: [PermissionType]) {
+            var types = types
+            guard !types.isEmpty else {
+                self.delegate?.onboardingGDPRViewControllerDidComplete(self)
+                return
+            }
+            let type = types.removeFirst()
+            
+            if PermissionsManager.shared.hasPermission(for: type) {
+                requestPermissions(types)
+            }
+            else {
+                PermissionsManager.shared.requestPermission(for: type) { granted in
+                    requestPermissions(types)
+                }
+            }
+        }
+        
+        requestPermissions([.push, .photo])
     }
 }
 
