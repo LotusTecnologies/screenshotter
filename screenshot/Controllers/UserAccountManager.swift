@@ -839,7 +839,8 @@ extension UserAccountManager {
                                 }()
                                 if imageData != nil {
                                     let createdAt = Date.init(timeIntervalSince1970: createdAtNumber.doubleValue)
-                                    let s = DataModel.sharedInstance.saveScreenshot(managedObjectContext: context,
+                                    let s = DataModel.sharedInstance.saveScreenshot(upsert:true,
+                                                                                    managedObjectContext: context,
                                                                                     assetId: assetId,
                                                                                     createdAt: createdAt,
                                                                                     isRecognized: true,
@@ -1001,7 +1002,7 @@ extension UserAccountManager {
             let uploadedImageURL = screenshot.uploadedImageURL {
             let trackingInfo = screenshot.trackingInfo ?? ""
             let source = screenshot.source.rawValue
-            let forbiddenChacters = CharacterSet.init(charactersIn: "\\#$[]")
+            let forbiddenChacters = CharacterSet.init(charactersIn: "\\#$[].")
             let escapedAssetId = assetId.components(separatedBy:forbiddenChacters).joined()
             let dict:[String:Any] = [
                 "assetId":escapedAssetId,

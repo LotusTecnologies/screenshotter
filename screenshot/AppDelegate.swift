@@ -781,9 +781,22 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
                 isHandled = true
                 if openingScreen == Constants.openingScreenValueScreenshot {
                     if let openingAssetId = userInfo[Constants.openingAssetIdKey] as? String {
-                        AssetSyncModel.sharedInstance.importPhotosToScreenshot(assetIds: [openingAssetId], source: .screenshot)
+                        if response.notification.request.identifier == LocalNotificationIdentifier.saleScreenshot.rawValue {
+                            // Go into screenshot for saleScreenshot local notification.
+                            showScreenshotListTop()
+                            let dataModel = DataModel.sharedInstance
+                            if let mainTabBarController = self.window?.rootViewController as? MainTabBarController,
+                              let screenshot = dataModel.retrieveScreenshot(managedObjectContext: dataModel.mainMoc(), assetId: openingAssetId) {
+                                mainTabBarController.screenshotsNavigationController.presentScreenshot(screenshot)
+                            }
+                        } else {
+                            // Show screenshot as first in screenshots list for screenshotAdded local notification.
+                            AssetSyncModel.sharedInstance.importPhotosToScreenshot(assetIds: [openingAssetId], source: .screenshot)
+                            showScreenshotListTop()
+                        }
+                    } else {
+                        showScreenshotListTop()
                     }
-                    showScreenshotListTop()
                 } else if openingScreen == Constants.openingScreenValueDiscover {
                     if let mainTabBarController = self.window?.rootViewController as? MainTabBarController {
                         mainTabBarController.goTo(tab: .discover)
@@ -801,6 +814,10 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
                 isHandled = true
                 LocalNotificationModel.shared.cancelPendingNotifications(within: Date(timeIntervalSinceNow: Constants.secondsInDay))
                 ProductViewController.present(with: id)
+                
+                let pushTypeString = dataDict["type"] as? String
+                Analytics.trackAppOpenedFromPushNotification(source: pushTypeString)
+                
             }
         }
         
