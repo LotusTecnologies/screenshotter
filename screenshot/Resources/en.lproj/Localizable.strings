@@ -198,6 +198,9 @@
 
 "facebook.register" = "Continue With Facebook";
 
+"favorite.price_updates.message" = "Enable notifications to get updates about when this item goes on sale!";
+"favorite.price_updates.title" = "Get Price Updates";
+
 "favorites.empty.detail" = "Tap the heart icon on products to add them to your favorites";
 "favorites.empty.title" = "No Favorites";
 "favorites.items.title" = "Favorited Items";
@@ -245,6 +248,7 @@
 "generic.dont_save" = "Don't Save";
 "generic.edit" = "Edit";
 "generic.error" = "Error";
+"generic.enable" = "Enable";
 "generic.enabled" = "Enabled";
 "generic.later" = "Later";
 "generic.no" = "No";
