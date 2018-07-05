@@ -139,21 +139,25 @@ extension ScreenshotsNavigationControllerNotificationInbox {
 extension ScreenshotsNavigationController :ScreenshotsViewControllerDelegate{
     func screenshotsViewController(_ viewController:ScreenshotsViewController, didSelectItemAt:IndexPath) {
         if let screenshot = viewController.screenshot(at: didSelectItemAt.item) {
-            let screenshotOID = screenshot.objectID
-            let _ = ShoppingCartModel.shared.checkStock(screenshotOID: screenshotOID)
-            
-            let productsViewController = createProductsViewController(screenshot: screenshot)
-            self.pushViewController(productsViewController, animated: true)
-            
-            if (screenshot.isNew) {
-                if screenshot.source == .discover {
-                    AccumulatorModel.screenshotUninformed.decrementUninformedCount(by:1)
-                }
-                screenshot.setViewed()
-            }
-            
-            RatingFlow.sharedInstance.recordSignificantEvent()
+            presentScreenshot(screenshot)
         }
+    }
+    
+    func presentScreenshot(_ screenshot: Screenshot) {
+//        let screenshotOID = screenshot.objectID
+//        let _ = ShoppingCartModel.shared.checkStock(screenshotOID: screenshotOID) // Revert to never use USC.
+        
+        let productsViewController = createProductsViewController(screenshot: screenshot)
+        self.pushViewController(productsViewController, animated: true)
+        
+        if (screenshot.isNew) {
+            if screenshot.source == .discover {
+                AccumulatorModel.screenshotUninformed.decrementUninformedCount(by:1)
+            }
+            screenshot.setViewed()
+        }
+        
+        RatingFlow.sharedInstance.recordSignificantEvent()
     }
     
     func screenshotsViewControllerWantsToPresentPicker(_  viewController:ScreenshotsViewController, openScreenshots:Bool){

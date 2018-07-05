@@ -51,7 +51,7 @@ class RegisterConfirmationViewController: UIViewController {
         iconImageView.contentMode = .scaleAspectFit
         view.addSubview(iconImageView)
         iconImageView.setContentHuggingPriority(.required, for: .vertical)
-        iconImageView.topAnchor.constraint(equalTo: view.topAnchor, constant: .extendedPadding).isActive = true
+        iconImageView.topAnchor.constraint(equalTo: view.topAnchor, constant: .extendedPadding * 2).isActive = true
         iconImageView.widthAnchor.constraint(lessThanOrEqualTo: view.widthAnchor, multiplier: 0.3).isActive = true
         iconImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         
@@ -68,25 +68,8 @@ class RegisterConfirmationViewController: UIViewController {
         titleLable.setContentHuggingPriority(.required, for: .vertical)
         titleLable.topAnchor.constraint(equalTo: iconImageView.bottomAnchor, constant: .padding).isActive = true
         titleLable.leadingAnchor.constraint(greaterThanOrEqualTo: view.layoutMarginsGuide.leadingAnchor).isActive = true
+        titleLable.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -.extendedPadding * 2).isActive = true
         titleLable.trailingAnchor.constraint(lessThanOrEqualTo: view.layoutMarginsGuide.trailingAnchor).isActive = true
         titleLable.centerXAnchor.constraint(equalTo: view.layoutMarginsGuide.centerXAnchor).isActive = true
-        
-        let messageLable = UILabel()
-        messageLable.translatesAutoresizingMaskIntoConstraints = false
-        messageLable.text = "authorize.register.confirmation.message".localized
-        messageLable.textAlignment = .center
-        messageLable.textColor = .gray2
-        messageLable.font = .screenshopFont(.quicksandMedium, textStyle: .title3, staticSize: true)
-        messageLable.adjustsFontSizeToFitWidth = true
-        messageLable.minimumScaleFactor = 0.7
-        messageLable.baselineAdjustment = .alignCenters
-        messageLable.numberOfLines = 2
-        view.addSubview(messageLable)
-        messageLable.setContentHuggingPriority(.required, for: .vertical)
-        messageLable.topAnchor.constraint(equalTo: titleLable.bottomAnchor, constant: .padding).isActive = true
-        messageLable.leadingAnchor.constraint(greaterThanOrEqualTo: view.layoutMarginsGuide.leadingAnchor).isActive = true
-        messageLable.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -.extendedPadding).isActive = true
-        messageLable.trailingAnchor.constraint(lessThanOrEqualTo: view.layoutMarginsGuide.trailingAnchor).isActive = true
-        messageLable.centerXAnchor.constraint(equalTo: view.layoutMarginsGuide.centerXAnchor).isActive = true
     }
 }

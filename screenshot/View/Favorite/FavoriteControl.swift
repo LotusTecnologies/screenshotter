@@ -64,5 +64,28 @@ class FavoriteControl: UIControl {
         animate = false
         
         ActionFeedbackGenerator().actionOccurred(.peek)
+        presentPushPermissionsIfNeeded()
+    }
+}
+
+typealias FavoriteControlPushPermissions = FavoriteControl
+extension FavoriteControlPushPermissions {
+    private func presentPushPermissionsIfNeeded() {
+        if isSelected && !UserDefaults.standard.bool(forKey: UserDefaultsKeys.hasFavorited) {
+            UserDefaults.standard.set(true, forKey: UserDefaultsKeys.hasFavorited)
+        
+            guard !PermissionsManager.shared.hasPermission(for: .push) else {
+                return
+            }
+            
+            let alertController = UIAlertController(title: "favorite.price_updates.title".localized, message: "favorite.price_updates.message".localized, preferredStyle: .alert)
+            let enableAction = UIAlertAction(title: "generic.enable".localized, style: .default) { action in
+                PermissionsManager.shared.requestPermission(for: .push, openSettingsIfNeeded: true)
+            }
+            alertController.addAction(enableAction)
+            alertController.preferredAction = enableAction
+            alertController.addAction(UIAlertAction(title: "generic.later".localized, style: .cancel, handler: nil))
+            window?.rootViewController?.present(alertController, animated: true)
+        }
     }
 }

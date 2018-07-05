@@ -45,7 +45,6 @@
 "authorize.register.legal.4" = " ";
 "authorize.register.offers" = "Send me emails about exclusive offers, sales and new features.";
 "authorize.register.password" = "Password";
-"authorize.register.confirmation.message" = "You are now a\nScreenshop user.";
 "authorize.register.confirmation.title" = "Welcome!";
 "authorize.register.skipConfirm" = "Are you sure you want to skip? Your account won’t be created.";
 "authorize.register.welcome_to" = "Welcome to";
@@ -198,6 +197,9 @@
 
 "facebook.register" = "Continue With Facebook";
 
+"favorite.price_updates.message" = "Enable notifications to get updates about when this item goes on sale!";
+"favorite.price_updates.title" = "Get Price Updates";
+
 "favorites.empty.detail" = "Tap the heart icon on products to add them to your favorites";
 "favorites.empty.title" = "No Favorites";
 "favorites.items.title" = "Favorited Items";
@@ -228,7 +230,7 @@
 "gdpr.image.message" = "When this setting is turned on, we send screenshots you take in and outside of the app to our server to detect whether there are clothing items in the photo and allow you to shop relevant photos quickly. This happens in the background and is not shown to you. We do not save any photos that are not detected as fashion.";
 "gdpr.image.title" = "Image Detection";
 "gdpr.onboarding.title" = "Your Privacy Settings";
-"gdpr.onboarding.subtitle" = "You can change these any time in the settings page of the app";
+"gdpr.onboarding.subtitle" = "You can change these any time in the profile page of the app";
 "gdpr.onboarding.edit" = "Manage Settings";
 "gdpr.onboarding.continue" = "Accept and Continue";
 "gdpr.title" = "Privacy Settings";
@@ -245,6 +247,7 @@
 "generic.dont_save" = "Don't Save";
 "generic.edit" = "Edit";
 "generic.error" = "Error";
+"generic.enable" = "Enable";
 "generic.enabled" = "Enabled";
 "generic.later" = "Later";
 "generic.no" = "No";
@@ -335,9 +338,9 @@
 "product.variants.quantity" = "Quantity";
 "product.variants.size" = "Size";
 "product.website" = "Go To %@";
-"product.sale_recovery.alert.title" = "Buy From Email";
-"product.sale_recovery.alert.message" = "Do you want an email with the item you just looked at so you can buy it on your computer?";
-"product.sale_recovery.alert.email_me" = "Email Me";
+"product.sale_recovery.alert.message" = "Shop this on your computer";
+"product.sale_recovery.alert.email_me" = "Email Product";
+"product.sale_recovery.alert.dissmis" = "Dismiss";
 "product.sale_recovery.email.subject" = "Screenshop Wishlist - %@";
 
 "products.details.similar" = "Similar Items";

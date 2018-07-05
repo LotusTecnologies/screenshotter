@@ -876,9 +876,14 @@ extension ProductsViewController : AsyncOperationMonitorDelegate {
 }
 extension ProductsViewController: RecoverLostSaleManagerDelegate {
     func recoverLostSaleManager(_ manager:RecoverLostSaleManager, returnedFrom product:Product){
-        self.recoverLostSaleManager.presetRecoverAlertViewFor(product: product, in: self)
+        if let index = self.products.index(of: product) {
+            if let cell = self.collectionView?.cellForItem(at: IndexPath.init(row: index, section: 0)) as? ProductsCollectionViewCell, let view = cell.productImageView{
+                self.recoverLostSaleManager.presetRecoverAlertViewFor(product: product, in: self, rect: view.bounds.insetBy(dx: 20, dy: 20), view:view)
+            }
+        }
+        
     }
-
 }
+
 
 
