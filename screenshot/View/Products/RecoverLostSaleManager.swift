@@ -21,7 +21,9 @@ class RecoverLostSaleManager: NSObject, MFMailComposeViewControllerDelegate {
     weak var delegate:RecoverLostSaleManagerDelegate?
     weak var presentingVC:UIViewController?
 
-    private let timeout:TimeInterval = 30
+    private let maxTime:TimeInterval = 120
+    private let minTime:TimeInterval = 0
+
     override init() {
         super.init()
         NotificationCenter.default.addObserver(self, selector: #selector(applicationDidBecomeActive), name: .UIApplicationDidBecomeActive, object: nil)
@@ -33,7 +35,7 @@ class RecoverLostSaleManager: NSObject, MFMailComposeViewControllerDelegate {
     }
     
     @objc private func applicationDidBecomeActive() {
-        if let data = timeLeftApp, abs(data.timeIntervalSinceNow) < timeout {
+        if let data = timeLeftApp, abs(data.timeIntervalSinceNow) < maxTime, abs(data.timeIntervalSinceNow) > minTime {
             if let objectId = clickOnProductObjectId {
                 if let product = DataModel.sharedInstance.mainMoc().productWith(objectId: objectId) {
                     self.timeLeftApp = nil
@@ -49,25 +51,42 @@ class RecoverLostSaleManager: NSObject, MFMailComposeViewControllerDelegate {
         self.clickOnProductObjectId = product.objectID
         timeLeftApp = Date.init()
     }
-    public func presetRecoverAlertViewFor(product:Product, in viewController:UIViewController){
-        let alert = UIAlertController.init(title: "product.sale_recovery.alert.title".localized, message: "product.sale_recovery.alert.message".localized, preferredStyle: .alert)
-        let body =  self.htmlEmailForProducts(products: [product])
+    public func presetRecoverAlertViewFor(product:Product, in viewController:UIViewController, rect:CGRect, view:UIView){
+        
+        let vc = UIViewController.init()
+        vc.view.backgroundColor = .red
+        vc.modalPresentationStyle = .popover
+        vc.preferredContentSize = CGSize.init(width: 300, height: 200)
 
-        Analytics.trackFeatureRecoveryAppeared(product: product)
-        self.presentingVC = viewController
-        alert.addAction(UIAlertAction.init(title: "product.sale_recovery.alert.email_me".localized, style: .default, handler: { (a) in
-            Analytics.trackFeatureRecoveryEmailPresented(product: product)
-            let recipient = AnalyticsUser.current.email ?? ""
-            let dateFormatter = DateFormatter.init()
-            dateFormatter.timeStyle = .none
-            dateFormatter.dateStyle = .medium
-            let subject = "product.sale_recovery.email.subject".localized(withFormat: dateFormatter.string(from: Date()))
-            viewController.presentMail(recipient: recipient, gmailMessage: body, subject: subject, message: body, isHTML:true, delegate:self, noEmailErrorMessage: "email.setup.message.reminder".localized, attachLogs:false)
-        }))
-        alert.addAction(UIAlertAction.init(title: "generic.no_thanks".localized, style: .cancel, handler: { (a) in
-            self.clickOnProductObjectId = nil
-        }))
-        viewController.present(alert, animated: true, completion: nil)
+
+        vc.popoverPresentationController?.backgroundColor = .red
+        vc.popoverPresentationController?.permittedArrowDirections = .any
+        vc.popoverPresentationController?.delegate = self
+        vc.popoverPresentationController?.sourceRect = rect
+        vc.popoverPresentationController?.sourceView = view
+        
+        viewController.present(vc, animated: true) {
+            
+        }
+        
+//        let alert = UIAlertController.init(title: "product.sale_recovery.alert.title".localized, message: "product.sale_recovery.alert.message".localized, preferredStyle: .alert)
+//        let body =  self.htmlEmailForProducts(products: [product])
+//
+//        Analytics.trackFeatureRecoveryAppeared(product: product)
+//        self.presentingVC = viewController
+//        alert.addAction(UIAlertAction.init(title: "product.sale_recovery.alert.email_me".localized, style: .default, handler: { (a) in
+//            Analytics.trackFeatureRecoveryEmailPresented(product: product)
+//            let recipient = AnalyticsUser.current.email ?? ""
+//            let dateFormatter = DateFormatter.init()
+//            dateFormatter.timeStyle = .none
+//            dateFormatter.dateStyle = .medium
+//            let subject = "product.sale_recovery.email.subject".localized(withFormat: dateFormatter.string(from: Date()))
+//            viewController.presentMail(recipient: recipient, gmailMessage: body, subject: subject, message: body, isHTML:true, delegate:self, noEmailErrorMessage: "email.setup.message.reminder".localized, attachLogs:false)
+//        }))
+//        alert.addAction(UIAlertAction.init(title: "generic.no_thanks".localized, style: .cancel, handler: { (a) in
+//            self.clickOnProductObjectId = nil
+//        }))
+//        viewController.present(alert, animated: true, completion: nil)
     }
     
     public func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
@@ -126,3 +145,12 @@ class RecoverLostSaleManager: NSObject, MFMailComposeViewControllerDelegate {
     }
     
 }
+
+extension RecoverLostSaleManager :UIPopoverPresentationControllerDelegate {
+    func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
+        return .none
+    }
+}
+
+
+

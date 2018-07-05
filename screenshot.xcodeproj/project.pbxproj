@@ -135,6 +135,7 @@
 		31C536A820B40446005810CA /* String+HTML.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C536A720B40446005810CA /* String+HTML.swift */; };
 		31CE11002035AC44000156EE /* UIApplication+openInChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE10FF2035AC44000156EE /* UIApplication+openInChrome.swift */; };
 		31CE11022039570B000156EE /* FetchedResultsControllerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE11012039570B000156EE /* FetchedResultsControllerManager.swift */; };
+		31D372B320EE5B91007E978E /* RecoveryLostSalePopupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31D372B220EE5B91007E978E /* RecoveryLostSalePopupViewController.swift */; };
 		31EF9B0720299D15006D3B35 /* InAppPurchaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31EF9B0620299D15006D3B35 /* InAppPurchaseManager.swift */; };
 		31EF9B092029D542006D3B35 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 31EF9B082029D542006D3B35 /* StoreKit.framework */; };
 		523C11391F5C195D001BD969 /* RatingFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523C11381F5C195D001BD969 /* RatingFlow.swift */; };
@@ -415,6 +416,7 @@
 		31CE10FF2035AC44000156EE /* UIApplication+openInChrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplication+openInChrome.swift"; sourceTree = "<group>"; };
 		31CE11012039570B000156EE /* FetchedResultsControllerManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FetchedResultsControllerManager.swift; sourceTree = "<group>"; };
 		31CE110C203BEFC1000156EE /* Model 10.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 10.xcdatamodel"; sourceTree = "<group>"; };
+		31D372B220EE5B91007E978E /* RecoveryLostSalePopupViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryLostSalePopupViewController.swift; sourceTree = "<group>"; };
 		31EF9B0620299D15006D3B35 /* InAppPurchaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InAppPurchaseManager.swift; sourceTree = "<group>"; };
 		31EF9B082029D542006D3B35 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		3F0C1FB8EA3C6E2B9CFD91FD /* Pods-screenshot.prddebug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.prddebug.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.prddebug.xcconfig"; sourceTree = "<group>"; };
@@ -746,6 +748,7 @@
 				311A4F9520D90B740001D463 /* ProductHeaderCollectionViewCell.swift */,
 				311A4F9620D90B740001D463 /* ProductCollectionViewManager.swift */,
 				311A50C820DAB2EF0001D463 /* RecoverLostSaleManager.swift */,
+				31D372B220EE5B91007E978E /* RecoveryLostSalePopupViewController.swift */,
 				311A4F9720D90B740001D463 /* ProductsRateView.swift */,
 				311A4F9820D90B740001D463 /* SectionBackgroundCollectionViewFlowLayout.swift */,
 			);
@@ -1816,6 +1819,7 @@
 				C53B46531FBC397700A8C886 /* Geometry.swift in Sources */,
 				C58BAE5820E101DD0051394A /* ModalNavigationController.swift in Sources */,
 				31C536A820B40446005810CA /* String+HTML.swift in Sources */,
+				31D372B320EE5B91007E978E /* RecoveryLostSalePopupViewController.swift in Sources */,
 				C58BAE6120E101DD0051394A /* IntrinsicContentSizePresentationController.swift in Sources */,
 				C58BAE5920E101DD0051394A /* BaseViewController.swift in Sources */,
 				C58BAE8D20E101DD0051394A /* LoadingButton.swift in Sources */,
