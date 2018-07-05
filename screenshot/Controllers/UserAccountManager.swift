@@ -1001,7 +1001,7 @@ extension UserAccountManager {
             let uploadedImageURL = screenshot.uploadedImageURL {
             let trackingInfo = screenshot.trackingInfo ?? ""
             let source = screenshot.source.rawValue
-            let forbiddenChacters = CharacterSet.init(charactersIn: "\\#$[]")
+            let forbiddenChacters = CharacterSet.init(charactersIn: "\\#$[].")
             let escapedAssetId = assetId.components(separatedBy:forbiddenChacters).joined()
             let dict:[String:Any] = [
                 "assetId":escapedAssetId,
