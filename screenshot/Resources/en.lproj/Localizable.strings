@@ -45,7 +45,6 @@
 "authorize.register.legal.4" = " ";
 "authorize.register.offers" = "Send me emails about exclusive offers, sales and new features.";
 "authorize.register.password" = "Password";
-"authorize.register.confirmation.message" = "You are now a\nScreenshop user.";
 "authorize.register.confirmation.title" = "Welcome!";
 "authorize.register.skipConfirm" = "Are you sure you want to skip? Your account won’t be created.";
 "authorize.register.welcome_to" = "Welcome to";
