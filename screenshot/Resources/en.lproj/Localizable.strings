@@ -228,7 +228,7 @@
 "gdpr.image.message" = "When this setting is turned on, we send screenshots you take in and outside of the app to our server to detect whether there are clothing items in the photo and allow you to shop relevant photos quickly. This happens in the background and is not shown to you. We do not save any photos that are not detected as fashion.";
 "gdpr.image.title" = "Image Detection";
 "gdpr.onboarding.title" = "Your Privacy Settings";
-"gdpr.onboarding.subtitle" = "You can change these any time in the settings page of the app";
+"gdpr.onboarding.subtitle" = "You can change these any time in the profile page of the app";
 "gdpr.onboarding.edit" = "Manage Settings";
 "gdpr.onboarding.continue" = "Accept and Continue";
 "gdpr.title" = "Privacy Settings";
