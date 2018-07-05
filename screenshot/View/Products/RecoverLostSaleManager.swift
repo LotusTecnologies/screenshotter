@@ -22,7 +22,7 @@ class RecoverLostSaleManager: NSObject, MFMailComposeViewControllerDelegate {
     weak var presentingVC:UIViewController?
 
     private let maxTime:TimeInterval = 120
-    private let minTime:TimeInterval = 0
+    private let minTime:TimeInterval = 10
 
     override init() {
         super.init()
