@@ -813,11 +813,16 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
               !id.isEmpty {
                 isHandled = true
                 LocalNotificationModel.shared.cancelPendingNotifications(within: Date(timeIntervalSinceNow: Constants.secondsInDay))
-                ProductViewController.present(with: id)
-                
+                if let updatedPrice = dataDict["price"] as? Float {
+                    let currency = dataDict["currency"] as? String ?? "USD"
+                    DataModel.sharedInstance.updateProductPrice(id: id, updatedPrice: updatedPrice, updatedCurrency: currency).then(on: .main) {
+                        ProductViewController.present(with: id)
+                    }
+                } else {
+                    ProductViewController.present(with: id)
+                }
                 let pushTypeString = dataDict["type"] as? String
                 Analytics.trackAppOpenedFromPushNotification(source: pushTypeString)
-                
             }
         }
         
