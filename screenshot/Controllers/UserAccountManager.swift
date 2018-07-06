@@ -865,7 +865,7 @@ extension UserAccountManager {
                 }
             }
             
-            self.databaseRef.child("users").child(user.uid).child("favorite").observeSingleEvent(of: .value) { (snapshot) in
+            self.databaseRef.child("users").child(user.uid).child("favorites").observeSingleEvent(of: .value) { (snapshot) in
                 for child in snapshot.children {
                     if let child = child as? DataSnapshot,
                         let dict = child.value as? NSDictionary,
@@ -928,6 +928,7 @@ extension UserAccountManager {
         return when(fulfilled: promiseArray)
     }
     
+    
     func uploadFavorites(product:Product){
         if let user = self.user,
         let price = product.price,
@@ -939,8 +940,8 @@ extension UserAccountManager {
             let floatOriginalPrice = product.floatOriginalPrice
             var dict:[String:Any] = ["price":price,
                                      "imageURL":imageURL,
-                                     "floatPrice":floatPrice,
-                                     "floatOriginalPrice":floatOriginalPrice,
+                                     "floatPrice":NSNumber.init(value: floatPrice),
+                                     "floatOriginalPrice":NSNumber.init(value: floatOriginalPrice),
                                      "offer":offer,
                                      "productDescription":productDescription]
             
@@ -976,21 +977,30 @@ extension UserAccountManager {
             }
             dict["optionsMask"] = product.optionsMask
             dict["fallbackPrice"] = NSNumber.init(value: product.fallbackPrice)
-            self.databaseRef.child("users").child(user.uid).child("favorites").child(offer).setValue(dict)
+
+            if let escapedoffer = offer.firebaseSafe() {
+                self.databaseRef.child("users").child(user.uid).child("favorites").child(escapedoffer).setValue(dict)
+            }
         }
     }
     
     func deleteFavorite(product:Product){
         if let user = self.user {
             if let offer = product.offer {
-                self.databaseRef.child("users").child(user.uid).child("favorites").child(offer).removeValue()
+
+                if let escapedoffer = offer.firebaseSafe() {
+                    self.databaseRef.child("users").child(user.uid).child("favorites").child(escapedoffer).removeValue()
+                }
             }
         }
     }
     
     func deleteScreenshot(screenshot:Screenshot) {
         if let assetId = screenshot.assetId, let user = self.user {
-            self.databaseRef.child("users").child(user.uid).child("screenshots").child(assetId).removeValue()
+
+            if let escapedAssetId = assetId.firebaseSafe() {
+                self.databaseRef.child("users").child(user.uid).child("screenshots").child(escapedAssetId).removeValue()
+            }
         }
     }
     
@@ -1002,19 +1012,29 @@ extension UserAccountManager {
             let uploadedImageURL = screenshot.uploadedImageURL {
             let trackingInfo = screenshot.trackingInfo ?? ""
             let source = screenshot.source.rawValue
-            let forbiddenChacters = CharacterSet.init(charactersIn: "\\#$[].")
-            let escapedAssetId = assetId.components(separatedBy:forbiddenChacters).joined()
-            let dict:[String:Any] = [
-                "assetId":escapedAssetId,
-                "createdAt":NSNumber.init(value: createdAtNumber as Double),
-                "source":source,
-                "uploadedImageURL":uploadedImageURL,
-                "trackingInfo" :trackingInfo
-                        ]
-            
-            self.databaseRef.child("users").child(user.uid).child("screenshots").child(escapedAssetId).setValue(dict)
+            if let escapedAssetId = assetId.firebaseSafe() {
+                
+                let dict:[String:Any] = [
+                    "assetId":assetId,
+                    "createdAt":NSNumber.init(value: createdAtNumber as Double),
+                    "source":source,
+                    "uploadedImageURL":uploadedImageURL,
+                    "trackingInfo" :trackingInfo
+                ]
+                self.databaseRef.child("users").child(user.uid).child("screenshots").child(escapedAssetId).setValue(dict)
+            }
         }
 
+    }
+}
+extension String {
+    fileprivate func firebaseSafe() ->  String?{
+        let forbiddenChacters = CharacterSet.init(charactersIn: "\\#$[]./")
+        let toReturn =  self.components(separatedBy:forbiddenChacters).joined()
+        if toReturn.count == 0 {
+            return nil
+        }
+        return toReturn
     }
 }
 

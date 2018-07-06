@@ -1188,6 +1188,8 @@ extension DataModel {
                             }
                             screenshot.lastFavorited = now
                         }
+                        UserAccountManager.shared.uploadFavorites(product: product)
+
                     } else {
                         product.dateFavorited = nil
                         if let screenshot = product.shoppable?.screenshot {
@@ -1199,6 +1201,7 @@ extension DataModel {
                                 screenshot.lastFavorited = nil
                             }
                         }
+                        UserAccountManager.shared.deleteFavorite(product: product)
                     }
                 }
                 try managedObjectContext.save()
