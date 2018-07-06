@@ -512,6 +512,20 @@ extension DataModel {
         }
     }
     
+    func updateProductPrice(id: String, updatedPrice: Float, updatedCurrency: String) -> Promise<Void> {
+        return Promise { fulfill, reject in
+            self.performBackgroundTask { managedObjectContext in
+                if let formattedUpdatePrice = self.formattedPrice(price: updatedPrice, currency: updatedCurrency),
+                  let product = self.retrieveProduct(managedObjectContext: managedObjectContext, id: id) {
+                    product.floatPrice = updatedPrice
+                    product.price = formattedUpdatePrice
+                    managedObjectContext.saveIfNeeded()
+                }
+                fulfill(())
+            }
+        }
+    }
+    
     func retrieveLatestFavorite() -> Promise<(String, String?)> {
         return Promise { fulfill, reject in
             self.performBackgroundTask { managedObjectContext in
@@ -1188,6 +1202,8 @@ extension DataModel {
                             }
                             screenshot.lastFavorited = now
                         }
+                        UserAccountManager.shared.uploadFavorites(product: product)
+
                     } else {
                         product.dateFavorited = nil
                         if let screenshot = product.shoppable?.screenshot {
@@ -1199,6 +1215,7 @@ extension DataModel {
                                 screenshot.lastFavorited = nil
                             }
                         }
+                        UserAccountManager.shared.deleteFavorite(product: product)
                     }
                 }
                 try managedObjectContext.save()
@@ -1330,6 +1347,14 @@ extension DataModel {
                 }
             }
         }
+    }
+    
+    func formattedPrice(price: Float, currency: String) -> String? {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        let localeIdentifier = Locale.identifier(fromComponents: [NSLocale.Key.currencyCode.rawValue: currency])
+        formatter.locale = Locale(identifier: localeIdentifier)
+        return formatter.string(from: NSNumber(value: price))
     }
     
     // MARK: DB Migration
