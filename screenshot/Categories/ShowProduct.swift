@@ -34,11 +34,7 @@ extension ProductViewController {
         
         if let product = dataModel.retrieveProduct(managedObjectContext: dataModel.mainMoc(), id: id) {
             AssetSyncModel.sharedInstance.addSubShoppable(fromProduct: product).then(on: .main) { (shoppable) -> Void in
-                let burrowViewController = ProductDetailViewController()
-                burrowViewController.product = product
-                burrowViewController.shoppable = product.shoppable
-                let navigationController = ModalNavigationController(rootViewController: burrowViewController)
-                AppDelegate.shared.window?.rootViewController?.present(navigationController, animated: true, completion: nil)
+                present(product: product)
             }
         }
     }
@@ -49,13 +45,18 @@ extension ProductViewController {
         
         if let product = dataModel.retrieveProduct(managedObjectContext: dataModel.mainMoc(), imageURL: imageURL) {
             AssetSyncModel.sharedInstance.addSubShoppable(fromProduct: product).then(on: .main) { (shoppable) -> Void in
-                let burrowViewController = ProductDetailViewController()
-                burrowViewController.product = product
-                burrowViewController.shoppable = product.shoppable
-                let navigationController = ModalNavigationController(rootViewController: burrowViewController)
-                AppDelegate.shared.window?.rootViewController?.present(navigationController, animated: true, completion: nil)
+                present(product: product)
             }
         }
+    }
+    
+    static func present(product: Product) {
+        let burrowViewController = ProductDetailViewController()
+        burrowViewController.product = product
+        burrowViewController.shoppable = product.shoppable
+        burrowViewController.uuid = UUID().uuidString
+        let navigationController = ModalNavigationController(rootViewController: burrowViewController)
+        AppDelegate.shared.window?.rootViewController?.present(navigationController, animated: true, completion: nil)
     }
 
 }
