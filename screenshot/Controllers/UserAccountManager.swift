@@ -681,14 +681,9 @@ extension UserAccountManager {
         alert.addAction(UIAlertAction.init(title: "authorize.error.undefined.contactSupport".localized, style: .default, handler: { (a) in
             let recipient = "support@screenshopit.com"
             let subject = "unable to login"
-            let userInfoJson:String = {
-                if let userinfoJsonData = try? JSONSerialization.data(withJSONObject: error.userInfo, options: []), let s = String.init(data: userinfoJsonData, encoding: .utf8) {
-                    return s
-                }
-                return "{}"
-            }()
+            let userInfoString = String.init(describing: error.userInfo)
 
-            let body = "Please help me. I’m getting this weirdo error: \(String.init(describing: viewController)) Domain: \(error.domain) Code: \(error.code) \(userInfoJson) -  \(Bundle.displayVersionBuild). I don’t know what this means, because I am not a programmer. But ya’ll should be able to help me."
+            let body = "Please help me. I’m getting this weirdo error: \(String.init(describing: viewController)) Domain: \(error.domain) Code: \(error.code) \(userInfoString) -  \(Bundle.displayVersionBuild). I don’t know what this means, because I am not a programmer. But ya’ll should be able to help me."
             let gmailMessage = body
             viewController.presentMail(recipient: recipient, gmailMessage: gmailMessage, subject: subject, message: body, isHTML: false, delegate:nil, noEmailErrorMessage: "email.setup.message.bug".localized, attachLogs:true)
         }))
