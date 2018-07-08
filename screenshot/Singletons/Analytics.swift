@@ -310,13 +310,32 @@ class Analytics {
                 }
             }
         }
-        if let jsonData = try? JSONSerialization.data(withJSONObject: properties, options: []), let propertiesString = String.init(data: jsonData, encoding: .utf8) {
-            if eventName == "Log", let line = properties["line"] as? Int, let file = properties["file"] as? NSString, let message =  properties["message"] as? String {
-                logw("[\(eventName) - \(message)] - \( file.lastPathComponent ):\( line )")
+        
+        var prop = properties.mapValues { (a) -> Any in
+            if let a = a as? String {
+                return a
+            }else if let a = a as? NSNumber {
+                return a
+            }else if let  a = a as? Date {
+                return String.init(describing: a)
             }else{
-                logw("[\(eventName)] - \( propertiesString )")
+                return String.init(describing: a)
             }
+        }        
+        var propertiesString = ""
+        if JSONSerialization.isValidJSONObject(prop), let jsonData = try? JSONSerialization.data(withJSONObject: prop, options: []), let string = String.init(data: jsonData, encoding: .utf8) {
+            propertiesString = string
+        }else{
+            propertiesString = String.init(describing: prop)
         }
+        if eventName == "Log", let line = properties["line"] as? Int, let file = properties["file"] as? NSString, let message =  properties["message"] as? String {
+            logw("[\(eventName) - \(message)] - \( file.lastPathComponent ):\( line )")
+        }else{
+            logw("[\(eventName)] - \( propertiesString )")
+        }
+        
+    
+        
     }
     init() {
         Log.logger.printToConsole = false
