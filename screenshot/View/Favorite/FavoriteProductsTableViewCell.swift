@@ -47,7 +47,6 @@ class FavoriteProductsTableViewCell: UITableViewCell, DynamicTypeAccessibilityLa
         labelsContainerView.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
         
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.numberOfLines = 3
         titleLabel.font = .screenshopFont(.hindLight, textStyle: .body)
         titleLabel.adjustsFontForContentSizeCategory = true
         titleLabel.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: -halfPadding, right: 0)
@@ -62,7 +61,10 @@ class FavoriteProductsTableViewCell: UITableViewCell, DynamicTypeAccessibilityLa
             titleLabel.trailingAnchor.constraint(equalTo: labelsContainerView.trailingAnchor)
         ]
         
+        syncTitleLabelLinesCount()
+        
         outOfStockLabel.translatesAutoresizingMaskIntoConstraints = false
+        outOfStockLabel.numberOfLines = 1
         outOfStockLabel.font = .screenshopFont(.hindBold, textStyle: .footnote)
         outOfStockLabel.textColor = .red
         outOfStockLabel.text = "cart.item.error.unavailable".localized
@@ -73,7 +75,6 @@ class FavoriteProductsTableViewCell: UITableViewCell, DynamicTypeAccessibilityLa
         outOfStockLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor).isActive = true
         self.outOfStockLabelHiddenConstraints = outOfStockLabel.heightAnchor.constraint(equalToConstant: 0)
         self.outOfStockLabelHiddenConstraints?.isActive = true
-        syncTitleLabelLinesCount()
         
         priceLabel.translatesAutoresizingMaskIntoConstraints = false
         priceLabel.textColor = .crazeGreen
