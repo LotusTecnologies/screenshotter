@@ -311,7 +311,7 @@ class Analytics {
             }
         }
         
-        var prop = properties.mapValues { (a) -> Any in
+        let prop = properties.mapValues { (a) -> Any in
             if let a = a as? String {
                 return a
             }else if let a = a as? NSNumber {
