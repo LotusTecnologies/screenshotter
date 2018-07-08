@@ -67,6 +67,7 @@ class BadgeBarButtonItem: UIBarButtonItem {
             countContainer.translatesAutoresizingMaskIntoConstraints = false
             countContainer.clipsToBounds = true
             countContainer.isUserInteractionEnabled = false
+            countContainer.layer.zPosition = 1 // Stay above bar item image
             view.addSubview(countContainer)
             countContainer.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
             countContainer.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
