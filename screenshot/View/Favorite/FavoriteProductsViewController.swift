@@ -326,7 +326,7 @@ extension FavoriteProductsViewController: UITableViewDataSource, AsyncOperationM
                 cell.isOutOfStockLabelHidden = true
                 cell.isPriceAlertButtonHidden = true
                 cell.isCartButtonHidden = false
-                cell.isShareButtonHidden = true
+                cell.isShareButtonHidden = false
                 cell.cartButton.setTitle("product.buy_now".localized, for: .normal)
             }
             

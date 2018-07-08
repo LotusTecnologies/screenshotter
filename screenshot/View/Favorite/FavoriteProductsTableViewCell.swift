@@ -47,7 +47,7 @@ class FavoriteProductsTableViewCell: UITableViewCell, DynamicTypeAccessibilityLa
         labelsContainerView.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
         
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.numberOfLines = 2
+        titleLabel.numberOfLines = 3
         titleLabel.font = .screenshopFont(.hindLight, textStyle: .body)
         titleLabel.adjustsFontForContentSizeCategory = true
         titleLabel.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: -halfPadding, right: 0)
@@ -63,7 +63,6 @@ class FavoriteProductsTableViewCell: UITableViewCell, DynamicTypeAccessibilityLa
         ]
         
         outOfStockLabel.translatesAutoresizingMaskIntoConstraints = false
-        outOfStockLabel.numberOfLines = 1
         outOfStockLabel.font = .screenshopFont(.hindBold, textStyle: .footnote)
         outOfStockLabel.textColor = .red
         outOfStockLabel.text = "cart.item.error.unavailable".localized
@@ -74,6 +73,7 @@ class FavoriteProductsTableViewCell: UITableViewCell, DynamicTypeAccessibilityLa
         outOfStockLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor).isActive = true
         self.outOfStockLabelHiddenConstraints = outOfStockLabel.heightAnchor.constraint(equalToConstant: 0)
         self.outOfStockLabelHiddenConstraints?.isActive = true
+        syncTitleLabelLinesCount()
         
         priceLabel.translatesAutoresizingMaskIntoConstraints = false
         priceLabel.textColor = .crazeGreen
@@ -159,22 +159,26 @@ class FavoriteProductsTableViewCell: UITableViewCell, DynamicTypeAccessibilityLa
         priceAlertButton.setContentHuggingPriority(.defaultLow, for: .vertical)
         priceAlertButtonHiddenConstraints = priceAlertButton.heightAnchor.constraint(equalToConstant: 0.0)
         
-        shareButton.translatesAutoresizingMaskIntoConstraints = false
-        shareButton.setImage(UIImage(named: "ScreenshotShare"), for: .normal)
-        shareButton.contentEdgeInsets = .init(top: 10, left: contentView.layoutMargins.right, bottom: 10, right: contentView.layoutMargins.right)
-        contentView.addSubview(shareButton)
-        shareButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
-        shareButton.centerYAnchor.constraint(equalTo: priceAlertButton.centerYAnchor).isActive = true
-        
         cartButton.translatesAutoresizingMaskIntoConstraints = false
         cartButton.setTitle("favorites.product.cart".localized, for: .normal)
         cartButton.setTitleColor(.crazeGreen, for: .normal)
         contentView.addSubview(cartButton)
         cartButton.leadingAnchor.constraint(equalTo: productImageView.layoutMarginsGuide.trailingAnchor).isActive = true
-        cartButton.bottomAnchor.constraint(lessThanOrEqualTo: contentView.layoutMarginsGuide.bottomAnchor).isActive = true
+        cartButton.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor).isActive = true
         cartButton.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
-        cartButton.topAnchor.constraint(equalTo: priceAlertButton.bottomAnchor, constant: halfPadding).isActive = true
         cartButtonHideConstraints = cartButton.heightAnchor.constraint(equalToConstant: 0)
+        
+        let shareVerticalGuide = UILayoutGuide()
+        contentView.addLayoutGuide(shareVerticalGuide)
+        shareVerticalGuide.topAnchor.constraint(equalTo: priceLabel.bottomAnchor).isActive = true
+        shareVerticalGuide.bottomAnchor.constraint(equalTo: cartButton.topAnchor).isActive = true
+        
+        shareButton.translatesAutoresizingMaskIntoConstraints = false
+        shareButton.setImage(UIImage(named: "ScreenshotShare"), for: .normal)
+        shareButton.contentEdgeInsets = .init(top: 10, left: contentView.layoutMargins.right, bottom: 10, right: contentView.layoutMargins.right)
+        contentView.addSubview(shareButton)
+        shareButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
+        shareButton.centerYAnchor.constraint(equalTo: shareVerticalGuide.centerYAnchor).isActive = true
         
         adjustDynamicTypeLayout(traitCollection: traitCollection)
     }
@@ -183,6 +187,10 @@ class FavoriteProductsTableViewCell: UITableViewCell, DynamicTypeAccessibilityLa
         super.traitCollectionDidChange(previousTraitCollection)
         
         adjustDynamicTypeLayout(traitCollection: traitCollection, previousTraitCollection: previousTraitCollection)
+    }
+    
+    private func syncTitleLabelLinesCount() {
+        titleLabel.numberOfLines = isPriceAlertButtonHidden ? 3 : 2
     }
     
     // MARK: Cart
@@ -226,6 +234,7 @@ class FavoriteProductsTableViewCell: UITableViewCell, DynamicTypeAccessibilityLa
     var isPriceAlertButtonHidden = true {
         didSet {
             priceAlertButton.isHidden = isPriceAlertButtonHidden
+            syncTitleLabelLinesCount()
             
             if priceAlertButtonHiddenConstraints?.isActive != isPriceAlertButtonHidden {
                 priceAlertButtonHiddenConstraints?.isActive = isPriceAlertButtonHidden
