@@ -285,9 +285,9 @@ extension FavoriteProductsViewController: UITableViewDataSource, AsyncOperationM
             cell.selectionStyle = .none
             cell.contentView.backgroundColor = .cellBackground
             cell.productImageView.setImage(withURLString: product.imageURL)
-            cell.titleLabel.text = product.productTitle()
+            cell.titleLabel.text = product.productTitle()?.decodingHTMLEntities()
             cell.priceLabel.text = product.price
-            cell.merchantLabel.text = product.merchant
+            cell.merchantLabel.text = product.merchant?.decodingHTMLEntities()
             cell.favoriteControl.isSelected = !self.unfavoriteProductsIds.contains(product.objectID)
             cell.favoriteControl.addTarget(self, action: #selector(favoriteProductAction(_:event:)), for: .touchUpInside)
                         
