@@ -9,6 +9,8 @@
 import UIKit
 
 class MainButton: LoadingButton {
+    static let cornerRadius: CGFloat = 9
+    
     private var backgroundColorStates: [UInt : UIColor] = [:]
     private var isSettingBackgroundColor = false
     
@@ -25,7 +27,7 @@ class MainButton: LoadingButton {
         contentEdgeInsets = UIEdgeInsets(top: 0, left: .padding, bottom: 0, right: .padding)
         adjustsImageWhenHighlighted = false
         titleLabel?.font = UIFont(screenshopName: .hindMedium, size: UIFont.buttonFontSize)
-        layer.cornerRadius = 9
+        layer.cornerRadius = MainButton.cornerRadius
         layer.shadowColor = Shadow.basic.color.cgColor
         layer.shadowOffset = Shadow.basic.offset
         layer.shadowRadius = Shadow.basic.radius

@@ -76,6 +76,8 @@ class UserAccountManager : NSObject {
         case unconfirmed
     }
     
+    var isFacebookConnected = false // TODO:
+    
     var userFromLogin:User?
     var user:User? {
         get {

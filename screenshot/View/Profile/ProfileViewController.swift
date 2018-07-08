@@ -19,6 +19,7 @@ class ProfileViewController: BaseTableViewController {
     enum Section: Int {
         case account
         case invite
+        case facebook
         case options
         case permissions
         case logout
@@ -49,6 +50,7 @@ class ProfileViewController: BaseTableViewController {
     private var data: [Section: [Row]] = [
         .account: [],
         .invite: [],
+        .facebook: [],
         .options: [
             .optionCurrency,
             .optionOpenIn
@@ -76,7 +78,35 @@ class ProfileViewController: BaseTableViewController {
         button.setTitle("profile.tell_friend".localized, for: .normal)
         button.addTarget(self, action: #selector(inviteAction), for: .touchUpInside)
         button.clipsToBounds = true
+        button.isExclusiveTouch = true
         button.adjustInsetsForImage()
+        view.addSubview(button)
+        button.sizeToFit()
+        button.setContentHuggingPriority(.required, for: .vertical)
+        button.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor).isActive = true
+        button.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor).isActive = true
+        button.bottomAnchor.constraint(equalTo: view.layoutMarginsGuide.bottomAnchor).isActive = true
+        button.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor).isActive = true
+        
+        var frame = view.frame
+        frame.size.height = button.bounds.height
+        view.frame = frame
+        
+        return view
+    }()
+    
+    private let facebookView: UIView = {
+        let view = UIView()
+        view.layoutMargins = UIEdgeInsets(top: 0, left: .padding, bottom: 0, right: .padding)
+        
+        let button = FacebookButton()
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(facebookLoginAction(_:)), for: .touchUpInside)
+        button.actionCopy = .connect
+        button.hasArrow = false
+        button.clipsToBounds = true
+        button.isExclusiveTouch = true
+        button.layer.cornerRadius = MainButton.cornerRadius
         view.addSubview(button)
         button.sizeToFit()
         button.setContentHuggingPriority(.required, for: .vertical)
@@ -185,17 +215,21 @@ class ProfileViewController: BaseTableViewController {
         if isLoggedIn {
             profileAccountView.name = UserDefaults.standard.string(forKey: UserDefaultsKeys.name)
             profileAccountView.email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email)
+            
             if let string = UserDefaults.standard.string(forKey: UserDefaultsKeys.avatarURL), let url = URL.init(string: string) {
                 profileAccountView.avatarURL = url
             }else{
                 profileAccountView.avatarURL = nil
             }
             
-            
+            if UserAccountManager.shared.isFacebookConnected {
+                data.removeValue(forKey: .facebook)
+            }
             
             data[.logout] = [.logout]
         }
         else {
+            data[.facebook] = []
             data.removeValue(forKey: .logout)
         }
         
@@ -218,6 +252,31 @@ class ProfileViewController: BaseTableViewController {
             .init("com.apple.mobilenotes.SharingExtension")
         ]
         present(activityViewController, animated: true)
+    }
+    
+    // MARK: Facebook
+    
+    @objc private func facebookLoginAction(_ button: FacebookButton) {
+        // TODO: analytics
+        // TODO: block user interaction
+        
+        button.isLoading = true
+        
+        UserAccountManager.shared.loginWithFacebook()
+            .then { result -> Void in
+                self.syncLoggedIn()
+            }
+            .catch { error in
+                let e = error as NSError
+
+                if !UserAccountManager.shared.isIgnorableFacebookError(error: e) {
+                    let alert = UserAccountManager.shared.alertViewForUndefinedError(error: e, viewController: self)
+                    self.present(alert, animated: true)
+                }
+            }
+            .always {
+                button.isLoading = false
+        }
     }
     
     // MARK: Permissions
@@ -371,6 +430,9 @@ extension ProfileViewController {
         else if Section.invite.rawValue == section {
             return inviteView.bounds.height
         }
+        else if Section.facebook.rawValue == section {
+            return facebookView.bounds.height
+        }
         else if let section = Section(rawValue: section), sectionText(for: section) != nil {
             return tableView.sectionHeaderHeight
         }
@@ -383,6 +445,9 @@ extension ProfileViewController {
         }
         else if section == Section.invite.rawValue {
             return inviteView
+        }
+        else if section == Section.facebook.rawValue {
+            return facebookView
         }
         return nil
     }
