@@ -32,15 +32,17 @@ class DiscoverManager {
                 item.wasAdded = true
                 item.isDisplaying = false
                 //create screesnhot
-                let addedScreenshot = DataModel.sharedInstance.saveScreenshot(managedObjectContext: context,
-                                                               assetId: assetId,
-                                                               createdAt: Date(),
-                                                               isRecognized: true,
-                                                               source: .discover,
-                                                               isHidden: false,
-                                                               imageData: item.imageData as Data?,
-                                                               uploadedImageURL: uploadedImageURL,
-                                                               syteJsonString: nil)
+                let addedScreenshot = DataModel.sharedInstance.saveScreenshot(
+                    upsert:true,
+                    managedObjectContext: context,
+                    assetId: assetId,
+                    createdAt: Date(),
+                    isRecognized: true,
+                    source: .discover,
+                    isHidden: false,
+                    imageData: item.imageData as Data?,
+                    uploadedImageURL: uploadedImageURL,
+                    syteJsonString: nil)
                 addedScreenshot.trackingInfo = item.trackingInfo
                 Analytics.trackScreenshotCreated(screenshot: addedScreenshot)
                 AssetSyncModel.sharedInstance.processingQ.async {
@@ -56,13 +58,14 @@ class DiscoverManager {
                 
                 
                 // send recombee rating = 0.5 completion { request more recombee }
-                let event = AnalyticsTrackers.RecombeeAnalyticsTracker.RecombeeEvent.positiveRating
-                NetworkingPromise.sharedInstance.recombeeRequest(path: event.path(), method: "POST", params: event.postData(itemId: assetId)).always {
-                    NetworkingPromise.sharedInstance.recombeeRecommendation().then(execute: { (recommendations) -> Void in
-                        self.recombeeRecommendation(recommendations)
-                    }).catch(execute: { (error) in
-                        print("recombee error: \(error)")
-                    })
+                let isRecombeeId = (Int(assetId) != nil)
+                if isRecombeeId {
+                    let event = AnalyticsTrackers.RecombeeAnalyticsTracker.RecombeeEvent.positiveRating
+                    NetworkingPromise.sharedInstance.recombeeRequest(path: event.path(), method: "POST", params: event.postData(itemId: assetId)).always {
+                        self.recombeRequestOne()
+                    }
+                }else{
+                    self.recombeRequestOne()
                 }
                 
                 if let callback = callback {
@@ -93,17 +96,27 @@ class DiscoverManager {
                 self.fillQueues(in: context)
                 
                 // send recombee rating = -0.5 completion { request more recombee }
-                let event = AnalyticsTrackers.RecombeeAnalyticsTracker.RecombeeEvent.negativeRating
-                NetworkingPromise.sharedInstance.recombeeRequest(path: event.path(), method: "POST", params: event.postData(itemId: assetId)).always {
-                    NetworkingPromise.sharedInstance.recombeeRecommendation().then(execute: { (recommendations) -> Void in
-                        self.recombeeRecommendation(recommendations)
-                    }).catch(execute: { (error) in
-                        print("recombee error: \(error)")
-                    })
+                let isRecombeeId = (Int(assetId) != nil)
+                if isRecombeeId {
+                    
+                    let event = AnalyticsTrackers.RecombeeAnalyticsTracker.RecombeeEvent.negativeRating
+                    NetworkingPromise.sharedInstance.recombeeRequest(path: event.path(), method: "POST", params: event.postData(itemId: assetId)).always {
+                        self.recombeRequestOne()
+                    }
+                }else{
+                    self.recombeRequestOne()
                 }
                 context.saveIfNeeded()
             }
         }
+    }
+    
+    private func recombeRequestOne(){
+        NetworkingPromise.sharedInstance.recombeeRecommendation().then(execute: { (recommendations) -> Void in
+            self.recombeeRecommendation(recommendations)
+        }).catch(execute: { (error) in
+            print("recombee error: \(error)")
+        })
     }
     
     private func fillQueues(in context:NSManagedObjectContext){
