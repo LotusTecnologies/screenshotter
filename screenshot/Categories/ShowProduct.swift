@@ -28,21 +28,13 @@ extension UIViewController {
 
 extension ProductViewController {
     
-    static func present(with partNumber: String) {
-        print("ProductViewController present partNumber:\(partNumber)")
+    static func present(with id: String) {
+        print("ProductViewController present id:\(id)")
         let dataModel = DataModel.sharedInstance
         
-        if let product = dataModel.retrieveProduct(managedObjectContext: dataModel.mainMoc(), partNumber: partNumber) {
-            Analytics.trackProductPriceAlertOpened(product: product)
-            
-            if UIApplication.isUSC {
-                let productViewController = ProductViewController(product: product)
-                let navigationController = ModalNavigationController(rootViewController: productViewController)
-                AppDelegate.shared.window?.rootViewController?.present(navigationController, animated: true, completion: nil)
-            }else{
-                if let vc = AppDelegate.shared.window?.rootViewController {
-                    OpenWebPage.presentProduct(product, fromViewController: vc)
-                }
+        if let product = dataModel.retrieveProduct(managedObjectContext: dataModel.mainMoc(), id: id) {
+            AssetSyncModel.sharedInstance.addSubShoppable(fromProduct: product).then(on: .main) { (shoppable) -> Void in
+                present(product: product)
             }
         }
     }
@@ -53,13 +45,18 @@ extension ProductViewController {
         
         if let product = dataModel.retrieveProduct(managedObjectContext: dataModel.mainMoc(), imageURL: imageURL) {
             AssetSyncModel.sharedInstance.addSubShoppable(fromProduct: product).then(on: .main) { (shoppable) -> Void in
-                let burrowViewController = ProductDetailViewController()
-                burrowViewController.product = product
-                burrowViewController.shoppable = product.shoppable
-                let navigationController = ModalNavigationController(rootViewController: burrowViewController)
-                AppDelegate.shared.window?.rootViewController?.present(navigationController, animated: true, completion: nil)
+                present(product: product)
             }
         }
+    }
+    
+    static func present(product: Product) {
+        let burrowViewController = ProductDetailViewController()
+        burrowViewController.product = product
+        burrowViewController.shoppable = product.shoppable
+        burrowViewController.uuid = UUID().uuidString
+        let navigationController = ModalNavigationController(rootViewController: burrowViewController)
+        AppDelegate.shared.window?.rootViewController?.present(navigationController, animated: true, completion: nil)
     }
 
 }

@@ -14,7 +14,7 @@ import PromiseKit
 enum LocalNotificationIdentifier: String {
     case screenshotAdded        = "CrazeLocal"
     case tappedProduct          = "CrazeTappedProduct"
-    case saleCount              = "CrazeSaleCount"
+    case saleScreenshot         = "CrazeSaleScreenshot"
     case favoritedItem          = "CrazeFavoritedItem"
     case inactivityDiscover     = "CrazeInactivityDiscover"
 }
@@ -41,35 +41,12 @@ class LocalNotificationModel {
 
     @objc func applicationWillEnterForeground() {
         sessionStart = NSDate()
-        UNUserNotificationCenter.current().getPendingNotificationRequests { notificationRequestArray in
-            let toCancel = [LocalNotificationIdentifier.tappedProduct.rawValue, LocalNotificationIdentifier.saleCount.rawValue, LocalNotificationIdentifier.favoritedItem.rawValue, LocalNotificationIdentifier.inactivityDiscover.rawValue]
-            let toCancelSet = Set<String>(toCancel)
-            notificationRequestArray.forEach { notificationRequest in
-                if toCancelSet.contains(notificationRequest.identifier) {
-                    switch notificationRequest.identifier {
-                    case LocalNotificationIdentifier.tappedProduct.rawValue:
-                        Analytics.trackTimedLocalNotificationCancelled(source: .tappedProduct)
-                        self.cancelProductInNotif(productKey: notificationRequest.content.userInfo[Constants.openingProductKey] as? String)
-                    case LocalNotificationIdentifier.saleCount.rawValue:
-                        Analytics.trackTimedLocalNotificationCancelled(source: .saleCount)
-                    case LocalNotificationIdentifier.favoritedItem.rawValue:
-                        Analytics.trackTimedLocalNotificationCancelled(source: .favoritedItem)
-                        self.cancelProductInNotif(productKey: notificationRequest.content.userInfo[Constants.openingProductKey] as? String)
-                    case LocalNotificationIdentifier.inactivityDiscover.rawValue:
-                        Analytics.trackTimedLocalNotificationCancelled(source: .inactivityDiscover)
-                    default:
-                        print("Cancel unknown timedLocalNotification. WTF?")
-                    }
-                    print("Canceling notification \(notificationRequest.identifier)")
-                }
-            }
-            UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: toCancel)
-        }
+        cancelPendingNotifications()
     }
     
     @objc func applicationDidEnterBackground() {
         postLatestTapped()
-        postSaleCount()
+        postSaleScreenshot()
         postLatestFavorite()
         scheduleInactivityDiscoverLocalNotification()
     }
@@ -154,7 +131,7 @@ class LocalNotificationModel {
                 switch identifier {
                 case LocalNotificationIdentifier.tappedProduct.rawValue:
                     Analytics.trackTimedLocalNotificationScheduled(source: .tappedProduct)
-                case LocalNotificationIdentifier.saleCount.rawValue:
+                case LocalNotificationIdentifier.saleScreenshot.rawValue:
                     Analytics.trackTimedLocalNotificationScheduled(source: .saleCount)
                 case LocalNotificationIdentifier.favoritedItem.rawValue:
                     Analytics.trackTimedLocalNotificationScheduled(source: .favoritedItem)
@@ -189,24 +166,23 @@ class LocalNotificationModel {
         }
     }
 
-    func postSaleCount() {
+    func postSaleScreenshot() {
         guard PermissionsManager.shared.hasPermission(for: .push) else {
-            print("postSaleCount no push permission")
+            print("postSaleScreenshot no push permission")
             return
         }
-        var imageURLString = ""
-        var saleCount = 0
-        let identifier = LocalNotificationIdentifier.saleCount.rawValue
-        DataModel.sharedInstance.retrieveSaleCount(from: sessionStart)
-            .then { productCount -> Promise<URL> in
-                imageURLString = "https://images-na.ssl-images-amazon.com/images/I/71F2ZBXnwtL._SX679_.jpg" // TODO: GMK collage from first 4 images.
-                saleCount = productCount
-                return NetworkingPromise.sharedInstance.downloadTmp(from: imageURLString, identifier: identifier)
+        var assetIdString = ""
+        let identifier = LocalNotificationIdentifier.saleScreenshot.rawValue
+        DataModel.sharedInstance.retrieveSaleScreenshot()
+            .then { assetId, imageData -> Promise<URL> in
+                assetIdString = assetId
+                return NetworkingPromise.sharedInstance.saveToTmp(data: imageData, identifier: identifier, originalExtension: "")
             }.then { copiedTmpURL -> Void in
                 self.scheduleImageLocalNotification(copiedTmpURL: copiedTmpURL,
-                                                    userInfo: [Constants.openingScreenKey : Constants.openingScreenValueScreenshot],
+                                                    userInfo: [Constants.openingScreenKey  : Constants.openingScreenValueScreenshot,
+                                                               Constants.openingAssetIdKey : assetIdString],
                                                     identifier: identifier,
-                                                    body: saleCount == 1 ? "notification.sale.count.message.single".localized(withFormat: saleCount) : "notification.sale.count.message.plural".localized(withFormat: saleCount),
+                                                    body: "notification.sale.screenshot.message".localized,
                                                     interval: 2 * Constants.secondsInDay)
         }
     }
@@ -245,11 +221,150 @@ class LocalNotificationModel {
                                             interval: 4 * Constants.secondsInDay)
     }
     
+    func cancelPendingNotifications(within: Date? = nil) {
+        UNUserNotificationCenter.current().getPendingNotificationRequests { notificationRequestArray in
+            var toCancel = [LocalNotificationIdentifier.tappedProduct.rawValue, LocalNotificationIdentifier.saleScreenshot.rawValue, LocalNotificationIdentifier.favoritedItem.rawValue, LocalNotificationIdentifier.inactivityDiscover.rawValue]
+            let toCancelPotentialSet = Set<String>(toCancel)
+            toCancel.removeAll()
+            notificationRequestArray.forEach { notificationRequest in
+                var isInCancelDateRange = true
+                if let within = within,
+                  let trigger = notificationRequest.trigger as? UNCalendarNotificationTrigger,
+                  let triggerDate = trigger.nextTriggerDate(),
+                  triggerDate > within {
+                    isInCancelDateRange = false
+                }
+                if isInCancelDateRange && toCancelPotentialSet.contains(notificationRequest.identifier) {
+                    switch notificationRequest.identifier {
+                    case LocalNotificationIdentifier.tappedProduct.rawValue:
+                        Analytics.trackTimedLocalNotificationCancelled(source: .tappedProduct)
+                        self.cancelProductInNotif(productKey: notificationRequest.content.userInfo[Constants.openingProductKey] as? String)
+                    case LocalNotificationIdentifier.saleScreenshot.rawValue:
+                        Analytics.trackTimedLocalNotificationCancelled(source: .saleCount)
+                        self.cancelScreenshotInNotif(assetId: notificationRequest.content.userInfo[Constants.openingAssetIdKey] as? String)
+                    case LocalNotificationIdentifier.favoritedItem.rawValue:
+                        Analytics.trackTimedLocalNotificationCancelled(source: .favoritedItem)
+                        self.cancelProductInNotif(productKey: notificationRequest.content.userInfo[Constants.openingProductKey] as? String)
+                    case LocalNotificationIdentifier.inactivityDiscover.rawValue:
+                        Analytics.trackTimedLocalNotificationCancelled(source: .inactivityDiscover)
+                    default:
+                        print("Cancel unknown timedLocalNotification. WTF?")
+                    }
+                    print("Canceling notification \(notificationRequest.identifier)")
+                    toCancel.append(notificationRequest.identifier)
+                }
+            }
+            UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: toCancel)
+        }
+    }
+    
     func cancelProductInNotif(productKey: String?) {
         guard let productKey = productKey else {
             return
         }
         DataModel.sharedInstance.markProductNotInNotif(imageURL: productKey)
+    }
+    
+    func cancelScreenshotInNotif(assetId: String?) {
+        guard let assetId = assetId else {
+            return
+        }
+        DataModel.sharedInstance.markScreenshotNotInNotif(assetId: assetId)
+    }
+    
+    // MARK: Remote Notification
+
+    func registerCrazeFavoritedPriceAlert(id: String?, lastPrice: Float) {
+        guard let id = id else {
+            print("registerCrazeFavoritedPriceAlert no product id")
+            return
+        }
+        guard let firebaseId = UserAccountManager.shared.user?.uid else {
+            print("registerCrazeFavoritedPriceAlert no firebase id")
+            return
+        }
+        NetworkingPromise.sharedInstance.registerCrazePriceAlert(id: id, lastPrice: lastPrice, firebaseId: firebaseId, action: "favorited")
+            .catch { error in
+                if let err = error as? PMKURLError {
+                    switch err {
+                    case let .badResponse(request, data, response):
+                        var errorString: String = "-"
+                        var dataCount: Int = 0
+                        if let data = data {
+                            errorString = String(data: data, encoding: .utf8) ?? "-"
+                            dataCount = data.count
+                        }
+                        let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
+                        print("registerCrazeFavoritedPriceAlert specific catch badResponse data count:\(dataCount)  statusCode:\(statusCode)  errorString:\(errorString)  request:\(request)")
+                        return
+                    default:
+                        break
+                    }
+                }
+                print("registerCrazeFavoritedPriceAlert caught error:\(error)")
+        }
+    }
+    
+    func deregisterCrazeFavoritedPriceAlert(id: String?) {
+        guard let id = id else {
+            print("deregisterCrazeFavoritedPriceAlert no product id")
+            return
+        }
+        guard let firebaseId = UserAccountManager.shared.user?.uid else {
+            print("deregisterCrazeFavoritedPriceAlert no firebase id")
+            return
+        }
+        NetworkingPromise.sharedInstance.registerCrazePriceAlert(id: id, lastPrice: 0, firebaseId: firebaseId, action: "disabled")
+            .catch { error in
+                if let err = error as? PMKURLError {
+                    switch err {
+                    case let .badResponse(request, data, response):
+                        var errorString: String = "-"
+                        var dataCount: Int = 0
+                        if let data = data {
+                            errorString = String(data: data, encoding: .utf8) ?? "-"
+                            dataCount = data.count
+                        }
+                        let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
+                        print("deregisterCrazeFavoritedPriceAlert specific catch badResponse data count:\(dataCount)  statusCode:\(statusCode)  errorString:\(errorString)  request:\(request)")
+                        return
+                    default:
+                        break
+                    }
+                }
+                print("deregisterCrazeFavoritedPriceAlert caught error:\(error)")
+        }
+    }
+
+    func registerCrazeTappedPriceAlert(id: String?, lastPrice: Float) {
+        guard let id = id else {
+            print("registerCrazeTappedPriceAlert no product id")
+            return
+        }
+        guard let firebaseId = UserAccountManager.shared.user?.uid else {
+            print("registerCrazeTappedPriceAlert no firebase id")
+            return
+        }
+        NetworkingPromise.sharedInstance.registerCrazePriceAlert(id: id, lastPrice: lastPrice, firebaseId: firebaseId, action: "tapped")
+            .catch { error in
+                if let err = error as? PMKURLError {
+                    switch err {
+                    case let .badResponse(request, data, response):
+                        var errorString: String = "-"
+                        var dataCount: Int = 0
+                        if let data = data {
+                            errorString = String(data: data, encoding: .utf8) ?? "-"
+                            dataCount = data.count
+                        }
+                        let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
+                        print("registerCrazeTappedPriceAlert specific catch badResponse data count:\(dataCount)  statusCode:\(statusCode)  errorString:\(errorString)  request:\(request)")
+                        return
+                    default:
+                        break
+                    }
+                }
+                print("registerCrazeTappedPriceAlert caught error:\(error)")
+        }
     }
     
 }

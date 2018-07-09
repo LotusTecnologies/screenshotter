@@ -181,7 +181,6 @@ class OnboardingGDPRViewController: UIViewController {
         editButton.addTarget(self, action: #selector(editAction), for: .touchUpInside)
         continueButton.isExclusiveTouch = true
         continueButton.addTarget(self, action: #selector(continueAction), for: .touchUpInside)
-
     }
     
     deinit {
@@ -189,7 +188,8 @@ class OnboardingGDPRViewController: UIViewController {
         tableView.delegate = nil
     }
     
-    // MARK: Edit
+    // MARK: Actions
+    
     @objc private func editAction() {
         editButton.isHidden = true
         UIView.animate(withDuration: .defaultAnimationDuration) {
@@ -205,9 +205,27 @@ class OnboardingGDPRViewController: UIViewController {
     @objc private func continueAction() {
         Analytics.trackOnboardingGdpr(agreedToEmail: agreedToEmail, agreedToImageDetection: agreedToImageDetection)
         UserAccountManager.shared.setGDPR(agreedToEmail: agreedToEmail, agreedToImageDetection: agreedToImageDetection)
-        
         print("agreedToEmail :\(agreedToEmail),agreedToImageDetection: \(agreedToImageDetection)" )
-        self.delegate?.onboardingGDPRViewControllerDidComplete(self)
+        
+        func requestPermissions(_ types: [PermissionType]) {
+            var types = types
+            guard !types.isEmpty else {
+                self.delegate?.onboardingGDPRViewControllerDidComplete(self)
+                return
+            }
+            let type = types.removeFirst()
+            
+            if PermissionsManager.shared.hasPermission(for: type) {
+                requestPermissions(types)
+            }
+            else {
+                PermissionsManager.shared.requestPermission(for: type) { granted in
+                    requestPermissions(types)
+                }
+            }
+        }
+        
+        requestPermissions([.push, .photo])
     }
 }
 
@@ -224,9 +242,9 @@ extension OnboardingGDPRViewController: UITableViewDataSource {
         cell.hasSelectableAppearance = self.managingSettings
 
         
-        if indexPath.row == GDPRViewController.Rows.notification.rawValue {
-            cell.titleLabel.text = "gdpr.notification.title".localized
-            cell.explanationLabel.text = "gdpr.notification.message".localized
+        if indexPath.row == GDPRViewController.Rows.email.rawValue {
+            cell.titleLabel.text = "gdpr.email.title".localized
+            cell.explanationLabel.text = "gdpr.email.message".localized
         }
         else if indexPath.row == GDPRViewController.Rows.imageDetection.rawValue {
             cell.titleLabel.text = "gdpr.image.title".localized
@@ -239,7 +257,7 @@ extension OnboardingGDPRViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         var isSelected = true
         
-        if indexPath.row == GDPRViewController.Rows.notification.rawValue {
+        if indexPath.row == GDPRViewController.Rows.email.rawValue {
             isSelected = agreedToEmail
         }
         else if indexPath.row == GDPRViewController.Rows.imageDetection.rawValue {
@@ -253,7 +271,7 @@ extension OnboardingGDPRViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if self.managingSettings {
-            if indexPath.row == GDPRViewController.Rows.notification.rawValue {
+            if indexPath.row == GDPRViewController.Rows.email.rawValue {
                 agreedToEmail = true
             }
             else if indexPath.row == GDPRViewController.Rows.imageDetection.rawValue {
@@ -262,9 +280,10 @@ extension OnboardingGDPRViewController: UITableViewDataSource {
             self.continueButton.isSelected = (!agreedToEmail && !agreedToImageDetection)
         }
     }
+    
     func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
         if self.managingSettings {
-            if indexPath.row == GDPRViewController.Rows.notification.rawValue {
+            if indexPath.row == GDPRViewController.Rows.email.rawValue {
                 agreedToEmail = false
             }
             else if indexPath.row == GDPRViewController.Rows.imageDetection.rawValue {
@@ -273,7 +292,6 @@ extension OnboardingGDPRViewController: UITableViewDataSource {
             
             self.continueButton.isSelected = (!agreedToEmail && !agreedToImageDetection)
         }
-        
     }
 }
 

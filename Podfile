@@ -21,13 +21,13 @@ target 'screenshot' do
     pod 'PhoneNumberKit'
     pod 'CardIO'
     pod 'PushwooshInboxUI'
-    pod 'Pushwoosh'
     pod 'Hero'
     pod 'Firebase/Core'
     pod 'Firebase/Auth'
     pod 'Firebase/Database'
     pod 'Firebase/Storage'
     pod 'FBSDKLoginKit'
+    pod 'SwiftLog', '~> 1.0.0'
 end
 
 post_install do |installer|

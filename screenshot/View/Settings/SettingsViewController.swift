@@ -415,7 +415,7 @@ fileprivate extension SettingsViewController {
 extension SettingsViewController {
     func presentMailComposerForContactUs(){
         let recipient = "Info+\(Bundle.displayVersionBuild)@screenshopit.com"
-        self.presentMail(recipient: recipient, gmailMessage: "", subject: "To Screenshop:", message: "")
+        self.presentMail(recipient: recipient, gmailMessage: "", subject: "To Screenshop:", message: "", isHTML: false, delegate: nil, noEmailErrorMessage: "email.setup.message.contactUs".localized, attachLogs:false)
         
     }
     
@@ -428,9 +428,12 @@ extension SettingsViewController {
         ].joined(separator: "\n")
         let gmailMessage = "(Don't edit) version: \(Bundle.displayVersionBuild)"  //gmail has a bug that it won't respect new line charactors in a URL
         let subject = "Bug Report"
-        let recipient = "support@screenshopit.com"
+        let recipient = "support+\(Bundle.displayVersionBuild)@screenshopit.com"
         
-        self.presentMail(recipient: recipient, gmailMessage: gmailMessage, subject: subject, message: message)
+        
+        
+        
+        self.presentMail(recipient: recipient, gmailMessage: gmailMessage, subject: subject, message: message, isHTML: false, delegate: nil, noEmailErrorMessage: "email.setup.message.bug".localized, attachLogs:true)
     }
     
 }

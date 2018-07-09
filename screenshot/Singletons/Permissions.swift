@@ -34,20 +34,7 @@ final class PermissionsManager : NSObject, CLLocationManagerDelegate {
     
     // MARK: Status
     
-    private var pushStatus: PermissionStatus = .undetermined {
-        didSet {
-            let enabled = pushStatus == .authorized
-            
-            let tokenString = (UserDefaults.standard.object(forKey: UserDefaultsKeys.deviceToken) as? Data)?.description
-            
-            if enabled {
-                Analytics.trackAPNEnabled(token: tokenString)
-            }
-            else {
-                Analytics.trackAPNDisabled(token: tokenString)
-            }
-        }
-    }
+    private var pushStatus: PermissionStatus = .undetermined
     
     func permissionStatus(for type: PermissionType) -> PermissionStatus {
         switch type {
@@ -201,7 +188,13 @@ final class PermissionsManager : NSObject, CLLocationManagerDelegate {
         
         UNUserNotificationCenter.current().requestAuthorization(options: options) { (granted, error) in
             self.pushStatus = granted ? .authorized : .denied
-            
+            let tokenString = (UserDefaults.standard.object(forKey: UserDefaultsKeys.deviceToken) as? Data)?.description
+            if granted {
+                Analytics.trackAPNEnabled(token: tokenString)
+            }
+            else {
+                Analytics.trackAPNDisabled(token: tokenString)
+            }
             if granted {
                 DispatchQueue.main.async {
                     PushNotificationManager.push().registerForPushNotifications()

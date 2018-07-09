@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		311A4F5320D90AED0001D463 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 311A4F5220D90AED0001D463 /* GoogleService-Info.plist */; };
 		311A4F5520D90B020001D463 /* UserAccountManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A4F5420D90B020001D463 /* UserAccountManager.swift */; };
 		311A502220D90B780001D463 /* ProductWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A4F5720D90B730001D463 /* ProductWebViewController.swift */; };
 		311A502320D90B780001D463 /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A4F5820D90B730001D463 /* WebView.swift */; };
@@ -137,6 +136,7 @@
 		31C536A820B40446005810CA /* String+HTML.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C536A720B40446005810CA /* String+HTML.swift */; };
 		31CE11002035AC44000156EE /* UIApplication+openInChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE10FF2035AC44000156EE /* UIApplication+openInChrome.swift */; };
 		31CE11022039570B000156EE /* FetchedResultsControllerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE11012039570B000156EE /* FetchedResultsControllerManager.swift */; };
+		31D372B320EE5B91007E978E /* RecoveryLostSalePopupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31D372B220EE5B91007E978E /* RecoveryLostSalePopupViewController.swift */; };
 		31EF9B0720299D15006D3B35 /* InAppPurchaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31EF9B0620299D15006D3B35 /* InAppPurchaseManager.swift */; };
 		31EF9B092029D542006D3B35 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 31EF9B082029D542006D3B35 /* StoreKit.framework */; };
 		523C11391F5C195D001BD969 /* RatingFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523C11381F5C195D001BD969 /* RatingFlow.swift */; };
@@ -248,7 +248,6 @@
 		E42AC3911F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E42AC3901F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift */; };
 		E44CA6FC1F41E608001CB493 /* NetworkingPromise.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44CA6FB1F41E608001CB493 /* NetworkingPromise.swift */; };
 		E44D6108203EC5CB00039CCB /* ShoppingCartModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44D6107203EC5CB00039CCB /* ShoppingCartModel.swift */; };
-		E45C7AFF20E0235700A8B4A9 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E45C7AFE20E0235600A8B4A9 /* GoogleService-Info.plist */; };
 		E49261D6206A704C006FE84E /* UIImage+craze.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49261D5206A704C006FE84E /* UIImage+craze.swift */; };
 		E4978C3C1F53610F0008B87F /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4978C3B1F53610F0008B87F /* Constants.swift */; };
 		E4A671631FA88AAA00250410 /* ScreenshotDetectionProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4A671621FA88AAA00250410 /* ScreenshotDetectionProtocol.swift */; };
@@ -419,6 +418,7 @@
 		31CE10FF2035AC44000156EE /* UIApplication+openInChrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplication+openInChrome.swift"; sourceTree = "<group>"; };
 		31CE11012039570B000156EE /* FetchedResultsControllerManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FetchedResultsControllerManager.swift; sourceTree = "<group>"; };
 		31CE110C203BEFC1000156EE /* Model 10.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 10.xcdatamodel"; sourceTree = "<group>"; };
+		31D372B220EE5B91007E978E /* RecoveryLostSalePopupViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryLostSalePopupViewController.swift; sourceTree = "<group>"; };
 		31EF9B0620299D15006D3B35 /* InAppPurchaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InAppPurchaseManager.swift; sourceTree = "<group>"; };
 		31EF9B082029D542006D3B35 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		3F0C1FB8EA3C6E2B9CFD91FD /* Pods-screenshot.prddebug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.prddebug.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.prddebug.xcconfig"; sourceTree = "<group>"; };
@@ -749,6 +749,7 @@
 				311A4F9520D90B740001D463 /* ProductHeaderCollectionViewCell.swift */,
 				311A4F9620D90B740001D463 /* ProductCollectionViewManager.swift */,
 				311A50C820DAB2EF0001D463 /* RecoverLostSaleManager.swift */,
+				31D372B220EE5B91007E978E /* RecoveryLostSalePopupViewController.swift */,
 				311A4F9720D90B740001D463 /* ProductsRateView.swift */,
 				311A4F9820D90B740001D463 /* SectionBackgroundCollectionViewFlowLayout.swift */,
 			);
@@ -1347,6 +1348,7 @@
 				AE7846E2803BA1055B53CB98 /* [CP] Check Pods Manifest.lock */,
 				E4139D3C1F09083B00E8A53B /* Sources */,
 				E4139D3D1F09083B00E8A53B /* Frameworks */,
+				E4C6C7CE20ED014D00525928 /* Setup Firebase Environment GoogleService-Info.plist */,
 				E4139D3E1F09083B00E8A53B /* Resources */,
 				E4D495D31F4987B100312614 /* Upload Symbols To AppSee */,
 				062DDE6A3EEF8844E9956F39 /* [CP] Embed Pods Frameworks */,
@@ -1455,11 +1457,9 @@
 				C572FEFF205C00070046BFEB /* Hind-Bold.ttf in Resources */,
 				E4DB2B7C1F7E1D4600320BE5 /* LaunchScreen.storyboard in Resources */,
 				C53B15BA1FDD638C00658A78 /* Localizable.strings in Resources */,
-				311A4F5320D90AED0001D463 /* GoogleService-Info.plist in Resources */,
 				C5E6C318208F23AA006E9C54 /* CheckoutSupportedStates.plist in Resources */,
 				C5DC531D20CD3F2100E90DB8 /* Quicksand-Bold.ttf in Resources */,
 				C5E6C31A208F2415006E9C54 /* CheckoutSupportedCountries.plist in Resources */,
-				E45C7AFF20E0235700A8B4A9 /* GoogleService-Info.plist in Resources */,
 				C5DC531A20CD3F2100E90DB8 /* Quicksand-Medium.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1497,6 +1497,7 @@
 				"${BUILT_PRODUCTS_DIR}/RateView/RateView.framework",
 				"${BUILT_PRODUCTS_DIR}/SDWebImage/SDWebImage.framework",
 				"${BUILT_PRODUCTS_DIR}/SwiftKeychainWrapper/SwiftKeychainWrapper.framework",
+				"${BUILT_PRODUCTS_DIR}/SwiftLog/SwiftLog.framework",
 				"${BUILT_PRODUCTS_DIR}/Whisper/Whisper.framework",
 				"${BUILT_PRODUCTS_DIR}/leveldb-library/leveldb.framework",
 				"${BUILT_PRODUCTS_DIR}/lottie-ios/Lottie.framework",
@@ -1520,6 +1521,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RateView.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SDWebImage.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftKeychainWrapper.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftLog.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Whisper.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/leveldb.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Lottie.framework",
@@ -1565,6 +1567,20 @@
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
+		};
+		E4C6C7CE20ED014D00525928 /* Setup Firebase Environment GoogleService-Info.plist */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Setup Firebase Environment GoogleService-Info.plist";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# See https://medium.com/rocket-fuel/using-multiple-firebase-environments-in-ios-12b204cfa6c0\n# Name of the resource we're selectively copying\nGOOGLESERVICE_INFO_PLIST=GoogleService-Info.plist\n\n# Get references to dev and prod versions of the GoogleService-Info.plist\n# NOTE: These should only live on the file system and should NOT be part of the target (since we'll be adding them to the target manually)\nGOOGLESERVICE_INFO_DEV=${PROJECT_DIR}/${TARGET_NAME}/dev/${GOOGLESERVICE_INFO_PLIST}\nGOOGLESERVICE_INFO_PROD=${PROJECT_DIR}/${TARGET_NAME}/prd/${GOOGLESERVICE_INFO_PLIST}\n\n# Make sure the dev version of GoogleService-Info.plist exists\necho \"Looking for ${GOOGLESERVICE_INFO_PLIST} in ${GOOGLESERVICE_INFO_DEV}\"\nif [ ! -f $GOOGLESERVICE_INFO_DEV ]\nthen\necho \"No Development GoogleService-Info.plist found. Please ensure it's in the proper directory.\"\nexit 1\nfi\n\n# Make sure the prod version of GoogleService-Info.plist exists\necho \"Looking for ${GOOGLESERVICE_INFO_PLIST} in ${GOOGLESERVICE_INFO_PROD}\"\nif [ ! -f $GOOGLESERVICE_INFO_PROD ]\nthen\necho \"No Production GoogleService-Info.plist found. Please ensure it's in the proper directory.\"\nexit 1\nfi\n\n# Get a reference to the destination location for the GoogleService-Info.plist\nPLIST_DESTINATION=${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app\necho \"Will copy ${GOOGLESERVICE_INFO_PLIST} to final destination: ${PLIST_DESTINATION}\"\n\n# Copy over the prod GoogleService-Info.plist for Release builds\nif [ \"${CONFIGURATION}\" == \"prdRelease\" ]\nthen\necho \"Using ${GOOGLESERVICE_INFO_PROD}\"\ncp \"${GOOGLESERVICE_INFO_PROD}\" \"${PLIST_DESTINATION}\"\nelse\necho \"Using ${GOOGLESERVICE_INFO_DEV}\"\ncp \"${GOOGLESERVICE_INFO_DEV}\" \"${PLIST_DESTINATION}\"\nfi\n";
 		};
 		E4D495D31F4987B100312614 /* Upload Symbols To AppSee */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1804,6 +1820,7 @@
 				C53B46531FBC397700A8C886 /* Geometry.swift in Sources */,
 				C58BAE5820E101DD0051394A /* ModalNavigationController.swift in Sources */,
 				31C536A820B40446005810CA /* String+HTML.swift in Sources */,
+				31D372B320EE5B91007E978E /* RecoveryLostSalePopupViewController.swift in Sources */,
 				C58BAE6120E101DD0051394A /* IntrinsicContentSizePresentationController.swift in Sources */,
 				C58BAE5920E101DD0051394A /* BaseViewController.swift in Sources */,
 				C58BAE8D20E101DD0051394A /* LoadingButton.swift in Sources */,
@@ -1968,7 +1985,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 161;
+				CURRENT_PROJECT_VERSION = 169;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/dev/;
 				INFOPLIST_FILE = screenshot/dev/Info.plist;
@@ -1998,7 +2015,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 161;
+				CURRENT_PROJECT_VERSION = 169;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/dev/;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -2086,10 +2103,10 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 161;
+				CURRENT_PROJECT_VERSION = 169;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
-				ENVIRONMENT_FOLDER = screenshot/prd/;
-				INFOPLIST_FILE = screenshot/prd/Info.plist;
+				ENVIRONMENT_FOLDER = screenshot/dev/;
+				INFOPLIST_FILE = screenshot/dev/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" -Xfrontend -warn-long-function-bodies=200";
 				PRODUCT_BUNDLE_IDENTIFIER = io.crazeapp.screenshot;
@@ -2169,7 +2186,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 161;
+				CURRENT_PROJECT_VERSION = 169;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/prd/;
 				INFOPLIST_FILE = screenshot/prd/Info.plist;

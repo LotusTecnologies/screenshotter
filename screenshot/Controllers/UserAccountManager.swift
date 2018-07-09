@@ -32,18 +32,25 @@ class FacebookProxy : NSObject, FBSDKLoginButtonDelegate {
     
     func loginButton(_ loginButton: FBSDKLoginButton!, didCompleteWith result: FBSDKLoginManagerLoginResult!, error: Error!) {
         print("delegate is \(self)")
+        Analytics.trackDevLog(file: #file, line: #line, message: "loginButton didCompleteWith")
 
         if let error = error {
+            Analytics.trackDevLog(file: #file, line: #line, message: "loginButton didCompleteWith error \(error)")
+
             reject(error)
         }else if let result = result {
             if result.isCancelled {
+                Analytics.trackDevLog(file: #file, line: #line, message: "loginButton didCompleteWith cancel")
                 reject(NSError.init(domain: FacebookProxy.FacebookProxyErrorDomain, code: FacebookError.canceled.rawValue, userInfo: [:]))
             }else if result.token == nil {
+                Analytics.trackDevLog(file: #file, line: #line, message: "loginButton didCompleteWith token is nil")
                 reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
             }else{
+                Analytics.trackDevLog(file: #file, line: #line, message: "loginButton didCompleteWith ")
                 fulfill(result)
             }
         }else{
+            Analytics.trackDevLog(file: #file, line: #line, message: "loginButton didCompleteWith no error, no result")
             reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
         }
         facebookButton.delegate = nil
@@ -51,6 +58,8 @@ class FacebookProxy : NSObject, FBSDKLoginButtonDelegate {
     
     func loginButtonDidLogOut(_ loginButton: FBSDKLoginButton!) {
         print("delegate is \(self)")
+        Analytics.trackDevLog(file: #file, line: #line, message: "loginButtonDidLogOut")
+
         reject(NSError.init(domain: FacebookProxy.FacebookProxyErrorDomain, code: FacebookError.wasLogout.rawValue, userInfo: [:]))
     }
     func loginButtonWillLogin(_ loginButton: FBSDKLoginButton!) -> Bool {
@@ -91,34 +100,67 @@ class UserAccountManager : NSObject {
 //        self.facebookLogin.interceptApplication(application, didFinishLaunchingWithOptions: launchOptions)
         return true
     }
-    
+
     func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any]) -> Bool {
+        Analytics.trackDevLog(file: #file, line: #line, message: "application didFinishLaunchingWithOptions with mode \(url)")
+
+        let queryParams = URLComponents.init(string: url.absoluteString)
+        if let mode = queryParams?.queryItems?.first(where: {$0.name == "mode"})?.value, let code = queryParams?.queryItems?.first(where: {$0.name == "oobCode"})?.value {
+            return applicationOpenLinkedWith(mode: mode, code: code)
+        }
+        return false
+    }
+    func applicationOpenLinkedWith( mode:String, code:String) -> Bool {
+    
         var handled = false
 //        let source = options[.sourceApplication] as? String
 //        let annotation = options[.annotation]
 
-
-        let queryParams = URLComponents.init(string: url.absoluteString)
-        let mode = queryParams?.queryItems?.first(where: {$0.name == "mode"})
-        let code = queryParams?.queryItems?.first(where: {$0.name == "oobCode"})
-        if let _ = mode?.value, let code = code?.value{
-            if let confirmVC = AppDelegate.shared.window?.rootViewController?.childViewControllers.last as? ConfirmCodeViewController {
-                confirmVC.applyCode(code: code)
-            }
-            if let resetVC = AppDelegate.shared.window?.rootViewController?.childViewControllers.last as? ResetPasswordViewController {
-                resetVC.code = code
-            }
-            if let confirmVC = AppDelegate.shared.window?.rootViewController?.childViewControllers.last?.childViewControllers.first?.presentedViewController?.childViewControllers.last as? ConfirmCodeViewController{
-                confirmVC.applyCode(code: code)
-            }
-            if let resetVC = AppDelegate.shared.window?.rootViewController?.childViewControllers.last?.childViewControllers.first?.presentedViewController?.childViewControllers.last as? ResetPasswordViewController {
-                resetVC.code = code
+        func find(_ t:AnyClass, viewController:UIViewController? ) -> UIViewController?{
+            if let viewController = viewController {
+                if viewController.isKind(of: t) {
+                    return viewController
+                }
+                for vc in viewController.childViewControllers {
+                    if let found = find(t, viewController: vc) {
+                        return found
+                    }
+                }
+                
+                if let presented = viewController.presentedViewController{
+                    if let found = find(t, viewController: presented) {
+                        return found
+                    }
+                }
             }
             
-            handled = true
+            return nil
         }
+        
+        // there are 6 here: 3 for confirm, 3 for reset. each one has one for onboarding and one for inapp, and one fallback to try to find VC anywhere it can.
+        if let confirmVC = AppDelegate.shared.window?.rootViewController?.childViewControllers.last as? ConfirmCodeViewController {
+            confirmVC.applyCode(code: code)
+        }else if let resetVC = AppDelegate.shared.window?.rootViewController?.childViewControllers.last as? ResetPasswordViewController {
+            resetVC.code = code
+        }else if let confirmVC = AppDelegate.shared.window?.rootViewController?.childViewControllers.last?.childViewControllers.first?.presentedViewController?.childViewControllers.last as? ConfirmCodeViewController{
+            confirmVC.applyCode(code: code)
+        }else if let resetVC = AppDelegate.shared.window?.rootViewController?.childViewControllers.last?.childViewControllers.first?.presentedViewController?.childViewControllers.last as? ResetPasswordViewController {
+            resetVC.code = code
+        }else if let confirmVC = find(ConfirmCodeViewController.self, viewController:AppDelegate.shared.window?.rootViewController) as? ConfirmCodeViewController {
+            confirmVC.applyCode(code: code)
+        }else if let resetVC =  find(ResetPasswordViewController.self, viewController:AppDelegate.shared.window?.rootViewController) as? ResetPasswordViewController {
+            resetVC.code = code
+        }else{
+            let debugInfo =  UIApplication.shared.keyWindow?.rootViewController?.value(forKey: "_printHierarchy") as? String
+            Analytics.trackDevLog(file: #file, line: #line, message: "could not find VC \(debugInfo ?? "?")")
+            
+            Analytics.trackOnboardingError(domain: "code pressed VC not found", code: #line, localizedDescription: "link pressed but cannot find view controller \(String(describing: debugInfo))")
+        }
+        
+        handled = true
         return handled
     }
+    
     private func linkFirebaseStuffForFacebookFor(user:User ) {
         if let name = user.providerData.first?.displayName {
             self.databaseRef.child("users").child(user.uid).child("facebook-displayName").setValue(name)
@@ -140,10 +182,12 @@ class UserAccountManager : NSObject {
         
         self.userFromLogin = user
         self.databaseRef.child("users").child(user.uid).child("identifier").setValue(AnalyticsUser.current.identifier)
-        self.downloadAndReplaceUserData()
+        let _ = self.downloadAndReplaceUserData()
     }
     var loginWithFacebookPromise: Promise<LoginOrCreateAccountResult>?
     public func loginWithFacebook()  -> Promise<LoginOrCreateAccountResult>{
+        Analytics.trackDevLog(file: #file, line: #line, message: "loginWithFacebook")
+
         let completion =  { (result:AuthDataResult?, error:Error?,  fulfil: @escaping (LoginOrCreateAccountResult) -> Void, reject:@escaping (Error) -> Void) in
             if let error = error{
                 let e = error as NSError
@@ -152,19 +196,25 @@ class UserAccountManager : NSObject {
                     if let user = self.user {
                         self.linkFirebaseStuffForFacebookFor(user: user)
                     }
-                    fulfil(.facebookOld)
+                    self.downloadAndReplaceUserData().always {
+                        fulfil(.facebookOld)
+                    }
+                    
                 }else{
                     reject(error)
                 }
             }else if let user = result?.user {
                self.linkFirebaseStuffForFacebookFor(user: user)
+                let downloadAndReplaceUserDataTask = self.downloadAndReplaceUserData()
                 self.databaseRef.child("users").child(user.uid).child("createdAt").observeSingleEvent(of: .value) { (snapshot) in
-                    if let _ = snapshot.value as? NSNumber {
-                        fulfil(.facebookOld)
-                    }else{
-                        let now = NSNumber.init(value: (Date().timeIntervalSince1970 as Double) )
-                        self.databaseRef.child("users").child(user.uid).child("createdAt").setValue(now)
-                        fulfil(.facebookNew)
+                    downloadAndReplaceUserDataTask.always {
+                        if let _ = snapshot.value as? NSNumber {
+                            fulfil(.facebookOld)
+                        }else{
+                            let now = NSNumber.init(value: (Date().timeIntervalSince1970 as Double) )
+                            self.databaseRef.child("users").child(user.uid).child("createdAt").setValue(now)
+                            fulfil(.facebookNew)
+                        }
                     }
                 }
             }else {
@@ -175,13 +225,18 @@ class UserAccountManager : NSObject {
         let promise = Promise<LoginOrCreateAccountResult>.init(resolvers: { (fulfil, reject) in
             let proxy = FacebookProxy.init()
             self.facebookProxy = proxy
+            Analytics.trackDevLog(file: #file, line: #line, message: "loginWithFacebook")
+
             proxy.promise.then(execute: { (result) -> Void in
-               
+                Analytics.trackDevLog(file: #file, line: #line, message: "loginWithFacebook success")
+
                 let credential = FacebookAuthProvider.credential(withAccessToken: FBSDKAccessToken.current().tokenString)
                 if let user = self.user {
+                    Analytics.trackDevLog(file: #file, line: #line, message: "loginWithFacebook success link current user")
                     user.linkAndRetrieveData(with: credential, completion: { (result, error) in
                         if let e = error,  (e as NSError).domain == AuthErrorDomain, (e as NSError).code == 17025 {
                             //"This credential is already associated with a different user account."
+                            Analytics.trackDevLog(file: #file, line: #line, message: "loginWithFacebook success link current user already associated")
                             Auth.auth().signInAndRetrieveData(with: credential, completion: { (result, error) in
                                 completion(result, error, fulfil, reject)
                             })
@@ -190,11 +245,14 @@ class UserAccountManager : NSObject {
                         }
                     })
                 }else{
+                    Analytics.trackDevLog(file: #file, line: #line, message: "loginWithFacebook success no user")
                     Auth.auth().signInAndRetrieveData(with: credential, completion:{ (result, error) in
                         completion(result, error, fulfil, reject)
                     })
                 }
             }).catch(execute: { (error) in
+                Analytics.trackDevLog(file: #file, line: #line, message: "loginWithFacebook error \(error)")
+
                 reject(error)
             })
         })
@@ -206,24 +264,36 @@ class UserAccountManager : NSObject {
     
     
     public func loginOrCreatAccountAsNeeded(email:String, password:String) -> Promise<LoginOrCreateAccountResult> {
+        Analytics.trackDevLog(file: #file, line: #line, message: "loginOrCreatAccountAsNeeded")
+
         if let user = self.user, user.isAnonymous{
+            Analytics.trackDevLog(file: #file, line: #line, message: "loginOrCreatAccountAsNeeded already user")
             return Promise.init(resolvers: { (fulfil, reject) in
                 user.updateEmail(to: email, completion: { (error) in
                     if let error = error {
+                        Analytics.trackDevLog(file: #file, line: #line, message: "loginOrCreatAccountAsNeeded updateEmail error \(error)")
                         reject(error)
                     }else{
+                        self.email = email
                         user.sendEmailVerification(completion: { (error) in
                             if let error = error {
+                                Analytics.trackDevLog(file: #file, line: #line, message: "loginOrCreatAccountAsNeeded updateEmail error \(error)")
                                 reject(error)
                             }else{
                                 user.updatePassword(to: password, completion: { (error) in
                                     if let error = error {
+                                        Analytics.trackDevLog(file: #file, line: #line, message: "loginOrCreatAccountAsNeeded updatePassword error \(error)")
+
                                         reject(error)
                                     }else{
+                                        self.email = email
                                         user.sendEmailVerification(completion: { (error) in
                                             if let error = error {
+                                                Analytics.trackDevLog(file: #file, line: #line, message: "loginOrCreatAccountAsNeeded sendEmailVerification error \(error)")
+
                                                 reject(error)
                                             }else{
+                                                Analytics.trackDevLog(file: #file, line: #line, message: "loginOrCreatAccountAsNeeded from anon -> real \(String(describing: self.user?.isAnonymous))")
                                                 fulfil(LoginOrCreateAccountResult.unconfirmed)
                                             }
                                         })
@@ -236,14 +306,17 @@ class UserAccountManager : NSObject {
             }).recover(execute: { (error) -> Promise<UserAccountManager.LoginOrCreateAccountResult> in
                 let nsError = error as NSError
                 if nsError.code == AuthErrorCode.emailAlreadyInUse.rawValue && nsError.domain == AuthErrorDomain {
+                    Analytics.trackDevLog(file: #file, line: #line, message: "loginOrCreatAccountAsNeeded anon -> login")
                     return self.login(email: email.lowercased(), password: password)
                 }
                 return Promise.init(error: error)
             })
+            
         }
         return createAccount(email:email.lowercased(), password: password).recover(execute: { (error) -> Promise<UserAccountManager.LoginOrCreateAccountResult> in
             let nsError = error as NSError
             if nsError.code == AuthErrorCode.emailAlreadyInUse.rawValue && nsError.domain == AuthErrorDomain {
+                Analytics.trackDevLog(file: #file, line: #line, message: "createAccount fail -> login")
                 return self.login(email: email.lowercased(), password: password)
             }
             return Promise.init(error: error)
@@ -254,31 +327,43 @@ class UserAccountManager : NSObject {
     
     
     private func login(email:String, password:String) -> Promise<LoginOrCreateAccountResult>{
+        Analytics.trackDevLog(file: #file, line: #line, message: "login")
+
         return Promise<LoginOrCreateAccountResult>.init(resolvers: { (fulfil, reject) in
             
             Auth.auth().signIn(withEmail: email, password: password) { (authResult, error) in
                 
                 if let error = error {
+                    Analytics.trackDevLog(file: #file, line: #line, message: " login error \(error)")
+
                     reject(error)
                 }else if let authResult = authResult {
                     let user = authResult.user
                     self.userFromLogin = user
                     self.databaseRef.child("users").child(user.uid).child("identifier").setValue(AnalyticsUser.current.identifier)
-                    self.downloadAndReplaceUserData()
-                    if user.isEmailVerified {
-                        self.databaseRef.child("users").child(user.uid).child("email").setValue(email.lowercased())
-                        UserDefaults.standard.set(email.lowercased(), forKey: UserDefaultsKeys.email)
-                        fulfil(LoginOrCreateAccountResult.confirmed)
-                    }else{
-                        user.sendEmailVerification(completion: { (error) in
-                            if let error = error {
-                                reject(error)
-                            }else{
-                                fulfil(LoginOrCreateAccountResult.unconfirmed)
-                            }
-                        })
+                    self.downloadAndReplaceUserData().always {
+                        if user.isEmailVerified {
+                            self.databaseRef.child("users").child(user.uid).child("email").setValue(email.lowercased())
+                            UserDefaults.standard.set(email.lowercased(), forKey: UserDefaultsKeys.email)
+                            Analytics.trackDevLog(file: #file, line: #line, message: " login user email verified")
+                            fulfil(LoginOrCreateAccountResult.confirmed)
+                        }else{
+                            Analytics.trackDevLog(file: #file, line: #line, message: " login user email unverified")
+                            self.email = email
+                            user.sendEmailVerification(completion: { (error) in
+                                if let error = error {
+                                    Analytics.trackDevLog(file: #file, line: #line, message: " login user email unverified send email error \(error)")
+
+                                    reject(error)
+                                }else{
+                                    Analytics.trackDevLog(file: #file, line: #line, message: " login user email unverified send email")
+                                    fulfil(LoginOrCreateAccountResult.unconfirmed)
+                                }
+                            })
+                        }
                     }
                 }else{
+                    Analytics.trackDevLog(file: #file, line: #line, message: "unexpected")
                     reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
                 }
                 
@@ -287,21 +372,29 @@ class UserAccountManager : NSObject {
     }
     var makeAnonAccountPromise: Promise<Void>?
     @discardableResult func makeAnonAccount() -> Promise<Void>{
+        Analytics.trackDevLog(file: #file, line: #line, message: "makeAnonAccount")
+
         if let promise = self.makeAnonAccountPromise {
+            Analytics.trackDevLog(file: #file, line: #line, message: "already making/made anon account")
             return promise
         }else{
             let promise = Promise<Void>.init(resolvers: { (fulfil, reject) in
                 Auth.auth().signInAnonymously() { (authResult, error) in
                     if let error = error {
                          ///automatic retry?
+                        Analytics.trackDevLog(file: #file, line: #line, message: "eror making anon acc ount \(error)")
+
                         reject(error)
                     }else  if let authResult = authResult {
+                        Analytics.trackDevLog(file: #file, line: #line, message: "made anon account")
                         let user = authResult.user
                         self.userFromLogin = user
                         self.databaseRef.child("users").child(user.uid).child("identifier").setValue(AnalyticsUser.current.identifier)
-                        self.downloadAndReplaceUserData()
-                        fulfil(())
+                        self.downloadAndReplaceUserData().always {
+                            fulfil(())
+                        }
                     }else{
+                        Analytics.trackDevLog(file: #file, line: #line, message: "unexpected")
                         reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
                     }
                     
@@ -311,27 +404,43 @@ class UserAccountManager : NSObject {
         }
     }
     private func createAccount(email:String, password:String) -> Promise<LoginOrCreateAccountResult>{
+        Analytics.trackDevLog(file: #file, line: #line, message: "createAccount")
+
         return Promise<LoginOrCreateAccountResult>.init(resolvers: { (fulfil, reject) in
             Auth.auth().createUser(withEmail: email, password: password) { (authResult, error) in
                 if let error = error {
+                    Analytics.trackDevLog(file: #file, line: #line, message: "createAccount error  \(error)")
+
                     reject(error)
                 }else  if let authResult = authResult {
                     let user = authResult.user
                     self.userFromLogin = user
                     self.databaseRef.child("users").child(user.uid).child("identifier").setValue(AnalyticsUser.current.identifier)
-                    self.downloadAndReplaceUserData()
+                    let downloadPromise = self.downloadAndReplaceUserData()
                     if authResult.user.isEmailVerified {
-                        fulfil(LoginOrCreateAccountResult.confirmed)
+                        downloadPromise.always {
+                            Analytics.trackDevLog(file: #file, line: #line, message: "created email verified")
+                            fulfil(LoginOrCreateAccountResult.confirmed)
+                        }
                     }else{
+                        self.email = email
+                        Analytics.trackDevLog(file: #file, line: #line, message: "created email unverified")
+
                         authResult.user.sendEmailVerification(completion: { (error) in
-                            if let error = error {
-                                reject(error)
-                            }else{
-                                fulfil(LoginOrCreateAccountResult.unconfirmed)
+                            downloadPromise.always {
+                                if let error = error {
+                                    Analytics.trackDevLog(file: #file, line: #line, message: "createAccount sendEmailVerification error  \(error)")
+                                    reject(error)
+                                }else{
+                                    Analytics.trackDevLog(file: #file, line: #line, message: "created account")
+                                    fulfil(LoginOrCreateAccountResult.unconfirmed)
+                                }
                             }
                         })
                     }
                 }else{
+                    Analytics.trackDevLog(file: #file, line: #line, message: "unexpected")
+
                     reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
                 }
                 
@@ -340,14 +449,20 @@ class UserAccountManager : NSObject {
     }
     
     func confirmSignup(code:String) -> Promise<Void>{
+        Analytics.trackDevLog(file: #file, line: #line, message: "confirmSignup")
+
         return Promise { fulfill, reject in
             Auth.auth().applyActionCode(code, completion: { (error) in
                 if let error = error {
+                    Analytics.trackDevLog(file: #file, line: #line, message: "confirmSignup error \(error)")
                     reject(error)
                 }else{
+                    Analytics.trackDevLog(file: #file, line: #line, message: "confirmSignup success")
                     if let user = self.user, let email = self.email {
                         self.databaseRef.child("users").child(user.uid).child("email").setValue(email.lowercased())
                         UserDefaults.standard.set(email.lowercased(), forKey: UserDefaultsKeys.email)
+                    }else{
+                        Analytics.trackDevLog(file: #file, line: #line, message: "unexpected")
                     }
                     
                     fulfill(())
@@ -357,6 +472,8 @@ class UserAccountManager : NSObject {
     }
     
     func resendConfirmCode() -> Promise<Void>{
+        Analytics.trackDevLog(file: #file, line: #line, message: "resendConfirmCode")
+
         return Promise { fulfill, reject in
             if let user = self.user {
                 user.sendEmailVerification(completion: { (error) in
@@ -367,6 +484,7 @@ class UserAccountManager : NSObject {
                     }
                 })
             }else{
+                Analytics.trackDevLog(file: #file, line: #line, message: "unexpected")
                 reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
             }
             
@@ -381,11 +499,18 @@ class UserAccountManager : NSObject {
     }
     
     func forgotPassword(email:String) ->Promise<Void> {
+        Analytics.trackDevLog(file: #file, line: #line, message: "forgotPassword")
+
         return Promise { fulfill, reject in
+            self.email = email
+
             Auth.auth().sendPasswordReset(withEmail: email, completion: { (error) in
                 if let error = error {
+                    Analytics.trackDevLog(file: #file, line: #line, message: "forgotPassword erro \(error)")
+
                     reject(error)
                 }else{
+                    Analytics.trackDevLog(file: #file, line: #line, message: "forgotPassword sucess")
                     fulfill(())
                 }
             })
@@ -394,18 +519,35 @@ class UserAccountManager : NSObject {
     }
     
     func confirmForgotPassword(code:String, password:String) ->Promise<Void> {
+        Analytics.trackDevLog(file: #file, line: #line, message: "confirmForgotPassword")
+
         return Promise { fulfill, reject in
             Auth.auth().confirmPasswordReset(withCode: code, newPassword: password, completion: { (error) in
                 if let error = error {
+                    Analytics.trackDevLog(file: #file, line: #line, message: "reset password error - \(error)")
                     reject(error)
                 }else{
-                    fulfill(())
+                    if let email = self.email {
+                        Analytics.trackDevLog(file: #file, line: #line, message: "reset password success - now login")
+
+                        self.login(email: email, password: password).then(execute: { (result) -> Void in
+                            fulfill(())
+                        }).catch(execute: { (error) in
+                            reject(error)
+                        })
+                    }else{
+                        Analytics.trackDevLog(file: #file, line: #line, message: "unexpected")
+
+                        reject(NSError.init(domain: #file, code: #line, userInfo: [:]))
+                    }
                 }
             })
         }
     }
     
     @discardableResult func setGDPR(agreedToEmail:Bool, agreedToImageDetection:Bool) -> Promise<Void>{
+        Analytics.trackDevLog(file: #file, line: #line, message: "setGDPR")
+
         return Promise { fulfill, reject in
             UserDefaults.standard.setValue(agreedToEmail, forKey: UserDefaultsKeys.gdpr_agreedToEmail)
             UserDefaults.standard.setValue(agreedToImageDetection, forKey: UserDefaultsKeys.gdpr_agreedToImageDetection)
@@ -419,17 +561,24 @@ class UserAccountManager : NSObject {
                 if let user = self.user {
                     self.databaseRef.child("users").child(user.uid).child("GDRP-agreedToEmail").setValue(NSNumber.init(value: agreedToEmail))
                     self.databaseRef.child("users").child(user.uid).child("GDRP-agreedToImageDetection").setValue(NSNumber.init(value: agreedToImageDetection))
+                    Analytics.trackDevLog(file: #file, line: #line, message: "setGDPR sucess")
+
                     fulfill(())
                 }else{
+                    Analytics.trackDevLog(file: #file, line: #line, message: "unexpected")
                     reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
                 }
             }).catch(execute: { (error) in
+                Analytics.trackDevLog(file: #file, line: #line, message: "unexpected")
+
                 reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
             })
         }
     }
     
     @discardableResult func setProfile(displayName:String?, gender:String?, size:String?, unverifiedEmail:String?, avatarURL:String? = nil) -> Promise<Void>{
+        Analytics.trackDevLog(file: #file, line: #line, message: "setProfile")
+        
         return Promise { fulfill, reject in
             let promise = makeAnonAccountPromise ?? Promise.init(value:())
             promise.then(execute: { () -> Void in
@@ -455,32 +604,44 @@ class UserAccountManager : NSObject {
                     }
                     fulfill(())
                 }else{
+                    Analytics.trackDevLog(file: #file, line: #line, message: "unexpected")
                     reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
                 }
             }).catch(execute: { (error) in
+                Analytics.trackDevLog(file: #file, line: #line, message: "unexpected")
+
                 reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
             })
         }
     }
 
     func logout() -> Promise<Void>{
+                        Analytics.trackDevLog(file: #file, line: #line, message: "logout")
         return Promise { fulfill, reject in
             do {
+                UserDefaults.standard.removeObject(forKey: UserDefaultsKeys.name)
+                UserDefaults.standard.removeObject(forKey: UserDefaultsKeys.email)
+                UserDefaults.standard.removeObject(forKey: UserDefaultsKeys.avatarURL)
                 FBSDKLoginManager().logOut()
                 if self.user?.isAnonymous == false || self.user?.providerData.first(where: {$0.providerID == "facebook.com"}) != nil {
                     try Auth.auth().signOut()
                     makeAnonAccountPromise = nil
                     makeAnonAccount().then(execute: { () -> () in
+                        Analytics.trackDevLog(file: #file, line: #line, message: "logout sucess")
                         fulfill(())
                     }).catch(execute: { (e) in
+                        Analytics.trackDevLog(file: #file, line: #line, message: "logout error \(e)")
+
                         fulfill(()) // not a bug.  you did logout - even if a new accout was not created.
                     })
                     
                 }else{
+                    Analytics.trackDevLog(file: #file, line: #line, message: "unexpected")
                     fulfill(())
                 }
                 
             }catch let error {
+                Analytics.trackDevLog(file: #file, line: #line, message: "unexpected")
                 reject(error)
             }
             
@@ -520,16 +681,11 @@ extension UserAccountManager {
         alert.addAction(UIAlertAction.init(title: "authorize.error.undefined.contactSupport".localized, style: .default, handler: { (a) in
             let recipient = "support@screenshopit.com"
             let subject = "unable to login"
-            let userInfoJson:String = {
-                if let userinfoJsonData = try? JSONSerialization.data(withJSONObject: error.userInfo, options: []), let s = String.init(data: userinfoJsonData, encoding: .utf8) {
-                    return s
-                }
-                return "{}"
-            }()
+            let userInfoString = String.init(describing: error.userInfo)
 
-            let body = "Please help me. I’m getting this weirdo error: \(String.init(describing: viewController)) Domain: \(error.domain) Code: \(error.code) \(userInfoJson) -  \(Bundle.displayVersionBuild). I don’t know what this means, because I am not a programmer. But ya’ll should be able to help me."
+            let body = "Please help me. I’m getting this weirdo error: \(String.init(describing: viewController)) Domain: \(error.domain) Code: \(error.code) \(userInfoString) -  \(Bundle.displayVersionBuild). I don’t know what this means, because I am not a programmer. But ya’ll should be able to help me."
             let gmailMessage = body
-            viewController.presentMail(recipient: recipient, gmailMessage: gmailMessage, subject: subject, message: body)
+            viewController.presentMail(recipient: recipient, gmailMessage: gmailMessage, subject: subject, message: body, isHTML: false, delegate:nil, noEmailErrorMessage: "email.setup.message.bug".localized, attachLogs:true)
         }))
         alert.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .cancel, handler: nil))
         return alert
@@ -612,35 +768,50 @@ extension UserAccountManager {
 extension UserAccountManager {
     
     
-    func downloadAndReplaceUserData(){
+    func downloadAndReplaceUserData()->Promise<Void>{
+        var promiseArray:[Promise<Void>] = []
         if let user = self.user{
             
-            self.databaseRef.child("users").child(user.uid).child("avatarURL").observeSingleEvent(of: .value) { (snapshot) in
-                if let url = snapshot.value as? String  {
-                    UserDefaults.standard.setValue(url, forKey: UserDefaultsKeys.avatarURL)
-                }
-            }
-            if UserDefaults.standard.string(forKey: UserDefaultsKeys.name) == nil {
-                self.databaseRef.child("users").child(user.uid).child("displayName").observeSingleEvent(of: .value) { (snapshot) in
-                    if let displayName = snapshot.value as? String  {
-                        UserDefaults.standard.setValue(displayName, forKey: UserDefaultsKeys.name)
+            promiseArray.append(Promise<Void>.init(resolvers: { (fulfil, reject) in
+                self.databaseRef.child("users").child(user.uid).child("avatarURL").observeSingleEvent(of: .value) { (snapshot) in
+                    if let url = snapshot.value as? String  {
+                        UserDefaults.standard.setValue(url, forKey: UserDefaultsKeys.avatarURL)
                     }
+                    fulfil(())
                 }
-            }
+            }))
             
-            self.databaseRef.child("users").child(user.uid).child("GDRP-agreedToEmail").observeSingleEvent(of: .value) { (snapshot) in
-                if let agreedToEmailNumber = snapshot.value as? NSNumber  {
-                    let agreedToEmail = agreedToEmailNumber.boolValue
-                    UserDefaults.standard.setValue(agreedToEmail, forKey: UserDefaultsKeys.gdpr_agreedToEmail)
-                }
+            if UserDefaults.standard.string(forKey: UserDefaultsKeys.name) == nil {
+                promiseArray.append(Promise<Void>.init(resolvers: { (fulfil, reject) in
+
+                    self.databaseRef.child("users").child(user.uid).child("displayName").observeSingleEvent(of: .value) { (snapshot) in
+                        if let displayName = snapshot.value as? String  {
+                            UserDefaults.standard.setValue(displayName, forKey: UserDefaultsKeys.name)
+                        }
+                        fulfil(())
+                    }
+                }))
             }
-            self.databaseRef.child("users").child(user.uid).child("GDRP-agreedToImageDetection").observeSingleEvent(of: .value) { (snapshot) in
-                if let agreedToImageDetectionNumber = snapshot.value as? NSNumber  {
-                    let agreedToImageDetection = agreedToImageDetectionNumber.boolValue
-                    UserDefaults.standard.setValue(agreedToImageDetection, forKey: UserDefaultsKeys.gdpr_agreedToImageDetection)
+            promiseArray.append(Promise<Void>.init(resolvers: { (fulfil, reject) in
+                self.databaseRef.child("users").child(user.uid).child("GDRP-agreedToEmail").observeSingleEvent(of: .value) { (snapshot) in
+                    if let agreedToEmailNumber = snapshot.value as? NSNumber  {
+                        let agreedToEmail = agreedToEmailNumber.boolValue
+                        UserDefaults.standard.setValue(agreedToEmail, forKey: UserDefaultsKeys.gdpr_agreedToEmail)
+                    }
+                    fulfil(())
+                    
                 }
-            }
-            
+            }))
+            promiseArray.append(Promise<Void>.init(resolvers: { (fulfil, reject) in
+                self.databaseRef.child("users").child(user.uid).child("GDRP-agreedToImageDetection").observeSingleEvent(of: .value) { (snapshot) in
+                    if let agreedToImageDetectionNumber = snapshot.value as? NSNumber  {
+                        let agreedToImageDetection = agreedToImageDetectionNumber.boolValue
+                        UserDefaults.standard.setValue(agreedToImageDetection, forKey: UserDefaultsKeys.gdpr_agreedToImageDetection)
+                    }
+                    fulfil(())
+                }
+            }))
+
             self.databaseRef.child("users").child(user.uid).child("screenshots").observeSingleEvent(of: .value) { (snapshot) in
                 for child in snapshot.children {
                     if let child = child as? DataSnapshot,
@@ -663,7 +834,8 @@ extension UserAccountManager {
                                 }()
                                 if imageData != nil {
                                     let createdAt = Date.init(timeIntervalSince1970: createdAtNumber.doubleValue)
-                                    let s = DataModel.sharedInstance.saveScreenshot(managedObjectContext: context,
+                                    let s = DataModel.sharedInstance.saveScreenshot(upsert:true,
+                                                                                    managedObjectContext: context,
                                                                                     assetId: assetId,
                                                                                     createdAt: createdAt,
                                                                                     isRecognized: true,
@@ -685,11 +857,10 @@ extension UserAccountManager {
                             })
                         })
                     }
-                    
                 }
             }
             
-            self.databaseRef.child("users").child(user.uid).child("favorite").observeSingleEvent(of: .value) { (snapshot) in
+            self.databaseRef.child("users").child(user.uid).child("favorites").observeSingleEvent(of: .value) { (snapshot) in
                 for child in snapshot.children {
                     if let child = child as? DataSnapshot,
                         let dict = child.value as? NSDictionary,
@@ -710,6 +881,7 @@ extension UserAccountManager {
                         let brand = dict["brand"] as? String
                         let merchant = dict["merchant"] as? String
                         let partNumber = dict["partNumber"] as? String
+                        let id = dict["id"] as? String
                         let color = dict["color"] as? String
                         let sku = dict["sku"] as? String
                         let fallbackPriceNumber =  dict["fallbackPrice"] as? NSNumber
@@ -732,6 +904,7 @@ extension UserAccountManager {
                                                                                imageURL: imageURL,
                                                                                merchant: merchant,
                                                                                partNumber:  partNumber,
+                                                                               id: id,
                                                                                color:  color,
                                                                                sku: sku,
                                                                                fallbackPrice: fallbackPrice,
@@ -740,12 +913,16 @@ extension UserAccountManager {
                             
                             context.saveIfNeeded()
                             DataModel.sharedInstance.favorite(toFavorited: true, productOIDs: [product.objectID])
+                            LocalNotificationModel.shared.registerCrazeFavoritedPriceAlert(id: product.id, lastPrice: product.floatPrice)
                         })
                     }
                 }
             }
         }
+        
+        return when(fulfilled: promiseArray)
     }
+    
     
     func uploadFavorites(product:Product){
         if let user = self.user,
@@ -758,8 +935,8 @@ extension UserAccountManager {
             let floatOriginalPrice = product.floatOriginalPrice
             var dict:[String:Any] = ["price":price,
                                      "imageURL":imageURL,
-                                     "floatPrice":floatPrice,
-                                     "floatOriginalPrice":floatOriginalPrice,
+                                     "floatPrice":NSNumber.init(value: floatPrice),
+                                     "floatOriginalPrice":NSNumber.init(value: floatOriginalPrice),
                                      "offer":offer,
                                      "productDescription":productDescription]
             
@@ -781,6 +958,10 @@ extension UserAccountManager {
                 dict["partNumber"] = partNumber
             }
             
+            if let id = product.id {
+                dict["id"] = id
+            }
+            
             if let color = product.color {
                 dict["color"] = color
                 
@@ -791,21 +972,30 @@ extension UserAccountManager {
             }
             dict["optionsMask"] = product.optionsMask
             dict["fallbackPrice"] = NSNumber.init(value: product.fallbackPrice)
-            self.databaseRef.child("users").child(user.uid).child("favorites").child(offer).setValue(dict)
+
+            if let escapedoffer = offer.firebaseSafe() {
+                self.databaseRef.child("users").child(user.uid).child("favorites").child(escapedoffer).setValue(dict)
+            }
         }
     }
     
     func deleteFavorite(product:Product){
         if let user = self.user {
             if let offer = product.offer {
-                self.databaseRef.child("users").child(user.uid).child("favorites").child(offer).removeValue()
+
+                if let escapedoffer = offer.firebaseSafe() {
+                    self.databaseRef.child("users").child(user.uid).child("favorites").child(escapedoffer).removeValue()
+                }
             }
         }
     }
     
     func deleteScreenshot(screenshot:Screenshot) {
         if let assetId = screenshot.assetId, let user = self.user {
-            self.databaseRef.child("users").child(user.uid).child("screenshots").child(assetId).removeValue()
+
+            if let escapedAssetId = assetId.firebaseSafe() {
+                self.databaseRef.child("users").child(user.uid).child("screenshots").child(escapedAssetId).removeValue()
+            }
         }
     }
     
@@ -817,23 +1007,35 @@ extension UserAccountManager {
             let uploadedImageURL = screenshot.uploadedImageURL {
             let trackingInfo = screenshot.trackingInfo ?? ""
             let source = screenshot.source.rawValue
-            let escapedAssetId = assetId.replacingOccurrences(of: "\"", with: "")
-            let dict:[String:Any] = [
-                "assetId":escapedAssetId,
-                "createdAt":NSNumber.init(value: createdAtNumber as Double),
-                "source":source,
-                "uploadedImageURL":uploadedImageURL,
-                "trackingInfo" :trackingInfo
-                        ]
-            
-            self.databaseRef.child("users").child(user.uid).child("screenshots").child(assetId).setValue(dict)
+            if let escapedAssetId = assetId.firebaseSafe() {
+                
+                let dict:[String:Any] = [
+                    "assetId":assetId,
+                    "createdAt":NSNumber.init(value: createdAtNumber as Double),
+                    "source":source,
+                    "uploadedImageURL":uploadedImageURL,
+                    "trackingInfo" :trackingInfo
+                ]
+                self.databaseRef.child("users").child(user.uid).child("screenshots").child(escapedAssetId).setValue(dict)
+            }
         }
 
+    }
+}
+extension String {
+    fileprivate func firebaseSafe() ->  String?{
+        let forbiddenChacters = CharacterSet.init(charactersIn: "\\#$[]./")
+        let toReturn =  self.components(separatedBy:forbiddenChacters).joined()
+        if toReturn.count == 0 {
+            return nil
+        }
+        return toReturn
     }
 }
 
 extension UserAccountManager {
     public func uploadImage(data:Data) -> Promise<URL> {
+        
         return Promise { fulfill, reject in
             if let user = self.user {
                 let name = UUID().uuidString

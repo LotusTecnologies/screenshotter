@@ -14,9 +14,14 @@ protocol InitiateResetPasswordViewControllerDelegate: NSObjectProtocol {
 }
 
 class InitiateResetPasswordView: UIScrollView {
+    private let titleLabel = UILabel()
     let emailTextField = UnderlineTextField()
     let continueButton = MainButton()
     let backButton = UIButton()
+    
+    var activeTextFieldTopOffset: CGFloat {
+        return titleLabel.frame.maxY - contentOffset.y
+    }
     
     let _layoutMargins = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
     
@@ -33,7 +38,6 @@ class InitiateResetPasswordView: UIScrollView {
             backgroundColor = UIColor(patternImage: backgroundImage)
         }
         
-        let titleLabel = UILabel()
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.text = "authorize.initiate_reset_password.title".localized
         titleLabel.textColor = .gray3
@@ -147,6 +151,7 @@ class InitiateResetPasswordViewController: UIViewController {
         super.viewDidLoad()
         
         inputViewAdjustsScrollViewController.scrollView = _view
+        inputViewAdjustsScrollViewController.delegate = self
         
         _view.emailTextField.delegate = self
         
@@ -158,6 +163,7 @@ class InitiateResetPasswordViewController: UIViewController {
     }
     
     deinit {
+        inputViewAdjustsScrollViewController.delegate = nil
         _view.emailTextField.delegate = nil
     }
     
@@ -237,5 +243,19 @@ extension InitiateResetPasswordViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         continueAction()
         return true
+    }
+}
+
+extension InitiateResetPasswordViewController: InputViewAdjustsScrollViewControllerDelegate {
+    func inputViewAdjustsScrollViewControllerWillShow(_ controller: InputViewAdjustsScrollViewController) {
+        var contentInset = _view.contentInset
+        contentInset.top = -_view.activeTextFieldTopOffset
+        _view.contentInset = contentInset
+    }
+    
+    func inputViewAdjustsScrollViewControllerWillHide(_ controller: InputViewAdjustsScrollViewController) {
+        var contentInset = _view.contentInset
+        contentInset.top = 0
+        _view.contentInset = contentInset
     }
 }

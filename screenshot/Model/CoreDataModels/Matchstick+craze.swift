@@ -26,13 +26,13 @@ extension Matchstick {
             return true
         }else if let date = self.dateSkipped {
             if abs(date.timeIntervalSinceNow) < Matchstick.skipRotationTime {
-                return true
+                return true                
             }
         }
         return false
+
     }
-    
-    
+  
     public func add(callback: ((_ screenshot: Screenshot) -> Void)? = nil) {
         DiscoverManager.shared.didAdd(self, callback:callback)
     }

@@ -262,6 +262,7 @@ extension ProductDetailViewController : UICollectionViewDelegateFlowLayout, UICo
             let product = self.productAtIndex(indexPath.item)
             product.recordViewedProduct()
             self.recoverLostSaleManager.didClick(on: product)
+            LocalNotificationModel.shared.registerCrazeTappedPriceAlert(id: product.id, lastPrice: product.floatPrice)
             if let productViewController = presentProduct(product, atLocation: .burrowList) {
                 productViewController.similarProducts = products
             }
@@ -292,8 +293,10 @@ extension ProductDetailViewController : UICollectionViewDelegateFlowLayout, UICo
             if isFavorited {
                 let _ = ShoppingCartModel.shared.populateVariants(productOID: product.objectID)
                 Analytics.trackProductFavorited(product: product, page: .productList)
+                LocalNotificationModel.shared.registerCrazeFavoritedPriceAlert(id: product.id, lastPrice: product.floatPrice)
             }else{
                 Analytics.trackProductUnfavorited(product: product, page: .productList)
+                LocalNotificationModel.shared.deregisterCrazeFavoritedPriceAlert(id: product.id)
             }
         }
     }
@@ -484,7 +487,20 @@ extension ProductDetailViewController: RelatedLooksManagerDelegate {
 
 extension ProductDetailViewController: RecoverLostSaleManagerDelegate {
     func recoverLostSaleManager(_ manager:RecoverLostSaleManager, returnedFrom product:Product){
-        self.recoverLostSaleManager.presetRecoverAlertViewFor(product: product, in: self)
+        if product == self.product {
+            if let cell = self.collectionView?.cellForItem(at: IndexPath.init(row: 0, section: 0)) as? ProductHeaderCollectionViewCell {
+                let view = cell.productImageView
+                self.recoverLostSaleManager.presetRecoverAlertViewFor(product: product, in: self, rect: view.bounds, view:view)
+            }
+        }else {
+            if let index = self.products.index(of: product) {
+                if let cell = self.collectionView?.cellForItem(at: IndexPath.init(row: index, section: 1)) as? ProductsCollectionViewCell, let view = cell.productImageView{
+                    self.recoverLostSaleManager.presetRecoverAlertViewFor(product: product, in: self, rect: view.bounds.insetBy(dx: 20, dy: 20), view:view)
+                }
+            }
+        }
+        
+        
     }
     
 }

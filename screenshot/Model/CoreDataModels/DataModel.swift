@@ -136,7 +136,8 @@ extension DataModel {
 extension DataModel {
     
     // Save a new Screenshot to Core Data.
-    func saveScreenshot(managedObjectContext: NSManagedObjectContext,
+    func saveScreenshot(upsert:Bool,
+                        managedObjectContext: NSManagedObjectContext,
                         assetId: String,
                         createdAt: Date?,
                         isRecognized: Bool,
@@ -145,7 +146,15 @@ extension DataModel {
                         imageData: Data?,
                         uploadedImageURL: String?,
                         syteJsonString: String?) -> Screenshot {
-        let screenshotToSave = Screenshot(context: managedObjectContext)
+        
+        var current:Screenshot? = nil;
+        var wasHidden:Bool? = nil
+        if upsert {
+            current = managedObjectContext.screenshotWith(assetId: assetId)
+            wasHidden = current?.isHidden
+        }
+        let screenshotToSave = current ?? Screenshot(context: managedObjectContext)
+        
         screenshotToSave.assetId = assetId
         screenshotToSave.createdAt = createdAt
         screenshotToSave.isRecognized = isRecognized
@@ -157,11 +166,9 @@ extension DataModel {
         screenshotToSave.syteJson = syteJsonString
 
         screenshotToSave.lastModified = Date()
-        do {
-            try managedObjectContext.save()
-        } catch {
-            self.receivedCoreDataError(error: error)
-            print("Failed to saveScreenshot")
+        
+        if current == nil || (wasHidden == true && isHidden == false) {
+            Analytics.trackScreenshotCreated(screenshot: screenshotToSave)
         }
         return screenshotToSave
     }
@@ -292,6 +299,11 @@ extension DataModel {
                        b1x: Double,
                        b1y: Double,
                        optionsMask: ProductsOptionsMask) -> Shoppable {
+        
+        if let current =  (screenshot.shoppables as? Set<Shoppable>)?.first(where: { $0.offersURL == offersURL } ){
+            return current
+        }
+        
         let shoppableToSave = Shoppable(context: managedObjectContext)
         shoppableToSave.screenshot = screenshot
         let spellingMap = ["Bodypart" : "Body Part",
@@ -369,10 +381,15 @@ extension DataModel {
                      imageURL: String?,
                      merchant: String?,
                      partNumber: String?,
+                     id: String?,
                      color: String?,
                      sku: String?,
                      fallbackPrice: Float,
                      optionsMask: Int32) -> Product {
+        if let current =  (shoppable?.products as? Set<Product>)?.first(where: { $0.offer == offer } ){
+            return current
+        }
+        
         let productToSave = Product(context: managedObjectContext)
         productToSave.shoppable = shoppable
         productToSave.order = order
@@ -387,6 +404,7 @@ extension DataModel {
         productToSave.imageURL = imageURL
         productToSave.merchant = merchant
         productToSave.partNumber = partNumber
+        productToSave.id = id
         productToSave.color = color
         productToSave.sku = sku
         productToSave.fallbackPrice = fallbackPrice
@@ -407,6 +425,22 @@ extension DataModel {
         } catch {
             self.receivedCoreDataError(error: error)
             print("retrieveProduct partNumber:\(partNumber) results with error:\(error)")
+        }
+        return nil
+    }
+    
+    func retrieveProduct(managedObjectContext: NSManagedObjectContext, id: String) -> Product? {
+        let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "id == %@", id)
+        fetchRequest.sortDescriptors = nil //[NSSortDescriptor(key: "createdAt", ascending: false)]
+        fetchRequest.fetchLimit = 1
+        
+        do {
+            let results = try managedObjectContext.fetch(fetchRequest)
+            return results.first
+        } catch {
+            self.receivedCoreDataError(error: error)
+            print("retrieveProduct id:\(id) results with error:\(error)")
         }
         return nil
     }
@@ -432,7 +466,6 @@ extension DataModel {
             let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
             fetchRequest.predicate = NSPredicate(format: "imageURL == %@", imageURL)
             fetchRequest.sortDescriptors = nil //[NSSortDescriptor(key: "createdAt", ascending: false)]
-            fetchRequest.fetchLimit = 1
             
             do {
                 let results = try managedObjectContext.fetch(fetchRequest)
@@ -441,6 +474,54 @@ extension DataModel {
             } catch {
                 self.receivedCoreDataError(error: error)
                 print("markProductNotInNotif imageURL:\(imageURL) results with error:\(error)")
+            }
+        }
+    }
+    
+    func markScreenshotNotInNotif(assetId: String) {
+        self.performBackgroundTask { managedObjectContext in
+            let fetchRequest: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
+            fetchRequest.predicate = NSPredicate(format: "assetId == %@", assetId)
+            fetchRequest.sortDescriptors = nil //[NSSortDescriptor(key: "createdAt", ascending: false)]
+            
+            do {
+                let results = try managedObjectContext.fetch(fetchRequest)
+                results.forEach { $0.inNotif = false }
+                managedObjectContext.saveIfNeeded()
+            } catch {
+                self.receivedCoreDataError(error: error)
+                print("markScreenshotNotInNotif assetId:\(assetId) results with error:\(error)")
+            }
+        }
+    }
+    
+    func markProductHasPriceAlerts(id: String) {
+        self.performBackgroundTask { managedObjectContext in
+            let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
+            fetchRequest.predicate = NSPredicate(format: "id == %@ AND hasPriceAlerts == FALSE", id)
+            fetchRequest.sortDescriptors = nil //[NSSortDescriptor(key: "createdAt", ascending: false)]
+            
+            do {
+                let results = try managedObjectContext.fetch(fetchRequest)
+                results.forEach { $0.hasPriceAlerts = true }
+                managedObjectContext.saveIfNeeded()
+            } catch {
+                self.receivedCoreDataError(error: error)
+                print("markProductHasPriceAlerts id:\(id) results with error:\(error)")
+            }
+        }
+    }
+    
+    func updateProductPrice(id: String, updatedPrice: Float, updatedCurrency: String) -> Promise<Void> {
+        return Promise { fulfill, reject in
+            self.performBackgroundTask { managedObjectContext in
+                if let formattedUpdatePrice = self.formattedPrice(price: updatedPrice, currency: updatedCurrency),
+                  let product = self.retrieveProduct(managedObjectContext: managedObjectContext, id: id) {
+                    product.floatPrice = updatedPrice
+                    product.price = formattedUpdatePrice
+                    managedObjectContext.saveIfNeeded()
+                }
+                fulfill(())
             }
         }
     }
@@ -502,23 +583,30 @@ extension DataModel {
         }
     }
     
-    func retrieveSaleCount(from startDate: NSDate) -> Promise<Int> {
+    func retrieveSaleScreenshot() -> Promise<(String, Data)> {
         return Promise { fulfill, reject in
             self.performBackgroundTask { managedObjectContext in
-                let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
-                fetchRequest.predicate = NSPredicate(format: "floatPrice < floatOriginalPrice AND dateRetrieved > %@", startDate)
-                fetchRequest.sortDescriptors = [NSSortDescriptor(key: "dateRetrieved", ascending: false)]
+                let fetchRequest: NSFetchRequest<Shoppable> = Shoppable.fetchRequest()
+                let twoMonthsAgo = NSDate(timeIntervalSinceNow: -60 * Constants.secondsInDay)
+                fetchRequest.predicate = NSPredicate(format: "screenshot.lastModified > %@ AND screenshot.inNotif == FALSE AND screenshot.isHidden == FALSE AND screenshot.imageData != nil AND (SUBQUERY(products, $x, ($x.order == 0 OR $x.order == 1) AND $x.floatPrice < $x.floatOriginalPrice).@count == 2)", twoMonthsAgo)
+                fetchRequest.sortDescriptors = [NSSortDescriptor(key: "screenshot.lastModified", ascending: false)]
+                fetchRequest.fetchLimit = 1
                 
                 do {
                     let results = try managedObjectContext.fetch(fetchRequest)
-                    if results.count > 0 {
-                        fulfill(results.count)
+                    if let latestShoppable = results.first,
+                      let latestScreenshot = latestShoppable.screenshot,
+                      let assetId = latestScreenshot.assetId,
+                      let imageData = latestScreenshot.imageData {
+                        latestScreenshot.inNotif = true
+                        managedObjectContext.saveIfNeeded()
+                        fulfill((assetId, imageData))
                     } else {
-                        reject(NSError(domain: "Craze", code: 96, userInfo: [NSLocalizedDescriptionKey : "no recent sale count"]))
+                        reject(NSError(domain: "Craze", code: 96, userInfo: [NSLocalizedDescriptionKey : "no recent sale screenshot"]))
                     }
                 } catch {
                     self.receivedCoreDataError(error: error)
-                    print("retrieveSaleCount results with error:\(error)")
+                    print("retrieveSaleScreenshot results with error:\(error)")
                     reject(error)
                 }
             }
@@ -1083,6 +1171,8 @@ extension DataModel {
                             }
                             screenshot.lastFavorited = now
                         }
+                        UserAccountManager.shared.uploadFavorites(product: product)
+
                     } else {
                         product.dateFavorited = nil
                         if let screenshot = product.shoppable?.screenshot {
@@ -1094,6 +1184,7 @@ extension DataModel {
                                 screenshot.lastFavorited = nil
                             }
                         }
+                        UserAccountManager.shared.deleteFavorite(product: product)
                     }
                 }
                 try managedObjectContext.save()
@@ -1186,6 +1277,14 @@ extension DataModel {
             print("countScreenshotWorkhorse results with error:\(error)")
         }
         return count
+    }
+    
+    func formattedPrice(price: Float, currency: String) -> String? {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        let localeIdentifier = Locale.identifier(fromComponents: [NSLocale.Key.currencyCode.rawValue: currency])
+        formatter.locale = Locale(identifier: localeIdentifier)
+        return formatter.string(from: NSNumber(value: price))
     }
     
     // MARK: DB Migration

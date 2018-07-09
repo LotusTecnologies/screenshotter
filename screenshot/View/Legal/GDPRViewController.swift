@@ -10,7 +10,7 @@ import UIKit
 
 class GDPRViewController: BaseTableViewController {
     enum Rows: Int {
-        case notification
+        case email
         case imageDetection
     }
     var agreedToEmail = UserDefaults.standard.bool(forKey: UserDefaultsKeys.gdpr_agreedToEmail)
@@ -42,6 +42,10 @@ class GDPRViewController: BaseTableViewController {
 
 typealias GDPRViewControllerTableView = GDPRViewController
 extension GDPRViewControllerTableView {
+    private func indexPathFor(_ row: GDPRViewController.Rows) -> IndexPath {
+        return IndexPath(row: row.rawValue, section: 0)
+    }
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 2
     }
@@ -69,9 +73,9 @@ extension GDPRViewControllerTableView {
         
         cell.hasSelectableAppearance = true
         
-        if indexPath.row == GDPRViewController.Rows.notification.rawValue {
-            cell.titleLabel.text = "gdpr.notification.title".localized
-            cell.explanationLabel.text = "gdpr.notification.message".localized
+        if indexPath.row == GDPRViewController.Rows.email.rawValue {
+            cell.titleLabel.text = "gdpr.email.title".localized
+            cell.explanationLabel.text = "gdpr.email.message".localized
         }
         else if indexPath.row == GDPRViewController.Rows.imageDetection.rawValue {
             cell.titleLabel.text = "gdpr.image.title".localized
@@ -84,7 +88,7 @@ extension GDPRViewControllerTableView {
     override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         var isSelected = true
         
-        if indexPath.row == GDPRViewController.Rows.notification.rawValue {
+        if indexPath.row == GDPRViewController.Rows.email.rawValue {
             isSelected = self.agreedToEmail
         }
         else if indexPath.row == GDPRViewController.Rows.imageDetection.rawValue {
@@ -97,7 +101,7 @@ extension GDPRViewControllerTableView {
     }
     
     override func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
-        if indexPath.row == GDPRViewController.Rows.notification.rawValue {
+        if indexPath.row == GDPRViewController.Rows.email.rawValue {
             self.agreedToEmail = false
         }
         else if indexPath.row == GDPRViewController.Rows.imageDetection.rawValue {
@@ -107,7 +111,7 @@ extension GDPRViewControllerTableView {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if indexPath.row == GDPRViewController.Rows.notification.rawValue {
+        if indexPath.row == GDPRViewController.Rows.email.rawValue {
             self.agreedToEmail = true
         }
         else if indexPath.row == GDPRViewController.Rows.imageDetection.rawValue {

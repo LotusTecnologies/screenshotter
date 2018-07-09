@@ -33,6 +33,7 @@ class UserDefaultsKeys  {
     
     // Favorites
     static let uninformedFavoritesCount = "UninformedFavoritesCount"
+    static let hasFavorited = "HasFavorited"
 
     // Product
     static let productGender = "ProductGender"
@@ -62,6 +63,7 @@ class UserDefaultsKeys  {
     static let dateInstalled = "DateInstalled"
     static let dateLastSound = "DateLastSound"
     static let dateLastAppSession = "DateLastAppSession"
+    static let sessionCount = "SessionCount"
     static let significantEventCount = "SignificantEventCount"
     static let deviceToken = "deviceToken"
     static let versionLastAskedToUpdate = "versionLastAskedToUpdate"

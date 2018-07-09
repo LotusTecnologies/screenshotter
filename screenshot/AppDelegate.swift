@@ -27,6 +27,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var bgTask: UIBackgroundTaskIdentifier = UIBackgroundTaskInvalid
     var shouldLoadDiscoverNextLoad = false
     let appSettings: AppSettings = AppSettings()
+    var appLaunchedForFirstTime = false
     
     fileprivate var frameworkSetupLaunchOptions: [UIApplicationLaunchOptionsKey : Any]?
     
@@ -48,6 +49,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let _ = UserAccountManager.shared.application(application, didFinishLaunchingWithOptions: launchOptions)
         
         window = UIWindow(frame: UIScreen.main.bounds)
+        if UserDefaults.standard.value(forKey: UserDefaultsKeys.lastDbVersionMigrated) == nil {
+            appLaunchedForFirstTime = true
+        }
         
         if DataModel.sharedInstance.storeNeedsMigration() {
             window?.rootViewController = LoadingViewController()
@@ -109,6 +113,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         NotificationCenter.default.addObserver(self, selector: #selector(badgeNumberDidChange(_:)), name: .ScreenshotUninformedAccumulatorModelDidChange, object: nil)
         
+        if self.appLaunchedForFirstTime == true {
+            Analytics.trackAppOpenedFirstTime()
+        }
+        
         if application.applicationState == .background,
             let remoteNotification = launchOptions?[.remoteNotification] as? [String: AnyObject],
             let aps = remoteNotification["aps"] as? [String : AnyObject],
@@ -116,11 +124,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             contentAvailable.intValue == 1 {
             Analytics.trackWokeFromSilentPush()
         } else {
+            
             Analytics.trackSessionStarted() // Roi Tal from AppSee suggested
         }
         
+        Analytics.trackDevLog(file: #file, line: #line, message: "application didFinishLaunchingWithOptions")
+
         if let launchOptions = launchOptions, let url = launchOptions[UIApplicationLaunchOptionsKey.url] as? URL {
-            
+            Analytics.trackDevLog(file: #file, line: #line, message: "application didFinishLaunchingWithOptions with url \(url)")
+
             if self.isSendToDebugURL(url) {
                 self.sendDebugDataToDebugApp(url:url)
                 return true
@@ -143,7 +155,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func isSendToDebugURL(_ url:URL) -> Bool{
-        //we use this uuid so we will never accidentently detect a wrong openURL even from branch or other thrid parties
+        //we use this uuid so we will never accidentently detect a wrong openURL even from branch or other third parties
         return url.absoluteString.contains("sendDebugInfo-b32963e7-ad86-4f80-8f2a-131d76ece793")
 
     }
@@ -513,13 +525,14 @@ extension AppDelegate : KochavaTrackerDelegate {
         if !ASIdentifierManager.shared().isAdvertisingTrackingEnabled {
             Branch.setTrackingDisabled(true)
         }
-        
+        Analytics.trackDevLog(file: #file, line: #line, message: "framework setup: \(launchOptions)")
         Branch.getInstance()?.initSession(launchOptions: launchOptions) { params, error in
             // params are the deep linked params associated with the link that the user clicked -> was re-directed to this app
             // params will be empty if no data found
 
             guard error == nil, let params = params as? [String : AnyObject] else {
                 if let e = error as NSError? {
+                    Analytics.trackDevLog(file: #file, line: #line, message: "branch error: \(e)")
                     Analytics.trackError(type: nil, domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
                 }
                 return
@@ -537,10 +550,18 @@ extension AppDelegate : KochavaTrackerDelegate {
             if let campaign = params["~campaign"] as? String {
                 UserDefaults.standard.set(campaign, forKey: UserDefaultsKeys.campaign)
             }
+            
+            Analytics.trackDevLog(file: #file, line: #line, message: "branch params: \(params)")
             if let nonBranchLink = params["+non_branch_link"]  as? String {
                 if nonBranchLink.contains("validate"), let url = URL.init(string: nonBranchLink) {
                     let _ = UserAccountManager.shared.application(application, open:url, options: [:])
                 }
+            }else if let referring_link = params["~referring_link"] as? String{
+                if referring_link.contains("validate"), let url = URL.init(string: referring_link){
+                    let _ = UserAccountManager.shared.application(application, open:url, options: [:])
+                }
+            }else if let mode = params["mode"] as? String, let oobCode = params["oobCode"] as? String {
+                let _ = UserAccountManager.shared.applicationOpenLinkedWith(mode: mode, code: oobCode)
             }
         }
         
@@ -706,8 +727,8 @@ extension AppDelegate: PushNotificationDelegate {
                    completionHandler(.newData)
                 }
             }
-        } else if let aps = userInfo["aps"] as? NSDictionary, let category = aps["category"] as? String, category == "PRICE_ALERT",  let partNumber = userInfo["partNumber"] as? String{
-            let product = DataModel.sharedInstance.retrieveProduct(managedObjectContext: DataModel.sharedInstance.mainMoc(), partNumber: partNumber)
+        } else if let aps = userInfo["aps"] as? NSDictionary, let category = aps["category"] as? String, category == "PRICE_ALERT",  let id = userInfo["variantId"] as? String{
+            let product = DataModel.sharedInstance.retrieveProduct(managedObjectContext: DataModel.sharedInstance.mainMoc(), id: id)
             Analytics.trackProductPriceAlertRecieved(product: product)
             completionHandler(.noData)
         } else {
@@ -760,10 +781,22 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
                 isHandled = true
                 if openingScreen == Constants.openingScreenValueScreenshot {
                     if let openingAssetId = userInfo[Constants.openingAssetIdKey] as? String {
-                        Analytics.trackAppOpenedFromLocalNotification()
-                        AssetSyncModel.sharedInstance.importPhotosToScreenshot(assetIds: [openingAssetId], source: .screenshot)
+                        if response.notification.request.identifier == LocalNotificationIdentifier.saleScreenshot.rawValue {
+                            // Go into screenshot for saleScreenshot local notification.
+                            showScreenshotListTop()
+                            let dataModel = DataModel.sharedInstance
+                            if let mainTabBarController = self.window?.rootViewController as? MainTabBarController,
+                              let screenshot = dataModel.retrieveScreenshot(managedObjectContext: dataModel.mainMoc(), assetId: openingAssetId) {
+                                mainTabBarController.screenshotsNavigationController.presentScreenshot(screenshot)
+                            }
+                        } else {
+                            // Show screenshot as first in screenshots list for screenshotAdded local notification.
+                            AssetSyncModel.sharedInstance.importPhotosToScreenshot(assetIds: [openingAssetId], source: .screenshot)
+                            showScreenshotListTop()
+                        }
+                    } else {
+                        showScreenshotListTop()
                     }
-                    showScreenshotListTop()
                 } else if openingScreen == Constants.openingScreenValueDiscover {
                     if let mainTabBarController = self.window?.rootViewController as? MainTabBarController {
                         mainTabBarController.goTo(tab: .discover)
@@ -775,10 +808,21 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
             } else if let aps = userInfo["aps"] as? [String : Any],
               let category = aps["category"] as? String,
               category == "PRICE_ALERT",
-              let partNumber = userInfo["partNumber"] as? String,
-              !partNumber.isEmpty {
+              let dataDict = userInfo["data"] as? [String : Any],
+              let id = dataDict["variantId"] as? String,
+              !id.isEmpty {
                 isHandled = true
-                ProductViewController.present(with: partNumber)
+                LocalNotificationModel.shared.cancelPendingNotifications(within: Date(timeIntervalSinceNow: Constants.secondsInDay))
+                if let updatedPrice = dataDict["price"] as? Float {
+                    let currency = dataDict["currency"] as? String ?? "USD"
+                    DataModel.sharedInstance.updateProductPrice(id: id, updatedPrice: updatedPrice, updatedCurrency: currency).then(on: .main) {
+                        ProductViewController.present(with: id)
+                    }
+                } else {
+                    ProductViewController.present(with: id)
+                }
+                let pushTypeString = dataDict["type"] as? String
+                Analytics.trackAppOpenedFromPushNotification(source: pushTypeString)
             }
         }
         
@@ -795,8 +839,10 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
             Analytics.trackAppOpenedFromTimedLocalNotification(source: .favoritedItem)
         case LocalNotificationIdentifier.tappedProduct.rawValue:
             Analytics.trackAppOpenedFromTimedLocalNotification(source: .tappedProduct)
-        case LocalNotificationIdentifier.saleCount.rawValue:
+        case LocalNotificationIdentifier.saleScreenshot.rawValue:
             Analytics.trackAppOpenedFromTimedLocalNotification(source: .saleCount)
+        case let x where x.hasPrefix(LocalNotificationIdentifier.screenshotAdded.rawValue):
+            Analytics.trackAppOpenedFromLocalNotification()
         default:
             break
         }

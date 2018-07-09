@@ -53,6 +53,7 @@ class Constants {
 #if DEV
     static let appSeeApiKey = "d9010050cea04490b6b9cdd795849dd4"
     static let screenShotLambdaDomain = "https://c3fkst0oq3.execute-api.us-east-1.amazonaws.com/dev/"
+    static let notificationsApiEndpoint = "https://aen2f0owb9.execute-api.us-east-1.amazonaws.com/dev"
     static let amplitudeApiKey = "1e8c1c66e73368665d6e3cc486104c7e"
     static let buildEnvironmentSuffix = "d"
     static let appSettingsDomain = "https://api.craze-dev.com/static/config.json"
@@ -63,12 +64,10 @@ class Constants {
     static let shoppableToken = "F81iFWJ93by99pqC22c422189db74b52" //"gD1GV3cVFGC9hk8W5927b13e5e"
     static let syteUscFeed = "shoppable_production" //"shoppable"
     static let kocchavaGUIDKey = "koscreenshot-ios-dev-wiwhb"
-    static let pushWooshAppCode = "3D767-313B8"
-    static let pushWooshAppName = "Screenshop Dev"
-
 #else
     static let appSeeApiKey = "0ece18b50f7d4ef9aae3e473c28030bc"
     static let screenShotLambdaDomain = "https://q598b771ed.execute-api.us-east-1.amazonaws.com/production/"
+    static let notificationsApiEndpoint = "https://0n4jo7cgbk.execute-api.us-east-1.amazonaws.com/production"
     static let amplitudeApiKey = "22f09c1b641be78951bc3cc2e21024f9"
     static let buildEnvironmentSuffix = ""
     static let appSettingsDomain = "https://api.craze-api.com/static/config.json"
@@ -78,8 +77,6 @@ class Constants {
     static let shoppableToken = "F81iFWJ93by99pqC22c422189db74b52"
     static let syteUscFeed = "shoppable_production"
     static let kocchavaGUIDKey = "koscreenshot-cq8h4"
-    static let pushWooshAppCode = "B9909-951E1"
-    static let pushWooshAppName = "Screenshop"
 #endif
 
 }

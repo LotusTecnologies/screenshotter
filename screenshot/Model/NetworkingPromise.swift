@@ -379,21 +379,22 @@ class NetworkingPromise : NSObject {
         let sessionConfiguration = URLSessionConfiguration.default
         sessionConfiguration.timeoutIntervalForRequest = 60
         return URLSession(configuration: sessionConfiguration).dataTask(with: URLRequest(url: url)).asDataAndResponse().then { (data, response) -> Promise<URL> in
-            var extensionToUse = url.pathExtension
-            if extensionToUse.isEmpty {
-                extensionToUse = "jpg"
-            }
-            let tmpImageFileUrl = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(identifier).appendingPathExtension(extensionToUse)
-            do {
-                try data.write(to: tmpImageFileUrl)
-                return Promise(value: tmpImageFileUrl)
-            } catch {
-                print("downloadTmp error:\(error)")
-                return Promise(error: error)
-            }
+            return self.saveToTmp(data: data, identifier: identifier, originalExtension: url.pathExtension)
         }
     }
 
+    func saveToTmp(data: Data, identifier: String, originalExtension: String) -> Promise<URL> {
+        let appendingExtension = originalExtension.isEmpty ? "jpg" : originalExtension
+        let tmpImageFileUrl = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(identifier).appendingPathExtension(appendingExtension)
+        do {
+            try data.write(to: tmpImageFileUrl)
+            return Promise(value: tmpImageFileUrl)
+        } catch {
+            print("saveToTmp error:\(error)")
+            return Promise(error: error)
+        }
+    }
+    
     func getAvailableVariants(partNumber: String) -> Promise<NSDictionary> {
         guard let url = URL(string: Constants.shoppableDomain + "/product/" + partNumber) else {
             let error = NSError(domain: "Craze", code: 27, userInfo: [NSLocalizedDescriptionKey: "Cannot create shoppable url from shoppableDomain:\(Constants.shoppableDomain)"])
@@ -741,6 +742,27 @@ class NetworkingPromise : NSObject {
              "lastPrice" : lastPrice,
              "outOfStock" : outOfStock] // One of lastPrice and outOfStock must be provided. Each is optional.
         return priceAlertWorkhorse(parameterDict: parameterDict, actionName: "registerPriceAlert", serverActionName: "track")
+    }
+    
+    // action = [tapped|favorited|disabled]
+    func registerCrazePriceAlert(id: String, lastPrice: Float, firebaseId: String, action: String = "favorited") -> Promise<(Data, URLResponse)> {
+        guard let url = URL(string: "\(Constants.notificationsApiEndpoint)/users/\(firebaseId)/subscriptions") else {
+            let error = NSError(domain: "Craze", code: 9, userInfo: [NSLocalizedDescriptionKey: "Cannot create url from notificationsApiEndpoint:\(Constants.notificationsApiEndpoint)"])
+            return Promise(error: error)
+        }
+        let parameters = ["subscription" : ["priceAlert" : ["lastSeenPrice" : lastPrice, "variantId" : id, "type" : action]]]
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.addValue("application/json", forHTTPHeaderField: "Accept")
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: parameters, options: [])
+        } catch {
+            return Promise(error: error)
+        }
+        
+        return URLSession.shared.dataTask(with: request).asDataAndResponse()
     }
     
     func deregisterPriceAlert(partNumber: String, pushToken: String) -> Promise<Bool> {

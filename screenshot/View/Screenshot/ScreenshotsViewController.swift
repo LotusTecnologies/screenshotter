@@ -19,8 +19,6 @@ protocol ScreenshotsViewControllerDelegate : NSObjectProtocol{
 }
 
 class ScreenshotsViewController: BaseViewController {
-    
-    
     enum Section : Int {
         case product
         case notification
@@ -317,6 +315,10 @@ extension ScreenshotsViewController : FetchedResultsControllerManagerDelegate {
         change.shiftIndexSections(by: 2)
         change.applyChanges(collectionView: collectionView)
         syncEmptyListView()
+        
+        if collectionView.numberOfItems(inSection: indexFor(section: .image)) != 1 {
+            removeScreenshotHelperView()
+        }
     }
 }
 
@@ -381,10 +383,11 @@ extension ScreenshotsViewController : ProductsBarControllerDelegate {
 
 //Helper view
 extension ScreenshotsViewController {
-    func insertScreenshotHelperView() {
-        
+    func insertScreenshotHelperViewIfNeeded() {
         let hasPresented = UserDefaults.standard.bool(forKey: UserDefaultsKeys.onboardingPresentedScreenshotHelper)
-        if !hasPresented && self.collectionView.numberOfItems(inSection: self.indexFor(section: .image )) == 1 && !self.hasNewScreenshotSection {
+        let has1Screenshot = self.collectionView.numberOfItems(inSection: self.indexFor(section: .image )) == 1
+        
+        if !hasPresented && has1Screenshot && !self.hasNewScreenshotSection {
             UserDefaults.standard.set(true, forKey: UserDefaultsKeys.onboardingPresentedScreenshotHelper)
             if let layout = self.collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
                 let backgroundView = UIView()
@@ -672,7 +675,7 @@ extension ScreenshotsViewController:ScreenshotNotificationCollectionViewCellDele
             }else{
                 if self.collectionView.numberOfItems(inSection: self.indexFor(section: .notification )) == 1{
                     self.collectionView.deleteItems(at: [indexPath])
-                    self.insertScreenshotHelperView()
+                    self.insertScreenshotHelperViewIfNeeded()
                 }
             }
         }
@@ -758,7 +761,7 @@ extension ScreenshotsViewController:UICollectionViewDelegateFlowLayout {
                 break
             case .image:
                 if indexPath.item == 0 {
-                    self.insertScreenshotHelperView()
+                    self.insertScreenshotHelperViewIfNeeded()
                 }
             }
         }

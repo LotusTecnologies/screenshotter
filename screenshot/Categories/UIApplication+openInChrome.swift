@@ -9,6 +9,7 @@
 import Foundation
 import UIKit
 import MessageUI
+import SwiftLog
 
 extension UIApplication {
     
@@ -93,20 +94,41 @@ extension URL {
 }
 
 extension UIViewController :MFMailComposeViewControllerDelegate{
-    func presentMail(recipient:String, gmailMessage:String, subject:String, message:String, isHTML:Bool = false, delegate:MFMailComposeViewControllerDelegate? = nil ){
+    static func canPresentMail() -> Bool {
+        let canSendGmail:Bool = {
+            if let url = URL.googleMailUrl(to: "recipient@screenshopit.com", body: "gmailMessage", subject: "subject"), UIApplication.shared.canOpenURL(url){
+                return true
+            }
+            return false
+        }()
+       return MFMailComposeViewController.canSendMail() || canSendGmail
+    }
+    
+    func presentMail(recipient:String, gmailMessage:String, subject:String, message:String, isHTML:Bool, delegate:MFMailComposeViewControllerDelegate?, noEmailErrorMessage:String, attachLogs:Bool ){
         if MFMailComposeViewController.canSendMail() {
             let mail = MFMailComposeViewController()
             mail.mailComposeDelegate = delegate ?? self
             mail.setSubject(subject)
             mail.setMessageBody(message, isHTML: isHTML)
             mail.setToRecipients([recipient])
-            present(mail, animated: true, completion: nil)
             
+            if attachLogs {
+                if let fileURLs = try? FileManager.default.contentsOfDirectory(at: URL.init(fileURLWithPath: Log.logger.directory), includingPropertiesForKeys: nil) {
+                    fileURLs.forEach{
+                        if let data = try? Data.init(contentsOf: $0) {
+                            mail.addAttachmentData(data, mimeType: "text/plain", fileName: $0.lastPathComponent)
+                        }
+                    }
+                }
+            }
+            
+            present(mail, animated: true, completion: nil)
+
         } else if let url = URL.googleMailUrl(to: recipient, body: gmailMessage, subject: subject), UIApplication.shared.canOpenURL(url) {
             UIApplication.shared.open(url, options: [:], completionHandler: nil)
-            
+
         } else {
-            let alertController = UIAlertController(title: "email.setup.title".localized, message: "email.setup.message".localized, preferredStyle: .alert)
+            let alertController = UIAlertController(title: "email.setup.title".localized, message: noEmailErrorMessage, preferredStyle: .alert)
             alertController.addAction(UIAlertAction(title: "generic.later".localized, style: .cancel, handler: nil))
             
             if let mailURL = URL(string: "message://"), UIApplication.shared.canOpenURL(mailURL) {
