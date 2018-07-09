@@ -76,7 +76,14 @@ class UserAccountManager : NSObject {
         case unconfirmed
     }
     
-    var isFacebookConnected = false // TODO:
+    var isFacebookConnected: Bool {
+        guard let user = user else {
+            return false
+        }
+        return user.providerData.contains { userInfo -> Bool in
+            return userInfo.providerID == "facebook.com"
+        }
+    }
     
     var userFromLogin:User?
     var user:User? {

@@ -47,26 +47,38 @@ class ProfileViewController: BaseTableViewController {
         }
     }
     
-    private var data: [Section: [Row]] = [
-        .account: [],
-        .invite: [],
-        .facebook: [],
-        .options: [
-            .optionCurrency,
-            .optionOpenIn
-        ],
-        .permissions: [
-            .permissionPhoto,
-            .permissionPush,
-            .permissionGDRP
-        ]
+    private var data: [(section: Section, rows: [Row])] = [
+        (Section.account, []),
+        (Section.invite, []),
+        (Section.facebook, []),
+        (Section.options, [.optionCurrency, .optionOpenIn]),
+        (Section.permissions, [.permissionPhoto, .permissionPush, .permissionGDRP])
     ]
+    
+    func removeSection(_ section: Section) {
+        let index = data.index { (_section, rows) -> Bool in
+            return _section == section
+        }
+        if let index = index {
+            data.remove(at: index)
+        }
+    }
+    
+    func addSection(_ section: Section, rows: [Row]) {
+        guard !data.contains(where: { $0.section == section }) else {
+            return
+        }
+        data.insert((section, rows), at: 0)
+        data.sort { (a, b) -> Bool in
+            return a.section.rawValue < b.section.rawValue
+        }
+    }
     
     weak var delegate: ProfileViewControllerDelegate?
     
     private let profileAccountView = ProfileAccountView()
     
-    private let inviteView: UIView = {
+    private lazy var inviteView: UIView = {
         let view = UIView()
         view.layoutMargins = UIEdgeInsets(top: 0, left: .padding, bottom: 0, right: .padding)
         
@@ -95,7 +107,7 @@ class ProfileViewController: BaseTableViewController {
         return view
     }()
     
-    private let facebookView: UIView = {
+    private lazy var facebookView: UIView = {
         let view = UIView()
         view.layoutMargins = UIEdgeInsets(top: 0, left: .padding, bottom: 0, right: .padding)
         
@@ -223,14 +235,14 @@ class ProfileViewController: BaseTableViewController {
             }
             
             if UserAccountManager.shared.isFacebookConnected {
-                data.removeValue(forKey: .facebook)
+                removeSection(.facebook)
             }
             
-            data[.logout] = [.logout]
+            addSection(.logout, rows: [.logout])
         }
         else {
-            data[.facebook] = []
-            data.removeValue(forKey: .logout)
+            addSection(.facebook, rows: [])
+            removeSection(.logout)
         }
         
         tableView.reloadData()
@@ -258,9 +270,9 @@ class ProfileViewController: BaseTableViewController {
     
     @objc private func facebookLoginAction(_ button: FacebookButton) {
         // TODO: analytics
-        // TODO: block user interaction
         
         button.isLoading = true
+        button.isUserInteractionEnabled = false
         
         UserAccountManager.shared.loginWithFacebook()
             .then { result -> Void in
@@ -276,6 +288,7 @@ class ProfileViewController: BaseTableViewController {
             }
             .always {
                 button.isLoading = false
+                button.isUserInteractionEnabled = true
         }
     }
     
@@ -305,14 +318,12 @@ class ProfileViewController: BaseTableViewController {
 
 extension ProfileViewController: ProfileAccountViewDelegate {
     func profileAccountViewAuthorize(_ view: ProfileAccountView) {
-        
         let vc = RegisterViewController.init()
         vc.isOnboardingLayout = false
         vc.delegate = self
         let navVC = UINavigationController.init(rootViewController: vc)
         navVC.isNavigationBarHidden = true
         self.present(navVC, animated: true, completion: nil)
-
     }
     
     func profileAccountViewWantsToContract(_ view: ProfileAccountView) {
@@ -394,17 +405,16 @@ extension ProfileViewController : RegisterViewControllerDelegate, ConfirmCodeVie
 
 extension ProfileViewController {
     private func row(for indexPath: IndexPath) -> Row? {
-        guard let section = Section(rawValue: indexPath.section) else {
-            return nil
-        }
-        return data[section]?[indexPath.row]
+        return data[indexPath.section].rows[indexPath.row]
     }
     
     private func indexPath(for row: Row, in section: Section) -> IndexPath? {
-        guard let rowValue = data[section]?.index(of: row) else {
-            return nil
+        guard let sectionIndex = data.index(where: { $0.section == section }),
+            let rowIndex = data[sectionIndex].rows.index(of: row)
+            else {
+                return nil
         }
-        return IndexPath(row: rowValue, section: section.rawValue)
+        return IndexPath(row: rowIndex, section: sectionIndex)
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -412,44 +422,45 @@ extension ProfileViewController {
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        guard let settingsSection = Section(rawValue: section) else {
-            return 0
-        }
-        return data[settingsSection]?.count ?? 0
+        return data[section].rows.count
+    }
+    
+    func sectionFor(section: Int) -> Section {
+        return data[section].section
     }
     
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        if Section.account.rawValue == section {
+        switch data[section].section {
+        case .account:
             if profileAccountView.isExpanded {
                 return profileAccountView.maxHeight
             }
             else {
                 return profileAccountView.minHeight
             }
-        }
-        else if Section.invite.rawValue == section {
+        case .invite:
             return inviteView.bounds.height
-        }
-        else if Section.facebook.rawValue == section {
+        case .facebook:
             return facebookView.bounds.height
-        }
-        else if let section = Section(rawValue: section), sectionText(for: section) != nil {
-            return tableView.sectionHeaderHeight
+        case let _section:
+            if sectionText(for: _section) != nil {
+                return tableView.sectionHeaderHeight
+            }
         }
         return 0
     }
     
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        if section == Section.account.rawValue {
+        switch data[section].section {
+        case .account:
             return profileAccountView
-        }
-        else if section == Section.invite.rawValue {
+        case .invite:
             return inviteView
-        }
-        else if section == Section.facebook.rawValue {
+        case .facebook:
             return facebookView
+        default:
+            return nil
         }
-        return nil
     }
     
     override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
@@ -462,10 +473,7 @@ extension ProfileViewController {
     }
     
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        if let section = Section(rawValue: section) {
-            return sectionText(for: section)
-        }
-        return nil
+        return sectionText(for: data[section].section)
     }
     
     override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
@@ -479,7 +487,7 @@ extension ProfileViewController {
         
         let cell: UITableViewCell
         
-        if indexPath.section == Section.logout.rawValue {
+        if data[indexPath.section].section == Section.logout {
             cell = tableView.dequeueReusableCell(withIdentifier: "logout", for: indexPath)
             
             cell.textLabel?.text = cellText(for: row)
