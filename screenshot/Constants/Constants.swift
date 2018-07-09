@@ -47,7 +47,7 @@ class Constants {
     
     
     //Discover
-    static let discoverTotal = 14930
+    static let discoverTotal = 36514
     
     // Keys
 #if DEV

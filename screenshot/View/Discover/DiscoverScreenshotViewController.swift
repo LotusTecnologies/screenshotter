@@ -525,6 +525,13 @@ extension DiscoverScreenshotViewController : UICollectionViewDataSource {
             
             let matchstick = matchstickAt(index: indexPath)
             
+            if matchstick?.recombeeRecommended ?? 0 > 0  {
+                cell.mainView.layer.borderColor = UIColor.red.cgColor
+                cell.mainView.layer.borderWidth = 5.0
+            }else{
+                cell.mainView.layer.borderColor = UIColor.clear.cgColor
+                cell.mainView.layer.borderWidth = 0.0
+            }
             if let imageData = matchstick?.imageData as Data? {
                 cell.image = UIImage(data: imageData)
             }else{
