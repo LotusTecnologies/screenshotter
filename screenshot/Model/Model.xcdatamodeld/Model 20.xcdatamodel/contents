@@ -106,6 +106,7 @@
         <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="favoritesCount" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="imageData" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES" syncable="YES"/>
+        <attribute name="inNotif" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="isFromShare" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="isHidden" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="isNew" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
@@ -168,7 +169,7 @@
         <element name="Matchstick" positionX="-380" positionY="-117" width="128" height="210"/>
         <element name="Product" positionX="-101" positionY="396" width="128" height="570"/>
         <element name="ProductFilter" positionX="160" positionY="276" width="128" height="120"/>
-        <element name="Screenshot" positionX="-191" positionY="-114" width="128" height="420"/>
+        <element name="Screenshot" positionX="-191" positionY="-114" width="128" height="435"/>
         <element name="ShippingAddress" positionX="718" positionY="393" width="128" height="75"/>
         <element name="Shoppable" positionX="-38" positionY="18" width="128" height="300"/>
         <element name="Variant" positionX="124" positionY="636" width="128" height="150"/>
