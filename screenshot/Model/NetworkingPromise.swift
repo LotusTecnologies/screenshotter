@@ -99,6 +99,7 @@ class NetworkingPromise : NSObject {
                         }
                         guard let response = response as? HTTPURLResponse else {
                             print("uploadToSyte invalid response")
+                            Analytics.trackReceivedUploadErrorFromSyte(imageUrl: orImageUrlString, httpStatusCode: 0, reason: "no response")
                             reject(NSError(domain: "Craze", code: 4, userInfo: [NSLocalizedDescriptionKey : "uploadToSyte invalid response"]))
                             return
                         }
@@ -106,18 +107,22 @@ class NetworkingPromise : NSObject {
                         guard statusCode >= 200 && statusCode < 300 else {
                             if let data = data, let dataString = String(data: data, encoding: .utf8) {
                                 print("uploadToSyte invalid status code:\(statusCode)   dataString:\(dataString)   url:\(String(describing: response.url))   headers:\(response.allHeaderFields)")
+                                Analytics.trackReceivedUploadErrorFromSyte(imageUrl: orImageUrlString, httpStatusCode: statusCode, reason: dataString)
                             } else {
                                 print("uploadToSyte invalid status code:\(statusCode)   no dataString   url:\(String(describing: response.url))   headers:\(response.allHeaderFields)")
+                                Analytics.trackReceivedUploadErrorFromSyte(imageUrl: orImageUrlString, httpStatusCode: statusCode, reason: "no data")
                             }
                             reject(NSError(domain: "Craze", code: 4, userInfo: [NSLocalizedDescriptionKey : "uploadToSyte invalid status code:\(statusCode)"]))
                             return
                         }
                         guard let data = data else {
+                            Analytics.trackReceivedUploadErrorFromSyte(imageUrl: orImageUrlString, httpStatusCode: 200, reason: "no data")
                             reject(NSError(domain: "Craze", code: 4, userInfo: [NSLocalizedDescriptionKey : "uploadToSyte no data"]))
                             return
                         }
                         guard let responseObjectDict = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [String: Any] else {
                             print("uploadToSyte invalid response object dictionary")
+                            Analytics.trackReceivedUploadErrorFromSyte(imageUrl: orImageUrlString, httpStatusCode: 200, reason: "bad dictionary")
                             reject(NSError(domain: "Craze", code: 4, userInfo: [NSLocalizedDescriptionKey : "uploadToSyte invalid response object dictionary"]))
                             return
                         }
