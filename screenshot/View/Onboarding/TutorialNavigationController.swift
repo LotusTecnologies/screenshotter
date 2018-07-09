@@ -14,7 +14,7 @@ import UIKit
 
 class TutorialNavigationController : UINavigationController {
     weak var tutorialDelegate: TutorialNavigationControllerDelegate?
-    var showProfilePage = false
+    var showProfilePage = true
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -64,15 +64,17 @@ extension TutorialNavigationController: RegisterViewControllerDelegate {
         Analytics.trackOnboardingSkipped()
     }
     
-    func registerViewControllerNeedEmailConfirmation(_ viewController: RegisterViewController) {
-        let confirm = ConfirmCodeViewController()
-        confirm.email = viewController.email
-        confirm.delegate = self
-        self.pushViewController(confirm, animated: true)
-        Analytics.trackOnboardingRegisterEmailSent()
+    func registerViewControllerDidCreateAccount(_ viewController: RegisterViewController) {
+        pushGDPRViewController()
+
+    
+        Analytics.trackOnboardingLoginSucess()
+
     }
     
     func registerViewControllerDidSignin(_ viewController: RegisterViewController) {
+        showProfilePage = false
+
         let agreedToAllPermisions = (UserDefaults.standard.bool(forKey: UserDefaultsKeys.gdpr_agreedToEmail) && UserDefaults.standard.bool(forKey: UserDefaultsKeys.gdpr_agreedToImageDetection))
         if ( !agreedToAllPermisions ) {
             pushGDPRViewController()
