@@ -217,29 +217,9 @@ class DiscoverManager {
                 NetworkingPromise.sharedInstance.downloadImageData(urlString: imageURL)
                     .then { imageData -> Void in
                         DataModel.sharedInstance.performBackgroundTask { (context) in
-                            let fetchRequest: NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
-                            fetchRequest.predicate = NSPredicate(format: "imageUrl == %@", imageURL)
-                            fetchRequest.sortDescriptors = nil
-                            if let results = try? context.fetch(fetchRequest), let matchstick = results.first {
+                            
+                            if let matchstick = Matchstick.with(imageUrl: imageURL, in: context) {
                                 matchstick.imageData = imageData
-                                ////////
-                                ////////   DEBUG
-                                ////////
-                                if matchstick.recombeeRecommended != nil {
-                                    if let image = UIImage.init(data: imageData) {
-                                        DispatchQueue.main.async {
-                                            
-                                            let a = Announcement.init(title: "Recommbee", subtitle: "Recomendation", image: image, duration: 10.0, action: {
-                                            })
-                                            if let viewController = AppDelegate.shared.window?.rootViewController {
-                                                Whisper.show(shout: a, to: viewController)
-                                            }
-                                        }
-                                    }
-                                }
-                                //////
-                                //////
-                                //////
                                 
                              
                             }else{
@@ -255,14 +235,17 @@ class DiscoverManager {
                             
                         }
                     }.catch { error in
-                        DataModel.sharedInstance.performBackgroundTask { (context) in
-                            // if 404 set as 404
-                            // TODO:
-                            print("error:\(error)")
-                            context.saveIfNeeded()
-                            completed()
-
+                        if case let PMKURLError.badResponse(_, _, response) = error,  let r = response as? HTTPURLResponse, r.statusCode == 404 {
+                            DataModel.sharedInstance.performBackgroundTask { (context) in
+                                if let matchstick = Matchstick.with(imageUrl: imageURL, in: context) {
+                                    matchstick.was404 = true
+                                    context.saveIfNeeded()
+                                }
+                            }
                         }
+                        
+                        completed()
+                       
                 }
             })
             operation.queuePriority = priority

@@ -54,4 +54,13 @@ extension Matchstick {
         return matchstickLookup
     }
     
+    static func with( imageUrl:String, in context:NSManagedObjectContext) -> Matchstick?{
+        let fetchRequest: NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "imageUrl == %@", imageUrl)
+        fetchRequest.sortDescriptors = nil
+        if let results = try? context.fetch(fetchRequest), let matchstick = results.first {
+            return matchstick
+        }
+        return nil
+    }
 }
