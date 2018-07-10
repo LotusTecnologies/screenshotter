@@ -284,6 +284,9 @@ class UserAccountManager : NSObject {
                                 self.email = email
                                 
                                 Analytics.trackDevLog(file: #file, line: #line, message: "loginOrCreatAccountAsNeeded from anon -> real \(String(describing: self.user?.isAnonymous))")
+                                self.databaseRef.child("users").child(user.uid).child("email").setValue(email.lowercased())
+                                UserDefaults.standard.set(email.lowercased(), forKey: UserDefaultsKeys.email)
+
                                 fulfil(LoginOrCreateAccountResult.createAccount)
                             }
                         })
