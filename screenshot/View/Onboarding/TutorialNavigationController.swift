@@ -59,6 +59,22 @@ extension TutorialNavigationController : UINavigationControllerDelegate {
 }
 
 extension TutorialNavigationController: RegisterViewControllerDelegate {
+    
+    func returningUserPermissionAlert(){
+        let alert = UIAlertController.init(title: "screenshot.permission.returning_user.title".localized, message: "screenshot.permission.returning_user.message".localized, preferredStyle: .alert)
+        alert.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .default, handler: { (a) in
+            PermissionsManager.shared.requestPermissions([.push, .photo]){
+                self.tutorialCompleted()
+            }
+        }))
+        alert.addAction(UIAlertAction.init(title: "generic.later".localized, style: .cancel, handler: { (a) in
+            self.tutorialCompleted()
+        }))
+        self.present(alert, animated: true) {
+            
+        }
+    }
+    
     func registerViewControllerDidSkip(_ viewController: RegisterViewController) {
         pushGDPRViewController()
         Analytics.trackOnboardingSkipped()
@@ -72,6 +88,8 @@ extension TutorialNavigationController: RegisterViewControllerDelegate {
 
     }
     
+    
+    
     func registerViewControllerDidSignin(_ viewController: RegisterViewController) {
         showProfilePage = false
 
@@ -79,7 +97,7 @@ extension TutorialNavigationController: RegisterViewControllerDelegate {
         if ( !agreedToAllPermisions ) {
             pushGDPRViewController()
         }else{
-            tutorialCompleted()
+            returningUserPermissionAlert()
         }
         Analytics.trackOnboardingLoginSucess()
     }
@@ -89,7 +107,7 @@ extension TutorialNavigationController: RegisterViewControllerDelegate {
         if ( !agreedToAllPermisions ) {
             pushGDPRViewController()
         }else{
-            tutorialCompleted()
+            returningUserPermissionAlert()
         }
 
         Analytics.trackOnboardingFacebookSuccess(isReturning: true)
