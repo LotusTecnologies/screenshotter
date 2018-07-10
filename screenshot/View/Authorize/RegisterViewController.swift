@@ -11,7 +11,7 @@ import Appsee
 
 protocol RegisterViewControllerDelegate: NSObjectProtocol {
     func registerViewControllerDidSkip(_ viewController: RegisterViewController)
-    func registerViewControllerNeedEmailConfirmation(_ viewController: RegisterViewController)
+    func registerViewControllerDidCreateAccount(_ viewController: RegisterViewController)
     func registerViewControllerDidSignin(_ viewController: RegisterViewController)
     func registerViewControllerDidFacebookLogin(_ viewController: RegisterViewController)
     func registerViewControllerDidFacebookSignup(_ viewController: RegisterViewController)
@@ -376,11 +376,11 @@ class RegisterViewController: UIViewController {
             self._view.forgotPasswordButton.isUserInteractionEnabled = false
             UserAccountManager.shared.loginOrCreatAccountAsNeeded(email: email, password: password)
             .then { result -> Void in
-                if  result  == .unconfirmed {
-                    
-                    self.delegate?.registerViewControllerNeedEmailConfirmation(self)
-                } else {
+                if  result  == .login {
                     self.delegate?.registerViewControllerDidSignin(self)
+
+                } else {
+                    self.delegate?.registerViewControllerDidCreateAccount(self)
                 }
             }.catch { error in
                 

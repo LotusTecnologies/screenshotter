@@ -303,12 +303,10 @@ extension ProfileViewController : RegisterViewControllerDelegate, ConfirmCodeVie
     func registerViewControllerDidSkip(_ viewController: RegisterViewController) {
         self.dismiss(animated: true, completion: nil)
     }
-    
-    func registerViewControllerNeedEmailConfirmation(_ viewController: RegisterViewController) {
-        let confirm = ConfirmCodeViewController()
-        confirm.email = viewController.email
-        confirm.delegate = self
-        viewController.navigationController?.pushViewController(confirm, animated: true)
+    func registerViewControllerDidCreateAccount(_ viewController: RegisterViewController){
+        self.dismiss(animated: true, completion: nil)
+        self.didLogin()
+
     }
     
     func didLogin(){

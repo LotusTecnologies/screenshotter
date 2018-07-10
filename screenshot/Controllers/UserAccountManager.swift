@@ -72,8 +72,8 @@ class UserAccountManager : NSObject {
     enum LoginOrCreateAccountResult {
         case facebookNew
         case facebookOld
-        case confirmed
-        case unconfirmed
+        case login
+        case createAccount
     }
     
     var userFromLogin:User?
@@ -275,32 +275,22 @@ class UserAccountManager : NSObject {
                         reject(error)
                     }else{
                         self.email = email
-                        user.sendEmailVerification(completion: { (error) in
+                        user.updatePassword(to: password, completion: { (error) in
                             if let error = error {
-                                Analytics.trackDevLog(file: #file, line: #line, message: "loginOrCreatAccountAsNeeded updateEmail error \(error)")
+                                Analytics.trackDevLog(file: #file, line: #line, message: "loginOrCreatAccountAsNeeded updatePassword error \(error)")
+                                
                                 reject(error)
                             }else{
-                                user.updatePassword(to: password, completion: { (error) in
-                                    if let error = error {
-                                        Analytics.trackDevLog(file: #file, line: #line, message: "loginOrCreatAccountAsNeeded updatePassword error \(error)")
+                                self.email = email
+                                
+                                Analytics.trackDevLog(file: #file, line: #line, message: "loginOrCreatAccountAsNeeded from anon -> real \(String(describing: self.user?.isAnonymous))")
+                                self.databaseRef.child("users").child(user.uid).child("email").setValue(email.lowercased())
+                                UserDefaults.standard.set(email.lowercased(), forKey: UserDefaultsKeys.email)
 
-                                        reject(error)
-                                    }else{
-                                        self.email = email
-                                        user.sendEmailVerification(completion: { (error) in
-                                            if let error = error {
-                                                Analytics.trackDevLog(file: #file, line: #line, message: "loginOrCreatAccountAsNeeded sendEmailVerification error \(error)")
-
-                                                reject(error)
-                                            }else{
-                                                Analytics.trackDevLog(file: #file, line: #line, message: "loginOrCreatAccountAsNeeded from anon -> real \(String(describing: self.user?.isAnonymous))")
-                                                fulfil(LoginOrCreateAccountResult.unconfirmed)
-                                            }
-                                        })
-                                    }
-                                })
+                                fulfil(LoginOrCreateAccountResult.createAccount)
                             }
                         })
+                    
                     }
                 })
             }).recover(execute: { (error) -> Promise<UserAccountManager.LoginOrCreateAccountResult> in
@@ -342,25 +332,14 @@ class UserAccountManager : NSObject {
                     self.userFromLogin = user
                     self.databaseRef.child("users").child(user.uid).child("identifier").setValue(AnalyticsUser.current.identifier)
                     self.downloadAndReplaceUserData().always {
-                        if user.isEmailVerified {
-                            self.databaseRef.child("users").child(user.uid).child("email").setValue(email.lowercased())
-                            UserDefaults.standard.set(email.lowercased(), forKey: UserDefaultsKeys.email)
-                            Analytics.trackDevLog(file: #file, line: #line, message: " login user email verified")
-                            fulfil(LoginOrCreateAccountResult.confirmed)
-                        }else{
-                            Analytics.trackDevLog(file: #file, line: #line, message: " login user email unverified")
-                            self.email = email
-                            user.sendEmailVerification(completion: { (error) in
-                                if let error = error {
-                                    Analytics.trackDevLog(file: #file, line: #line, message: " login user email unverified send email error \(error)")
-
-                                    reject(error)
-                                }else{
-                                    Analytics.trackDevLog(file: #file, line: #line, message: " login user email unverified send email")
-                                    fulfil(LoginOrCreateAccountResult.unconfirmed)
-                                }
-                            })
-                        }
+                        self.email = email
+                        
+                        self.databaseRef.child("users").child(user.uid).child("email").setValue(email.lowercased())
+                        UserDefaults.standard.set(email.lowercased(), forKey: UserDefaultsKeys.email)
+                        Analytics.trackDevLog(file: #file, line: #line, message: " login user email verified")
+                        fulfil(LoginOrCreateAccountResult.login)
+                        
+                        
                     }
                 }else{
                     Analytics.trackDevLog(file: #file, line: #line, message: "unexpected")
@@ -417,27 +396,14 @@ class UserAccountManager : NSObject {
                     self.userFromLogin = user
                     self.databaseRef.child("users").child(user.uid).child("identifier").setValue(AnalyticsUser.current.identifier)
                     let downloadPromise = self.downloadAndReplaceUserData()
-                    if authResult.user.isEmailVerified {
-                        downloadPromise.always {
-                            Analytics.trackDevLog(file: #file, line: #line, message: "created email verified")
-                            fulfil(LoginOrCreateAccountResult.confirmed)
-                        }
-                    }else{
-                        self.email = email
-                        Analytics.trackDevLog(file: #file, line: #line, message: "created email unverified")
 
-                        authResult.user.sendEmailVerification(completion: { (error) in
-                            downloadPromise.always {
-                                if let error = error {
-                                    Analytics.trackDevLog(file: #file, line: #line, message: "createAccount sendEmailVerification error  \(error)")
-                                    reject(error)
-                                }else{
-                                    Analytics.trackDevLog(file: #file, line: #line, message: "created account")
-                                    fulfil(LoginOrCreateAccountResult.unconfirmed)
-                                }
-                            }
-                        })
+                    downloadPromise.always {
+                        Analytics.trackDevLog(file: #file, line: #line, message: "created email verified")
+                        self.databaseRef.child("users").child(user.uid).child("email").setValue(email.lowercased())
+                        UserDefaults.standard.set(email.lowercased(), forKey: UserDefaultsKeys.email)
+                        fulfil(LoginOrCreateAccountResult.createAccount)
                     }
+                    
                 }else{
                     Analytics.trackDevLog(file: #file, line: #line, message: "unexpected")
 
