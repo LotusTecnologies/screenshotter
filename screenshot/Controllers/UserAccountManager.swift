@@ -353,32 +353,32 @@ class UserAccountManager : NSObject {
     @discardableResult func makeAnonAccount() -> Promise<Void>{
         Analytics.trackDevLog(file: #file, line: #line, message: "makeAnonAccount")
 
-        if let promise = self.makeAnonAccountPromise {
-            Analytics.trackDevLog(file: #file, line: #line, message: "already making/made anon account")
+        if let promise = self.makeAnonAccountPromise, !promise.isRejected {
+            Analytics.trackDevLog(file: "UserAccountManager", line: #line, message: "already making/made anon account")
             return promise
         }else{
+            self.makeAnonAccountPromise = nil
             let promise = Promise<Void>.init(resolvers: { (fulfil, reject) in
                 Auth.auth().signInAnonymously() { (authResult, error) in
                     if let error = error {
                          ///automatic retry?
-                        Analytics.trackDevLog(file: #file, line: #line, message: "eror making anon acc ount \(error)")
-
+                        Analytics.trackDevLog(file: #file, line: #line, message: "eror making anon account \(error)")
                         reject(error)
                     }else  if let authResult = authResult {
                         Analytics.trackDevLog(file: #file, line: #line, message: "made anon account")
                         let user = authResult.user
                         self.userFromLogin = user
                         self.databaseRef.child("users").child(user.uid).child("identifier").setValue(AnalyticsUser.current.identifier)
-                        self.downloadAndReplaceUserData().always {
-                            fulfil(())
-                        }
+                        fulfil(())
                     }else{
                         Analytics.trackDevLog(file: #file, line: #line, message: "unexpected")
-                        reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+                        reject(NSError.init(domain: "UserAccountManager", code: #line, userInfo: [:]))
                     }
                     
                 }
             })
+            
+            self.makeAnonAccountPromise = promise
             return promise
         }
     }
@@ -451,7 +451,7 @@ class UserAccountManager : NSObject {
                 })
             }else{
                 Analytics.trackDevLog(file: #file, line: #line, message: "unexpected")
-                reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+                reject(NSError.init(domain: "UserAccountManager", code: #line, userInfo: [:]))
             }
             
         }
@@ -504,7 +504,7 @@ class UserAccountManager : NSObject {
                     }else{
                         Analytics.trackDevLog(file: #file, line: #line, message: "unexpected")
 
-                        reject(NSError.init(domain: #file, code: #line, userInfo: [:]))
+                        reject(NSError.init(domain: "UserAccountManager", code: #line, userInfo: [:]))
                     }
                 }
             })
@@ -532,12 +532,12 @@ class UserAccountManager : NSObject {
                     fulfill(())
                 }else{
                     Analytics.trackDevLog(file: #file, line: #line, message: "unexpected")
-                    reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+                    reject(NSError.init(domain: "UserAccountManager", code: #line, userInfo: [:]))
                 }
             }).catch(execute: { (error) in
                 Analytics.trackDevLog(file: #file, line: #line, message: "unexpected")
 
-                reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+                reject(NSError.init(domain: "UserAccountManager", code: #line, userInfo: [:]))
             })
         }
     }
@@ -571,12 +571,12 @@ class UserAccountManager : NSObject {
                     fulfill(())
                 }else{
                     Analytics.trackDevLog(file: #file, line: #line, message: "unexpected")
-                    reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+                    reject(NSError.init(domain: "UserAccountManager", code: #line, userInfo: [:]))
                 }
             }).catch(execute: { (error) in
                 Analytics.trackDevLog(file: #file, line: #line, message: "unexpected")
 
-                reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+                reject(NSError.init(domain: "UserAccountManager", code: #line, userInfo: [:]))
             })
         }
     }
@@ -1001,11 +1001,27 @@ extension String {
 
 extension UserAccountManager {
     public func uploadImage(data:Data) -> Promise<URL> {
-        
+        func getUser() -> Promise<User> {
+            return Promise { fulfill, reject in
+                if let user = self.user {
+                    fulfill(user)
+                }else {
+                    self.makeAnonAccount().then(execute: { () -> () in
+                        if let user = self.user{
+                            fulfill(user)
+                        }else{
+                            reject(NSError.init(domain: "UserAccountManager", code: #line, userInfo: [:]))
+                        }
+                    }).catch(execute: { (error) in
+                        reject(error)
+                    })
+                }
+            }
+        }
         return Promise { fulfill, reject in
-            if let user = self.user {
+            getUser().then(execute: { (user) -> (Void) in
                 let name = UUID().uuidString
-                let uploadRef = storageRef.child("user").child(user.uid).child("images").child("\(name).jpg")
+                let uploadRef = self.storageRef.child("user").child(user.uid).child("images").child("\(name).jpg")
                 
                 let _ = uploadRef.putData(data, metadata: nil) { (metadata, error) in
                     if let error = error {
@@ -1017,14 +1033,14 @@ extension UserAccountManager {
                             } else if let url = url{
                                 fulfill(url)
                             }else{
-                                reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+                                reject(NSError.init(domain: #file, code: #line, userInfo: [:]))
                             }
                         }
                     }
                 }
-            }else{
-                reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
-            }
+            }).catch(execute: { (error) in
+                reject(error)
+            })
         }
     }
 }
