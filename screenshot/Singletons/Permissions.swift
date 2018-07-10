@@ -105,6 +105,24 @@ final class PermissionsManager : NSObject, CLLocationManagerDelegate {
     
     // MARK: Request
     
+    func requestPermissions(_ types: [PermissionType], completion:@escaping (()->())) {
+        var types = types
+        guard !types.isEmpty else {
+            completion()
+            return
+        }
+        let type = types.removeFirst()
+        
+        if PermissionsManager.shared.hasPermission(for: type) {
+            requestPermissions(types, completion: completion)
+        }
+        else {
+            PermissionsManager.shared.requestPermission(for: type) { granted in
+                self.requestPermissions(types, completion: completion)
+            }
+        }
+    }
+    
     func requestPermission(for type: PermissionType, response: PermissionBlock? = nil) {
         func requestResponse(_ granted: Bool) {
             guard let response = response else {
