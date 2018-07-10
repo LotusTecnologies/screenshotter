@@ -287,10 +287,10 @@ class NetworkingPromise : NSObject {
         var imageURL:String
         var remoteId:String
     }
-    func recombeeRecommendation() -> Promise<[RecombeeRecommendation]>{
+    func recombeeRecommendation(count:Int) -> Promise<[RecombeeRecommendation]>{
         let userId = AnalyticsUser.current.identifier
         var params:[String:Any] = [:]
-        params["count"] = 1
+        params["count"] = count
         params["cascadeCreate"] = true
         params["rotationRate"] = 0.99
         params["filter"] = "'displayable' == true"

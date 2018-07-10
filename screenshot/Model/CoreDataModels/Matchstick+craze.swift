@@ -18,9 +18,11 @@ extension Matchstick {
     }
 
     static var skipRotationTime:TimeInterval = 7*24*60*60  // 1 week
-    static var displayingSize = 3
-    static var queueSize = 50
-    
+    static var displayingSize = 2
+    static var queueSize = 30  //Must have at least this ammount  - if not grab random numbers
+    static var recombeeQueueSize = 20  // want to have this amount of recombee recommendations
+    static var recombeeQueueLowMark = 10 // if less than this amount make request for recombee recomendations (recombeeQueueSize - current)
+
     var isInGarbage:Bool {
         if self.wasAdded || self.was404 {
             return true
@@ -39,6 +41,17 @@ extension Matchstick {
     
     public func pass() {
         DiscoverManager.shared.didSkip(self)
+    }
+    
+    static func lookupWith(remoteIds:[String], in context:NSManagedObjectContext) -> [String:Matchstick]{
+        let fetchRequest: NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "remoteId IN %@", remoteIds)
+        fetchRequest.sortDescriptors = nil
+        var matchstickLookup:[String:Matchstick] = [:]
+        if let results = try? context.fetch(fetchRequest) {
+            results.forEach { if let remoteId = $0.remoteId { matchstickLookup[remoteId] = $0  } }
+        }
+        return matchstickLookup
     }
     
 }

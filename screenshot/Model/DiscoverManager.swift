@@ -13,7 +13,7 @@ import Whisper
 
 class DiscoverManager {
     public static let shared = DiscoverManager()
-
+    var makingLoadRecombeeRequest = false
     var downloadMatchsitckQueue:OperationQueue = {
         var queue = AsyncOperationQueue()
         queue.name = "Download matchsticks Queue"
@@ -58,15 +58,8 @@ class DiscoverManager {
                 
                 
                 // send recombee rating = 0.5 completion { request more recombee }
-                let isRecombeeId = (Int(assetId) != nil)
-                if isRecombeeId {
-                    let event = AnalyticsTrackers.RecombeeAnalyticsTracker.RecombeeEvent.positiveRating
-                    NetworkingPromise.sharedInstance.recombeeRequest(path: event.path(), method: "POST", params: event.postData(itemId: assetId)).always {
-                        self.recombeRequestOne()
-                    }
-                }else{
-                    self.recombeRequestOne()
-                }
+                self.sendrecombee(event: .positiveRating, assetId: assetId)
+               
                 
                 if let callback = callback {
                     let addedScreenshotOID = addedScreenshot.objectID
@@ -96,24 +89,29 @@ class DiscoverManager {
                 self.fillQueues(in: context)
                 
                 // send recombee rating = -0.5 completion { request more recombee }
-                let isRecombeeId = (Int(assetId) != nil)
-                if isRecombeeId {
-                    
-                    let event = AnalyticsTrackers.RecombeeAnalyticsTracker.RecombeeEvent.negativeRating
-                    NetworkingPromise.sharedInstance.recombeeRequest(path: event.path(), method: "POST", params: event.postData(itemId: assetId)).always {
-                        self.recombeRequestOne()
-                    }
-                }else{
-                    self.recombeRequestOne()
-                }
+                self.sendrecombee(event: .negativeRating, assetId: assetId)
+                
                 context.saveIfNeeded()
             }
         }
     }
     
-    private func recombeRequestOne(){
-        NetworkingPromise.sharedInstance.recombeeRecommendation().then(execute: { (recommendations) -> Void in
-            self.recombeeRecommendation(recommendations)
+    private func sendrecombee(event:AnalyticsTrackers.RecombeeAnalyticsTracker.RecombeeEvent, assetId:String){
+        let isRecombeeId = (Int(assetId) != nil)
+        if isRecombeeId {
+            NetworkingPromise.sharedInstance.recombeeRequest(path: event.path(), method: "POST", params: event.postData(itemId: assetId)).always {
+                self.recombeRequest(count:1)
+            }
+        }else{
+            self.recombeRequest(count:1)
+        }
+        
+    }
+    
+    @discardableResult private func recombeRequest(count:Int) -> Promise<Void>{
+        let dateRequested = Date()
+        return NetworkingPromise.sharedInstance.recombeeRecommendation(count:count).then(execute: { (recommendations) -> Void in
+            self.recombeeRecommendation(recommendations, dateRequested: dateRequested)
         }).catch(execute: { (error) in
             print("recombee error: \(error)")
         })
@@ -189,6 +187,16 @@ class DiscoverManager {
             UserDefaults.standard.setValue(currentIndex, forKey: UserDefaultsKeys.discoverCurrentIndex)
             
             
+            if !makingLoadRecombeeRequest {
+                let recombeeCount = queued.filter{ $0.recombeeRecommended != nil && $0.isDisplaying == false }.count
+                if recombeeCount <= Matchstick.recombeeQueueLowMark {
+                    self.makingLoadRecombeeRequest = true
+                    self.recombeRequest(count:Matchstick.recombeeQueueSize - recombeeCount).always {
+                        self.makingLoadRecombeeRequest = false
+                    }
+                }
+            }
+            
         }
     }
     
@@ -204,7 +212,6 @@ class DiscoverManager {
                 op.queuePriority = priority
             }
         }else{
-            
             let tag = AsyncOperationTag.init(type: .assetId, value: imageURL)
             let operation = AsyncOperation.init(timeout: 90.0, tags: [tag], completion: { (completed) in
                 NetworkingPromise.sharedInstance.downloadImageData(urlString: imageURL)
@@ -213,22 +220,28 @@ class DiscoverManager {
                             let fetchRequest: NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
                             fetchRequest.predicate = NSPredicate(format: "imageUrl == %@", imageURL)
                             fetchRequest.sortDescriptors = nil
-                            
                             if let results = try? context.fetch(fetchRequest), let matchstick = results.first {
                                 matchstick.imageData = imageData
-                                if matchstick.recombeeRecommended > 0 {
+                                ////////
+                                ////////   DEBUG
+                                ////////
+                                if matchstick.recombeeRecommended != nil {
                                     if let image = UIImage.init(data: imageData) {
                                         DispatchQueue.main.async {
                                             
                                             let a = Announcement.init(title: "Recommbee", subtitle: "Recomendation", image: image, duration: 10.0, action: {
                                             })
                                             if let viewController = AppDelegate.shared.window?.rootViewController {
-                                                
                                                 Whisper.show(shout: a, to: viewController)
                                             }
                                         }
                                     }
                                 }
+                                //////
+                                //////
+                                //////
+                                
+                             
                             }else{
                                 print("error: cannot find image to put data into!!!")
                             }
@@ -257,34 +270,28 @@ class DiscoverManager {
         }
     }
     
-    func recombeeRecommendation(_ recommendations:[NetworkingPromise.RecombeeRecommendation]){
+    func recombeeRecommendation(_ recommendations:[NetworkingPromise.RecombeeRecommendation], dateRequested:Date){
         DataModel.sharedInstance.performBackgroundTask { (context) in
             let remoteIds = recommendations.map{ $0.remoteId }
-            let fetchRequest: NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
-            fetchRequest.predicate = NSPredicate(format: "remoteId IN %@", remoteIds)
-            fetchRequest.sortDescriptors = nil
-            var matchstickLookup:[String:Matchstick] = [:]
-            if let results = try? context.fetch(fetchRequest) {
-                results.forEach { if let remoteId = $0.remoteId { matchstickLookup[remoteId] = $0  } }
-            }
-
+            
+            var matchstickLookup = Matchstick.lookupWith(remoteIds: remoteIds, in: context)
+            
+            var mayNeedToRequestMore = false
             recommendations.forEach({ (recomend) in
-                if let matchstick = matchstickLookup[recomend.remoteId], matchstick.isInGarbage || matchstick.isDisplaying {
-                    NetworkingPromise.sharedInstance.recombeeRecommendation().then(execute: { (recommendations) -> Void in
-                        self.recombeeRecommendation(recommendations)
-                    }).catch(execute: { (error) in
-                        print("recombee error: \(error)")
-
-                    })
+                if let matchstick = matchstickLookup[recomend.remoteId], (matchstick.isInGarbage || matchstick.isDisplaying) {
+                    mayNeedToRequestMore = true
                 }else {
                     let matchstick = matchstickLookup[recomend.remoteId] ?? DataModel.sharedInstance.saveMatchstick(managedObjectContext: context, remoteId: recomend.remoteId, imageUrl: recomend.imageURL, syteJson: nil, trackingInfo: nil)
                     if let matchstick = matchstick {
-                        matchstick.recombeeRecommended += 1
+                        matchstick.recombeeRecommended = dateRequested
                         matchstick.dateSkipped = nil
                         self.downloadIfNeeded(imageURL: recomend.imageURL, priority:.high)
                     }
                 }
             })
+            if mayNeedToRequestMore {
+                self.fillQueues(in: context)
+            }
             context.saveIfNeeded()
         }
     }

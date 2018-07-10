@@ -50,7 +50,7 @@
         <attribute name="imageUrl" attributeType="String" syncable="YES"/>
         <attribute name="isDisplaying" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="receivedAt" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
-        <attribute name="recombeeRecommended" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="recombeeRecommended" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="remoteId" attributeType="String" syncable="YES"/>
         <attribute name="syteJson" attributeType="String" syncable="YES"/>
         <attribute name="trackingInfo" optional="YES" attributeType="String" syncable="YES"/>
