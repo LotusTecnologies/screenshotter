@@ -47,32 +47,19 @@ class ProfileViewController: BaseTableViewController {
         }
     }
     
-    private var data: [(section: Section, rows: [Row])] = [
-        (Section.account, []),
-        (Section.invite, []),
-        (Section.facebook, []),
-        (Section.options, [.optionCurrency, .optionOpenIn]),
-        (Section.permissions, [.permissionPhoto, .permissionPush, .permissionGDRP])
-    ]
-    
-    func removeSection(_ section: Section) {
-        let index = data.index { (_section, rows) -> Bool in
-            return _section == section
-        }
-        if let index = index {
-            data.remove(at: index)
-        }
-    }
-    
-    func addSection(_ section: Section, rows: [Row]) {
-        guard !data.contains(where: { $0.section == section }) else {
-            return
-        }
-        data.insert((section, rows), at: 0)
-        data.sort { (a, b) -> Bool in
-            return a.section.rawValue < b.section.rawValue
-        }
-    }
+    private let dataSource = DataSource<Section, Row>(data: [
+        .account: [],
+        .invite: [],
+        .options: [
+            .optionCurrency,
+            .optionOpenIn
+        ],
+        .permissions: [
+            .permissionPhoto,
+            .permissionPush,
+            .permissionGDRP
+        ]
+    ])
     
     weak var delegate: ProfileViewControllerDelegate?
     
@@ -235,14 +222,17 @@ class ProfileViewController: BaseTableViewController {
             }
             
             if UserAccountManager.shared.isFacebookConnected {
-                removeSection(.facebook)
+                dataSource.removeSection(.facebook)
+            }
+            else {
+                dataSource.addSection(.facebook, rows: [])
             }
             
-            addSection(.logout, rows: [.logout])
+            dataSource.addSection(.logout, rows: [.logout])
         }
         else {
-            addSection(.facebook, rows: [])
-            removeSection(.logout)
+            dataSource.removeSection(.facebook)
+            dataSource.removeSection(.logout)
         }
         
         tableView.reloadData()
@@ -404,63 +394,51 @@ extension ProfileViewController : RegisterViewControllerDelegate, ConfirmCodeVie
 // MARK: - Table View
 
 extension ProfileViewController {
-    private func row(for indexPath: IndexPath) -> Row? {
-        return data[indexPath.section].rows[indexPath.row]
-    }
-    
-    private func indexPath(for row: Row, in section: Section) -> IndexPath? {
-        guard let sectionIndex = data.index(where: { $0.section == section }),
-            let rowIndex = data[sectionIndex].rows.index(of: row)
-            else {
-                return nil
-        }
-        return IndexPath(row: rowIndex, section: sectionIndex)
-    }
-    
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return data.count
+        return dataSource.count
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return data[section].rows.count
-    }
-    
-    func sectionFor(section: Int) -> Section {
-        return data[section].section
+        return dataSource.rows(section)?.count ?? 0
     }
     
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        switch data[section].section {
-        case .account:
-            if profileAccountView.isExpanded {
-                return profileAccountView.maxHeight
-            }
-            else {
-                return profileAccountView.minHeight
-            }
-        case .invite:
-            return inviteView.bounds.height
-        case .facebook:
-            return facebookView.bounds.height
-        case let _section:
-            if sectionText(for: _section) != nil {
-                return tableView.sectionHeaderHeight
+        if let s = dataSource.section(section) {
+            switch s {
+            case .account:
+                if profileAccountView.isExpanded {
+                    return profileAccountView.maxHeight
+                }
+                else {
+                    return profileAccountView.minHeight
+                }
+            case .invite:
+                return inviteView.bounds.height
+            case .facebook:
+                return facebookView.bounds.height
+            case let _section:
+                if sectionText(for: _section) != nil {
+                    return tableView.sectionHeaderHeight
+                }
             }
         }
         return 0
     }
     
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        switch data[section].section {
-        case .account:
-            return profileAccountView
-        case .invite:
-            return inviteView
-        case .facebook:
-            return facebookView
-        default:
-            return nil
+        if let s = dataSource.section(section) {
+            switch s {
+            case .account:
+                return profileAccountView
+            case .invite:
+                return inviteView
+            case .facebook:
+                return facebookView
+            default:
+                break
+            }
         }
+        return nil
     }
     
     override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
@@ -473,7 +451,10 @@ extension ProfileViewController {
     }
     
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return sectionText(for: data[section].section)
+        guard let s = dataSource.section(section) else {
+            return nil
+        }
+        return sectionText(for: s)
     }
     
     override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
@@ -481,13 +462,13 @@ extension ProfileViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let row = row(for: indexPath) else {
+        guard let row = dataSource.row(indexPath) else {
             return UITableViewCell()
         }
         
         let cell: UITableViewCell
         
-        if data[indexPath.section].section == Section.logout {
+        if dataSource.section(indexPath.section) == Section.logout {
             cell = tableView.dequeueReusableCell(withIdentifier: "logout", for: indexPath)
             
             cell.textLabel?.text = cellText(for: row)
@@ -523,7 +504,7 @@ extension ProfileViewController {
     }
     
     override func tableView(_ tableView: UITableView, shouldHighlightRowAt indexPath: IndexPath) -> Bool {
-        guard let row = row(for: indexPath) else {
+        guard let row = dataSource.row(indexPath) else {
             return true
         }
         
@@ -541,7 +522,7 @@ extension ProfileViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let row = row(for: indexPath) else {
+        guard let row = dataSource.row(indexPath) else {
             return
         }
         
@@ -718,7 +699,7 @@ extension ProfileViewController {
     
     @objc private func reloadChangeableIndexPaths() {
         func append(section: Section, row: Row, to indexPaths: inout [IndexPath]) {
-            if let indexPath = indexPath(for: row, in: section) {
+            if let indexPath = dataSource.indexPath(row: row, section: section) {
                 indexPaths.append(indexPath)
             }
         }
