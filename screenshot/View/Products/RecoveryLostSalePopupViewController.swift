@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import GameKit
 
 class RecoveryLostSalePopupViewController: UIViewController {
 
@@ -24,14 +25,61 @@ class RecoveryLostSalePopupViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    var ABTestColor:UIColor = .crazeRed
+    var ABTestHeadline:String =  "product.sale_recovery.alert.message".localized
+    var ABTestButton:String = "product.sale_recovery.alert.email_me".localized
+    
+    static func ABTestColor() -> UIColor {
+        let rs = GKMersenneTwisterRandomSource()
+        rs.seed = UInt64( abs(AnalyticsUser.current.identifier.hashValue ) )
+        
+        // Use the random source and a lowest and highest value to create a
+        // GKRandomDistribution object that will provide the random numbers.
+        let rd = GKRandomDistribution(randomSource: rs, lowestValue: 0, highestValue: 1)
+        let value = rd.nextInt()
+        if value == 0 {
+            return .crazeRed
+        }else{
+            return .crazeGreen
+        }
+    }
+    static func ABTestHeadline() ->String{
+        let rs = GKMersenneTwisterRandomSource()
+        rs.seed = UInt64( abs(AnalyticsUser.current.identifier.hashValue + 1 ) )
+        
+        // Use the random source and a lowest and highest value to create a
+        // GKRandomDistribution object that will provide the random numbers.
+        let rd = GKRandomDistribution(randomSource: rs, lowestValue: 0, highestValue: 1)
+        let value = rd.nextInt()
+        if value == 0 {
+            return  "product.sale_recovery.alert.message".localized
+        }else{
+            return "Shop this later"
+        }
+    }
+    
+    static func ABTestButton() ->String{
+        let rs = GKMersenneTwisterRandomSource()
+        rs.seed = UInt64( abs(AnalyticsUser.current.identifier.hashValue + 2 ) )
+        
+        // Use the random source and a lowest and highest value to create a
+        // GKRandomDistribution object that will provide the random numbers.
+        let rd = GKRandomDistribution(randomSource: rs, lowestValue: 0, highestValue: 1)
+        let value = rd.nextInt()
+        if value == 0 {
+            return "product.sale_recovery.alert.email_me".localized
+        }else{
+            return "Email link"
+        }
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.view.backgroundColor = .crazeRed
+        self.view.backgroundColor = ABTestColor
         
         
         let titleLabel = UILabel.init()
         titleLabel.textColor = .white
-        titleLabel.text = "product.sale_recovery.alert.message".localized
+        titleLabel.text = ABTestHeadline
         titleLabel.font = UIFont.screenshopFont(.quicksandMedium, size: 18.0)
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.textAlignment = .center
@@ -42,7 +90,7 @@ class RecoveryLostSalePopupViewController: UIViewController {
         titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -.extendedPadding).isActive = true
 
         let emailProductButton = UIButton.init(type: .custom)
-        emailProductButton.setTitle("product.sale_recovery.alert.email_me".localized, for: .normal)
+        emailProductButton.setTitle(ABTestButton, for: .normal)
         emailProductButton.backgroundColor = .clear
         emailProductButton.titleLabel?.textColor = .white
         emailProductButton.contentEdgeInsets = UIEdgeInsetsMake(10, 10, 10, 10)
@@ -75,7 +123,11 @@ class RecoveryLostSalePopupViewController: UIViewController {
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        let size = self.view.systemLayoutSizeFitting(UILayoutFittingCompressedSize, withHorizontalFittingPriority: .defaultLow, verticalFittingPriority: .defaultHigh)
+        var size = self.view.systemLayoutSizeFitting(UILayoutFittingCompressedSize, withHorizontalFittingPriority: .defaultLow, verticalFittingPriority: .defaultHigh)
+        let minWidth = UIScreen.main.bounds.size.width * 0.9
+        if size.width < minWidth {
+            size.width = minWidth
+        }
         self.preferredContentSize = size
     }
 

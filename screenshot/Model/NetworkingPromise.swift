@@ -8,7 +8,7 @@
 
 import UIKit
 import PromiseKit
-
+import CoreData
 
 struct ChangelogResponse : Decodable {
     enum CodingKeys : String, CodingKey {
@@ -846,6 +846,17 @@ class NetworkingPromise : NSObject {
             }
             dataTask.resume()
         }
+    }
+    
+    func sendProductEmail( product:NSManagedObjectID, email:String) -> Promise<Void>{
+        return Promise.init(resolvers: { (fulfil, reject) in
+            fulfil(())
+        })
+    }
+    
+    func sendProductEmailWithRetry( product:Product, email:String) -> Promise<Void>{
+        let productId = product.objectID
+        return attempt(interdelay: .seconds(21), maxRepeat: 5, body: { self.sendProductEmail(product: productId, email: email)  })
     }
     
     func appSettings() -> Promise<[String : Any]> {
