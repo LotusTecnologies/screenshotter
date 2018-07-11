@@ -694,7 +694,8 @@ extension AssetSyncModel {
                     UserAccountManager.shared.uploadImage(data: data).then(execute: { (url) -> () in
                         fulfil((nil, url.absoluteString))
                     }).catch{error in
-                        reject(error)
+                        //If the firebase upload fails, still try to upload it via syte
+                        fulfil((data, orImageUrlString))
                     }
                 }else {
                     fulfil((localImageData, orImageUrlString))
