@@ -102,7 +102,7 @@ class AssetSyncModel: NSObject {
     }
     
     func performBackgroundTask(assetId:String?, shoppableId:String?,  _ block: @escaping (NSManagedObjectContext) -> Void ) {
-        self.coreDataProcessingQueue.addOperation(AsyncOperation.init(timeout: 10, assetId: assetId, shoppableId: shoppableId, completion: { (completion) in
+        self.coreDataProcessingQueue.addOperation(AsyncOperation.init(timeout: 20, assetId: assetId, shoppableId: shoppableId, completion: { (completion) in
             DataModel.sharedInstance.performBackgroundTask({ (context) in
                 block(context)
                 completion()
@@ -690,7 +690,8 @@ extension AssetSyncModel {
                     UserAccountManager.shared.uploadImage(data: data).then(execute: { (url) -> () in
                         fulfil((nil, url.absoluteString))
                     }).catch{error in
-                        reject(error)
+                        //If the firebase upload fails, still try to upload it via syte
+                        fulfil((data, orImageUrlString))
                     }
                 }else {
                     fulfil((localImageData, orImageUrlString))
@@ -826,7 +827,6 @@ extension AssetSyncModel {
                     UserAccountManager.shared.uploadScreenshots(screenshot: screenshot)
                 }
             }
-            managedObjectContext.saveIfNeeded()
             for segment in segments {
                 if let offersURL = segment["offers"] as? String,
                     let url = self.augmentedUrl(offersURL: offersURL, optionsMask: optionsMask) {
@@ -838,6 +838,8 @@ extension AssetSyncModel {
                     print("AssetSyncModel saveShoppables error forming augmentedUrl for shoppable offersURL:\(String(describing: segment["offers"]))")
                 }
             }
+            managedObjectContext.saveIfNeeded()
+
         }
     }
     

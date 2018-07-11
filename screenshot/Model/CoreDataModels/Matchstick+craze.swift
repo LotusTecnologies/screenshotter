@@ -35,10 +35,8 @@ extension Matchstick {
                 }
                 managedObjectContext.saveIfNeeded()
 
-                AssetSyncModel.sharedInstance.processingQ.async {
-                    AssetSyncModel.sharedInstance.syteProcessing(imageData: nil, orImageUrlString: uploadedImageURL, assetId: assetId, optionsMask: ProductsOptionsMask.global)
+                AssetSyncModel.sharedInstance.syteProcessing(imageData: nil, orImageUrlString: uploadedImageURL, assetId: assetId, optionsMask: ProductsOptionsMask.global)
                     
-                }
                 DispatchQueue.main.async {
                     AccumulatorModel.screenshotUninformed.incrementUninformedCount()
                 }

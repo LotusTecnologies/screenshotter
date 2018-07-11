@@ -48,7 +48,7 @@ class AsyncOperationMonitor {
         if let userInfo = notification.userInfo, let changedTags = userInfo["tags"] as? [AsyncOperationTag], let queueUUID = userInfo["queueUUID"] as? UUID {
             if self.queueUUIDs.contains(queueUUID) {
                 var didChangeTag = false
-                for t  in changedTags {
+                for t in changedTags {
                     if tags.contains(t) {
                         didChangeTag = true
                     }
@@ -57,10 +57,8 @@ class AsyncOperationMonitor {
                     let oldValue = self.didStart
                     let newValue = calculateDidStart()
                     if oldValue != newValue {
-                        DispatchQueue.main.async {
-                            self.didStart = newValue
-                            self.delegate?.asyncOperationMonitorDidChange(self)
-                        }
+                        self.didStart = newValue
+                        self.delegate?.asyncOperationMonitorDidChange(self)
                     }
                 }
             }
@@ -80,41 +78,47 @@ class AsyncOperationMonitorCenter {
     
     
     public func registerStarted(queueUUID:UUID?, tags:[AsyncOperationTag]?) {
-        if let queueUUID = queueUUID, let tags = tags {
-            var queueDict = self.runningTags[queueUUID] ?? [:]
-            for tag in tags {
-                var tagDict = queueDict[tag.type] ?? [:]
-                tagDict[tag.value] = (tagDict[tag.value] ?? 0) + 1
-                queueDict[tag.type] = tagDict
+        DispatchQueue.mainAsyncIfNeeded {
+            if let queueUUID = queueUUID, let tags = tags {
+                var queueDict = self.runningTags[queueUUID] ?? [:]
+                
+                for tag in tags {
+                    var tagDict = queueDict[tag.type] ?? [:]
+                    tagDict[tag.value] = (tagDict[tag.value] ?? 0) + 1
+                    queueDict[tag.type] = tagDict
+                    print("add \(tag.value) in \(queueUUID)")
+                    
+                }
+                self.runningTags[queueUUID] = queueDict
+                print("\(self.runningTags)")
+                NotificationCenter.default.post(name: .AsyncOperationTagMonitorCenterDidChange, object: nil, userInfo: ["tags":tags,"queueUUID":queueUUID.uuidString])
             }
-            self.runningTags[queueUUID] = queueDict
-            NotificationCenter.default.post(name: .AsyncOperationTagMonitorCenterDidChange, object: nil, userInfo: ["tags":tags,"queueUUID":queueUUID.uuidString])
         }
 
     }
     
     public func registerStopped(queueUUID:UUID?, tags:[AsyncOperationTag]?) {
-        if let queueUUID = queueUUID, let tags = tags {
-            var queueDict = self.runningTags[queueUUID] ?? [:]
-            for tag in tags {
-                var tagDict = queueDict[tag.type] ?? [:]
-                tagDict[tag.value] = (tagDict[tag.value] ?? 1) - 1
-                queueDict[tag.type] = tagDict
+        DispatchQueue.mainAsyncIfNeeded {
+            
+            if let queueUUID = queueUUID, let tags = tags {
+                var queueDict = self.runningTags[queueUUID] ?? [:]
+                
+                for tag in tags {
+                    var tagDict = queueDict[tag.type] ?? [:]
+                    tagDict[tag.value] = (tagDict[tag.value] ?? 1) - 1
+                    queueDict[tag.type] = tagDict
+                    print("remove \(tag.value) in \(queueUUID)")
+                }
+                
+                self.runningTags[queueUUID] = queueDict
+                print("\(self.runningTags)")
+                NotificationCenter.default.post(name: .AsyncOperationTagMonitorCenterDidChange, object: nil, userInfo: ["tags":tags,"queueUUID":queueUUID])
             }
-            self.runningTags[queueUUID] = queueDict
-            NotificationCenter.default.post(name: .AsyncOperationTagMonitorCenterDidChange, object: nil, userInfo: ["tags":tags,"queueUUID":queueUUID])
         }
     }
     
     public func countFor(tag:AsyncOperationTag, queue:UUID) -> Int{
         return self.runningTags[queue]?[tag.type]?[tag.value] ?? 0
-    }
-    
-    func tagsEnded(_ tags:[AsyncOperationTag]) {
-    }
-    
-    func tagStarted(_ tags:[AsyncOperationTag]) {
-        NotificationCenter.default.post(name: .AsyncOperationTagMonitorCenterDidChange, object: nil, userInfo: ["tags":tags])
     }
     
 }

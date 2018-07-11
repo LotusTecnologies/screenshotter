@@ -294,6 +294,10 @@ extension ProductsViewController: ShoppablesToolbarDelegate {
     
     func shoppablesToolbarDidChangeSelectedShoppable(toolbar:ShoppablesToolbar, shoppable:Shoppable){
         self.selectedShoppable = shoppable
+        if let p = self.productsLoadingMonitor {
+            p.delegate = nil
+        }
+        self.productsLoadingMonitor = AsyncOperationMonitor.init(assetId: nil, shoppableId: shoppable.offersURL, queues: AssetSyncModel.sharedInstance.queues, delegate: self)
         self.reloadProductsFor(shoppable: shoppable)
     }
 }
@@ -724,6 +728,8 @@ extension ProductsViewController {
             return
         }
         
+        shoppablesToolbar.layoutIfNeeded()
+        
         var scrollInsets = collectionView.scrollIndicatorInsets
         scrollInsets.top = shoppablesToolbar.bounds.size.height
         
@@ -832,7 +838,7 @@ extension ProductsViewController : RelatedLooksManagerDelegate {
 }
 extension ProductsViewController : AsyncOperationMonitorDelegate {
     func updateLoadingState(){
-        DispatchQueue.main.async {
+        DispatchQueue.mainAsyncIfNeeded {
             let isLoading = self.loadingMonitor?.didStart ?? false
             let state:ProductsViewControllerState = {
                 if self.hasShoppables {
@@ -850,18 +856,24 @@ extension ProductsViewController : AsyncOperationMonitorDelegate {
             }
             
             
-            let isProductLoading = self.productsLoadingMonitor?.didStart ?? false
             let productState:ProductsViewControllerState = {
-                if self.products.count > 0 {
-                    return .products
-                }else{
-                    if isProductLoading {
-                        return .loading
+                if let monitor = self.productsLoadingMonitor {
+                    let isProductLoading = monitor.didStart
+                    
+                    if self.products.count > 0 {
+                        return .products
                     }else{
-                        return .retry
+                        if isProductLoading {
+                            return .loading
+                        }else{
+                            return .retry
+                        }
                     }
+                }else{
+                    return .unknown
                 }
             }()
+           
             if productState != self.productLoadingState {
                 self.productLoadingState = productState
             }
