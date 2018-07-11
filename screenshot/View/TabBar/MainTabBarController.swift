@@ -8,7 +8,7 @@
 
 import UIKit
 
-class MainTabBarController: UITabBarController, UITabBarControllerDelegate, ScreenshotsNavigationControllerDelegate, ProfileViewControllerDelegate, ScreenshotDetectionProtocol, ViewControllerLifeCycle {
+class MainTabBarController: UITabBarController, UITabBarControllerDelegate, ScreenshotsNavigationControllerDelegate, ProfileViewControllerDelegate, ViewControllerLifeCycle {
     enum TabIndex {
         case favorites
         case discover
@@ -109,9 +109,6 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         notificationCenter.addObserver(self, selector: #selector(syncShowingCart), name: .isUSCUpdated, object: nil)
 
         notificationCenter.addObserver(self, selector: #selector(syncScreenshotTabBadgeCount), name: .ScreenshotUninformedAccumulatorModelDidChange, object: nil)
-
-
-        AssetSyncModel.sharedInstance.screenshotDetectionDelegate = self
         
         cartItemFrc = DataModel.sharedInstance.cartItemFrc(delegate: self)
         syncCartTabBadgeCount()
@@ -221,7 +218,6 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
     
     deinit {
         self.dismissTabBarSettingsBadge()
-        AssetSyncModel.sharedInstance.screenshotDetectionDelegate = nil
         NotificationCenter.default.removeObserver(self)
     }
 
@@ -409,16 +405,6 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
     
     func profileViewControllerDidGrantPermission(_ viewController: ProfileViewController) {
         self.refreshTabBarSettingsBadge()
-    }
-    
-    // MARK: - Foreground Screenshots
-    
-    func foregroundScreenshotTaken(assetId: String) {
-        if self.selectedViewController != self.screenshotsNavigationController {
-            NotificationManager.shared.presentForegroundScreenshot(withAssetId: assetId) {
-                self.selectedViewController = self.screenshotsNavigationController
-            }
-        }
     }
     
     // MARK: - Update Prompt

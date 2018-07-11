@@ -273,9 +273,6 @@
 "negative_feedback.title" = "Sorry To Hear That!";
 
 "notification.message" = "Check out the products in your screenshot";
-"notification.screenshot.latest" = "Tap to import your latest screenshot";
-"notification.screenshot.recent" = "Tap to import your new screenshots";
-"notification.screenshot.shoppable" = "Your screenshot is shoppable in the screenshot tab";
 "notification.title" = "Ready to shop?";
 
 "notification.favorited.item.message" = "We have items similar to the %@ you checked out recently that you’ll LOVE!";
