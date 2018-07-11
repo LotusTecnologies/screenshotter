@@ -728,6 +728,8 @@ extension ProductsViewController {
             return
         }
         
+        shoppablesToolbar.layoutIfNeeded()
+        
         var scrollInsets = collectionView.scrollIndicatorInsets
         scrollInsets.top = shoppablesToolbar.bounds.size.height
         
