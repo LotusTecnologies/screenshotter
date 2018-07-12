@@ -42,14 +42,13 @@ class ProductsViewController: BaseViewController {
     var collectionView:UICollectionView?
     var productsOptions:ProductsOptions = ProductsOptions()
     var scrollRevealController:ScrollRevealController?
-    var rateView:ProductsRateView!
+    var rateView = ProductsRateView.init(frame: .zero)
     var productsRateNegativeFeedbackSubmitAction:UIAlertAction?
     var productsRateNegativeFeedbackTextField:UITextField?
     var shamrockButton : FloatingActionButton?
     var screenshotLoadingState:ProductsViewControllerState = .unknown {
         didSet {
             Analytics.trackDevLog(file: #file, line: #line, message: "from\(oldValue) to \(screenshotLoadingState)")            
-            self.syncViewsAfterStateChange()
         }
     }
     var productLoadingState:ProductsViewControllerState = .unknown {
@@ -147,14 +146,9 @@ class ProductsViewController: BaseViewController {
         }()
         self.collectionView = collectionView
         
-        let rateView:ProductsRateView = {
-            let view = ProductsRateView.init(frame: .zero)
-            view.translatesAutoresizingMaskIntoConstraints = false
-            view.voteUpButton.addTarget(self, action: #selector(productsRatePositiveAction), for: .touchUpInside)
-            view.voteDownButton.addTarget(self, action: #selector(productsRateNegativeAction), for: .touchUpInside)
-            return view
-        }()
-        self.rateView = rateView
+        rateView.translatesAutoresizingMaskIntoConstraints = false
+        rateView.voteUpButton.addTarget(self, action: #selector(productsRatePositiveAction), for: .touchUpInside)
+        rateView.voteDownButton.addTarget(self, action: #selector(productsRateNegativeAction), for: .touchUpInside)
         
         let scrollRevealController = ScrollRevealController(edge: .bottom)
         scrollRevealController.hasBottomBar = !hidesBottomBarWhenPushed
@@ -189,6 +183,7 @@ class ProductsViewController: BaseViewController {
         
         if self.screenshotController?.first?.shoppablesCount == -1 {
             self.screenshotLoadingState = .retry
+            syncViewsAfterStateChange()
             Analytics.trackScreenshotOpenedWithoutShoppables(screenshot: screenshot)
         }
         else {
@@ -839,6 +834,7 @@ extension ProductsViewController : RelatedLooksManagerDelegate {
 extension ProductsViewController : AsyncOperationMonitorDelegate {
     func updateLoadingState(){
         DispatchQueue.mainAsyncIfNeeded {
+            var didChange = false
             let isLoading = self.loadingMonitor?.didStart ?? false
             let state:ProductsViewControllerState = {
                 if self.hasShoppables {
@@ -853,6 +849,7 @@ extension ProductsViewController : AsyncOperationMonitorDelegate {
             }()
             if state != self.screenshotLoadingState {
                 self.screenshotLoadingState = state
+                didChange = true
             }
             
             
@@ -876,8 +873,12 @@ extension ProductsViewController : AsyncOperationMonitorDelegate {
            
             if productState != self.productLoadingState {
                 self.productLoadingState = productState
+                didChange = true
             }
             
+            if didChange {
+                self.syncViewsAfterStateChange()
+            }
         }
     }
     
