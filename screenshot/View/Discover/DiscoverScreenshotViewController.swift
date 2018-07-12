@@ -197,7 +197,7 @@ class DiscoverScreenshotViewController : BaseViewController {
             if let matchStick = currentMatchstick {
                 removeCurrentMatchstickIfPossible()
                 screenshotsTabPulseAnimation()
-                matchStick.pass()
+                matchStick.delayedAdd()
             }
         }
     }

@@ -28,9 +28,7 @@ class DiscoverManager {
             if let item = context.object(with: managedObjectID) as? Matchstick,
                 let assetId = item.remoteId,
                 let uploadedImageURL = item.imageUrl {
-                // DisplayingItem -> GarbageItem
-                item.wasAdded = true
-                item.isDisplaying = false
+                
                 //create screesnhot
                 let addedScreenshot = DataModel.sharedInstance.saveScreenshot(
                     upsert:true,
@@ -50,8 +48,11 @@ class DiscoverManager {
                 DispatchQueue.main.async {
                     AccumulatorModel.screenshotUninformed.incrementUninformedCount()
                 }
-                //fill up queues
-                self.fillQueues(in: context)
+                if callback == nil {
+                    item.wasAdded = true
+                    item.isDisplaying = false
+                    self.fillQueues(in: context)
+                }
                 context.saveIfNeeded()
                 
                 
@@ -70,7 +71,20 @@ class DiscoverManager {
             }
         }
     }
-  
+    func didDelayedAdd(_ item:Matchstick) {
+        let managedObjectID = item.objectID
+        
+        DataModel.sharedInstance.performBackgroundTask { (context) in
+            if let item = context.object(with: managedObjectID) as? Matchstick {
+                
+                item.wasAdded = true
+                item.isDisplaying = false
+                self.fillQueues(in: context)
+                context.saveIfNeeded()
+            }
+        }
+    }
+
     func didSkip(_ item:Matchstick) {
         
         let managedObjectID = item.objectID

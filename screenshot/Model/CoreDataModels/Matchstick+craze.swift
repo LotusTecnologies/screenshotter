@@ -41,6 +41,9 @@ extension Matchstick {
     public func pass() {
         DiscoverManager.shared.didSkip(self)
     }
+    public func delayedAdd(){
+        DiscoverManager.shared.didDelayedAdd(self)
+    }
     
     static func lookupWith(remoteIds:[String], in context:NSManagedObjectContext) -> [String:Matchstick]{
         let fetchRequest: NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
