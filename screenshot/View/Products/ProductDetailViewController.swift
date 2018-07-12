@@ -262,7 +262,7 @@ extension ProductDetailViewController : UICollectionViewDelegateFlowLayout, UICo
             let product = self.productAtIndex(indexPath.item)
             product.recordViewedProduct()
             self.recoverLostSaleManager.didClick(on: product)
-            LocalNotificationModel.shared.registerCrazeTappedPriceAlert(id: product.id, lastPrice: product.floatPrice)
+            LocalNotificationModel.shared.registerCrazeTappedPriceAlert(id: product.id, lastPrice: product.floatPrice, merchant: product.merchant)
             if let productViewController = presentProduct(product, atLocation: .burrowList) {
                 productViewController.similarProducts = products
             }
@@ -293,7 +293,7 @@ extension ProductDetailViewController : UICollectionViewDelegateFlowLayout, UICo
             if isFavorited {
                 let _ = ShoppingCartModel.shared.populateVariants(productOID: product.objectID)
                 Analytics.trackProductFavorited(product: product, page: .productList)
-                LocalNotificationModel.shared.registerCrazeFavoritedPriceAlert(id: product.id, lastPrice: product.floatPrice)
+                LocalNotificationModel.shared.registerCrazeFavoritedPriceAlert(id: product.id, lastPrice: product.floatPrice, merchant: product.merchant)
             }else{
                 Analytics.trackProductUnfavorited(product: product, page: .productList)
                 LocalNotificationModel.shared.deregisterCrazeFavoritedPriceAlert(id: product.id)

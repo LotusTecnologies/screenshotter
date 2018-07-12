@@ -73,7 +73,7 @@ class ProductsCollectionView: UICollectionView {
         product.setFavorited(toFavorited: isFavorited)
         if isFavorited {
             Analytics.trackProductFavorited(product: product, page: .product)
-            LocalNotificationModel.shared.registerCrazeFavoritedPriceAlert(id: product.id, lastPrice: product.floatPrice)
+            LocalNotificationModel.shared.registerCrazeFavoritedPriceAlert(id: product.id, lastPrice: product.floatPrice, merchant: product.merchant)
         }else{
             Analytics.trackProductUnfavorited(product: product, page: .product)
             LocalNotificationModel.shared.deregisterCrazeFavoritedPriceAlert(id: product.id)
