@@ -350,7 +350,6 @@
 "product.sale_recovery.alert.email_me_5" = "Email me";
 
 "product.sale_recovery.alert.dissmis" = "Dismiss";
-"product.sale_recovery.email.subject" = "Screenshop Wishlist - %@";
 "product.sale_recovery.alert.enter_email.title" = "What’s Your Email?";
 "product.sale_recovery.alert.enter_email.body" = "We will send you this product so you can shop it on your computer.";
 "product.sale_recovery.alert.email_sent.title" = "Email Sent!";
