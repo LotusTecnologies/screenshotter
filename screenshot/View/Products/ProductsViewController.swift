@@ -51,11 +51,7 @@ class ProductsViewController: BaseViewController {
             Analytics.trackDevLog(file: #file, line: #line, message: "from\(oldValue) to \(screenshotLoadingState)")            
         }
     }
-    var productLoadingState:ProductsViewControllerState = .unknown {
-        didSet {
-            self.syncViewsAfterStateChange()
-        }
-    }
+    var productLoadingState:ProductsViewControllerState = .unknown 
 
     var selectedShoppable:Shoppable?
 
@@ -594,6 +590,7 @@ extension ProductsViewControllerProducts{
             self.collectionView?.scrollToItem(at: IndexPath(item: 0, section: ProductsSection.product.section), at: .top, animated: false)
         }
         self.updateLoadingState()
+        
     }
 }
 
