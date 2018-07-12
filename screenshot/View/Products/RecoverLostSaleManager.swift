@@ -108,6 +108,7 @@ class RecoverLostSaleManager: NSObject, MFMailComposeViewControllerDelegate {
                 let alert = UIAlertController.init(title: "product.sale_recovery.alert.email_sent.title".localized, message: "product.sale_recovery.alert.email_sent.body".localized, preferredStyle: .alert)
                 alert.addTextField(configurationHandler: { (textField) in
                     textField.placeholder = "generic.email".localized
+                    textField.keyboardType = .emailAddress
                     textField.addTarget(self, action: #selector(self.textChange(_:)), for: .editingChanged)
                 })
 
