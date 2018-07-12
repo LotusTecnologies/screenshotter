@@ -8,6 +8,22 @@
 
 import Foundation
 
+/* Example:
+ 
+ enum Section: Int {
+    case firstSection
+    case secondSection
+ }
+ 
+ enum Row: Int {
+    case firstRow
+    case secondRow
+ }
+ 
+ let dataSource = DataSource<Section, Row>(data: [:])
+ 
+ */
+
 /// The section enum must maintain its order.
 class DataSource<S: RawRepresentable & Hashable, R: RawRepresentable> where S.RawValue == Int, R.RawValue == Int {
     private var data: [(section: S, rows: [R])] = []

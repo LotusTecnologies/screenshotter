@@ -10,6 +10,11 @@ import UIKit
 import CoreData
 
 class FavoriteProductsViewController : BaseViewController {
+    enum Section: Int {
+        case notification
+        case favorite
+    }
+    
     var productsFRC:FetchedResultsControllerManager<Product>?
     
     fileprivate var unfavoriteProductsIds: Set<NSManagedObjectID> = []
@@ -233,9 +238,11 @@ extension FavoriteProductsViewController: ProductVariantsSelectorViewControllerD
     }
 }
 
-
 extension FavoriteProductsViewController: UITableViewDataSource, AsyncOperationMonitorDelegate {
-
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 2
+    }
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.productsFRC?.fetchedObjectsCount ?? 0
     }
