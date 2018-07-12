@@ -273,11 +273,11 @@
 "negative_feedback.options.send" = "Send Feedback";
 "negative_feedback.title" = "Sorry To Hear That!";
 
-"notification.message" = "Check out the products in your screenshot";
+"notification.message" = "discover the best deals on products in your screenshot";
 "notification.screenshot.latest" = "Tap to import your latest screenshot";
 "notification.screenshot.recent" = "Tap to import your new screenshots";
 "notification.screenshot.shoppable" = "Your screenshot is shoppable in the screenshot tab";
-"notification.title" = "Ready to shop?";
+"notification.title" = "Shop Your Inspiration";
 
 "notification.favorited.item.message" = "We have items similar to the %@ you checked out recently that you’ll LOVE!";
 "notification.inactivity.discover.message" = "Check out the latest fashion trends on Discover!";
