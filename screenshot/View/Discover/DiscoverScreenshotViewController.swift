@@ -130,6 +130,7 @@ class DiscoverScreenshotViewController : BaseViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
+        DiscoverManager.shared.discoverViewDidAppear()
         syncEmptyListViews()
     }
     
@@ -196,7 +197,7 @@ class DiscoverScreenshotViewController : BaseViewController {
             if let matchStick = currentMatchstick {
                 removeCurrentMatchstickIfPossible()
                 screenshotsTabPulseAnimation()
-                matchStick.pass()
+                matchStick.delayedAdd()
             }
         }
     }
@@ -523,7 +524,6 @@ extension DiscoverScreenshotViewController : UICollectionViewDataSource {
             cell.flagButton.addTarget(self, action: #selector(presentReportAlertController), for: .touchUpInside)
             
             let matchstick = matchstickAt(index: indexPath)
-            
             if let imageData = matchstick?.imageData as Data? {
                 cell.image = UIImage(data: imageData)
             }else{

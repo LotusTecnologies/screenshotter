@@ -525,7 +525,7 @@ extension AppDelegate : KochavaTrackerDelegate {
         if !ASIdentifierManager.shared().isAdvertisingTrackingEnabled {
             Branch.setTrackingDisabled(true)
         }
-        Analytics.trackDevLog(file: #file, line: #line, message: "framework setup: \(launchOptions)")
+        Analytics.trackDevLog(file: #file, line: #line, message: "framework setup: \(String(describing: launchOptions))")
         Branch.getInstance()?.initSession(launchOptions: launchOptions) { params, error in
             // params are the deep linked params associated with the link that the user clicked -> was re-directed to this app
             // params will be empty if no data found
