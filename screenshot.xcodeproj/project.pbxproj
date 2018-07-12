@@ -106,9 +106,6 @@
 		311A50C420D90B780001D463 /* FormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A502020D90B770001D463 /* FormView.swift */; };
 		311A50C520D90B780001D463 /* Form.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A502120D90B770001D463 /* Form.swift */; };
 		311A50C920DAB2EF0001D463 /* RecoverLostSaleManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A50C820DAB2EF0001D463 /* RecoverLostSaleManager.swift */; };
-		311A50CD20DAB4CC0001D463 /* productEmailitem.html in Resources */ = {isa = PBXBuildFile; fileRef = 311A50CA20DAB4CB0001D463 /* productEmailitem.html */; };
-		311A50CE20DAB4CC0001D463 /* productEmailfooter.html in Resources */ = {isa = PBXBuildFile; fileRef = 311A50CB20DAB4CB0001D463 /* productEmailfooter.html */; };
-		311A50CF20DAB4CC0001D463 /* productEmailheader.html in Resources */ = {isa = PBXBuildFile; fileRef = 311A50CC20DAB4CC0001D463 /* productEmailheader.html */; };
 		311A50D120DBD9EE0001D463 /* ResendCodeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A50D020DBD9EE0001D463 /* ResendCodeManager.swift */; };
 		3125446B2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		3125446C2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
@@ -385,9 +382,6 @@
 		311A502020D90B770001D463 /* FormView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FormView.swift; sourceTree = "<group>"; };
 		311A502120D90B770001D463 /* Form.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Form.swift; sourceTree = "<group>"; };
 		311A50C820DAB2EF0001D463 /* RecoverLostSaleManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoverLostSaleManager.swift; sourceTree = "<group>"; };
-		311A50CA20DAB4CB0001D463 /* productEmailitem.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = productEmailitem.html; sourceTree = "<group>"; };
-		311A50CB20DAB4CB0001D463 /* productEmailfooter.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = productEmailfooter.html; sourceTree = "<group>"; };
-		311A50CC20DAB4CC0001D463 /* productEmailheader.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = productEmailheader.html; sourceTree = "<group>"; };
 		311A50D020DBD9EE0001D463 /* ResendCodeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResendCodeManager.swift; sourceTree = "<group>"; };
 		31254460209079C7009410D5 /* screenshot-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "screenshot-Bridging-Header.h"; sourceTree = "<group>"; };
 		3125448E209871B4009410D5 /* Analytics+api.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Analytics+api.swift"; sourceTree = "<group>"; };
@@ -942,9 +936,6 @@
 				C50EE26D1FC406F1002B4259 /* Fonts */,
 				C5CAF2791FCC0EFD006F37DC /* ISO4217.plist */,
 				C53B15BC1FDD638C00658A78 /* Localizable.strings */,
-				311A50CB20DAB4CB0001D463 /* productEmailfooter.html */,
-				311A50CC20DAB4CC0001D463 /* productEmailheader.html */,
-				311A50CA20DAB4CB0001D463 /* productEmailitem.html */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -1448,13 +1439,10 @@
 				C572FF01205C00070046BFEB /* Hind-SemiBold.ttf in Resources */,
 				C5CAF27A1FCC0EFD006F37DC /* ISO4217.plist in Resources */,
 				C5DC531B20CD3F2100E90DB8 /* Quicksand-Regular.ttf in Resources */,
-				311A50CE20DAB4CC0001D463 /* productEmailfooter.html in Resources */,
 				C5DC531C20CD3F2100E90DB8 /* Quicksand-Light.ttf in Resources */,
 				C572FEFE205C00070046BFEB /* Hind-Light.ttf in Resources */,
 				C572FF02205C00070046BFEB /* Hind-Medium.ttf in Resources */,
-				311A50CF20DAB4CC0001D463 /* productEmailheader.html in Resources */,
 				E4139D501F09083B00E8A53B /* Assets.xcassets in Resources */,
-				311A50CD20DAB4CC0001D463 /* productEmailitem.html in Resources */,
 				C572FF00205C00070046BFEB /* Hind-Regular.ttf in Resources */,
 				C572FEFF205C00070046BFEB /* Hind-Bold.ttf in Resources */,
 				E4DB2B7C1F7E1D4600320BE5 /* LaunchScreen.storyboard in Resources */,

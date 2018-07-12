@@ -706,9 +706,8 @@ class NetworkingPromise : NSObject {
         let parameters = ["subscription" : ["priceAlert" : ["lastSeenPrice" : lastPrice, "variantId" : id, "type" : action]]]
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.addValue("application/json", forHTTPHeaderField: "Accept")
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        
+        request.addValue(AnalyticsUser.current.identifier, forHTTPHeaderField: "cid")
+
         do {
             request.httpBody = try JSONSerialization.data(withJSONObject: parameters, options: [])
         } catch {
@@ -848,15 +847,47 @@ class NetworkingPromise : NSObject {
         }
     }
     
-    func sendProductEmail( product:NSManagedObjectID, email:String) -> Promise<Void>{
-        return Promise.init(resolvers: { (fulfil, reject) in
-            fulfil(())
-        })
+    func sendProductEmail( brand:String, title:String, offer:String, price:String, imageURL:String, email:String) -> Promise<NSDictionary>{
+        let postDict:[String:Any] = [
+            "email":email,
+            "products":[[
+                "brand":brand,
+                "title":title,
+                "link":offer,
+                "price":price,
+                "image":imageURL]]
+        ]
+        let userId = UserAccountManager.shared.user?.uid ?? "unknown"
+        
+        if let url = URL(string: Constants.notificationsApiEndpoint + "/users/\(userId)/emailme"), let postData = try? JSONSerialization.data(withJSONObject: postDict, options: []) {
+            let postLength = "\(postData.count)"
+            
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            request.addValue(postLength, forHTTPHeaderField: "Content-Length")
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.addValue("application/json", forHTTPHeaderField: "Accept")
+            request.addValue(AnalyticsUser.current.identifier, forHTTPHeaderField: "cid")
+
+            request.httpBody = postData
+            
+            
+            return URLSession.shared.dataTask(with: request).asDictionary()
+            
+        }else{
+            let error = NSError(domain: "Craze", code: #line, userInfo: [NSLocalizedDescriptionKey: "unable to send 'emailme' request"])
+            return Promise(error: error)
+            
+        }
     }
     
-    func sendProductEmailWithRetry( product:Product, email:String) -> Promise<Void>{
-        let productId = product.objectID
-        return attempt(interdelay: .seconds(21), maxRepeat: 5, body: { self.sendProductEmail(product: productId, email: email)  })
+    func sendProductEmailWithRetry( product:Product, email:String) -> Promise<NSDictionary>{
+        let title = product.productTitle() ?? ""
+        let brand = product.calculatedDisplayTitle ?? ""
+        let offer = product.offer ?? ""
+        let price = product.price ?? ""
+        let imageURL = product.imageURL ?? ""
+        return attempt(interdelay: .seconds(21), maxRepeat: 5, body: { self.sendProductEmail(brand: brand, title: title, offer: offer, price: price, imageURL: imageURL, email: email)   })
     }
     
     func appSettings() -> Promise<[String : Any]> {

@@ -246,6 +246,7 @@
 "generic.done" = "Done";
 "generic.dont_save" = "Don't Save";
 "generic.edit" = "Edit";
+"generic.email" = "email";
 "generic.error" = "Error";
 "generic.enable" = "Enable";
 "generic.enabled" = "Enabled";
@@ -338,10 +339,23 @@
 "product.variants.quantity" = "Quantity";
 "product.variants.size" = "Size";
 "product.website" = "Go To %@";
-"product.sale_recovery.alert.message" = "Shop this on your computer";
-"product.sale_recovery.alert.email_me" = "Email Product";
+"product.sale_recovery.alert.message_1" = "Shop this on your computer";
+"product.sale_recovery.alert.message_2" = "Shop this item later";
+"product.sale_recovery.alert.message_3" = "Shop this product on your computer";
+"product.sale_recovery.alert.message_4" = "Shop this product later";
+"product.sale_recovery.alert.email_me_1" = "Email product";
+"product.sale_recovery.alert.email_me_2" = "Email link";
+"product.sale_recovery.alert.email_me_3" = "Email item";
+"product.sale_recovery.alert.email_me_4" = "Send a link";
+"product.sale_recovery.alert.email_me_5" = "Email me";
+
 "product.sale_recovery.alert.dissmis" = "Dismiss";
 "product.sale_recovery.email.subject" = "Screenshop Wishlist - %@";
+"product.sale_recovery.alert.enter_email.title" = "What’s Your Email?";
+"product.sale_recovery.alert.enter_email.body" = "We will send you this product so you can shop it on your computer.";
+"product.sale_recovery.alert.email_sent.title" = "Email Sent!";
+"product.sale_recovery.alert.email_sent.body" = "You can now shop this item on your computer.";
+
 
 "products.details.similar" = "Similar Items";
 "products.helper.message" = "No visually similar products were detected";

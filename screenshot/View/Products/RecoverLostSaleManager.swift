@@ -9,26 +9,27 @@
 import UIKit
 import CoreData
 import MessageUI
+import PromiseKit
 
 protocol RecoverLostSaleManagerDelegate:class {
-    func recoverLostSaleManager(_ manager:RecoverLostSaleManager, returnedFrom product:Product, timeSinceLeftApp:TimeInterval)
+    func recoverLostSaleManager(_ manager:RecoverLostSaleManager, returnedFrom product:Product, timeSinceLeftApp:Int)
 }
 
 class RecoverLostSaleManager: NSObject, MFMailComposeViewControllerDelegate {
     private var timeLeftApp:Date?
     private var clickOnProductObjectId:NSManagedObjectID?
 
+    
     weak var delegate:RecoverLostSaleManagerDelegate?
     weak var presentingVC:UIViewController?
 
     private let maxTime:TimeInterval = 120
-    private let minTime:TimeInterval = 5
-    private var didTapToDismiss = false
+    private let minTime:TimeInterval = 10
+
     private var sendAction:UIAlertAction?
     override init() {
         super.init()
         NotificationCenter.default.addObserver(self, selector: #selector(applicationDidBecomeActive), name: .UIApplicationDidBecomeActive, object: nil)
-
     }
     
     deinit {
@@ -41,7 +42,7 @@ class RecoverLostSaleManager: NSObject, MFMailComposeViewControllerDelegate {
                 if let product = DataModel.sharedInstance.mainMoc().productWith(objectId: objectId) {
                     self.timeLeftApp = nil
                     if UIViewController.canPresentMail() {
-                        self.delegate?.recoverLostSaleManager(self, returnedFrom: product, timeSinceLeftApp: abs(date.timeIntervalSinceNow) )
+                        self.delegate?.recoverLostSaleManager(self, returnedFrom: product, timeSinceLeftApp: Int(round( abs(date.timeIntervalSinceNow) )))
                     }
                 }
             }
@@ -54,7 +55,7 @@ class RecoverLostSaleManager: NSObject, MFMailComposeViewControllerDelegate {
     }
     
     private func showEmailSentAlert(in viewController:UIViewController, email:String) {
-        let alert = UIAlertController.init(title: nil, message: "Email sent to \(email) !", preferredStyle: .alert)
+        let alert = UIAlertController.init(title: "product.sale_recovery.alert.email_sent.title".localized, message: "product.sale_recovery.alert.email_sent.body".localized, preferredStyle: .alert)
         alert.addAction(UIAlertAction.init(title: "generic.ok".localized, style: .default, handler: { (a) in
         }))
         
@@ -62,19 +63,23 @@ class RecoverLostSaleManager: NSObject, MFMailComposeViewControllerDelegate {
     
 }
     
-    public func presetRecoverAlertViewFor(product:Product, in viewController:UIViewController, rect:CGRect, view:UIView, timeSinceLeftApp:TimeInterval){
+    public func presetRecoverAlertViewFor(product:Product, in viewController:UIViewController, rect:CGRect, view:UIView, timeSinceLeftApp:Int?, reason:Analytics.AnalyticsFeatureRecoveryAppearedReason){
         
-        let color = RecoveryLostSalePopupViewController.ABTestColor()
-        let headline = RecoveryLostSalePopupViewController.ABTestHeadline()
-        let button = RecoveryLostSalePopupViewController.ABTestButton()
-        Analytics.trackFeatureRecoveryAppeared(product: product, secondsSinceLeftApp: Int(round(timeSinceLeftApp)), abTestColor: color.hexString(), abTestHeadline: headline, abTestButton: button )
+        guard let _ = product.price, let _ = product.imageURL, let _ = product.calculatedDisplayTitle, let _ = product.offer else {
+            //lacking required properties of product
+            return
+        }
+        let abtest = RecoveryLostSalePopupViewController.ABTest.init(seed: AnalyticsUser.current.randomSeed)
+
+//        let abtest = RecoveryLostSalePopupViewController.ABTest.init(seed: UUID.init().toRandomSeed())
+        
+        Analytics.trackFeatureRecoveryAppeared(product: product, secondsSinceLeftApp: timeSinceLeftApp, abTestColor: abtest.backgroundColor.hexString(), abTestHeadline: abtest.headlineText, abTestButton: abtest.buttonText, reason: reason )
 
         self.presentingVC = viewController
 
-        let vc = RecoveryLostSalePopupViewController.init(emailProductAction: {
+        let vc = RecoveryLostSalePopupViewController.init(abTest:abtest, emailProductAction: {
             self.clickOnProductObjectId = nil
 
-            Analytics.trackFeatureRecoveryEmailPrompt(product: product)
             var email = AnalyticsUser.current.email
             if email == nil {
                 email = UserAccountManager.shared.email
@@ -84,22 +89,36 @@ class RecoverLostSaleManager: NSObject, MFMailComposeViewControllerDelegate {
             }
             
             if let email = email {
+                Analytics.trackFeatureRecoveryEmailPrompt(product: product, hasEmail: true)
                 Analytics.trackFeatureRecoveryEmailSent(product: product)
-                let _ = NetworkingPromise.sharedInstance.sendProductEmailWithRetry(product: product, email: email )
-                
-                self.showEmailSentAlert(in: viewController, email:email)
-            }else{
-                let alert = UIAlertController.init(title: nil, message: "Email:", preferredStyle: .alert)
-                alert.addTextField(configurationHandler: { (textField) in
-                    textField.placeholder = "email"
-                    textField.addTarget(self, action: #selector(self.textChange(_:)), for: .editingChanged)
+                NetworkingPromise.sharedInstance.sendProductEmailWithRetry(product: product, email: email ).then(execute: { (dict) -> Void in
+                    print("send email: \(dict)")
+                }).catch(execute: { (e) in
+                    if case let PMKURLError.badResponse(_, data, _) = e, let d = data, let errorString = String.init(data: d, encoding: .utf8) {
+                        print("error sending email: \(errorString)")
+                    }
 
+                    print("error sending email: \(e)")
+                })
+                viewController.dismiss(animated: true, completion: {
+                    self.showEmailSentAlert(in: viewController, email:email)
+                })
+            }else{
+                Analytics.trackFeatureRecoveryEmailPrompt(product: product, hasEmail: false)
+                let alert = UIAlertController.init(title: "product.sale_recovery.alert.email_sent.title".localized, message: "product.sale_recovery.alert.email_sent.body".localized, preferredStyle: .alert)
+                alert.addTextField(configurationHandler: { (textField) in
+                    textField.placeholder = "generic.email".localized
+                    textField.addTarget(self, action: #selector(self.textChange(_:)), for: .editingChanged)
                 })
 
                 let sendAction = UIAlertAction.init(title: "generic.send".localized, style: .default, handler: { (a) in
                     if let textFields = alert.textFields, let textField = textFields.first, let email = textField.text {
                         if email.lengthOfBytes(using: .utf8) > 0 {
-                            let _ = NetworkingPromise.sharedInstance.sendProductEmailWithRetry(product: product, email: email )
+                            NetworkingPromise.sharedInstance.sendProductEmailWithRetry(product: product, email: email ).then(execute: { (dict) -> Void in
+                                print("send email: \(dict)")
+                            }).catch(execute: { (e) in
+                                print("error sending email: \(e)")
+                            })
                             self.showEmailSentAlert(in: viewController, email:email)
                         }
                     }
@@ -119,16 +138,17 @@ class RecoverLostSaleManager: NSObject, MFMailComposeViewControllerDelegate {
         }, dismissAction: {
             self.clickOnProductObjectId = nil
             viewController.dismiss(animated: true, completion: nil)
+
         })
-        vc.ABTestColor = color
-        vc.ABTestHeadline = headline
-        vc.ABTestButton = button
+//        vc.view.layer.shadowOffset = CGSizeMake(50, 50);
+//        vc.view.layer.shadowColor = [[UIColor blackColor] CGColor];
+
         vc.modalPresentationStyle = .popover
 
         vc.popoverPresentationController?.backgroundColor = vc.view.backgroundColor
         vc.popoverPresentationController?.permittedArrowDirections = [.up, .down]
         vc.popoverPresentationController?.delegate = self
-        vc.popoverPresentationController?.sourceRect = rect
+        vc.popoverPresentationController?.sourceRect = rect.insetBy(dx: 20, dy: 20)
         vc.popoverPresentationController?.sourceView = view
         
         viewController.present(vc, animated: true) {
@@ -147,61 +167,6 @@ class RecoverLostSaleManager: NSObject, MFMailComposeViewControllerDelegate {
         }
     }
     
-    public func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
-        if result == .sent {
-            let product:Product? = {
-                if let clickOnProductObjectId = self.clickOnProductObjectId {
-                    return DataModel.sharedInstance.mainMoc().productWith(objectId:clickOnProductObjectId )
-                }
-                return nil
-            }()
-            Analytics.trackFeatureRecoveryEmailSent(product: product)
-        }
-        self.clickOnProductObjectId = nil
-        if let presentingVC  = self.presentingVC {
-            presentingVC.dismiss(animated: true, completion: nil)
-        }else{
-            controller.dismiss(animated: true, completion: nil)
-        }
-    }
-    
-    func stringFromFile(named:String) -> String?{
-        if let filepath = Bundle.main.path(forResource: named, ofType: nil) {
-            do {
-                let contents = try String(contentsOfFile: filepath)
-                return contents
-            } catch {
-                // contents could not be loaded
-            }
-        } else {
-            
-        }
-        return nil
-    }
-//    func stringWith(template:String, replacements:[String:String?]) -> String{
-//        var toReturn = template
-//        for (key, value) in replacements {
-//            if let range = toReturn.range(of: "{{\(key)}}"), let value = value {
-//                toReturn = toReturn.replacingCharacters(in: range, with: value)
-//            }
-//        }
-//        return toReturn
-//    }
-//    func htmlEmailForProducts(products:[Product])  -> String {
-//        var toReturn = ""
-//        if let header = stringFromFile(named: "productEmailheader.html"), let footer = stringFromFile(named: "productEmailfooter.html"), let item = stringFromFile(named: "productEmailitem.html") {
-//            
-//            toReturn.append(header)
-//            for p in products {
-//                let itemString = stringWith(template: item, replacements: ["brand":p.calculatedDisplayTitle, "title":p.productTitle(), "offer":p.offer, "price":p.price, "imageURL":p.imageURL])
-//                toReturn.append(itemString)
-//            }
-//            toReturn.append(footer)
-//            
-//        }
-//        return toReturn
-//    }
-    
 }
 
 extension RecoverLostSaleManager :UIPopoverPresentationControllerDelegate {
@@ -210,13 +175,9 @@ extension RecoverLostSaleManager :UIPopoverPresentationControllerDelegate {
     }
     
     func popoverPresentationControllerShouldDismissPopover(_ popoverPresentationController: UIPopoverPresentationController) -> Bool {
-        // only block the first tap
-        if didTapToDismiss {
-            return true
-        }
-        Analytics.trackFeatureRecoveryDismissBlocked(product: nil)
-        didTapToDismiss = true
-        return false
+
+        return true
+        
     }
 }
 
