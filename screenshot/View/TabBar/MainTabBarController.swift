@@ -195,6 +195,7 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
     @objc private func applicationUserDidTakeScreenshot(_ notification: Notification) {
         if self.view.window != nil {
             Analytics.trackTookScreenshot()
+            self.presentScreenshottingAlertIfNeeded()
         }
     }
     
@@ -447,5 +448,49 @@ extension MainTabBarControllerGDPR: OnboardingGDPRViewControllerDelegate {
     
     func onboardingGDPRViewControllerDidComplete(_ viewController: OnboardingGDPRViewController) {
         dismiss(animated: true)
+    }
+}
+
+// MARK: - Screenshotting
+
+extension MainTabBarController {
+    private func presentScreenshottingAlertIfNeeded() {
+        guard let selectedViewController = self.selectedViewController else {
+            return
+        }
+        
+        var key: String?
+        var title: String?
+        var message: String?
+        
+        switch selectedViewController {
+        case self.screenshotsNavigationController:
+            if let _ = self.screenshotsNavigationController.topViewController as? ScreenshotsViewController {
+                key = UserDefaultsKeys.screenshottingPresentedScreenshotAlert
+                title = "screenshotting.screenshots.title".localized
+                message = "screenshotting.screenshots.message".localized
+            }
+            else if let _ = self.screenshotsNavigationController.topViewController as? ProductsViewController {
+                key = UserDefaultsKeys.screenshottingPresentedProductAlert
+                title = "screenshotting.products.title".localized
+                message = "screenshotting.products.message".localized
+            }
+        case self.discoverNavigationController:
+            if let _ = self.discoverNavigationController.topViewController as? DiscoverScreenshotViewController {
+                key = UserDefaultsKeys.screenshottingPresentedDiscoverAlert
+                title = "screenshotting.discover.title".localized
+                message = "screenshotting.discover.message".localized
+            }
+        default:
+            break
+        }
+        
+        if let key = key, !UserDefaults.standard.bool(forKey: key) {
+            UserDefaults.standard.set(true, forKey: key)
+            
+            let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "generic.ok".localized, style: .cancel, handler: nil))
+            self.present(alert, animated: true)
+        }
     }
 }

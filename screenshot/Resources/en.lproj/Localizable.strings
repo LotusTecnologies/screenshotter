@@ -415,6 +415,13 @@
 "screenshots.share.title" = "Check out this look on SCREENSHOP!";
 "screenshots.title" = "Screenshots";
 
+"screenshotting.discover.message" = "Swipe right to add screenshots to your collection. If you want to share them, you can press the share button on the screenshot in the screenshot tab.";
+"screenshotting.discover.title" = "Add Photos You Like";
+"screenshotting.products.message" = "To find products that are similar to one you like, press \"Shop Similar\" under the photo of that product.";
+"screenshotting.products.title" = "Shop Similar";
+"screenshotting.screenshots.message" = "To share a screenshot, press the share icon on the top right of the photo.";
+"screenshotting.screenshots.title" = "Share Screenshots";
+
 "share_to_discover.add_button" = "Add";
 "share_to_discover.share_icon" = "Post on Discover";
 "share_to_discover.text" = "Add this to Discover so other users can shop your screenshot!";
