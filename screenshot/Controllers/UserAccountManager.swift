@@ -76,6 +76,15 @@ class UserAccountManager : NSObject {
         case createAccount
     }
     
+    var isFacebookConnected: Bool {
+        guard let user = user else {
+            return false
+        }
+        return user.providerData.contains { userInfo -> Bool in
+            return userInfo.providerID == "facebook.com"
+        }
+    }
+    
     var userFromLogin:User?
     var user:User? {
         get {
