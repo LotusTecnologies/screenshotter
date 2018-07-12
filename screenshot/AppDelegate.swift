@@ -654,10 +654,28 @@ extension AppDelegate: PushNotificationDelegate {
         print("pushwoosh notification received: \(pushNotification)")
         // shows a push is received. Implement passive reaction to a push here, such as UI update or data download.
     }
+    
     //this event is fired when user taps the notification
     func onPushAccepted(_ pushManager: PushNotificationManager!, withNotification pushNotification: [AnyHashable : Any]!, onStart: Bool) {
         print("pushwoosh notification accepted: \(pushNotification)")
         // shows a user tapped the notification. Implement user interaction, such as showing push details
+        if let aps = pushNotification["aps"] as? [String : Any],
+          let category = aps["category"] as? String,
+          category == "PRICE_ALERT",
+          let dataDict = pushNotification["data"] as? [String : Any],
+          let id = dataDict["variantId"] as? String,
+          !id.isEmpty {
+            if let updatedPrice = dataDict["price"] as? Float {
+                let currency = dataDict["currency"] as? String ?? "USD"
+                DataModel.sharedInstance.updateProductPrice(id: id, updatedPrice: updatedPrice, updatedCurrency: currency).then(on: .main) {
+                    ProductViewController.present(with: id)
+                }
+            } else {
+                ProductViewController.present(with: id)
+            }
+            let pushTypeString = dataDict["type"] as? String
+            Analytics.trackAppOpenedFromPushNotification(source: pushTypeString)
+        }
     }
     
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
@@ -724,15 +742,21 @@ extension AppDelegate: PushNotificationDelegate {
                         UserFeedback.shared.cancelNotifications()
                         UserFeedback.shared.scheduleNotifications()
                     }
-                   completionHandler(.newData)
+                   completionHandler(.newData) // Rose explains .newData is really telling Apple it was worthwhile being woken
                 }
             }
-        } else if let aps = userInfo["aps"] as? NSDictionary, let category = aps["category"] as? String, category == "PRICE_ALERT",  let id = userInfo["variantId"] as? String{
-            let product = DataModel.sharedInstance.retrieveProduct(managedObjectContext: DataModel.sharedInstance.mainMoc(), id: id)
-            Analytics.trackProductPriceAlertRecieved(product: product)
-            completionHandler(.noData)
-        } else {
+        } else if let aps = userInfo["aps"] as? [String : Any],
+          let category = aps["category"] as? String,
+          category == "PRICE_ALERT",
+          let dataDict = userInfo["data"] as? [String : Any],
+          let id = dataDict["variantId"] as? String,
+          !id.isEmpty {
+            LocalNotificationModel.shared.cancelPendingNotifications(within: Date(timeIntervalSinceNow: Constants.secondsInDay))
+            let pushTypeString = dataDict["type"] as? String
+            Analytics.trackAppOpenedFromPushNotification(source: pushTypeString) // TODO: trackReceivedPushNotification
             PushNotificationManager.push().handlePushReceived(userInfo)  // pushwoosh
+            completionHandler(.newData)
+        } else {
             Branch.getInstance().handlePushNotification(userInfo)
 
             // Only spin up a background task if we are already in the background
@@ -740,18 +764,12 @@ extension AppDelegate: PushNotificationDelegate {
                 if bgTask != UIBackgroundTaskInvalid {
                     application.endBackgroundTask(self.bgTask)
                 }
-                
                 bgTask = application.beginBackgroundTask(withName: "LongRunningSync", expirationHandler: {
-                    // TODO: Call the completion handler when the sync is done.
-                    // TODO: Provide the correct background fetch result to the completionHandler.
                     application.endBackgroundTask(self.bgTask)
                     self.bgTask = UIBackgroundTaskInvalid
-                    
-                    completionHandler(.newData)
                 })
-            } else {
-                completionHandler(.noData)
             }
+            completionHandler(.noData)
         }
     }
     
@@ -805,24 +823,6 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
             } else if let openingProductKey = userInfo[Constants.openingProductKey] as? String {
                 isHandled = true
                 ProductViewController.present(imageURL: openingProductKey)
-            } else if let aps = userInfo["aps"] as? [String : Any],
-              let category = aps["category"] as? String,
-              category == "PRICE_ALERT",
-              let dataDict = userInfo["data"] as? [String : Any],
-              let id = dataDict["variantId"] as? String,
-              !id.isEmpty {
-                isHandled = true
-                LocalNotificationModel.shared.cancelPendingNotifications(within: Date(timeIntervalSinceNow: Constants.secondsInDay))
-                if let updatedPrice = dataDict["price"] as? Float {
-                    let currency = dataDict["currency"] as? String ?? "USD"
-                    DataModel.sharedInstance.updateProductPrice(id: id, updatedPrice: updatedPrice, updatedCurrency: currency).then(on: .main) {
-                        ProductViewController.present(with: id)
-                    }
-                } else {
-                    ProductViewController.present(with: id)
-                }
-                let pushTypeString = dataDict["type"] as? String
-                Analytics.trackAppOpenedFromPushNotification(source: pushTypeString)
             }
         }
         
