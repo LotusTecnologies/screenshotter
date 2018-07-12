@@ -436,7 +436,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
             let product = self.productAtIndex(indexPath.item)
             product.recordViewedProduct()
             self.recoverLostSaleManager.didClick(on: product)
-            LocalNotificationModel.shared.registerCrazeTappedPriceAlert(id: product.id, lastPrice: product.floatPrice)
+            LocalNotificationModel.shared.registerCrazeTappedPriceAlert(id: product.id, lastPrice: product.floatPrice, merchant: product.merchant)
             if let productViewController = presentProduct(product, atLocation: .products) {
                 productViewController.similarProducts = products
             }
@@ -470,7 +470,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         if isFavorited {
             let _ = ShoppingCartModel.shared.populateVariants(productOID: product.objectID)
             Analytics.trackProductFavorited(product: product, page: .productList)
-            LocalNotificationModel.shared.registerCrazeFavoritedPriceAlert(id: product.id, lastPrice: product.floatPrice)
+            LocalNotificationModel.shared.registerCrazeFavoritedPriceAlert(id: product.id, lastPrice: product.floatPrice, merchant: product.merchant)
         }else{
             Analytics.trackProductUnfavorited(product: product, page: .productList)
             LocalNotificationModel.shared.deregisterCrazeFavoritedPriceAlert(id: product.id)
@@ -485,7 +485,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         
         let product = self.productAtIndex(indexPath.item)
         product.recordViewedProduct()
-        LocalNotificationModel.shared.registerCrazeTappedPriceAlert(id: product.id, lastPrice: product.floatPrice)
+        LocalNotificationModel.shared.registerCrazeTappedPriceAlert(id: product.id, lastPrice: product.floatPrice, merchant: product.merchant)
 
         if let cell = collectionView?.cellForItem(at: indexPath) as? ProductsCollectionViewCell {
             self.productCollectionViewManager.burrow(cell: cell, product: product, fromVC: self)
