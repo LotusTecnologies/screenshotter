@@ -559,8 +559,8 @@ extension DataModel {
         return Promise { fulfill, reject in
             self.performBackgroundTask { managedObjectContext in
                 let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
-                let twoDaysAgo = NSDate(timeIntervalSinceNow: -2 * Constants.secondsInDay)
-                fetchRequest.predicate = NSPredicate(format: "isFavorite == FALSE AND inNotif == FALSE AND imageURL != nil AND dateViewed > %@", twoDaysAgo)
+                let aMonthAgo = NSDate(timeIntervalSinceNow: -30 * Constants.secondsInDay)
+                fetchRequest.predicate = NSPredicate(format: "isFavorite == FALSE AND inNotif == FALSE AND imageURL != nil AND dateViewed > %@", aMonthAgo)
                 fetchRequest.sortDescriptors = [NSSortDescriptor(key: "dateViewed", ascending: false)]
                 fetchRequest.fetchLimit = 1
                 

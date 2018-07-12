@@ -72,8 +72,17 @@ class UserAccountManager : NSObject {
     enum LoginOrCreateAccountResult {
         case facebookNew
         case facebookOld
-        case confirmed
-        case unconfirmed
+        case login
+        case createAccount
+    }
+    
+    var isFacebookConnected: Bool {
+        guard let user = user else {
+            return false
+        }
+        return user.providerData.contains { userInfo -> Bool in
+            return userInfo.providerID == "facebook.com"
+        }
     }
     
     var userFromLogin:User?
@@ -275,32 +284,22 @@ class UserAccountManager : NSObject {
                         reject(error)
                     }else{
                         self.email = email
-                        user.sendEmailVerification(completion: { (error) in
+                        user.updatePassword(to: password, completion: { (error) in
                             if let error = error {
-                                Analytics.trackDevLog(file: #file, line: #line, message: "loginOrCreatAccountAsNeeded updateEmail error \(error)")
+                                Analytics.trackDevLog(file: #file, line: #line, message: "loginOrCreatAccountAsNeeded updatePassword error \(error)")
+                                
                                 reject(error)
                             }else{
-                                user.updatePassword(to: password, completion: { (error) in
-                                    if let error = error {
-                                        Analytics.trackDevLog(file: #file, line: #line, message: "loginOrCreatAccountAsNeeded updatePassword error \(error)")
+                                self.email = email
+                                
+                                Analytics.trackDevLog(file: #file, line: #line, message: "loginOrCreatAccountAsNeeded from anon -> real \(String(describing: self.user?.isAnonymous))")
+                                self.databaseRef.child("users").child(user.uid).child("email").setValue(email.lowercased())
+                                UserDefaults.standard.set(email.lowercased(), forKey: UserDefaultsKeys.email)
 
-                                        reject(error)
-                                    }else{
-                                        self.email = email
-                                        user.sendEmailVerification(completion: { (error) in
-                                            if let error = error {
-                                                Analytics.trackDevLog(file: #file, line: #line, message: "loginOrCreatAccountAsNeeded sendEmailVerification error \(error)")
-
-                                                reject(error)
-                                            }else{
-                                                Analytics.trackDevLog(file: #file, line: #line, message: "loginOrCreatAccountAsNeeded from anon -> real \(String(describing: self.user?.isAnonymous))")
-                                                fulfil(LoginOrCreateAccountResult.unconfirmed)
-                                            }
-                                        })
-                                    }
-                                })
+                                fulfil(LoginOrCreateAccountResult.createAccount)
                             }
                         })
+                    
                     }
                 })
             }).recover(execute: { (error) -> Promise<UserAccountManager.LoginOrCreateAccountResult> in
@@ -342,25 +341,14 @@ class UserAccountManager : NSObject {
                     self.userFromLogin = user
                     self.databaseRef.child("users").child(user.uid).child("identifier").setValue(AnalyticsUser.current.identifier)
                     self.downloadAndReplaceUserData().always {
-                        if user.isEmailVerified {
-                            self.databaseRef.child("users").child(user.uid).child("email").setValue(email.lowercased())
-                            UserDefaults.standard.set(email.lowercased(), forKey: UserDefaultsKeys.email)
-                            Analytics.trackDevLog(file: #file, line: #line, message: " login user email verified")
-                            fulfil(LoginOrCreateAccountResult.confirmed)
-                        }else{
-                            Analytics.trackDevLog(file: #file, line: #line, message: " login user email unverified")
-                            self.email = email
-                            user.sendEmailVerification(completion: { (error) in
-                                if let error = error {
-                                    Analytics.trackDevLog(file: #file, line: #line, message: " login user email unverified send email error \(error)")
-
-                                    reject(error)
-                                }else{
-                                    Analytics.trackDevLog(file: #file, line: #line, message: " login user email unverified send email")
-                                    fulfil(LoginOrCreateAccountResult.unconfirmed)
-                                }
-                            })
-                        }
+                        self.email = email
+                        
+                        self.databaseRef.child("users").child(user.uid).child("email").setValue(email.lowercased())
+                        UserDefaults.standard.set(email.lowercased(), forKey: UserDefaultsKeys.email)
+                        Analytics.trackDevLog(file: #file, line: #line, message: " login user email verified")
+                        fulfil(LoginOrCreateAccountResult.login)
+                        
+                        
                     }
                 }else{
                     Analytics.trackDevLog(file: #file, line: #line, message: "unexpected")
@@ -374,32 +362,32 @@ class UserAccountManager : NSObject {
     @discardableResult func makeAnonAccount() -> Promise<Void>{
         Analytics.trackDevLog(file: #file, line: #line, message: "makeAnonAccount")
 
-        if let promise = self.makeAnonAccountPromise {
-            Analytics.trackDevLog(file: #file, line: #line, message: "already making/made anon account")
+        if let promise = self.makeAnonAccountPromise, !promise.isRejected {
+            Analytics.trackDevLog(file: "UserAccountManager", line: #line, message: "already making/made anon account")
             return promise
         }else{
+            self.makeAnonAccountPromise = nil
             let promise = Promise<Void>.init(resolvers: { (fulfil, reject) in
                 Auth.auth().signInAnonymously() { (authResult, error) in
                     if let error = error {
                          ///automatic retry?
-                        Analytics.trackDevLog(file: #file, line: #line, message: "eror making anon acc ount \(error)")
-
+                        Analytics.trackDevLog(file: #file, line: #line, message: "eror making anon account \(error)")
                         reject(error)
                     }else  if let authResult = authResult {
                         Analytics.trackDevLog(file: #file, line: #line, message: "made anon account")
                         let user = authResult.user
                         self.userFromLogin = user
                         self.databaseRef.child("users").child(user.uid).child("identifier").setValue(AnalyticsUser.current.identifier)
-                        self.downloadAndReplaceUserData().always {
-                            fulfil(())
-                        }
+                        fulfil(())
                     }else{
                         Analytics.trackDevLog(file: #file, line: #line, message: "unexpected")
-                        reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+                        reject(NSError.init(domain: "UserAccountManager", code: #line, userInfo: [:]))
                     }
                     
                 }
             })
+            
+            self.makeAnonAccountPromise = promise
             return promise
         }
     }
@@ -417,27 +405,14 @@ class UserAccountManager : NSObject {
                     self.userFromLogin = user
                     self.databaseRef.child("users").child(user.uid).child("identifier").setValue(AnalyticsUser.current.identifier)
                     let downloadPromise = self.downloadAndReplaceUserData()
-                    if authResult.user.isEmailVerified {
-                        downloadPromise.always {
-                            Analytics.trackDevLog(file: #file, line: #line, message: "created email verified")
-                            fulfil(LoginOrCreateAccountResult.confirmed)
-                        }
-                    }else{
-                        self.email = email
-                        Analytics.trackDevLog(file: #file, line: #line, message: "created email unverified")
 
-                        authResult.user.sendEmailVerification(completion: { (error) in
-                            downloadPromise.always {
-                                if let error = error {
-                                    Analytics.trackDevLog(file: #file, line: #line, message: "createAccount sendEmailVerification error  \(error)")
-                                    reject(error)
-                                }else{
-                                    Analytics.trackDevLog(file: #file, line: #line, message: "created account")
-                                    fulfil(LoginOrCreateAccountResult.unconfirmed)
-                                }
-                            }
-                        })
+                    downloadPromise.always {
+                        Analytics.trackDevLog(file: #file, line: #line, message: "created email verified")
+                        self.databaseRef.child("users").child(user.uid).child("email").setValue(email.lowercased())
+                        UserDefaults.standard.set(email.lowercased(), forKey: UserDefaultsKeys.email)
+                        fulfil(LoginOrCreateAccountResult.createAccount)
                     }
+                    
                 }else{
                     Analytics.trackDevLog(file: #file, line: #line, message: "unexpected")
 
@@ -485,7 +460,7 @@ class UserAccountManager : NSObject {
                 })
             }else{
                 Analytics.trackDevLog(file: #file, line: #line, message: "unexpected")
-                reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+                reject(NSError.init(domain: "UserAccountManager", code: #line, userInfo: [:]))
             }
             
         }
@@ -538,7 +513,7 @@ class UserAccountManager : NSObject {
                     }else{
                         Analytics.trackDevLog(file: #file, line: #line, message: "unexpected")
 
-                        reject(NSError.init(domain: #file, code: #line, userInfo: [:]))
+                        reject(NSError.init(domain: "UserAccountManager", code: #line, userInfo: [:]))
                     }
                 }
             })
@@ -566,12 +541,12 @@ class UserAccountManager : NSObject {
                     fulfill(())
                 }else{
                     Analytics.trackDevLog(file: #file, line: #line, message: "unexpected")
-                    reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+                    reject(NSError.init(domain: "UserAccountManager", code: #line, userInfo: [:]))
                 }
             }).catch(execute: { (error) in
                 Analytics.trackDevLog(file: #file, line: #line, message: "unexpected")
 
-                reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+                reject(NSError.init(domain: "UserAccountManager", code: #line, userInfo: [:]))
             })
         }
     }
@@ -605,12 +580,12 @@ class UserAccountManager : NSObject {
                     fulfill(())
                 }else{
                     Analytics.trackDevLog(file: #file, line: #line, message: "unexpected")
-                    reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+                    reject(NSError.init(domain: "UserAccountManager", code: #line, userInfo: [:]))
                 }
             }).catch(execute: { (error) in
                 Analytics.trackDevLog(file: #file, line: #line, message: "unexpected")
 
-                reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+                reject(NSError.init(domain: "UserAccountManager", code: #line, userInfo: [:]))
             })
         }
     }
@@ -913,7 +888,7 @@ extension UserAccountManager {
                             
                             context.saveIfNeeded()
                             DataModel.sharedInstance.favorite(toFavorited: true, productOIDs: [product.objectID])
-                            LocalNotificationModel.shared.registerCrazeFavoritedPriceAlert(id: product.id, lastPrice: product.floatPrice)
+                            LocalNotificationModel.shared.registerCrazeFavoritedPriceAlert(id: product.id, lastPrice: product.floatPrice, merchant: product.merchant)
                         })
                     }
                 }
@@ -1035,11 +1010,27 @@ extension String {
 
 extension UserAccountManager {
     public func uploadImage(data:Data) -> Promise<URL> {
-        
+        func getUser() -> Promise<User> {
+            return Promise { fulfill, reject in
+                if let user = self.user {
+                    fulfill(user)
+                }else {
+                    self.makeAnonAccount().then(execute: { () -> () in
+                        if let user = self.user{
+                            fulfill(user)
+                        }else{
+                            reject(NSError.init(domain: "UserAccountManager", code: #line, userInfo: [:]))
+                        }
+                    }).catch(execute: { (error) in
+                        reject(error)
+                    })
+                }
+            }
+        }
         return Promise { fulfill, reject in
-            if let user = self.user {
+            getUser().then(execute: { (user) -> (Void) in
                 let name = UUID().uuidString
-                let uploadRef = storageRef.child("user").child(user.uid).child("images").child("\(name).jpg")
+                let uploadRef = self.storageRef.child("user").child(user.uid).child("images").child("\(name).jpg")
                 
                 let _ = uploadRef.putData(data, metadata: nil) { (metadata, error) in
                     if let error = error {
@@ -1051,14 +1042,14 @@ extension UserAccountManager {
                             } else if let url = url{
                                 fulfill(url)
                             }else{
-                                reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
+                                reject(NSError.init(domain: #file, code: #line, userInfo: [:]))
                             }
                         }
                     }
                 }
-            }else{
-                reject(NSError.init(domain: "SigninManager", code: #line, userInfo: [:]))
-            }
+            }).catch(execute: { (error) in
+                reject(error)
+            })
         }
     }
 }

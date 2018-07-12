@@ -32,7 +32,6 @@ extension Matchstick {
             }
         }
         return false
-
     }
   
     public func add(callback: ((_ screenshot: Screenshot) -> Void)? = nil) {

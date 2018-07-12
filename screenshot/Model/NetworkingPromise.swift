@@ -99,6 +99,7 @@ class NetworkingPromise : NSObject {
                         }
                         guard let response = response as? HTTPURLResponse else {
                             print("uploadToSyte invalid response")
+                            Analytics.trackReceivedUploadErrorFromSyte(imageUrl: orImageUrlString, httpStatusCode: 0, reason: "no response")
                             reject(NSError(domain: "Craze", code: 4, userInfo: [NSLocalizedDescriptionKey : "uploadToSyte invalid response"]))
                             return
                         }
@@ -106,18 +107,22 @@ class NetworkingPromise : NSObject {
                         guard statusCode >= 200 && statusCode < 300 else {
                             if let data = data, let dataString = String(data: data, encoding: .utf8) {
                                 print("uploadToSyte invalid status code:\(statusCode)   dataString:\(dataString)   url:\(String(describing: response.url))   headers:\(response.allHeaderFields)")
+                                Analytics.trackReceivedUploadErrorFromSyte(imageUrl: orImageUrlString, httpStatusCode: statusCode, reason: dataString)
                             } else {
                                 print("uploadToSyte invalid status code:\(statusCode)   no dataString   url:\(String(describing: response.url))   headers:\(response.allHeaderFields)")
+                                Analytics.trackReceivedUploadErrorFromSyte(imageUrl: orImageUrlString, httpStatusCode: statusCode, reason: "no data")
                             }
                             reject(NSError(domain: "Craze", code: 4, userInfo: [NSLocalizedDescriptionKey : "uploadToSyte invalid status code:\(statusCode)"]))
                             return
                         }
                         guard let data = data else {
+                            Analytics.trackReceivedUploadErrorFromSyte(imageUrl: orImageUrlString, httpStatusCode: 200, reason: "no data")
                             reject(NSError(domain: "Craze", code: 4, userInfo: [NSLocalizedDescriptionKey : "uploadToSyte no data"]))
                             return
                         }
                         guard let responseObjectDict = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [String: Any] else {
                             print("uploadToSyte invalid response object dictionary")
+                            Analytics.trackReceivedUploadErrorFromSyte(imageUrl: orImageUrlString, httpStatusCode: 200, reason: "bad dictionary")
                             reject(NSError(domain: "Craze", code: 4, userInfo: [NSLocalizedDescriptionKey : "uploadToSyte invalid response object dictionary"]))
                             return
                         }
@@ -745,12 +750,12 @@ class NetworkingPromise : NSObject {
     }
     
     // action = [tapped|favorited|disabled]
-    func registerCrazePriceAlert(id: String, lastPrice: Float, firebaseId: String, action: String = "favorited") -> Promise<(Data, URLResponse)> {
+    func registerCrazePriceAlert(id: String, lastPrice: Float, merchant: String, firebaseId: String, action: String = "favorited") -> Promise<(Data, URLResponse)> {
         guard let url = URL(string: "\(Constants.notificationsApiEndpoint)/users/\(firebaseId)/subscriptions") else {
             let error = NSError(domain: "Craze", code: 9, userInfo: [NSLocalizedDescriptionKey: "Cannot create url from notificationsApiEndpoint:\(Constants.notificationsApiEndpoint)"])
             return Promise(error: error)
         }
-        let parameters = ["subscription" : ["priceAlert" : ["lastSeenPrice" : lastPrice, "variantId" : id, "type" : action]]]
+        let parameters = ["subscription" : ["priceAlert" : ["lastSeenPrice" : lastPrice, "variantId" : id, "type" : action, "merchant" : merchant]]]
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.addValue("application/json", forHTTPHeaderField: "Accept")

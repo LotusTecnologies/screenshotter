@@ -14,7 +14,7 @@ import UIKit
 
 class TutorialNavigationController : UINavigationController {
     weak var tutorialDelegate: TutorialNavigationControllerDelegate?
-    var showProfilePage = false
+    var showProfilePage = true
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -59,25 +59,45 @@ extension TutorialNavigationController : UINavigationControllerDelegate {
 }
 
 extension TutorialNavigationController: RegisterViewControllerDelegate {
+    
+    func returningUserPermissionAlert(){
+        let alert = UIAlertController.init(title: "screenshot.permission.returning_user.title".localized, message: "screenshot.permission.returning_user.message".localized, preferredStyle: .alert)
+        let continueAction = UIAlertAction.init(title: "generic.ok".localized, style: .default, handler: { (a) in
+            PermissionsManager.shared.requestPermissions([.push, .photo]){
+                self.tutorialCompleted()
+            }
+        })
+        alert.addAction(continueAction)
+        alert.preferredAction = continueAction
+        alert.addAction(UIAlertAction.init(title: "generic.later".localized, style: .cancel, handler: { (a) in
+            self.tutorialCompleted()
+        }))
+        self.present(alert, animated: true)
+    }
+    
     func registerViewControllerDidSkip(_ viewController: RegisterViewController) {
         pushGDPRViewController()
         Analytics.trackOnboardingSkipped()
     }
     
-    func registerViewControllerNeedEmailConfirmation(_ viewController: RegisterViewController) {
-        let confirm = ConfirmCodeViewController()
-        confirm.email = viewController.email
-        confirm.delegate = self
-        self.pushViewController(confirm, animated: true)
-        Analytics.trackOnboardingRegisterEmailSent()
+    func registerViewControllerDidCreateAccount(_ viewController: RegisterViewController) {
+        pushGDPRViewController()
+
+    
+        Analytics.trackOnboardingLoginSucess()
+
     }
     
+    
+    
     func registerViewControllerDidSignin(_ viewController: RegisterViewController) {
+        showProfilePage = false
+
         let agreedToAllPermisions = (UserDefaults.standard.bool(forKey: UserDefaultsKeys.gdpr_agreedToEmail) && UserDefaults.standard.bool(forKey: UserDefaultsKeys.gdpr_agreedToImageDetection))
         if ( !agreedToAllPermisions ) {
             pushGDPRViewController()
         }else{
-            tutorialCompleted()
+            returningUserPermissionAlert()
         }
         Analytics.trackOnboardingLoginSucess()
     }
@@ -87,7 +107,7 @@ extension TutorialNavigationController: RegisterViewControllerDelegate {
         if ( !agreedToAllPermisions ) {
             pushGDPRViewController()
         }else{
-            tutorialCompleted()
+            returningUserPermissionAlert()
         }
 
         Analytics.trackOnboardingFacebookSuccess(isReturning: true)

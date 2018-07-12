@@ -207,25 +207,9 @@ class OnboardingGDPRViewController: UIViewController {
         UserAccountManager.shared.setGDPR(agreedToEmail: agreedToEmail, agreedToImageDetection: agreedToImageDetection)
         print("agreedToEmail :\(agreedToEmail),agreedToImageDetection: \(agreedToImageDetection)" )
         
-        func requestPermissions(_ types: [PermissionType]) {
-            var types = types
-            guard !types.isEmpty else {
-                self.delegate?.onboardingGDPRViewControllerDidComplete(self)
-                return
-            }
-            let type = types.removeFirst()
-            
-            if PermissionsManager.shared.hasPermission(for: type) {
-                requestPermissions(types)
-            }
-            else {
-                PermissionsManager.shared.requestPermission(for: type) { granted in
-                    requestPermissions(types)
-                }
-            }
+        PermissionsManager.shared.requestPermissions([.push, .photo]){
+            self.delegate?.onboardingGDPRViewControllerDidComplete(self)
         }
-        
-        requestPermissions([.push, .photo])
     }
 }
 

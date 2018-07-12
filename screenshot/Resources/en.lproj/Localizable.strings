@@ -195,6 +195,7 @@
 "error.database_cant_load.button.reset_app.message" = "Are you sure? You'll lose all your screenshots.";
 "error.database_cant_load.button.reset_app.button.reset" = "Reset";
 
+"facebook.connect" = "Connect With Facebook";
 "facebook.register" = "Continue With Facebook";
 
 "favorite.price_updates.message" = "Enable notifications to get updates about when this item goes on sale!";
@@ -395,6 +396,10 @@
 "screenshot.import.multiple" = "You have %d new screenshots, do you want to import them?";
 "screenshot.import.very_many" = "You have many new screenshots, do you want to import them?";
 "screenshot.shop" = "Shop Photo";
+
+"screenshot.permission.returning_user.title" = "Get The Best Experience";
+"screenshot.permission.returning_user.message" = "Enable notification and photo permissions to receive updates when products you love go on sale and when your photos are shoppable!";
+
 "screenshot.permission.photo.allow" = "Allow Access";
 "screenshot.permission.photo.detail" = "Allow Screenshop to access your screenshots to start shopping!";
 "screenshot.permission.photo.title" = "Shop With Screenshop";

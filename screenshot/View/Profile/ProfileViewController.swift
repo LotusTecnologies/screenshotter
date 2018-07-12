@@ -19,6 +19,7 @@ class ProfileViewController: BaseTableViewController {
     enum Section: Int {
         case account
         case invite
+        case facebook
         case options
         case permissions
         case logout
@@ -46,7 +47,7 @@ class ProfileViewController: BaseTableViewController {
         }
     }
     
-    private var data: [Section: [Row]] = [
+    private let dataSource = DataSource<Section, Row>(data: [
         .account: [],
         .invite: [],
         .options: [
@@ -58,13 +59,13 @@ class ProfileViewController: BaseTableViewController {
             .permissionPush,
             .permissionGDRP
         ]
-    ]
+    ])
     
     weak var delegate: ProfileViewControllerDelegate?
     
     private let profileAccountView = ProfileAccountView()
     
-    private let inviteView: UIView = {
+    private lazy var inviteView: UIView = {
         let view = UIView()
         view.layoutMargins = UIEdgeInsets(top: 0, left: .padding, bottom: 0, right: .padding)
         
@@ -76,7 +77,35 @@ class ProfileViewController: BaseTableViewController {
         button.setTitle("profile.tell_friend".localized, for: .normal)
         button.addTarget(self, action: #selector(inviteAction), for: .touchUpInside)
         button.clipsToBounds = true
+        button.isExclusiveTouch = true
         button.adjustInsetsForImage()
+        view.addSubview(button)
+        button.sizeToFit()
+        button.setContentHuggingPriority(.required, for: .vertical)
+        button.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor).isActive = true
+        button.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor).isActive = true
+        button.bottomAnchor.constraint(equalTo: view.layoutMarginsGuide.bottomAnchor).isActive = true
+        button.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor).isActive = true
+        
+        var frame = view.frame
+        frame.size.height = button.bounds.height
+        view.frame = frame
+        
+        return view
+    }()
+    
+    private lazy var facebookView: UIView = {
+        let view = UIView()
+        view.layoutMargins = UIEdgeInsets(top: 0, left: .padding, bottom: 0, right: .padding)
+        
+        let button = FacebookButton()
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(facebookLoginAction(_:)), for: .touchUpInside)
+        button.actionCopy = .connect
+        button.hasArrow = false
+        button.clipsToBounds = true
+        button.isExclusiveTouch = true
+        button.layer.cornerRadius = MainButton.cornerRadius
         view.addSubview(button)
         button.sizeToFit()
         button.setContentHuggingPriority(.required, for: .vertical)
@@ -185,18 +214,25 @@ class ProfileViewController: BaseTableViewController {
         if isLoggedIn {
             profileAccountView.name = UserDefaults.standard.string(forKey: UserDefaultsKeys.name)
             profileAccountView.email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email)
+            
             if let string = UserDefaults.standard.string(forKey: UserDefaultsKeys.avatarURL), let url = URL.init(string: string) {
                 profileAccountView.avatarURL = url
             }else{
                 profileAccountView.avatarURL = nil
             }
             
+            if UserAccountManager.shared.isFacebookConnected {
+                dataSource.removeSection(.facebook)
+            }
+            else {
+                dataSource.addSection(.facebook, rows: [])
+            }
             
-            
-            data[.logout] = [.logout]
+            dataSource.addSection(.logout, rows: [.logout])
         }
         else {
-            data.removeValue(forKey: .logout)
+            dataSource.removeSection(.facebook)
+            dataSource.removeSection(.logout)
         }
         
         tableView.reloadData()
@@ -218,6 +254,32 @@ class ProfileViewController: BaseTableViewController {
             .init("com.apple.mobilenotes.SharingExtension")
         ]
         present(activityViewController, animated: true)
+    }
+    
+    // MARK: Facebook
+    
+    @objc private func facebookLoginAction(_ button: FacebookButton) {
+        // TODO: analytics
+        
+        button.isLoading = true
+        button.isUserInteractionEnabled = false
+        
+        UserAccountManager.shared.loginWithFacebook()
+            .then { result -> Void in
+                self.syncLoggedIn()
+            }
+            .catch { error in
+                let e = error as NSError
+
+                if !UserAccountManager.shared.isIgnorableFacebookError(error: e) {
+                    let alert = UserAccountManager.shared.alertViewForUndefinedError(error: e, viewController: self)
+                    self.present(alert, animated: true)
+                }
+            }
+            .always {
+                button.isLoading = false
+                button.isUserInteractionEnabled = true
+        }
     }
     
     // MARK: Permissions
@@ -246,14 +308,12 @@ class ProfileViewController: BaseTableViewController {
 
 extension ProfileViewController: ProfileAccountViewDelegate {
     func profileAccountViewAuthorize(_ view: ProfileAccountView) {
-        
         let vc = RegisterViewController.init()
         vc.isOnboardingLayout = false
         vc.delegate = self
         let navVC = UINavigationController.init(rootViewController: vc)
         navVC.isNavigationBarHidden = true
         self.present(navVC, animated: true, completion: nil)
-
     }
     
     func profileAccountViewWantsToContract(_ view: ProfileAccountView) {
@@ -303,12 +363,10 @@ extension ProfileViewController : RegisterViewControllerDelegate, ConfirmCodeVie
     func registerViewControllerDidSkip(_ viewController: RegisterViewController) {
         self.dismiss(animated: true, completion: nil)
     }
-    
-    func registerViewControllerNeedEmailConfirmation(_ viewController: RegisterViewController) {
-        let confirm = ConfirmCodeViewController()
-        confirm.email = viewController.email
-        confirm.delegate = self
-        viewController.navigationController?.pushViewController(confirm, animated: true)
+    func registerViewControllerDidCreateAccount(_ viewController: RegisterViewController){
+        self.dismiss(animated: true, completion: nil)
+        self.didLogin()
+
     }
     
     func didLogin(){
@@ -334,55 +392,49 @@ extension ProfileViewController : RegisterViewControllerDelegate, ConfirmCodeVie
 // MARK: - Table View
 
 extension ProfileViewController {
-    private func row(for indexPath: IndexPath) -> Row? {
-        guard let section = Section(rawValue: indexPath.section) else {
-            return nil
-        }
-        return data[section]?[indexPath.row]
-    }
-    
-    private func indexPath(for row: Row, in section: Section) -> IndexPath? {
-        guard let rowValue = data[section]?.index(of: row) else {
-            return nil
-        }
-        return IndexPath(row: rowValue, section: section.rawValue)
-    }
-    
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return data.count
+        return dataSource.count
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        guard let settingsSection = Section(rawValue: section) else {
-            return 0
-        }
-        return data[settingsSection]?.count ?? 0
+        return dataSource.rows(section)?.count ?? 0
     }
     
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        if Section.account.rawValue == section {
-            if profileAccountView.isExpanded {
-                return profileAccountView.maxHeight
+        if let s = dataSource.section(section) {
+            switch s {
+            case .account:
+                if profileAccountView.isExpanded {
+                    return profileAccountView.maxHeight
+                }
+                else {
+                    return profileAccountView.minHeight
+                }
+            case .invite:
+                return inviteView.bounds.height
+            case .facebook:
+                return facebookView.bounds.height
+            case let _section:
+                if sectionText(for: _section) != nil {
+                    return tableView.sectionHeaderHeight
+                }
             }
-            else {
-                return profileAccountView.minHeight
-            }
-        }
-        else if Section.invite.rawValue == section {
-            return inviteView.bounds.height
-        }
-        else if let section = Section(rawValue: section), sectionText(for: section) != nil {
-            return tableView.sectionHeaderHeight
         }
         return 0
     }
     
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        if section == Section.account.rawValue {
-            return profileAccountView
-        }
-        else if section == Section.invite.rawValue {
-            return inviteView
+        if let s = dataSource.section(section) {
+            switch s {
+            case .account:
+                return profileAccountView
+            case .invite:
+                return inviteView
+            case .facebook:
+                return facebookView
+            default:
+                break
+            }
         }
         return nil
     }
@@ -397,10 +449,10 @@ extension ProfileViewController {
     }
     
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        if let section = Section(rawValue: section) {
-            return sectionText(for: section)
+        guard let s = dataSource.section(section) else {
+            return nil
         }
-        return nil
+        return sectionText(for: s)
     }
     
     override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
@@ -408,13 +460,13 @@ extension ProfileViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let row = row(for: indexPath) else {
+        guard let row = dataSource.row(indexPath) else {
             return UITableViewCell()
         }
         
         let cell: UITableViewCell
         
-        if indexPath.section == Section.logout.rawValue {
+        if dataSource.section(indexPath.section) == Section.logout {
             cell = tableView.dequeueReusableCell(withIdentifier: "logout", for: indexPath)
             
             cell.textLabel?.text = cellText(for: row)
@@ -450,7 +502,7 @@ extension ProfileViewController {
     }
     
     override func tableView(_ tableView: UITableView, shouldHighlightRowAt indexPath: IndexPath) -> Bool {
-        guard let row = row(for: indexPath) else {
+        guard let row = dataSource.row(indexPath) else {
             return true
         }
         
@@ -468,7 +520,7 @@ extension ProfileViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let row = row(for: indexPath) else {
+        guard let row = dataSource.row(indexPath) else {
             return
         }
         
@@ -645,7 +697,7 @@ extension ProfileViewController {
     
     @objc private func reloadChangeableIndexPaths() {
         func append(section: Section, row: Row, to indexPaths: inout [IndexPath]) {
-            if let indexPath = indexPath(for: row, in: section) {
+            if let indexPath = dataSource.indexPath(row: row, section: section) {
                 indexPaths.append(indexPath)
             }
         }
