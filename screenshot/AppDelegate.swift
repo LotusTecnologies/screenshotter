@@ -753,7 +753,7 @@ extension AppDelegate: PushNotificationDelegate {
           !id.isEmpty {
             LocalNotificationModel.shared.cancelPendingNotifications(within: Date(timeIntervalSinceNow: Constants.secondsInDay))
             let pushTypeString = dataDict["type"] as? String
-            Analytics.trackAppOpenedFromPushNotification(source: pushTypeString) // TODO: trackReceivedPushNotification
+            Analytics.trackAppReceivedPushNotification(source: pushTypeString)
             PushNotificationManager.push().handlePushReceived(userInfo)  // pushwoosh
             completionHandler(.newData)
         } else {
