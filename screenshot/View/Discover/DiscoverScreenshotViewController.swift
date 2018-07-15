@@ -123,6 +123,9 @@ class DiscoverScreenshotViewController : BaseViewController {
         emptyView.bottomAnchor.constraint(equalTo: passButton.topAnchor).isActive = true
         emptyView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "NavigationBarFilter"), style: .plain, target: self, action: #selector(filterAction(_:)))
+
+        
         let pinchZoom = UIPinchGestureRecognizer.init(target: self, action: #selector(pinch(gesture:)))
         self.view.addGestureRecognizer(pinchZoom)
     }
@@ -134,6 +137,20 @@ class DiscoverScreenshotViewController : BaseViewController {
         syncEmptyListViews()
     }
     
+    @objc func filterAction(_ sender:Any){
+        if let sender = sender as? UIBarButtonItem {
+            let vc = DiscoverGenderOptionViewController.init()
+            vc.modalPresentationStyle = .popover
+            
+            vc.popoverPresentationController?.permittedArrowDirections = [.up, .down]
+            vc.popoverPresentationController?.delegate = self
+            vc.popoverPresentationController?.barButtonItem = sender
+            
+            self.present(vc, animated: true) {
+                
+            }
+        }
+    }
     
     deinit {
         if let layout = collectionView.collectionViewLayout as? DiscoverScreenshotCollectionViewLayout {
@@ -574,5 +591,12 @@ fileprivate extension UIButton {
     func isDisabled(_ disabled: Bool) {
         isEnabled = !disabled
         alpha = disabled ? 0.5 : 1
+    }
+}
+
+
+extension DiscoverScreenshotViewController :UIPopoverPresentationControllerDelegate {
+    func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
+        return .none
     }
 }
