@@ -312,7 +312,7 @@ extension ScreenshotsViewController {
 
 extension ScreenshotsViewController : FetchedResultsControllerManagerDelegate {
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
-        change.shiftIndexSections(by: 2)
+        change.shiftIndexSections(by: Section.image.rawValue)
         change.applyChanges(collectionView: collectionView)
         syncEmptyListView()
         

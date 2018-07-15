@@ -31,7 +31,7 @@ protocol FetchedResultsControllerManagerChange {
 
 protocol FetchedResultsControllerManagerDelegate : class {
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange)
-}
+} 
 
 class FetchedResultsControllerManager<ResultType> : NSObject, NSFetchedResultsControllerDelegate  where ResultType : NSFetchRequestResult {
     class Section {
