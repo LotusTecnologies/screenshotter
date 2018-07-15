@@ -309,16 +309,20 @@ class LocalNotificationModel {
         }
     }
     
-    func deregisterCrazeFavoritedPriceAlert(id: String?) {
+    func deregisterCrazeFavoritedPriceAlert(id: String?, merchant: String?) {
         guard let id = id else {
             print("deregisterCrazeFavoritedPriceAlert no product id")
+            return
+        }
+        guard let merchant = merchant else {
+            print("deregisterCrazeFavoritedPriceAlert no merchant")
             return
         }
         guard let firebaseId = UserAccountManager.shared.user?.uid else {
             print("deregisterCrazeFavoritedPriceAlert no firebase id")
             return
         }
-        NetworkingPromise.sharedInstance.registerCrazePriceAlert(id: id, merchant: "", lastPrice: 0, firebaseId: firebaseId, action: "disabled")
+        NetworkingPromise.sharedInstance.registerCrazePriceAlert(id: id, merchant: merchant, lastPrice: 0, firebaseId: firebaseId, action: "disabled")
             .catch { error in
                 if let err = error as? PMKURLError {
                     switch err {

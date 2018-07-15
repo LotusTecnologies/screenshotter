@@ -56,7 +56,7 @@ class ProductWebViewController : WebViewController {
             LocalNotificationModel.shared.registerCrazeFavoritedPriceAlert(id: product.id, merchant: product.merchant, lastPrice: product.floatPrice)
         }else{
             Analytics.trackProductUnfavorited(product: product, page: .productWebView)
-            LocalNotificationModel.shared.deregisterCrazeFavoritedPriceAlert(id: product.id)
+            LocalNotificationModel.shared.deregisterCrazeFavoritedPriceAlert(id: product.id, merchant: product.merchant)
         }
     }
 }
