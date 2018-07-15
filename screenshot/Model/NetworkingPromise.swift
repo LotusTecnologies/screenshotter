@@ -299,23 +299,29 @@ class NetworkingPromise : NSObject {
         params["cascadeCreate"] = true
         params["rotationRate"] = 0.99
         params["filter"] = "'displayable' == true"
-        if let genderNumber = UserDefaults.standard.value(forKey: UserDefaultsKeys.productGender) as? NSNumber
-            , let gender = ProductsOptionsGender.init(rawValue: genderNumber.intValue){
-            if gender == .female {
-//                params["booster"] = "if  \"female\" in 'genders' then 99999999 else 0.01"
-                params["filter"] = "'displayable' == true AND \"female\" in 'genders'"
-            }else if gender == .male{
-//                params["booster"] = "if  \"male\" in 'genders' then 99999999 else 0.01"
-                params["filter"] = "'displayable' == true AND \"male\" in 'genders'"
-            }else if gender == .galGadot{
-//                params["booster"] = "if  \"Gal Gadot\" in 'rekognition-celebs' then 99999999 else 0.01"
-                params["filter"] = "'displayable' == true AND \"Gal Gadot\" in 'rekognition-celebs'"
+        if UserDefaults.standard.bool(forKey: UserDefaultsKeys.discoverDontFilter) != true {
+            if let genderNumber = UserDefaults.standard.value(forKey: UserDefaultsKeys.productGender) as? NSNumber
+                , let gender = ProductsOptionsGender.init(rawValue: genderNumber.intValue){
+                if gender == .female {
+                    //                params["booster"] = "if  \"female\" in 'genders' then 99999999 else 0.01"
+                    params["filter"] = "'displayable' == true AND \"female\" in 'genders'"
+                }else if gender == .male{
+                    //                params["booster"] = "if  \"male\" in 'genders' then 99999999 else 0.01"
+                    params["filter"] = "'displayable' == true AND \"male\" in 'genders'"
+                }else if gender == .galGadot{
+                    //                params["booster"] = "if  \"Gal Gadot\" in 'rekognition-celebs' then 99999999 else 0.01"
+                    params["filter"] = "'displayable' == true AND \"Gal Gadot\" in 'rekognition-celebs'"
+                }
             }
         }
         params["rotationTime"] = 60*60*24*2 // 2 days rotation
         return NetworkingPromise.sharedInstance.recombeeRequest(path: "recomms/users/\(userId)/items/", method: "GET", params: params).then { (dict) -> Promise<[RecombeeRecommendation]> in
             var toReturn:[RecombeeRecommendation] = []
             if let recomms = dict["recomms"] as? [[String:Any]]{
+                if recomms.count == 0 {
+                    //turn off filter...
+                     UserDefaults.standard.set(true, forKey: UserDefaultsKeys.discoverDontFilter)
+                }
                 recomms.forEach({ (matchstick) in
                     if let index = matchstick["id"] as? String {
                         toReturn.append(RecombeeRecommendation.init(imageURL: "https://s3.amazonaws.com/screenshop-ordered-matchsticks/\(index).jpg", remoteId: "\(index)"))

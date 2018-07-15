@@ -145,6 +145,7 @@ class DiscoverGenderOptionViewController: UIViewController {
                 }else{
                     UserDefaults.standard.set(genderOfButton.rawValue, forKey: UserDefaultsKeys.productGender)
                 }
+                UserDefaults.standard.set(false, forKey: UserDefaultsKeys.discoverDontFilter)
                 syncViews()
             }
             
