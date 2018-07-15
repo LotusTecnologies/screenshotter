@@ -304,7 +304,7 @@ fileprivate extension ProductViewControllerProductView {
         
         if isFavorited {
             Analytics.trackProductFavorited(product: product, page: .product)
-            LocalNotificationModel.shared.registerCrazeFavoritedPriceAlert(id: product.id, lastPrice: product.floatPrice, merchant: product.merchant)
+            LocalNotificationModel.shared.registerCrazeFavoritedPriceAlert(id: product.id, merchant: product.merchant, lastPrice: product.floatPrice)
         }else{
             Analytics.trackProductUnfavorited(product: product, page: .product)
             LocalNotificationModel.shared.deregisterCrazeFavoritedPriceAlert(id: product.id)

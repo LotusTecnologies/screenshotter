@@ -750,7 +750,7 @@ class NetworkingPromise : NSObject {
     }
     
     // action = [tapped|favorited|disabled]
-    func registerCrazePriceAlert(id: String, lastPrice: Float, merchant: String, firebaseId: String, action: String = "favorited") -> Promise<(Data, URLResponse)> {
+    func registerCrazePriceAlert(id: String, merchant: String, lastPrice: Float, firebaseId: String, action: String = "favorited") -> Promise<(Data, URLResponse)> {
         guard let url = URL(string: "\(Constants.notificationsApiEndpoint)/users/\(firebaseId)/subscriptions") else {
             let error = NSError(domain: "Craze", code: 9, userInfo: [NSLocalizedDescriptionKey: "Cannot create url from notificationsApiEndpoint:\(Constants.notificationsApiEndpoint)"])
             return Promise(error: error)
