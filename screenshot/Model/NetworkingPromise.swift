@@ -287,23 +287,75 @@ class NetworkingPromise : NSObject {
     func downloadProductsWithRetry(url: URL) -> Promise<[String : Any]> {
         return attempt(interdelay: .seconds(11), maxRepeat: 2, body: {self.downloadProducts(url: url)})
     }
-    
-    func nextMatchsticks() -> Promise<NSDictionary> {
-        let syncTokenParam: String
-        if let matchsticksSyncToken = UserDefaults.standard.string(forKey: UserDefaultsKeys.matchsticksSyncToken),
-          !matchsticksSyncToken.isEmpty {
-            syncTokenParam = "?start=\(matchsticksSyncToken)"
-        } else {
-            syncTokenParam = ""
+  
+    struct RecombeeRecommendation{
+        var imageURL:String
+        var remoteId:String
+    }
+    func recombeeRecommendation(count:Int) -> Promise<[RecombeeRecommendation]>{
+        let userId = AnalyticsUser.current.identifier
+        var params:[String:Any] = [:]
+        params["count"] = count
+        params["cascadeCreate"] = true
+        params["rotationRate"] = 0.99
+        params["filter"] = "'displayable' == true"
+        params["rotationTime"] = 60*60*24*2 // 2 days rotation
+        return NetworkingPromise.sharedInstance.recombeeRequest(path: "recomms/users/\(userId)/items/", method: "GET", params: params).then { (dict) -> Promise<[RecombeeRecommendation]> in
+            var toReturn:[RecombeeRecommendation] = []
+            if let recomms = dict["recomms"] as? [[String:Any]]{
+                recomms.forEach({ (matchstick) in
+                    if let index = matchstick["id"] as? String {
+                        toReturn.append(RecombeeRecommendation.init(imageURL: "https://s3.amazonaws.com/screenshop-ordered-matchsticks/\(index).jpg", remoteId: "\(index)"))
+                    }
+                })
+            }
+            return Promise.init(value:toReturn)
         }
-        guard let url = URL(string: Constants.screenShotLambdaDomain + "screenshots/matchsticks" + syncTokenParam) else {
-            let error = NSError(domain: "Craze", code: 21, userInfo: [NSLocalizedDescriptionKey: "Cannot create matchsticks url from screenShotLambdaDomain:\(Constants.screenShotLambdaDomain)"])
-            return Promise(error: error)
+    }
+    func recombeeRequest(path:String, method:String, params:[String:Any]? ) -> Promise<NSDictionary> {
+        let hostName = "rapi.recombee.com"
+        let databaseId = "screenshop"
+        let hmac_timestamp = String(Int(NSDate().timeIntervalSince1970))
+        let partialPath = "/\(databaseId)/\(path)"
+        var queryItems = [URLQueryItem.init(name: "hmac_timestamp", value: "\(hmac_timestamp)")]
+        if let params = params, method == "GET" {
+            params.forEach({ (arg) in
+                let (key, value) = arg
+                    queryItems.append( URLQueryItem.init(name: key, value: "\(value)"))
+
+
+            })
         }
-        let sessionConfiguration = URLSessionConfiguration.default
-        sessionConfiguration.timeoutIntervalForRequest = 60
-        let promise = URLSession(configuration: sessionConfiguration).dataTask(with: URLRequest(url: url)).asDictionary()
-        return promise
+        var components = URLComponents.init()
+        components.path = partialPath
+        components.queryItems = queryItems
+        if let string = components.string {
+            let recombeeKey = "TJVMFkb5sq4aaIXJGTCrCzPKsjxuyV8RLZOBlXt9QhGQSVOLNgy4jp3lqdlOc8Gn"
+            let hmac_sign = string.hmac(algorithm: .SHA1, key: recombeeKey)
+            let urlString = "https://\(hostName)\(string)&hmac_sign=\(hmac_sign)"
+            
+            if let url = URL.init(string: urlString ) {
+                var request = URLRequest.init(url: url )
+                request.httpMethod = method
+                request.addValue("application/json", forHTTPHeaderField: "Accept")
+                request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+                if let params = params, method == "POST" {
+                    do{
+                        let parameterData = try JSONSerialization.data(withJSONObject: params, options: [])
+                        request.httpBody = parameterData
+                        request.setValue("\(parameterData.count)", forHTTPHeaderField: "Content-Length")
+                    }catch{
+                        print("recombee request error:\(error)")
+                    }
+                }
+                let sessionConfiguration = URLSessionConfiguration.default
+                sessionConfiguration.timeoutIntervalForRequest = 60
+                let promise = URLSession(configuration: sessionConfiguration).dataTask(with: request).asDictionary()
+                return promise
+            }
+        }
+        return Promise.init(error: NSError.init(domain: #file, code: #line, userInfo: [NSLocalizedDescriptionKey:"unable to make url\(path) = \(String(describing: params))"]))
+        
     }
     
     func downloadImageData(urlString: String) -> Promise<Data> {
@@ -698,12 +750,12 @@ class NetworkingPromise : NSObject {
     }
     
     // action = [tapped|favorited|disabled]
-    func registerCrazePriceAlert(id: String, lastPrice: Float, firebaseId: String, action: String = "favorited") -> Promise<(Data, URLResponse)> {
+    func registerCrazePriceAlert(id: String, lastPrice: Float, merchant: String, firebaseId: String, action: String = "favorited") -> Promise<(Data, URLResponse)> {
         guard let url = URL(string: "\(Constants.notificationsApiEndpoint)/users/\(firebaseId)/subscriptions") else {
             let error = NSError(domain: "Craze", code: 9, userInfo: [NSLocalizedDescriptionKey: "Cannot create url from notificationsApiEndpoint:\(Constants.notificationsApiEndpoint)"])
             return Promise(error: error)
         }
-        let parameters = ["subscription" : ["priceAlert" : ["lastSeenPrice" : lastPrice, "variantId" : id, "type" : action]]]
+        let parameters = ["subscription" : ["priceAlert" : ["lastSeenPrice" : lastPrice, "variantId" : id, "type" : action, "merchant" : merchant]]]
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.addValue(AnalyticsUser.current.identifier, forHTTPHeaderField: "cid")

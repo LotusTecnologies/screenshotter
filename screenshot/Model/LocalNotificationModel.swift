@@ -274,7 +274,7 @@ class LocalNotificationModel {
     
     // MARK: Remote Notification
 
-    func registerCrazeFavoritedPriceAlert(id: String?, lastPrice: Float) {
+    func registerCrazeFavoritedPriceAlert(id: String?, lastPrice: Float, merchant: String?) {
         guard let id = id else {
             print("registerCrazeFavoritedPriceAlert no product id")
             return
@@ -283,7 +283,11 @@ class LocalNotificationModel {
             print("registerCrazeFavoritedPriceAlert no firebase id")
             return
         }
-        NetworkingPromise.sharedInstance.registerCrazePriceAlert(id: id, lastPrice: lastPrice, firebaseId: firebaseId, action: "favorited")
+        guard let merchant = merchant else {
+            print("registerCrazeFavoritedPriceAlert no merchant")
+            return
+        }
+        NetworkingPromise.sharedInstance.registerCrazePriceAlert(id: id, lastPrice: lastPrice, merchant: merchant, firebaseId: firebaseId, action: "favorited")
             .catch { error in
                 if let err = error as? PMKURLError {
                     switch err {
@@ -314,7 +318,7 @@ class LocalNotificationModel {
             print("deregisterCrazeFavoritedPriceAlert no firebase id")
             return
         }
-        NetworkingPromise.sharedInstance.registerCrazePriceAlert(id: id, lastPrice: 0, firebaseId: firebaseId, action: "disabled")
+        NetworkingPromise.sharedInstance.registerCrazePriceAlert(id: id, lastPrice: 0, merchant: "", firebaseId: firebaseId, action: "disabled")
             .catch { error in
                 if let err = error as? PMKURLError {
                     switch err {
@@ -336,7 +340,7 @@ class LocalNotificationModel {
         }
     }
 
-    func registerCrazeTappedPriceAlert(id: String?, lastPrice: Float) {
+    func registerCrazeTappedPriceAlert(id: String?, lastPrice: Float, merchant: String?) {
         guard let id = id else {
             print("registerCrazeTappedPriceAlert no product id")
             return
@@ -345,7 +349,11 @@ class LocalNotificationModel {
             print("registerCrazeTappedPriceAlert no firebase id")
             return
         }
-        NetworkingPromise.sharedInstance.registerCrazePriceAlert(id: id, lastPrice: lastPrice, firebaseId: firebaseId, action: "tapped")
+        guard let merchant = merchant else {
+            print("registerCrazeTappedPriceAlert no merchant")
+            return
+        }
+        NetworkingPromise.sharedInstance.registerCrazePriceAlert(id: id, lastPrice: lastPrice, merchant: merchant, firebaseId: firebaseId, action: "tapped")
             .catch { error in
                 if let err = error as? PMKURLError {
                     switch err {

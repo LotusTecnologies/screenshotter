@@ -42,21 +42,16 @@ class ProductsViewController: BaseViewController {
     var collectionView:UICollectionView?
     var productsOptions:ProductsOptions = ProductsOptions()
     var scrollRevealController:ScrollRevealController?
-    var rateView:ProductsRateView!
+    var rateView = ProductsRateView.init(frame: .zero)
     var productsRateNegativeFeedbackSubmitAction:UIAlertAction?
     var productsRateNegativeFeedbackTextField:UITextField?
     var shamrockButton : FloatingActionButton?
     var screenshotLoadingState:ProductsViewControllerState = .unknown {
         didSet {
             Analytics.trackDevLog(file: #file, line: #line, message: "from\(oldValue) to \(screenshotLoadingState)")            
-            self.syncViewsAfterStateChange()
         }
     }
-    var productLoadingState:ProductsViewControllerState = .unknown {
-        didSet {
-            self.syncViewsAfterStateChange()
-        }
-    }
+    var productLoadingState:ProductsViewControllerState = .unknown 
 
     var selectedShoppable:Shoppable?
 
@@ -147,14 +142,9 @@ class ProductsViewController: BaseViewController {
         }()
         self.collectionView = collectionView
         
-        let rateView:ProductsRateView = {
-            let view = ProductsRateView.init(frame: .zero)
-            view.translatesAutoresizingMaskIntoConstraints = false
-            view.voteUpButton.addTarget(self, action: #selector(productsRatePositiveAction), for: .touchUpInside)
-            view.voteDownButton.addTarget(self, action: #selector(productsRateNegativeAction), for: .touchUpInside)
-            return view
-        }()
-        self.rateView = rateView
+        rateView.translatesAutoresizingMaskIntoConstraints = false
+        rateView.voteUpButton.addTarget(self, action: #selector(productsRatePositiveAction), for: .touchUpInside)
+        rateView.voteDownButton.addTarget(self, action: #selector(productsRateNegativeAction), for: .touchUpInside)
         
         let scrollRevealController = ScrollRevealController(edge: .bottom)
         scrollRevealController.hasBottomBar = !hidesBottomBarWhenPushed
@@ -189,6 +179,7 @@ class ProductsViewController: BaseViewController {
         
         if self.screenshotController?.first?.shoppablesCount == -1 {
             self.screenshotLoadingState = .retry
+            syncViewsAfterStateChange()
             Analytics.trackScreenshotOpenedWithoutShoppables(screenshot: screenshot)
         }
         else {
@@ -452,7 +443,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
             let product = self.productAtIndex(indexPath.item)
             product.recordViewedProduct()
             self.recoverLostSaleManager.didClick(on: product)
-            LocalNotificationModel.shared.registerCrazeTappedPriceAlert(id: product.id, lastPrice: product.floatPrice)
+            LocalNotificationModel.shared.registerCrazeTappedPriceAlert(id: product.id, lastPrice: product.floatPrice, merchant: product.merchant)
             if let productViewController = presentProduct(product, atLocation: .products) {
                 productViewController.similarProducts = products
             }
@@ -486,7 +477,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         if isFavorited {
             let _ = ShoppingCartModel.shared.populateVariants(productOID: product.objectID)
             Analytics.trackProductFavorited(product: product, page: .productList)
-            LocalNotificationModel.shared.registerCrazeFavoritedPriceAlert(id: product.id, lastPrice: product.floatPrice)
+            LocalNotificationModel.shared.registerCrazeFavoritedPriceAlert(id: product.id, lastPrice: product.floatPrice, merchant: product.merchant)
         }else{
             Analytics.trackProductUnfavorited(product: product, page: .productList)
             LocalNotificationModel.shared.deregisterCrazeFavoritedPriceAlert(id: product.id)
@@ -501,7 +492,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         
         let product = self.productAtIndex(indexPath.item)
         product.recordViewedProduct()
-        LocalNotificationModel.shared.registerCrazeTappedPriceAlert(id: product.id, lastPrice: product.floatPrice)
+        LocalNotificationModel.shared.registerCrazeTappedPriceAlert(id: product.id, lastPrice: product.floatPrice, merchant: product.merchant)
 
         if let cell = collectionView?.cellForItem(at: indexPath) as? ProductsCollectionViewCell {
             self.productCollectionViewManager.burrow(cell: cell, product: product, fromVC: self)
@@ -615,6 +606,7 @@ extension ProductsViewControllerProducts{
             self.collectionView?.scrollToItem(at: IndexPath(item: 0, section: ProductsSection.product.section), at: .top, animated: false)
         }
         self.updateLoadingState()
+        
     }
 }
 
@@ -855,6 +847,7 @@ extension ProductsViewController : RelatedLooksManagerDelegate {
 extension ProductsViewController : AsyncOperationMonitorDelegate {
     func updateLoadingState(){
         DispatchQueue.mainAsyncIfNeeded {
+            var didChange = false
             let isLoading = self.loadingMonitor?.didStart ?? false
             let state:ProductsViewControllerState = {
                 if self.hasShoppables {
@@ -869,6 +862,7 @@ extension ProductsViewController : AsyncOperationMonitorDelegate {
             }()
             if state != self.screenshotLoadingState {
                 self.screenshotLoadingState = state
+                didChange = true
             }
             
             
@@ -892,8 +886,12 @@ extension ProductsViewController : AsyncOperationMonitorDelegate {
            
             if productState != self.productLoadingState {
                 self.productLoadingState = productState
+                didChange = true
             }
             
+            if didChange {
+                self.syncViewsAfterStateChange()
+            }
         }
     }
     
