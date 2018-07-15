@@ -129,7 +129,7 @@ class ProductsOptions : NSObject {
             sort = ProductsOptionsSort.all[selected]
         }
         
-        UserDefaults.standard.set(gender.rawValue, forKey: UserDefaultsKeys.productGender)
+
         UserDefaults.standard.set(size.rawValue, forKey: UserDefaultsKeys.productSize)
         UserDefaults.standard.set(sale.rawValue, forKey: UserDefaultsKeys.productSale)
         UserDefaults.standard.set(sort.rawValue, forKey: UserDefaultsKeys.productSort)
@@ -474,7 +474,7 @@ enum ProductsOptionsGender : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol 
     static let `default` = ProductsOptionsGender.auto
     
     static var globalValue: ProductsOptionsGender {
-        return ProductsOptionsGender(intValue: UserDefaults.standard.integer(forKey: UserDefaultsKeys.productGender))
+        return ProductsOptionsGender.auto
     }
     
     init(intValue: Int) {

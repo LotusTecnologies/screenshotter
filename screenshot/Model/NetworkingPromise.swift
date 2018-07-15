@@ -299,6 +299,14 @@ class NetworkingPromise : NSObject {
         params["cascadeCreate"] = true
         params["rotationRate"] = 0.99
         params["filter"] = "'displayable' == true"
+        if let genderNumber = UserDefaults.standard.value(forKey: UserDefaultsKeys.productGender) as? NSNumber
+            , let gender = ProductsOptionsGender.init(rawValue: genderNumber.intValue){
+            if gender == .female {
+                params["filter"] = "'displayable' == true AND \"female\" in 'genders'"
+            }else if gender == .male{
+                params["filter"] = "'displayable' == true AND \"male\" in 'genders'"
+            }
+        }
         params["rotationTime"] = 60*60*24*2 // 2 days rotation
         return NetworkingPromise.sharedInstance.recombeeRequest(path: "recomms/users/\(userId)/items/", method: "GET", params: params).then { (dict) -> Promise<[RecombeeRecommendation]> in
             var toReturn:[RecombeeRecommendation] = []
