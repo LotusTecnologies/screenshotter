@@ -354,6 +354,13 @@ public class AnalyticsUser : NSObject {
     let name: String?
     let email: String?
     
+    var randomSeed: UInt64{
+        if let uuid = UUID.init(uuidString: identifier ){
+            return uuid.toRandomSeed()
+        }
+        return 0
+    }
+    
     init(name: String?, email: String?) {
         self.name = name
         self.email = (email?.count ?? 0 > 0) ? email : nil
