@@ -101,7 +101,10 @@ extension TutorialNavigationController: RegisterViewControllerDelegate {
         }
         Analytics.trackOnboardingLoginSucess()
     }
-    
+    func registerViewControllerDidFacebookStarted(_ viewController: RegisterViewController) {
+        Analytics.trackOnboardingFacebookStarted(source: .onboarding)
+    }
+
     func registerViewControllerDidFacebookLogin(_ viewController: RegisterViewController) {
         let agreedToAllPermisions = (UserDefaults.standard.bool(forKey: UserDefaultsKeys.gdpr_agreedToEmail) && UserDefaults.standard.bool(forKey: UserDefaultsKeys.gdpr_agreedToImageDetection))
         if ( !agreedToAllPermisions ) {
@@ -110,13 +113,13 @@ extension TutorialNavigationController: RegisterViewControllerDelegate {
             returningUserPermissionAlert()
         }
 
-        Analytics.trackOnboardingFacebookSuccess(isReturning: true)
+        Analytics.trackOnboardingFacebookSuccess(isReturning: true, source:.onboarding)
     }
     
     func registerViewControllerDidFacebookSignup(_ viewController: RegisterViewController) {
         showProfilePage = true
         self.presentRegisterConfirmationViewController()
-        Analytics.trackOnboardingFacebookSuccess(isReturning: false)
+        Analytics.trackOnboardingFacebookSuccess(isReturning: false, source:.onboarding)
         
     }
     private func pushGDPRViewController() {
