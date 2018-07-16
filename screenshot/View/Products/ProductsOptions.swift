@@ -100,14 +100,6 @@ class ProductsOptions : NSObject {
         return viewController
     }()
     
-    func syncOptions() {
-        gender = ProductsOptionsGender.globalValue
-        size = ProductsOptionsSize.globalValue
-        sale = ProductsOptionsSale.globalValue
-        sort = ProductsOptionsSort.globalValue
-        syncOptions(with: viewController)
-    }
-    
     func syncOptions(withMask mask: ProductsOptionsMask? = nil) {
         gender = mask?.gender ?? ProductsOptionsGender.globalValue
         size = mask?.size ?? ProductsOptionsSize.globalValue
@@ -125,8 +117,6 @@ class ProductsOptions : NSObject {
     
     @objc private func continueAction() {
         let previousMask = ProductsOptionsMask(gender, size)
-//        let previousGender = gender
-//        let previousSize = size
         let previousSale = sale
         let previousSort = sort
         
@@ -145,11 +135,9 @@ class ProductsOptions : NSObject {
         UserDefaults.standard.synchronize()
         
         let maskChanged = previousMask.rawValue != ProductsOptionsMask(gender, size).rawValue
-//        let genderChanged = previousGender.rawValue != gender.rawValue
-//        let sizeChanged = previousSize.rawValue != size.rawValue
 //        let saleChanged = previousSale.rawValue != sale.rawValue
 //        let sortChanged = previousSort.rawValue != sort.rawValue
-        let changed = maskChanged //genderChanged || sizeChanged
+        let changed = maskChanged //|| saleChanged || sortChanged
         
         delegate?.productsOptionsDidComplete(self, withModelChange: changed)
         

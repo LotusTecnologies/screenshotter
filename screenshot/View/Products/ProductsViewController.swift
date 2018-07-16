@@ -505,6 +505,10 @@ extension ProductsViewControllerOptionsView: ProductsOptionsDelegate {
     @objc func presentOptions() {
         Analytics.trackOpenedFiltersView()
         
+        if let shoppable = self.getSelectedShoppable() {
+            self.productsOptions.syncOptions(withMask: shoppable.getLast())
+        }
+        
         present(self.productsOptions.viewController, animated: true)
     }
     
@@ -516,12 +520,6 @@ extension ProductsViewControllerOptionsView: ProductsOptionsDelegate {
         self.products = []
         self.relatedLooksManager.relatedLooks = nil
         self.collectionView?.reloadData()
-    }
-    
-    func d() {
-        if let shoppable = self.getSelectedShoppable() {
-            self.productsOptions.syncOptions(withMask: shoppable.getLast())
-        }
     }
     
     func productsOptionsDidComplete(_ productsOptions: ProductsOptions, withModelChange changed: Bool) {
