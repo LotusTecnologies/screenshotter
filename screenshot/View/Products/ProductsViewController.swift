@@ -518,6 +518,12 @@ extension ProductsViewControllerOptionsView: ProductsOptionsDelegate {
         self.collectionView?.reloadData()
     }
     
+    func d() {
+        if let shoppable = self.getSelectedShoppable() {
+            self.productsOptions.syncOptions(withMask: shoppable.getLast())
+        }
+    }
+    
     func productsOptionsDidComplete(_ productsOptions: ProductsOptions, withModelChange changed: Bool) {
         self.productsOptions = productsOptions
         if changed, let shoppable = self.getSelectedShoppable(){
