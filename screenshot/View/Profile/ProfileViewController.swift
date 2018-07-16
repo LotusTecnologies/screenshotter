@@ -260,16 +260,25 @@ class ProfileViewController: BaseTableViewController {
     
     @objc private func facebookLoginAction(_ button: FacebookButton) {
         // TODO: analytics
-        
         button.isLoading = true
         button.isUserInteractionEnabled = false
-        
+        Analytics.trackOnboardingFacebookStarted(source:.profileShortcutButton)
+
         UserAccountManager.shared.loginWithFacebook()
             .then { result -> Void in
                 self.syncLoggedIn()
+                let isExistingUser = (result == .facebookOld)
+                
+                if isExistingUser {
+                    Analytics.trackOnboardingFacebookSuccess(isReturning: true, source:.profileShortcutButton)
+                } else {
+                    Analytics.trackOnboardingFacebookSuccess(isReturning: true, source:.profileShortcutButton)
+                }
+
             }
             .catch { error in
                 let e = error as NSError
+                Analytics.trackOnboardingError(domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
 
                 if !UserAccountManager.shared.isIgnorableFacebookError(error: e) {
                     let alert = UserAccountManager.shared.alertViewForUndefinedError(error: e, viewController: self)
@@ -377,15 +386,20 @@ extension ProfileViewController : RegisterViewControllerDelegate, ConfirmCodeVie
         self.dismiss(animated: true, completion: nil)
         self.didLogin()
     }
+    func registerViewControllerDidFacebookStarted(_ viewController: RegisterViewController) {
+        Analytics.trackOnboardingFacebookStarted(source: .profileLoginPage)
+    }
     
     func registerViewControllerDidFacebookLogin(_ viewController: RegisterViewController) {
         self.dismiss(animated: true, completion: nil)
         self.didLogin()
+        Analytics.trackOnboardingFacebookSuccess(isReturning: true, source: .profileLoginPage)
     }
     
     func registerViewControllerDidFacebookSignup(_ viewController: RegisterViewController) {
         self.dismiss(animated: true, completion: nil)
         self.didLogin()
+        Analytics.trackOnboardingFacebookSuccess(isReturning: true, source: .profileLoginPage)
     }
 }
 
