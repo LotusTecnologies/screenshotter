@@ -35,6 +35,7 @@ class UserDefaultsKeys  {
     // Favorites
     static let uninformedFavoritesCount = "UninformedFavoritesCount"
     static let hasFavorited = "HasFavorited"
+    static let favoritesDismissedNotification = "FavoritesDismissedNotification"
 
     // Product
     static let productGender = "ProductGender"

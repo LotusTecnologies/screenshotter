@@ -160,6 +160,7 @@
 		C53B46581FBC3DFA00A8C886 /* NotificationCenterKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53B46571FBC3DFA00A8C886 /* NotificationCenterKeys.swift */; };
 		C53B465E1FBC685D00A8C886 /* EnvironmentHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53B465D1FBC685D00A8C886 /* EnvironmentHelper.swift */; };
 		C54124C220A8308600CA03DB /* AccumulatorModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54124C120A8308600CA03DB /* AccumulatorModel.swift */; };
+		C547068C20FC6085003BD1D1 /* FavoriteNotificationTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C547068B20FC6084003BD1D1 /* FavoriteNotificationTableViewCell.swift */; };
 		C553563C1F8369DF00849E64 /* DeviceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C553563B1F8369DE00849E64 /* DeviceHelper.swift */; };
 		C5709E451FC57B4500AB2D04 /* EnumProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5709E441FC57B4500AB2D04 /* EnumProtocol.swift */; };
 		C572FEFE205C00070046BFEB /* Hind-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C572FEF9205C00050046BFEB /* Hind-Light.ttf */; };
@@ -443,6 +444,7 @@
 		C53B46571FBC3DFA00A8C886 /* NotificationCenterKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationCenterKeys.swift; sourceTree = "<group>"; };
 		C53B465D1FBC685D00A8C886 /* EnvironmentHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnvironmentHelper.swift; sourceTree = "<group>"; };
 		C54124C120A8308600CA03DB /* AccumulatorModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccumulatorModel.swift; sourceTree = "<group>"; };
+		C547068B20FC6084003BD1D1 /* FavoriteNotificationTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FavoriteNotificationTableViewCell.swift; sourceTree = "<group>"; };
 		C553563B1F8369DE00849E64 /* DeviceHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceHelper.swift; sourceTree = "<group>"; };
 		C5709E441FC57B4500AB2D04 /* EnumProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnumProtocol.swift; sourceTree = "<group>"; };
 		C572FEF9205C00050046BFEB /* Hind-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Hind-Light.ttf"; sourceTree = "<group>"; };
@@ -757,10 +759,11 @@
 			isa = PBXGroup;
 			children = (
 				311A4F9A20D90B750001D463 /* FavoriteControl.swift */,
-				311A4F9B20D90B750001D463 /* FavoritesNavigationController.swift */,
+				C547068B20FC6084003BD1D1 /* FavoriteNotificationTableViewCell.swift */,
 				311A4F9C20D90B750001D463 /* FavoriteProductsTableViewCell.swift */,
 				311A4F9D20D90B750001D463 /* FavoriteProductsViewController.swift */,
 				311A4F9E20D90B750001D463 /* FavoriteProductsView.swift */,
+				311A4F9B20D90B750001D463 /* FavoritesNavigationController.swift */,
 			);
 			path = Favorite;
 			sourceTree = "<group>";
@@ -1710,6 +1713,7 @@
 				311A506720D90B780001D463 /* ScreenshotsHelperView.swift in Sources */,
 				311A505720D90B780001D463 /* ProductsRateView.swift in Sources */,
 				316C831420C3AEBD0012A908 /* Variant+craze.swift in Sources */,
+				C547068C20FC6085003BD1D1 /* FavoriteNotificationTableViewCell.swift in Sources */,
 				C58BAE6520E101DD0051394A /* BorderView.swift in Sources */,
 				C58BAE5E20E101DD0051394A /* SegmentedDropDownControl.swift in Sources */,
 				311A503D20D90B780001D463 /* CheckoutOrderItemTableViewCell.swift in Sources */,

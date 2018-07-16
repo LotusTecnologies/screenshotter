@@ -49,11 +49,21 @@ extension CGFloat {
         }
     }
     
+    private static func space(_ baseSpace: CGFloat) -> CGFloat {
+        return y(is480h: baseSpace, is568h: baseSpace * 1.2, is667h: baseSpace * 1.4, isGreater: baseSpace * 1.6)
+    }
+    
     static let containerPaddingX = x(is320w: 20, is375w: 28, isGreater: 32)
     static let containerPaddingY = y(is480h: 20, is568h: 24, is667h: 28, isGreater: 32)
     
     static let marginX = x(is320w: 10, is375w: 16, isGreater: 22)
     static let marginY = y(is480h: 10, is568h: 12, is667h: 16, isGreater: 22)
+    
+    static let space1 = space(10)
+    static let space2 = space(15)
+    static let space3 = space(20)
+    static let space4 = space(25)
+    static let space5 = space(30)
     
     static let halfPoint: CGFloat = UIScreen.main.scale > 1 ? 0.5 : 1
     

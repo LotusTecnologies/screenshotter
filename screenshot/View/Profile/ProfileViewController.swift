@@ -176,14 +176,14 @@ class ProfileViewController: BaseTableViewController {
     }
     
     @objc private func applicationDidBecomeActive(_ notification: Notification) {
-        if view?.window != nil {
+        if isViewLoaded && view?.window != nil {
             // Use did become active since the permissions values can change through an alert view
             reloadChangeableIndexPaths()
         }
     }
     
     @objc private func applicationWillEnterForeground(_ notification: Notification) {
-        if view?.window != nil {
+        if isViewLoaded && view?.window != nil {
             reloadChangeableIndexPaths()
         }
     }

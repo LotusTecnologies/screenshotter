@@ -8,13 +8,25 @@
 
 import Foundation
 
+/* Example:
+ 
+ enum Section: Int {
+    case firstSection
+    case secondSection
+ }
+ 
+ enum Row: Int {
+    case firstRow
+    case secondRow
+ }
+ 
+ let dataSource = DataSource<Section, Row>(data: [:])
+ 
+ */
+
 /// The section enum must maintain its order.
 class DataSource<S: RawRepresentable & Hashable, R: RawRepresentable> where S.RawValue == Int, R.RawValue == Int {
     private var data: [(section: S, rows: [R])] = []
-    
-    var count: Int {
-        return data.count
-    }
     
     init(data: [S: [R]]) {
         data.forEach { (section, rows) in
@@ -22,8 +34,18 @@ class DataSource<S: RawRepresentable & Hashable, R: RawRepresentable> where S.Ra
         }
     }
     
+    // MARK: Section
+    
+    var count: Int {
+        return data.count
+    }
+    
+    private func sectionIndex(_ section: S) -> Int? {
+        return data.index(where: { $0.section == section })
+    }
+    
     func addSection(_ section: S, rows: [R]) {
-        guard !data.contains(where: { $0.section == section }) else {
+        guard sectionIndex(section) == nil else {
             return
         }
         data.insert((section, rows), at: 0)
@@ -31,21 +53,16 @@ class DataSource<S: RawRepresentable & Hashable, R: RawRepresentable> where S.Ra
     }
     
     func removeSection(_ section: S) {
-        let index = data.index { (_section, rows) -> Bool in
-            return _section == section
-        }
-        if let index = index {
+        if let index = sectionIndex(section) {
             data.remove(at: index)
         }
     }
     
-    func indexPath(row: R, section: S) -> IndexPath? {
-        guard let sectionIndex = data.index(where: { $0.section == section }),
-            let rowIndex = data[sectionIndex].rows.index(where: { $0 == row })
-            else {
-                return nil
+    func updateSection(_ section: S, rows: [R]) {
+        guard let sectionIndex = sectionIndex(section) else {
+            return
         }
-        return IndexPath(row: rowIndex, section: sectionIndex)
+        data[sectionIndex].rows = rows
     }
     
     func section(_ sectionIndex: Int) -> S? {
@@ -54,6 +71,8 @@ class DataSource<S: RawRepresentable & Hashable, R: RawRepresentable> where S.Ra
         }
         return data[sectionIndex].section
     }
+    
+    // MARK: Row
     
     func rows(_ sectionIndex: Int) -> [R]? {
         guard data.count > sectionIndex else {
@@ -71,5 +90,16 @@ class DataSource<S: RawRepresentable & Hashable, R: RawRepresentable> where S.Ra
             return nil
         }
         return rows[indexPath.row]
+    }
+    
+    // MARK: Index Path
+    
+    func indexPath(row: R, section: S) -> IndexPath? {
+        guard let sectionIndex = sectionIndex(section),
+            let rowIndex = data[sectionIndex].rows.index(where: { $0 == row })
+            else {
+                return nil
+        }
+        return IndexPath(row: rowIndex, section: sectionIndex)
     }
 }
