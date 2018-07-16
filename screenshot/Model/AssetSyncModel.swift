@@ -16,7 +16,6 @@ class AssetSyncModel: NSObject {
     
     public static let sharedInstance = AssetSyncModel()
     public weak var networkingIndicatorDelegate: NetworkingIndicatorProtocol?
-    public weak var screenshotDetectionDelegate: ScreenshotDetectionProtocol?
     let serialQ = DispatchQueue(label: "io.crazeapp.screenshot.syncPhotos.serial")
     let processingQ = DispatchQueue.global(qos: .default) // .utility // DispatchQueue(label: "io.crazeapp.screenshot.syncPhotos.processing")
     var foregroundScreenshotAssetIds = Set<String>()
@@ -467,6 +466,9 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
     func uploadScreenshotWithClarifaiFromUserScreenshotAction(asset: PHAsset) {
         let isForeground = self.foregroundScreenshotAssetIds.contains(asset.localIdentifier)
         self.foregroundScreenshotAssetIds.remove(asset.localIdentifier)
+        guard !isForeground else {
+            return
+        }
         var imageData: Data?
         self.uploadScreenshotWithClarifaiQueueFromUserScreenshot.addOperation(AsyncOperation.init(timeout: 20.0,  assetId: asset.localIdentifier, shoppableId: nil, completion: { (completeOperation) in
             asset.image(allowFromICloud: false).then (on: self.processingQ) { image -> Promise<(String, [[String : Any]])> in
@@ -486,7 +488,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                                 let error = NSError.init(domain: "Craze", code: -90, userInfo: [NSLocalizedDescriptionKey:"already have screenshot in database"])
                                 reject(error)
                             }else{
-                                let isHidden = ( !isRecognized || !isForeground)
+                                let isHidden = !isRecognized
                                 let syteJsonString = NetworkingPromise.sharedInstance.jsonStringify(object: syteJson)
                                 let _ = DataModel.sharedInstance.saveScreenshot(upsert: false,
                                                                                 managedObjectContext: managedObjectContext,
@@ -507,20 +509,14 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                         
                     }
                 }.then (on: self.processingQ) { imageData, gottenUploadedURLString, gottenSegments -> Void in
-                    if isForeground { // Screenshot taken while app in foregorund
+                    // Screenshot taken while app in background (or killed)
+                    AccumulatorModel.screenshot.addAssetId(asset.localIdentifier)
+                    AccumulatorModel.screenshotUninformed.incrementUninformedCount()
+                    if  ApplicationStateModel.sharedInstance.isBackground() {
                         DispatchQueue.main.async {
-                            self.screenshotDetectionDelegate?.foregroundScreenshotTaken(assetId: asset.localIdentifier)
-                        }
-                        self.syteProcessing(imageData: imageData, orImageUrlString:nil, assetId: asset.localIdentifier, optionsMask: ProductsOptionsMask.global, gottenUploadedURLString: gottenUploadedURLString, gottenSegments: gottenSegments)
-                    } else { // Screenshot taken while app in background (or killed)
-                        AccumulatorModel.screenshot.addAssetId(asset.localIdentifier)
-                        AccumulatorModel.screenshotUninformed.incrementUninformedCount()
-                        if  ApplicationStateModel.sharedInstance.isBackground() {
-                            DispatchQueue.main.async {
-                                // The accumulator updates the count in an async block.
-                                // Without a delay the count is wrong when setting the content.badge.
-                                LocalNotificationModel.shared.sendScreenshotAddedLocalNotification(assetId: asset.localIdentifier, imageData: imageData)
-                            }
+                            // The accumulator updates the count in an async block.
+                            // Without a delay the count is wrong when setting the content.badge.
+                            LocalNotificationModel.shared.sendScreenshotAddedLocalNotification(assetId: asset.localIdentifier, imageData: imageData)
                         }
                     }
                 }.catch { error in

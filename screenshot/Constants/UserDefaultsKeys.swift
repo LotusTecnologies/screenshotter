@@ -30,6 +30,7 @@ class UserDefaultsKeys  {
     static let newScreenshotsCount = "NewScreenshotsCount"
     static let newScreenshotsAssetIds = "NewScreenshotsAssetIds"
     static let uninformedScreenshotsCount = "UninformedScreenshotsCount"
+    static let screenshottingPresentedScreenshotAlert = "ScreenshottingPresentedScreenshotAlert"
     
     // Favorites
     static let uninformedFavoritesCount = "UninformedFavoritesCount"
@@ -42,6 +43,7 @@ class UserDefaultsKeys  {
     static let productSort = "ProductSort"
     static let productCurrency = "ProductCurrency"
     static let productCategory = "ProductCategory"
+    static let screenshottingPresentedProductAlert = "ScreenshottingPresentedProductAlert"
     
     static let openWebPage = "OpenProductPageInSetting"  //open in safari, SFSafiriViewController, chrome, etc
     
@@ -76,9 +78,10 @@ class UserDefaultsKeys  {
     
     // Discover
     static let discoverScreenshotPresentedHelper = "discoverScreenshotPresentedHelper"
+    static let screenshottingPresentedDiscoverAlert = "ScreenshottingPresentedDiscoverAlert"
     static let discoverCurrentIndex = "discoverCurrentIndex"
     static let discoverDontFilter = "discoverDontFilter"
-
+    
     // Game
     @available(*, deprecated)
     static let gameScore = "GameScore"
