@@ -129,7 +129,7 @@ class ProductsOptions : NSObject {
             sort = ProductsOptionsSort.all[selected]
         }
         
-        UserDefaults.standard.set(gender.rawValue, forKey: UserDefaultsKeys.productGender)
+
         UserDefaults.standard.set(size.rawValue, forKey: UserDefaultsKeys.productSize)
         UserDefaults.standard.set(sale.rawValue, forKey: UserDefaultsKeys.productSale)
         UserDefaults.standard.set(sort.rawValue, forKey: UserDefaultsKeys.productSort)
@@ -470,11 +470,12 @@ enum ProductsOptionsGender : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol 
     case female = 1
     case male
     case auto
+    case galGadot
     
     static let `default` = ProductsOptionsGender.auto
     
     static var globalValue: ProductsOptionsGender {
-        return ProductsOptionsGender(intValue: UserDefaults.standard.integer(forKey: UserDefaultsKeys.productGender))
+        return ProductsOptionsGender.auto
     }
     
     init(intValue: Int) {
@@ -500,6 +501,8 @@ enum ProductsOptionsGender : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol 
         case .female: string = "products.options.gender.female".localized
         case .male: string = "products.options.gender.male".localized
         case .auto: string = "products.options.gender.auto".localized
+        case .galGadot: string = "Gal Gadot"
+
         }
         
         return string
@@ -509,6 +512,8 @@ enum ProductsOptionsGender : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol 
         case .female: return "female";
         case .male: return "male";
         case .auto: return "auto";
+        case .galGadot: return "galGadot";
+
         }
     }
 }

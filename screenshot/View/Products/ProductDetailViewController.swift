@@ -87,9 +87,30 @@ class ProductDetailViewController: BaseViewController {
         
         let pinchZoom = UIPinchGestureRecognizer.init(target: self, action: #selector(pinch(gesture:)))
         self.view.addGestureRecognizer(pinchZoom)
+
         
     }
+    func collectionView(_ collectionView: UICollectionView, shouldShowMenuForItemAt indexPath: IndexPath) -> Bool {
+        if let cell = collectionView.cellForItem(at: indexPath){
+            if let cell = cell as? ProductsCollectionViewCell, let imageView = cell.productImageView {
+                let product = self.productAtIndex(indexPath.item)
+                self.recoverLostSaleManager.presetRecoverAlertViewFor(product: product, in: self, rect: imageView.bounds, view: imageView, timeSinceLeftApp: nil, reason: .longPress)
+                return true
+            }else if let cell = cell as? ProductHeaderCollectionViewCell, let product = self.product {
+                let imageView = cell.productImageView.imageView
+                self.recoverLostSaleManager.presetRecoverAlertViewFor(product: product, in: self, rect: imageView.bounds, view: imageView, timeSinceLeftApp: nil, reason: .longPress)
+            }
+        }
+        return false
+    }
+    func collectionView(_ collectionView: UICollectionView, canPerformAction action: Selector, forItemAt indexPath: IndexPath, withSender sender: Any?) -> Bool {
+        return false
+    }
     
+    func collectionView(_ collectionView: UICollectionView, performAction action: Selector, forItemAt indexPath: IndexPath, withSender sender: Any?) {
+        
+    }
+
     @objc func pinch( gesture:UIPinchGestureRecognizer) {
         if CrazeImageZoom.shared.isHandlingGesture, let imageView = CrazeImageZoom.shared.hostedImageView  {
             CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: imageView)
@@ -262,7 +283,7 @@ extension ProductDetailViewController : UICollectionViewDelegateFlowLayout, UICo
             let product = self.productAtIndex(indexPath.item)
             product.recordViewedProduct()
             self.recoverLostSaleManager.didClick(on: product)
-            LocalNotificationModel.shared.registerCrazeTappedPriceAlert(id: product.id, lastPrice: product.floatPrice)
+            LocalNotificationModel.shared.registerCrazeTappedPriceAlert(id: product.id, merchant: product.merchant, lastPrice: product.floatPrice)
             if let productViewController = presentProduct(product, atLocation: .burrowList) {
                 productViewController.similarProducts = products
             }
@@ -293,10 +314,10 @@ extension ProductDetailViewController : UICollectionViewDelegateFlowLayout, UICo
             if isFavorited {
                 let _ = ShoppingCartModel.shared.populateVariants(productOID: product.objectID)
                 Analytics.trackProductFavorited(product: product, page: .productList)
-                LocalNotificationModel.shared.registerCrazeFavoritedPriceAlert(id: product.id, lastPrice: product.floatPrice)
+                LocalNotificationModel.shared.registerCrazeFavoritedPriceAlert(id: product.id, merchant: product.merchant, lastPrice: product.floatPrice)
             }else{
                 Analytics.trackProductUnfavorited(product: product, page: .productList)
-                LocalNotificationModel.shared.deregisterCrazeFavoritedPriceAlert(id: product.id)
+                LocalNotificationModel.shared.deregisterCrazeFavoritedPriceAlert(id: product.id, merchant: product.merchant)
             }
         }
     }
@@ -484,18 +505,17 @@ extension ProductDetailViewController: RelatedLooksManagerDelegate {
     
 }
 
-
 extension ProductDetailViewController: RecoverLostSaleManagerDelegate {
-    func recoverLostSaleManager(_ manager:RecoverLostSaleManager, returnedFrom product:Product){
+    func recoverLostSaleManager(_ manager: RecoverLostSaleManager, returnedFrom product: Product, timeSinceLeftApp: Int) {
         if product == self.product {
             if let cell = self.collectionView?.cellForItem(at: IndexPath.init(row: 0, section: 0)) as? ProductHeaderCollectionViewCell {
                 let view = cell.productImageView
-                self.recoverLostSaleManager.presetRecoverAlertViewFor(product: product, in: self, rect: view.bounds, view:view)
+                self.recoverLostSaleManager.presetRecoverAlertViewFor(product: product, in: self, rect: view.bounds, view:view, timeSinceLeftApp:timeSinceLeftApp, reason: .returnedFromProductLink)
             }
         }else {
             if let index = self.products.index(of: product) {
                 if let cell = self.collectionView?.cellForItem(at: IndexPath.init(row: index, section: 1)) as? ProductsCollectionViewCell, let view = cell.productImageView{
-                    self.recoverLostSaleManager.presetRecoverAlertViewFor(product: product, in: self, rect: view.bounds.insetBy(dx: 20, dy: 20), view:view)
+                    self.recoverLostSaleManager.presetRecoverAlertViewFor(product: product, in: self, rect: view.bounds, view:view, timeSinceLeftApp:timeSinceLeftApp, reason: .returnedFromProductLink)
                 }
             }
         }

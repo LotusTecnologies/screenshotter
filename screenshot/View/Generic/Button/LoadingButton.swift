@@ -9,7 +9,7 @@
 import UIKit
 
 class LoadingButton: UIButton {
-    var isLoading = Bool() {
+    var isLoading = false {
         didSet {
             if isLoading {
                 imageView?.isHidden = true

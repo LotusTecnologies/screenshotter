@@ -10,74 +10,59 @@ import Foundation
 import CoreData
 
 extension Matchstick {
-    
-    public func add(callback: ((_ screenshot: Screenshot) -> Void)? = nil) {
-        let managedObjectID = self.objectID
-        let dataModel = DataModel.sharedInstance
-        dataModel.performBackgroundTask { (managedObjectContext) in
-            if let matchstick = managedObjectContext.object(with: managedObjectID) as? Matchstick,
-                let assetId = matchstick.remoteId,
-                let uploadedImageURL = matchstick.imageUrl {
-                
-                let addedScreenshot = dataModel.saveScreenshot(upsert:true,
-                                                               managedObjectContext: managedObjectContext,
-                                                               assetId: assetId,
-                                                               createdAt: Date(),
-                                                               isRecognized: true,
-                                                               source: .discover,
-                                                               isHidden: false,
-                                                               imageData: matchstick.imageData as Data?,
-                                                               uploadedImageURL: uploadedImageURL,
-                                                               syteJsonString: nil)
-                addedScreenshot.trackingInfo = matchstick.trackingInfo
-                if callback == nil {
-                    managedObjectContext.delete(matchstick)
-                }
-                managedObjectContext.saveIfNeeded()
+    static func predicateForDisplayingMatchstick() -> NSPredicate {
+        return NSPredicate.init(format: "isDisplaying == true")
+    }
+    static func predicateForQueuedMatchstick() -> NSPredicate {
+        return NSPredicate.init(format: "dateSkipped = nil AND was404 != true AND wasAdded != true AND isDisplaying != true")
+    }
 
-                AssetSyncModel.sharedInstance.syteProcessing(imageData: nil, orImageUrlString: uploadedImageURL, assetId: assetId, optionsMask: ProductsOptionsMask.global)
-                    
-                DispatchQueue.main.async {
-                    AccumulatorModel.screenshotUninformed.incrementUninformedCount()
-                }
-                
-                if let callback = callback {
-                    let addedScreenshotOID = addedScreenshot.objectID
-                    DispatchQueue.main.async {
-                        if let mainScreenshot = dataModel.mainMoc().object(with: addedScreenshotOID) as? Screenshot {
-                            callback(mainScreenshot)
-                        }
-                    }
-                }
-                if callback == nil,
-                    dataModel.isNextMatchsticksNeeded(matchstickCount: dataModel.countMatchsticks(managedObjectContext: managedObjectContext)) {
-                    MatchstickModel.shared.fetchNextIfBelowWatermark()
-                }
-            } else {
-                print("matchstick add managedObjectID:\(managedObjectID) not found")
+    static var skipRotationTime:TimeInterval = 7*24*60*60  // 1 week
+    static var displayingSize = 2
+    static var queueSize = 30  //Must have at least this ammount  - if not grab random numbers
+    static var recombeeQueueSize = 20  // want to have this amount of recombee recommendations
+    static var recombeeQueueLowMark = 10 // if less than this amount make request for recombee recomendations (recombeeQueueSize - current)
+
+    var isInGarbage:Bool {
+        if self.wasAdded || self.was404 {
+            return true
+        }else if let date = self.dateSkipped {
+            if abs(date.timeIntervalSinceNow) < Matchstick.skipRotationTime {
+                return true                
             }
         }
+        return false
+    }
+  
+    public func add(callback: ((_ screenshot: Screenshot) -> Void)? = nil) {
+        DiscoverManager.shared.didAdd(self, callback:callback)
     }
     
     public func pass() {
-        let managedObjectID = self.objectID
-        let dataModel = DataModel.sharedInstance
-        dataModel.performBackgroundTask { (managedObjectContext) in
-            do {
-                if let matchstick = managedObjectContext.object(with: managedObjectID) as? Matchstick {
-                    managedObjectContext.delete(matchstick)
-                    try managedObjectContext.save()
-                    if dataModel.isNextMatchsticksNeeded(matchstickCount: dataModel.countMatchsticks(managedObjectContext: managedObjectContext)) {
-                        MatchstickModel.shared.fetchNextIfBelowWatermark()
-                    }
-                } else {
-                    print("matchstick pass managedObjectID:\(managedObjectID) not found")
-                }
-            } catch {
-                DataModel.sharedInstance.receivedCoreDataError(error: error)
-                print("matchstick pass managedObjectID:\(managedObjectID) results with error:\(error)")
-            }
-        }
+        DiscoverManager.shared.didSkip(self)
+    }
+    public func delayedAdd(){
+        DiscoverManager.shared.didDelayedAdd(self)
     }
     
+    static func lookupWith(remoteIds:[String], in context:NSManagedObjectContext) -> [String:Matchstick]{
+        let fetchRequest: NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "remoteId IN %@", remoteIds)
+        fetchRequest.sortDescriptors = nil
+        var matchstickLookup:[String:Matchstick] = [:]
+        if let results = try? context.fetch(fetchRequest) {
+            results.forEach { if let remoteId = $0.remoteId { matchstickLookup[remoteId] = $0  } }
+        }
+        return matchstickLookup
+    }
+    
+    static func with( imageUrl:String, in context:NSManagedObjectContext) -> Matchstick?{
+        let fetchRequest: NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "imageUrl == %@", imageUrl)
+        fetchRequest.sortDescriptors = nil
+        if let results = try? context.fetch(fetchRequest), let matchstick = results.first {
+            return matchstick
+        }
+        return nil
+    }
 }

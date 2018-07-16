@@ -7,15 +7,56 @@
 //
 
 import UIKit
+import GameKit
 
 class RecoveryLostSalePopupViewController: UIViewController {
 
+    struct ABTest {
+        var backgroundColor:UIColor
+        var foregroundColor:UIColor
+        var headlineText:String
+        var buttonText:String
+        
+        init(seed:UInt64) {
+            backgroundColor = .crazeRed
+            foregroundColor = .white
+            
+            let colorsRandomSource = GKMersenneTwisterRandomSource()
+            colorsRandomSource.seed = seed
+            let randomColorNumber = GKRandomDistribution(randomSource: colorsRandomSource, lowestValue: 0, highestValue: 2).nextInt()
+            if randomColorNumber == 0 {
+                backgroundColor = .crazeRed
+                foregroundColor = .white
+            }else if randomColorNumber == 1 {
+                backgroundColor = .white
+                foregroundColor = .black
+            }else{
+                backgroundColor = .crazeGreen
+                foregroundColor = .white
+            }
+            
+            let headlineRandomSource = GKMersenneTwisterRandomSource()
+            headlineRandomSource.seed = seed + 1
+            let randomHeadlineNumber = GKRandomDistribution(randomSource: colorsRandomSource, lowestValue: 1, highestValue: 4).nextInt()
+            headlineText = "product.sale_recovery.alert.message_\(randomHeadlineNumber)".localized
+
+            let buttonTextRandomSource = GKMersenneTwisterRandomSource()
+            buttonTextRandomSource.seed = seed + 2
+            let buttonTextNumber = GKRandomDistribution(randomSource: colorsRandomSource, lowestValue: 1, highestValue: 4).nextInt()
+            buttonText = "product.sale_recovery.alert.email_me_\(buttonTextNumber)".localized
+
+            
+        }
+    }
+    
+    let abTest:ABTest
     let emailProductBlock:(()->())
     let dismissBlock:(()->())
 
-    init(emailProductAction:@escaping(()->()),dismissAction:@escaping (()->()) ) {
+    init(abTest:ABTest, emailProductAction:@escaping(()->()),dismissAction:@escaping (()->()) ) {
         self.emailProductBlock = emailProductAction
         self.dismissBlock = dismissAction
+        self.abTest = abTest
         super.init(nibName: nil, bundle: nil)
         
     }
@@ -26,28 +67,31 @@ class RecoveryLostSalePopupViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.view.backgroundColor = .crazeRed
+        self.view.backgroundColor = self.abTest.backgroundColor
         
         
         let titleLabel = UILabel.init()
-        titleLabel.textColor = .white
-        titleLabel.text = "product.sale_recovery.alert.message".localized
+        titleLabel.textColor = self.abTest.foregroundColor
+        titleLabel.text = self.abTest.headlineText
         titleLabel.font = UIFont.screenshopFont(.quicksandMedium, size: 18.0)
+        titleLabel.minimumScaleFactor = 0.3
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.textAlignment = .center
         titleLabel.numberOfLines = 0
+        titleLabel.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
+        titleLabel.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
         view.addSubview(titleLabel)
         titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: .padding).isActive = true
-        titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: .extendedPadding).isActive = true
-        titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -.extendedPadding).isActive = true
+        titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: .padding).isActive = true
+        titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -.padding).isActive = true
 
         let emailProductButton = UIButton.init(type: .custom)
-        emailProductButton.setTitle("product.sale_recovery.alert.email_me".localized, for: .normal)
+        emailProductButton.setTitle(self.abTest.buttonText, for: .normal)
         emailProductButton.backgroundColor = .clear
-        emailProductButton.titleLabel?.textColor = .white
+        emailProductButton.setTitleColor(self.abTest.foregroundColor, for: .normal)
         emailProductButton.contentEdgeInsets = UIEdgeInsetsMake(10, 10, 10, 10)
         emailProductButton.setContentCompressionResistancePriority(.required, for: .vertical)
-        emailProductButton.layer.borderColor = UIColor.white.cgColor
+        emailProductButton.layer.borderColor = self.abTest.foregroundColor.cgColor
         emailProductButton.titleLabel?.font = UIFont.screenshopFont(.quicksandBold, size: 18.0)
         emailProductButton.layer.borderWidth = 1.0
         emailProductButton.layer.cornerRadius = 5.0
@@ -60,11 +104,11 @@ class RecoveryLostSalePopupViewController: UIViewController {
 
 
         let dismissButton = UIButton.init(type: .custom)
-        let string = NSAttributedString.init(string: "product.sale_recovery.alert.dissmis".localized, attributes: [.underlineStyle:NSUnderlineStyle.styleSingle.rawValue, .underlineColor: UIColor.white, .foregroundColor:UIColor.white, .font: UIFont.screenshopFont(.quicksand, size: 18.0)])
+        let string = NSAttributedString.init(string: "product.sale_recovery.alert.dissmis".localized, attributes: [.underlineStyle:NSUnderlineStyle.styleSingle.rawValue, .underlineColor: abTest.foregroundColor, .foregroundColor: abTest.foregroundColor, .font: UIFont.screenshopFont(.quicksand, size: 18.0)])
         dismissButton.setAttributedTitle(string, for: .normal)
         dismissButton.backgroundColor = .clear
         dismissButton.addTarget(self, action: #selector(dissmissAction(_ :)), for: .touchUpInside)
-        dismissButton.titleLabel?.textColor = .white
+        dismissButton.titleLabel?.textColor = abTest.foregroundColor
         dismissButton.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(dismissButton)
         dismissButton.topAnchor.constraint(equalTo: emailProductButton.bottomAnchor, constant: .padding).isActive = true
@@ -75,7 +119,12 @@ class RecoveryLostSalePopupViewController: UIViewController {
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        let size = self.view.systemLayoutSizeFitting(UILayoutFittingCompressedSize, withHorizontalFittingPriority: .defaultLow, verticalFittingPriority: .defaultHigh)
+        var size = self.view.systemLayoutSizeFitting(UILayoutFittingCompressedSize, withHorizontalFittingPriority: .defaultLow, verticalFittingPriority: .defaultHigh)
+        let minWidth = UIScreen.main.bounds.size.width * 0.9
+        if size.width < minWidth {
+            size.width = minWidth
+        }
+
         self.preferredContentSize = size
     }
 

@@ -13,6 +13,7 @@ protocol RegisterViewControllerDelegate: NSObjectProtocol {
     func registerViewControllerDidSkip(_ viewController: RegisterViewController)
     func registerViewControllerDidCreateAccount(_ viewController: RegisterViewController)
     func registerViewControllerDidSignin(_ viewController: RegisterViewController)
+    func registerViewControllerDidFacebookStarted(_ viewController: RegisterViewController)
     func registerViewControllerDidFacebookLogin(_ viewController: RegisterViewController)
     func registerViewControllerDidFacebookSignup(_ viewController: RegisterViewController)
 }
@@ -479,7 +480,7 @@ class RegisterViewController: UIViewController {
     // MARK: Facebook
     
     @objc fileprivate func facebookLoginAction() {
-        Analytics.trackOnboardingFacebookStarted()
+        self.delegate?.registerViewControllerDidFacebookSignup(self)
         self.continueButton.isUserInteractionEnabled = false
         self.skipButton.isUserInteractionEnabled = false
         self.facebookLoginButton.isUserInteractionEnabled = false

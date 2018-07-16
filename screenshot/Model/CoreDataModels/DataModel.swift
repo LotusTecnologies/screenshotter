@@ -1,4 +1,4 @@
-//
+//&& //
 //  DataModel.swift
 //  screenshot
 //
@@ -94,7 +94,7 @@ class DataModel: NSObject {
                         self.postDbMigration(from: lastDbVersionMigrated, to: Constants.currentMomVersion, container: self.persistentContainer)
                         UserDefaults.standard.set(Constants.currentMomVersion, forKey: UserDefaultsKeys.lastDbVersionMigrated)
                     }
-                    MatchstickModel.shared.prepareMatchsticks()
+                    DiscoverManager.shared.discoverViewDidAppear() //make sure some stuff is there when the user arrives
                     self.dbQ.isSuspended = false
                     
                     fulfill(true)
@@ -559,8 +559,8 @@ extension DataModel {
         return Promise { fulfill, reject in
             self.performBackgroundTask { managedObjectContext in
                 let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
-                let twoDaysAgo = NSDate(timeIntervalSinceNow: -2 * Constants.secondsInDay)
-                fetchRequest.predicate = NSPredicate(format: "isFavorite == FALSE AND inNotif == FALSE AND imageURL != nil AND dateViewed > %@", twoDaysAgo)
+                let aMonthAgo = NSDate(timeIntervalSinceNow: -30 * Constants.secondsInDay)
+                fetchRequest.predicate = NSPredicate(format: "isFavorite == FALSE AND inNotif == FALSE AND imageURL != nil AND dateViewed > %@", aMonthAgo)
                 fetchRequest.sortDescriptors = [NSSortDescriptor(key: "dateViewed", ascending: false)]
                 fetchRequest.fetchLimit = 1
                 
@@ -896,12 +896,20 @@ extension DataModel {
     func saveMatchstick(managedObjectContext: NSManagedObjectContext,
                         remoteId: String,
                         imageUrl: String,
-                        syteJson: String,
-                        trackingInfo: String?) -> Matchstick {
+                        syteJson: String?,
+                        trackingInfo: String?) -> Matchstick? {
+        let fetchRequest: NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "imageUrl == %@", imageUrl)
+        fetchRequest.sortDescriptors = nil
+        
+        let results = try? managedObjectContext.fetch(fetchRequest)
+        if let first = results?.first {
+            return first
+        }
         let matchstickToSave = Matchstick(context: managedObjectContext)
         matchstickToSave.remoteId = remoteId
         matchstickToSave.imageUrl = imageUrl
-        matchstickToSave.syteJson = syteJson
+        matchstickToSave.syteJson = syteJson ?? "[]"
         matchstickToSave.receivedAt = Date()
         matchstickToSave.trackingInfo = trackingInfo
         return matchstickToSave
@@ -912,49 +920,10 @@ extension DataModel {
         fetchRequest.predicate = NSPredicate(format: "imageUrl == %@", imageUrl)
         fetchRequest.sortDescriptors = nil
         
-        do {
-            let results = try managedObjectContext.fetch(fetchRequest)
-            for matchstick in results {
-                matchstick.imageData = imageData
-                matchstick.receivedAt = Date()
-            }
-            try managedObjectContext.save()
-        } catch {
-            self.receivedCoreDataError(error: error)
-            print("addImageDataToMatchstick imageUrl:\(imageUrl) results with error:\(error)")
+        if let results = try? managedObjectContext.fetch(fetchRequest), let matchstick = results.first {
+            matchstick.imageData = imageData
         }
-    }
-    
-    func retrieveMatchstickImageUrlsWithNoData(managedObjectContext: NSManagedObjectContext) -> [String] {
-        let fetchRequest: NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "imageData == nil")
-        fetchRequest.sortDescriptors = nil
-        
-        do {
-            let results = try managedObjectContext.fetch(fetchRequest)
-            if let imageUrls = results.compactMap({$0.imageUrl}).compactMap({$0.copy()}) as? [String] {
-                return imageUrls
-            }
-        } catch {
-            self.receivedCoreDataError(error: error)
-            print("retrieveMatchstickImageUrlsWithNoData results with error:\(error)")
-        }
-        return []
-    }
-    
-    func deleteMatchstick(managedObjectContext: NSManagedObjectContext, imageUrl: String) {
-        let fetchRequest: NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "imageUrl == %@", imageUrl)
-        fetchRequest.sortDescriptors = nil
-        
-        do {
-            let results = try managedObjectContext.fetch(fetchRequest)
-            results.forEach { managedObjectContext.delete($0) }
-            managedObjectContext.saveIfNeeded()
-        } catch {
-            self.receivedCoreDataError(error: error)
-            print("deleteMatchstick imageUrl:\(imageUrl) results with error:\(error)")
-        }
+       
     }
     
     // Returns a Promise of the saved Card that should be used only on the main thread.
@@ -1308,45 +1277,6 @@ extension DataModel {
             print("countScreenshotWorkhorse results with error:\(error)")
         }
         return count
-    }
-    
-    func countMatchsticks(managedObjectContext: NSManagedObjectContext) -> Int {
-        let fetchRequest: NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
-        fetchRequest.predicate = nil
-        fetchRequest.resultType = .countResultType
-        fetchRequest.includesSubentities = false
-        
-        var count: Int = 0
-        do {
-            count = try managedObjectContext.count(for: fetchRequest)
-        } catch {
-            self.receivedCoreDataError(error: error)
-            print("countMatchsticks results with error:\(error)")
-        }
-        return count
-    }
-    
-    func isNextMatchsticksNeeded(matchstickCount: Int) -> Bool {
-        let lowWatermark = 20
-        return matchstickCount <= lowWatermark
-    }
-    
-    // Returns a promise of the count of matchsticks in the DB,
-    // and, crucially, errors if above the low water mark,
-    // allowing chained promises to not execute.
-    public func nextMatchsticksIfNeeded() -> Promise<Int> {
-        return Promise { fulfill, reject in
-            performBackgroundTask { (managedObjectContext) in
-                let matchstickCount = self.countMatchsticks(managedObjectContext: managedObjectContext)
-                if self.isNextMatchsticksNeeded(matchstickCount: matchstickCount) {
-                    fulfill(matchstickCount)
-                } else {
-                    // Not really an error. Just an easy way to cancel further processing.
-                    let error = NSError(domain: "Craze", code: 24, userInfo: [NSLocalizedDescriptionKey : "Good. We have enough, \(matchstickCount) matchsticks."])
-                    reject(error)
-                }
-            }
-        }
     }
     
     func formattedPrice(price: Float, currency: String) -> String? {
