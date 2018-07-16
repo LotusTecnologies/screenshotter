@@ -86,11 +86,9 @@ class AsyncOperationMonitorCenter {
                     var tagDict = queueDict[tag.type] ?? [:]
                     tagDict[tag.value] = (tagDict[tag.value] ?? 0) + 1
                     queueDict[tag.type] = tagDict
-                    print("add \(tag.value) in \(queueUUID)")
                     
                 }
                 self.runningTags[queueUUID] = queueDict
-                print("\(self.runningTags)")
                 NotificationCenter.default.post(name: .AsyncOperationTagMonitorCenterDidChange, object: nil, userInfo: ["tags":tags,"queueUUID":queueUUID.uuidString])
             }
         }
@@ -107,11 +105,9 @@ class AsyncOperationMonitorCenter {
                     var tagDict = queueDict[tag.type] ?? [:]
                     tagDict[tag.value] = (tagDict[tag.value] ?? 1) - 1
                     queueDict[tag.type] = tagDict
-                    print("remove \(tag.value) in \(queueUUID)")
                 }
                 
                 self.runningTags[queueUUID] = queueDict
-                print("\(self.runningTags)")
                 NotificationCenter.default.post(name: .AsyncOperationTagMonitorCenterDidChange, object: nil, userInfo: ["tags":tags,"queueUUID":queueUUID])
             }
         }
@@ -198,7 +194,7 @@ class AsyncOperation: Operation {
     
     private var executionBlock: ((@escaping() -> ()) -> ())?
     private let timeout:TimeInterval?
-    fileprivate let tags:[AsyncOperationTag]
+    let tags:[AsyncOperationTag]
     
     convenience init(timeout:TimeInterval?, completion:@escaping ((@escaping() -> ()) -> ())) {
         self.init(timeout: timeout, tags: [], completion: completion)

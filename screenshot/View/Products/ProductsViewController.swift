@@ -42,21 +42,16 @@ class ProductsViewController: BaseViewController {
     var collectionView:UICollectionView?
     var productsOptions:ProductsOptions = ProductsOptions()
     var scrollRevealController:ScrollRevealController?
-    var rateView:ProductsRateView!
+    var rateView = ProductsRateView.init(frame: .zero)
     var productsRateNegativeFeedbackSubmitAction:UIAlertAction?
     var productsRateNegativeFeedbackTextField:UITextField?
     var shamrockButton : FloatingActionButton?
     var screenshotLoadingState:ProductsViewControllerState = .unknown {
         didSet {
             Analytics.trackDevLog(file: #file, line: #line, message: "from\(oldValue) to \(screenshotLoadingState)")            
-            self.syncViewsAfterStateChange()
         }
     }
-    var productLoadingState:ProductsViewControllerState = .unknown {
-        didSet {
-            self.syncViewsAfterStateChange()
-        }
-    }
+    var productLoadingState:ProductsViewControllerState = .unknown 
 
     var selectedShoppable:Shoppable?
 
@@ -147,14 +142,9 @@ class ProductsViewController: BaseViewController {
         }()
         self.collectionView = collectionView
         
-        let rateView:ProductsRateView = {
-            let view = ProductsRateView.init(frame: .zero)
-            view.translatesAutoresizingMaskIntoConstraints = false
-            view.voteUpButton.addTarget(self, action: #selector(productsRatePositiveAction), for: .touchUpInside)
-            view.voteDownButton.addTarget(self, action: #selector(productsRateNegativeAction), for: .touchUpInside)
-            return view
-        }()
-        self.rateView = rateView
+        rateView.translatesAutoresizingMaskIntoConstraints = false
+        rateView.voteUpButton.addTarget(self, action: #selector(productsRatePositiveAction), for: .touchUpInside)
+        rateView.voteDownButton.addTarget(self, action: #selector(productsRateNegativeAction), for: .touchUpInside)
         
         let scrollRevealController = ScrollRevealController(edge: .bottom)
         scrollRevealController.hasBottomBar = !hidesBottomBarWhenPushed
@@ -189,6 +179,7 @@ class ProductsViewController: BaseViewController {
         
         if self.screenshotController?.first?.shoppablesCount == -1 {
             self.screenshotLoadingState = .retry
+            syncViewsAfterStateChange()
             Analytics.trackScreenshotOpenedWithoutShoppables(screenshot: screenshot)
         }
         else {
@@ -198,9 +189,25 @@ class ProductsViewController: BaseViewController {
         let pinchZoom = UIPinchGestureRecognizer.init(target: self, action: #selector(pinch(gesture:)))
         self.view.addGestureRecognizer(pinchZoom)
         
-
+    }
+    func collectionView(_ collectionView: UICollectionView, shouldShowMenuForItemAt indexPath: IndexPath) -> Bool {
+        if let cell = collectionView.cellForItem(at: indexPath){
+            if let cell = cell as? ProductsCollectionViewCell, let imageView = cell.productImageView {
+                let product = self.productAtIndex(indexPath.item)
+                self.recoverLostSaleManager.presetRecoverAlertViewFor(product: product, in: self, rect: imageView.bounds, view: imageView, timeSinceLeftApp: nil, reason: .longPress)
+                return true
+            }
+        }
+        return false
+    }
+    func collectionView(_ collectionView: UICollectionView, canPerformAction action: Selector, forItemAt indexPath: IndexPath, withSender sender: Any?) -> Bool {
+        return false
     }
     
+    func collectionView(_ collectionView: UICollectionView, performAction action: Selector, forItemAt indexPath: IndexPath, withSender sender: Any?) {
+        
+    }
+
     @objc func pinch( gesture:UIPinchGestureRecognizer) {
         if CrazeImageZoom.shared.isHandlingGesture, let imageView = CrazeImageZoom.shared.hostedImageView  {
             CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: imageView)
@@ -436,7 +443,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
             let product = self.productAtIndex(indexPath.item)
             product.recordViewedProduct()
             self.recoverLostSaleManager.didClick(on: product)
-            LocalNotificationModel.shared.registerCrazeTappedPriceAlert(id: product.id, lastPrice: product.floatPrice)
+            LocalNotificationModel.shared.registerCrazeTappedPriceAlert(id: product.id, merchant: product.merchant, lastPrice: product.floatPrice)
             if let productViewController = presentProduct(product, atLocation: .products) {
                 productViewController.similarProducts = products
             }
@@ -470,10 +477,10 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         if isFavorited {
             let _ = ShoppingCartModel.shared.populateVariants(productOID: product.objectID)
             Analytics.trackProductFavorited(product: product, page: .productList)
-            LocalNotificationModel.shared.registerCrazeFavoritedPriceAlert(id: product.id, lastPrice: product.floatPrice)
+            LocalNotificationModel.shared.registerCrazeFavoritedPriceAlert(id: product.id, merchant: product.merchant, lastPrice: product.floatPrice)
         }else{
             Analytics.trackProductUnfavorited(product: product, page: .productList)
-            LocalNotificationModel.shared.deregisterCrazeFavoritedPriceAlert(id: product.id)
+            LocalNotificationModel.shared.deregisterCrazeFavoritedPriceAlert(id: product.id, merchant: product.merchant)
         }
     }
     
@@ -485,7 +492,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         
         let product = self.productAtIndex(indexPath.item)
         product.recordViewedProduct()
-        LocalNotificationModel.shared.registerCrazeTappedPriceAlert(id: product.id, lastPrice: product.floatPrice)
+        LocalNotificationModel.shared.registerCrazeTappedPriceAlert(id: product.id, merchant: product.merchant, lastPrice: product.floatPrice)
 
         if let cell = collectionView?.cellForItem(at: indexPath) as? ProductsCollectionViewCell {
             self.productCollectionViewManager.burrow(cell: cell, product: product, fromVC: self)
@@ -599,6 +606,7 @@ extension ProductsViewControllerProducts{
             self.collectionView?.scrollToItem(at: IndexPath(item: 0, section: ProductsSection.product.section), at: .top, animated: false)
         }
         self.updateLoadingState()
+        
     }
 }
 
@@ -839,6 +847,7 @@ extension ProductsViewController : RelatedLooksManagerDelegate {
 extension ProductsViewController : AsyncOperationMonitorDelegate {
     func updateLoadingState(){
         DispatchQueue.mainAsyncIfNeeded {
+            var didChange = false
             let isLoading = self.loadingMonitor?.didStart ?? false
             let state:ProductsViewControllerState = {
                 if self.hasShoppables {
@@ -853,6 +862,7 @@ extension ProductsViewController : AsyncOperationMonitorDelegate {
             }()
             if state != self.screenshotLoadingState {
                 self.screenshotLoadingState = state
+                didChange = true
             }
             
             
@@ -876,8 +886,12 @@ extension ProductsViewController : AsyncOperationMonitorDelegate {
            
             if productState != self.productLoadingState {
                 self.productLoadingState = productState
+                didChange = true
             }
             
+            if didChange {
+                self.syncViewsAfterStateChange()
+            }
         }
     }
     
@@ -886,11 +900,12 @@ extension ProductsViewController : AsyncOperationMonitorDelegate {
     }
 
 }
+
 extension ProductsViewController: RecoverLostSaleManagerDelegate {
-    func recoverLostSaleManager(_ manager:RecoverLostSaleManager, returnedFrom product:Product){
+    func recoverLostSaleManager(_ manager: RecoverLostSaleManager, returnedFrom product: Product, timeSinceLeftApp: Int) {
         if let index = self.products.index(of: product) {
             if let cell = self.collectionView?.cellForItem(at: IndexPath.init(row: index, section: 0)) as? ProductsCollectionViewCell, let view = cell.productImageView{
-                self.recoverLostSaleManager.presetRecoverAlertViewFor(product: product, in: self, rect: view.bounds.insetBy(dx: 20, dy: 20), view:view)
+                self.recoverLostSaleManager.presetRecoverAlertViewFor(product: product, in: self, rect: view.bounds, view:view, timeSinceLeftApp:timeSinceLeftApp, reason: .returnedFromProductLink)
             }
         }
         

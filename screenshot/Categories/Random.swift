@@ -20,6 +20,15 @@ extension Collection where Index == Int {
     }
  
 }
+extension UUID {
+    func toRandomSeed() -> UInt64 {
+        let uuid = self.uuid
+        let bytes:[UInt8] = [uuid.8, uuid.9, uuid.10, uuid.11, uuid.12, uuid.13, uuid.14, uuid.15]
+        let data = Data.init(bytes: bytes)
+        let number = data.withUnsafeBytes{ $0.pointee } as UInt64
+        return number
+    }
+}
 
 extension MutableCollection {
     /// Shuffles the contents of this collection.

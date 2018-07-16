@@ -107,7 +107,7 @@ extension DataModel {
     func matchstickFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<Matchstick> {
         let request: NSFetchRequest = Matchstick.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(key: "receivedAt", ascending: true)]
-        request.predicate = NSPredicate(format: "imageData != nil")
+        request.predicate = Matchstick.predicateForDisplayingMatchstick()
         let context = self.mainMoc()
         let fetchedResultsController:FetchedResultsControllerManager<Matchstick> = FetchedResultsControllerManager<Matchstick>.init(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate:delegate)
         

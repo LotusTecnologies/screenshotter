@@ -77,7 +77,9 @@ class UserDefaultsKeys  {
     
     // Discover
     static let discoverScreenshotPresentedHelper = "discoverScreenshotPresentedHelper"
-    
+    static let discoverCurrentIndex = "discoverCurrentIndex"
+    static let discoverDontFilter = "discoverDontFilter"
+
     // Game
     @available(*, deprecated)
     static let gameScore = "GameScore"

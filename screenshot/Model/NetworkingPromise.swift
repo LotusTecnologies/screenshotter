@@ -8,7 +8,7 @@
 
 import UIKit
 import PromiseKit
-
+import CoreData
 
 struct ChangelogResponse : Decodable {
     enum CodingKeys : String, CodingKey {
@@ -287,23 +287,94 @@ class NetworkingPromise : NSObject {
     func downloadProductsWithRetry(url: URL) -> Promise<[String : Any]> {
         return attempt(interdelay: .seconds(11), maxRepeat: 2, body: {self.downloadProducts(url: url)})
     }
-    
-    func nextMatchsticks() -> Promise<NSDictionary> {
-        let syncTokenParam: String
-        if let matchsticksSyncToken = UserDefaults.standard.string(forKey: UserDefaultsKeys.matchsticksSyncToken),
-          !matchsticksSyncToken.isEmpty {
-            syncTokenParam = "?start=\(matchsticksSyncToken)"
-        } else {
-            syncTokenParam = ""
+  
+    struct RecombeeRecommendation{
+        var imageURL:String
+        var remoteId:String
+    }
+    func recombeeRecommendation(count:Int) -> Promise<[RecombeeRecommendation]>{
+        let userId = AnalyticsUser.current.identifier
+        var params:[String:Any] = [:]
+        params["count"] = count
+        params["cascadeCreate"] = true
+        params["rotationRate"] = 0.99
+        params["filter"] = "'displayable' == true"
+        if UserDefaults.standard.bool(forKey: UserDefaultsKeys.discoverDontFilter) != true {
+            if let genderNumber = UserDefaults.standard.value(forKey: UserDefaultsKeys.productGender) as? NSNumber
+                , let gender = ProductsOptionsGender.init(rawValue: genderNumber.intValue){
+                if gender == .female {
+                    //                params["booster"] = "if  \"female\" in 'genders' then 99999999 else 0.01"
+                    params["filter"] = "'displayable' == true AND \"female\" in 'genders'"
+                }else if gender == .male{
+                    //                params["booster"] = "if  \"male\" in 'genders' then 99999999 else 0.01"
+                    params["filter"] = "'displayable' == true AND \"male\" in 'genders'"
+                }else if gender == .galGadot{
+                    //                params["booster"] = "if  \"Gal Gadot\" in 'rekognition-celebs' then 99999999 else 0.01"
+                    params["filter"] = "'displayable' == true AND \"Gal Gadot\" in 'rekognition-celebs'"
+                }
+            }
         }
-        guard let url = URL(string: Constants.screenShotLambdaDomain + "screenshots/matchsticks" + syncTokenParam) else {
-            let error = NSError(domain: "Craze", code: 21, userInfo: [NSLocalizedDescriptionKey: "Cannot create matchsticks url from screenShotLambdaDomain:\(Constants.screenShotLambdaDomain)"])
-            return Promise(error: error)
+        params["rotationTime"] = 60*60*24*2 // 2 days rotation
+        return NetworkingPromise.sharedInstance.recombeeRequest(path: "recomms/users/\(userId)/items/", method: "GET", params: params).then { (dict) -> Promise<[RecombeeRecommendation]> in
+            var toReturn:[RecombeeRecommendation] = []
+            if let recomms = dict["recomms"] as? [[String:Any]]{
+                if recomms.count == 0 {
+                    //turn off filter...
+                     UserDefaults.standard.set(true, forKey: UserDefaultsKeys.discoverDontFilter)
+                }
+                recomms.forEach({ (matchstick) in
+                    if let index = matchstick["id"] as? String {
+                        toReturn.append(RecombeeRecommendation.init(imageURL: "https://s3.amazonaws.com/screenshop-ordered-matchsticks/\(index).jpg", remoteId: "\(index)"))
+                    }
+                })
+            }
+            return Promise.init(value:toReturn)
         }
-        let sessionConfiguration = URLSessionConfiguration.default
-        sessionConfiguration.timeoutIntervalForRequest = 60
-        let promise = URLSession(configuration: sessionConfiguration).dataTask(with: URLRequest(url: url)).asDictionary()
-        return promise
+    }
+    func recombeeRequest(path:String, method:String, params:[String:Any]? ) -> Promise<NSDictionary> {
+        let hostName = "rapi.recombee.com"
+        let databaseId = "screenshop"
+        let hmac_timestamp = String(Int(NSDate().timeIntervalSince1970))
+        let partialPath = "/\(databaseId)/\(path)"
+        var queryItems = [URLQueryItem.init(name: "hmac_timestamp", value: "\(hmac_timestamp)")]
+        if let params = params, method == "GET" {
+            params.forEach({ (arg) in
+                let (key, value) = arg
+                    queryItems.append( URLQueryItem.init(name: key, value: "\(value)"))
+
+
+            })
+        }
+        var components = URLComponents.init()
+        components.path = partialPath
+        components.queryItems = queryItems
+        if let string = components.string {
+            let recombeeKey = "TJVMFkb5sq4aaIXJGTCrCzPKsjxuyV8RLZOBlXt9QhGQSVOLNgy4jp3lqdlOc8Gn"
+            let hmac_sign = string.hmac(algorithm: .SHA1, key: recombeeKey)
+            let urlString = "https://\(hostName)\(string)&hmac_sign=\(hmac_sign)"
+            
+            if let url = URL.init(string: urlString ) {
+                var request = URLRequest.init(url: url )
+                request.httpMethod = method
+                request.addValue("application/json", forHTTPHeaderField: "Accept")
+                request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+                if let params = params, method == "POST" {
+                    do{
+                        let parameterData = try JSONSerialization.data(withJSONObject: params, options: [])
+                        request.httpBody = parameterData
+                        request.setValue("\(parameterData.count)", forHTTPHeaderField: "Content-Length")
+                    }catch{
+                        print("recombee request error:\(error)")
+                    }
+                }
+                let sessionConfiguration = URLSessionConfiguration.default
+                sessionConfiguration.timeoutIntervalForRequest = 60
+                let promise = URLSession(configuration: sessionConfiguration).dataTask(with: request).asDictionary()
+                return promise
+            }
+        }
+        return Promise.init(error: NSError.init(domain: #file, code: #line, userInfo: [NSLocalizedDescriptionKey:"unable to make url\(path) = \(String(describing: params))"]))
+        
     }
     
     func downloadImageData(urlString: String) -> Promise<Data> {
@@ -698,17 +769,16 @@ class NetworkingPromise : NSObject {
     }
     
     // action = [tapped|favorited|disabled]
-    func registerCrazePriceAlert(id: String, lastPrice: Float, firebaseId: String, action: String = "favorited") -> Promise<(Data, URLResponse)> {
+    func registerCrazePriceAlert(id: String, merchant: String, lastPrice: Float, firebaseId: String, action: String = "favorited") -> Promise<(Data, URLResponse)> {
         guard let url = URL(string: "\(Constants.notificationsApiEndpoint)/users/\(firebaseId)/subscriptions") else {
             let error = NSError(domain: "Craze", code: 9, userInfo: [NSLocalizedDescriptionKey: "Cannot create url from notificationsApiEndpoint:\(Constants.notificationsApiEndpoint)"])
             return Promise(error: error)
         }
-        let parameters = ["subscription" : ["priceAlert" : ["lastSeenPrice" : lastPrice, "variantId" : id, "type" : action]]]
+        let parameters = ["subscription" : ["priceAlert" : ["lastSeenPrice" : lastPrice, "variantId" : id, "type" : action, "merchant" : merchant]]]
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.addValue("application/json", forHTTPHeaderField: "Accept")
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        
+        request.addValue(AnalyticsUser.current.identifier, forHTTPHeaderField: "cid")
+
         do {
             request.httpBody = try JSONSerialization.data(withJSONObject: parameters, options: [])
         } catch {
@@ -846,6 +916,49 @@ class NetworkingPromise : NSObject {
             }
             dataTask.resume()
         }
+    }
+    
+    func sendProductEmail( brand:String, title:String, offer:String, price:String, imageURL:String, email:String) -> Promise<NSDictionary>{
+        let postDict:[String:Any] = [
+            "email":email,
+            "products":[[
+                "brand":brand,
+                "title":title,
+                "link":offer,
+                "price":price,
+                "image":imageURL]]
+        ]
+        let userId = UserAccountManager.shared.user?.uid ?? "unknown"
+        
+        if let url = URL(string: Constants.notificationsApiEndpoint + "/users/\(userId)/emailme"), let postData = try? JSONSerialization.data(withJSONObject: postDict, options: []) {
+            let postLength = "\(postData.count)"
+            
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            request.addValue(postLength, forHTTPHeaderField: "Content-Length")
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.addValue("application/json", forHTTPHeaderField: "Accept")
+            request.addValue(AnalyticsUser.current.identifier, forHTTPHeaderField: "cid")
+
+            request.httpBody = postData
+            
+            
+            return URLSession.shared.dataTask(with: request).asDictionary()
+            
+        }else{
+            let error = NSError(domain: "Craze", code: #line, userInfo: [NSLocalizedDescriptionKey: "unable to send 'emailme' request"])
+            return Promise(error: error)
+            
+        }
+    }
+    
+    func sendProductEmailWithRetry( product:Product, email:String) -> Promise<NSDictionary>{
+        let title = product.productTitle() ?? ""
+        let brand = product.calculatedDisplayTitle ?? ""
+        let offer = product.offer ?? ""
+        let price = product.price ?? ""
+        let imageURL = product.imageURL ?? ""
+        return attempt(interdelay: .seconds(21), maxRepeat: 5, body: { self.sendProductEmail(brand: brand, title: title, offer: offer, price: price, imageURL: imageURL, email: email)   })
     }
     
     func appSettings() -> Promise<[String : Any]> {

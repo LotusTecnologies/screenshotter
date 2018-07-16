@@ -888,7 +888,7 @@ extension UserAccountManager {
                             
                             context.saveIfNeeded()
                             DataModel.sharedInstance.favorite(toFavorited: true, productOIDs: [product.objectID])
-                            LocalNotificationModel.shared.registerCrazeFavoritedPriceAlert(id: product.id, lastPrice: product.floatPrice)
+                            LocalNotificationModel.shared.registerCrazeFavoritedPriceAlert(id: product.id, merchant: product.merchant, lastPrice: product.floatPrice)
                         })
                     }
                 }

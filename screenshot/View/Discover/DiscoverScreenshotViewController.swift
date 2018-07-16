@@ -123,6 +123,9 @@ class DiscoverScreenshotViewController : BaseViewController {
         emptyView.bottomAnchor.constraint(equalTo: passButton.topAnchor).isActive = true
         emptyView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "NavigationBarFilter"), style: .plain, target: self, action: #selector(filterAction(_:)))
+
+        
         let pinchZoom = UIPinchGestureRecognizer.init(target: self, action: #selector(pinch(gesture:)))
         self.view.addGestureRecognizer(pinchZoom)
     }
@@ -130,9 +133,24 @@ class DiscoverScreenshotViewController : BaseViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
+        DiscoverManager.shared.discoverViewDidAppear()
         syncEmptyListViews()
     }
     
+    @objc func filterAction(_ sender:Any){
+        if let sender = sender as? UIBarButtonItem {
+            let vc = DiscoverGenderOptionViewController.init()
+            vc.modalPresentationStyle = .popover
+            
+            vc.popoverPresentationController?.permittedArrowDirections = [.up, .down]
+            vc.popoverPresentationController?.delegate = self
+            vc.popoverPresentationController?.barButtonItem = sender
+            
+            self.present(vc, animated: true) {
+                
+            }
+        }
+    }
     
     deinit {
         if let layout = collectionView.collectionViewLayout as? DiscoverScreenshotCollectionViewLayout {
@@ -196,7 +214,7 @@ class DiscoverScreenshotViewController : BaseViewController {
             if let matchStick = currentMatchstick {
                 removeCurrentMatchstickIfPossible()
                 screenshotsTabPulseAnimation()
-                matchStick.pass()
+                matchStick.delayedAdd()
             }
         }
     }
@@ -523,7 +541,6 @@ extension DiscoverScreenshotViewController : UICollectionViewDataSource {
             cell.flagButton.addTarget(self, action: #selector(presentReportAlertController), for: .touchUpInside)
             
             let matchstick = matchstickAt(index: indexPath)
-            
             if let imageData = matchstick?.imageData as Data? {
                 cell.image = UIImage(data: imageData)
             }else{
@@ -574,5 +591,12 @@ fileprivate extension UIButton {
     func isDisabled(_ disabled: Bool) {
         isEnabled = !disabled
         alpha = disabled ? 0.5 : 1
+    }
+}
+
+
+extension DiscoverScreenshotViewController :UIPopoverPresentationControllerDelegate {
+    func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
+        return .none
     }
 }
