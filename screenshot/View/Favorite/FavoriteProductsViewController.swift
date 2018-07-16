@@ -222,12 +222,13 @@ class FavoriteProductsViewController : BaseViewController {
     
     @objc private func closeNotificationAction() {
         UserDefaults.standard.set(true, forKey: UserDefaultsKeys.favoritesDismissedNotification)
+        self.reloadNotificationSection()
     }
     
     @objc private func enableNotificationAction() {
         if PermissionsManager.shared.permissionStatus(for: .push) == .undetermined {
             PermissionsManager.shared.requestPermission(for: .push) { granted in
-                self.tableView.reloadData()
+                self.reloadNotificationSection()
             }
         }
         else {
