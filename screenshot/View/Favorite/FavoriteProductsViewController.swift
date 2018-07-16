@@ -61,7 +61,6 @@ class FavoriteProductsViewController : BaseViewController {
         addNavigationItemLogo()
         
         NotificationCenter.default.addObserver(self, selector: #selector(reloadTableView), name: .isUSCUpdated, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(applicationDidBecomeActive(_:)), name: .UIApplicationDidBecomeActive, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(applicationWillEnterForeground(_:)), name: .UIApplicationWillEnterForeground, object: nil)
     }
     
@@ -87,25 +86,21 @@ class FavoriteProductsViewController : BaseViewController {
         self.view.addGestureRecognizer(pinchZoom)
         self.productsFRC = DataModel.sharedInstance.favoritedProductsFrc(delegate: self)
         
-        dataSource = DataSource<Section, Row>(data: [ .favorite: [] ])
-        
+        dataSource = DataSource<Section, Row>(data: [
+            .notification: [],
+            .favorite: []
+            ])
         self.tableView.reloadData()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        self.reloadNotificationSection()
-    }
-    
-    @objc private func applicationDidBecomeActive(_ notification: Notification) {
-        if isViewLoaded && view?.window != nil {
-            self.reloadNotificationSection()
-        }
+        self.syncNotification()
     }
     
     @objc private func applicationWillEnterForeground(_ notification: Notification) {
         if isViewLoaded && view?.window != nil {
-            self.reloadNotificationSection()
+            self.syncNotification()
         }
     }
     
@@ -213,22 +208,34 @@ class FavoriteProductsViewController : BaseViewController {
     
     // MARK: Notification
     
-    private var shouldDisplayNotification: Bool {
+    private func syncNotification() {
         let hasFavorite = productsFRC?.fetchedObjectsCount ?? 0 > 0
         let hasPushPermissions = PermissionsManager.shared.hasPermission(for: .push)
         let dismissedNotification = UserDefaults.standard.bool(forKey: UserDefaultsKeys.favoritesDismissedNotification)
-        return hasFavorite && !hasPushPermissions && !dismissedNotification
+        let shouldDisplay = hasFavorite && !hasPushPermissions && !dismissedNotification
+        
+        let rows: [Row] = shouldDisplay ? [.notification] : []
+        dataSource?.updateSection(.notification, rows: rows)
+        
+        if self.isViewLoaded {
+            if self.view.window == nil {
+                self.tableView.reloadData()
+            }
+            else {
+                self.tableView.reloadSections(IndexSet(integer: Section.notification.rawValue), with: .none)
+            }
+        }
     }
     
     @objc private func closeNotificationAction() {
         UserDefaults.standard.set(true, forKey: UserDefaultsKeys.favoritesDismissedNotification)
-        self.reloadNotificationSection()
+        self.syncNotification()
     }
     
     @objc private func enableNotificationAction() {
         if PermissionsManager.shared.permissionStatus(for: .push) == .undetermined {
             PermissionsManager.shared.requestPermission(for: .push) { granted in
-                self.reloadNotificationSection()
+                self.syncNotification()
             }
         }
         else {
@@ -236,10 +243,6 @@ class FavoriteProductsViewController : BaseViewController {
                 present(alertController, animated: true)
             }
         }
-    }
-    
-    private func reloadNotificationSection() {
-        self.tableView.reloadSections(IndexSet(integer: Section.notification.rawValue), with: .none)
     }
 }
 
@@ -294,7 +297,7 @@ extension FavoriteProductsViewController: UITableViewDataSource {
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return 2
+        return self.dataSource?.count ?? 0
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -304,30 +307,31 @@ extension FavoriteProductsViewController: UITableViewDataSource {
         
         switch eSection {
         case .notification:
-            return self.shouldDisplayNotification ? 1 : 0
+            return self.dataSource?.rows(section)?.count ?? 0
         case .favorite:
             return self.productsFRC?.fetchedObjectsCount ?? 0
         }
     }
     
     func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if dataSource?.section(indexPath.section) == .favorite {
-            var visiblePartNumbers:Set<String> = []
-            self.tableView.indexPathsForVisibleRows?.forEach({ visibleIndexPath in
-                if let product = product(at: visibleIndexPath), let productId = product.partNumber {
-                    visiblePartNumbers.insert(productId)
-                }
-            })
-            let unusedMonitors = self.trackingProgressMonitors.filter {
-                return !visiblePartNumbers.contains( $0.key )
+        var visiblePartNumbers:Set<String> = []
+        self.tableView.indexPathsForVisibleRows?.forEach({ visibleIndexPath in
+            if visibleIndexPath.section == Section.favorite.rawValue,
+                let product = product(at: visibleIndexPath),
+                let productId = product.partNumber
+            {
+                visiblePartNumbers.insert(productId)
             }
-            
-            unusedMonitors.forEach {
-                if let monitor = self.trackingProgressMonitors[$0.key] {
-                    monitor.delegate = nil
-                }
-                self.trackingProgressMonitors.removeValue(forKey: $0.key)
+        })
+        let unusedMonitors = self.trackingProgressMonitors.filter {
+            return !visiblePartNumbers.contains( $0.key )
+        }
+        
+        unusedMonitors.forEach {
+            if let monitor = self.trackingProgressMonitors[$0.key] {
+                monitor.delegate = nil
             }
+            self.trackingProgressMonitors.removeValue(forKey: $0.key)
         }
     }
     
@@ -494,6 +498,7 @@ extension FavoriteProductsViewController: FetchedResultsControllerManagerDelegat
         if self.isViewLoaded {
             change.shiftIndexSections(by: Section.favorite.rawValue)
             change.applyChanges(tableView: tableView)
+            self.syncNotification()
         }
     }
 }
