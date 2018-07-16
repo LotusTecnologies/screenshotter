@@ -100,9 +100,9 @@ class ProductsOptions : NSObject {
         return viewController
     }()
     
-    func syncOptions() {
-        gender = ProductsOptionsGender.globalValue
-        size = ProductsOptionsSize.globalValue
+    func syncOptions(withMask mask: ProductsOptionsMask? = nil) {
+        gender = mask?.gender ?? ProductsOptionsGender.globalValue
+        size = mask?.size ?? ProductsOptionsSize.globalValue
         sale = ProductsOptionsSale.globalValue
         sort = ProductsOptionsSort.globalValue
         syncOptions(with: viewController)
@@ -116,8 +116,7 @@ class ProductsOptions : NSObject {
     }
     
     @objc private func continueAction() {
-        let previousGender = gender
-        let previousSize = size
+        let previousMask = ProductsOptionsMask(gender, size)
         let previousSale = sale
         let previousSort = sort
         
@@ -129,24 +128,23 @@ class ProductsOptions : NSObject {
             sort = ProductsOptionsSort.all[selected]
         }
         
-
-        UserDefaults.standard.set(size.rawValue, forKey: UserDefaultsKeys.productSize)
+//        UserDefaults.standard.set(gender.rawValue, forKey: UserDefaultsKeys.productGender)
+//        UserDefaults.standard.set(size.rawValue, forKey: UserDefaultsKeys.productSize)
         UserDefaults.standard.set(sale.rawValue, forKey: UserDefaultsKeys.productSale)
         UserDefaults.standard.set(sort.rawValue, forKey: UserDefaultsKeys.productSort)
         UserDefaults.standard.synchronize()
         
-        let genderChanged = previousGender.rawValue != gender.rawValue
-        let sizeChanged = previousSize.rawValue != size.rawValue
+        let maskChanged = previousMask.rawValue != ProductsOptionsMask(gender, size).rawValue
 //        let saleChanged = previousSale.rawValue != sale.rawValue
 //        let sortChanged = previousSort.rawValue != sort.rawValue
-        let changed = genderChanged || sizeChanged
+        let changed = maskChanged //|| saleChanged || sortChanged
         
         delegate?.productsOptionsDidComplete(self, withModelChange: changed)
         
         if changed {
             let changeMap = [
-                "Gender": (new: gender.stringValue, old: previousGender.stringValue),
-                "Size": (new: size.stringValue, old: previousSize.stringValue),
+                "Gender": (new: gender.stringValue, old: previousMask.gender.stringValue),
+                "Size": (new: size.stringValue, old: previousMask.size.stringValue),
                 "Sale": (new: sale.stringValue, old: previousSale.stringValue),
                 "Sort": (new: sort.stringValue, old: previousSort.stringValue)
             ]
@@ -507,13 +505,13 @@ enum ProductsOptionsGender : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol 
         
         return string
     }
+    
     var analyticsStringValue:String {
         switch self {
-        case .female: return "female";
-        case .male: return "male";
-        case .auto: return "auto";
-        case .galGadot: return "galGadot";
-
+        case .female: return "female"
+        case .male: return "male"
+        case .auto: return "auto"
+        case .galGadot: return "galGadot"
         }
     }
 }
@@ -555,6 +553,7 @@ enum ProductsOptionsSize : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol {
         
         return string
     }
+    
     var analyticsStringValue:String {
         switch self {
         case .child: return "child"
