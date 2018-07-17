@@ -308,9 +308,6 @@ class NetworkingPromise : NSObject {
                 }else if gender == .male{
                     //                params["booster"] = "if  \"male\" in 'genders' then 99999999 else 0.01"
                     params["filter"] = "'displayable' == true AND \"male\" in 'genders'"
-                }else if gender == .galGadot{
-                    //                params["booster"] = "if  \"Gal Gadot\" in 'rekognition-celebs' then 99999999 else 0.01"
-                    params["filter"] = "'displayable' == true AND \"Gal Gadot\" in 'rekognition-celebs'"
                 }
             }
         }
