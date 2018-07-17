@@ -410,6 +410,7 @@
 		31A0781A207E182100D70DC3 /* URL+craze.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+craze.swift"; sourceTree = "<group>"; };
 		31A0781C207F239400D70DC3 /* Model 14.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 14.xcdatamodel"; sourceTree = "<group>"; };
 		31A0781D20830D9900D70DC3 /* UserFeedback.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserFeedback.swift; sourceTree = "<group>"; };
+		31BFAFF020FDAFBF00D7C891 /* Model 21.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 21.xcdatamodel"; sourceTree = "<group>"; };
 		31C0C80520A15EAA002EE95B /* CrazeImageZoom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrazeImageZoom.swift; sourceTree = "<group>"; };
 		31C0C82620A30A02002EE95B /* Model 17.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 17.xcdatamodel"; sourceTree = "<group>"; };
 		31C536A720B40446005810CA /* String+HTML.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+HTML.swift"; sourceTree = "<group>"; };
@@ -2484,6 +2485,7 @@
 		C5278FBD1F3C38510090E422 /* Model.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				31BFAFF020FDAFBF00D7C891 /* Model 21.xcdatamodel */,
 				311A50D920E4BE470001D463 /* Model 20.xcdatamodel */,
 				E4AF5CC820E22EFD00C0155E /* Model 19.xcdatamodel */,
 				31912DB220BFEFCD0098EE5B /* Model 18.xcdatamodel */,
@@ -2505,7 +2507,7 @@
 				E42AC3921F60340B0035A07C /* Model 2.xcdatamodel */,
 				C5278FBE1F3C38510090E422 /* Model.xcdatamodel */,
 			);
-			currentVersion = 311A50D920E4BE470001D463 /* Model 20.xcdatamodel */;
+			currentVersion = 31BFAFF020FDAFBF00D7C891 /* Model 21.xcdatamodel */;
 			path = Model.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

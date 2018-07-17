@@ -14,7 +14,8 @@ protocol DiscoverScreenshotViewControllerDelegate : NSObjectProtocol {
     func discoverScreenshotViewController(_ viewController: DiscoverScreenshotViewController, didSelectItemAtIndexPath indexPath: IndexPath)
 }
 
-class DiscoverScreenshotViewController : BaseViewController {
+class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonitorDelegate {
+    
     fileprivate let collectionView = UICollectionView(frame: .zero, collectionViewLayout: DiscoverScreenshotCollectionViewLayout())
     fileprivate var matchstickFrc: FetchedResultsControllerManager<Matchstick>?
     fileprivate var matchsticks:[Matchstick] = []
@@ -24,6 +25,10 @@ class DiscoverScreenshotViewController : BaseViewController {
     fileprivate let emptyView = HelperView()
     
     weak var delegate: DiscoverScreenshotViewControllerDelegate?
+    
+    private var loading = Loader()
+    
+    var filterReloadMonitor:AsyncOperationMonitor?
     
     override var title: String? {
         set {}
@@ -43,13 +48,30 @@ class DiscoverScreenshotViewController : BaseViewController {
         
         restorationIdentifier = String(describing: type(of: self))
         
-        
         addNavigationItemLogo()
     }
     
+    func updateViewsLoadingState(){
+        let isFilterReloading = self.filterReloadMonitor?.didStart ?? false
+        passButton.isHidden = isFilterReloading
+        addButton.isHidden = isFilterReloading
+        collectionView.isHidden = isFilterReloading
+        loading.isHidden = !isFilterReloading
+        emptyView.isHidden = isFilterReloading
+        if isFilterReloading {
+            loading.startAnimation()
+        }else{
+            loading.stopAnimation()
+        }
+    }
+    func asyncOperationMonitorDidChange(_ monitor: AsyncOperationMonitor) {
+        updateViewsLoadingState()
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        self.filterReloadMonitor = DiscoverManager.shared.createFilterChangingMonitor(delegate: self)
+
         matchstickFrc = DataModel.sharedInstance.matchstickFrc(delegate:self)
         self.matchsticks = matchstickFrc?.fetchedObjects ?? []
         
@@ -59,6 +81,11 @@ class DiscoverScreenshotViewController : BaseViewController {
         if let layout = collectionView.collectionViewLayout as? DiscoverScreenshotCollectionViewLayout {
             layout.delegate = self
         }
+
+        loading.translatesAutoresizingMaskIntoConstraints = false
+        self.view.addSubview(loading)
+        loading.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
+        loading.centerYAnchor.constraint(equalTo: self.view.centerYAnchor).isActive = true
         
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.dataSource = self
@@ -128,6 +155,8 @@ class DiscoverScreenshotViewController : BaseViewController {
         
         let pinchZoom = UIPinchGestureRecognizer.init(target: self, action: #selector(pinch(gesture:)))
         self.view.addGestureRecognizer(pinchZoom)
+        updateViewsLoadingState()
+
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -598,5 +627,15 @@ fileprivate extension UIButton {
 extension DiscoverScreenshotViewController :UIPopoverPresentationControllerDelegate {
     func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
         return .none
+    }
+    func popoverPresentationControllerDidDismissPopover(_ popoverPresentationController: UIPopoverPresentationController){
+        if let optionsVC = popoverPresentationController.presentedViewController as? DiscoverGenderOptionViewController {
+            if let updatedGender = optionsVC.updatedGender {
+                if optionsVC.gender != updatedGender {
+                    DiscoverManager.shared.updateGender(gender: updatedGender)
+                    self.updateViewsLoadingState()
+                }
+            }
+        }
     }
 }

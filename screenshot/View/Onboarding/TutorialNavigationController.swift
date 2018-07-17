@@ -192,6 +192,10 @@ extension TutorialNavigationController: OnboardingDetailsViewControllerDelegate 
         let gender = viewController.gender
         let size = viewController.size
         
+        if let gender = gender, let g = ProductsOptionsGender.from(string: gender) {
+            DiscoverManager.shared.updateGender(gender: g)
+        }
+        
         func saveData() {
             UserAccountManager.shared.setProfile(displayName: name, gender: gender, size: size, unverifiedEmail: nil)
             Analytics.trackOnboardingProfileSubmit(name: name, gender: gender, size: size)

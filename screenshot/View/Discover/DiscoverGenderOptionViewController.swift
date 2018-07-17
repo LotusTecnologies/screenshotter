@@ -12,10 +12,17 @@ class DiscoverGenderOptionViewController: UIViewController {
 
     var femaleButton = UIButton()
     var maleButton = UIButton()
+    let gender:ProductsOptionsGender = {
+        if let genderNumber = UserDefaults.standard.value(forKey: UserDefaultsKeys.productGender) as? NSNumber {
+            return ProductsOptionsGender.init(intValue: genderNumber.intValue)
+        }
+        return .auto
+    }()
+    var updatedGender:ProductsOptionsGender?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        updatedGender = gender
         
         maleButton.setImage(UIImage.init(named: "man"), for: .normal)
         maleButton.imageView?.contentMode = .scaleAspectFit
@@ -34,8 +41,6 @@ class DiscoverGenderOptionViewController: UIViewController {
         femaleButton.layer.borderWidth = 1.0
         femaleButton.translatesAutoresizingMaskIntoConstraints = false
         self.view.addSubview(femaleButton)
-        
-        
         
         
         
@@ -76,23 +81,17 @@ class DiscoverGenderOptionViewController: UIViewController {
     
     func syncViews(){
         
-        let gender:ProductsOptionsGender = {
-            if let genderNumber = UserDefaults.standard.value(forKey: UserDefaultsKeys.productGender) as? NSNumber {
-                return ProductsOptionsGender.init(intValue: genderNumber.intValue)
-            }
-            return .auto
-        }()
+       
 
         femaleButton.layer.borderColor = UIColor.lightGray.cgColor
         femaleButton.layer.borderWidth = 1.0
         maleButton.layer.borderColor = UIColor.lightGray.cgColor
         maleButton.layer.borderWidth = 1.0
 
-        if gender == .male {
+        if updatedGender == .male {
             maleButton.layer.borderColor = UIColor.red.cgColor
             maleButton.layer.borderWidth = 3.0
-            
-        }else if gender == .female {
+        }else if updatedGender == .female {
             femaleButton.layer.borderColor = UIColor.red.cgColor
             femaleButton.layer.borderWidth = 3.0
         }
@@ -118,11 +117,10 @@ class DiscoverGenderOptionViewController: UIViewController {
             if let genderOfButton = genderOfButton {
                 
                 if gender == genderOfButton {
-                    UserDefaults.standard.set(ProductsOptionsGender.auto.rawValue, forKey: UserDefaultsKeys.productGender)
+                    self.updatedGender = .auto
                 }else{
-                    UserDefaults.standard.set(genderOfButton.rawValue, forKey: UserDefaultsKeys.productGender)
+                    self.updatedGender = genderOfButton
                 }
-                UserDefaults.standard.set(false, forKey: UserDefaultsKeys.discoverDontFilter)
                 syncViews()
             }
             
@@ -135,7 +133,7 @@ class DiscoverGenderOptionViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         let width =  UIScreen.main.bounds.size.width * 0.9
-        let itemSize = (width - .padding * 4) / 3
+        let itemSize = (width - .padding * 3) / 2
         let height = itemSize + .padding * 2 + .extendedPadding
         self.preferredContentSize = CGSize.init(width:width, height: height)
     }
