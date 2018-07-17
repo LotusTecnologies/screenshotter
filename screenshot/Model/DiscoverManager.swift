@@ -20,7 +20,26 @@ class DiscoverManager {
         queue.maxConcurrentOperationCount = 4
         return queue
     }()
-    
+    var reloadingFilterQueue:AsyncOperationQueue = {
+        var queue = AsyncOperationQueue()
+        queue.name = "reloading filter matchsticks Queue"
+        queue.maxConcurrentOperationCount = 1
+        return queue
+    }()
+    var gender:ProductsOptionsGender = {
+            if let genderNumber = UserDefaults.standard.value(forKey: UserDefaultsKeys.productGender) as? NSNumber,
+                let gender = ProductsOptionsGender.init(rawValue: genderNumber.intValue){
+                return gender
+            }
+            return .auto
+        }() {
+        didSet{
+            UserDefaults.standard.set(gender.rawValue, forKey: UserDefaultsKeys.productGender)
+        }
+    }
+    func createFilterChangingMonitor(delegate:AsyncOperationMonitorDelegate) -> AsyncOperationMonitor {
+        return AsyncOperationMonitor.init(tags: [AsyncOperationTag.init(type: .filterChange, value: "DiscoverManager")], queues: [self.reloadingFilterQueue], delegate: delegate)
+    }
     func didAdd(_ item:Matchstick, callback: ((_ screenshot: Screenshot) -> Void)? = nil ){
         let managedObjectID = item.objectID
 
@@ -122,11 +141,35 @@ class DiscoverManager {
     
     @discardableResult private func recombeRequest(count:Int) -> Promise<Void>{
         let dateRequested = Date()
-        return NetworkingPromise.sharedInstance.recombeeRecommendation(count:count).then(execute: { (recommendations) -> Void in
-            self.recombeeRecommendation(recommendations, dateRequested: dateRequested)
+        return NetworkingPromise.sharedInstance.recombeeRecommendation(count:count, gender:self.gender).then(execute: { (recommendations) -> Promise<Void> in
+            return self.recombeeRecommendation(recommendations, dateRequested: dateRequested)
         }).catch(execute: { (error) in
             print("recombee error: \(error)")
         })
+    }
+    
+    func updateGender(gender:ProductsOptionsGender) {
+        self.reloadingFilterQueue.addOperation(AsyncOperation.init(timeout: 90, tags: [AsyncOperationTag.init(type: .filterChange, value: "DiscoverManager")], completion: { (completion) in
+           self.gender = gender
+            DataModel.sharedInstance.performBackgroundTask({ (context) in
+                let displayingFetchRequest:NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
+                let displayingFetchRequestPredicate = Matchstick.predicateForDisplayingMatchstick()
+                displayingFetchRequest.predicate = displayingFetchRequestPredicate
+                if let displaying = try? context.fetch(displayingFetchRequest) {
+                    displaying.forEach{ $0.isDisplaying = false }
+                }
+                context.saveIfNeeded()
+                self.recombeRequest(count: 3).always {
+                    DataModel.sharedInstance.performBackgroundTask({ (context) in
+                        self.fillQueues(in: context)
+                        context.saveIfNeeded()
+                        DispatchQueue.main.async {
+                            completion()
+                        }
+                    })
+                }
+            })
+        }))
     }
     
     private func fillQueues(in context:NSManagedObjectContext){
@@ -138,7 +181,15 @@ class DiscoverManager {
         let queuedFetchRequest:NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
         let queuedFetchRequestPredicate = Matchstick.predicateForQueuedMatchstick()
         queuedFetchRequest.predicate = queuedFetchRequestPredicate
+        switch self.gender {
+        case .auto:
         queuedFetchRequest.sortDescriptors = [NSSortDescriptor.init(key: "recombeeRecommended", ascending: false)]
+        case .female:
+        queuedFetchRequest.sortDescriptors = [NSSortDescriptor.init(key: "isFemale", ascending: false), NSSortDescriptor.init(key: "recombeeRecommended", ascending: false)]
+        case .male:
+        queuedFetchRequest.sortDescriptors = [NSSortDescriptor.init(key: "isMale", ascending: false), NSSortDescriptor.init(key: "recombeeRecommended", ascending: false)]
+        }
+        
 
         if let displaying = try? context.fetch(displayingFetchRequest), let queued = try? context.fetch(queuedFetchRequest) {
 
@@ -192,7 +243,7 @@ class DiscoverManager {
             
             newDiscover.forEach { (remoteId) in
                 let imageUrl = "https://s3.amazonaws.com/screenshop-ordered-matchsticks/\(remoteId).jpg"
-                let _ = DataModel.sharedInstance.saveMatchstick(managedObjectContext: context, remoteId: remoteId, imageUrl: imageUrl, syteJson: nil, trackingInfo: nil)
+                let _ = DataModel.sharedInstance.saveMatchstick(managedObjectContext: context, remoteId: remoteId, imageUrl: imageUrl, properties: nil)
                 self.downloadIfNeeded(imageURL: imageUrl, priority: .low)
             }
             
@@ -265,30 +316,33 @@ class DiscoverManager {
         }
     }
     
-    func recombeeRecommendation(_ recommendations:[NetworkingPromise.RecombeeRecommendation], dateRequested:Date){
-        DataModel.sharedInstance.performBackgroundTask { (context) in
-            let remoteIds = recommendations.map{ $0.remoteId }
-            
-            var matchstickLookup = Matchstick.lookupWith(remoteIds: remoteIds, in: context)
-            
-            var mayNeedToRequestMore = false
-            recommendations.forEach({ (recomend) in
-                if let matchstick = matchstickLookup[recomend.remoteId], (matchstick.isInGarbage || matchstick.isDisplaying) {
-                    mayNeedToRequestMore = true
-                }else {
-                    let matchstick = matchstickLookup[recomend.remoteId] ?? DataModel.sharedInstance.saveMatchstick(managedObjectContext: context, remoteId: recomend.remoteId, imageUrl: recomend.imageURL, syteJson: nil, trackingInfo: nil)
-                    if let matchstick = matchstick {
-                        matchstick.recombeeRecommended = dateRequested
-                        matchstick.dateSkipped = nil
-                        self.downloadIfNeeded(imageURL: recomend.imageURL, priority:.high)
+    func recombeeRecommendation(_ recommendations:[NetworkingPromise.RecombeeRecommendation], dateRequested:Date) -> Promise<Void>{
+        return Promise.init(resolvers: { (fulfil, reject) in
+            DataModel.sharedInstance.performBackgroundTask { (context) in
+                let remoteIds = recommendations.map{ $0.remoteId }
+                
+                var matchstickLookup = Matchstick.lookupWith(remoteIds: remoteIds, in: context)
+                
+                var mayNeedToRequestMore = false
+                recommendations.forEach({ (recomend) in
+                    if let matchstick = matchstickLookup[recomend.remoteId], (matchstick.isInGarbage || matchstick.isDisplaying) {
+                        mayNeedToRequestMore = true
+                    }else {
+                        let matchstick = matchstickLookup[recomend.remoteId] ?? DataModel.sharedInstance.saveMatchstick(managedObjectContext: context, remoteId: recomend.remoteId, imageUrl: recomend.imageURL, properties: recomend.properties)
+                        if let matchstick = matchstick {
+                            matchstick.recombeeRecommended = dateRequested
+                            matchstick.dateSkipped = nil
+                            self.downloadIfNeeded(imageURL: recomend.imageURL, priority:.high)
+                        }
                     }
+                })
+                if mayNeedToRequestMore {
+                    self.fillQueues(in: context)
                 }
-            })
-            if mayNeedToRequestMore {
-                self.fillQueues(in: context)
+                context.saveIfNeeded()
+                fulfil(())
             }
-            context.saveIfNeeded()
-        }
+        })
     }
     
     func currentDownloadingImageUrls() -> Set<String> {

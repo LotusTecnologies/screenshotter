@@ -468,7 +468,7 @@ enum ProductsOptionsGender : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol 
     case female = 1
     case male
     case auto
-    case galGadot
+
     
     static let `default` = ProductsOptionsGender.auto
     
@@ -499,8 +499,6 @@ enum ProductsOptionsGender : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol 
         case .female: string = "products.options.gender.female".localized
         case .male: string = "products.options.gender.male".localized
         case .auto: string = "products.options.gender.auto".localized
-        case .galGadot: string = "Gal Gadot"
-
         }
         
         return string
@@ -511,7 +509,6 @@ enum ProductsOptionsGender : Int, EnumIntDefaultProtocol, EnumIntOffsetProtocol 
         case .female: return "female"
         case .male: return "male"
         case .auto: return "auto"
-        case .galGadot: return "galGadot"
         }
     }
 }

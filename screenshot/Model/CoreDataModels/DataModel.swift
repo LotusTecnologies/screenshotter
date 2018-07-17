@@ -896,8 +896,8 @@ extension DataModel {
     func saveMatchstick(managedObjectContext: NSManagedObjectContext,
                         remoteId: String,
                         imageUrl: String,
-                        syteJson: String?,
-                        trackingInfo: String?) -> Matchstick? {
+                        properties:[String:[String]]?
+                        ) -> Matchstick? {
         let fetchRequest: NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "imageUrl == %@", imageUrl)
         fetchRequest.sortDescriptors = nil
@@ -909,9 +909,17 @@ extension DataModel {
         let matchstickToSave = Matchstick(context: managedObjectContext)
         matchstickToSave.remoteId = remoteId
         matchstickToSave.imageUrl = imageUrl
-        matchstickToSave.syteJson = syteJson ?? "[]"
+        if let properties = properties {
+            if JSONSerialization.isValidJSONObject(properties), let data = try? JSONSerialization.data(withJSONObject: properties, options: []), let string = String.init(data: data, encoding: .utf8) {
+                matchstickToSave.propertiesJson = string
+            }
+            
+            matchstickToSave.isMale = properties["genders"]?.contains("male")  ?? false
+            matchstickToSave.isFemale = properties["genders"]?.contains("female") ?? false
+        }
         matchstickToSave.receivedAt = Date()
-        matchstickToSave.trackingInfo = trackingInfo
+        
+
         return matchstickToSave
     }
     
