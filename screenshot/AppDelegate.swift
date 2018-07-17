@@ -46,6 +46,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         UNUserNotificationCenter.current().delegate = self
         
+        NetworkingPromise.sharedInstance.searchAmazon(keywords: "red dress")
         let _ = UserAccountManager.shared.application(application, didFinishLaunchingWithOptions: launchOptions)
         
         window = UIWindow(frame: UIScreen.main.bounds)

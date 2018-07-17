@@ -1031,3 +1031,90 @@ class NetworkingPromise : NSObject {
     }
 
 }
+
+//Amazon
+extension NetworkingPromise {
+//    struct AmazonItemLink {
+//        var url:String
+//        var description:String
+//    }
+//    struct AmazonItem {
+//        var itemLinks:[AmazonItemLink] = []
+//        var DetailPageURL:String
+//        var ASIN:String
+//        var ParentASIN:String
+//        var ProductGroup:String
+//        var title:String
+//        var manufacturer:String
+//    }
+    func searchAmazon(keywords:String){
+        // RFC 3986 section 2.3
+        let unreservedCharacters = CharacterSet.init(charactersIn:  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.~")
+        
+        let secretKey = "DS2XiI+TpojibQxtMSFkfHGdLkcQVHaoM2mVGVh/"
+        var components = URLComponents.init()
+        components.scheme = "http"
+        components.host = "webservices.amazon.com"
+        components.path = "/onca/xml"
+        var queryItems:[URLQueryItem] = []
+        
+        queryItems.append(URLQueryItem.init(name: "Service", value: "AWSECommerceService"))
+        queryItems.append(URLQueryItem.init(name: "Operation", value: "ItemSearch"))
+        queryItems.append(URLQueryItem.init(name: "AWSAccessKeyId", value: "AKIAIQQSEU7DPKUSEXTA"))
+        queryItems.append(URLQueryItem.init(name: "AssociateTag", value: "041897-20"))
+        queryItems.append(URLQueryItem.init(name: "SearchIndex", value: "Fashion"))
+        queryItems.append(URLQueryItem.init(name: "Availability", value: "Available"))
+        queryItems.append(URLQueryItem.init(name: "Keywords", value: keywords))
+        queryItems.append(URLQueryItem.init(name: "ResponseGroup", value: "Images,Offers"))
+
+        
+        let dateFormatter = ISO8601DateFormatter()
+        queryItems.append(URLQueryItem.init(name: "Timestamp", value: dateFormatter.string(from: Date())))
+//        queryItems.append(URLQueryItem.init(name: "Version", value: "2013-08-01"))
+
+        
+        queryItems.sort { (s1, s2) -> Bool in
+            let u1 = s1.name.decomposedStringWithCanonicalMapping.unicodeScalars
+            let u2 = s2.name.decomposedStringWithCanonicalMapping.unicodeScalars
+            for (x, y) in zip(u1, u2) {
+                if x.value < y.value { return true }
+                if x.value > y.value { return false }
+            }
+            return u1.count < u2.count
+        }
+
+        let queryItemsString = queryItems.compactMap({ (item) -> String? in
+            if let name = item.name.addingPercentEncoding(withAllowedCharacters: unreservedCharacters),
+                let value = item.value?.addingPercentEncoding(withAllowedCharacters: unreservedCharacters) {
+                return "\(name)=\(value)"
+            }
+            return nil
+       }).joined(separator: "&")
+
+        let stringToHmac = "GET\u{0A}webservices.amazon.com\u{0A}/onca/xml\u{0A}\(queryItemsString)"
+        print("stirng to hmac:\(stringToHmac)")
+        let hmac_sign = stringToHmac.hmacBase64(algorithm: .SHA256, key: secretKey)
+        queryItems.append(URLQueryItem.init(name: "Signature", value: hmac_sign))
+        
+        components.queryItems = queryItems
+        if let url = components.url {
+            let request = URLRequest.init(url: url)
+            
+            print("sending request \(url.absoluteString)")
+            let dataTask = URLSession.shared.dataTask(with: request) { (data, response, error) in
+                if let data = data,  let dataString = String.init(data: data, encoding: .utf8) {
+                    print("amazon repsonst \(dataString)")
+                    if let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
+                        let fileURL = dir.appendingPathComponent("amazonResponse.txt")
+
+                        do {
+                            try data.write(to:  fileURL)
+                        }
+                        catch {/* error handling here */}
+                    }
+                }
+            }
+            dataTask.resume()
+        }
+    }
+ }
