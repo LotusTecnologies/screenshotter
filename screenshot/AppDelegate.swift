@@ -756,6 +756,13 @@ extension AppDelegate: PushNotificationDelegate {
             Analytics.trackAppReceivedPushNotification(source: pushTypeString)
             PushNotificationManager.push().handlePushReceived(userInfo)  // pushwoosh
             completionHandler(.newData)
+        } else if let aps = userInfo["aps"] as? [String : Any],
+          aps.count <= 3,
+          let contentAvailable = aps["content-available"] as? NSNumber,
+          contentAvailable.intValue == 1 {
+            AssetSyncModel.sharedInstance.scanPhotoGalleryForFashion()
+            Analytics.trackAppReceivedPushNotification(source: "silent")
+            completionHandler(.newData)
         } else {
             Branch.getInstance().handlePushNotification(userInfo)
 
