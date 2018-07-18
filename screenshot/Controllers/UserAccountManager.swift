@@ -1027,12 +1027,14 @@ extension UserAccountManager {
                 }
             }
         }
-        return Promise { fulfill, reject in
+        
+        var uploadTask:StorageUploadTask? = nil
+        let upload:Promise<URL> = Promise { fulfill, reject in
             getUser().then(execute: { (user) -> (Void) in
                 let name = UUID().uuidString
                 let uploadRef = self.storageRef.child("user").child(user.uid).child("images").child("\(name).jpg")
                 
-                let _ = uploadRef.putData(data, metadata: nil) { (metadata, error) in
+                uploadTask = uploadRef.putData(data, metadata: nil) { (metadata, error) in
                     if let error = error {
                         reject(error)
                     }else{
@@ -1051,6 +1053,14 @@ extension UserAccountManager {
                 reject(error)
             })
         }
+        
+        let timeout:Promise<URL> = Promise  { fulfill, reject in
+            DispatchQueue.main.asyncAfter(deadline: .now() + 60, execute: {
+                uploadTask?.cancel() //  not thread safe, so only call methods on the main thread.
+                reject(NSError.init(domain: #file, code: #line, userInfo: [:]))
+            })
+        }
+        return race(upload, timeout)
     }
 }
 
