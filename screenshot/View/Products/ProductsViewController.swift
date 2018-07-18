@@ -86,6 +86,8 @@ class ProductsViewController: BaseViewController {
         self.productsOptions.delegate = self
         recoverLostSaleManager.delegate = self
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "NavigationBarFilter"), style: .plain, target: self, action: #selector(presentOptions))
+        
+        self.automaticallyAdjustsScrollViewInsets = false
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -782,10 +784,6 @@ extension ProductsViewController {
             }
             
         case .retry:
-            if #available(iOS 11.0, *) {} else {
-                self.automaticallyAdjustsScrollViewInsets = false
-            }
-            
             self.productCollectionViewManager.stopAndRemoveLoader()
             self.rateView.isHidden = true
             self.hideNoItemsHelperView()
