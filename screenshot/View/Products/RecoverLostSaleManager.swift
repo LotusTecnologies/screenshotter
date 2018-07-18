@@ -41,9 +41,7 @@ class RecoverLostSaleManager: NSObject, MFMailComposeViewControllerDelegate {
             if let objectId = clickOnProductObjectId {
                 if let product = DataModel.sharedInstance.mainMoc().productWith(objectId: objectId) {
                     self.timeLeftApp = nil
-                    if UIViewController.canPresentMail() {
-                        self.delegate?.recoverLostSaleManager(self, returnedFrom: product, timeSinceLeftApp: Int(round( abs(date.timeIntervalSinceNow) )))
-                    }
+                    self.delegate?.recoverLostSaleManager(self, returnedFrom: product, timeSinceLeftApp: Int(round( abs(date.timeIntervalSinceNow) )))
                 }
             }
         }
@@ -76,7 +74,7 @@ class RecoverLostSaleManager: NSObject, MFMailComposeViewControllerDelegate {
         Analytics.trackFeatureRecoveryAppeared(product: product, secondsSinceLeftApp: timeSinceLeftApp, abTestColor: abtest.backgroundColor.hexString(), abTestHeadline: abtest.headlineText, abTestButton: abtest.buttonText, reason: reason )
 
         self.presentingVC = viewController
-
+        let productObjectId = product.objectID
         let vc = RecoveryLostSalePopupViewController.init(abTest:abtest, emailProductAction: {
             self.clickOnProductObjectId = nil
 
@@ -90,9 +88,14 @@ class RecoverLostSaleManager: NSObject, MFMailComposeViewControllerDelegate {
             
             if let email = email {
                 Analytics.trackFeatureRecoveryEmailPrompt(product: product, hasEmail: true)
-                Analytics.trackFeatureRecoveryEmailSent(product: product)
                 NetworkingPromise.sharedInstance.sendProductEmailWithRetry(product: product, email: email ).then(execute: { (dict) -> Void in
                     print("send email: \(dict)")
+                    DataModel.sharedInstance.performBackgroundTask({ (context) in
+                        let product = context.productWith(objectId: productObjectId)
+                        Analytics.trackFeatureRecoveryEmailSent(product: product)
+
+                    })
+
                 }).catch(execute: { (e) in
                     if case let PMKURLError.badResponse(_, data, _) = e, let d = data, let errorString = String.init(data: d, encoding: .utf8) {
                         print("error sending email: \(errorString)")
@@ -116,7 +119,10 @@ class RecoverLostSaleManager: NSObject, MFMailComposeViewControllerDelegate {
                     if let textFields = alert.textFields, let textField = textFields.first, let email = textField.text {
                         if email.lengthOfBytes(using: .utf8) > 0 {
                             NetworkingPromise.sharedInstance.sendProductEmailWithRetry(product: product, email: email ).then(execute: { (dict) -> Void in
-                                print("send email: \(dict)")
+                                DataModel.sharedInstance.performBackgroundTask({ (context) in
+                                    let product = context.productWith(objectId: productObjectId)
+                                    Analytics.trackFeatureRecoveryEmailSent(product: product)                                    
+                                })
                             }).catch(execute: { (e) in
                                 print("error sending email: \(e)")
                             })
