@@ -78,8 +78,10 @@ class ProductCollectionViewManager {
             cell.productImageView.setImage(withURLString: product.imageURL)
             cell.favoriteControl.isSelected = product.isFavorite
             cell.priceLabel.text = product.price
+            cell.originalPrice = product.originalPrice
             cell.merchantLabel.text = product.merchant?.decodingHTMLEntities()
             cell.titleLabel.text = product.productTitle()?.decodingHTMLEntities()
+            cell.isSale = product.isSale()
         }
         return cell
     }
