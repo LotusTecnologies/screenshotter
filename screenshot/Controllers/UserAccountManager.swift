@@ -1046,7 +1046,7 @@ extension UserAccountManager {
         }
         
         let timeout:Promise<URL> = Promise  { fulfill, reject in
-            DispatchQueue.main.asyncAfter(deadline: .now() + 15, execute: {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 60, execute: {
                 uploadTask?.cancel() //  not thread safe, so only call methods on the main thread.
                 reject(NSError.init(domain: #file, code: #line, userInfo: [:]))
             })
