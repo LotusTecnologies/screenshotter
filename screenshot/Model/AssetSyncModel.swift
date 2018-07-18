@@ -258,13 +258,14 @@ extension AssetSyncModel {
                                 let screenshot = Screenshot(context: managedObjectContext)
                                 screenshot.assetId = assetId
                                 screenshot.createdAt = creationDate
-                                screenshot.isHidden = true
                                 screenshot.isNew = true
                                 screenshot.lastModified = creationDate
                                 screenshot.isRecognized = true
                                 screenshot.isHidden = false
                                 screenshot.imageData = imageData
                                 screenshot.source = source
+                                
+                                Analytics.trackScreenshotCreated(screenshot: screenshot)
                                 
                                 managedObjectContext.saveIfNeeded()
                                 fulfill((imageData, nil, nil))
@@ -488,7 +489,6 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                                 let error = NSError.init(domain: "Craze", code: -90, userInfo: [NSLocalizedDescriptionKey:"already have screenshot in database"])
                                 reject(error)
                             }else{
-                                let isHidden = !isRecognized
                                 let syteJsonString = NetworkingPromise.sharedInstance.jsonStringify(object: syteJson)
                                 let _ = DataModel.sharedInstance.saveScreenshot(upsert: false,
                                                                                 managedObjectContext: managedObjectContext,
@@ -496,7 +496,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                                                                                 createdAt: asset.creationDate,
                                                                                 isRecognized: isRecognized,
                                                                                 source: .screenshot,
-                                                                                isHidden: isHidden,
+                                                                                isHidden: true,
                                                                                 imageData: imageData,
                                                                                 uploadedImageURL: uploadedImageURL,
                                                                                 syteJsonString: syteJsonString)
