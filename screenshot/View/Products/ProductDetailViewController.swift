@@ -338,7 +338,7 @@ extension ProductDetailViewController : UICollectionViewDelegateFlowLayout, UICo
     }
     
     @objc func productCollectionViewCellBuyNowAction(_ control: UIControl, event: UIEvent) {
-        guard let indexPath = collectionView?.indexPath(for: event) else {
+        guard !self.recoverLostSaleManager.isPresented, let indexPath = collectionView?.indexPath(for: event) else {
             return
         }
 
