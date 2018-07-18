@@ -61,7 +61,9 @@ class RecoverLostSaleManager: NSObject, MFMailComposeViewControllerDelegate {
         
         viewController.present(alert, animated: true)
     
-}
+    }
+    
+    var isPresented = false
     
     public func presetRecoverAlertViewFor(product:Product, in viewController:UIViewController, rect:CGRect, view:UIView, timeSinceLeftApp:Int?, reason:Analytics.AnalyticsFeatureRecoveryAppearedReason){
         
@@ -153,7 +155,7 @@ class RecoverLostSaleManager: NSObject, MFMailComposeViewControllerDelegate {
         vc.popoverPresentationController?.sourceView = view
         
         viewController.present(vc, animated: true) {
-            
+            self.isPresented = true
         }
     }
     
@@ -176,7 +178,7 @@ extension RecoverLostSaleManager :UIPopoverPresentationControllerDelegate {
     }
     
     func popoverPresentationControllerShouldDismissPopover(_ popoverPresentationController: UIPopoverPresentationController) -> Bool {
-
+        self.isPresented = false
         return true
         
     }
