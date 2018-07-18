@@ -274,7 +274,7 @@
 "negative_feedback.options.send" = "Send Feedback";
 "negative_feedback.title" = "Sorry To Hear That!";
 
-"notification.message" = "discover the best deals on products in your screenshot";
+"notification.message" = "Discover the best deals on products in your screenshot";
 "notification.title" = "Shop Your Inspiration";
 
 "notification.favorited.item.message" = "We have items similar to the %@ you checked out recently that you’ll LOVE!";
