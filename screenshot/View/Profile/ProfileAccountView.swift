@@ -28,6 +28,7 @@ class ProfileAccountView: UIView {
     private let emailLabel = UILabel()
     private let emailTextField = UnderlineTextField()
     private let continueButton = MainButton()
+    private let logoutButton = MainButton()
     private let loggedOutContainerView = UIImageView()
     
     private var heightConstraint: NSLayoutConstraint?
@@ -343,6 +344,14 @@ class ProfileAccountView: UIView {
             emailLabel.centerYAnchor.constraint(equalTo: nameTextField.centerYAnchor)
         ]
         
+        // TODO:
+        logoutButton.translatesAutoresizingMaskIntoConstraints = false
+        logoutButton.isExclusiveTouch = true
+        logoutButton.setTitle("Logout", for: .normal)
+        logoutButton.addTarget(self, action: #selector(logoutAction), for: .touchUpInside)
+        loggedInContainerView.addSubview(logoutButton)
+        logoutButton.centerXAnchor.constraint(equalTo: loggedInContainerView.layoutMarginsGuide.centerXAnchor).isActive = true
+        
         continueButton.translatesAutoresizingMaskIntoConstraints = false
         continueButton.backgroundColor = .crazeGreen
         continueButton.alpha = 0
@@ -388,6 +397,10 @@ class ProfileAccountView: UIView {
         }))
         alertController.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
         viewController.present(alertController, animated: true)
+    }
+    
+    @objc private func logoutAction() {
+        
     }
     
     @objc private func loggedInContinueAction() {
