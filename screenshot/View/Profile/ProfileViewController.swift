@@ -22,7 +22,6 @@ class ProfileViewController: BaseTableViewController {
         case facebook
         case options
         case permissions
-        case logout
     }
     
     enum Row: Int {
@@ -32,8 +31,6 @@ class ProfileViewController: BaseTableViewController {
         case permissionPhoto
         case permissionPush
         case permissionGDRP
-        
-        case logout
         
         var permissionType: PermissionType? {
             switch self {
@@ -154,7 +151,6 @@ class ProfileViewController: BaseTableViewController {
         
         tableView.keyboardDismissMode = .onDrag
         tableView.backgroundColor = .background
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "logout")
         
         profileAccountView.delegate = self
     }
@@ -227,12 +223,9 @@ class ProfileViewController: BaseTableViewController {
             else {
                 dataSource.addSection(.facebook, rows: [])
             }
-            
-            dataSource.addSection(.logout, rows: [.logout])
         }
         else {
             dataSource.removeSection(.facebook)
-            dataSource.removeSection(.logout)
         }
         
         tableView.reloadData()
@@ -337,6 +330,20 @@ extension ProfileViewController: ProfileAccountViewDelegate {
         return self
     }
     
+    func profileAccountViewWantsToLogout(_ view: ProfileAccountView) {
+        guard !view.logoutButton.isLoading else {
+            return
+        }
+        
+        view.logoutButton.isLoading = true
+        
+        UserAccountManager.shared.logout().then(on: .main, execute: { () -> () in
+            self.syncLoggedIn()
+            self.animateProfileAccountView(isExpanded: false)
+            view.logoutButton.isLoading = false
+        })
+    }
+    
     private func animateProfileAccountView(isExpanded: Bool) {
         tableView.endEditing(true)
         
@@ -356,13 +363,14 @@ extension ProfileViewController: ProfileAccountViewDelegate {
         tableView.isScrollEnabled = !profileAccountView.isExpanded
         tableView.beginUpdates()
         tableView.endUpdates()
+        tableView.bringSubview(toFront: self.profileAccountView)
     }
 }
 
 extension ProfileViewController : RegisterViewControllerDelegate, ConfirmCodeViewControllerDelegate {
     func confirmCodeViewControllerDidConfirm(_ viewController: ConfirmCodeViewController) {
         self.dismiss(animated: true, completion: nil)
-        self.didLogin()
+        self.syncLoggedIn()
     }
     
     func confirmCodeViewControllerDidCancel(_ viewController: ConfirmCodeViewController) {
@@ -372,33 +380,30 @@ extension ProfileViewController : RegisterViewControllerDelegate, ConfirmCodeVie
     func registerViewControllerDidSkip(_ viewController: RegisterViewController) {
         self.dismiss(animated: true, completion: nil)
     }
+    
     func registerViewControllerDidCreateAccount(_ viewController: RegisterViewController){
         self.dismiss(animated: true, completion: nil)
-        self.didLogin()
-
-    }
-    
-    func didLogin(){
         self.syncLoggedIn()
     }
     
     func registerViewControllerDidSignin(_ viewController: RegisterViewController) {
         self.dismiss(animated: true, completion: nil)
-        self.didLogin()
+        self.syncLoggedIn()
     }
+    
     func registerViewControllerDidFacebookStarted(_ viewController: RegisterViewController) {
         Analytics.trackOnboardingFacebookStarted(source: .profileLoginPage)
     }
     
     func registerViewControllerDidFacebookLogin(_ viewController: RegisterViewController) {
         self.dismiss(animated: true, completion: nil)
-        self.didLogin()
+        self.syncLoggedIn()
         Analytics.trackOnboardingFacebookSuccess(isReturning: true, source: .profileLoginPage)
     }
     
     func registerViewControllerDidFacebookSignup(_ viewController: RegisterViewController) {
         self.dismiss(animated: true, completion: nil)
-        self.didLogin()
+        self.syncLoggedIn()
         Analytics.trackOnboardingFacebookSuccess(isReturning: true, source: .profileLoginPage)
     }
 }
@@ -478,40 +483,27 @@ extension ProfileViewController {
             return UITableViewCell()
         }
         
-        let cell: UITableViewCell
+        let reusableCell = tableView.dequeueReusableCell(withIdentifier: "cell")
+        let cell = reusableCell ?? UITableViewCell(style: .value1, reuseIdentifier: "cell")
         
-        if dataSource.section(indexPath.section) == Section.logout {
-            cell = tableView.dequeueReusableCell(withIdentifier: "logout", for: indexPath)
-            
-            cell.textLabel?.text = cellText(for: row)
-            cell.textLabel?.font = .screenshopFont(.hindLight, textStyle: .body)
-            cell.textLabel?.textColor = .crazeRed
-            cell.textLabel?.textAlignment = .center
+        cell.textLabel?.text = cellText(for: row)
+        cell.textLabel?.font = .preferredFont(forTextStyle: .body)
+        cell.textLabel?.textColor = .gray4
+        
+        cell.detailTextLabel?.font = .preferredFont(forTextStyle: .body, symbolicTraits: .traitBold)
+        cell.detailTextLabel?.textColor = .gray3
+        cell.detailTextLabel?.text = nil
+        cell.detailTextLabel?.attributedText = nil
+        
+        if let text = cellDetailedText(for: row) {
+            cell.detailTextLabel?.text = text
         }
-        else {
-            let reusableCell = tableView.dequeueReusableCell(withIdentifier: "cell")
-            cell = reusableCell ?? UITableViewCell(style: .value1, reuseIdentifier: "cell")
-            
-            cell.textLabel?.text = cellText(for: row)
-            cell.textLabel?.font = .preferredFont(forTextStyle: .body)
-            cell.textLabel?.textColor = .gray4
-            
-            cell.detailTextLabel?.font = .preferredFont(forTextStyle: .body, symbolicTraits: .traitBold)
-            cell.detailTextLabel?.textColor = .gray3
-            cell.detailTextLabel?.text = nil
-            cell.detailTextLabel?.attributedText = nil
-            
-            if let text = cellDetailedText(for: row) {
-                cell.detailTextLabel?.text = text
-            }
-            else if let attributedText = cellDetailedAttributedText(for: row) {
-                cell.detailTextLabel?.attributedText = attributedText
-            }
-            
-            cell.accessoryType = cellAccessoryType(for: row)
-            cell.accessoryView = cellAccessoryView(for: row)
+        else if let attributedText = cellDetailedAttributedText(for: row) {
+            cell.detailTextLabel?.attributedText = attributedText
         }
         
+        cell.accessoryType = cellAccessoryType(for: row)
+        cell.accessoryView = cellAccessoryView(for: row)
         return cell
     }
     
@@ -574,11 +566,6 @@ extension ProfileViewController {
             
         case .permissionGDRP:
             navigationController?.pushViewController(GDPRViewController(), animated: true)
-            
-        case .logout:
-            UserAccountManager.shared.logout().then(on: .main, execute: { () -> () in
-                self.syncLoggedIn()
-            })
         }
     }
     
@@ -603,8 +590,6 @@ extension ProfileViewController {
             return "profile.row.photo_permission.title".localized
         case .permissionGDRP:
             return "profile.row.gdpr.title".localized
-        case .logout:
-            return "profile.row.logout.title".localized
         }
     }
     

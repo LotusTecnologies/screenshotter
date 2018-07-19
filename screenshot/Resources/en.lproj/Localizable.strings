@@ -383,13 +383,13 @@
 "products.related_looks.error.connection" = "Please check your connection and try again.";
 "products.related_looks.error.no_looks" = "No similar looks found";
 
+"profile.header.logged_in.logout" = "Log Out";
 "profile.header.logged_out.continue.0" = "Log In";
 "profile.header.logged_out.continue.1" = " or ";
 "profile.header.logged_out.continue.2" = "Sign Up";
 "profile.header.logged_out.title" = "Log in for exclusive benefits!";
 "profile.row.currency.title" = "Currency";
 "profile.row.gdpr.title" = "Email & Image detection";
-"profile.row.logout.title" = "Logout";
 "profile.row.open_in.title" = "Open Products In";
 "profile.row.photo_permission.title" = "Camera Roll";
 "profile.row.push_permission.title" = "Push Notifications";
