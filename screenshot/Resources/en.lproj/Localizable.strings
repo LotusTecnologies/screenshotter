@@ -203,7 +203,6 @@
 
 "favorites.empty.detail" = "Tap the heart icon on products to add them to your favorites";
 "favorites.empty.title" = "No Favorites";
-"favorites.items.title" = "Favorited Items";
 "favorites.product.cart" = "Add to Cart";
 "favorites.product.price_alert_off" = "GET PRICE ALERTS";
 "favorites.product.price_alert_on" = "PRICE ALERTS ON";

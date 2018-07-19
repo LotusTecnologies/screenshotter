@@ -29,7 +29,7 @@ class FavoriteProductsViewController : BaseViewController {
     override var title: String? {
         set {}
         get {
-            return "favorites.items.title".localized
+            return "favorites.title".localized
         }
     }
     
