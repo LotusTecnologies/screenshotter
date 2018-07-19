@@ -15,34 +15,25 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "E4139D3F1F09083B00E8A53B"
-               BuildableName = "screenshot.app"
-               BlueprintName = "screenshot"
-               ReferencedContainer = "container:screenshot.xcodeproj">
+               BuildableName = "Screenshop.app"
+               BlueprintName = "Screenshop"
+               ReferencedContainer = "container:Screenshop.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
-      buildConfiguration = "prdRelease"
+      buildConfiguration = "prdDebug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
       </Testables>
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "E42AC3951F6147E20035A07C"
-            BuildableName = "devScreenshot.app"
-            BlueprintName = "devScreenshot"
-            ReferencedContainer = "container:screenshot.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </TestAction>
    <LaunchAction
-      buildConfiguration = "prdRelease"
+      buildConfiguration = "prdDebug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
@@ -51,16 +42,15 @@
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
+      <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E4139D3F1F09083B00E8A53B"
-            BuildableName = "screenshot.app"
-            BlueprintName = "screenshot"
-            ReferencedContainer = "container:screenshot.xcodeproj">
+            BuildableName = "Screenshop.app"
+            BlueprintName = "Screenshop"
+            ReferencedContainer = "container:Screenshop.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
       <EnvironmentVariables>
          <EnvironmentVariable
             key = "DYLD_PRINT_STATISTICS"
@@ -82,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E4139D3F1F09083B00E8A53B"
-            BuildableName = "screenshot.app"
-            BlueprintName = "screenshot"
-            ReferencedContainer = "container:screenshot.xcodeproj">
+            BuildableName = "Screenshop.app"
+            BlueprintName = "Screenshop"
+            ReferencedContainer = "container:Screenshop.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

@@ -15,15 +15,15 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "E4139D3F1F09083B00E8A53B"
-               BuildableName = "screenshot.app"
-               BlueprintName = "screenshot"
-               ReferencedContainer = "container:screenshot.xcodeproj">
+               BuildableName = "Screenshop.app"
+               BlueprintName = "Screenshop"
+               ReferencedContainer = "container:Screenshop.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
-      buildConfiguration = "prdDebug"
+      buildConfiguration = "prdRelease"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
@@ -35,14 +35,14 @@
             BlueprintIdentifier = "E42AC3951F6147E20035A07C"
             BuildableName = "devScreenshot.app"
             BlueprintName = "devScreenshot"
-            ReferencedContainer = "container:screenshot.xcodeproj">
+            ReferencedContainer = "container:Screenshop.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </TestAction>
    <LaunchAction
-      buildConfiguration = "prdDebug"
+      buildConfiguration = "prdRelease"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
@@ -56,9 +56,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E4139D3F1F09083B00E8A53B"
-            BuildableName = "screenshot.app"
-            BlueprintName = "screenshot"
-            ReferencedContainer = "container:screenshot.xcodeproj">
+            BuildableName = "Screenshop.app"
+            BlueprintName = "Screenshop"
+            ReferencedContainer = "container:Screenshop.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <EnvironmentVariables>
@@ -82,9 +82,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E4139D3F1F09083B00E8A53B"
-            BuildableName = "screenshot.app"
-            BlueprintName = "screenshot"
-            ReferencedContainer = "container:screenshot.xcodeproj">
+            BuildableName = "Screenshop.app"
+            BlueprintName = "Screenshop"
+            ReferencedContainer = "container:Screenshop.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
