@@ -278,12 +278,6 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
             if let tabTitle = viewcontroller.title {
                 Analytics.trackTabBarTapped(tab: tabTitle)
             }
-            if viewcontroller != screenshotsNavigationController {
-                AccumulatorModel.screenshotUninformed.resetUninformedCount()
-            }
-            if viewcontroller != favoritesNavigationController {
-                AccumulatorModel.favorite.resetUninformedCount()
-            }
         }
     }
     
