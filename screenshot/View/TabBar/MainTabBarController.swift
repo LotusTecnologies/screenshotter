@@ -104,7 +104,7 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         notificationCenter.addObserver(self, selector: #selector(applicationUserDidTakeScreenshot(_:)), name: .UIApplicationUserDidTakeScreenshot, object: nil)
         notificationCenter.addObserver(self, selector: #selector(applicationFetchedAppSettings(_:)), name: .fetchedAppSettings, object: nil)
         
-        notificationCenter.addObserver(self, selector: #selector(syncFavoriteTabBadgeCount), name: .FavoriteAccumulatorModelDidChange, object: nil)
+        notificationCenter.addObserver(self, selector: #selector(syncFavoriteTabBadgeCount), name: .FavoriteUninformedAccumulatorModelDidChange, object: nil)
         
         notificationCenter.addObserver(self, selector: #selector(syncShowingCart), name: .isUSCUpdated, object: nil)
 
@@ -169,7 +169,7 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
                 AccumulatorModel.screenshotUninformed.resetUninformedCount()
             }
             if viewcontroller == favoritesNavigationController {
-                AccumulatorModel.favorite.resetUninformedCount()
+                AccumulatorModel.favoriteUninformed.resetUninformedCount()
             }
         }
     }
@@ -265,7 +265,7 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
             AccumulatorModel.screenshotUninformed.resetUninformedCount()
         }
         if viewController == favoritesNavigationController {
-            AccumulatorModel.favorite.resetUninformedCount()
+            AccumulatorModel.favoriteUninformed.resetUninformedCount()
         }
         
         return true
@@ -282,7 +282,7 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
                 AccumulatorModel.screenshotUninformed.resetUninformedCount()
             }
             if viewcontroller != favoritesNavigationController {
-                AccumulatorModel.favorite.resetUninformedCount()
+                AccumulatorModel.favoriteUninformed.resetUninformedCount()
             }
         }
     }
@@ -363,7 +363,7 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
     }
     
     @objc func syncFavoriteTabBadgeCount() {
-        let count = AccumulatorModel.favorite.uninformedCount
+        let count = AccumulatorModel.favoriteUninformed.uninformedCount
         favoritesNavigationController.tabBarItem.badgeValue = count > 0 ? "\(count)" : nil
     }
     
