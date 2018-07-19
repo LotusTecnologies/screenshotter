@@ -1198,9 +1198,9 @@ extension DataModel {
                 try managedObjectContext.save()
                 
                 if toFavorited {
-                    AccumulatorModel.favorite.incrementUninformedCount()
+                    AccumulatorModel.favoriteUninformed.incrementUninformedCount()
                 }else{
-                    AccumulatorModel.favorite.decrementUninformedCount(by:1)
+                    AccumulatorModel.favoriteUninformed.decrementUninformedCount(by:1)
                 }
             } catch {
                 self.receivedCoreDataError(error: error)
@@ -1232,7 +1232,7 @@ extension DataModel {
                     }
                     product.isFavorite = false
                     product.dateFavorited = nil
-                    AccumulatorModel.favorite.decrementUninformedCount(by:results.count)
+                    AccumulatorModel.favoriteUninformed.decrementUninformedCount(by:results.count)
                     product.untrack()
                 }
                 try managedObjectContext.save()
