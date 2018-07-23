@@ -1209,41 +1209,6 @@ extension DataModel {
         }
     }
     
-    public func unfavorite(favoriteArray: [Product]) {
-        let moiArray = favoriteArray.map { $0.objectID }
-        self.unfavorite(favoriteArray: moiArray)
-    }
-    
-    public func unfavorite(favoriteArray: [NSManagedObjectID]) {
-        let moiArray = favoriteArray
-        
-        
-        self.performBackgroundTask { (managedObjectContext) in
-            let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
-            fetchRequest.predicate = NSPredicate(format: "SELF IN %@", moiArray)
-            fetchRequest.sortDescriptors = nil
-            
-            do {
-                let results = try managedObjectContext.fetch(fetchRequest)
-                for product in results {
-                    if let screenshot = product.screenshot {
-                        screenshot.removeFromFavorites(product)
-                        screenshot.favoritesCount -= 1
-                    }
-                    product.isFavorite = false
-                    product.dateFavorited = nil
-                    AccumulatorModel.favoriteUninformed.decrementUninformedCount(by:results.count)
-                    product.untrack()
-                }
-                try managedObjectContext.save()
-                
-            } catch {
-                self.receivedCoreDataError(error: error)
-                print("unfavorite objectIDs:\(moiArray) results with error:\(error)")
-            }
-        }
-    }
-    
     public func setNoShoppables(assetId: String, uploadedURLString: String?) {
         DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
             let fetchRequest: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
