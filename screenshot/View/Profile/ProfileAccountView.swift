@@ -466,6 +466,9 @@ extension ProfileAccountView: UIImagePickerControllerDelegate, UINavigationContr
                         SDWebImageManager.shared().saveImage(toCache: pickedImage, for: url)
                         self.avatarURL = url
                         UserAccountManager.shared.setProfile(displayName: nil, gender: nil, size: nil, unverifiedEmail: nil, avatarURL:url.absoluteString)
+                        }.catch { (error) in
+                            //whatever..
+                            Analytics.trackDevLog(file:  NSString.init(string: #file).lastPathComponent, line: #line, message: "cant upload profile image")
                     }
                 }
                 

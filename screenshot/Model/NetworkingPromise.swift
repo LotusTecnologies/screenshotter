@@ -59,8 +59,8 @@ class NetworkingPromise : NSObject {
     func uploadToSyteWorkhorse(imageData: Data?, orImageUrlString:String?) -> Promise<URLRequest> {
         var httpBody:Data?
         var payloadType:String = ""
-        if let url = orImageUrlString {
-            httpBody =  "[\"\(url)\"]".data(using: .utf8)
+        if let urlToSendToSyte = orImageUrlString {
+            httpBody =  "[\"\(urlToSendToSyte)\"]".data(using: .utf8)
             payloadType = ""
         }else if let imageData = imageData {
             httpBody = imageData
@@ -85,9 +85,7 @@ class NetworkingPromise : NSObject {
     }
 
     func uploadToSyte(imageData: Data?, orImageUrlString:String?) -> Promise<(String, [[String : Any]])> {
-        return firstly {// _ -> Promise<(Data, Foundation.URLResponse)> in
-            return self.uploadToSyteWorkhorse(imageData: imageData, orImageUrlString:orImageUrlString)
-            }.then { request -> Promise<(String, [[String : Any]])> in
+        return self.uploadToSyteWorkhorse(imageData: imageData, orImageUrlString:orImageUrlString).then { request -> Promise<(String, [[String : Any]])> in
                 return Promise { fulfill, reject in
                     let sessionConfiguration = URLSessionConfiguration.default
                     //        sessionConfiguration.timeoutIntervalForResource = 60  // On GPRS, even 60 seconds timeout.
@@ -376,7 +374,7 @@ class NetworkingPromise : NSObject {
                 return promise
             }
         }
-        return Promise.init(error: NSError.init(domain: #file, code: #line, userInfo: [NSLocalizedDescriptionKey:"unable to make url\(path) = \(String(describing: params))"]))
+        return Promise.init(error: NSError.init(domain:  NSString.init(string: #file).lastPathComponent, code: #line, userInfo: [NSLocalizedDescriptionKey:"unable to make url\(path) = \(String(describing: params))"]))
         
     }
     
