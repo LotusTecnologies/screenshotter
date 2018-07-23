@@ -128,10 +128,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             Analytics.trackSessionStarted() // Roi Tal from AppSee suggested
         }
         
-        Analytics.trackDevLog(file: #file, line: #line, message: "application didFinishLaunchingWithOptions")
+        Analytics.trackDevLog(file:  NSString.init(string: #file).lastPathComponent, line: #line, message: "application didFinishLaunchingWithOptions")
 
         if let launchOptions = launchOptions, let url = launchOptions[UIApplicationLaunchOptionsKey.url] as? URL {
-            Analytics.trackDevLog(file: #file, line: #line, message: "application didFinishLaunchingWithOptions with url \(url)")
+            Analytics.trackDevLog(file:  NSString.init(string: #file).lastPathComponent, line: #line, message: "application didFinishLaunchingWithOptions with url \(url)")
 
             if self.isSendToDebugURL(url) {
                 self.sendDebugDataToDebugApp(url:url)
@@ -525,14 +525,14 @@ extension AppDelegate : KochavaTrackerDelegate {
         if !ASIdentifierManager.shared().isAdvertisingTrackingEnabled {
             Branch.setTrackingDisabled(true)
         }
-        Analytics.trackDevLog(file: #file, line: #line, message: "framework setup: \(String(describing: launchOptions))")
+        Analytics.trackDevLog(file:  NSString.init(string: #file).lastPathComponent, line: #line, message: "framework setup: \(String(describing: launchOptions))")
         Branch.getInstance()?.initSession(launchOptions: launchOptions) { params, error in
             // params are the deep linked params associated with the link that the user clicked -> was re-directed to this app
             // params will be empty if no data found
 
             guard error == nil, let params = params as? [String : AnyObject] else {
                 if let e = error as NSError? {
-                    Analytics.trackDevLog(file: #file, line: #line, message: "branch error: \(e)")
+                    Analytics.trackDevLog(file:  NSString.init(string: #file).lastPathComponent, line: #line, message: "branch error: \(e)")
                     Analytics.trackError(type: nil, domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
                 }
                 return
@@ -551,7 +551,7 @@ extension AppDelegate : KochavaTrackerDelegate {
                 UserDefaults.standard.set(campaign, forKey: UserDefaultsKeys.campaign)
             }
             
-            Analytics.trackDevLog(file: #file, line: #line, message: "branch params: \(params)")
+            Analytics.trackDevLog(file:  NSString.init(string: #file).lastPathComponent, line: #line, message: "branch params: \(params)")
             if let nonBranchLink = params["+non_branch_link"]  as? String {
                 if nonBranchLink.contains("validate"), let url = URL.init(string: nonBranchLink) {
                     let _ = UserAccountManager.shared.application(application, open:url, options: [:])

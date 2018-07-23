@@ -48,7 +48,7 @@ class ProductsViewController: BaseViewController {
     var shamrockButton : FloatingActionButton?
     var screenshotLoadingState:ProductsViewControllerState = .unknown {
         didSet {
-            Analytics.trackDevLog(file: #file, line: #line, message: "from\(oldValue) to \(screenshotLoadingState)")            
+            Analytics.trackDevLog(file:  NSString.init(string: #file).lastPathComponent, line: #line, message: "from\(oldValue) to \(screenshotLoadingState)")            
         }
     }
     var productLoadingState:ProductsViewControllerState = .unknown 

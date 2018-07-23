@@ -206,6 +206,8 @@ class LocalNotificationModel {
                                                     identifier: identifier,
                                                     body: "notification.favorited.item.message".localized(withFormat: category),
                                                     interval: 3 * Constants.secondsInDay)
+            }.catch { (error) in
+                //"no latest favorite" or other error
         }
     }
     
