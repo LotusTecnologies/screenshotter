@@ -124,7 +124,7 @@ class FavoriteProductsViewController : BaseViewController {
     }
     
     public func clearMarkedAsUnfavorite(){
-        DataModel.sharedInstance.unfavorite(favoriteArray: Array(self.unfavoriteProductsIds))
+        DataModel.sharedInstance.favorite(toFavorited: false, productOIDs: Array(self.unfavoriteProductsIds))
         self.unfavoriteProductsIds.removeAll()
     }
     
