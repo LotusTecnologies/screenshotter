@@ -203,7 +203,6 @@
 
 "favorites.empty.detail" = "Tap the heart icon on products to add them to your favorites";
 "favorites.empty.title" = "No Favorites";
-"favorites.items.title" = "Favorited Items";
 "favorites.product.cart" = "Add to Cart";
 "favorites.product.price_alert_off" = "GET PRICE ALERTS";
 "favorites.product.price_alert_on" = "PRICE ALERTS ON";
@@ -274,7 +273,7 @@
 "negative_feedback.options.send" = "Send Feedback";
 "negative_feedback.title" = "Sorry To Hear That!";
 
-"notification.message" = "discover the best deals on products in your screenshot";
+"notification.message" = "Discover the best deals on products in your screenshot";
 "notification.title" = "Shop Your Inspiration";
 
 "notification.favorited.item.message" = "We have items similar to the %@ you checked out recently that you’ll LOVE!";
@@ -399,9 +398,7 @@
 "profile.title" = "Profile";
 
 "screenshot.empty.detail" = "Upload a photo or add a look from the Discover tab";
-"screenshot.empty.discover" = "Browse Looks";
 "screenshot.empty.title" = "Shop A Photo";
-"screenshot.empty.upload" = "Upload Photo";
 "screenshot.import.latest" = "Import your latest screenshot?";
 "screenshot.import.multiple" = "You have %d new screenshots, do you want to import them?";
 "screenshot.import.very_many" = "You have many new screenshots, do you want to import them?";

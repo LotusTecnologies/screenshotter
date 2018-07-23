@@ -146,7 +146,7 @@
 		529A36661FCC99B300BCA798 /* SilentPushSubscriptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529A36651FCC99B300BCA798 /* SilentPushSubscriptionManager.swift */; };
 		52E547441FE2487B00627D6D /* ScreenshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E547431FE2487B00627D6D /* ScreenshotHelper.swift */; };
 		52FA93911F6FF106000C7A71 /* UpdatePrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52FA93901F6FF106000C7A71 /* UpdatePrompt.swift */; };
-		5BCAB697F3F2E7E51098066C /* Pods_screenshot.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 46992D2723222F954C7B60D7 /* Pods_screenshot.framework */; };
+		A1BB93398D02CA6BE20E4B49 /* Pods_Screenshop.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC53E8002BDC1493B0EF237F /* Pods_Screenshop.framework */; };
 		C50E25EA207DDFF1003C8D24 /* CreditCardValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50E25E9207DDFF1003C8D24 /* CreditCardValidator.swift */; };
 		C5233F0B1F6FF05800F25C7C /* LifeCycleProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5233F0A1F6FF05800F25C7C /* LifeCycleProtocol.swift */; };
 		C5278FEB1F3C38510090E422 /* AssetSyncModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5278FB91F3C38510090E422 /* AssetSyncModel.swift */; };
@@ -410,6 +410,7 @@
 		31A0781A207E182100D70DC3 /* URL+craze.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+craze.swift"; sourceTree = "<group>"; };
 		31A0781C207F239400D70DC3 /* Model 14.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 14.xcdatamodel"; sourceTree = "<group>"; };
 		31A0781D20830D9900D70DC3 /* UserFeedback.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserFeedback.swift; sourceTree = "<group>"; };
+		31BFAFF020FDAFBF00D7C891 /* Model 21.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 21.xcdatamodel"; sourceTree = "<group>"; };
 		31C0C80520A15EAA002EE95B /* CrazeImageZoom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrazeImageZoom.swift; sourceTree = "<group>"; };
 		31C0C82620A30A02002EE95B /* Model 17.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 17.xcdatamodel"; sourceTree = "<group>"; };
 		31C536A720B40446005810CA /* String+HTML.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+HTML.swift"; sourceTree = "<group>"; };
@@ -419,9 +420,7 @@
 		31D372B220EE5B91007E978E /* RecoveryLostSalePopupViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryLostSalePopupViewController.swift; sourceTree = "<group>"; };
 		31EF9B0620299D15006D3B35 /* InAppPurchaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InAppPurchaseManager.swift; sourceTree = "<group>"; };
 		31EF9B082029D542006D3B35 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
-		3F0C1FB8EA3C6E2B9CFD91FD /* Pods-screenshot.prddebug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.prddebug.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.prddebug.xcconfig"; sourceTree = "<group>"; };
-		3F5EF5527B5ECCDCEAB24BDD /* Pods-screenshot.prdrelease.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.prdrelease.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.prdrelease.xcconfig"; sourceTree = "<group>"; };
-		46992D2723222F954C7B60D7 /* Pods_screenshot.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_screenshot.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		493CE8354B6ACA06E709778B /* Pods-Screenshop.prdrelease.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Screenshop.prdrelease.xcconfig"; path = "Pods/Target Support Files/Pods-Screenshop/Pods-Screenshop.prdrelease.xcconfig"; sourceTree = "<group>"; };
 		523C11381F5C195D001BD969 /* RatingFlow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RatingFlow.swift; sourceTree = "<group>"; };
 		524DB5391FC6F69800BD408F /* UsageStreak.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageStreak.swift; sourceTree = "<group>"; };
 		5268B5251FE65E1800B7D257 /* ChangelogAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangelogAlert.swift; sourceTree = "<group>"; };
@@ -430,7 +429,9 @@
 		529A36651FCC99B300BCA798 /* SilentPushSubscriptionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SilentPushSubscriptionManager.swift; sourceTree = "<group>"; };
 		52E547431FE2487B00627D6D /* ScreenshotHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotHelper.swift; sourceTree = "<group>"; };
 		52FA93901F6FF106000C7A71 /* UpdatePrompt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdatePrompt.swift; sourceTree = "<group>"; };
-		8E165CE332F45A2FD8C55A92 /* Pods-screenshot.devdebug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.devdebug.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.devdebug.xcconfig"; sourceTree = "<group>"; };
+		5D46F5FB952185827C62CED4 /* Pods-Screenshop.devdebug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Screenshop.devdebug.xcconfig"; path = "Pods/Target Support Files/Pods-Screenshop/Pods-Screenshop.devdebug.xcconfig"; sourceTree = "<group>"; };
+		77779D7BFEE5D04A53C2725F /* Pods-Screenshop.devrelease.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Screenshop.devrelease.xcconfig"; path = "Pods/Target Support Files/Pods-Screenshop/Pods-Screenshop.devrelease.xcconfig"; sourceTree = "<group>"; };
+		C43822AEF9F923C6F6F8E840 /* Pods-Screenshop.prddebug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Screenshop.prddebug.xcconfig"; path = "Pods/Target Support Files/Pods-Screenshop/Pods-Screenshop.prddebug.xcconfig"; sourceTree = "<group>"; };
 		C50E25E9207DDFF1003C8D24 /* CreditCardValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditCardValidator.swift; sourceTree = "<group>"; };
 		C5233F0A1F6FF05800F25C7C /* LifeCycleProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifeCycleProtocol.swift; sourceTree = "<group>"; };
 		C5278FB91F3C38510090E422 /* AssetSyncModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssetSyncModel.swift; sourceTree = "<group>"; };
@@ -529,7 +530,7 @@
 		C5F73C9D1FE244C800E49F2B /* Permissions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Permissions.swift; sourceTree = "<group>"; };
 		E402A7C72084D59B00094F14 /* Model 15.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 15.xcdatamodel"; sourceTree = "<group>"; };
 		E4104DBF20DC540200683FE9 /* LocalNotificationModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocalNotificationModel.swift; sourceTree = "<group>"; };
-		E4139D401F09083B00E8A53B /* screenshot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = screenshot.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E4139D401F09083B00E8A53B /* screenshot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = screenshot.app; path = Screenshop.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4139D4F1F09083B00E8A53B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E41BB9321F61BDD200A74F04 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E41BB9341F61BDD900A74F04 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -559,7 +560,7 @@
 		E4F124C5205FBA670026D91B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E4F124CF2060F5700026D91B /* Model 12.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 12.xcdatamodel"; sourceTree = "<group>"; };
 		E4F9B9552005315E0019264E /* Model 8.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 8.xcdatamodel"; sourceTree = "<group>"; };
-		E564B3319115D6C7FCDFE967 /* Pods-screenshot.devrelease.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-screenshot.devrelease.xcconfig"; path = "Pods/Target Support Files/Pods-screenshot/Pods-screenshot.devrelease.xcconfig"; sourceTree = "<group>"; };
+		EC53E8002BDC1493B0EF237F /* Pods_Screenshop.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Screenshop.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -567,8 +568,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5BCAB697F3F2E7E51098066C /* Pods_screenshot.framework in Frameworks */,
 				31EF9B092029D542006D3B35 /* StoreKit.framework in Frameworks */,
+				A1BB93398D02CA6BE20E4B49 /* Pods_Screenshop.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -948,10 +949,10 @@
 		BEBA23337A8F69FF9EF80643 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				8E165CE332F45A2FD8C55A92 /* Pods-screenshot.devdebug.xcconfig */,
-				3F0C1FB8EA3C6E2B9CFD91FD /* Pods-screenshot.prddebug.xcconfig */,
-				E564B3319115D6C7FCDFE967 /* Pods-screenshot.devrelease.xcconfig */,
-				3F5EF5527B5ECCDCEAB24BDD /* Pods-screenshot.prdrelease.xcconfig */,
+				5D46F5FB952185827C62CED4 /* Pods-Screenshop.devdebug.xcconfig */,
+				C43822AEF9F923C6F6F8E840 /* Pods-Screenshop.prddebug.xcconfig */,
+				77779D7BFEE5D04A53C2725F /* Pods-Screenshop.devrelease.xcconfig */,
+				493CE8354B6ACA06E709778B /* Pods-Screenshop.prdrelease.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -1330,7 +1331,7 @@
 			isa = PBXGroup;
 			children = (
 				31EF9B082029D542006D3B35 /* StoreKit.framework */,
-				46992D2723222F954C7B60D7 /* Pods_screenshot.framework */,
+				EC53E8002BDC1493B0EF237F /* Pods_Screenshop.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -1338,9 +1339,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		E4139D3F1F09083B00E8A53B /* screenshot */ = {
+		E4139D3F1F09083B00E8A53B /* Screenshop */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = E4139D571F09083B00E8A53B /* Build configuration list for PBXNativeTarget "screenshot" */;
+			buildConfigurationList = E4139D571F09083B00E8A53B /* Build configuration list for PBXNativeTarget "Screenshop" */;
 			buildPhases = (
 				AE7846E2803BA1055B53CB98 /* [CP] Check Pods Manifest.lock */,
 				E4139D3C1F09083B00E8A53B /* Sources */,
@@ -1357,7 +1358,7 @@
 			dependencies = (
 				E4F124C7205FBA670026D91B /* PBXTargetDependency */,
 			);
-			name = screenshot;
+			name = Screenshop;
 			productName = screenshot;
 			productReference = E4139D401F09083B00E8A53B /* screenshot.app */;
 			productType = "com.apple.product-type.application";
@@ -1415,7 +1416,7 @@
 					};
 				};
 			};
-			buildConfigurationList = E4139D3B1F09083B00E8A53B /* Build configuration list for PBXProject "screenshot" */;
+			buildConfigurationList = E4139D3B1F09083B00E8A53B /* Build configuration list for PBXProject "Screenshop" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -1428,7 +1429,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				E4139D3F1F09083B00E8A53B /* screenshot */,
+				E4139D3F1F09083B00E8A53B /* Screenshop */,
 				E4F124C0205FBA670026D91B /* productAlert */,
 			);
 		};
@@ -1474,7 +1475,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-screenshot/Pods-screenshot-frameworks.sh",
+				"${SRCROOT}/Pods/Target Support Files/Pods-Screenshop/Pods-Screenshop-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Amplitude-iOS/Amplitude_iOS.framework",
 				"${BUILT_PRODUCTS_DIR}/Analytics/Analytics.framework",
 				"${BUILT_PRODUCTS_DIR}/Bolts/Bolts.framework",
@@ -1523,7 +1524,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-screenshot/Pods-screenshot-frameworks.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Screenshop/Pods-Screenshop-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		AA5E1E000EDD4CA7B80FC6BA /* [CP] Copy Pods Resources */ = {
@@ -1532,7 +1533,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-screenshot/Pods-screenshot-resources.sh",
+				"${SRCROOT}/Pods/Target Support Files/Pods-Screenshop/Pods-Screenshop-resources.sh",
 				"${PODS_ROOT}/PushwooshInboxUI/Framework/PushwooshInboxBundle.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
@@ -1541,7 +1542,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-screenshot/Pods-screenshot-resources.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Screenshop/Pods-Screenshop-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		AE7846E2803BA1055B53CB98 /* [CP] Check Pods Manifest.lock */ = {
@@ -1555,7 +1556,7 @@
 			);
 			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-screenshot-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-Screenshop-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -1574,7 +1575,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# See https://medium.com/rocket-fuel/using-multiple-firebase-environments-in-ios-12b204cfa6c0\n# Name of the resource we're selectively copying\nGOOGLESERVICE_INFO_PLIST=GoogleService-Info.plist\n\n# Get references to dev and prod versions of the GoogleService-Info.plist\n# NOTE: These should only live on the file system and should NOT be part of the target (since we'll be adding them to the target manually)\nGOOGLESERVICE_INFO_DEV=${PROJECT_DIR}/${TARGET_NAME}/dev/${GOOGLESERVICE_INFO_PLIST}\nGOOGLESERVICE_INFO_PROD=${PROJECT_DIR}/${TARGET_NAME}/prd/${GOOGLESERVICE_INFO_PLIST}\n\n# Make sure the dev version of GoogleService-Info.plist exists\necho \"Looking for ${GOOGLESERVICE_INFO_PLIST} in ${GOOGLESERVICE_INFO_DEV}\"\nif [ ! -f $GOOGLESERVICE_INFO_DEV ]\nthen\necho \"No Development GoogleService-Info.plist found. Please ensure it's in the proper directory.\"\nexit 1\nfi\n\n# Make sure the prod version of GoogleService-Info.plist exists\necho \"Looking for ${GOOGLESERVICE_INFO_PLIST} in ${GOOGLESERVICE_INFO_PROD}\"\nif [ ! -f $GOOGLESERVICE_INFO_PROD ]\nthen\necho \"No Production GoogleService-Info.plist found. Please ensure it's in the proper directory.\"\nexit 1\nfi\n\n# Get a reference to the destination location for the GoogleService-Info.plist\nPLIST_DESTINATION=${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app\necho \"Will copy ${GOOGLESERVICE_INFO_PLIST} to final destination: ${PLIST_DESTINATION}\"\n\n# Copy over the prod GoogleService-Info.plist for Release builds\nif [ \"${CONFIGURATION}\" == \"prdRelease\" ]\nthen\necho \"Using ${GOOGLESERVICE_INFO_PROD}\"\ncp \"${GOOGLESERVICE_INFO_PROD}\" \"${PLIST_DESTINATION}\"\nelse\necho \"Using ${GOOGLESERVICE_INFO_DEV}\"\ncp \"${GOOGLESERVICE_INFO_DEV}\" \"${PLIST_DESTINATION}\"\nfi\n";
+			shellScript = "# See https://medium.com/rocket-fuel/using-multiple-firebase-environments-in-ios-12b204cfa6c0\n# Name of the resource we're selectively copying\nGOOGLESERVICE_INFO_PLIST=GoogleService-Info.plist\n\n# Get references to dev and prod versions of the GoogleService-Info.plist\n# NOTE: These should only live on the file system and should NOT be part of the target (since we'll be adding them to the target manually)\nGOOGLESERVICE_INFO_DEV=${PROJECT_DIR}/screenshot/dev/${GOOGLESERVICE_INFO_PLIST}\nGOOGLESERVICE_INFO_PROD=${PROJECT_DIR}/screenshot/prd/${GOOGLESERVICE_INFO_PLIST}\n\n# Make sure the dev version of GoogleService-Info.plist exists\necho \"Looking for ${GOOGLESERVICE_INFO_PLIST} in ${GOOGLESERVICE_INFO_DEV}\"\nif [ ! -f $GOOGLESERVICE_INFO_DEV ]\nthen\necho \"No Development GoogleService-Info.plist found. Please ensure it's in the proper directory.\"\nexit 1\nfi\n\n# Make sure the prod version of GoogleService-Info.plist exists\necho \"Looking for ${GOOGLESERVICE_INFO_PLIST} in ${GOOGLESERVICE_INFO_PROD}\"\nif [ ! -f $GOOGLESERVICE_INFO_PROD ]\nthen\necho \"No Production GoogleService-Info.plist found. Please ensure it's in the proper directory.\"\nexit 1\nfi\n\n# Get a reference to the destination location for the GoogleService-Info.plist\nPLIST_DESTINATION=${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app\necho \"Will copy ${GOOGLESERVICE_INFO_PLIST} to final destination: ${PLIST_DESTINATION}\"\n\n# Copy over the prod GoogleService-Info.plist for Release builds\nif [ \"${CONFIGURATION}\" == \"prdRelease\" ]\nthen\necho \"Using ${GOOGLESERVICE_INFO_PROD}\"\ncp \"${GOOGLESERVICE_INFO_PROD}\" \"${PLIST_DESTINATION}\"\nelse\necho \"Using ${GOOGLESERVICE_INFO_DEV}\"\ncp \"${GOOGLESERVICE_INFO_DEV}\" \"${PLIST_DESTINATION}\"\nfi\n";
 		};
 		E4D495D31F4987B100312614 /* Upload Symbols To AppSee */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1971,7 +1972,7 @@
 		};
 		E4139D581F09083B00E8A53B /* devDebug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8E165CE332F45A2FD8C55A92 /* Pods-screenshot.devdebug.xcconfig */;
+			baseConfigurationReference = 5D46F5FB952185827C62CED4 /* Pods-Screenshop.devdebug.xcconfig */;
 			buildSettings = {
 				APPSEE_API_KEY = d9010050cea04490b6b9cdd795849dd4;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -1981,7 +1982,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 175;
+				CURRENT_PROJECT_VERSION = 179;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/dev/;
 				INFOPLIST_FILE = screenshot/dev/Info.plist;
@@ -2001,7 +2002,7 @@
 		};
 		E4139D591F09083B00E8A53B /* devRelease */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E564B3319115D6C7FCDFE967 /* Pods-screenshot.devrelease.xcconfig */;
+			baseConfigurationReference = 77779D7BFEE5D04A53C2725F /* Pods-Screenshop.devrelease.xcconfig */;
 			buildSettings = {
 				APPSEE_API_KEY = d9010050cea04490b6b9cdd795849dd4;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -2011,7 +2012,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 175;
+				CURRENT_PROJECT_VERSION = 179;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/dev/;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -2089,7 +2090,7 @@
 		};
 		E4D6D8A21F61ADBF009DD999 /* prdDebug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3F0C1FB8EA3C6E2B9CFD91FD /* Pods-screenshot.prddebug.xcconfig */;
+			baseConfigurationReference = C43822AEF9F923C6F6F8E840 /* Pods-Screenshop.prddebug.xcconfig */;
 			buildSettings = {
 				APPSEE_API_KEY = d9010050cea04490b6b9cdd795849dd4;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -2099,7 +2100,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 175;
+				CURRENT_PROJECT_VERSION = 179;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/dev/;
 				INFOPLIST_FILE = screenshot/dev/Info.plist;
@@ -2172,7 +2173,7 @@
 		};
 		E4D6D8A41F61ADD1009DD999 /* prdRelease */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3F5EF5527B5ECCDCEAB24BDD /* Pods-screenshot.prdrelease.xcconfig */;
+			baseConfigurationReference = 493CE8354B6ACA06E709778B /* Pods-Screenshop.prdrelease.xcconfig */;
 			buildSettings = {
 				APPSEE_API_KEY = 0ece18b50f7d4ef9aae3e473c28030bc;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -2182,7 +2183,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 175;
+				CURRENT_PROJECT_VERSION = 179;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/prd/;
 				INFOPLIST_FILE = screenshot/prd/Info.plist;
@@ -2445,7 +2446,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		E4139D3B1F09083B00E8A53B /* Build configuration list for PBXProject "screenshot" */ = {
+		E4139D3B1F09083B00E8A53B /* Build configuration list for PBXProject "Screenshop" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E4139D551F09083B00E8A53B /* devDebug */,
@@ -2456,7 +2457,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = devDebug;
 		};
-		E4139D571F09083B00E8A53B /* Build configuration list for PBXNativeTarget "screenshot" */ = {
+		E4139D571F09083B00E8A53B /* Build configuration list for PBXNativeTarget "Screenshop" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E4139D581F09083B00E8A53B /* devDebug */,
@@ -2484,6 +2485,7 @@
 		C5278FBD1F3C38510090E422 /* Model.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				31BFAFF020FDAFBF00D7C891 /* Model 21.xcdatamodel */,
 				311A50D920E4BE470001D463 /* Model 20.xcdatamodel */,
 				E4AF5CC820E22EFD00C0155E /* Model 19.xcdatamodel */,
 				31912DB220BFEFCD0098EE5B /* Model 18.xcdatamodel */,
@@ -2505,7 +2507,7 @@
 				E42AC3921F60340B0035A07C /* Model 2.xcdatamodel */,
 				C5278FBE1F3C38510090E422 /* Model.xcdatamodel */,
 			);
-			currentVersion = 311A50D920E4BE470001D463 /* Model 20.xcdatamodel */;
+			currentVersion = 31BFAFF020FDAFBF00D7C891 /* Model 21.xcdatamodel */;
 			path = Model.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

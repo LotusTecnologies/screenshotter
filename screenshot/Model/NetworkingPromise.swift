@@ -59,8 +59,8 @@ class NetworkingPromise : NSObject {
     func uploadToSyteWorkhorse(imageData: Data?, orImageUrlString:String?) -> Promise<URLRequest> {
         var httpBody:Data?
         var payloadType:String = ""
-        if let url = orImageUrlString {
-            httpBody =  "[\"\(url)\"]".data(using: .utf8)
+        if let urlToSendToSyte = orImageUrlString {
+            httpBody =  "[\"\(urlToSendToSyte)\"]".data(using: .utf8)
             payloadType = ""
         }else if let imageData = imageData {
             httpBody = imageData
@@ -85,9 +85,7 @@ class NetworkingPromise : NSObject {
     }
 
     func uploadToSyte(imageData: Data?, orImageUrlString:String?) -> Promise<(String, [[String : Any]])> {
-        return firstly {// _ -> Promise<(Data, Foundation.URLResponse)> in
-            return self.uploadToSyteWorkhorse(imageData: imageData, orImageUrlString:orImageUrlString)
-            }.then { request -> Promise<(String, [[String : Any]])> in
+        return self.uploadToSyteWorkhorse(imageData: imageData, orImageUrlString:orImageUrlString).then { request -> Promise<(String, [[String : Any]])> in
                 return Promise { fulfill, reject in
                     let sessionConfiguration = URLSessionConfiguration.default
                     //        sessionConfiguration.timeoutIntervalForResource = 60  // On GPRS, even 60 seconds timeout.
@@ -291,28 +289,21 @@ class NetworkingPromise : NSObject {
     struct RecombeeRecommendation{
         var imageURL:String
         var remoteId:String
+        var properties:[String:[String]] = [:]
     }
-    func recombeeRecommendation(count:Int) -> Promise<[RecombeeRecommendation]>{
+    func recombeeRecommendation(count:Int, gender:ProductsOptionsGender) -> Promise<[RecombeeRecommendation]>{
         let userId = AnalyticsUser.current.identifier
         var params:[String:Any] = [:]
         params["count"] = count
         params["cascadeCreate"] = true
         params["rotationRate"] = 0.99
         params["filter"] = "'displayable' == true"
-        if UserDefaults.standard.bool(forKey: UserDefaultsKeys.discoverDontFilter) != true {
-            if let genderNumber = UserDefaults.standard.value(forKey: UserDefaultsKeys.productGender) as? NSNumber
-                , let gender = ProductsOptionsGender.init(rawValue: genderNumber.intValue){
-                if gender == .female {
-                    //                params["booster"] = "if  \"female\" in 'genders' then 99999999 else 0.01"
-                    params["filter"] = "'displayable' == true AND \"female\" in 'genders'"
-                }else if gender == .male{
-                    //                params["booster"] = "if  \"male\" in 'genders' then 99999999 else 0.01"
-                    params["filter"] = "'displayable' == true AND \"male\" in 'genders'"
-                }else if gender == .galGadot{
-                    //                params["booster"] = "if  \"Gal Gadot\" in 'rekognition-celebs' then 99999999 else 0.01"
-                    params["filter"] = "'displayable' == true AND \"Gal Gadot\" in 'rekognition-celebs'"
-                }
-            }
+        params["returnProperties"] = true
+        params["includedProperties"] = "rekognition-labels,genders,itemTypes,rekognition-celebs"
+        if gender == .female {
+            params["filter"] = "'displayable' == true AND \"female\" in 'genders'"
+        }else if gender == .male{
+            params["filter"] = "'displayable' == true AND \"male\" in 'genders'"
         }
         params["rotationTime"] = 60*60*24*2 // 2 days rotation
         return NetworkingPromise.sharedInstance.recombeeRequest(path: "recomms/users/\(userId)/items/", method: "GET", params: params).then { (dict) -> Promise<[RecombeeRecommendation]> in
@@ -324,7 +315,17 @@ class NetworkingPromise : NSObject {
                 }
                 recomms.forEach({ (matchstick) in
                     if let index = matchstick["id"] as? String {
-                        toReturn.append(RecombeeRecommendation.init(imageURL: "https://s3.amazonaws.com/screenshop-ordered-matchsticks/\(index).jpg", remoteId: "\(index)"))
+                        var properties:[String:[String]] = [:]
+                        
+                        if let values = matchstick["values"] as? [String:Any]{
+                            values.forEach({ (key, value) in
+                                if let value = value as? [String] {
+                                    properties[key] = value
+                                }
+                            })
+                        }
+                        
+                        toReturn.append(RecombeeRecommendation.init(imageURL: "https://s3.amazonaws.com/screenshop-ordered-matchsticks/\(index).jpg", remoteId: "\(index)", properties:properties))
                     }
                 })
             }
@@ -373,7 +374,7 @@ class NetworkingPromise : NSObject {
                 return promise
             }
         }
-        return Promise.init(error: NSError.init(domain: #file, code: #line, userInfo: [NSLocalizedDescriptionKey:"unable to make url\(path) = \(String(describing: params))"]))
+        return Promise.init(error: NSError.init(domain:  NSString.init(string: #file).lastPathComponent, code: #line, userInfo: [NSLocalizedDescriptionKey:"unable to make url\(path) = \(String(describing: params))"]))
         
     }
     

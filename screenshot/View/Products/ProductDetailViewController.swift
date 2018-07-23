@@ -29,12 +29,6 @@ class ProductDetailViewController: BaseViewController {
             self.syncViewsAfterStateChange()
         }
     }
-    var headerCell:ProductHeaderCollectionViewCell? {
-        if self.collectionView?.numberOfSections ?? 0 > 0 && self.collectionView?.numberOfItems(inSection: 0) ?? 0 > 0 {
-            return self.collectionView?.cellForItem(at: IndexPath.init(row: 0, section: 0)) as? ProductHeaderCollectionViewCell
-        }
-        return nil
-    }
     
     override func viewDidLoad() {
         
@@ -338,7 +332,7 @@ extension ProductDetailViewController : UICollectionViewDelegateFlowLayout, UICo
     }
     
     @objc func productCollectionViewCellBuyNowAction(_ control: UIControl, event: UIEvent) {
-        guard let indexPath = collectionView?.indexPath(for: event) else {
+        guard !self.recoverLostSaleManager.isPresented, let indexPath = collectionView?.indexPath(for: event) else {
             return
         }
 

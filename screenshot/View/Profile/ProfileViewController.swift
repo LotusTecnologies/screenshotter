@@ -207,7 +207,7 @@ class ProfileViewController: BaseTableViewController {
     // MARK: Login
     
     private func syncLoggedIn() {
-        Analytics.trackDevLog(file: #file, line: #line, message: "syncLoggedIn")
+        Analytics.trackDevLog(file:  NSString.init(string: #file).lastPathComponent, line: #line, message: "syncLoggedIn")
         let isLoggedIn = (UserAccountManager.shared.user?.isAnonymous == false)
         profileAccountView.isLoggedIn = isLoggedIn
         

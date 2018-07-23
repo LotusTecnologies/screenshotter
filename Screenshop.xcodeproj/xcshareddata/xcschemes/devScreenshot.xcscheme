@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "E4139D3F1F09083B00E8A53B"
-               BuildableName = "screenshot.app"
-               BlueprintName = "screenshot"
-               ReferencedContainer = "container:screenshot.xcodeproj">
+               BuildableName = "Screenshop.app"
+               BlueprintName = "Screenshop"
+               ReferencedContainer = "container:Screenshop.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -29,15 +29,6 @@
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
       </Testables>
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "E42AC3951F6147E20035A07C"
-            BuildableName = "devScreenshot.app"
-            BlueprintName = "devScreenshot"
-            ReferencedContainer = "container:screenshot.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </TestAction>
@@ -56,9 +47,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E4139D3F1F09083B00E8A53B"
-            BuildableName = "screenshot.app"
-            BlueprintName = "screenshot"
-            ReferencedContainer = "container:screenshot.xcodeproj">
+            BuildableName = "Screenshop.app"
+            BlueprintName = "Screenshop"
+            ReferencedContainer = "container:Screenshop.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <EnvironmentVariables>
@@ -82,9 +73,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E4139D3F1F09083B00E8A53B"
-            BuildableName = "screenshot.app"
-            BlueprintName = "screenshot"
-            ReferencedContainer = "container:screenshot.xcodeproj">
+            BuildableName = "Screenshop.app"
+            BlueprintName = "Screenshop"
+            ReferencedContainer = "container:Screenshop.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

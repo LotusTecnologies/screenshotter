@@ -8,9 +8,9 @@ PODS:
   - Bolts/AppLinks (1.9.0):
     - Bolts/Tasks
   - Bolts/Tasks (1.9.0)
-  - Branch (0.25.0):
-    - Branch/Core (= 0.25.0)
-  - Branch/Core (0.25.0)
+  - Branch (0.25.1):
+    - Branch/Core (= 0.25.1)
+  - Branch/Core (0.25.1)
   - CardIO (5.4.1)
   - CreditCardValidator (0.4)
   - EggRating (0.1.6):
@@ -19,18 +19,18 @@ PODS:
     - Bolts (~> 1.7)
   - FBSDKLoginKit (4.34.0):
     - FBSDKCoreKit
-  - Firebase/Auth (5.4.0):
+  - Firebase/Auth (5.4.1):
     - Firebase/CoreOnly
     - FirebaseAuth (= 5.0.2)
-  - Firebase/Core (5.4.0):
+  - Firebase/Core (5.4.1):
     - Firebase/CoreOnly
     - FirebaseAnalytics (= 5.0.1)
-  - Firebase/CoreOnly (5.4.0):
-    - FirebaseCore (= 5.0.5)
-  - Firebase/Database (5.4.0):
+  - Firebase/CoreOnly (5.4.1):
+    - FirebaseCore (= 5.0.6)
+  - Firebase/Database (5.4.1):
     - Firebase/CoreOnly
     - FirebaseDatabase (= 5.0.2)
-  - Firebase/Storage (5.4.0):
+  - Firebase/Storage (5.4.1):
     - Firebase/CoreOnly
     - FirebaseStorage (= 3.0.0)
   - FirebaseAnalytics (5.0.1):
@@ -41,7 +41,7 @@ PODS:
   - FirebaseAuth (5.0.2):
     - FirebaseCore (~> 5.0)
     - GTMSessionFetcher/Core (~> 1.1)
-  - FirebaseCore (5.0.5):
+  - FirebaseCore (5.0.6):
     - "GoogleToolboxForMac/NSData+zlib (~> 2.1)"
   - FirebaseDatabase (5.0.2):
     - FirebaseCore (~> 5.0)
@@ -75,13 +75,13 @@ PODS:
     - PromiseKit/CorePromise
   - PromiseKit/StoreKit (4.5.2):
     - PromiseKit/CorePromise
-  - Pushwoosh (5.8.0)
+  - Pushwoosh (5.8.1)
   - PushwooshInboxUI (5.5.4):
     - Pushwoosh (> 5.5)
   - RateView (1.2)
-  - SDWebImage (4.4.1):
-    - SDWebImage/Core (= 4.4.1)
-  - SDWebImage/Core (4.4.1)
+  - SDWebImage (4.4.2):
+    - SDWebImage/Core (= 4.4.2)
+  - SDWebImage/Core (4.4.2)
   - SwiftKeychainWrapper (3.0.1)
   - SwiftLog (1.0.0)
   - Whisper (6.0.2)
@@ -152,16 +152,16 @@ SPEC CHECKSUMS:
   Analytics: 6541ce337e99d9f7a2240a8b3953940a7be5f998
   Appsee: ab8b0317b0a5217d08637f61dbddaba2c9748f2a
   Bolts: ac6567323eac61e203f6a9763667d0f711be34c8
-  Branch: 127d29ab0a8866025eece1cf9e950ddb6f7d4070
+  Branch: 0f01403ad0cac16269540d05ed001f60249e045d
   CardIO: 56983b39b62f495fc6dae9ad7cf875143df06443
   CreditCardValidator: 9f0814dd61682c004071a250d89327ca83514a48
   EggRating: 378f25f5ac0629e7edfb011f5c5177c63f135e6e
   FBSDKCoreKit: 0ff57f093b85c8c9d5aba697d3edf68a8960ce78
   FBSDKLoginKit: 8c78f57a145afb756e4755e69195ebe08a42466e
-  Firebase: d66f4f29c23f22d96808d9abc174d81d8eee968f
+  Firebase: 355bd535bfdacaa82a7fe8d9784115edefd6fc03
   FirebaseAnalytics: b3628aea54c50464c32c393fb2ea032566e7ecc2
   FirebaseAuth: 096e457cdd4274412a66c4a35874787e411f5a03
-  FirebaseCore: 42b3267233bd21a5abd54117ccc38ca3dd0f8e83
+  FirebaseCore: 4c28e3b9708ba48a765e76515f913a71596eb5dd
   FirebaseDatabase: 27be5ac5bc75e0b17537b2bbfada8258addcc8cd
   FirebaseInstanceID: f3f0657372592ecdfdfe2cac604a5a75758376a6
   FirebaseStorage: 7ca4bb7b58a25fa647b04f524033fc7cb7eb272b
@@ -174,14 +174,14 @@ SPEC CHECKSUMS:
   nanopb: 5601e6bca2dbf1ed831b519092ec110f66982ca3
   PhoneNumberKit: 62003f40ff75315fd3738286558bc365365ac222
   PromiseKit: 743e497a5f505a470d3bbbf4ce0663c1268af0a4
-  Pushwoosh: 0605a9f5938ef9e4fd0b76bddb1da2d5c3f35c35
+  Pushwoosh: 166d50f7a094a0d94030ac6c87d8ff403caebaf7
   PushwooshInboxUI: 2b6aa7dea3109b9ceaff0959fb82b6896b230ca3
   RateView: d4d12e9bb76dc23a77a56f4e5c5fb530a3f3f998
-  SDWebImage: 47e9b5b925cbce75946c23f0c42dd19464189af4
+  SDWebImage: 624d6e296c69b244bcede364c72ae0430ac14681
   SwiftKeychainWrapper: 38952a3636320ae61bad3513cadd870929de7a4a
   SwiftLog: f6c4f9a4ade06263555ab34b2c0f72025ffcda9e
   Whisper: 169760fc4bab0abf24d5529f9276f95c25cf1025
 
-PODFILE CHECKSUM: 4201ed30a1b02bb3f29d9e0c34a4fca79a0734b2
+PODFILE CHECKSUM: 7bac391e7b8cf1a5d3202f8a8c91b1a5405a2f08
 
 COCOAPODS: 1.5.3

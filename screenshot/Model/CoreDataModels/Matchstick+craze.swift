@@ -19,9 +19,9 @@ extension Matchstick {
 
     static var skipRotationTime:TimeInterval = 7*24*60*60  // 1 week
     static var displayingSize = 2
-    static var queueSize = 30  //Must have at least this ammount  - if not grab random numbers
-    static var recombeeQueueSize = 20  // want to have this amount of recombee recommendations
-    static var recombeeQueueLowMark = 10 // if less than this amount make request for recombee recomendations (recombeeQueueSize - current)
+    static var queueSize = 10  //Must have at least this ammount  - if not grab random numbers
+    static var recombeeQueueSize = 30  // want to have this amount of recombee recommendations
+    static var recombeeQueueLowMark = 20 // if less than this amount make request for recombee recomendations (recombeeQueueSize - current)
 
     var isInGarbage:Bool {
         if self.wasAdded || self.was404 {

@@ -896,8 +896,8 @@ extension DataModel {
     func saveMatchstick(managedObjectContext: NSManagedObjectContext,
                         remoteId: String,
                         imageUrl: String,
-                        syteJson: String?,
-                        trackingInfo: String?) -> Matchstick? {
+                        properties:[String:[String]]?
+                        ) -> Matchstick? {
         let fetchRequest: NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "imageUrl == %@", imageUrl)
         fetchRequest.sortDescriptors = nil
@@ -909,9 +909,17 @@ extension DataModel {
         let matchstickToSave = Matchstick(context: managedObjectContext)
         matchstickToSave.remoteId = remoteId
         matchstickToSave.imageUrl = imageUrl
-        matchstickToSave.syteJson = syteJson ?? "[]"
+        if let properties = properties {
+            if JSONSerialization.isValidJSONObject(properties), let data = try? JSONSerialization.data(withJSONObject: properties, options: []), let string = String.init(data: data, encoding: .utf8) {
+                matchstickToSave.propertiesJson = string
+            }
+            
+            matchstickToSave.isMale = properties["genders"]?.contains("male")  ?? false
+            matchstickToSave.isFemale = properties["genders"]?.contains("female") ?? false
+        }
         matchstickToSave.receivedAt = Date()
-        matchstickToSave.trackingInfo = trackingInfo
+        
+
         return matchstickToSave
     }
     
@@ -1190,48 +1198,13 @@ extension DataModel {
                 try managedObjectContext.save()
                 
                 if toFavorited {
-                    AccumulatorModel.favorite.incrementUninformedCount()
+                    AccumulatorModel.favoriteUninformed.incrementUninformedCount()
                 }else{
-                    AccumulatorModel.favorite.decrementUninformedCount(by:1)
+                    AccumulatorModel.favoriteUninformed.decrementUninformedCount(by:1)
                 }
             } catch {
                 self.receivedCoreDataError(error: error)
                 print("favorite toFavorited:\(toFavorited) results with error:\(error)")
-            }
-        }
-    }
-    
-    public func unfavorite(favoriteArray: [Product]) {
-        let moiArray = favoriteArray.map { $0.objectID }
-        self.unfavorite(favoriteArray: moiArray)
-    }
-    
-    public func unfavorite(favoriteArray: [NSManagedObjectID]) {
-        let moiArray = favoriteArray
-        
-        
-        self.performBackgroundTask { (managedObjectContext) in
-            let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
-            fetchRequest.predicate = NSPredicate(format: "SELF IN %@", moiArray)
-            fetchRequest.sortDescriptors = nil
-            
-            do {
-                let results = try managedObjectContext.fetch(fetchRequest)
-                for product in results {
-                    if let screenshot = product.screenshot {
-                        screenshot.removeFromFavorites(product)
-                        screenshot.favoritesCount -= 1
-                    }
-                    product.isFavorite = false
-                    product.dateFavorited = nil
-                    AccumulatorModel.favorite.decrementUninformedCount(by:results.count)
-                    product.untrack()
-                }
-                try managedObjectContext.save()
-                
-            } catch {
-                self.receivedCoreDataError(error: error)
-                print("unfavorite objectIDs:\(moiArray) results with error:\(error)")
             }
         }
     }

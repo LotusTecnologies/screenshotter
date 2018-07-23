@@ -29,7 +29,7 @@ class FavoriteProductsViewController : BaseViewController {
     override var title: String? {
         set {}
         get {
-            return "favorites.items.title".localized
+            return "favorites.title".localized
         }
     }
     
@@ -124,7 +124,7 @@ class FavoriteProductsViewController : BaseViewController {
     }
     
     public func clearMarkedAsUnfavorite(){
-        DataModel.sharedInstance.unfavorite(favoriteArray: Array(self.unfavoriteProductsIds))
+        DataModel.sharedInstance.favorite(toFavorited: false, productOIDs: Array(self.unfavoriteProductsIds))
         self.unfavoriteProductsIds.removeAll()
     }
     

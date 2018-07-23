@@ -89,7 +89,7 @@ class AsyncOperationMonitorCenter {
                     
                 }
                 self.runningTags[queueUUID] = queueDict
-                NotificationCenter.default.post(name: .AsyncOperationTagMonitorCenterDidChange, object: nil, userInfo: ["tags":tags,"queueUUID":queueUUID.uuidString])
+                NotificationCenter.default.post(name: .AsyncOperationTagMonitorCenterDidChange, object: nil, userInfo: ["tags":tags,"queueUUID":queueUUID])
             }
         }
 
@@ -125,6 +125,7 @@ class AsyncOperationTag: Equatable {
         case assetId
         case shoppableId
         case productNumber
+        case filterChange
     }
     var type:TagType
     var value:String
