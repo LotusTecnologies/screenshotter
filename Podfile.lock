@@ -84,6 +84,7 @@ PODS:
   - SDWebImage/Core (4.4.2)
   - SwiftKeychainWrapper (3.0.1)
   - SwiftLog (1.0.0)
+  - SWXMLHash (4.7.0)
   - Whisper (6.0.2)
 
 DEPENDENCIES:
@@ -109,6 +110,7 @@ DEPENDENCIES:
   - SDWebImage (~> 4.0)
   - SwiftKeychainWrapper
   - SwiftLog (~> 1.0.0)
+  - SWXMLHash
   - Whisper
 
 SPEC REPOS:
@@ -145,6 +147,7 @@ SPEC REPOS:
     - SDWebImage
     - SwiftKeychainWrapper
     - SwiftLog
+    - SWXMLHash
     - Whisper
 
 SPEC CHECKSUMS:
@@ -180,8 +183,9 @@ SPEC CHECKSUMS:
   SDWebImage: 624d6e296c69b244bcede364c72ae0430ac14681
   SwiftKeychainWrapper: 38952a3636320ae61bad3513cadd870929de7a4a
   SwiftLog: f6c4f9a4ade06263555ab34b2c0f72025ffcda9e
+  SWXMLHash: f4522438189f72b41e39676d19469a8969d60dd1
   Whisper: 169760fc4bab0abf24d5529f9276f95c25cf1025
 
-PODFILE CHECKSUM: 7bac391e7b8cf1a5d3202f8a8c91b1a5405a2f08
+PODFILE CHECKSUM: c870c1592e3562dad6ad1b4ddb80dd715f629c02
 
 COCOAPODS: 1.5.3
