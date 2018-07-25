@@ -114,6 +114,8 @@
 		3125448F209871B4009410D5 /* Analytics+api.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3125448E209871B4009410D5 /* Analytics+api.swift */; };
 		31357EE220F6636D00515116 /* UIColor+craze.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31357EE120F6636D00515116 /* UIColor+craze.swift */; };
 		314C488A205E86E700B8381D /* PHAsset+craze.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314C4889205E86E700B8381D /* PHAsset+craze.swift */; };
+		31571D7021084085002E0599 /* InboxMessage+craze.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31571D6F21084085002E0599 /* InboxMessage+craze.swift */; };
+		31571D72210843C8002E0599 /* GlobalDateTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31571D71210843C8002E0599 /* GlobalDateTools.swift */; };
 		316C831020C3AEBD0012A908 /* DataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316C830520C3AEBD0012A908 /* DataModel.swift */; };
 		316C831120C3AEBD0012A908 /* Product+craze.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316C830620C3AEBD0012A908 /* Product+craze.swift */; };
 		316C831220C3AEBD0012A908 /* Cart+craze.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316C830720C3AEBD0012A908 /* Cart+craze.swift */; };
@@ -390,6 +392,9 @@
 		3125448E209871B4009410D5 /* Analytics+api.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Analytics+api.swift"; sourceTree = "<group>"; };
 		31357EE120F6636D00515116 /* UIColor+craze.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+craze.swift"; sourceTree = "<group>"; };
 		314C4889205E86E700B8381D /* PHAsset+craze.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PHAsset+craze.swift"; sourceTree = "<group>"; };
+		31571D6E21084015002E0599 /* Model 22.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 22.xcdatamodel"; sourceTree = "<group>"; };
+		31571D6F21084085002E0599 /* InboxMessage+craze.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "InboxMessage+craze.swift"; sourceTree = "<group>"; };
+		31571D71210843C8002E0599 /* GlobalDateTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalDateTools.swift; sourceTree = "<group>"; };
 		3162AEDD207DD5B6008A746B /* Model 13.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 13.xcdatamodel"; sourceTree = "<group>"; };
 		316C830520C3AEBD0012A908 /* DataModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataModel.swift; sourceTree = "<group>"; };
 		316C830620C3AEBD0012A908 /* Product+craze.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Product+craze.swift"; sourceTree = "<group>"; };
@@ -928,6 +933,8 @@
 				316C830D20C3AEBD0012A908 /* Matchstick+craze.swift */,
 				316C830E20C3AEBD0012A908 /* Screenshot+craze.swift */,
 				316C830F20C3AEBD0012A908 /* DataModel+FRC.swift */,
+				31571D6F21084085002E0599 /* InboxMessage+craze.swift */,
+				31571D71210843C8002E0599 /* GlobalDateTools.swift */,
 			);
 			path = CoreDataModels;
 			sourceTree = "<group>";
@@ -1648,6 +1655,7 @@
 				C553563C1F8369DF00849E64 /* DeviceHelper.swift in Sources */,
 				C5709E451FC57B4500AB2D04 /* EnumProtocol.swift in Sources */,
 				C5D2428020F4866A001403E4 /* DataSource.swift in Sources */,
+				31571D72210843C8002E0599 /* GlobalDateTools.swift in Sources */,
 				311A504120D90B780001D463 /* CheckoutOrderViewController.swift in Sources */,
 				318DC5F220FB5ECA00C16190 /* DiscoverGenderOptionViewController.swift in Sources */,
 				C58BAE7620E101DD0051394A /* ModalAnimatedTransitioning.swift in Sources */,
@@ -1713,6 +1721,7 @@
 				C58BAE6B20E101DD0051394A /* EmbossedView.swift in Sources */,
 				311A506720D90B780001D463 /* ScreenshotsHelperView.swift in Sources */,
 				311A505720D90B780001D463 /* ProductsRateView.swift in Sources */,
+				31571D7021084085002E0599 /* InboxMessage+craze.swift in Sources */,
 				316C831420C3AEBD0012A908 /* Variant+craze.swift in Sources */,
 				C547068C20FC6085003BD1D1 /* FavoriteNotificationTableViewCell.swift in Sources */,
 				C58BAE6520E101DD0051394A /* BorderView.swift in Sources */,
@@ -2485,6 +2494,7 @@
 		C5278FBD1F3C38510090E422 /* Model.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				31571D6E21084015002E0599 /* Model 22.xcdatamodel */,
 				31BFAFF020FDAFBF00D7C891 /* Model 21.xcdatamodel */,
 				311A50D920E4BE470001D463 /* Model 20.xcdatamodel */,
 				E4AF5CC820E22EFD00C0155E /* Model 19.xcdatamodel */,
@@ -2507,7 +2517,7 @@
 				E42AC3921F60340B0035A07C /* Model 2.xcdatamodel */,
 				C5278FBE1F3C38510090E422 /* Model.xcdatamodel */,
 			);
-			currentVersion = 31BFAFF020FDAFBF00D7C891 /* Model 21.xcdatamodel */;
+			currentVersion = 31571D6E21084015002E0599 /* Model 22.xcdatamodel */;
 			path = Model.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
