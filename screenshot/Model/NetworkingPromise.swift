@@ -60,7 +60,12 @@ class NetworkingPromise : NSObject {
         var httpBody:Data?
         var payloadType:String = ""
         if let urlToSendToSyte = orImageUrlString {
-            httpBody =  "[\"\(urlToSendToSyte)\"]".data(using: .utf8)
+            if let urlListBody = "[\"\(urlToSendToSyte)\"]".data(using: .utf8) {
+                httpBody = urlListBody
+            } else {
+                let emptyError = NSError(domain: "Craze", code: 3, userInfo: [NSLocalizedDescriptionKey : "Bad URL array to Syte from:\(urlToSendToSyte)"])
+                return Promise(error: emptyError)
+            }
             payloadType = ""
         }else if let imageData = imageData {
             httpBody = imageData
