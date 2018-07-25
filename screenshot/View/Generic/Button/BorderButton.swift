@@ -27,10 +27,10 @@ class BorderButton: LoadingButton {
     override func setTitleColor(_ color: UIColor?, for state: UIControlState) {
         super.setTitleColor(color, for: state)
         syncColors()
-        
+
         if state == .normal {
             let darkerColor = color?.darker(by: 14)
-            
+
             super.setTitleColor(darkerColor, for: .highlighted)
             super.setTitleColor(darkerColor, for: [.highlighted, .selected])
         }
@@ -59,4 +59,31 @@ class BorderButton: LoadingButton {
         tintColor = color
         layer.borderColor = color?.cgColor
     }
+    
+    // MARK: Tint Color
+    
+    // TODO: this is a better way of dealing with synced colors
+//    private var tintColorStates: [UInt: UIColor?] = [:]
+//
+//    func setTintColor(_ color: UIColor?, for state: UIControlState) {
+//        tintColorStates[state.rawValue] = color
+//        setTitleColor(color, for: state)
+//        syncColors()
+//
+//        if state == .normal {
+//            let darkerColor = color?.darker(by: 14)
+//
+//            var _state: UIControlState = .highlighted
+//            tintColorStates[_state.rawValue] = darkerColor
+//            setTitleColor(darkerColor, for: _state)
+//
+//            _state = [.highlighted, .selected]
+//            tintColorStates[_state.rawValue] = darkerColor
+//            setTitleColor(darkerColor, for: _state)
+//        }
+//    }
+//
+//    func tintColor(for state: UIControlState) -> UIColor? {
+//        return tintColorStates[state.rawValue] ?? nil
+//    }
 }
