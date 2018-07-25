@@ -760,7 +760,7 @@ extension AssetSyncModel {
                         }
                     }
                     let uploadedURLString = nsError.userInfo[NSURLErrorFailingURLStringErrorKey] as? String
-                    let imageUrl: String = uploadedURLString ?? ""
+                    let imageUrl: String = uploadedURLString ?? orImageUrlString ?? gottenUploadedURLString ?? ""
                     DataModel.sharedInstance.setNoShoppables(assetId: assetId, uploadedURLString: uploadedURLString)
                     Analytics.trackReceivedResponseFromSyte(imageUrl: imageUrl, segmentCount: 0, categories: nil)
                     if let e = error as? PMKURLError {
