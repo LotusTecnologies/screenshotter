@@ -60,7 +60,12 @@ class NetworkingPromise : NSObject {
         var httpBody:Data?
         var payloadType:String = ""
         if let urlToSendToSyte = orImageUrlString {
-            httpBody =  "[\"\(urlToSendToSyte)\"]".data(using: .utf8)
+            if let urlListBody = "[\"\(urlToSendToSyte)\"]".data(using: .utf8) {
+                httpBody = urlListBody
+            } else {
+                let emptyError = NSError(domain: "Craze", code: 3, userInfo: [NSLocalizedDescriptionKey : "Bad URL array to Syte from:\(urlToSendToSyte)"])
+                return Promise(error: emptyError)
+            }
             payloadType = ""
         }else if let imageData = imageData {
             httpBody = imageData
@@ -517,202 +522,8 @@ class NetworkingPromise : NSObject {
         return (firstName, lastName)
     }
     
-    func checkStock(partNumbers: [String]) -> Promise<([[String : Any]], [String])> {
-        guard let url = URL(string: Constants.shoppableDomain + "/product?part_numbers=" + partNumbers.joined(separator: "%2C")) else {
-            let error = NSError(domain: "Craze", code: 27, userInfo: [NSLocalizedDescriptionKey: "Cannot create shoppable url from shoppableDomain:\(Constants.shoppableDomain)"])
-            print("networking checkStock url error:\(error)")
-            return Promise(error: error)
-        }
-        var request = URLRequest(url: url)
-        request.addValue("bearer \(Constants.shoppableToken)", forHTTPHeaderField: "Authorization")
-        request.addValue(AnalyticsUser.current.identifier, forHTTPHeaderField: "cid")
-        let sessionConfiguration = URLSessionConfiguration.default
-        sessionConfiguration.timeoutIntervalForRequest = 60
-        return URLSession(configuration: sessionConfiguration).dataTask(with: request).asDataAndResponse().then { data, response -> Promise<([[String : Any]], [String])> in
-            guard let httpResponse = response as? HTTPURLResponse else {
-                let error = NSError(domain: "Craze", code: 42, userInfo: [NSLocalizedDescriptionKey: "checkStock no http response for url:\(String(describing: request.url))"])
-                print("checkStock no httpResponse")
-                return Promise(error: error)
-            }
-            let serializedObject: Any
-            do {
-                serializedObject = try JSONSerialization.jsonObject(with: data)
-            } catch {
-                let error = NSError(domain: "Craze", code: 42, userInfo: [NSLocalizedDescriptionKey: "checkStock JSONSerialize exception for url:\(String(describing: request.url))"])
-                print("checkStock exception on JSONSerialize")
-                return Promise(error: error)
-            }
-            guard httpResponse.statusCode >= 200,
-                httpResponse.statusCode < 300 else {
-                    let error: NSError
-                    if httpResponse.statusCode == 422,
-                        let jsonError = serializedObject as? [String : Any] {
-                        error = NSError(domain: "Shoppable", code: httpResponse.statusCode, userInfo: jsonError)
-                        print("checkStock Shoppable code:\(httpResponse.statusCode)  jsonError:\(String(describing: jsonError))")
-                    } else {
-                        error = NSError(domain: "Craze", code: 41, userInfo: [NSLocalizedDescriptionKey: "checkStock invalid http statusCode for url:\(String(describing: request.url))"])
-                        print("checkStock httpResponse.statusCode error")
-                    }
-                    return Promise(error: error)
-            }
-            if let jsonObject = serializedObject as? [[[String : Any]]] { // First array is array of variant info, second array is array of out of stock. Either may be empty.
-                let variantInfo: [[String : Any]] = jsonObject.first ?? []
-                let outOfStocks: [String] = jsonObject.count >= 2 ? jsonObject[1].compactMap { $0["part_number"] as? String } : []
-                return Promise(value: (variantInfo, outOfStocks))
-            } else if let jsonObject = serializedObject as? [String : Any] { // Unlikely. If passed in single partNumber, receive dictionary, like redirect to /product/partNumber.
-                let variantInfo: [[String : Any]]
-                let outOfStocks: [String]
-                if jsonObject["error"] as? String == "Product Not Found" {
-                    variantInfo = []
-                    if let partNumber = jsonObject["part_number"] as? String {
-                        outOfStocks = [partNumber]
-                    } else {
-                        outOfStocks = []
-                    }
-                } else {
-                    variantInfo = [jsonObject]
-                    outOfStocks = []
-                }
-                return Promise(value: (variantInfo, outOfStocks))
-            }
-            let error = NSError(domain: "Craze", code: 42, userInfo: [NSLocalizedDescriptionKey: "checkStock JSONSerialize failed for url:\(String(describing: request.url))"])
-            print("checkStock failed to JSONSerialize")
-            return Promise(error: error)
-        }
-    }
     
-    func nativeCheckout(remoteId: String, card: Card, cvv: String, shippingAddress: ShippingAddress) -> Promise<[[String : Any]]> {
-        guard let url = URL(string: Constants.shoppableHosted + "/api/v3/token/\(Constants.shoppableToken)/checkout") else {
-            let error = NSError(domain: "Craze", code: 37, userInfo: [NSLocalizedDescriptionKey: "Cannot form nativeCheckout url from shoppableHosted:\(Constants.shoppableHosted)"])
-            return Promise(error: error)
-        }
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.addValue("bearer \(Constants.shoppableToken)", forHTTPHeaderField: "Authorization")
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.addValue("http://screenshopit.com", forHTTPHeaderField: "Referer")
-        request.addValue("no-cache", forHTTPHeaderField: "Cache-Control")
-        request.addValue(AnalyticsUser.current.identifier, forHTTPHeaderField: "cid")
-        let tuple = divideByLastSpace(fullName: card.fullName)
-        let billingFirstName = tuple.0
-        let billingLastName = tuple.1
-        let jsonObject: [String : Any] = [
-            "billing_city" : card.city ?? "",
-            "billing_country" : card.country ?? "",
-            "billing_email" : card.email ?? "",
-            "billing_first_name" : billingFirstName,
-            "billing_last_name" : billingLastName,
-            "billing_phone" : card.phone ?? "",
-            "billing_postal_code" : card.zipCode ?? "",
-            "billing_state" : card.state ?? "",
-            "billing_street1" : card.street ?? "",
-            "billing_street2" : "",
-            "card_name" : card.fullName ?? "",
-            "card_number" : card.retrieveCardNumber() ?? "",
-            "cartId" : remoteId,
-            "currency" : "USD",
-            "expiry_month" : "\(card.expirationMonth)",
-            "expiry_year" : "\(card.expirationYear)",
-            "referer" : "http://screenshopit.com",
-            "security_code" : cvv,
-            "shipping_city" : shippingAddress.city ?? "",
-            "shipping_country" : shippingAddress.country ?? "",
-            "shipping_email" : card.email ?? "",
-            "shipping_first_name" : shippingAddress.firstName ?? "",
-            "shipping_last_name" : shippingAddress.lastName ?? "",
-            "shipping_phone" : shippingAddress.phone ?? "",
-            "shipping_postal_code" : shippingAddress.zipCode ?? "",
-            "shipping_state" : shippingAddress.state ?? "",
-            "shipping_street1" : shippingAddress.street ?? "",
-            "shipping_street2" : ""
-        ]
-        request.httpBody = jsonDatafy(object: jsonObject)
-        let sessionConfiguration = URLSessionConfiguration.default
-        sessionConfiguration.timeoutIntervalForResource = 60
-        return sendAndParseNativeCheckout(request: request)
-    }
     
-    func sendAndParseNativeCheckout(request: URLRequest) -> Promise<[[String : Any]]> {
-        let sessionConfiguration = URLSessionConfiguration.default
-        sessionConfiguration.timeoutIntervalForResource = 60
-        return Promise<[[String : Any]]> { fulfill, reject in
-            let dataTask = URLSession(configuration: sessionConfiguration).dataTask(with: request, completionHandler: { (data, response, error) in
-                if let error = error {
-                    print("sendAndParseNativeCheckout received error:\(error)")
-                    reject(error)
-                    return
-                }
-                guard let data = data else {
-                    let error = NSError(domain: "Craze", code: 42, userInfo: [NSLocalizedDescriptionKey: "sendAndParseNativeCheckout empty data for url:\(String(describing: request.url))"])
-                    print("sendAndParseNativeCheckout empty data")
-                    reject(error)
-                    return
-                }
-                guard let httpResponse = response as? HTTPURLResponse else {
-                    let error = NSError(domain: "Craze", code: 42, userInfo: [NSLocalizedDescriptionKey: "sendAndParseNativeCheckout no http response for url:\(String(describing: request.url))"])
-                    print("sendAndParseNativeCheckout no httpResponse")
-                    reject(error)
-                    return
-                }
-                let serializedObject: Any
-                do {
-                    serializedObject = try JSONSerialization.jsonObject(with: data)
-                } catch {
-                    let error = NSError(domain: "Craze", code: 42, userInfo: [NSLocalizedDescriptionKey: "sendAndParseNativeCheckout JSONSerialize exception for url:\(String(describing: request.url))"])
-                    print("sendAndParseNativeCheckout exception on JSONSerialize")
-                    reject(error)
-                    return
-                }
-                guard httpResponse.statusCode >= 200,
-                  httpResponse.statusCode < 300 else {
-                    let error: NSError
-                    if httpResponse.statusCode == 422,
-                      let jsonError = serializedObject as? [String : Any] {
-                        error = NSError(domain: "Shoppable", code: httpResponse.statusCode, userInfo: jsonError)
-                        print("sendAndParseNativeCheckout Shoppable code:\(httpResponse.statusCode)  jsonError:\(String(describing: jsonError))")
-                    } else {
-                        error = NSError(domain: "Craze", code: 41, userInfo: [NSLocalizedDescriptionKey: "sendAndParseNativeCheckout invalid http statusCode for url:\(String(describing: request.url))"])
-                        print("sendAndParseNativeCheckout httpResponse.statusCode error")
-                    }
-                    reject(error)
-                    return
-                }
-                guard let jsonObject = serializedObject as? [[String : Any]] else {
-                    let error = NSError(domain: "Craze", code: 42, userInfo: [NSLocalizedDescriptionKey: "sendAndParseNativeCheckout JSONSerialize failed for url:\(String(describing: request.url))"])
-                    print("sendAndParseNativeCheckout failed to JSONSerialize")
-                    reject(error)
-                    return
-                }
-                fulfill(jsonObject)
-            })
-            dataTask.resume()
-        }
-    }
-    
-    func geoLocateIsUSC() -> Promise<Bool> {
-        guard let url = URL(string: "http://www.geoplugin.net/json.gp?jsoncallback=") else {
-            let error = NSError(domain: "Craze", code: 49, userInfo: [NSLocalizedDescriptionKey: "Cannot form geoLocate url"])
-            return Promise(error: error)
-        }
-        let sessionConfiguration = URLSessionConfiguration.default
-        sessionConfiguration.timeoutIntervalForResource = 60
-        return URLSession(configuration: sessionConfiguration).dataTask(with: URLRequest(url: url)).asDictionary().then { dict -> Promise<Bool> in
-            var isUsc = false
-            if let countryCode = dict["geoplugin_countryCode"] as? String,
-              countryCode == "US" || countryCode == "IL" {
-                // Set half of the USC audience to non-USC UI, but continue to give USC feed.
-                if arc4random_uniform(2) == 1 {
-                    UserDefaults.standard.set(true, forKey: UserDefaultsKeys.abUSC)
-                } else {
-                    isUsc = true
-                }
-            }
-            UserDefaults.standard.set(isUsc, forKey: UserDefaultsKeys.isUSC)
-            UserDefaults.standard.synchronize()
-            NotificationCenter.default.post(name: .isUSCUpdated, object: nil)
-            return Promise(value: isUsc)
-        }
-    }
     
     // Promises to return an AWS Subscription ARN identifying this device's subscription to our AWS cloud
     func createAndSubscribeToSilentPushEndpoint(pushToken token: String, tzOffset: String, subscriptionARN arn: String? = nil) -> Promise<String> {

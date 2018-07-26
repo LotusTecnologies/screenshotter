@@ -27,7 +27,6 @@ class SettingsViewController : BaseViewController {
         case followFacebook
         case followInstagram
         case partners
-        case region
     }
     
     fileprivate let tableView = UITableView(frame: .zero, style: .grouped)
@@ -121,7 +120,6 @@ class SettingsViewController : BaseViewController {
             .usageStreak,
             .termsOfService,
             .privacyPolicy,
-//            .region,  // Revert to never use USC.
             .partners,
             .version
         ],
@@ -276,26 +274,7 @@ extension SettingsViewController : UITableViewDelegate {
             viewController.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(viewController, animated: true)
             
-        case .region:
-            let alert = UIAlertController.init(title: nil, message: nil, preferredStyle: .actionSheet)
-            
-            alert.addAction(UIAlertAction(title: "settings.region.us".localized, style: .default, handler: { (alertAction) in
-                UserDefaults.standard.set(true, forKey: UserDefaultsKeys.isUSC)
-                UserDefaults.standard.synchronize()
-                NotificationCenter.default.post(name: .isUSCUpdated, object: nil)
-                tableView.reloadRows(at: [indexPath], with: .none)
-            }))
-            alert.addAction(UIAlertAction(title: "settings.region.other".localized, style: .default, handler: { (alertAction) in
-                UserDefaults.standard.set(false, forKey: UserDefaultsKeys.isUSC)
-                UserDefaults.standard.synchronize()
-                NotificationCenter.default.post(name: .isUSCUpdated, object: nil)
-                tableView.reloadRows(at: [indexPath], with: .none)
-            }))
-
-            alert.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
-            
-            present(alert, animated: true, completion: nil)
-            
+        
         case .usageStreak, .version:
             break;
         }
@@ -345,8 +324,6 @@ fileprivate extension SettingsViewController {
             return "settings.row.facebook.title".localized
         case .partners:
             return "settings.row.partners.title".localized
-        case .region:
-            return "settings.row.region.title".localized
         }
     }
     
@@ -362,16 +339,6 @@ fileprivate extension SettingsViewController {
             }
         case .version:
             return "\(Bundle.displayVersionBuild)\(Constants.buildEnvironmentSuffix)"
-        case .region:
-            if UserDefaults.standard.object(forKey: UserDefaultsKeys.isUSC) == nil {
-                return "settings.region.unknown".localized
-            } else {
-                if UIApplication.isUSC {
-                    return "settings.region.us".localized
-                } else {
-                    return "settings.region.other".localized
-                }
-            }
             
         default:
             return nil

@@ -41,22 +41,7 @@ class Analytics {
             
         }
     }
-    
-    static func uscExperience() -> String {
-//        let uscExperience: String
-//        if UserDefaults.standard.object(forKey: UserDefaultsKeys.isUSC) == nil {
-//            uscExperience = "unset"
-//        } else if UserDefaults.standard.bool(forKey: UserDefaultsKeys.isUSC) {
-//            uscExperience = "full-usc"
-//        } else if UserDefaults.standard.bool(forKey: UserDefaultsKeys.abUSC) {
-//            uscExperience = "usc-feed-external-ui"
-//        } else {
-//            uscExperience = "non-usc"
-//        }
-//        return uscExperience
-        // Revert to never use USC.
-        return "non-usc"
-    }
+   
     
     static func propertiesForAllEvents() -> [String:Any] {
         var properties:[String:Any] = [:]
@@ -105,8 +90,6 @@ class Analytics {
             properties["screenshot-submittedToDiscoverDate"] = submittedDate
         }
         
-        properties["usc-experience"] = uscExperience()
-
         self.addScreenshotProperitesFrom(trackingData: screenshot.trackingInfo, toProperties: &properties)
         
         return properties
@@ -117,40 +100,8 @@ class Analytics {
     }
     
     static func propertiesFor(_ cart:Cart) -> [String:Any] {
-        var properties:[String:Any] = [:]
+        let properties:[String:Any] = [:]
 
-        properties["cart-uniqueItems"] = cart.items?.count ?? 0
-        
-        var totalItemCount = 0
-        if let items = cart.items {
-            items.forEach { (cartItem) in
-                if let c = cartItem as? CartItem {
-                    totalItemCount += Int(c.quantity)
-                }
-            }
-        }
-        
-        properties["cart-items"] = totalItemCount
-
-        properties["cart-shippingTotal"] = cart.shippingTotal
-        properties["cart-subtotal"] = cart.subtotal
-        properties["cart-taxEstimated"] = cart.estimatedTax
-        properties["cart-orderTotal"] = cart.estimatedTotalOrder
-        
-        properties["cart-remoteId"] = cart.remoteId
-        
-        if let dateModified = cart.dateModified {
-            properties["cart-dateModified"] = dateModified
-        }
-        if let dateSubmitted = cart.dateSubmitted {
-            properties["cart-dateSubmitted"] = dateSubmitted
-        }
-        properties["cart-isPastOrder"] = cart.isPastOrder
-        if let orderNumber = cart.orderNumber {
-            properties["cart-orderNumber"] = orderNumber
-        }
-        
-        properties["usc-experience"] = uscExperience()
 
         return properties
     }
@@ -257,30 +208,24 @@ class Analytics {
             properties["product-sku"] = sku
         }
         
-        
-
         return properties
 
     }
 
     
     static func trackTappedOnProduct(_ product: Product, atLocation location: Analytics.AnalyticsProductOpenedFromPage) {
-        let willShowShoppingCartPage = product.isSupportingUSC
         let displayAs:Analytics.AnalyticsProductOpenedDisplayAs = {
-            if willShowShoppingCartPage {
-                return .productPage
-            }else{
-                if let urlString = product.offer, let url = URL(string:urlString) {
-                    let willOpenWith = OpenWebPage.using(url:url)
-                    if let a = Analytics.AnalyticsProductOpenedDisplayAs.init(rawValue: willOpenWith.analyticsString()){
-                        return a
-                    }else{
-                        return .error
-                    }
+            if let urlString = product.offer, let url = URL(string:urlString) {
+                let willOpenWith = OpenWebPage.using(url:url)
+                if let a = Analytics.AnalyticsProductOpenedDisplayAs.init(rawValue: willOpenWith.analyticsString()){
+                    return a
                 }else{
                     return .error
                 }
+            }else{
+                return .error
             }
+            
         }()
         
         Analytics.trackProductOpened(product: product, order: nil, sort: nil, displayAs: displayAs, fromPage: location)
@@ -415,12 +360,7 @@ public class AnalyticsUser : NSObject {
             return ageInDays
         }()
         props["userAge"] = "\(userAge)"
-        if InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist) {
-            props["personalStylistPurchased"] = "true"
-        }
         
-        
-
         return props
     }
     

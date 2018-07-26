@@ -659,23 +659,6 @@ extension AppDelegate: PushNotificationDelegate {
     func onPushAccepted(_ pushManager: PushNotificationManager!, withNotification pushNotification: [AnyHashable : Any]!, onStart: Bool) {
         print("pushwoosh notification accepted: \(pushNotification)")
         // shows a user tapped the notification. Implement user interaction, such as showing push details
-        if let aps = pushNotification["aps"] as? [String : Any],
-          let category = aps["category"] as? String,
-          category == "PRICE_ALERT",
-          let dataDict = pushNotification["data"] as? [String : Any],
-          let id = dataDict["variantId"] as? String,
-          !id.isEmpty {
-            if let updatedPrice = dataDict["price"] as? Float {
-                let currency = dataDict["currency"] as? String ?? "USD"
-                DataModel.sharedInstance.updateProductPrice(id: id, updatedPrice: updatedPrice, updatedCurrency: currency).then(on: .main) {
-                    ProductViewController.present(with: id)
-                }
-            } else {
-                ProductViewController.present(with: id)
-            }
-            let pushTypeString = dataDict["type"] as? String
-            Analytics.trackAppOpenedFromPushNotification(source: pushTypeString)
-        }
     }
     
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
@@ -756,16 +739,7 @@ extension AppDelegate: PushNotificationDelegate {
             Analytics.trackAppReceivedPushNotification(source: pushTypeString)
             PushNotificationManager.push().handlePushReceived(userInfo)  // pushwoosh
             completionHandler(.newData)
-        } else if let aps = userInfo["aps"] as? [String : Any],
-          aps.count <= 3,
-          let contentAvailable = aps["content-available"] as? NSNumber,
-          contentAvailable.intValue == 1 {
-            AssetSyncModel.sharedInstance.scanPhotoGalleryForFashion()
-            Analytics.trackAppReceivedPushNotification(source: "silent")
-            completionHandler(.newData)
         } else {
-            Branch.getInstance().handlePushNotification(userInfo)
-
             // Only spin up a background task if we are already in the background
             if application.applicationState == .background {
                 if bgTask != UIBackgroundTaskInvalid {
@@ -776,7 +750,17 @@ extension AppDelegate: PushNotificationDelegate {
                     self.bgTask = UIBackgroundTaskInvalid
                 })
             }
-            completionHandler(.noData)
+
+            if let aps = userInfo["aps"] as? [String : Any],
+              aps.count <= 3,
+              let contentAvailable = aps["content-available"] as? NSNumber,
+              contentAvailable.intValue == 1 {
+                Analytics.trackAppReceivedPushNotification(source: "silent")
+                completionHandler(.newData)
+            } else {
+                Branch.getInstance().handlePushNotification(userInfo)
+                completionHandler(.noData)
+            }
         }
     }
     
@@ -829,7 +813,24 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
                 }
             } else if let openingProductKey = userInfo[Constants.openingProductKey] as? String {
                 isHandled = true
-                ProductViewController.present(imageURL: openingProductKey)
+                ProductDetailViewController.present(imageURL: openingProductKey)
+            } else if let aps = userInfo["aps"] as? [String : Any],
+              let category = aps["category"] as? String,
+              category == "PRICE_ALERT",
+              let dataDict = userInfo["data"] as? [String : Any],
+              let id = dataDict["variantId"] as? String,
+              !id.isEmpty {
+                isHandled = true
+                if let updatedPrice = dataDict["price"] as? Float {
+                    let currency = dataDict["currency"] as? String ?? "USD"
+                    DataModel.sharedInstance.updateProductPrice(id: id, updatedPrice: updatedPrice, updatedCurrency: currency).then(on: .main) {
+                        ProductDetailViewController.present(with: id)
+                    }
+                } else {
+                    ProductDetailViewController.present(with: id)
+                }
+                let pushTypeString = dataDict["type"] as? String
+                Analytics.trackAppOpenedFromPushNotification(source: pushTypeString)
             }
         }
         

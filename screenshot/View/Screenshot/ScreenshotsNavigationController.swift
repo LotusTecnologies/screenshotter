@@ -144,8 +144,6 @@ extension ScreenshotsNavigationController :ScreenshotsViewControllerDelegate{
     }
     
     func presentScreenshot(_ screenshot: Screenshot) {
-//        let screenshotOID = screenshot.objectID
-//        let _ = ShoppingCartModel.shared.checkStock(screenshotOID: screenshotOID) // Revert to never use USC.
         
         let productsViewController = createProductsViewController(screenshot: screenshot)
         self.pushViewController(productsViewController, animated: true)
