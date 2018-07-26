@@ -124,6 +124,12 @@ class FavoriteProductsViewController : BaseViewController {
     
     public func clearMarkedAsUnfavorite(){
         DataModel.sharedInstance.favorite(toFavorited: false, productOIDs: Array(self.unfavoriteProductsIds))
+        
+        self.unfavoriteProductsIds.forEach { (objectId) in
+            if let product = DataModel.sharedInstance.mainMoc().productWith(objectId: objectId) {
+                LocalNotificationModel.shared.deregisterCrazeFavoritedPriceAlert(id: product.id, merchant: product.merchant)
+            }
+        }
         self.unfavoriteProductsIds.removeAll()
     }
     

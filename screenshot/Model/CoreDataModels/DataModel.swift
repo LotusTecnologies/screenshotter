@@ -698,11 +698,6 @@ extension DataModel {
                 let results = try managedObjectContext.fetch(fetchRequest)
                 for product in results {
                     product.isFavorite = toFavorited
-                    if toFavorited {
-//                        product.track()
-                    }else{
-//                        product.untrack()
-                    }
                     if toFavorited == false {
                         product.dateViewed  = nil
                     }
