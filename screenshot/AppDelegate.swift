@@ -860,7 +860,7 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
         if notification.request.content.categoryIdentifier == "PRICE_ALERT" {
             completionHandler([.alert, .badge, .sound])
         } else {
-            PushNotificationManager.push().notificationCenterDelegate.userNotificationCenter?(center, willPresent: notification, withCompletionHandler: completionHandler)
+            completionHandler([])
         }
     }
     
