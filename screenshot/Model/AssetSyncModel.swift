@@ -870,6 +870,11 @@ extension AssetSyncModel {
         }
     }
     
+    func calcFallbackPrice(originalData: [String : Any]) -> Float {
+        let dataModel = DataModel.sharedInstance
+        return dataModel.parseFloat(originalData["price"]) ?? dataModel.parseFloat(originalData["sale_price"]) ?? dataModel.parseFloat(originalData["discount_price"]) ?? dataModel.parseFloat(originalData["retail_price"]) ?? 0
+    }
+    
     func saveProduct(managedObjectContext: NSManagedObjectContext,
                      shoppable: Shoppable,
                      productOrder: Int16,
@@ -883,11 +888,7 @@ extension AssetSyncModel {
         var color: String? = nil
         var sku: String? = nil
         if let originalData = prod["original_data"] as? [String : Any] {
-            fallbackPrice = dataModel.parseFloat(originalData["price"])
-            ?? dataModel.parseFloat(originalData["sale_price"])
-            ?? dataModel.parseFloat(originalData["discount_price"])
-            ?? dataModel.parseFloat(originalData["retail_price"])
-            ?? 0
+            fallbackPrice = calcFallbackPrice(originalData: originalData)
             partNumber = originalData["part_number"] as? String
             id = originalData["Product ID"] as? String ?? originalData["sku"] as? String ?? originalData["merchant_product_id"] as? String
             color = originalData["color"] as? String
