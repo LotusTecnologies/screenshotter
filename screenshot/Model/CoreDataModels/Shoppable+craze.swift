@@ -8,7 +8,7 @@
 
 import Foundation
 import CoreData
-
+import UIKit
 
 extension Shoppable {
     public func relatedImagesUrl() -> URL? {

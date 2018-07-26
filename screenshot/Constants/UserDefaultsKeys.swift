@@ -9,9 +9,6 @@
 import Foundation
 import UIKit
 
-extension Notification.Name {
-    static let isUSCUpdated = Notification.Name(rawValue: "io.crazeapp.screenshot.isUSCUpdated")
-}
 
 class UserDefaultsKeys  {
     // User

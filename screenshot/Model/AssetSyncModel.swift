@@ -590,7 +590,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                     // Store screenshot and syteJson to DB.
                     return Promise { fulfill, reject in
                         self.performBackgroundTask(assetId: asset.localIdentifier, shoppableId: nil) { (managedObjectContext) in
-                            if let screenshot = managedObjectContext.screenshotWith(assetId: asset.localIdentifier) {
+                            if let _ = managedObjectContext.screenshotWith(assetId: asset.localIdentifier) {
                                 //do nothing if already exsists
                                 let error = NSError.init(domain: "Craze", code: -90, userInfo: [NSLocalizedDescriptionKey:"already have screenshot in database"])
                                 reject(error)
@@ -795,15 +795,7 @@ extension AssetSyncModel {
             (!productCurrency.isEmpty && productCurrency != CurrencyMap.autoCode) {
             fixedQueryitems.append(URLQueryItem(name: "force_currency", value: productCurrency))
         }
-        //        let userDefaults = UserDefaults.standard
-        //        if userDefaults.object(forKey: UserDefaultsKeys.isUSC) == nil {
-        //            return self.geoLocateIsUSC()
-        //        } else {
-        //            let isUsc: Bool = userDefaults.bool(forKey: UserDefaultsKeys.isUSC)
-        //            return Promise(value: isUsc)
-        //        }
-        // Revert to never use USC.
-        // let sizeValue = isPlus ? "craze_plus_size" : isChild ? "kids_craze" : isUsc ? Constants.syteUscFeed : Constants.syteNonUscFeed
+       
         let sizeValue = isPlus ? "craze_plus_size" : isChild ? "kids_craze" : Constants.syteNonUscFeed
         fixedQueryitems.append(URLQueryItem(name: "feed", value: sizeValue))
         if optionsMask.rawValue & ProductsOptionsMask.genderMale.rawValue > 0 {
