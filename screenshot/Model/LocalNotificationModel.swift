@@ -84,7 +84,7 @@ class LocalNotificationModel {
                 content.attachments = [attachment]
             } catch {
                 print("Local notification attachment error:\(error)")
-                Analytics.trackError(type: nil, domain: "Craze", code: 94, localizedDescription: "Screenshot notif identifier:\(identifier) attachment error:\(error)")
+                Analytics.trackError(type: nil, domain: "Craze", code: 101, localizedDescription: "Screenshot notif identifier:\(identifier) attachment error:\(error)")
             }
         }
         
@@ -97,7 +97,7 @@ class LocalNotificationModel {
         UNUserNotificationCenter.current().add(request, withCompletionHandler: { (error) in
             if let error = error {
                 print("sendScreenshotAddedLocalNotification identifier:\(identifier)  error:\(error)")
-                Analytics.trackError(type: nil, domain: "Craze", code: 95, localizedDescription: "Screenshot notif identifier:\(identifier) schedule error:\(error)")
+                Analytics.trackError(type: nil, domain: "Craze", code: 102, localizedDescription: "Screenshot notif identifier:\(identifier) schedule error:\(error)")
             } else {
                 Analytics.trackAppSentLocalPushNotification()
             }
