@@ -590,7 +590,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                     // Store screenshot and syteJson to DB.
                     return Promise { fulfill, reject in
                         self.performBackgroundTask(assetId: asset.localIdentifier, shoppableId: nil) { (managedObjectContext) in
-                            if let screenshot = managedObjectContext.screenshotWith(assetId: asset.localIdentifier) {
+                            if let _ = managedObjectContext.screenshotWith(assetId: asset.localIdentifier) {
                                 //do nothing if already exsists
                                 let error = NSError.init(domain: "Craze", code: -90, userInfo: [NSLocalizedDescriptionKey:"already have screenshot in database"])
                                 reject(error)
