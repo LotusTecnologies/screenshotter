@@ -26,38 +26,44 @@ class MessageInboxCollectionViewCell: UICollectionViewCell {
         var toReturn = NSMutableAttributedString()
         
         func append(char:Character, tags:[String]){
-            
-            var attributes:[NSAttributedStringKey: Any] = [
-                .foregroundColor: UIColor.gray2,
-                .font: UIFont.screenshopFont(.hindMedium, size: UIFont.buttonFontSize),
-                .underlineStyle : NSUnderlineStyle.styleNone.rawValue
-            ]
-            tags.forEach { (t) in
+            var color = UIColor.gray3
+            var font = UIFont.screenshopFont(.hindMedium, size: UIFont.buttonFontSize)
+            var underlineStyle = NSUnderlineStyle.styleNone.rawValue
+
+            for t in tags {
                 let tag = t.lowercased()
                 let uppper = tag.uppercased()
-                if tag == "crazeRed" {
-                    attributes[.foregroundColor] = UIColor.crazeRed
-                }else if tag == "crazeGreen" {
-                    attributes[.foregroundColor] = UIColor.crazeGreen
+                if tag == "crazered" {
+                    color = UIColor.crazeRed
+                }else if tag == "crazegreen" {
+                    color = UIColor.crazeGreen
                 }else if tag == "bold" {
-                    attributes[.font] = UIFont.screenshopFont(.hindBold, size: UIFont.buttonFontSize)
+                    font = UIFont.screenshopFont(.hindBold, size: UIFont.buttonFontSize)
                 }else if tag == "underline"{
-                    attributes[.underlineStyle] = NSUnderlineStyle.styleSingle.rawValue
+                    underlineStyle = NSUnderlineStyle.styleSingle.rawValue
                 }else if let hex = cssToHexDictionairy[uppper] {
-                    let color = UIColor.init(hex: hex)
-                    attributes[.foregroundColor] = color
-                }else if tag.first == "#" {
-                    let color = UIColor.init(hex: tag)
-                    attributes[.foregroundColor] = color
+                     color = UIColor.init(hex: hex)
+                }else if tag.hasPrefix("#") {
+                     color = UIColor.init(hex: tag)
                 }
-                
-                attributes[.underlineColor] = attributes[.foregroundColor]
              }
-            
-           
-            
-            let string = NSAttributedString.init(string: String(char), attributes: attributes)
-            toReturn.append(string)
+            if underlineStyle == NSUnderlineStyle.styleNone.rawValue {
+                toReturn.append(NSAttributedString.init(string: String(char), attributes: [
+                    .foregroundColor: color,
+                    .backgroundColor:UIColor.clear,
+                    .font: font
+                    ])
+                )
+            }else{
+                toReturn.append(NSAttributedString.init(string: String(char), attributes: [
+                    .foregroundColor: color,
+                    .backgroundColor:UIColor.clear,
+                    .font: font ,
+                    .underlineStyle : underlineStyle,
+                    .underlineColor: color
+                    ])
+                )
+            }
             
         }
         
