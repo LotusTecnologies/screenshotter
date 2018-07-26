@@ -16,31 +16,30 @@ extension InboxMessage {
                 return "Expired"
             }else if let date = self.date {
                 let oneDay:TimeInterval = 60*60*24
-                let mostRecentMidnight = Date()
-                let mostRecentJan1 = Date()
+                let mostRecentMidnight = GlobalDateTools.shared.mostRecentMidnight
+                let mostRecentJan1 = GlobalDateTools.shared.mostRecentJan1
                 
                 if date > mostRecentMidnight {
                     return "Today".localized
-                }else if date > date.addingTimeInterval(-oneDay) {
+                }else if date > date.addingTimeInterval(-1 * oneDay) {
                     return "Yesterday".localized
-                }else if date > date.addingTimeInterval(-2*oneDay) {
+                }else if date > date.addingTimeInterval(-2 * oneDay) {
                     return "2 days ago".localized
-                }else if date > date.addingTimeInterval(-3*oneDay) {
+                }else if date > date.addingTimeInterval(-3 * oneDay) {
                     return "3 days ago".localized
-                }else if date > date.addingTimeInterval(-4*oneDay) {
+                }else if date > date.addingTimeInterval(-4 * oneDay) {
                     return "4 days ago".localized
-                }else if date > date.addingTimeInterval(-5*oneDay) {
+                }else if date > date.addingTimeInterval(-5 * oneDay) {
                     return "5 days ago".localized
-                }else if date > date.addingTimeInterval(-6*oneDay) {
+                }else if date > date.addingTimeInterval(-6 * oneDay) {
                     return "6 days ago".localized
                 }else if date > mostRecentJan1 {
-                    return "MM/DD"
+                    let formatter = GlobalDateTools.shared.shortDateFormatter
+                    return formatter.string(from: date)
                 }else{
-                    return "MM/DD/YYYY"
+                    let formatter = GlobalDateTools.shared.longDateFormatter
+                    return formatter.string(from: date)
                 }
-                
-                
-
             }else{
                  // error?
                 return ""

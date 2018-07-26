@@ -46,20 +46,23 @@ class GlobalDateTools: NSObject {
     lazy var mostRecentJan1:Date = {
         if self.privateMostRecentJan1 == nil {
             var comp = self.gregorianCalendar.dateComponents([.year], from: Date())
-            self.gregorianCalendar.date(from: comp)
+            comp.day = 1
+            comp.month = 1
+            self.privateMostRecentJan1 = self.gregorianCalendar.date(from: comp)
         }
         return self.privateMostRecentJan1 ?? Date()
     }()
     
     lazy var shortDateFormatter:DateFormatter = {
         let df = DateFormatter.init()
-        df.dateFormat = "MM/dd"
+        df.dateFormat = "MMMMM dd"
         return df
     }()
     
     lazy var longDateFormatter:DateFormatter = {
         let df = DateFormatter.init()
-        df.dateFormat = "MM/dd/yyyy"
+        df.timeStyle = .none
+        df.dateStyle = .short
         return df
     }()
     

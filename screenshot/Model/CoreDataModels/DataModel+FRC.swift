@@ -146,9 +146,9 @@ extension DataModel {
         
         let request: NSFetchRequest<InboxMessage> = InboxMessage.fetchRequest()
         request.predicate = nil
-        request.sortDescriptors = [NSSortDescriptor(key: "dateAdded", ascending: false)]
+        request.sortDescriptors = [NSSortDescriptor(key:"isExpired", ascending:true), NSSortDescriptor(key: "date", ascending: false)]
         let context = self.mainMoc()
-        let fetchedResultsController = FetchedResultsControllerManager<InboxMessage>(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
+        let fetchedResultsController = FetchedResultsControllerManager<InboxMessage>(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: "sectionHeader", delegate: delegate)
         return fetchedResultsController
 
         
