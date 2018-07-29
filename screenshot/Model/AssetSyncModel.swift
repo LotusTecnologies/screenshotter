@@ -795,15 +795,7 @@ extension AssetSyncModel {
             (!productCurrency.isEmpty && productCurrency != CurrencyMap.autoCode) {
             fixedQueryitems.append(URLQueryItem(name: "force_currency", value: productCurrency))
         }
-        //        let userDefaults = UserDefaults.standard
-        //        if userDefaults.object(forKey: UserDefaultsKeys.isUSC) == nil {
-        //            return self.geoLocateIsUSC()
-        //        } else {
-        //            let isUsc: Bool = userDefaults.bool(forKey: UserDefaultsKeys.isUSC)
-        //            return Promise(value: isUsc)
-        //        }
-        // Revert to never use USC.
-        // let sizeValue = isPlus ? "craze_plus_size" : isChild ? "kids_craze" : isUsc ? Constants.syteUscFeed : Constants.syteNonUscFeed
+       
         let sizeValue = isPlus ? "craze_plus_size" : isChild ? "kids_craze" : Constants.syteNonUscFeed
         fixedQueryitems.append(URLQueryItem(name: "feed", value: sizeValue))
         if optionsMask.rawValue & ProductsOptionsMask.genderMale.rawValue > 0 {

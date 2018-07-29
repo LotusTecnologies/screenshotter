@@ -288,14 +288,6 @@ extension AsyncOperationMonitor {
         }
         self.init(tags: tags, queues:queues, delegate: delegate)
     }
-    
-    convenience init(tracking partNumbers:[String], delegate:AsyncOperationMonitorDelegate?) {
-        var tags:[AsyncOperationTag] = []
-        partNumbers.forEach { tags.append(AsyncOperationTag.init(type: .productNumber, value: $0)) }
-        
-        self.init(tags: tags, queues:[ShoppingCartModel.shared.priceAlertQueue], delegate: delegate)
-
-    }
 
 }
 

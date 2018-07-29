@@ -26,10 +26,7 @@ extension UIApplication {
         #endif
     }
     
-    static var isUSC: Bool {
-        // Revert to never use USC.
-        return false //UserDefaults.standard.bool(forKey: UserDefaultsKeys.isUSC)
-    }
+    
 }
 
 extension DispatchQueue {

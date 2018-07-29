@@ -9,24 +9,14 @@
 import UIKit
 
 extension UIViewController {
-    @discardableResult func presentProduct(_ product: Product, atLocation location: Analytics.AnalyticsProductOpenedFromPage) -> ProductViewController? {
+    func presentProduct(_ product: Product, atLocation location: Analytics.AnalyticsProductOpenedFromPage) {
         Analytics.trackTappedOnProduct(product, atLocation: location)
         
-        
-        if product.isSupportingUSC {
-            let productViewController = ProductViewController(product: product)
-            navigationController?.pushViewController(productViewController, animated: true)
-            return productViewController
-        }
-        else {
-            OpenWebPage.presentProduct(product, fromViewController: self)
-        }
-        
-        return nil
+        OpenWebPage.presentProduct(product, fromViewController: self)
     }
 }
 
-extension ProductViewController {
+extension ProductDetailViewController {
     
     static func present(with id: String) {
         print("ProductViewController present id:\(id)")

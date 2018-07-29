@@ -38,12 +38,9 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
     let favoritesNavigationController = FavoritesNavigationController()
     let discoverNavigationController = DiscoverNavigationController()
     let profileNavigationController = ProfileNavigationController()
-    let cartNavigationController = CartNavigationController()
     
     fileprivate var settingsTabBarItem: UITabBarItem?
     var updatePromptHandler: UpdatePromptHandler?
-    
-    fileprivate var cartItemFrc: FetchedResultsControllerManager<CartItem>?
     
     fileprivate var isObservingSettingsBadgeFont = false
     fileprivate let TabBarBadgeFontKey = "view.badge.label.font"
@@ -81,21 +78,17 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         profileNavigationController.tabBarItem = createTabBarItem(title: profileNavigationController.title, imageNamed: "TabBarUser", tag: .profile)
         settingsTabBarItem = profileNavigationController.tabBarItem
         
-        cartNavigationController.title = cartNavigationController.cartViewController.title
-        cartNavigationController.tabBarItem = createTabBarItem(title: cartNavigationController.title, imageNamed: "TabBarCart", tag: .cart)
         
         self.delegate = self
         self.restorationIdentifier = String(describing: type(of: self))
     
-        var viewControllerList =  [
+        let viewControllerList =  [
             screenshotsNavigationController,
             favoritesNavigationController,
             discoverNavigationController,
             profileNavigationController
         ]
-        if UIApplication.isUSC {
-            viewControllerList.append(cartNavigationController)
-        }
+      
         viewControllers = viewControllerList
         selectedIndex = viewControllers?.index(of: screenshotsNavigationController) ?? 0
         
@@ -106,37 +99,9 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         
         notificationCenter.addObserver(self, selector: #selector(syncFavoriteTabBadgeCount), name: .FavoriteUninformedAccumulatorModelDidChange, object: nil)
         
-        notificationCenter.addObserver(self, selector: #selector(syncShowingCart), name: .isUSCUpdated, object: nil)
 
         notificationCenter.addObserver(self, selector: #selector(syncScreenshotTabBadgeCount), name: .ScreenshotUninformedAccumulatorModelDidChange, object: nil)
         
-        cartItemFrc = DataModel.sharedInstance.cartItemFrc(delegate: self)
-        syncCartTabBadgeCount()
-    }
-    
-    @objc public func syncShowingCart() {
-        DispatchQueue.mainAsyncIfNeeded {
-            let index = self.selectedIndex
-            var viewControllerList = [
-                self.screenshotsNavigationController,
-                self.favoritesNavigationController,
-                self.discoverNavigationController,
-                self.screenshotsNavigationController,
-                self.profileNavigationController
-            ]
-            
-            if UIApplication.isUSC {
-                viewControllerList.append(self.cartNavigationController)
-            }
-            
-            self.viewControllers = viewControllerList
-            
-            if viewControllerList.count > index {
-                self.selectedIndex = index
-            }else{
-                self.selectedIndex = self.viewControllers?.index(of: self.screenshotsNavigationController) ?? 0
-            }
-        }
     }
     
     override func viewDidLoad() {
@@ -338,18 +303,7 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         }
         self.pulse(tabBarItem: tabView)
     }
-    func cartTabPulseAnimation() {
-        guard let tabView = cartNavigationController.tabBarItem else {
-            return
-        }
-        self.pulse(tabBarItem: tabView)
-    }
-
     
-    fileprivate func syncCartTabBadgeCount() {
-        let count = cartItemFrc?.fetchedObjectsCount ?? 0
-        cartNavigationController.tabBarItem.badgeValue = count > 0 ? "\(count)" : nil
-    }
     
     @objc func syncScreenshotTabBadgeCount() {
         let count = AccumulatorModel.screenshotUninformed.uninformedCount
@@ -418,11 +372,6 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
     }
 }
 
-extension MainTabBarController: FetchedResultsControllerManagerDelegate {
-    func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
-        syncCartTabBadgeCount()
-    }
-}
 
 typealias MainTabBarControllerGDPR = MainTabBarController
 extension MainTabBarControllerGDPR: OnboardingGDPRViewControllerDelegate {
