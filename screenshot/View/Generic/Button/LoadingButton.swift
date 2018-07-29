@@ -8,7 +8,17 @@
 
 import UIKit
 
+extension UIControlState {
+    static var loading: UIControlState {
+        return self.application
+    }
+}
+
 class LoadingButton: UIButton {
+    override var state: UIControlState {
+        return isLoading ? [super.state, .loading] : super.state
+    }
+    
     var isLoading = false {
         didSet {
             if isLoading {
@@ -53,9 +63,8 @@ class LoadingButton: UIButton {
     }()
     
     fileprivate func syncActivityIndicatorColor() {
-        guard hasActivityIndicator &&
-            state != .disabled else {
-                return
+        guard hasActivityIndicator && state != .disabled else {
+            return
         }
         
         activityIndicator.color = titleColor(for: state)

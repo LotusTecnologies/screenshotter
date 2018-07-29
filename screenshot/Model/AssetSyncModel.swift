@@ -590,7 +590,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                     // Store screenshot and syteJson to DB.
                     return Promise { fulfill, reject in
                         self.performBackgroundTask(assetId: asset.localIdentifier, shoppableId: nil) { (managedObjectContext) in
-                            if let screenshot = managedObjectContext.screenshotWith(assetId: asset.localIdentifier) {
+                            if let _ = managedObjectContext.screenshotWith(assetId: asset.localIdentifier) {
                                 //do nothing if already exsists
                                 let error = NSError.init(domain: "Craze", code: -90, userInfo: [NSLocalizedDescriptionKey:"already have screenshot in database"])
                                 reject(error)
@@ -760,7 +760,7 @@ extension AssetSyncModel {
                         }
                     }
                     let uploadedURLString = nsError.userInfo[NSURLErrorFailingURLStringErrorKey] as? String
-                    let imageUrl: String = uploadedURLString ?? ""
+                    let imageUrl: String = uploadedURLString ?? orImageUrlString ?? gottenUploadedURLString ?? ""
                     DataModel.sharedInstance.setNoShoppables(assetId: assetId, uploadedURLString: uploadedURLString)
                     Analytics.trackReceivedResponseFromSyte(imageUrl: imageUrl, segmentCount: 0, categories: nil)
                     if let e = error as? PMKURLError {
@@ -870,6 +870,11 @@ extension AssetSyncModel {
         }
     }
     
+    func calcFallbackPrice(originalData: [String : Any]) -> Float {
+        let dataModel = DataModel.sharedInstance
+        return dataModel.parseFloat(originalData["price"]) ?? dataModel.parseFloat(originalData["sale_price"]) ?? dataModel.parseFloat(originalData["discount_price"]) ?? dataModel.parseFloat(originalData["retail_price"]) ?? 0
+    }
+    
     func saveProduct(managedObjectContext: NSManagedObjectContext,
                      shoppable: Shoppable,
                      productOrder: Int16,
@@ -883,11 +888,7 @@ extension AssetSyncModel {
         var color: String? = nil
         var sku: String? = nil
         if let originalData = prod["original_data"] as? [String : Any] {
-            fallbackPrice = dataModel.parseFloat(originalData["price"])
-            ?? dataModel.parseFloat(originalData["sale_price"])
-            ?? dataModel.parseFloat(originalData["discount_price"])
-            ?? dataModel.parseFloat(originalData["retail_price"])
-            ?? 0
+            fallbackPrice = calcFallbackPrice(originalData: originalData)
             partNumber = originalData["part_number"] as? String
             id = originalData["Product ID"] as? String ?? originalData["sku"] as? String ?? originalData["merchant_product_id"] as? String
             color = originalData["color"] as? String
