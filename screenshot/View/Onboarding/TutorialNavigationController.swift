@@ -45,17 +45,6 @@ class TutorialNavigationController : UINavigationController {
 }
 
 extension TutorialNavigationController : UINavigationControllerDelegate {
-    func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool){
-        if self.interactivePopGestureRecognizer?.state == UIGestureRecognizerState.possible {
-            self.isNavigationBarHidden = !(viewController is CheckoutPaymentFormViewController)
-        }
-    }
-    
-    func navigationController(_ navigationController: UINavigationController, didShow viewController: UIViewController, animated: Bool){
-        if self.interactivePopGestureRecognizer?.state == UIGestureRecognizerState.possible {
-            self.isNavigationBarHidden = !(viewController is CheckoutPaymentFormViewController)
-        }
-    }
 }
 
 extension TutorialNavigationController: RegisterViewControllerDelegate {

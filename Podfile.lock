@@ -11,13 +11,11 @@ PODS:
   - Branch (0.25.1):
     - Branch/Core (= 0.25.1)
   - Branch/Core (0.25.1)
-  - CardIO (5.4.1)
-  - CreditCardValidator (0.4)
   - EggRating (0.1.6):
     - RateView
-  - FBSDKCoreKit (4.34.0):
+  - FBSDKCoreKit (4.35.0):
     - Bolts (~> 1.7)
-  - FBSDKLoginKit (4.34.0):
+  - FBSDKLoginKit (4.35.0):
     - FBSDKCoreKit
   - Firebase/Auth (5.4.1):
     - Firebase/CoreOnly
@@ -54,9 +52,9 @@ PODS:
   - GoogleToolboxForMac/Defines (2.1.4)
   - "GoogleToolboxForMac/NSData+zlib (2.1.4)":
     - GoogleToolboxForMac/Defines (= 2.1.4)
-  - GTMSessionFetcher/Core (1.1.15)
+  - GTMSessionFetcher/Core (1.2.0)
   - Hero (1.2.0)
-  - KochavaTrackeriOS (3.5.1)
+  - KochavaTrackeriOS (3.5.2)
   - leveldb-library (1.20)
   - lottie-ios (2.5.0)
   - nanopb (0.3.8):
@@ -64,16 +62,8 @@ PODS:
     - nanopb/encode (= 0.3.8)
   - nanopb/decode (0.3.8)
   - nanopb/encode (0.3.8)
-  - PhoneNumberKit (2.1.0):
-    - PhoneNumberKit/PhoneNumberKitCore (= 2.1.0)
-    - PhoneNumberKit/UIKit (= 2.1.0)
-  - PhoneNumberKit/PhoneNumberKitCore (2.1.0)
-  - PhoneNumberKit/UIKit (2.1.0):
-    - PhoneNumberKit/PhoneNumberKitCore
   - PromiseKit/CorePromise (4.5.2)
   - PromiseKit/Foundation (4.5.2):
-    - PromiseKit/CorePromise
-  - PromiseKit/StoreKit (4.5.2):
     - PromiseKit/CorePromise
   - Pushwoosh (5.8.1)
   - PushwooshInboxUI (5.5.4):
@@ -82,7 +72,6 @@ PODS:
   - SDWebImage (4.4.2):
     - SDWebImage/Core (= 4.4.2)
   - SDWebImage/Core (4.4.2)
-  - SwiftKeychainWrapper (3.0.1)
   - SwiftLog (1.0.0)
   - SWXMLHash (4.7.0)
   - Whisper (6.0.2)
@@ -92,8 +81,6 @@ DEPENDENCIES:
   - Analytics (~> 3.0)
   - Appsee
   - Branch
-  - CardIO
-  - CreditCardValidator
   - EggRating
   - FBSDKLoginKit
   - Firebase/Auth
@@ -103,12 +90,9 @@ DEPENDENCIES:
   - Hero
   - KochavaTrackeriOS
   - lottie-ios
-  - PhoneNumberKit
   - PromiseKit/Foundation (= 4.5.2)
-  - PromiseKit/StoreKit (~> 4.0)
   - PushwooshInboxUI
   - SDWebImage (~> 4.0)
-  - SwiftKeychainWrapper
   - SwiftLog (~> 1.0.0)
   - SWXMLHash
   - Whisper
@@ -120,8 +104,6 @@ SPEC REPOS:
     - Appsee
     - Bolts
     - Branch
-    - CardIO
-    - CreditCardValidator
     - EggRating
     - FBSDKCoreKit
     - FBSDKLoginKit
@@ -139,13 +121,11 @@ SPEC REPOS:
     - leveldb-library
     - lottie-ios
     - nanopb
-    - PhoneNumberKit
     - PromiseKit
     - Pushwoosh
     - PushwooshInboxUI
     - RateView
     - SDWebImage
-    - SwiftKeychainWrapper
     - SwiftLog
     - SWXMLHash
     - Whisper
@@ -156,11 +136,9 @@ SPEC CHECKSUMS:
   Appsee: ab8b0317b0a5217d08637f61dbddaba2c9748f2a
   Bolts: ac6567323eac61e203f6a9763667d0f711be34c8
   Branch: 0f01403ad0cac16269540d05ed001f60249e045d
-  CardIO: 56983b39b62f495fc6dae9ad7cf875143df06443
-  CreditCardValidator: 9f0814dd61682c004071a250d89327ca83514a48
   EggRating: 378f25f5ac0629e7edfb011f5c5177c63f135e6e
-  FBSDKCoreKit: 0ff57f093b85c8c9d5aba697d3edf68a8960ce78
-  FBSDKLoginKit: 8c78f57a145afb756e4755e69195ebe08a42466e
+  FBSDKCoreKit: 1a5b2e3ceb5ca827a53c54aa5f4a3480efff80d2
+  FBSDKLoginKit: 00a3d65d1226852f9d76dcddff01981e5e6d9c38
   Firebase: 355bd535bfdacaa82a7fe8d9784115edefd6fc03
   FirebaseAnalytics: b3628aea54c50464c32c393fb2ea032566e7ecc2
   FirebaseAuth: 096e457cdd4274412a66c4a35874787e411f5a03
@@ -169,23 +147,21 @@ SPEC CHECKSUMS:
   FirebaseInstanceID: f3f0657372592ecdfdfe2cac604a5a75758376a6
   FirebaseStorage: 7ca4bb7b58a25fa647b04f524033fc7cb7eb272b
   GoogleToolboxForMac: 91c824d21e85b31c2aae9bb011c5027c9b4e738f
-  GTMSessionFetcher: 5fa5b80fd20e439ef5f545fb2cb3ca6c6714caa2
+  GTMSessionFetcher: 0c4baf0a73acd0041bf9f71ea018deedab5ea84e
   Hero: 33dadf2cd1c98af71e213dcbc2902e6e03622a4e
-  KochavaTrackeriOS: 4d2c3915e83b55b1db6d72b54061849f68e36a31
+  KochavaTrackeriOS: b3421da65131a9a5da15f6cdb78d0861f095c3c3
   leveldb-library: 08cba283675b7ed2d99629a4bc5fd052cd2bb6a5
   lottie-ios: d699fdee68d7b63e721d949388b015fef1aaa4ac
   nanopb: 5601e6bca2dbf1ed831b519092ec110f66982ca3
-  PhoneNumberKit: 62003f40ff75315fd3738286558bc365365ac222
   PromiseKit: 743e497a5f505a470d3bbbf4ce0663c1268af0a4
   Pushwoosh: 166d50f7a094a0d94030ac6c87d8ff403caebaf7
   PushwooshInboxUI: 2b6aa7dea3109b9ceaff0959fb82b6896b230ca3
   RateView: d4d12e9bb76dc23a77a56f4e5c5fb530a3f3f998
   SDWebImage: 624d6e296c69b244bcede364c72ae0430ac14681
-  SwiftKeychainWrapper: 38952a3636320ae61bad3513cadd870929de7a4a
   SwiftLog: f6c4f9a4ade06263555ab34b2c0f72025ffcda9e
   SWXMLHash: f4522438189f72b41e39676d19469a8969d60dd1
   Whisper: 169760fc4bab0abf24d5529f9276f95c25cf1025
 
-PODFILE CHECKSUM: c870c1592e3562dad6ad1b4ddb80dd715f629c02
+PODFILE CHECKSUM: 658545a7bcf3ddb5e14ab48993aa524dcb696ef7
 
 COCOAPODS: 1.5.3

@@ -814,7 +814,7 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
                 }
             } else if let openingProductKey = userInfo[Constants.openingProductKey] as? String {
                 isHandled = true
-                ProductViewController.present(imageURL: openingProductKey)
+                ProductDetailViewController.present(imageURL: openingProductKey)
             } else if let aps = userInfo["aps"] as? [String : Any],
               let category = aps["category"] as? String,
               category == "PRICE_ALERT",
@@ -825,10 +825,10 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
                 if let updatedPrice = dataDict["price"] as? Float {
                     let currency = dataDict["currency"] as? String ?? "USD"
                     DataModel.sharedInstance.updateProductPrice(id: id, updatedPrice: updatedPrice, updatedCurrency: currency).then(on: .main) {
-                        ProductViewController.present(with: id)
+                        ProductDetailViewController.present(with: id)
                     }
                 } else {
-                    ProductViewController.present(with: id)
+                    ProductDetailViewController.present(with: id)
                 }
                 let pushTypeString = dataDict["type"] as? String
                 Analytics.trackAppOpenedFromPushNotification(source: pushTypeString)

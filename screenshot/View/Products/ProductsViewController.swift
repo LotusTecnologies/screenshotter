@@ -446,9 +446,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
             product.recordViewedProduct()
             self.recoverLostSaleManager.didClick(on: product)
             LocalNotificationModel.shared.registerCrazeTappedPriceAlert(id: product.id, merchant: product.merchant, lastPrice: product.floatPrice)
-            if let productViewController = presentProduct(product, atLocation: .products) {
-                productViewController.similarProducts = products
-            }
+            presentProduct(product, atLocation: .products) 
         }
         else if sectionType == .relatedLooks {
             if let url = self.relatedLooksManager.relatedLook(at:indexPath.row) {
@@ -477,7 +475,6 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         product.setFavorited(toFavorited: isFavorited)
         
         if isFavorited {
-            let _ = ShoppingCartModel.shared.populateVariants(productOID: product.objectID)
             Analytics.trackProductFavorited(product: product, page: .productList)
             LocalNotificationModel.shared.registerCrazeFavoritedPriceAlert(id: product.id, merchant: product.merchant, lastPrice: product.floatPrice)
         }else{
