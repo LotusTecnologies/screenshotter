@@ -104,8 +104,10 @@ class FavoriteProductsViewController : BaseViewController {
     }
     
     deinit {
-        tableView.dataSource = nil
-        tableView.delegate = nil
+        if isViewLoaded {
+            tableView.dataSource = nil
+            tableView.delegate = nil
+        }
         NotificationCenter.default.removeObserver(self)
     }
     

@@ -55,7 +55,7 @@ class ScreenshotsNavigationController: UINavigationController {
     }
     
     deinit {
-        AssetSyncModel.sharedInstance.networkingIndicatorDelegate = self
+        AssetSyncModel.sharedInstance.networkingIndicatorDelegate = nil
         NotificationCenter.default.removeObserver(self)
     }
 }

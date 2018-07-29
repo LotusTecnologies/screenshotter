@@ -241,7 +241,9 @@ class OnboardingDetailsViewController: UIViewController {
     
     deinit {
         inputViewAdjustsScrollViewController.delegate = nil
-        _view.nameTextField.delegate = nil
+        if isViewLoaded {
+            _view.nameTextField.delegate = nil
+        }
     }
     
 

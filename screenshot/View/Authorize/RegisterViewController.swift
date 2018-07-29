@@ -332,8 +332,10 @@ class RegisterViewController: UIViewController {
     deinit {
         NotificationCenter.default.removeObserver(self)
         inputViewAdjustsScrollViewController.delegate = nil
-        _view.emailTextField.delegate = nil
-        _view.passwordTextField.delegate = nil
+        if isViewLoaded {
+            _view.emailTextField.delegate = nil
+            _view.passwordTextField.delegate = nil
+        }
     }
     
     // MARK: Keyboard
