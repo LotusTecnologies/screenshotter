@@ -162,6 +162,14 @@ public extension UIColor {
         return cssName
     }
     
+    static func isCssName(_ cssName:String) -> Bool {
+        let key = cssName.uppercased()
+        if let _ = cssToHexDictionairy[key] {
+            return true
+        }
+        return false
+    }
+    
     fileprivate static let cssToHexDictionairy: [String: String] = [
         "CLEAR": "00000000",
         "TRANSPARENT": "00000000",

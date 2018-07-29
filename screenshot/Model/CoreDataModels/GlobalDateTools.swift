@@ -55,14 +55,13 @@ class GlobalDateTools: NSObject {
     
     lazy var shortDateFormatter:DateFormatter = {
         let df = DateFormatter.init()
-        df.dateFormat = "MMMMM dd"
+        df.dateFormat = "MMMMM d"
         return df
     }()
     
     lazy var longDateFormatter:DateFormatter = {
         let df = DateFormatter.init()
-        df.timeStyle = .none
-        df.dateStyle = .short
+        df.dateFormat = "MMMM d, yyyy"
         return df
     }()
     
