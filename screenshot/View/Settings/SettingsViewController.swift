@@ -107,8 +107,10 @@ class SettingsViewController : BaseViewController {
     }
     
     deinit {
-        tableView.delegate = nil
-        tableView.dataSource = nil
+        if isViewLoaded {
+            tableView.delegate = nil
+            tableView.dataSource = nil
+        }
     }
     
     // MARK: Data

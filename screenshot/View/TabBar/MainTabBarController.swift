@@ -183,7 +183,9 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
     }
     
     deinit {
-        self.dismissTabBarSettingsBadge()
+        if isViewLoaded {
+            self.dismissTabBarSettingsBadge()
+        }
         NotificationCenter.default.removeObserver(self)
     }
 

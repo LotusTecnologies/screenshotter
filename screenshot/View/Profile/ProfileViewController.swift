@@ -197,7 +197,9 @@ class ProfileViewController: BaseTableViewController {
     
     deinit {
         NotificationCenter.default.removeObserver(self)
-        profileAccountView.delegate = nil
+        if isViewLoaded {
+            profileAccountView.delegate = nil
+        }
     }
     
     // MARK: Login

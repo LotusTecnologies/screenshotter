@@ -182,12 +182,14 @@ class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonit
     }
     
     deinit {
-        if let layout = collectionView.collectionViewLayout as? DiscoverScreenshotCollectionViewLayout {
-            layout.delegate = nil
+        if isViewLoaded {
+            if let layout = collectionView.collectionViewLayout as? DiscoverScreenshotCollectionViewLayout {
+                layout.delegate = nil
+            }
+            
+            collectionView.dataSource = nil
+            collectionView.delegate = nil
         }
-        
-        collectionView.dataSource = nil
-        collectionView.delegate = nil
     }
     
     // MARK:

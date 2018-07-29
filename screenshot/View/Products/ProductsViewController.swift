@@ -247,8 +247,10 @@ class ProductsViewController: BaseViewController {
     }
     
     deinit {
-        self.shoppablesToolbar?.delegate = nil
-        self.shoppablesToolbar?.shoppableToolbarDelegate = nil
+        if isViewLoaded {
+            self.shoppablesToolbar?.delegate = nil
+            self.shoppablesToolbar?.shoppableToolbarDelegate = nil
+        }
     }
 }
 

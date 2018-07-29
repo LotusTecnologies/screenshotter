@@ -123,9 +123,10 @@ class ScreenshotsViewController: BaseViewController {
     }
     
     deinit {
-        self.collectionView?.delegate = nil
-        self.collectionView?.dataSource = nil
-        
+        if isViewLoaded {
+            self.collectionView?.delegate = nil
+            self.collectionView?.dataSource = nil
+        }
         NotificationCenter.default.removeObserver(self)
     }
 }
