@@ -65,8 +65,8 @@ extension InboxMessage {
             request.predicate = nil
             if let result = try? context.fetch(request) {
                 result.forEach({ (m) in
-                    if let date = m.date, let expire = m.expireDate {
-                        let isExpired = date < expire
+                    if let expire = m.expireDate {
+                        let isExpired = expire.timeIntervalSinceNow < 0
                         if m.isExpired != isExpired {
                             m.isExpired = isExpired
                         }
