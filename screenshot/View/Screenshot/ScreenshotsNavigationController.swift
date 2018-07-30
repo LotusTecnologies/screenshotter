@@ -104,21 +104,13 @@ extension ScreenshotsNavigationControllerPicker {
 typealias ScreenshotsNavigationControllerNotificationInbox = ScreenshotsNavigationController
 extension ScreenshotsNavigationControllerNotificationInbox {
     @objc private func presentNotificationInbox() {
-        guard let inboxStyle = PWIInboxStyle.default() else {
-            return
-        }
         
-        inboxStyle.backgroundColor = .background
-        inboxStyle.defaultTextColor = .gray3
-        inboxStyle.selectionColor = .gray9
-        inboxStyle.accentColor = .crazeGreen
-        inboxStyle.dateColor = .gray6
-        inboxStyle.separatorColor = .cellBorder
+        let vc = MessageInboxViewController.init()
         
-        if let inboxViewController = PWIInboxUI.createInboxController(with: inboxStyle) {
-            let navigationController = ModalNavigationController(rootViewController: inboxViewController)
-            present(navigationController, animated: true)
-        }
+        let navVC = UINavigationController.init(rootViewController: vc)
+//        navVC.navigationItem.leftBarButtonItem = ui
+        present(navVC, animated: true)
+       
     }
     
     private func updateInboxBadgeCount() {

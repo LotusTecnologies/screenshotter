@@ -10,17 +10,81 @@ import UIKit
 
 class MessageInboxCollectionViewCell: UICollectionViewCell {
     
-    let imageView = UIImageView()
+    let imageView = EmbossedView()
     let titleLabel = UILabel()
-    let newBadge = UIImageView()
-    let actionButton = UIButton()
+    let badge = UIView()
+    let actionButton = BorderButton()
     
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        
+        self.contentView.clipsToBounds = true
+        self.contentView.backgroundColor = .white
+        
+//        let line = UIView()
+//        line.backgroundColor = .gray9
+//        line.translatesAutoresizingMaskIntoConstraints = false
+//        self.contentView.addSubview(line)
+//        line.topAnchor.constraint(equalTo: self.contentView.topAnchor).isActive = true
+//        line.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor).isActive = true
+//        line.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor).isActive = true
+//        line.heightAnchor.constraint(equalToConstant: 1.0).isActive = true
+        
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        self.contentView.addSubview(imageView)
+        imageView.topAnchor.constraint(equalTo: self.contentView.topAnchor, constant:.padding).isActive = true
+        imageView.heightAnchor.constraint(equalToConstant: 80).isActive = true
+        imageView.widthAnchor.constraint(equalToConstant: 80).isActive = true
+        imageView.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor, constant: .padding).isActive = true
+        
+        titleLabel.numberOfLines = 0
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        self.contentView.addSubview(titleLabel)
+        titleLabel.leadingAnchor.constraint(equalTo: self.imageView.trailingAnchor, constant:.padding).isActive = true
+        titleLabel.topAnchor.constraint(equalTo: self.imageView.topAnchor).isActive = true
+        titleLabel.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor, constant:-.padding).isActive = true
+
+        
+        actionButton.setTitleColor(.crazeGreen, for: .normal)
+        actionButton.tintColor = .crazeGreen
+        actionButton.translatesAutoresizingMaskIntoConstraints = false
+        self.contentView.addSubview(actionButton)
+        actionButton.heightAnchor.constraint(equalToConstant: 48).isActive = true
+        actionButton.centerXAnchor.constraint(equalTo: self.contentView.centerXAnchor).isActive = true
+        actionButton.bottomAnchor.constraint(equalTo: self.contentView.bottomAnchor, constant:-.padding).isActive = true
+        actionButton.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor, constant: .padding + .extendedPadding).isActive = true
+        actionButton.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor, constant: -1 * (.padding + .extendedPadding) ).isActive = true
+
+        
+        badge.frame = CGRect(x: 0, y: 0, width: 28, height: 28)
+        badge.translatesAutoresizingMaskIntoConstraints = false
+        badge.backgroundColor = .crazeRed
+        badge.isUserInteractionEnabled = false
+        badge.isHidden = true
+        badge.transform = CGAffineTransform(rotationAngle: .pi / 4)
+        badge.layer.shadowPath = UIBezierPath(rect: badge.bounds).cgPath
+        badge.layer.shadowColor = UIColor.black.cgColor
+        badge.layer.shadowOffset = CGSize(width: 0, height: 1)
+        badge.layer.shadowRadius = 2
+        badge.layer.shadowOpacity = 0.4
+        self.contentView.addSubview(badge)
+        badge.topAnchor.constraint(equalTo: self.contentView.topAnchor, constant: -badge.bounds.size.height / 2).isActive = true
+        badge.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor, constant: badge.bounds.size.width / 2).isActive = true
+        badge.widthAnchor.constraint(equalToConstant: badge.bounds.size.width).isActive = true
+        badge.heightAnchor.constraint(equalToConstant: badge.bounds.size.height).isActive = true
+    }
+    static let height:CGFloat =  80 + 48 + 2 * CGFloat.padding + CGFloat.padding
     
     var isExpired = false {
         didSet {
             imageView.alpha = isExpired ? 0.5 : 1.0
             titleLabel.alpha = isExpired ? 0.5 : 1.0
-            newBadge.alpha = isExpired ? 0.5 : 1.0
+            badge.alpha = isExpired ? 0.5 : 1.0
             actionButton.alpha = isExpired ? 0.5 : 1.0
         }
     }

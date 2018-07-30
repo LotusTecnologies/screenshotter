@@ -77,6 +77,7 @@
 		311A50C920DAB2EF0001D463 /* RecoverLostSaleManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A50C820DAB2EF0001D463 /* RecoverLostSaleManager.swift */; };
 		311A50D120DBD9EE0001D463 /* ResendCodeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A50D020DBD9EE0001D463 /* ResendCodeManager.swift */; };
 		311A50D820E3E3570001D463 /* DiscoverManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A50D720E3E3560001D463 /* DiscoverManager.swift */; };
+		311C5989210EE01600F44F12 /* MessageInboxHeaderCollectionReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311C5988210EE01600F44F12 /* MessageInboxHeaderCollectionReusableView.swift */; };
 		3125446B2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		3125446C2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		3125446D2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
@@ -317,6 +318,7 @@
 		311A50D020DBD9EE0001D463 /* ResendCodeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResendCodeManager.swift; sourceTree = "<group>"; };
 		311A50D720E3E3560001D463 /* DiscoverManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverManager.swift; sourceTree = "<group>"; };
 		311A50D920E4BE470001D463 /* Model 20.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 20.xcdatamodel"; sourceTree = "<group>"; };
+		311C5988210EE01600F44F12 /* MessageInboxHeaderCollectionReusableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageInboxHeaderCollectionReusableView.swift; sourceTree = "<group>"; };
 		31254460209079C7009410D5 /* screenshot-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "screenshot-Bridging-Header.h"; sourceTree = "<group>"; };
 		3125448E209871B4009410D5 /* Analytics+api.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Analytics+api.swift"; sourceTree = "<group>"; };
 		31357EE120F6636D00515116 /* UIColor+craze.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+craze.swift"; sourceTree = "<group>"; };
@@ -790,6 +792,7 @@
 			children = (
 				313F80962109E29B0020F37D /* MessageInboxViewController.swift */,
 				313F80982109E3450020F37D /* MessageInboxCollectionViewCell.swift */,
+				311C5988210EE01600F44F12 /* MessageInboxHeaderCollectionReusableView.swift */,
 			);
 			path = MessageInbox;
 			sourceTree = "<group>";
@@ -1617,6 +1620,7 @@
 				C58BAE5C20E101DD0051394A /* TableView.swift in Sources */,
 				311A50D120DBD9EE0001D463 /* ResendCodeManager.swift in Sources */,
 				C58BAE5B20E101DD0051394A /* AutoresizingTableView.swift in Sources */,
+				311C5989210EE01600F44F12 /* MessageInboxHeaderCollectionReusableView.swift in Sources */,
 				311A506920D90B780001D463 /* PickerCollectionViewCell.swift in Sources */,
 				311A50B220D90B780001D463 /* ProfileViewController.swift in Sources */,
 				311A503820D90B780001D463 /* PartnersViewController.swift in Sources */,
