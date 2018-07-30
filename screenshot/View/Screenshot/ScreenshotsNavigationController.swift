@@ -19,16 +19,10 @@ class ScreenshotsNavigationController: UINavigationController {
     weak var screenshotsNavigationControllerDelegate:ScreenshotsNavigationControllerDelegate?
     var screenshotsViewController:ScreenshotsViewController = ScreenshotsViewController()
     var activityBarButtonItem:UIBarButtonItem?
-    fileprivate var inboxBarButtonItem: BadgeBarButtonItem?
     fileprivate var restoredProductsViewController: ProductsViewController?
     
     init() {
         super.init(nibName: nil, bundle: nil)
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(pushWooshDidReceiveInPush(_:)), name: .PWInboxMessagesDidReceiveInPush, object: nil)
-        
-        inboxBarButtonItem = BadgeBarButtonItem(image: UIImage(named: "NavigationBarEmail"), style: .plain, target: self, action: #selector(presentNotificationInbox))
-        screenshotsViewController.navigationItem.leftBarButtonItem = inboxBarButtonItem
         
         screenshotsViewController.navigationItem.rightBarButtonItem = screenshotsViewController.editButtonItem
         screenshotsViewController.delegate = self
@@ -51,12 +45,11 @@ class ScreenshotsNavigationController: UINavigationController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        updateInboxBadgeCount()
+        UniversalSearchController.shared.updateInboxBadgeCount()
     }
     
     deinit {
         AssetSyncModel.sharedInstance.networkingIndicatorDelegate = nil
-        NotificationCenter.default.removeObserver(self)
     }
 }
 
@@ -98,41 +91,6 @@ extension ScreenshotsNavigationControllerPicker {
     
     @objc func pickerViewControllerDidFinish(){
         self.dismiss(animated: true, completion: nil)
-    }
-}
-
-typealias ScreenshotsNavigationControllerNotificationInbox = ScreenshotsNavigationController
-extension ScreenshotsNavigationControllerNotificationInbox {
-    @objc private func presentNotificationInbox() {
-        guard let inboxStyle = PWIInboxStyle.default() else {
-            return
-        }
-        
-        inboxStyle.backgroundColor = .background
-        inboxStyle.defaultTextColor = .gray3
-        inboxStyle.selectionColor = .gray9
-        inboxStyle.accentColor = .crazeGreen
-        inboxStyle.dateColor = .gray6
-        inboxStyle.separatorColor = .cellBorder
-        
-        if let inboxViewController = PWIInboxUI.createInboxController(with: inboxStyle) {
-            let navigationController = ModalNavigationController(rootViewController: inboxViewController)
-            present(navigationController, animated: true)
-        }
-    }
-    
-    private func updateInboxBadgeCount() {
-        PWInbox.unreadMessagesCount(completion: { (count, error) in
-            DispatchQueue.mainAsyncIfNeeded {
-                if error == nil {
-                    self.inboxBarButtonItem?.count = UInt(count)
-                }
-            }
-        })
-    }
-    
-    @objc private func pushWooshDidReceiveInPush(_ notification: Notification) {
-        updateInboxBadgeCount()
     }
 }
 
