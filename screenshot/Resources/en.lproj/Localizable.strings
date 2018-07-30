@@ -24,6 +24,12 @@
 "authorize.register.continue.login" = "Log In";
 "authorize.register.email" = "Email Address";
 "authorize.register.forgot" = "Forgot Password?";
+"authorize.register.legal.0" = "By tapping \"Sign Up\" above, you agree to our ";
+"authorize.register.legal.1" = "Terms of Service";
+"authorize.register.legal.2" = " and ";
+"authorize.register.legal.3" = "Privacy Policy";
+"authorize.register.legal.4" = " ";
+"authorize.register.offers" = "Send me emails about exclusive offers, sales and new features.";
 "authorize.register.password" = "Password";
 "authorize.register.confirmation.title" = "Welcome!";
 "authorize.register.skipConfirm" = "Are you sure you want to skip? Your account won’t be created.";
@@ -52,17 +58,7 @@
 "authorize.error.NoAccountWithEmail" = "No account associated with that email address";
 "authorize.error.wrongPassword" = "Password and email address don’t match";
 
-
-
-
 "changelog.title" = "What's New";
-
-
-
-
-
-
-
 
 "currency.auto" = "Automatic";
 
@@ -78,6 +74,12 @@
 "discover.screenshot.flag.duplicate" = "Duplicate";
 "discover.screenshot.flag.message" = "What’s wrong?";
 "discover.screenshot.flag.title" = "Report Screenshot";
+"discover.screenshot.helper.swipe_left.0" = "Swipe Left";
+"discover.screenshot.helper.swipe_left.1" = "\nto pass";
+"discover.screenshot.helper.swipe_right.0" = "Swipe Right";
+"discover.screenshot.helper.swipe_right.1" = "\nto add to your collection";
+"discover.screenshot.helper.tap.0" = "Tap";
+"discover.screenshot.helper.tap.1" = " to shop";
 "discover.screenshot.helper.title" = "Discover Fashion";
 "discover.screenshot.pass" = "Pass";
 "discover.title" = "Discover";
@@ -107,7 +109,6 @@
 "favorites.product.cart" = "Add to Cart";
 "favorites.title" = "Favorites";
 
-
 "gdpr.email.message" = "When this setting is turned on, we will send you personalized emails with sales, availability updates and information about products in the app you looked at and favorited. Your email will also be used to retarget ads to you and to provide brands and retailers with anonymous data about your shopping habits.";
 "gdpr.email.title" = "Email";
 "gdpr.image.message" = "When this setting is turned on, we send screenshots you take in and outside of the app to our server to detect whether there are clothing items in the photo and allow you to shop relevant photos quickly. This happens in the background and is not shown to you. We do not save any photos that are not detected as fashion.";
@@ -127,6 +128,7 @@
 "generic.disabled" = "Disabled";
 "generic.dismiss" = "Dismiss";
 "generic.done" = "Done";
+"generic.edit" = "Edit";
 "generic.email" = "email";
 "generic.error" = "Error";
 "generic.enable" = "Enable";
@@ -201,7 +203,6 @@
 "product.sale_recovery.alert.email_sent.title" = "Email Sent!";
 "product.sale_recovery.alert.email_sent.body" = "You can now shop this item on your computer.";
 
-
 "products.details.similar" = "Similar Items";
 "products.helper.message" = "No visually similar products were detected";
 "products.helper.retry" = "Try Again";
@@ -231,6 +232,9 @@
 "products.related_looks.error.no_looks" = "No similar looks found";
 
 "profile.header.logged_in.logout" = "Log Out";
+"profile.header.logged_out.continue.0" = "Log In";
+"profile.header.logged_out.continue.1" = " or ";
+"profile.header.logged_out.continue.2" = "Sign Up";
 "profile.header.logged_out.title" = "Log in for exclusive benefits!";
 "profile.row.currency.title" = "Currency";
 "profile.row.gdpr.title" = "Email & Image detection";
@@ -304,16 +308,10 @@
 "settings.section.follow" = "Follow Us";
 "settings.title" = "Settings";
 
-
 "text_explanation.disabled" = "disabled";
 "text_explanation.enabled" = "enabled";
-
-
-
-
 
 "update.force.message" = "You need to update to the latest version to keep using Screenshop.";
 "update.force.title" = "Update Required";
 "update.request.message" = "Update now for the best Screenshop experience!";
 "update.request.title" = "New Version Available";
-
