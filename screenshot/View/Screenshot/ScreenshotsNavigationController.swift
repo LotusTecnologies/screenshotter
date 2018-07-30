@@ -8,8 +8,6 @@
 
 import UIKit
 import CoreData
-import PushwooshInboxUI
-import Pushwoosh
 
 protocol ScreenshotsNavigationControllerDelegate: NSObjectProtocol {
     func screenshotsNavigationControllerDidGrantPushPermissions(_ navigationController: ScreenshotsNavigationController)

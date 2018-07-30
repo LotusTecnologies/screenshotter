@@ -192,6 +192,8 @@
 		C58BAE9220E101DD0051394A /* HorizontalLinesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58BAE5320E101DD0051394A /* HorizontalLinesView.swift */; };
 		C58BAE9320E101DD0051394A /* MainSegmentedControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58BAE5520E101DD0051394A /* MainSegmentedControl.swift */; };
 		C5933D87210F2E1600BBCF5B /* UniversalSearchController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5933D86210F2E1600BBCF5B /* UniversalSearchController.swift */; };
+		C5933D8A210F3F9100BBCF5B /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5933D89210F3F9100BBCF5B /* SearchViewController.swift */; };
+		C5933D8C210F42DA00BBCF5B /* SearchNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5933D8B210F42DA00BBCF5B /* SearchNavigationController.swift */; };
 		C5CAF27A1FCC0EFD006F37DC /* ISO4217.plist in Resources */ = {isa = PBXBuildFile; fileRef = C5CAF2791FCC0EFD006F37DC /* ISO4217.plist */; };
 		C5CAF27C1FCC14C1006F37DC /* CurrencyModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CAF27B1FCC14C1006F37DC /* CurrencyModel.swift */; };
 		C5CC3E391F94A85900DA3425 /* NetworkingIndicatorProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CC3E381F94A85900DA3425 /* NetworkingIndicatorProtocol.swift */; };
@@ -436,6 +438,8 @@
 		C58BAE5320E101DD0051394A /* HorizontalLinesView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HorizontalLinesView.swift; sourceTree = "<group>"; };
 		C58BAE5520E101DD0051394A /* MainSegmentedControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainSegmentedControl.swift; sourceTree = "<group>"; };
 		C5933D86210F2E1600BBCF5B /* UniversalSearchController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UniversalSearchController.swift; sourceTree = "<group>"; };
+		C5933D89210F3F9100BBCF5B /* SearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewController.swift; sourceTree = "<group>"; };
+		C5933D8B210F42DA00BBCF5B /* SearchNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchNavigationController.swift; sourceTree = "<group>"; };
 		C5CAF2791FCC0EFD006F37DC /* ISO4217.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = ISO4217.plist; sourceTree = "<group>"; };
 		C5CAF27B1FCC14C1006F37DC /* CurrencyModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyModel.swift; sourceTree = "<group>"; };
 		C5CC3E381F94A85900DA3425 /* NetworkingIndicatorProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkingIndicatorProtocol.swift; sourceTree = "<group>"; };
@@ -520,6 +524,7 @@
 				311A4FA420D90B750001D463 /* Screenshot */,
 				311A4FA120D90B750001D463 /* ScreenshotDisplay */,
 				311A4FAD20D90B760001D463 /* ScreenshotPicker */,
+				C5933D88210F3EBD00BBCF5B /* Search */,
 				311A4F9F20D90B750001D463 /* Settings */,
 				311A4F8920D90B740001D463 /* ShareToDiscoverPrompt */,
 				311A4F8320D90B740001D463 /* Shoppable */,
@@ -1072,6 +1077,15 @@
 			path = SegmentedControl;
 			sourceTree = "<group>";
 		};
+		C5933D88210F3EBD00BBCF5B /* Search */ = {
+			isa = PBXGroup;
+			children = (
+				C5933D8B210F42DA00BBCF5B /* SearchNavigationController.swift */,
+				C5933D89210F3F9100BBCF5B /* SearchViewController.swift */,
+			);
+			path = Search;
+			sourceTree = "<group>";
+		};
 		C5CCBB3D1F41BBDB00D6B392 /* Categories */ = {
 			isa = PBXGroup;
 			children = (
@@ -1547,6 +1561,7 @@
 				C58BAE6520E101DD0051394A /* BorderView.swift in Sources */,
 				C58BAE5E20E101DD0051394A /* SegmentedDropDownControl.swift in Sources */,
 				311A505F20D90B780001D463 /* ScreenshotDisplayViewController.swift in Sources */,
+				C5933D8A210F3F9100BBCF5B /* SearchViewController.swift in Sources */,
 				C58BAE9320E101DD0051394A /* MainSegmentedControl.swift in Sources */,
 				C58BAE6620E101DD0051394A /* HiddenLogoController.swift in Sources */,
 				316C831020C3AEBD0012A908 /* DataModel.swift in Sources */,
@@ -1596,6 +1611,7 @@
 				C58BAE5C20E101DD0051394A /* TableView.swift in Sources */,
 				311A50D120DBD9EE0001D463 /* ResendCodeManager.swift in Sources */,
 				C58BAE5B20E101DD0051394A /* AutoresizingTableView.swift in Sources */,
+				C5933D8C210F42DA00BBCF5B /* SearchNavigationController.swift in Sources */,
 				311A506920D90B780001D463 /* PickerCollectionViewCell.swift in Sources */,
 				311A50B220D90B780001D463 /* ProfileViewController.swift in Sources */,
 				311A503820D90B780001D463 /* PartnersViewController.swift in Sources */,

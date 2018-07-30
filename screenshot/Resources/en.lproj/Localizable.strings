@@ -289,6 +289,8 @@
 "share_to_discover.action_sheet.message" = "Add this to Discover so other users can shop your screenshot!";
 "share_to_discover.action_sheet.error.alread_shared" = "This screenshot is already on Discover";
 
+"search.placeholder" = "Search for products...";
+
 "settings.contact" = "Questions? Get in touch: info@screenshopit.com";
 "settings.open_in.option.chrome" = "Chrome";
 "settings.open_in.option.embeded" = "ScreenShop";

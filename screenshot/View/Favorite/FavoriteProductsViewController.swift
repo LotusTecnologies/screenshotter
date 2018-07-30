@@ -58,8 +58,6 @@ class FavoriteProductsViewController : BaseViewController {
         
         restorationIdentifier = String(describing: type(of: self))
         
-        addNavigationItemLogo()
-        
         NotificationCenter.default.addObserver(self, selector: #selector(applicationWillEnterForeground(_:)), name: .UIApplicationWillEnterForeground, object: nil)
     }
     

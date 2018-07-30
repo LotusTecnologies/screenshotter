@@ -10,12 +10,14 @@ import UIKit
 import PushwooshInboxUI
 import Pushwoosh
 
-class UniversalSearchController {
+class UniversalSearchController: NSObject {
     static let shared = UniversalSearchController()
     
     fileprivate var inboxBarButtonItems: [BadgeBarButtonItem] = []
     
-    init() {
+    override init() {
+        super.init()
+        
         NotificationCenter.default.addObserver(self, selector: #selector(pushWooshDidReceiveInPush(_:)), name: .PWInboxMessagesDidReceiveInPush, object: nil)
     }
     
@@ -58,6 +60,35 @@ class UniversalSearchController {
             viewController.present(navigationController, animated: true)
         }
     }
+    
+    // MARK: Search
+    
+    private var searchNavigationController: SearchNavigationController?
+    
+    private func presentSearchViewController() {
+        
+        let searchViewController = SearchNavigationController()
+        self.searchNavigationController = searchViewController
+        
+        let modalVC = ModalNavigationController(rootViewController: searchViewController)
+        
+        UIApplication.shared.keyWindow?.rootViewController?.present(modalVC, animated: true)
+    }
+    
+    private func dismissSearchViewController() {
+        if let searchViewController = self.searchNavigationController {
+            searchViewController.presentingViewController?.dismiss(animated: true)
+        }
+    }
+}
+
+extension UniversalSearchController: UISearchBarDelegate {
+    func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
+        if self.searchNavigationController == nil {
+            self.presentSearchViewController()
+        }
+        return true
+    }
 }
 
 extension UIViewController {
@@ -66,6 +97,12 @@ extension UIViewController {
         
         navigationItem.leftBarButtonItem = inboxBarButtonItem
         UniversalSearchController.shared.inboxBarButtonItems.append(inboxBarButtonItem)
+        
+        let searchBar = UISearchBar()
+        searchBar.delegate = UniversalSearchController.shared
+        searchBar.placeholder = "search.placeholder".localized
+        searchBar.searchBarStyle = .minimal
+        navigationItem.titleView = searchBar
     }
     
     @objc func presentNotificationInbox() {
