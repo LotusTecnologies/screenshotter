@@ -404,13 +404,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
             else if let _ = cell as? RelatedLooksCollectionViewCell {
                 let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
                 
-                if let relatedLookUrlString = self.relatedLooksManager.relatedLook(at: indexPath.item) {
-                    // TODO: localize
-                    actionSheet.addAction(UIAlertAction(title: "Add screenshot", style: .default, handler: { alertAction in
-                        // ???: why is this not working
-                        AssetSyncModel.sharedInstance.addFromRelatedLook(urlString: relatedLookUrlString)
-                    }))
-                }
+                self.relatedLooksManager.addScreenshotAction(actionSheet, at: indexPath)
                 
                 if actionSheet.actions.count > 0 {
                     actionSheet.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
