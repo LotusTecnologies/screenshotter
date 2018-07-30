@@ -35,6 +35,17 @@ extension InboxMessage {
         return count ?? 0
         
     }
+    func markAsRead(){
+        let objId = self.objectID
+        DataModel.sharedInstance.performBackgroundTask { (context) in
+            if let message = context.inboxMessageWith(objectId: objId) {
+                if message.isNew == true {
+                    message.isNew = false
+                }
+            }
+            context.saveIfNeeded()
+        }
+    }
     
     static func updateExpired(completion:(() -> Void)? = nil ){
         DataModel.sharedInstance.performBackgroundTask { (context) in

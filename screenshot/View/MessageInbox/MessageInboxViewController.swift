@@ -61,13 +61,14 @@ class MessageInboxViewController: UIViewController {
                         let message = InboxMessage(context: context)
                         let date = Date.init(timeIntervalSinceNow: TimeInterval(-count*12*60*60))
                         
-                        let expire = Date().addingTimeInterval(-10*TimeInterval.oneDay)
+                        let expire = Date().addingTimeInterval(-3*TimeInterval.oneDay)
                         message.date = date
                         message.title = product.productTitle()?.decodingHTMLEntities()
                         message.image = product.imageURL
                         if let title = product.calculatedDisplayTitle {
                             message.buttonText = "Shop \(title)"
                         }
+                        message.buttonAction = product.offer
 //                        message.expireDate = expire
 //                        message.isExpired = expire > Date()
                     }
@@ -112,6 +113,7 @@ extension MessageInboxViewController : UICollectionViewDelegate, UICollectionVie
                 cell.badge.isHidden = !message.isNew
                 cell.titleLabel.attributedText = MessageInboxCollectionViewCell.attributedStringFor(taggedString: message.title)
                 cell.actionButton.setTitle(message.buttonText, for: .normal)
+                cell.actionButton.addTarget(self, action: #selector(inboxMessageCollectionViewCellAction(_:event:)), for: .touchUpInside)
 
             }
             
@@ -119,6 +121,21 @@ extension MessageInboxViewController : UICollectionViewDelegate, UICollectionVie
 
         }
         return cell
+    }
+    @objc func inboxMessageCollectionViewCellAction(_ control: UIControl, event: UIEvent) {
+        guard let indexPath = self.collectionView.indexPath(for: event) else {
+            return
+        }
+        if let message = messageInboxFRC?.object(at: indexPath) {
+            if let action = message.buttonAction {
+                if action.hasPrefix("http"), let url = URL.init(string: action) {
+                    if OpenWebPage.safari.canOpen(url: url){
+                        OpenWebPage.present(urlString: action, fromViewController: self)
+                        message.markAsRead()
+                    }
+                }
+            }
+        }
     }
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         let cell = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "header", for: indexPath)

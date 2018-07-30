@@ -1051,4 +1051,15 @@ extension NSManagedObjectContext {
         return nil
     }
     
+    func inboxMessageWith(objectId:NSManagedObjectID) ->InboxMessage? {
+        if let m = self.object(with: objectId) as? InboxMessage {
+            do{
+                try m.validateForUpdate()
+                return m
+            }catch{
+                DataModel.sharedInstance.receivedCoreDataError(error: error)
+            }
+        }
+        return nil
+    }
 }
