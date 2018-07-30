@@ -447,7 +447,7 @@
 		C5F73C9D1FE244C800E49F2B /* Permissions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Permissions.swift; sourceTree = "<group>"; };
 		E402A7C72084D59B00094F14 /* Model 15.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 15.xcdatamodel"; sourceTree = "<group>"; };
 		E4104DBF20DC540200683FE9 /* LocalNotificationModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocalNotificationModel.swift; sourceTree = "<group>"; };
-		E4139D401F09083B00E8A53B /* screenshot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = screenshot.app; path = Screenshop.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E4139D401F09083B00E8A53B /* Screenshop.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Screenshop.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4139D4F1F09083B00E8A53B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E41BB9321F61BDD200A74F04 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E41BB9341F61BDD900A74F04 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -1105,7 +1105,7 @@
 		E4139D411F09083B00E8A53B /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				E4139D401F09083B00E8A53B /* screenshot.app */,
+				E4139D401F09083B00E8A53B /* Screenshop.app */,
 				E4F124C1205FBA670026D91B /* productAlert.appex */,
 			);
 			name = Products;
@@ -1210,7 +1210,7 @@
 			);
 			name = Screenshop;
 			productName = screenshot;
-			productReference = E4139D401F09083B00E8A53B /* screenshot.app */;
+			productReference = E4139D401F09083B00E8A53B /* Screenshop.app */;
 			productType = "com.apple.product-type.application";
 		};
 		E4F124C0205FBA670026D91B /* productAlert */ = {
