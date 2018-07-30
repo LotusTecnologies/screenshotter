@@ -106,7 +106,7 @@ extension ScreenshotsNavigationControllerNotificationInbox {
     @objc private func presentNotificationInbox() {
         
         let vc = MessageInboxViewController.init()
-        
+        InboxMessage.updateExpired()
         let navVC = UINavigationController.init(rootViewController: vc)
 //        navVC.navigationItem.leftBarButtonItem = ui
         present(navVC, animated: true)

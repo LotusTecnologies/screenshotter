@@ -59,7 +59,7 @@ extension InboxMessage {
                             m.isExpired = isExpired
                         }
                         
-                        if expire.timeIntervalSinceNow < TimeInterval.oneWeek {
+                        if expire.timeIntervalSinceNow < -TimeInterval.oneWeek {
                             context.delete(m)
                         }
                         
@@ -77,26 +77,26 @@ extension InboxMessage {
     @objc var sectionHeader:String {
         get {
             if self.isExpired {
-                return "Expired"
+                return "inbox.section.expired".localized
             }else if let date = self.date {
                 let oneDay = TimeInterval.oneDay
                 let mostRecentMidnight = GlobalDateTools.shared.mostRecentMidnight
                 let mostRecentJan1 = GlobalDateTools.shared.mostRecentJan1
                 
                 if date > mostRecentMidnight {
-                    return "Today".localized
+                    return "inbox.section.today".localized
                 }else if date > mostRecentMidnight.addingTimeInterval(-1 * oneDay) {
-                    return "Yesterday".localized
+                    return "inbox.section.yesterday".localized
                 }else if date > mostRecentMidnight.addingTimeInterval(-2 * oneDay) {
-                    return "2 days ago".localized
+                    return "inbox.section.daysAgo".localized(withFormat: "2")
                 }else if date > mostRecentMidnight.addingTimeInterval(-3 * oneDay) {
-                    return "3 days ago".localized
+                    return "inbox.section.daysAgo".localized(withFormat: "3")
                 }else if date > mostRecentMidnight.addingTimeInterval(-4 * oneDay) {
-                    return "4 days ago".localized
+                    return "inbox.section.daysAgo".localized(withFormat: "4")
                 }else if date > mostRecentMidnight.addingTimeInterval(-5 * oneDay) {
-                    return "5 days ago".localized
+                    return "inbox.section.daysAgo".localized(withFormat: "5")
                 }else if date > mostRecentMidnight.addingTimeInterval(-6 * oneDay) {
-                    return "6 days ago".localized
+                    return "inbox.section.daysAgo".localized(withFormat: "6")
                 }else if date > mostRecentJan1 {
                     let formatter = GlobalDateTools.shared.shortDateFormatter
                     return formatter.string(from: date)

@@ -84,7 +84,7 @@ class MessageInboxCollectionViewCell: UICollectionViewCell {
         didSet {
             imageView.alpha = isExpired ? 0.5 : 1.0
             titleLabel.alpha = isExpired ? 0.5 : 1.0
-            badge.alpha = isExpired ? 0.5 : 1.0
+            badge.alpha = isExpired ? 0.0 : 1.0
             actionButton.alpha = isExpired ? 0.5 : 1.0
         }
     }

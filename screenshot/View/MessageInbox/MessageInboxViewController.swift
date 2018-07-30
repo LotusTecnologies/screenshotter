@@ -41,15 +41,33 @@ class MessageInboxViewController: UIViewController {
         collectionView.dataSource = self
         
         self.view.backgroundColor = .gray9
-        self.title = "Notifications"
+        self.title = "inbox.title".localized
         let closeX = UIImage(named: "FavoriteX")
         self.navigationItem.leftBarButtonItem = UIBarButtonItem.init(image: closeX, style: .plain, target: self, action: #selector(back(_:)))
         
         self.navigationItem.rightBarButtonItem = UIBarButtonItem.init(title: "debug", style: .plain, target: self, action: #selector(debug(_:)))
+        
+        let pinchZoom = UIPinchGestureRecognizer.init(target: self, action: #selector(pinch(gesture:)))
+        self.view.addGestureRecognizer(pinchZoom)
     }
     @objc func back(_ sender:Any){
         self.dismiss(animated: true, completion: nil)
+        InboxMessage.markAllAsRead()
+        
     }
+    
+    
+    @objc func pinch( gesture:UIPinchGestureRecognizer) {
+        if CrazeImageZoom.shared.isHandlingGesture, let imageView = CrazeImageZoom.shared.hostedImageView  {
+            CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: imageView)
+            return
+        }
+        let point = gesture.location(in: self.collectionView)
+        if let indexPath = self.collectionView.indexPathForItem(at: point), let cell = self.collectionView.cellForItem(at: indexPath) as? MessageInboxCollectionViewCell{
+            CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: cell.imageView.imageView)
+        }
+    }
+    
     @objc func debug(_ sender:Any){
         DataModel.sharedInstance.performBackgroundTask { (context) in
             let request:NSFetchRequest<Product> = Product.fetchRequest()
@@ -63,13 +81,14 @@ class MessageInboxViewController: UIViewController {
                         
                         let expire = Date().addingTimeInterval(-3*TimeInterval.oneDay)
                         message.date = date
-                        message.title = product.productTitle()?.decodingHTMLEntities()
+                        message.title = "\(product.productTitle()?.decodingHTMLEntities() ?? "") is now <pink>20% off</pink>"
                         message.image = product.imageURL
                         if let title = product.calculatedDisplayTitle {
                             message.buttonText = "Shop \(title)"
                         }
-                        message.buttonAction = product.offer
-//                        message.expireDate = expire
+                        message.actionValue = product.offer
+                        message.actionType = "link"
+                        message.expireDate = expire
 //                        message.isExpired = expire > Date()
                     }
                 }
@@ -114,7 +133,7 @@ extension MessageInboxViewController : UICollectionViewDelegate, UICollectionVie
                 cell.titleLabel.attributedText = MessageInboxCollectionViewCell.attributedStringFor(taggedString: message.title)
                 cell.actionButton.setTitle(message.buttonText, for: .normal)
                 cell.actionButton.addTarget(self, action: #selector(inboxMessageCollectionViewCellAction(_:event:)), for: .touchUpInside)
-
+                cell.isExpired = message.isExpired
             }
             
             
@@ -127,11 +146,13 @@ extension MessageInboxViewController : UICollectionViewDelegate, UICollectionVie
             return
         }
         if let message = messageInboxFRC?.object(at: indexPath) {
-            if let action = message.buttonAction {
-                if action.hasPrefix("http"), let url = URL.init(string: action) {
-                    if OpenWebPage.safari.canOpen(url: url){
-                        OpenWebPage.present(urlString: action, fromViewController: self)
-                        message.markAsRead()
+            if let action = message.actionType {
+                if action == "link"{
+                    if let urlString = message.actionValue,  let url = URL.init(string: urlString){
+                        if OpenWebPage.safari.canOpen(url: url){
+                            OpenWebPage.present(urlString: urlString, fromViewController: self)
+                            message.markAsRead()
+                        }
                     }
                 }
             }

@@ -266,6 +266,12 @@
 "generic.update" = "Update";
 "generic.yes" = "Yes";
 
+"inbox.title" = "Notifications";
+"inbox.section.today" = "Today";
+"inbox.section.yesterday" = "Yesterday";
+"inbox.section.daysAgo" = "%@ days ago";
+"inbox.section.expired" = "Expired";
+
 "legal.privacy_policy" = "Privacy Policy";
 "legal.terms_of_service" = "Terms of Service";
 
@@ -276,6 +282,7 @@
 
 "notification.message" = "Discover the best deals on products in your screenshot";
 "notification.title" = "Shop Your Inspiration";
+
 
 "notification.favorited.item.message" = "We have items similar to the %@ you checked out recently that you’ll LOVE!";
 "notification.inactivity.discover.message" = "Check out the latest fashion trends on Discover!";
