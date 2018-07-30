@@ -14,6 +14,7 @@ protocol ProfileAccountViewDelegate: NSObjectProtocol {
     func profileAccountViewWantsToContract(_ view: ProfileAccountView)
     func profileAccountViewWantsToExpand(_ view: ProfileAccountView)
     func profileAccountViewPresentImagePickerInViewController(_ view: ProfileAccountView) -> UIViewController
+    func profileAccountViewWantsToLogout(_ view: ProfileAccountView)
 }
 
 class ProfileAccountView: UIView {
@@ -28,6 +29,7 @@ class ProfileAccountView: UIView {
     private let emailLabel = UILabel()
     private let emailTextField = UnderlineTextField()
     private let continueButton = MainButton()
+    let logoutButton = BorderButton()
     private let loggedOutContainerView = UIImageView()
     
     private var heightConstraint: NSLayoutConstraint?
@@ -119,6 +121,7 @@ class ProfileAccountView: UIView {
             nameTextField.alpha = expandedAlpha
             emailTextField.alpha = expandedAlpha
             continueButton.alpha = expandedAlpha
+            logoutButton.alpha = expandedAlpha
         }
     }
     
@@ -359,6 +362,19 @@ class ProfileAccountView: UIView {
             continueButton.bottomAnchor.constraint(equalTo: loggedInContainerView.bottomAnchor, constant: -.containerPaddingY)
         ]
         
+        logoutButton.translatesAutoresizingMaskIntoConstraints = false
+        logoutButton.alpha = 0
+        logoutButton.isExclusiveTouch = true
+        logoutButton.setTitle("profile.header.logged_in.logout".localized, for: .normal)
+        logoutButton.setTitle("", for: .loading)
+        logoutButton.setTitle("", for: [.loading, .highlighted])
+        logoutButton.setTitleColor(.gray6, for: .normal)
+        logoutButton.addTarget(self, action: #selector(logoutAction), for: .touchUpInside)
+        loggedInContainerView.addSubview(logoutButton)
+        logoutButton.bottomAnchor.constraint(equalTo: continueButton.topAnchor, constant: -.padding).isActive = true
+        logoutButton.centerXAnchor.constraint(equalTo: loggedInContainerView.layoutMarginsGuide.centerXAnchor).isActive = true
+        logoutButton.widthAnchor.constraint(equalTo: continueButton.widthAnchor).isActive = true
+        
         loggedInControl.translatesAutoresizingMaskIntoConstraints = false
         loggedInControl.addTarget(self, action: #selector(loggedInControlAction), for: .touchUpInside)
         loggedInContainerView.addSubview(loggedInControl)
@@ -388,6 +404,10 @@ class ProfileAccountView: UIView {
         }))
         alertController.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
         viewController.present(alertController, animated: true)
+    }
+    
+    @objc private func logoutAction() {
+        delegate?.profileAccountViewWantsToLogout(self)
     }
     
     @objc private func loggedInContinueAction() {
@@ -466,6 +486,9 @@ extension ProfileAccountView: UIImagePickerControllerDelegate, UINavigationContr
                         SDWebImageManager.shared().saveImage(toCache: pickedImage, for: url)
                         self.avatarURL = url
                         UserAccountManager.shared.setProfile(displayName: nil, gender: nil, size: nil, unverifiedEmail: nil, avatarURL:url.absoluteString)
+                        }.catch { (error) in
+                            //whatever..
+                            Analytics.trackDevLog(file:  NSString.init(string: #file).lastPathComponent, line: #line, message: "cant upload profile image")
                     }
                 }
                 

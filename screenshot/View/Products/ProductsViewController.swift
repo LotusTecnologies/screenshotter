@@ -48,7 +48,7 @@ class ProductsViewController: BaseViewController {
     var shamrockButton : FloatingActionButton?
     var screenshotLoadingState:ProductsViewControllerState = .unknown {
         didSet {
-            Analytics.trackDevLog(file: #file, line: #line, message: "from\(oldValue) to \(screenshotLoadingState)")            
+            Analytics.trackDevLog(file:  NSString.init(string: #file).lastPathComponent, line: #line, message: "from\(oldValue) to \(screenshotLoadingState)")            
         }
     }
     var productLoadingState:ProductsViewControllerState = .unknown 
@@ -86,6 +86,8 @@ class ProductsViewController: BaseViewController {
         self.productsOptions.delegate = self
         recoverLostSaleManager.delegate = self
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "NavigationBarFilter"), style: .plain, target: self, action: #selector(presentOptions))
+        
+        self.automaticallyAdjustsScrollViewInsets = false
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -228,8 +230,10 @@ class ProductsViewController: BaseViewController {
     }
     
     deinit {
-        self.shoppablesToolbar?.delegate = nil
-        self.shoppablesToolbar?.shoppableToolbarDelegate = nil
+        if isViewLoaded {
+            self.shoppablesToolbar?.delegate = nil
+            self.shoppablesToolbar?.shoppableToolbarDelegate = nil
+        }
     }
 }
 
@@ -462,9 +466,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
             product.recordViewedProduct()
             self.recoverLostSaleManager.didClick(on: product)
             LocalNotificationModel.shared.registerCrazeTappedPriceAlert(id: product.id, merchant: product.merchant, lastPrice: product.floatPrice)
-            if let productViewController = presentProduct(product, atLocation: .products) {
-                productViewController.similarProducts = products
-            }
+            presentProduct(product, atLocation: .products) 
         }
         else if sectionType == .relatedLooks {
             if let url = self.relatedLooksManager.relatedLook(at:indexPath.row) {
@@ -493,7 +495,6 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         product.setFavorited(toFavorited: isFavorited)
         
         if isFavorited {
-            let _ = ShoppingCartModel.shared.populateVariants(productOID: product.objectID)
             Analytics.trackProductFavorited(product: product, page: .productList)
             LocalNotificationModel.shared.registerCrazeFavoritedPriceAlert(id: product.id, merchant: product.merchant, lastPrice: product.floatPrice)
         }else{
@@ -800,10 +801,6 @@ extension ProductsViewController {
             }
             
         case .retry:
-            if #available(iOS 11.0, *) {} else {
-                self.automaticallyAdjustsScrollViewInsets = false
-            }
-            
             self.productCollectionViewManager.stopAndRemoveLoader()
             self.rateView.isHidden = true
             self.hideNoItemsHelperView()

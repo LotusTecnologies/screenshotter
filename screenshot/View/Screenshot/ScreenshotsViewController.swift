@@ -123,9 +123,10 @@ class ScreenshotsViewController: BaseViewController {
     }
     
     deinit {
-        self.collectionView?.delegate = nil
-        self.collectionView?.dataSource = nil
-        
+        if isViewLoaded {
+            self.collectionView?.delegate = nil
+            self.collectionView?.dataSource = nil
+        }
         NotificationCenter.default.removeObserver(self)
     }
 }
@@ -319,6 +320,7 @@ extension ScreenshotsViewController : FetchedResultsControllerManagerDelegate {
         if collectionView.numberOfItems(inSection: indexFor(section: .image)) != 1 {
             removeScreenshotHelperView()
         }
+        self.hideProductBarIfLessThan4ShowIf4OrMoreWithoutAnimation()
     }
 }
 
@@ -328,7 +330,8 @@ extension ScreenshotsViewController : ProductsBarControllerDelegate {
         if let controller = self.productsBarController {
             UIView.performWithoutAnimation {
                 let count = controller.count
-                let shouldHaveproductBar = ( count > 4)
+                let hasScreenshots = ( self.screenshotFrcManager?.fetchedObjectsCount ?? 0 > 0 )
+                let shouldHaveproductBar = ( count > 4 &&  hasScreenshots )
                 if self.hasProductBar != shouldHaveproductBar {
                     self.hasProductBar = shouldHaveproductBar
                     syncProductShowOrHide()

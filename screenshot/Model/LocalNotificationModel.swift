@@ -26,8 +26,6 @@ class LocalNotificationModel {
         let _ = LocalNotificationModel.shared
     }
     
-    var sessionStart = NSDate()
-    
     init() {
         NotificationCenter.default.addObserver(self, selector: #selector(applicationWillEnterForeground), name: .UIApplicationWillEnterForeground, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(applicationDidEnterBackground), name: .UIApplicationDidEnterBackground, object: nil)
@@ -40,7 +38,6 @@ class LocalNotificationModel {
     // MARK: NotificationCenter Handlers
 
     @objc func applicationWillEnterForeground() {
-        sessionStart = NSDate()
         cancelPendingNotifications()
     }
     
@@ -76,7 +73,7 @@ class LocalNotificationModel {
             content.userInfo = [Constants.openingScreenKey  : Constants.openingScreenValueScreenshot,
                                 Constants.openingAssetIdKey : assetId]
             
-            identifier += assetId.replacingOccurrences(of: "/", with: "-")
+            identifier += String(assetId.unicodeScalars.filter { CharacterSet.alphanumerics.contains($0) }) // Strip out /.[]
             // Add image url
             let tmpImageFileUrl = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(identifier).appendingPathExtension("jpg")
             do {
@@ -87,6 +84,7 @@ class LocalNotificationModel {
                 content.attachments = [attachment]
             } catch {
                 print("Local notification attachment error:\(error)")
+                Analytics.trackError(type: nil, domain: "Craze", code: 101, localizedDescription: "Screenshot notif identifier:\(identifier) attachment error:\(error)")
             }
         }
         
@@ -99,6 +97,7 @@ class LocalNotificationModel {
         UNUserNotificationCenter.current().add(request, withCompletionHandler: { (error) in
             if let error = error {
                 print("sendScreenshotAddedLocalNotification identifier:\(identifier)  error:\(error)")
+                Analytics.trackError(type: nil, domain: "Craze", code: 102, localizedDescription: "Screenshot notif identifier:\(identifier) schedule error:\(error)")
             } else {
                 Analytics.trackAppSentLocalPushNotification()
             }
@@ -206,6 +205,8 @@ class LocalNotificationModel {
                                                     identifier: identifier,
                                                     body: "notification.favorited.item.message".localized(withFormat: category),
                                                     interval: 3 * Constants.secondsInDay)
+            }.catch { (error) in
+                //"no latest favorite" or other error
         }
     }
     

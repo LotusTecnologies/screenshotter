@@ -128,10 +128,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             Analytics.trackSessionStarted() // Roi Tal from AppSee suggested
         }
         
-        Analytics.trackDevLog(file: #file, line: #line, message: "application didFinishLaunchingWithOptions")
+        Analytics.trackDevLog(file:  NSString.init(string: #file).lastPathComponent, line: #line, message: "application didFinishLaunchingWithOptions")
 
         if let launchOptions = launchOptions, let url = launchOptions[UIApplicationLaunchOptionsKey.url] as? URL {
-            Analytics.trackDevLog(file: #file, line: #line, message: "application didFinishLaunchingWithOptions with url \(url)")
+            Analytics.trackDevLog(file:  NSString.init(string: #file).lastPathComponent, line: #line, message: "application didFinishLaunchingWithOptions with url \(url)")
 
             if self.isSendToDebugURL(url) {
                 self.sendDebugDataToDebugApp(url:url)
@@ -525,14 +525,14 @@ extension AppDelegate : KochavaTrackerDelegate {
         if !ASIdentifierManager.shared().isAdvertisingTrackingEnabled {
             Branch.setTrackingDisabled(true)
         }
-        Analytics.trackDevLog(file: #file, line: #line, message: "framework setup: \(String(describing: launchOptions))")
+        Analytics.trackDevLog(file:  NSString.init(string: #file).lastPathComponent, line: #line, message: "framework setup: \(String(describing: launchOptions))")
         Branch.getInstance()?.initSession(launchOptions: launchOptions) { params, error in
             // params are the deep linked params associated with the link that the user clicked -> was re-directed to this app
             // params will be empty if no data found
 
             guard error == nil, let params = params as? [String : AnyObject] else {
                 if let e = error as NSError? {
-                    Analytics.trackDevLog(file: #file, line: #line, message: "branch error: \(e)")
+                    Analytics.trackDevLog(file:  NSString.init(string: #file).lastPathComponent, line: #line, message: "branch error: \(e)")
                     Analytics.trackError(type: nil, domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
                 }
                 return
@@ -551,7 +551,7 @@ extension AppDelegate : KochavaTrackerDelegate {
                 UserDefaults.standard.set(campaign, forKey: UserDefaultsKeys.campaign)
             }
             
-            Analytics.trackDevLog(file: #file, line: #line, message: "branch params: \(params)")
+            Analytics.trackDevLog(file:  NSString.init(string: #file).lastPathComponent, line: #line, message: "branch params: \(params)")
             if let nonBranchLink = params["+non_branch_link"]  as? String {
                 if nonBranchLink.contains("validate"), let url = URL.init(string: nonBranchLink) {
                     let _ = UserAccountManager.shared.application(application, open:url, options: [:])
@@ -659,23 +659,6 @@ extension AppDelegate: PushNotificationDelegate {
     func onPushAccepted(_ pushManager: PushNotificationManager!, withNotification pushNotification: [AnyHashable : Any]!, onStart: Bool) {
         print("pushwoosh notification accepted: \(pushNotification)")
         // shows a user tapped the notification. Implement user interaction, such as showing push details
-        if let aps = pushNotification["aps"] as? [String : Any],
-          let category = aps["category"] as? String,
-          category == "PRICE_ALERT",
-          let dataDict = pushNotification["data"] as? [String : Any],
-          let id = dataDict["variantId"] as? String,
-          !id.isEmpty {
-            if let updatedPrice = dataDict["price"] as? Float {
-                let currency = dataDict["currency"] as? String ?? "USD"
-                DataModel.sharedInstance.updateProductPrice(id: id, updatedPrice: updatedPrice, updatedCurrency: currency).then(on: .main) {
-                    ProductViewController.present(with: id)
-                }
-            } else {
-                ProductViewController.present(with: id)
-            }
-            let pushTypeString = dataDict["type"] as? String
-            Analytics.trackAppOpenedFromPushNotification(source: pushTypeString)
-        }
     }
     
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
@@ -756,16 +739,7 @@ extension AppDelegate: PushNotificationDelegate {
             Analytics.trackAppReceivedPushNotification(source: pushTypeString)
             PushNotificationManager.push().handlePushReceived(userInfo)  // pushwoosh
             completionHandler(.newData)
-        } else if let aps = userInfo["aps"] as? [String : Any],
-          aps.count <= 3,
-          let contentAvailable = aps["content-available"] as? NSNumber,
-          contentAvailable.intValue == 1 {
-            AssetSyncModel.sharedInstance.scanPhotoGalleryForFashion()
-            Analytics.trackAppReceivedPushNotification(source: "silent")
-            completionHandler(.newData)
         } else {
-            Branch.getInstance().handlePushNotification(userInfo)
-
             // Only spin up a background task if we are already in the background
             if application.applicationState == .background {
                 if bgTask != UIBackgroundTaskInvalid {
@@ -776,7 +750,17 @@ extension AppDelegate: PushNotificationDelegate {
                     self.bgTask = UIBackgroundTaskInvalid
                 })
             }
-            completionHandler(.noData)
+
+            if let aps = userInfo["aps"] as? [String : Any],
+              aps.count <= 3,
+              let contentAvailable = aps["content-available"] as? NSNumber,
+              contentAvailable.intValue == 1 {
+                Analytics.trackAppReceivedPushNotification(source: "silent")
+                completionHandler(.newData)
+            } else {
+                Branch.getInstance().handlePushNotification(userInfo)
+                completionHandler(.noData)
+            }
         }
     }
     
@@ -829,7 +813,24 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
                 }
             } else if let openingProductKey = userInfo[Constants.openingProductKey] as? String {
                 isHandled = true
-                ProductViewController.present(imageURL: openingProductKey)
+                ProductDetailViewController.present(imageURL: openingProductKey)
+            } else if let aps = userInfo["aps"] as? [String : Any],
+              let category = aps["category"] as? String,
+              category == "PRICE_ALERT",
+              let dataDict = userInfo["data"] as? [String : Any],
+              let id = dataDict["variantId"] as? String,
+              !id.isEmpty {
+                isHandled = true
+                if let updatedPrice = dataDict["price"] as? Float {
+                    let currency = dataDict["currency"] as? String ?? "USD"
+                    DataModel.sharedInstance.updateProductPrice(id: id, updatedPrice: updatedPrice, updatedCurrency: currency).then(on: .main) {
+                        ProductDetailViewController.present(with: id)
+                    }
+                } else {
+                    ProductDetailViewController.present(with: id)
+                }
+                let pushTypeString = dataDict["type"] as? String
+                Analytics.trackAppOpenedFromPushNotification(source: pushTypeString)
             }
         }
         
@@ -859,7 +860,7 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
         if notification.request.content.categoryIdentifier == "PRICE_ALERT" {
             completionHandler([.alert, .badge, .sound])
         } else {
-            PushNotificationManager.push().notificationCenterDelegate.userNotificationCenter?(center, willPresent: notification, withCompletionHandler: completionHandler)
+            completionHandler([])
         }
     }
     

@@ -2,24 +2,19 @@
 platform :ios, '10.0'
 inhibit_all_warnings!
 
-target 'screenshot' do
+target 'Screenshop' do
     # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
     use_frameworks!
     pod 'KochavaTrackeriOS'
     pod 'Amplitude-iOS', '~> 4.2.1'
     pod 'PromiseKit/Foundation', '4.5.2'
-    pod 'PromiseKit/StoreKit', '~> 4.0'
     pod 'SDWebImage', '~> 4.0'
     pod 'Analytics', '~> 3.0'
     pod 'Appsee'
     pod 'Branch'
     pod 'EggRating'
     pod 'lottie-ios'
-    pod 'SwiftKeychainWrapper'
-    pod 'CreditCardValidator'
     pod 'Whisper'
-    pod 'PhoneNumberKit'
-    pod 'CardIO'
     pod 'PushwooshInboxUI'
     pod 'Hero'
     pod 'Firebase/Core'

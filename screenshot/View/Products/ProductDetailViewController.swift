@@ -29,12 +29,6 @@ class ProductDetailViewController: BaseViewController {
             self.syncViewsAfterStateChange()
         }
     }
-    var headerCell:ProductHeaderCollectionViewCell? {
-        if self.collectionView?.numberOfSections ?? 0 > 0 && self.collectionView?.numberOfItems(inSection: 0) ?? 0 > 0 {
-            return self.collectionView?.cellForItem(at: IndexPath.init(row: 0, section: 0)) as? ProductHeaderCollectionViewCell
-        }
-        return nil
-    }
     
     override func viewDidLoad() {
         
@@ -284,9 +278,7 @@ extension ProductDetailViewController : UICollectionViewDelegateFlowLayout, UICo
             product.recordViewedProduct()
             self.recoverLostSaleManager.didClick(on: product)
             LocalNotificationModel.shared.registerCrazeTappedPriceAlert(id: product.id, merchant: product.merchant, lastPrice: product.floatPrice)
-            if let productViewController = presentProduct(product, atLocation: .burrowList) {
-                productViewController.similarProducts = products
-            }
+            presentProduct(product, atLocation: .burrowList) 
         }else if indexPath.section == 2 {
             if let url = self.relatedLooksManager.relatedLook(at:indexPath.row) {
                 Analytics.trackScreenshotRelatedLookAdd(url: url)
@@ -312,7 +304,6 @@ extension ProductDetailViewController : UICollectionViewDelegateFlowLayout, UICo
             
             product.setFavorited(toFavorited: isFavorited)
             if isFavorited {
-                let _ = ShoppingCartModel.shared.populateVariants(productOID: product.objectID)
                 Analytics.trackProductFavorited(product: product, page: .productList)
                 LocalNotificationModel.shared.registerCrazeFavoritedPriceAlert(id: product.id, merchant: product.merchant, lastPrice: product.floatPrice)
             }else{
@@ -338,15 +329,13 @@ extension ProductDetailViewController : UICollectionViewDelegateFlowLayout, UICo
     }
     
     @objc func productCollectionViewCellBuyNowAction(_ control: UIControl, event: UIEvent) {
-        guard let indexPath = collectionView?.indexPath(for: event) else {
+        guard !self.recoverLostSaleManager.isPresented, let indexPath = collectionView?.indexPath(for: event) else {
             return
         }
 
         if  indexPath.section == 0, let product = self.product {
             self.recoverLostSaleManager.didClick(on: product)
-            if let productViewController = presentProduct(product, atLocation: .burrownMain) {
-                productViewController.similarProducts = products
-            }
+            presentProduct(product, atLocation: .burrownMain) 
         }
     }
     

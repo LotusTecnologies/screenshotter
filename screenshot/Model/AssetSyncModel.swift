@@ -258,13 +258,14 @@ extension AssetSyncModel {
                                 let screenshot = Screenshot(context: managedObjectContext)
                                 screenshot.assetId = assetId
                                 screenshot.createdAt = creationDate
-                                screenshot.isHidden = true
                                 screenshot.isNew = true
                                 screenshot.lastModified = creationDate
                                 screenshot.isRecognized = true
                                 screenshot.isHidden = false
                                 screenshot.imageData = imageData
                                 screenshot.source = source
+                                
+                                Analytics.trackScreenshotCreated(screenshot: screenshot)
                                 
                                 managedObjectContext.saveIfNeeded()
                                 fulfill((imageData, nil, nil))
@@ -471,7 +472,19 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
         }
         var imageData: Data?
         self.uploadScreenshotWithClarifaiQueueFromUserScreenshot.addOperation(AsyncOperation.init(timeout: 20.0,  assetId: asset.localIdentifier, shoppableId: nil, completion: { (completeOperation) in
-            asset.image(allowFromICloud: false).then (on: self.processingQ) { image -> Promise<(String, [[String : Any]])> in
+            Promise.init { fulfill, reject in
+                self.performBackgroundTask(assetId: asset.localIdentifier, shoppableId: nil) { (managedObjectContext) in
+                    if let _ = managedObjectContext.screenshotWith(assetId: asset.localIdentifier) {
+                        //do nothing if already exsists
+                        let error = NSError.init(domain: "Craze", code: -90, userInfo: [NSLocalizedDescriptionKey:"already have screenshot in database"])
+                        reject(error)
+                    }else{
+                        fulfill(())
+                    }
+                }
+            }.then (on: self.processingQ)  { () -> (Promise<UIImage>) in
+                return asset.image(allowFromICloud: false)
+            }.then (on: self.processingQ) { image -> Promise<(String, [[String : Any]])> in
                 Analytics.trackSentImageToClarifai()
                 //                return ClarifaiModel.sharedInstance.classify(image: image).then(execute: { (c) -> Promise<(ClarifaiModel.ImageClassification, UIImage)>  in
                 //                    return Promise.init(value: (c, image))
@@ -488,7 +501,6 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                                 let error = NSError.init(domain: "Craze", code: -90, userInfo: [NSLocalizedDescriptionKey:"already have screenshot in database"])
                                 reject(error)
                             }else{
-                                let isHidden = !isRecognized
                                 let syteJsonString = NetworkingPromise.sharedInstance.jsonStringify(object: syteJson)
                                 let _ = DataModel.sharedInstance.saveScreenshot(upsert: false,
                                                                                 managedObjectContext: managedObjectContext,
@@ -496,7 +508,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                                                                                 createdAt: asset.creationDate,
                                                                                 isRecognized: isRecognized,
                                                                                 source: .screenshot,
-                                                                                isHidden: isHidden,
+                                                                                isHidden: true,
                                                                                 imageData: imageData,
                                                                                 uploadedImageURL: uploadedImageURL,
                                                                                 syteJsonString: syteJsonString)
@@ -534,7 +546,9 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
         }
         var imageData: Data?
         self.uploadScreenshotWithClarifaiQueue.addOperation(AsyncOperation(timeout: 20.0, assetId: asset.localIdentifier, shoppableId: nil, completion: { (completeOperation) in
-            firstly{ () -> Promise<Bool> in
+            
+            
+            firstly{ () -> Promise<Void> in
                 if !isScreenshotUserJustTook {
                     if let date = asset.creationDate {
                         if let currentValue = UserDefaults.standard.value(forKey: UserDefaultsKeys.processBackgroundImagesForFashionAfterDate) as? Date {
@@ -549,8 +563,20 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                         throw error
                     }
                 }
-                return Promise.init(value: true)
-                }.then(on: self.processingQ) { success -> Promise<UIImage> in
+                return Promise.init(value: ())
+                }.then(on: self.processingQ) { success -> Promise<Void> in
+                   return Promise.init { fulfill, reject in
+                        self.performBackgroundTask(assetId: asset.localIdentifier, shoppableId: nil) { (managedObjectContext) in
+                            if let _ = managedObjectContext.screenshotWith(assetId: asset.localIdentifier) {
+                                //do nothing if already exsists
+                                let error = NSError.init(domain: "Craze", code: -90, userInfo: [NSLocalizedDescriptionKey:"already have screenshot in database"])
+                                reject(error)
+                            }else{
+                                fulfill(())
+                            }
+                        }
+                    }
+                }.then(on: self.processingQ) { () -> Promise<UIImage> in
                     return asset.image(allowFromICloud: false)
                 }.then (on: self.processingQ) { image -> Promise<(String, [[String : Any]])> in
                     Analytics.trackSentImageToClarifai()
@@ -559,7 +585,8 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                     //                })
                     imageData = self.data(for: image)
                     return NetworkingPromise.sharedInstance.uploadToSyte(imageData: imageData, orImageUrlString: nil)
-                }.then (on: self.processingQ) { tuple -> Promise<Bool> in
+                }.then (on: self.processingQ) { args -> Promise<Bool> in
+                    let (uploadedImageUrl, json) = args
                     // Store screenshot and syteJson to DB.
                     return Promise { fulfill, reject in
                         self.performBackgroundTask(assetId: asset.localIdentifier, shoppableId: nil) { (managedObjectContext) in
@@ -568,7 +595,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                                 let error = NSError.init(domain: "Craze", code: -90, userInfo: [NSLocalizedDescriptionKey:"already have screenshot in database"])
                                 reject(error)
                             } else {
-                                let syteJsonString = NetworkingPromise.sharedInstance.jsonStringify(object: tuple.1)
+                                let syteJsonString = NetworkingPromise.sharedInstance.jsonStringify(object: json)
                                 let _ = DataModel.sharedInstance.saveScreenshot(upsert: false,
                                                                                 managedObjectContext: managedObjectContext,
                                                                                 assetId: asset.localIdentifier,
@@ -577,7 +604,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                                                                                 source: .screenshot,
                                                                                 isHidden: true,
                                                                                 imageData: imageData,
-                                                                                uploadedImageURL: tuple.0,
+                                                                                uploadedImageURL: uploadedImageUrl,
                                                                                 syteJsonString: syteJsonString)
                                 managedObjectContext.saveIfNeeded()
                                 fulfill(true)
@@ -586,7 +613,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                     }
                 }.then(on: self.processingQ) { aBool -> Void in
                     self.performBackgroundTask(assetId: nil, shoppableId: nil) { (managedObjectContext) in
-                        if managedObjectContext.screenshotWith(assetId: asset.localIdentifier) == nil {
+                        if let _ = managedObjectContext.screenshotWith(assetId: asset.localIdentifier) {
                             AccumulatorModel.screenshot.addAssetId(asset.localIdentifier)
                             AccumulatorModel.screenshotUninformed.incrementUninformedCount()
                             if self.shouldSendPushWhenFindFashionWithoutUserScreenshotAction && ApplicationStateModel.sharedInstance.isBackground(){
@@ -733,7 +760,7 @@ extension AssetSyncModel {
                         }
                     }
                     let uploadedURLString = nsError.userInfo[NSURLErrorFailingURLStringErrorKey] as? String
-                    let imageUrl: String = uploadedURLString ?? ""
+                    let imageUrl: String = uploadedURLString ?? orImageUrlString ?? gottenUploadedURLString ?? ""
                     DataModel.sharedInstance.setNoShoppables(assetId: assetId, uploadedURLString: uploadedURLString)
                     Analytics.trackReceivedResponseFromSyte(imageUrl: imageUrl, segmentCount: 0, categories: nil)
                     if let e = error as? PMKURLError {
@@ -768,15 +795,7 @@ extension AssetSyncModel {
             (!productCurrency.isEmpty && productCurrency != CurrencyMap.autoCode) {
             fixedQueryitems.append(URLQueryItem(name: "force_currency", value: productCurrency))
         }
-        //        let userDefaults = UserDefaults.standard
-        //        if userDefaults.object(forKey: UserDefaultsKeys.isUSC) == nil {
-        //            return self.geoLocateIsUSC()
-        //        } else {
-        //            let isUsc: Bool = userDefaults.bool(forKey: UserDefaultsKeys.isUSC)
-        //            return Promise(value: isUsc)
-        //        }
-        // Revert to never use USC.
-        // let sizeValue = isPlus ? "craze_plus_size" : isChild ? "kids_craze" : isUsc ? Constants.syteUscFeed : Constants.syteNonUscFeed
+       
         let sizeValue = isPlus ? "craze_plus_size" : isChild ? "kids_craze" : Constants.syteNonUscFeed
         fixedQueryitems.append(URLQueryItem(name: "feed", value: sizeValue))
         if optionsMask.rawValue & ProductsOptionsMask.genderMale.rawValue > 0 {
@@ -843,6 +862,11 @@ extension AssetSyncModel {
         }
     }
     
+    func calcFallbackPrice(originalData: [String : Any]) -> Float {
+        let dataModel = DataModel.sharedInstance
+        return dataModel.parseFloat(originalData["price"]) ?? dataModel.parseFloat(originalData["sale_price"]) ?? dataModel.parseFloat(originalData["discount_price"]) ?? dataModel.parseFloat(originalData["retail_price"]) ?? 0
+    }
+    
     func saveProduct(managedObjectContext: NSManagedObjectContext,
                      shoppable: Shoppable,
                      productOrder: Int16,
@@ -856,11 +880,7 @@ extension AssetSyncModel {
         var color: String? = nil
         var sku: String? = nil
         if let originalData = prod["original_data"] as? [String : Any] {
-            fallbackPrice = dataModel.parseFloat(originalData["price"])
-            ?? dataModel.parseFloat(originalData["sale_price"])
-            ?? dataModel.parseFloat(originalData["discount_price"])
-            ?? dataModel.parseFloat(originalData["retail_price"])
-            ?? 0
+            fallbackPrice = calcFallbackPrice(originalData: originalData)
             partNumber = originalData["part_number"] as? String
             id = originalData["Product ID"] as? String ?? originalData["sku"] as? String ?? originalData["merchant_product_id"] as? String
             color = originalData["color"] as? String
