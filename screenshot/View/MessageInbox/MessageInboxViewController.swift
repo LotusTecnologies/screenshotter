@@ -45,7 +45,6 @@ class MessageInboxViewController: UIViewController {
         let closeX = UIImage(named: "FavoriteX")
         self.navigationItem.leftBarButtonItem = UIBarButtonItem.init(image: closeX, style: .plain, target: self, action: #selector(back(_:)))
         
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem.init(title: "debug", style: .plain, target: self, action: #selector(debug(_:)))
         
         let pinchZoom = UIPinchGestureRecognizer.init(target: self, action: #selector(pinch(gesture:)))
         self.view.addGestureRecognizer(pinchZoom)
@@ -67,68 +66,6 @@ class MessageInboxViewController: UIViewController {
             CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: cell.imageView.imageView)
         }
     }
-    
-    @objc func debug(_ sender:Any){
-        DataModel.sharedInstance.performBackgroundTask { (context) in
-            let allInboxMessagesRequest: NSFetchRequest<InboxMessage> = InboxMessage.fetchRequest()
-            allInboxMessagesRequest.predicate = nil
-            if let allMessages = try? context.fetch(allInboxMessagesRequest){
-                for m in allMessages {
-                    context.delete(m)
-                }
-            }
-            
-            let productRequest:NSFetchRequest<Product> = Product.fetchRequest()
-            if let result = try? context.fetch(productRequest) {
-                var count = 0;
-                for product in result {
-                    count += 1
-                    if count < 20 {
-                        let message = InboxMessage(context: context)
-                        let date = Date.init(timeIntervalSinceNow: TimeInterval(-count*12*60*60))
-                        
-                        let expire = Date().addingTimeInterval(-3*TimeInterval.oneDay)
-                        message.date = date
-                        let title = product.productTitle()?.decodingHTMLEntities() ?? ""
-                        message.title = "\(title) is now <pink>20% off</pink>"
-                        message.image = product.imageURL
-                        if let title = product.calculatedDisplayTitle {
-                            message.buttonText = "Shop \(title)"
-                        }
-                        message.actionValue = product.offer
-                        message.actionType = "link"
-                        message.expireDate = expire
-//                        message.isExpired = expire > Date()
-                    }
-                }
-            }
-            
-            let matchStickRequest:NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
-            if let result = try? context.fetch(matchStickRequest) {
-                var count = 0
-                for m  in result {
-                    count += 1
-                    if count < 20 {
-                        let message = InboxMessage(context: context)
-                        let date = Date.init(timeIntervalSinceNow: TimeInterval(-count*12*60*60))
-                        
-                        let expire = Date().addingTimeInterval(-3*TimeInterval.oneDay)
-                        message.date = date
-                        message.title = "Get the look now! Items in your screenshot are on sale."
-                        message.image = m.imageUrl
-                        message.actionValue = m.imageUrl
-                        message.actionType = "screenshot"
-                        message.buttonText = "View Items"
-                        message.expireDate = expire
-                    }
-                }
-            }
-            
-           
-            context.saveIfNeeded()
-        }
-    }
-
 }
 
 extension MessageInboxViewController : FetchedResultsControllerManagerDelegate {

@@ -1079,7 +1079,17 @@ extension UserAccountManager {
                                     message.trackingJSON = nil
                                 }
                             }
-                            
+                            message.isExpired = expireDate.timeIntervalSinceNow < 0
+                            if expireDate.timeIntervalSinceNow < -TimeInterval.oneWeek {
+                                context.delete(message)
+                            }
+                            if let installDate = UserDefaults.standard.object(forKey: UserDefaultsKeys.dateInstalled) as? Date {
+                                if date < installDate {
+                                    if message.isNew != false {
+                                        message.isNew = false
+                                    }
+                                }
+                            }
                             
                         }
                     }

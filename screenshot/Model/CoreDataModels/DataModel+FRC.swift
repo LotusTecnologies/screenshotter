@@ -118,7 +118,7 @@ extension DataModel {
     func inboxMessageNewFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<InboxMessage>{
         
         let request: NSFetchRequest<InboxMessage> = InboxMessage.fetchRequest()
-        request.predicate = NSPredicate.init(format: "isNew == true")
+        request.predicate = NSPredicate.init(format: "isNew == true AND isExpired == false")
         request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: false)]
         let context = self.mainMoc()
         let fetchedResultsController = FetchedResultsControllerManager<InboxMessage>(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
