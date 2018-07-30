@@ -97,7 +97,7 @@ extension DataModel {
     func productBarFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<Product> {
         let request: NSFetchRequest = Product.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(key: "dateSortProductBar", ascending: false)]
-        let date = NSDate.init(timeIntervalSinceNow:  -60*60*24*7)
+        let date = NSDate.init(timeIntervalSinceNow:  -TimeInterval.oneWeek)
         request.predicate = NSCompoundPredicate.init(andPredicateWithSubpredicates: [NSPredicate(format: "hideFromProductBar != true"), NSCompoundPredicate.init(orPredicateWithSubpredicates: [ NSPredicate(format: "isFavorite == true"), NSPredicate(format: "dateViewed != nil")]), NSPredicate(format:"dateSortProductBar > %@", date)])
         
         let context = self.mainMoc()

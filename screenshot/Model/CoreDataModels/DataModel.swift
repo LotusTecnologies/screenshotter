@@ -529,7 +529,7 @@ extension DataModel {
         return Promise { fulfill, reject in
             self.performBackgroundTask { managedObjectContext in
                 let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
-                let twoMonthsAgo = NSDate(timeIntervalSinceNow: -60 * Constants.secondsInDay)
+                let twoMonthsAgo = NSDate(timeIntervalSinceNow: -60 * TimeInterval.oneDay)
                 fetchRequest.predicate = NSPredicate(format: "isFavorite == TRUE AND inNotif == FALSE AND imageURL != nil AND dateFavorited > %@", twoMonthsAgo)
                 fetchRequest.sortDescriptors = [NSSortDescriptor(key: "dateFavorited", ascending: false)]
                 fetchRequest.fetchLimit = 1
@@ -558,7 +558,7 @@ extension DataModel {
         return Promise { fulfill, reject in
             self.performBackgroundTask { managedObjectContext in
                 let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
-                let aMonthAgo = NSDate(timeIntervalSinceNow: -30 * Constants.secondsInDay)
+                let aMonthAgo = NSDate(timeIntervalSinceNow: -30 * TimeInterval.oneDay)
                 fetchRequest.predicate = NSPredicate(format: "isFavorite == FALSE AND inNotif == FALSE AND imageURL != nil AND dateViewed > %@", aMonthAgo)
                 fetchRequest.sortDescriptors = [NSSortDescriptor(key: "dateViewed", ascending: false)]
                 fetchRequest.fetchLimit = 1
@@ -586,7 +586,7 @@ extension DataModel {
         return Promise { fulfill, reject in
             self.performBackgroundTask { managedObjectContext in
                 let fetchRequest: NSFetchRequest<Shoppable> = Shoppable.fetchRequest()
-                let twoMonthsAgo = NSDate(timeIntervalSinceNow: -60 * Constants.secondsInDay)
+                let twoMonthsAgo = NSDate(timeIntervalSinceNow: -60 * TimeInterval.oneDay)
                 fetchRequest.predicate = NSPredicate(format: "screenshot.lastModified > %@ AND screenshot.inNotif == FALSE AND screenshot.isHidden == FALSE AND screenshot.imageData != nil AND (SUBQUERY(products, $x, ($x.order == 0 OR $x.order == 1) AND $x.floatPrice < $x.floatOriginalPrice).@count == 2)", twoMonthsAgo)
                 fetchRequest.sortDescriptors = [NSSortDescriptor(key: "screenshot.lastModified", ascending: false)]
                 fetchRequest.fetchLimit = 1

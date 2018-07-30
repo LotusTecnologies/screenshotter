@@ -48,8 +48,7 @@ class Analytics {
         
         let dateInstalled = (UserDefaults.standard.object(forKey:  UserDefaultsKeys.dateInstalled) as? Date ) ?? Date()
         let timeSinceInstall:Double = abs(dateInstalled.timeIntervalSinceNow)
-        let secondsInDay:Double = 60*60*24
-        let daysSinceInstall = Int(round(timeSinceInstall / secondsInDay))
+        let daysSinceInstall = Int(round(timeSinceInstall / TimeInterval.oneDay))
         
         properties["user-age"] = daysSinceInstall
         

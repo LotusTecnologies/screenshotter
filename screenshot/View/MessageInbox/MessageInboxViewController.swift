@@ -64,12 +64,6 @@ class MessageInboxViewController: UIViewController {
             context.saveIfNeeded()
         }
     }
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-    
-
 
 }
 
@@ -102,7 +96,7 @@ extension MessageInboxViewController : UICollectionViewDelegate, UICollectionVie
                     cell.imageView.imageView.sd_setImage(with: url, placeholderImage: placeHolder, options: [.retryFailed, .highPriority], completed: nil)
 
                 }
-                cell.badge.isHidden = message.isNew
+                cell.badge.isHidden = !message.isNew
                 cell.titleLabel.attributedText = MessageInboxCollectionViewCell.attributedStringFor(taggedString: message.title)
                 cell.actionButton.setTitle(message.buttonText, for: .normal)
 

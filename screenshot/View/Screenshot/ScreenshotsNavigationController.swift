@@ -114,13 +114,10 @@ extension ScreenshotsNavigationControllerNotificationInbox {
     }
     
     private func updateInboxBadgeCount() {
-        PWInbox.unreadMessagesCount(completion: { (count, error) in
-            DispatchQueue.mainAsyncIfNeeded {
-                if error == nil {
-                    self.inboxBarButtonItem?.count = UInt(count)
-                }
-            }
-        })
+        DispatchQueue.mainAsyncIfNeeded {
+            let count = InboxMessage.fetchUnreadCount()
+            self.inboxBarButtonItem?.count = UInt(count)
+        }
     }
     
     @objc private func pushWooshDidReceiveInPush(_ notification: Notification) {

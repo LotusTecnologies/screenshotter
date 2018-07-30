@@ -162,7 +162,7 @@ class LocalNotificationModel {
                                                     userInfo: [Constants.openingProductKey : imageURLString],
                                                     identifier: identifier,
                                                     body: "notification.tapped.product.message".localized(withFormat: productTitle),
-                                                    interval: Constants.secondsInDay)
+                                                    interval: TimeInterval.oneDay)
         }
     }
 
@@ -183,7 +183,7 @@ class LocalNotificationModel {
                                                                Constants.openingAssetIdKey : assetIdString],
                                                     identifier: identifier,
                                                     body: "notification.sale.screenshot.message".localized,
-                                                    interval: 2 * Constants.secondsInDay)
+                                                    interval: 2 * TimeInterval.oneDay)
         }
     }
     
@@ -205,7 +205,7 @@ class LocalNotificationModel {
                                                     userInfo: [Constants.openingProductKey : imageURLString],
                                                     identifier: identifier,
                                                     body: "notification.favorited.item.message".localized(withFormat: category),
-                                                    interval: 3 * Constants.secondsInDay)
+                                                    interval: 3 * TimeInterval.oneDay)
             }.catch { (error) in
                 //"no latest favorite" or other error
         }
@@ -220,7 +220,7 @@ class LocalNotificationModel {
                                             userInfo: [Constants.openingScreenKey : Constants.openingScreenValueDiscover],
                                             identifier: LocalNotificationIdentifier.inactivityDiscover.rawValue,
                                             body: "notification.inactivity.discover.message".localized,
-                                            interval: 4 * Constants.secondsInDay)
+                                            interval: 4 * TimeInterval.oneDay)
     }
     
     func cancelPendingNotifications(within: Date? = nil) {

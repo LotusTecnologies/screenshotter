@@ -17,7 +17,7 @@ extension Matchstick {
         return NSPredicate.init(format: "dateSkipped = nil AND was404 != true AND wasAdded != true AND isDisplaying != true")
     }
 
-    static var skipRotationTime:TimeInterval = 7*24*60*60  // 1 week
+    static var skipRotationTime = TimeInterval.oneWeek
     static var displayingSize = 2
     static var queueSize = 10  //Must have at least this ammount  - if not grab random numbers
     static var recombeeQueueSize = 30  // want to have this amount of recombee recommendations
