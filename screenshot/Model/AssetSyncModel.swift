@@ -122,9 +122,11 @@ extension AssetSyncModel {
             }
         }
     }
-    
-    
     public func addFromRelatedLook(urlString:String, callback: ((_ screenshot: Screenshot) -> Void)? = nil) {
+        self.addScreenshotFrom(source: .shuffle, urlString: urlString, callback: callback)
+    }
+    public func addScreenshotFrom(source:ScreenshotSource, urlString:String, callback: ((_ screenshot: Screenshot) -> Void)? = nil) {
+
         self.userInitiatedQueue.addOperation(AsyncOperation.init(timeout: 30, assetId: urlString, shoppableId: nil, completion: { (completion) in
             self.performBackgroundTask(assetId: urlString, shoppableId: nil) { (managedObjectContext) in
                 if let screenshot = managedObjectContext.screenshotWith(assetId: urlString) {
@@ -159,7 +161,7 @@ extension AssetSyncModel {
                                                                                               assetId: urlString,
                                                                                               createdAt: Date(),
                                                                                               isRecognized: true,
-                                                                                              source: .shuffle,
+                                                                                              source: source,
                                                                                               isHidden: false,
                                                                                               imageData: imageData,
                                                                                               uploadedImageURL: urlString,

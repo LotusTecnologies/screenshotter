@@ -54,6 +54,7 @@
         <attribute name="isExpired" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="isNew" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="trackingJSON" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="uuid" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
     <entity name="Matchstick" representedClassName="Matchstick" syncable="YES" codeGenerationType="class">
@@ -181,7 +182,7 @@
         <element name="Card" positionX="718" positionY="173" width="128" height="165"/>
         <element name="Cart" positionX="297" positionY="423" width="128" height="165"/>
         <element name="CartItem" positionX="475" positionY="639" width="128" height="225"/>
-        <element name="InboxMessage" positionX="-171" positionY="36" width="128" height="195"/>
+        <element name="InboxMessage" positionX="-171" positionY="36" width="128" height="210"/>
         <element name="Matchstick" positionX="-380" positionY="-117" width="128" height="255"/>
         <element name="Product" positionX="-101" positionY="396" width="128" height="570"/>
         <element name="ProductFilter" positionX="160" positionY="276" width="128" height="120"/>

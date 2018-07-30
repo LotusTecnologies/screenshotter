@@ -28,6 +28,13 @@ class FacebookProxy : NSObject, FBSDKLoginButtonDelegate {
         facebookButton.delegate = self
         facebookButton.sendActions(for: .touchUpInside)
 
+        NotificationCenter.default.addObserver(self, selector: #selector(setupInboxSync), name: Notification.Name.UIApplicationDidBecomeActive, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(disconnectInboxSync), name: Notification.Name.UIApplicationDidEnterBackground, object: nil)
+
+        
+    }
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     func loginButton(_ loginButton: FBSDKLoginButton!, didCompleteWith result: FBSDKLoginManagerLoginResult!, error: Error!) {
@@ -747,6 +754,7 @@ extension UserAccountManager {
         var promiseArray:[Promise<Void>] = []
         if let user = self.user{
             
+            self.setupInboxSync()
             promiseArray.append(Promise<Void>.init(resolvers: { (fulfil, reject) in
                 self.databaseRef.child("users").child(user.uid).child("avatarURL").observeSingleEvent(of: .value) { (snapshot) in
                     if let url = snapshot.value as? String  {
@@ -995,6 +1003,90 @@ extension UserAccountManager {
             }
         }
 
+    }
+    
+    @objc func setupInboxSync() {
+        if let user = self.user {
+            self.databaseRef.removeAllObservers() // make sure not to doulbe listen
+                DataModel.sharedInstance.performBackgroundTask({ (context) in
+                    var uuids:[String] = []
+                    for child in snapshot.children {
+                        if let child = child as? DataSnapshot,
+                        let dict = child.value as? NSDictionary,
+                            let uuid = dict["uuid"] as? String {
+                            uuids.append(uuid)
+                        }
+                    }
+
+                    let lookup = InboxMessage.lookupWith(uuids: uuids, in: context)
+                    for child in snapshot.children {
+                        if let child = child as? DataSnapshot,
+                            let dict = child.value as? NSDictionary,
+                            let actionType = dict["actionType"] as? String,
+                            let actionValue = dict["actionValue"] as? String,
+                            let buttonText = dict["buttonText"] as? String,
+                            let image = dict["image"] as? String,
+                            let title = dict["title"] as? String,
+                            let uuid = dict["uuid"] as? String,
+                            let expireNumber = dict["expireDate"] as? NSNumber,
+                            let dateNumber = dict["date"] as? NSNumber
+                        {
+                            
+                            let message = lookup[uuid] ?? InboxMessage(context: context)
+                            
+                            let expireDate = Date.init(timeIntervalSince1970: TimeInterval(expireNumber.intValue))
+                            let date = Date.init(timeIntervalSince1970: TimeInterval(dateNumber.intValue))
+                            
+                            if message.uuid != uuid {
+                                message.uuid = uuid
+                            }
+                            if message.actionType != actionType {
+                                message.actionType = actionType
+                            }
+                            if message.actionValue != actionValue {
+                                message.actionValue = actionValue
+                            }
+                            if message.buttonText != buttonText {
+                                message.buttonText = buttonText
+                            }
+                            if message.image != image {
+                                message.image = image
+                            }
+                            if message.title != title {
+                                message.title = title
+                            }
+                            if message.title != title {
+                                message.title = title
+                            }
+                            if message.date != date {
+                                message.date = date
+                            }
+                            if message.expireDate != expireDate {
+                                message.expireDate = expireDate
+                            }
+                            
+                            if let tracking = dict["tracking"] as? [String:String] {
+                                if JSONSerialization.isValidJSONObject(tracking), let jsonData = try? JSONSerialization.data(withJSONObject: tracking, options: []), let jsonString = String.init(data:jsonData, encoding:.utf8) {
+                                    if message.trackingJSON != jsonString {
+                                        message.trackingJSON = jsonString
+                                    }
+                                }
+                            }else {
+                                if message.trackingJSON != nil {
+                                    message.trackingJSON = nil
+                                }
+                            }
+                            
+                            
+                        }
+                    }
+                    context.saveIfNeeded()
+                })
+            }
+        }
+    }
+    @objc func disconnectInboxSync(){
+        self.databaseRef.removeAllObservers()
     }
 }
 extension String {

@@ -10,6 +10,18 @@ import Foundation
 import CoreData
 
 extension InboxMessage {
+    
+    static func lookupWith(uuids:[String], in context:NSManagedObjectContext) -> [String:InboxMessage]{
+        let fetchRequest: NSFetchRequest<InboxMessage> = InboxMessage.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "uuid IN %@", uuids)
+        fetchRequest.sortDescriptors = nil
+        var lookup:[String:InboxMessage] = [:]
+        if let results = try? context.fetch(fetchRequest) {
+            results.forEach { if let uuid = $0.uuid { lookup[uuid] = $0  } }
+        }
+        return lookup
+    }
+    
     static func markAllAsRead(){
         DataModel.sharedInstance.performBackgroundTask { (context) in
             let request: NSFetchRequest<InboxMessage> = InboxMessage.fetchRequest()

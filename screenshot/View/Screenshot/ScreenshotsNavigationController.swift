@@ -8,8 +8,6 @@
 
 import UIKit
 import CoreData
-import PushwooshInboxUI
-import Pushwoosh
 
 protocol ScreenshotsNavigationControllerDelegate: NSObjectProtocol {
     func screenshotsNavigationControllerDidGrantPushPermissions(_ navigationController: ScreenshotsNavigationController)
@@ -21,11 +19,12 @@ class ScreenshotsNavigationController: UINavigationController {
     var activityBarButtonItem:UIBarButtonItem?
     fileprivate var inboxBarButtonItem: BadgeBarButtonItem?
     fileprivate var restoredProductsViewController: ProductsViewController?
+    var inboxUnreadCountFRC = DataModel.sharedInstance.inboxMessageNewFrc(delegate: nil)
+    
     
     init() {
         super.init(nibName: nil, bundle: nil)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(pushWooshDidReceiveInPush(_:)), name: .PWInboxMessagesDidReceiveInPush, object: nil)
         
         inboxBarButtonItem = BadgeBarButtonItem(image: UIImage(named: "NavigationBarEmail"), style: .plain, target: self, action: #selector(presentNotificationInbox))
         screenshotsViewController.navigationItem.leftBarButtonItem = inboxBarButtonItem
@@ -36,7 +35,6 @@ class ScreenshotsNavigationController: UINavigationController {
         self.restorationIdentifier = "ScreenshotsNavigationController"
         
         self.viewControllers = [self.screenshotsViewController]
-        
         AssetSyncModel.sharedInstance.networkingIndicatorDelegate = self
     }
     
@@ -51,6 +49,7 @@ class ScreenshotsNavigationController: UINavigationController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        inboxUnreadCountFRC.delegate = self
         updateInboxBadgeCount()
     }
     
@@ -114,14 +113,8 @@ extension ScreenshotsNavigationControllerNotificationInbox {
     }
     
     private func updateInboxBadgeCount() {
-        DispatchQueue.mainAsyncIfNeeded {
-            let count = InboxMessage.fetchUnreadCount()
-            self.inboxBarButtonItem?.count = UInt(count)
-        }
-    }
-    
-    @objc private func pushWooshDidReceiveInPush(_ notification: Notification) {
-        updateInboxBadgeCount()
+        let count = self.inboxUnreadCountFRC.fetchedObjectsCount
+        self.inboxBarButtonItem?.count = UInt(count)
     }
 }
 
@@ -262,5 +255,11 @@ extension ScreenshotsNavigationControllerStateRestoration {
         {
             restoredProductsViewController?.screenshot = screenshot
         }
+    }
+}
+
+extension ScreenshotsNavigationController : FetchedResultsControllerManagerDelegate {
+    func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
+        updateInboxBadgeCount()
     }
 }

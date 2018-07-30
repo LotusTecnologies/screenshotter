@@ -151,7 +151,16 @@ extension DataModel {
         if upsert {
             current = managedObjectContext.screenshotWith(assetId: assetId)
             wasHidden = current?.isHidden
+            
+            if  current == nil {
+                if let uploadedImageURL = uploadedImageURL {
+                    current = managedObjectContext.screenshotWith(imageUrl: uploadedImageURL)
+                    wasHidden = current?.isHidden
+                }
+            }
         }
+       
+        
         let screenshotToSave = current ?? Screenshot(context: managedObjectContext)
         
         screenshotToSave.assetId = assetId
@@ -1047,6 +1056,22 @@ extension NSManagedObjectContext {
         } catch {
             DataModel.sharedInstance.receivedCoreDataError(error: error)
             print("retrieveScreenshot assetId:\(assetId) results with error:\(error)")
+        }
+        return nil
+    }
+    
+    func screenshotWith(imageUrl:String) -> Screenshot? {
+        let fetchRequest: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "uploadedImageURL == %@", imageUrl)
+        fetchRequest.sortDescriptors = nil
+        fetchRequest.fetchLimit = 1
+        
+        do {
+            let results = try self.fetch(fetchRequest)
+            return results.first
+        } catch {
+            DataModel.sharedInstance.receivedCoreDataError(error: error)
+            print("retrieveScreenshot imageUrl:\(imageUrl) results with error:\(error)")
         }
         return nil
     }

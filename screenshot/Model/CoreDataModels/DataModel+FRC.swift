@@ -115,7 +115,15 @@ extension DataModel {
         return fetchedResultsController
     }
     
-   
+    func inboxMessageNewFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<InboxMessage>{
+        
+        let request: NSFetchRequest<InboxMessage> = InboxMessage.fetchRequest()
+        request.predicate = NSPredicate.init(format: "isNew == true")
+        request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: false)]
+        let context = self.mainMoc()
+        let fetchedResultsController = FetchedResultsControllerManager<InboxMessage>(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
+        return fetchedResultsController
+    }
     
     func inboxMessageFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<InboxMessage>{
         
@@ -125,9 +133,6 @@ extension DataModel {
         let context = self.mainMoc()
         let fetchedResultsController = FetchedResultsControllerManager<InboxMessage>(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: #keyPath(InboxMessage.sectionHeader), delegate: delegate)
         return fetchedResultsController
-
-        
-        
     }
     
 }
