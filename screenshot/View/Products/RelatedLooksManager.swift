@@ -219,6 +219,24 @@ class RelatedLooksManager: NSObject {
             }
         }
     }
+    
+    func addScreenshotAction(_ actionSheet: UIAlertController, at indexPath: IndexPath) {
+        guard let relatedLookUrlString = self.relatedLook(at: indexPath.item) else {
+            return
+        }
+        
+        actionSheet.addAction(UIAlertAction(title: "screenshot.action.add".localized, style: .default, handler: { alertAction in
+            AssetSyncModel.sharedInstance.addFromRelatedLook(urlString: relatedLookUrlString, callback: { screenshot in
+                let objectId = screenshot.objectID
+                DataModel.sharedInstance.performBackgroundTask({ (context) in
+                    if let s = context.screenshotWith(objectId: objectId) {
+                        s.source = .shuffleAdded
+                        context.saveIfNeeded()
+                    }
+                })
+            })
+        }))
+    }
 
 }
 
