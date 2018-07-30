@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreData
 
 class MessageInboxViewController: UIViewController {
     fileprivate let collectionView = UICollectionView(frame: .zero, collectionViewLayout: {
@@ -51,16 +52,28 @@ class MessageInboxViewController: UIViewController {
     }
     @objc func debug(_ sender:Any){
         DataModel.sharedInstance.performBackgroundTask { (context) in
-            for i in 0...20 {
-                let message = InboxMessage(context: context)
-                let date = Date.init(timeIntervalSinceNow: TimeInterval(-i*12*60*60))
-//                let expire = Date().addingTimeInterval(-10* 24*60*60)
-                message.date = date
-                message.title = "Hey \(String.randomFemaleName()) from \(String.randomCity()) wants to meet you"
-                message.buttonText = String.randomMaleName()
-//                message.expireDate = expire
-//                message.isExpired = expire > date
+            let request:NSFetchRequest<Product> = Product.fetchRequest()
+            if let result = try? context.fetch(request) {
+                var count = 0;
+                for product in result {
+                    count += 1
+                    if count < 20 {
+                        let message = InboxMessage(context: context)
+                        let date = Date.init(timeIntervalSinceNow: TimeInterval(-count*12*60*60))
+                        
+                        let expire = Date().addingTimeInterval(-10*TimeInterval.oneDay)
+                        message.date = date
+                        message.title = product.productTitle()?.decodingHTMLEntities()
+                        message.image = product.imageURL
+                        if let title = product.calculatedDisplayTitle {
+                            message.buttonText = "Shop \(title)"
+                        }
+//                        message.expireDate = expire
+//                        message.isExpired = expire > Date()
+                    }
+                }
             }
+           
             context.saveIfNeeded()
         }
     }
