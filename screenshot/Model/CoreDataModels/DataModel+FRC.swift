@@ -9,6 +9,7 @@
 import Foundation
 import CoreData
 
+
 extension DataModel {
     func screenshotFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<Screenshot>  {
         let request: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
@@ -114,24 +115,7 @@ extension DataModel {
         return fetchedResultsController
     }
     
-    func cardFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<Card>  {
-        let request: NSFetchRequest<Card> = Card.fetchRequest()
-        request.predicate = nil
-        request.sortDescriptors = [NSSortDescriptor(key: "dateAdded", ascending: false)]
-        let context = self.mainMoc()
-        let fetchedResultsController = FetchedResultsControllerManager<Card>(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
-        return fetchedResultsController
-    }
-    
-    func shippingAddressFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<ShippingAddress>  {
-        let request: NSFetchRequest<ShippingAddress> = ShippingAddress.fetchRequest()
-        request.predicate = nil
-        request.sortDescriptors = [NSSortDescriptor(key: "dateAdded", ascending: false)]
-        let context = self.mainMoc()
-        let fetchedResultsController = FetchedResultsControllerManager<ShippingAddress>(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
-        return fetchedResultsController
-    }
-    
+   
     
     func inboxMessageFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<InboxMessage>{
         
@@ -139,7 +123,7 @@ extension DataModel {
         request.predicate = nil
         request.sortDescriptors = [NSSortDescriptor(key:"isExpired", ascending:true), NSSortDescriptor(key: "date", ascending: false)]
         let context = self.mainMoc()
-        let fetchedResultsController = FetchedResultsControllerManager<InboxMessage>(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: "sectionHeader", delegate: delegate)
+        let fetchedResultsController = FetchedResultsControllerManager<InboxMessage>(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: #keyPath(InboxMessage.sectionHeader), delegate: delegate)
         return fetchedResultsController
 
         

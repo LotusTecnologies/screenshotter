@@ -89,7 +89,7 @@ class MessageInboxCollectionViewCell: UICollectionViewCell {
         }
     }
     
-    static func taggedStringForAttributedString(taggedString:String) -> NSAttributedString {
+    static func attributedStringFor(taggedString:String?) -> NSAttributedString {
         var toReturn = NSMutableAttributedString()
         
         func append(char:Character, tags:[String]){
@@ -136,41 +136,43 @@ class MessageInboxCollectionViewCell: UICollectionViewCell {
         var buildingTag:String?
         var buildingClosingTag:String?
         var justOpenedTag = false
-        taggedString.forEach { (char) in
-            if justOpenedTag {
-                justOpenedTag = false
-                if char == "/" {
-                    buildingClosingTag = ""
-                }else{
-                    buildingTag = ""
-                }
-            }
-            if let b = buildingTag {
-                if char == ">" {
-                    currentTags.append(b)
-                    buildingTag = nil
-                }else {
-                    buildingTag?.append(char)
-                }
-            }else if let b = buildingClosingTag{
-                if char == ">" {
-                    if currentTags.last == b {
-                        currentTags.removeLast()
+        if let taggedString = taggedString {
+            taggedString.forEach { (char) in
+                if justOpenedTag {
+                    justOpenedTag = false
+                    if char == "/" {
+                        buildingClosingTag = ""
                     }else{
-                        print("error parasing tagged string: \(taggedString)")
+                        buildingTag = ""
                     }
-
-                    buildingClosingTag = nil
-                }else if char == "/"{
-                    //ignore
-                }else{
-                    buildingClosingTag?.append(char)
                 }
-            }else {
-                if char == "<" {
-                    justOpenedTag = true
-                }else{
-                    append(char: char, tags: currentTags)
+                if let b = buildingTag {
+                    if char == ">" {
+                        currentTags.append(b)
+                        buildingTag = nil
+                    }else {
+                        buildingTag?.append(char)
+                    }
+                }else if let b = buildingClosingTag{
+                    if char == ">" {
+                        if currentTags.last == b {
+                            currentTags.removeLast()
+                        }else{
+                            print("error parasing tagged string: \(taggedString)")
+                        }
+                        
+                        buildingClosingTag = nil
+                    }else if char == "/"{
+                        //ignore
+                    }else{
+                        buildingClosingTag?.append(char)
+                    }
+                }else {
+                    if char == "<" {
+                        justOpenedTag = true
+                    }else{
+                        append(char: char, tags: currentTags)
+                    }
                 }
             }
         }

@@ -10,7 +10,7 @@ import Foundation
 import CoreData
 
 extension InboxMessage {
-    var sectionHeader:String {
+    @objc var sectionHeader:String {
         get {
             if self.isExpired {
                 return "Expired"
@@ -21,17 +21,17 @@ extension InboxMessage {
                 
                 if date > mostRecentMidnight {
                     return "Today".localized
-                }else if date > date.addingTimeInterval(-1 * oneDay) {
+                }else if date > mostRecentMidnight.addingTimeInterval(-1 * oneDay) {
                     return "Yesterday".localized
-                }else if date > date.addingTimeInterval(-2 * oneDay) {
+                }else if date > mostRecentMidnight.addingTimeInterval(-2 * oneDay) {
                     return "2 days ago".localized
-                }else if date > date.addingTimeInterval(-3 * oneDay) {
+                }else if date > mostRecentMidnight.addingTimeInterval(-3 * oneDay) {
                     return "3 days ago".localized
-                }else if date > date.addingTimeInterval(-4 * oneDay) {
+                }else if date > mostRecentMidnight.addingTimeInterval(-4 * oneDay) {
                     return "4 days ago".localized
-                }else if date > date.addingTimeInterval(-5 * oneDay) {
+                }else if date > mostRecentMidnight.addingTimeInterval(-5 * oneDay) {
                     return "5 days ago".localized
-                }else if date > date.addingTimeInterval(-6 * oneDay) {
+                }else if date > mostRecentMidnight.addingTimeInterval(-6 * oneDay) {
                     return "6 days ago".localized
                 }else if date > mostRecentJan1 {
                     let formatter = GlobalDateTools.shared.shortDateFormatter

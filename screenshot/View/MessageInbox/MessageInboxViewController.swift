@@ -43,9 +43,26 @@ class MessageInboxViewController: UIViewController {
         self.title = "Notifications"
         let closeX = UIImage(named: "FavoriteX")
         self.navigationItem.leftBarButtonItem = UIBarButtonItem.init(image: closeX, style: .plain, target: self, action: #selector(back(_:)))
+        
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem.init(title: "debug", style: .plain, target: self, action: #selector(debug(_:)))
     }
     @objc func back(_ sender:Any){
         self.dismiss(animated: true, completion: nil)
+    }
+    @objc func debug(_ sender:Any){
+        DataModel.sharedInstance.performBackgroundTask { (context) in
+            for i in 0...20 {
+                let message = InboxMessage(context: context)
+                let date = Date.init(timeIntervalSinceNow: TimeInterval(-i*12*60*60))
+//                let expire = Date().addingTimeInterval(-10* 24*60*60)
+                message.date = date
+                message.title = "Hey \(String.randomFemaleName()) from \(String.randomCity()) wants to meet you"
+                message.buttonText = String.randomMaleName()
+//                message.expireDate = expire
+//                message.isExpired = expire > date
+            }
+            context.saveIfNeeded()
+        }
     }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -67,23 +84,31 @@ extension MessageInboxViewController : FetchedResultsControllerManagerDelegate {
 extension MessageInboxViewController : UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 1;
-//        return self.messageInboxFRC?.numberOfSections() ?? 0
+
+        return self.messageInboxFRC?.numberOfSections() ?? 0
     }
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 5
-//        return self.messageInboxFRC?.numberOfItems(in: section) ?? 0
+        return self.messageInboxFRC?.numberOfItems(in: section) ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
         if let cell = cell as? MessageInboxCollectionViewCell {
-            let url = URL.init(string: "https://s3.amazonaws.com/screenshop-ordered-matchsticks/2.jpg")
-            cell.imageView.imageView.contentMode = .center
-            cell.imageView.imageView.sd_setImage(with: url, placeholderImage: nil, options: [.retryFailed, .highPriority], completed: nil)
-            cell.badge.isHidden = false
-            cell.titleLabel.attributedText = MessageInboxCollectionViewCell.taggedStringForAttributedString(taggedString: "<blue>get it <underline>now</underline> at <red><bold>20%</bold> off!</red> what are you waiting for?</blue>")
-            cell.actionButton.setTitle("lets go", for: .normal)
+            cell.imageView.imageView.sd_cancelCurrentAnimationImagesLoad()
+            let placeHolder = UIImage.init(named:"DefaultProduct")
+            cell.imageView.imageView.image = placeHolder
+            if let message = messageInboxFRC?.object(at: indexPath) {
+                if let urlString  = message.image, let url = URL.init(string: urlString){
+                    cell.imageView.imageView.sd_setImage(with: url, placeholderImage: placeHolder, options: [.retryFailed, .highPriority], completed: nil)
+
+                }
+                cell.badge.isHidden = message.isNew
+                cell.titleLabel.attributedText = MessageInboxCollectionViewCell.attributedStringFor(taggedString: message.title)
+                cell.actionButton.setTitle(message.buttonText, for: .normal)
+
+            }
+            
+            
 
         }
         return cell
@@ -92,8 +117,9 @@ extension MessageInboxViewController : UICollectionViewDelegate, UICollectionVie
         let cell = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "header", for: indexPath)
         if kind == UICollectionElementKindSectionHeader {
              if let cell = cell as? MessageInboxHeaderCollectionReusableView {
-                cell.textLabel.text = "Today"
-                
+                if let message = messageInboxFRC?.object(at: indexPath) {
+                    cell.textLabel.text = message.sectionHeader
+                }
             }
         }
         return cell
