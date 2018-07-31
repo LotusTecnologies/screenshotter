@@ -114,6 +114,15 @@ extension MessageInboxViewController : UICollectionViewDelegate, UICollectionVie
             return
         }
         if let message = messageInboxFRC?.object(at: indexPath) {
+            var tracking:[String:String] = [:]
+            if let trackingJSON = message.trackingJSON,  let trackingJsonData = trackingJSON.data(using: .utf8), let json = try? JSONSerialization.jsonObject(with: trackingJsonData, options: []), let validJson = json as? [String:String]{
+                tracking = validJson
+            }
+            var order:Int? = nil
+            if let location = self.collectionView.layoutAttributesForItem(at: indexPath)?.frame.minY {
+                order = Int(round((location - CGFloat(indexPath.section + 1)*44.0) / MessageInboxCollectionViewCell.height))
+            }
+            Analytics.trackInboxTappedMessage(tracking: tracking, action: message.actionType, isExpired: message.isExpired, order: order)
             if let action = message.actionType {
                 if action == "link"{
                     if let urlString = message.actionValue,  let url = URL.init(string: urlString){

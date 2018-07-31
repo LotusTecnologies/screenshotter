@@ -35,6 +35,8 @@ class UniversalSearchController {
         InboxMessage.updateExpired()
         let navVC = UINavigationController.init(rootViewController: vc)
         viewController.present(navVC, animated: true)
+        let inboxFRC = DataModel.sharedInstance.inboxMessageFrc(delegate: nil)
+        Analytics.trackInboxOpened(tab: viewController.title ?? "", unread: self.inboxUnreadCountFRC.fetchedObjectsCount, total: inboxFRC.fetchedObjectsCount)
     }
 }
 
