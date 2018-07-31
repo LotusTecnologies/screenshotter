@@ -38,7 +38,7 @@ extension UIImage {
     
     func grayscaleImage() -> UIImage {
         if let ciImage = CIImage(image: self){
-            let grayscale = ciImage.applyingFilter("CIColorControls", parameters: [ kCIInputSaturationKey: 0.0 ])
+            let grayscale = ciImage.applyingFilter("CIColorControls", parameters: [ kCIInputSaturationKey: 0.0, kCIInputBrightnessKey:0.5 ])
             return UIImage.init(ciImage: grayscale)
         }
         return self

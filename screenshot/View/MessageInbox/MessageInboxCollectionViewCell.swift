@@ -83,7 +83,6 @@ class MessageInboxCollectionViewCell: UICollectionViewCell {
     var isExpired = false {
         didSet {
             let expiredColor = UIColor.init(hex: "#C3C7CA")
-            embossedView.imageView.alpha = isExpired ? 0.5 : 1.0
             badge.alpha = isExpired ? 0.0 : 1.0
             
             if isExpired {
