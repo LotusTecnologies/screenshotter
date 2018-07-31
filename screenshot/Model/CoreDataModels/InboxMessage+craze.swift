@@ -10,6 +10,92 @@ import Foundation
 import CoreData
 
 extension InboxMessage {
+    static func insertMessageFromPush(userInfo: [AnyHashable : Any] ){
+        if let dict = userInfo["inbox"] as? [String:Any] {
+            DataModel.sharedInstance.performBackgroundTask { (context) in
+                InboxMessage.createUpdateWith(lookupDict: nil, dictionary: dict, create: true, update: false, context: context)
+            }
+        }
+    }
+    
+    static func createUpdateWith(lookupDict:[String:InboxMessage]?, dictionary:[String:Any], create:Bool, update:Bool, context:NSManagedObjectContext){
+        
+        if  let actionType = dictionary["actionType"] as? String,
+            let actionValue = dictionary["actionValue"] as? String,
+            let buttonText = dictionary["buttonText"] as? String,
+            let image = dictionary["image"] as? String,
+            let title = dictionary["title"] as? String,
+            let uuid = dictionary["uuid"] as? String,
+            let expireNumber = dictionary["expireDate"] as? NSNumber,
+            let dateNumber = dictionary["date"] as? NSNumber
+        {
+            
+            let lookup = lookupDict ?? InboxMessage.lookupWith(uuids: [uuid], in: context)
+            let foundMessage = lookup[uuid]
+            if foundMessage != nil && update == false {
+                return
+            }
+            if foundMessage == nil && create == false {
+                return
+            }
+            
+            let message = lookup[uuid] ?? InboxMessage(context: context)
+            
+            let expireDate = Date.init(timeIntervalSince1970: TimeInterval(expireNumber.intValue))
+            let date = Date.init(timeIntervalSince1970: TimeInterval(dateNumber.intValue))
+            
+            if message.uuid != uuid {
+                message.uuid = uuid
+            }
+            if message.actionType != actionType {
+                message.actionType = actionType
+            }
+            if message.actionValue != actionValue {
+                message.actionValue = actionValue
+            }
+            if message.buttonText != buttonText {
+                message.buttonText = buttonText
+            }
+            if message.image != image {
+                message.image = image
+            }
+            if message.title != title {
+                message.title = title
+            }
+            if message.title != title {
+                message.title = title
+            }
+            if message.date != date {
+                message.date = date
+            }
+            if message.expireDate != expireDate {
+                message.expireDate = expireDate
+            }
+            
+            if let tracking = dictionary["tracking"] as? [String:String] {
+                if JSONSerialization.isValidJSONObject(tracking), let jsonData = try? JSONSerialization.data(withJSONObject: tracking, options: []), let jsonString = String.init(data:jsonData, encoding:.utf8) {
+                    if message.trackingJSON != jsonString {
+                        message.trackingJSON = jsonString
+                    }
+                }
+            }else {
+                if message.trackingJSON != nil {
+                    message.trackingJSON = nil
+                }
+            }
+            message.isExpired = expireDate.timeIntervalSinceNow < 0
+            if expireDate.timeIntervalSinceNow < -TimeInterval.oneWeek {
+                context.delete(message)
+            }
+            if let installDate = UserDefaults.standard.object(forKey: UserDefaultsKeys.dateInstalled) as? Date {
+                if date < installDate {
+                    if message.isNew != false {
+                        message.isNew = false
+                    }
+                }
+            }
+        }
+    }
     
     static func lookupWith(uuids:[String], in context:NSManagedObjectContext) -> [String:InboxMessage]{
         let fetchRequest: NSFetchRequest<InboxMessage> = InboxMessage.fetchRequest()
