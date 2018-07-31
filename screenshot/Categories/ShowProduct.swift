@@ -31,6 +31,15 @@ extension ProductDetailViewController {
         }
     }
     
+    static func present(with id: String) {
+        let dataModel = DataModel.sharedInstance
+        if let product = dataModel.retrieveProduct(managedObjectContext: dataModel.mainMoc(), id: id) {
+            AssetSyncModel.sharedInstance.addSubShoppable(fromProduct: product).then(on: .main) { shoppable -> Void in
+                present(shoppable: shoppable, product: product)
+            }
+        }
+    }
+    
     static func present(imageURL: String) {
         let dataModel = DataModel.sharedInstance
         if let product = dataModel.retrieveProduct(managedObjectContext: dataModel.mainMoc(), imageURL: imageURL) {
