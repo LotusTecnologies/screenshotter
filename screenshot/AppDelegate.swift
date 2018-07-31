@@ -824,13 +824,12 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
               let id = dataDict["variantId"] as? String,
               !id.isEmpty {
                 isHandled = true
-                if let updatedPrice = dataDict["price"] as? Float {
-                    let currency = dataDict["currency"] as? String ?? "USD"
-                    DataModel.sharedInstance.updateProductPrice(id: id, updatedPrice: updatedPrice, updatedCurrency: currency).then(on: .main) {
-                        ProductDetailViewController.present(with: id)
-                    }
-                } else {
-                    ProductDetailViewController.present(with: id)
+                let updatedPrice = dataDict["price"] as? Float
+                let currency = dataDict["currency"] as? String ?? "USD"
+                DataModel.sharedInstance.updateProductPrice(id: id, updatedPrice: updatedPrice, updatedCurrency: currency).then(on: .main) { productOID in
+                        ProductDetailViewController.present(productOID: productOID)
+                    }.catch { error in
+                        Analytics.trackError(type: nil, domain: "Craze", code: 111, localizedDescription: error.localizedDescription)
                 }
                 let pushTypeString = dataDict["type"] as? String
                 Analytics.trackAppOpenedFromPushNotification(source: pushTypeString)

@@ -520,16 +520,20 @@ extension DataModel {
         }
     }
     
-    func updateProductPrice(id: String, updatedPrice: Float, updatedCurrency: String) -> Promise<Void> {
+    func updateProductPrice(id: String, updatedPrice: Float?, updatedCurrency: String) -> Promise<NSManagedObjectID> {
         return Promise { fulfill, reject in
             self.performBackgroundTask { managedObjectContext in
-                if let formattedUpdatePrice = self.formattedPrice(price: updatedPrice, currency: updatedCurrency),
-                  let product = self.retrieveProduct(managedObjectContext: managedObjectContext, id: id) {
-                    product.floatPrice = updatedPrice
-                    product.price = formattedUpdatePrice
-                    managedObjectContext.saveIfNeeded()
+                if let product = self.retrieveProduct(managedObjectContext: managedObjectContext, id: id) {
+                    if let updatedPrice = updatedPrice,
+                      let formattedUpdatePrice = self.formattedPrice(price: updatedPrice, currency: updatedCurrency) {
+                        product.floatPrice = updatedPrice
+                        product.price = formattedUpdatePrice
+                        managedObjectContext.saveIfNeeded()
+                    }
+                    fulfill(product.objectID)
+                } else {
+                    reject(NSError(domain: "Craze", code: 110, userInfo: [NSLocalizedDescriptionKey : "no product with variantID:\(id) updatedPrice:\(String(describing: updatedPrice))"]))
                 }
-                fulfill(())
             }
         }
     }
