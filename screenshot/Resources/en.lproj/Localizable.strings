@@ -1,18 +1,16 @@
-/* 
-  Localizable.strings
-  screenshot
-
-  Created by Corey Werner on 12/10/17.
-  Copyright © 2017 crazeapp. All rights reserved.
-*/
+/*
+ Localizable.strings
+ screenshot
+ 
+ Created by Corey Werner on 12/10/17.
+ Copyright © 2017 crazeapp. All rights reserved.
+ */
 
 // Before moving forward with Localizable.strings as the correct approch, read these
 // https://blog.lokalise.co/getting-started-with-ios-localization/
 // https://medium.com/@dcordero/a-different-way-to-deal-with-localized-strings-in-swift-3ea0da4cd143
 // https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/man1/genstrings.1.html
 
-
-// May 1, 2018 campain is a $25 gift card for users who complete their first purchase.
 
 "application.error.no_disk_space.message" = "Free up some space on your phone for a better Screenshop experience.";
 "application.error.no_disk_space.title" = "Out Of Space!";
@@ -29,7 +27,6 @@
 "authorize.register.legal.2" = " and ";
 "authorize.register.legal.3" = "Privacy Policy";
 "authorize.register.legal.4" = " ";
-"authorize.register.offers" = "Send me emails about exclusive offers, sales and new features.";
 "authorize.register.password" = "Password";
 "authorize.register.confirmation.title" = "Welcome!";
 "authorize.register.skipConfirm" = "Are you sure you want to skip? Your account won’t be created.";
@@ -57,6 +54,7 @@
 "authorize.error.cantSendMail" = "We were unable to send an email to the address %@. Please make sure you entered it correctly.";
 "authorize.error.NoAccountWithEmail" = "No account associated with that email address";
 "authorize.error.wrongPassword" = "Password and email address don’t match";
+
 
 "changelog.title" = "What's New";
 
@@ -128,6 +126,7 @@
 "generic.disabled" = "Disabled";
 "generic.dismiss" = "Dismiss";
 "generic.done" = "Done";
+"generic.dont_save" = "Don't Save";
 "generic.edit" = "Edit";
 "generic.email" = "email";
 "generic.error" = "Error";
@@ -148,6 +147,14 @@
 "generic.update" = "Update";
 "generic.yes" = "Yes";
 
+"inbox.title" = "Notifications";
+"inbox.section.today" = "Today";
+"inbox.section.yesterday" = "Yesterday";
+"inbox.section.daysAgo" = "%@ days ago";
+"inbox.section.expired" = "Expired";
+"inbox.empty.title" = "Stay Updated";
+"inbox.empty.subTitle" = "Price drops, sales, and other exclusive ScreenShop benefits will appear here";
+
 "legal.privacy_policy" = "Privacy Policy";
 "legal.terms_of_service" = "Terms of Service";
 
@@ -157,6 +164,7 @@
 
 "notification.message" = "Discover the best deals on products in your screenshot";
 "notification.title" = "Shop Your Inspiration";
+
 
 "notification.favorited.item.message" = "We have items similar to the %@ you checked out recently that you’ll LOVE!";
 "notification.inactivity.discover.message" = "Check out the latest fashion trends on Discover!";
@@ -196,10 +204,26 @@
 "picker.save.error" = "Save Error";
 "picker.title" = "Add Photos";
 
+"product.alert.favorited.price" = "Price alert: Your fav just dropped to %@, get it quick!!";
+"product.alert.tapped.price" = "%@ off this item you looked at recently: %@";
+"product.alert.price" = "Price alert: Your fav just dropped to %@, get it quick!!";
+"product.alert.price_stock" = "In-stock alert: Your fav just dropped to %@, get it quick!!";
+"product.alert.stock" = "In-stock alert: Your fav just became available, get it quick!!";
 "product.buy_now" = "Buy Now";
 "product.burrow" = "Shop Similar";
+"product.sale_recovery.alert.message_1" = "Shop this on your computer";
+"product.sale_recovery.alert.message_2" = "Shop this item later";
+"product.sale_recovery.alert.message_3" = "Shop this product on your computer";
+"product.sale_recovery.alert.message_4" = "Shop this product later";
+"product.sale_recovery.alert.email_me_1" = "Email product";
+"product.sale_recovery.alert.email_me_2" = "Email link";
+"product.sale_recovery.alert.email_me_3" = "Email item";
+"product.sale_recovery.alert.email_me_4" = "Send a link";
+"product.sale_recovery.alert.email_me_5" = "Email me";
 
 "product.sale_recovery.alert.dissmis" = "Dismiss";
+"product.sale_recovery.alert.enter_email.title" = "What’s Your Email?";
+"product.sale_recovery.alert.enter_email.body" = "We will send you this product so you can shop it on your computer.";
 "product.sale_recovery.alert.email_sent.title" = "Email Sent!";
 "product.sale_recovery.alert.email_sent.body" = "You can now shop this item on your computer.";
 
@@ -309,6 +333,7 @@
 "settings.section.follow" = "Follow Us";
 "settings.title" = "Settings";
 
+
 "text_explanation.disabled" = "disabled";
 "text_explanation.enabled" = "enabled";
 
@@ -316,3 +341,4 @@
 "update.force.title" = "Update Required";
 "update.request.message" = "Update now for the best Screenshop experience!";
 "update.request.title" = "New Version Available";
+

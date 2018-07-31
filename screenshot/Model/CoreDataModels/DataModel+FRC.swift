@@ -9,6 +9,7 @@
 import Foundation
 import CoreData
 
+
 extension DataModel {
     func screenshotFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<Screenshot>  {
         let request: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
@@ -96,7 +97,7 @@ extension DataModel {
     func productBarFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<Product> {
         let request: NSFetchRequest = Product.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(key: "dateSortProductBar", ascending: false)]
-        let date = NSDate.init(timeIntervalSinceNow:  -60*60*24*7)
+        let date = NSDate.init(timeIntervalSinceNow:  -TimeInterval.oneWeek)
         request.predicate = NSCompoundPredicate.init(andPredicateWithSubpredicates: [NSPredicate(format: "hideFromProductBar != true"), NSCompoundPredicate.init(orPredicateWithSubpredicates: [ NSPredicate(format: "isFavorite == true"), NSPredicate(format: "dateViewed != nil")]), NSPredicate(format:"dateSortProductBar > %@", date)])
         
         let context = self.mainMoc()
@@ -114,21 +115,23 @@ extension DataModel {
         return fetchedResultsController
     }
     
-    func cardFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<Card>  {
-        let request: NSFetchRequest<Card> = Card.fetchRequest()
-        request.predicate = nil
-        request.sortDescriptors = [NSSortDescriptor(key: "dateAdded", ascending: false)]
+    func inboxMessageNewFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<InboxMessage>{
+        
+        let request: NSFetchRequest<InboxMessage> = InboxMessage.fetchRequest()
+        request.predicate = NSPredicate.init(format: "isNew == true AND isExpired == false")
+        request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: false)]
         let context = self.mainMoc()
-        let fetchedResultsController = FetchedResultsControllerManager<Card>(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
+        let fetchedResultsController = FetchedResultsControllerManager<InboxMessage>(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
         return fetchedResultsController
     }
     
-    func shippingAddressFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<ShippingAddress>  {
-        let request: NSFetchRequest<ShippingAddress> = ShippingAddress.fetchRequest()
+    func inboxMessageFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<InboxMessage>{
+        let request: NSFetchRequest<InboxMessage> = InboxMessage.fetchRequest()
         request.predicate = nil
-        request.sortDescriptors = [NSSortDescriptor(key: "dateAdded", ascending: false)]
+        request.sortDescriptors = [NSSortDescriptor(key:"isExpired", ascending:true), NSSortDescriptor(key: "date", ascending: false), NSSortDescriptor(key: "uuid", ascending: false)]
         let context = self.mainMoc()
-        let fetchedResultsController = FetchedResultsControllerManager<ShippingAddress>(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
+        let fetchedResultsController = FetchedResultsControllerManager<InboxMessage>(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: #keyPath(InboxMessage.sectionHeader), delegate: delegate)
         return fetchedResultsController
     }
+    
 }

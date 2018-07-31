@@ -226,15 +226,7 @@ class RelatedLooksManager: NSObject {
         }
         
         actionSheet.addAction(UIAlertAction(title: "screenshot.action.add".localized, style: .default, handler: { alertAction in
-            AssetSyncModel.sharedInstance.addFromRelatedLook(urlString: relatedLookUrlString, callback: { screenshot in
-                let objectId = screenshot.objectID
-                DataModel.sharedInstance.performBackgroundTask({ (context) in
-                    if let s = context.screenshotWith(objectId: objectId) {
-                        s.source = .shuffleAdded
-                        context.saveIfNeeded()
-                    }
-                })
-            })
+            AssetSyncModel.sharedInstance.addScreenshotFrom(source: .shuffleAdded, urlString: relatedLookUrlString)
         }))
     }
 

@@ -8,6 +8,12 @@
 
 import Foundation
 
+extension TimeInterval {
+    static var oneHour:TimeInterval = 60*60
+    static var oneDay:TimeInterval  = 86400
+    static var oneWeek: TimeInterval = 60*60*24*7
+}
+
 class Constants {
     // iTunes
     static let itunesConnectApp = "itms-apps://itunes.apple.com/app/id1254964391"
@@ -25,11 +31,7 @@ class Constants {
     static let openingProductKey = "openingProductKey"
     
     // DB
-    static let currentMomVersion = 20
-        
-    // Calculation
-    static let secondsInHour: TimeInterval = 3600
-    static let secondsInDay: TimeInterval = 86400
+    static let currentMomVersion = 22
 
     // Syte
     static let syteAccountId = 6677
