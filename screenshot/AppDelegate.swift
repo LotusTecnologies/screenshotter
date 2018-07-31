@@ -311,8 +311,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     tab = .screenshots
                 case "profile":
                     tab = .profile
-//                case "cart":
-//                    tab = .cart
                 default:
                     tab = nil
                 }

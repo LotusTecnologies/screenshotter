@@ -35,6 +35,11 @@ class ProfileNavigationController: UINavigationController {
         view.backgroundColor = .background
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        UniversalSearchController.shared.updateInboxBadgeCount()
+    }
+    
     @objc private func pushSettingsViewController() {
         let viewController = SettingsViewController()
         pushViewController(viewController, animated: true)

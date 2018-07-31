@@ -14,7 +14,6 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         case discover
         case screenshots
         case profile
-        case cart
         
         var tagValue: Int {
             switch self {
@@ -26,8 +25,6 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
                 return 3
             case .profile:
                 return 4
-            case .cart:
-                return 5
             }
         }
     }
@@ -64,20 +61,23 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         }
         
         screenshotsNavigationController.screenshotsNavigationControllerDelegate = self
+        screenshotsNavigationController.screenshotsViewController.applyNavigationItemSearchAndInbox()
         screenshotsNavigationController.title = screenshotsNavigationController.screenshotsViewController.title
         screenshotsNavigationController.tabBarItem = createTabBarItem(title: screenshotsNavigationController.title, imageNamed: "TabBarScreenshot", tag: .screenshots)
         
+        favoritesNavigationController.favoritesViewController.applyNavigationItemSearchAndInbox()
         favoritesNavigationController.title = favoritesNavigationController.favoritesViewController.title
         favoritesNavigationController.tabBarItem = createTabBarItem(title: favoritesNavigationController.title, imageNamed: "TabBarHeart", tag: .favorites)
         
+        discoverNavigationController.discoverScreenshotViewController.applyNavigationItemSearchAndInbox()
         discoverNavigationController.title = discoverNavigationController.discoverScreenshotViewController.title
         discoverNavigationController.tabBarItem = createTabBarItem(title: discoverNavigationController.title, imageNamed: "TabBarGlobe", tag: .discover)
         
         profileNavigationController.profileViewController.delegate = self
+        profileNavigationController.profileViewController.applyNavigationItemSearchAndInbox()
         profileNavigationController.title = profileNavigationController.profileViewController.title
         profileNavigationController.tabBarItem = createTabBarItem(title: profileNavigationController.title, imageNamed: "TabBarUser", tag: .profile)
         settingsTabBarItem = profileNavigationController.tabBarItem
-        
         
         self.delegate = self
         self.restorationIdentifier = String(describing: type(of: self))
@@ -96,12 +96,8 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         notificationCenter.addObserver(self, selector: #selector(applicationDidBecomeActive(_:)), name: .UIApplicationDidBecomeActive, object: nil)
         notificationCenter.addObserver(self, selector: #selector(applicationUserDidTakeScreenshot(_:)), name: .UIApplicationUserDidTakeScreenshot, object: nil)
         notificationCenter.addObserver(self, selector: #selector(applicationFetchedAppSettings(_:)), name: .fetchedAppSettings, object: nil)
-        
         notificationCenter.addObserver(self, selector: #selector(syncFavoriteTabBadgeCount), name: .FavoriteUninformedAccumulatorModelDidChange, object: nil)
-        
-
         notificationCenter.addObserver(self, selector: #selector(syncScreenshotTabBadgeCount), name: .ScreenshotUninformedAccumulatorModelDidChange, object: nil)
-        
     }
     
     override func viewDidLoad() {
@@ -190,10 +186,6 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
     }
 
     // MARK: - Tab Bar
-    
-    func goToCart(){
-        goTo(tab: .cart)
-    }
     
     func goTo(tab: TabIndex) {
         func subViewControllers(_ vc:UIViewController) -> [UIViewController] {
@@ -439,3 +431,5 @@ extension MainTabBarController {
         }
     }
 }
+
+
