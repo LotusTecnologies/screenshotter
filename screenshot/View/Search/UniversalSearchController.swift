@@ -66,28 +66,30 @@ class UniversalSearchController: NSObject {
     private var searchNavigationController: SearchNavigationController?
     
     private func presentSearchViewController() {
+        let searchNavigationController = SearchNavigationController()
+        searchNavigationController.searchViewController.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(dismissSearchViewController))
+        self.searchNavigationController = searchNavigationController
         
-        let searchViewController = SearchNavigationController()
-        self.searchNavigationController = searchViewController
-        
-        let modalVC = ModalNavigationController(rootViewController: searchViewController)
-        
-        UIApplication.shared.keyWindow?.rootViewController?.present(modalVC, animated: true)
+        UIApplication.shared.keyWindow?.rootViewController?.present(searchNavigationController, animated: false, completion: { [weak searchNavigationController] in
+//            searchNavigationController?.searchViewController.searchBar.becomeFirstResponder()
+        })
     }
     
-    private func dismissSearchViewController() {
-        if let searchViewController = self.searchNavigationController {
-            searchViewController.presentingViewController?.dismiss(animated: true)
+    @objc private func dismissSearchViewController() {
+        if let searchNavigationController = searchNavigationController {
+            searchNavigationController.presentingViewController?.dismiss(animated: false)
         }
+        
+        searchNavigationController = nil
     }
 }
 
 extension UniversalSearchController: UISearchBarDelegate {
     func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
-        if self.searchNavigationController == nil {
-            self.presentSearchViewController()
+        if searchNavigationController == nil {
+            presentSearchViewController()
         }
-        return true
+        return false
     }
 }
 
