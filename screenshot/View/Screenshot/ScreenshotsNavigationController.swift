@@ -8,8 +8,6 @@
 
 import UIKit
 import CoreData
-import PushwooshInboxUI
-import Pushwoosh
 
 protocol ScreenshotsNavigationControllerDelegate: NSObjectProtocol {
     func screenshotsNavigationControllerDidGrantPushPermissions(_ navigationController: ScreenshotsNavigationController)
@@ -21,16 +19,15 @@ class ScreenshotsNavigationController: UINavigationController {
     var activityBarButtonItem:UIBarButtonItem?
     fileprivate var restoredProductsViewController: ProductsViewController?
     
+    
     init() {
         super.init(nibName: nil, bundle: nil)
-        
         screenshotsViewController.navigationItem.rightBarButtonItem = screenshotsViewController.editButtonItem
         screenshotsViewController.delegate = self
         
         self.restorationIdentifier = "ScreenshotsNavigationController"
         
         self.viewControllers = [self.screenshotsViewController]
-        
         AssetSyncModel.sharedInstance.networkingIndicatorDelegate = self
     }
     
@@ -233,3 +230,4 @@ extension ScreenshotsNavigationControllerStateRestoration {
         }
     }
 }
+

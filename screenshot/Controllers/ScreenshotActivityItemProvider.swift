@@ -15,6 +15,7 @@ class ScreenshotActivityItemProvider: UIActivityItemProvider {
     var didComplete: Bool = false
     var didSucceed: Bool = false
     
+    
     init(screenshot: Screenshot, placeholderURL: URL) {
         self.placeholderURL = placeholderURL
         super.init(placeholderItem: placeholderURL)

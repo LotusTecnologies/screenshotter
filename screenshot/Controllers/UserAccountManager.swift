@@ -102,7 +102,16 @@ class UserAccountManager : NSObject {
     static let shared = UserAccountManager()
 
     var facebookProxy:FacebookProxy?
-    
+    override init() {
+        super.init()
+        NotificationCenter.default.addObserver(self, selector: #selector(setupInboxSync), name: Notification.Name.UIApplicationDidBecomeActive, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(disconnectInboxSync), name: Notification.Name.UIApplicationDidEnterBackground, object: nil)
+        
+        
+    }
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         FirebaseApp.configure()
 
@@ -747,6 +756,7 @@ extension UserAccountManager {
         var promiseArray:[Promise<Void>] = []
         if let user = self.user{
             
+            self.setupInboxSync()
             promiseArray.append(Promise<Void>.init(resolvers: { (fulfil, reject) in
                 self.databaseRef.child("users").child(user.uid).child("avatarURL").observeSingleEvent(of: .value) { (snapshot) in
                     if let url = snapshot.value as? String  {
@@ -947,7 +957,7 @@ extension UserAccountManager {
             }
             dict["optionsMask"] = product.optionsMask
             dict["fallbackPrice"] = NSNumber.init(value: product.fallbackPrice)
-
+            
             if let escapedoffer = offer.firebaseSafe() {
                 self.databaseRef.child("users").child(user.uid).child("favorites").child(escapedoffer).setValue(dict)
             }
@@ -957,7 +967,7 @@ extension UserAccountManager {
     func deleteFavorite(product:Product){
         if let user = self.user {
             if let offer = product.offer {
-
+                
                 if let escapedoffer = offer.firebaseSafe() {
                     self.databaseRef.child("users").child(user.uid).child("favorites").child(escapedoffer).removeValue()
                 }
@@ -967,7 +977,7 @@ extension UserAccountManager {
     
     func deleteScreenshot(screenshot:Screenshot) {
         if let assetId = screenshot.assetId, let user = self.user {
-
+            
             if let escapedAssetId = assetId.firebaseSafe() {
                 self.databaseRef.child("users").child(user.uid).child("screenshots").child(escapedAssetId).removeValue()
             }
@@ -994,7 +1004,39 @@ extension UserAccountManager {
                 self.databaseRef.child("users").child(user.uid).child("screenshots").child(escapedAssetId).setValue(dict)
             }
         }
+        
+    }
+    
+    @objc func setupInboxSync() {
+        if let user = self.user {
+            self.databaseRef.removeAllObservers() // make sure not to doulbe listen
+            self.databaseRef.child("users").child(user.uid).child("inbox").observe(.value, with: { (snapshot) in
+                DataModel.sharedInstance.performBackgroundTask({ (context) in
+                    var uuids:[String] = []
+                    for child in snapshot.children {
+                        if let child = child as? DataSnapshot,
+                            let dict = child.value as? NSDictionary,
+                            let uuid = dict["uuid"] as? String {
+                            uuids.append(uuid)
+                        }
+                    }
+                    
+                    let lookup = InboxMessage.lookupWith(uuids: uuids, in: context)
+                    for child in snapshot.children {
+                        if let child = child as? DataSnapshot,
+                        let dict = child.value as? [String:Any]{
+                            InboxMessage.createUpdateWith(lookupDict: lookup, dictionary: dict, create: true, update: true, context: context)
+                        }
+                    }
+                    context.saveIfNeeded()
+                    
+                })
+            })
+        }
+    }
 
+    @objc func disconnectInboxSync(){
+        self.databaseRef.removeAllObservers()
     }
 }
 extension String {

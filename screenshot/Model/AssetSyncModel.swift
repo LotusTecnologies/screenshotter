@@ -122,12 +122,17 @@ extension AssetSyncModel {
             }
         }
     }
-    
-    
     public func addFromRelatedLook(urlString:String, callback: ((_ screenshot: Screenshot) -> Void)? = nil) {
+        self.addScreenshotFrom(source: .shuffle, urlString: urlString, callback: callback)
+    }
+    public func addScreenshotFrom(source:ScreenshotSource, urlString:String, callback: ((_ screenshot: Screenshot) -> Void)? = nil) {
+
         self.userInitiatedQueue.addOperation(AsyncOperation.init(timeout: 30, assetId: urlString, shoppableId: nil, completion: { (completion) in
             self.performBackgroundTask(assetId: urlString, shoppableId: nil) { (managedObjectContext) in
                 if let screenshot = managedObjectContext.screenshotWith(assetId: urlString) {
+                    if screenshot.source != source {
+                        screenshot.source = source
+                    }
                     if let callback = callback {
                         let addedScreenshotOID = screenshot.objectID
                         DispatchQueue.main.async {
@@ -140,6 +145,7 @@ extension AssetSyncModel {
                     }else{
                         completion()
                     }
+                    managedObjectContext.saveIfNeeded()
                 }else{
                     SDWebImageManager.shared().loadImage(with: URL.init(string: urlString), options: [SDWebImageOptions.fromCacheOnly], progress: nil, completed: { (image, data, error, cache, bool, url) in
                         
@@ -159,7 +165,7 @@ extension AssetSyncModel {
                                                                                               assetId: urlString,
                                                                                               createdAt: Date(),
                                                                                               isRecognized: true,
-                                                                                              source: .shuffle,
+                                                                                              source: source,
                                                                                               isHidden: false,
                                                                                               imageData: imageData,
                                                                                               uploadedImageURL: urlString,
