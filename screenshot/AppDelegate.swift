@@ -680,6 +680,8 @@ extension AppDelegate: PushNotificationDelegate {
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         ApplicationStateModel.sharedInstance.applicationState = application.applicationState
 
+        InboxMessage.insertMessageFromPush(userInfo: userInfo)
+        
         if let aps = userInfo["aps"] as? NSDictionary, let category = aps["category"] as? String, category == "MATCHSTICK_LIKES", let likeUpdates = userInfo["likeUpdates"] as? [[String:Any]]{
             DataModel.sharedInstance.performBackgroundTask { (context) in
             
@@ -782,8 +784,11 @@ extension AppDelegate {
 extension AppDelegate : UNUserNotificationCenterDelegate {
     
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        
         var isHandled = false
         if let userInfo = response.notification.request.content.userInfo as? [String : Any] {
+            InboxMessage.insertMessageFromPush(userInfo: userInfo)
+
             if let openingScreen = userInfo[Constants.openingScreenKey] as? String {
                 isHandled = true
                 if openingScreen == Constants.openingScreenValueScreenshot {

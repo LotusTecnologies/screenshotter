@@ -11,9 +11,10 @@ import CoreData
 
 extension InboxMessage {
     static func insertMessageFromPush(userInfo: [AnyHashable : Any] ){
-        if let dict = userInfo["inbox"] as? [String:Any] {
+        if let dataDict = userInfo["data"] as? [AnyHashable: Any],  let dict = dataDict["inbox"] as? [String:Any] {
             DataModel.sharedInstance.performBackgroundTask { (context) in
                 InboxMessage.createUpdateWith(lookupDict: nil, dictionary: dict, create: true, update: false, context: context)
+                context.saveIfNeeded()
             }
         }
     }

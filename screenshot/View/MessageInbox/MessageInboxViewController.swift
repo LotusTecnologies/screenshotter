@@ -164,6 +164,10 @@ extension MessageInboxViewController : UICollectionViewDelegate, UICollectionVie
                             message.markAsRead()
                         })
                     }
+                }else if action == "product" {
+                    if let productId = message.actionValue {
+                        ProductDetailViewController.present(with: productId)
+                    }
                 }
             }
         }
