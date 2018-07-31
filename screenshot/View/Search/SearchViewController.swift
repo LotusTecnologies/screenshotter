@@ -9,20 +9,31 @@
 import UIKit
 
 class SearchViewController: UIViewController {
-    let searchBar = UISearchBar()
+    let searchController: UISearchController
     let categoriesNavigationController: UINavigationController
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         categoriesNavigationController = UINavigationController(rootViewController: SearchCategoriesViewController())
-//        categoriesNavigationController.isNavigationBarHidden = true
         categoriesNavigationController.navigationBar.shadowImage = UIImage()
+        
+        let tableViewController = UITableViewController(style: .plain)
+        
+        searchController = SearchController(searchResultsController: tableViewController)
         
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
-        searchBar.delegate = self
-        searchBar.placeholder = "search.placeholder".localized
-        searchBar.searchBarStyle = .minimal
-        navigationItem.titleView = searchBar
+        definesPresentationContext = true
+        
+        searchController.delegate = self
+        searchController.searchResultsUpdater = self
+        searchController.dimsBackgroundDuringPresentation = true
+        searchController.hidesNavigationBarDuringPresentation = false
+        
+        searchController.searchBar.delegate = self
+        searchController.searchBar.placeholder = "search.placeholder".localized
+        searchController.searchBar.searchBarStyle = .minimal
+        searchController.searchBar.showsCancelButton = false
+        navigationItem.titleView = searchController.searchBar
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -46,4 +57,34 @@ class SearchViewController: UIViewController {
 
 extension SearchViewController: UISearchBarDelegate {
     
+}
+
+extension SearchViewController: UISearchResultsUpdating {
+    func updateSearchResults(for searchController: UISearchController) {
+        
+    }
+}
+
+extension SearchViewController: UISearchControllerDelegate {
+    func presentSearchController() {
+        searchController.isActive = true
+        
+        Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak searchController] timer in
+            guard let searchController = searchController else {
+                timer.invalidate()
+                return
+            }
+            
+            if searchController.searchBar.canBecomeFirstResponder {
+                searchController.searchBar.becomeFirstResponder()
+                timer.invalidate()
+            }
+        }
+    }
+    
+    func willPresentSearchController(_ searchController: UISearchController) {
+        DispatchQueue.main.async {
+            searchController.searchBar.setShowsCancelButton(false, animated: false)
+        }
+    }
 }

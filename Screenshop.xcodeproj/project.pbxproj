@@ -115,6 +115,8 @@
 		C5278FEB1F3C38510090E422 /* AssetSyncModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5278FB91F3C38510090E422 /* AssetSyncModel.swift */; };
 		C5278FEE1F3C38510090E422 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = C5278FBD1F3C38510090E422 /* Model.xcdatamodeld */; };
 		C52FD9DD211057F600AD3A0B /* SearchCategoryCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C52FD9DC211057F600AD3A0B /* SearchCategoryCollectionViewCell.swift */; };
+		C52FD9E1211091C900AD3A0B /* SearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = C52FD9E0211091C900AD3A0B /* SearchBar.swift */; };
+		C52FD9E3211091D200AD3A0B /* SearchController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C52FD9E2211091D200AD3A0B /* SearchController.swift */; };
 		C53B15B11FDD1EF400658A78 /* FavoriteHeart.json in Resources */ = {isa = PBXBuildFile; fileRef = C53B15B01FDD1EF400658A78 /* FavoriteHeart.json */; };
 		C53B15BA1FDD638C00658A78 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C53B15BC1FDD638C00658A78 /* Localizable.strings */; };
 		C53B15BE1FDE585B00658A78 /* LocalizeHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53B15BD1FDE585B00658A78 /* LocalizeHelper.swift */; };
@@ -364,6 +366,8 @@
 		C5278FB91F3C38510090E422 /* AssetSyncModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssetSyncModel.swift; sourceTree = "<group>"; };
 		C5278FBE1F3C38510090E422 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
 		C52FD9DC211057F600AD3A0B /* SearchCategoryCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchCategoryCollectionViewCell.swift; sourceTree = "<group>"; };
+		C52FD9E0211091C900AD3A0B /* SearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBar.swift; sourceTree = "<group>"; };
+		C52FD9E2211091D200AD3A0B /* SearchController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchController.swift; sourceTree = "<group>"; };
 		C53B15B01FDD1EF400658A78 /* FavoriteHeart.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = FavoriteHeart.json; sourceTree = "<group>"; };
 		C53B15BB1FDD638C00658A78 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C53B15BD1FDE585B00658A78 /* LocalizeHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizeHelper.swift; sourceTree = "<group>"; };
@@ -739,6 +743,8 @@
 				C58BAE2720E101DC0051394A /* SaleView.swift */,
 				C58BAE2E20E101DC0051394A /* ScreenshotShareManager.swift */,
 				C58BAE0820E101DA0051394A /* ScrollRevealController.swift */,
+				C52FD9DE211091C000AD3A0B /* SearchBar */,
+				C52FD9DF211091C000AD3A0B /* SearchController */,
 				C58BAE5420E101DD0051394A /* SegmentedControl */,
 				C58BAE0D20E101DB0051394A /* TableView */,
 				C58BAE3A20E101DD0051394A /* TableViewCell */,
@@ -895,6 +901,22 @@
 				311A4F5420D90B020001D463 /* UserAccountManager.swift */,
 			);
 			path = Controllers;
+			sourceTree = "<group>";
+		};
+		C52FD9DE211091C000AD3A0B /* SearchBar */ = {
+			isa = PBXGroup;
+			children = (
+				C52FD9E0211091C900AD3A0B /* SearchBar.swift */,
+			);
+			path = SearchBar;
+			sourceTree = "<group>";
+		};
+		C52FD9DF211091C000AD3A0B /* SearchController */ = {
+			isa = PBXGroup;
+			children = (
+				C52FD9E2211091D200AD3A0B /* SearchController.swift */,
+			);
+			path = SearchController;
 			sourceTree = "<group>";
 		};
 		C53B46541FBC399900A8C886 /* Structs */ = {
@@ -1576,6 +1598,7 @@
 				316C831020C3AEBD0012A908 /* DataModel.swift in Sources */,
 				C58BAE8520E101DD0051394A /* UIButton.swift in Sources */,
 				311A505620D90B780001D463 /* ProductCollectionViewManager.swift in Sources */,
+				C52FD9E1211091C900AD3A0B /* SearchBar.swift in Sources */,
 				311A506B20D90B780001D463 /* InitiateResetPasswordViewController.swift in Sources */,
 				311A503020D90B780001D463 /* ProductsBarController.swift in Sources */,
 				311A4F5520D90B020001D463 /* UserAccountManager.swift in Sources */,
@@ -1648,6 +1671,7 @@
 				311A503520D90B780001D463 /* DiscoverScreenshotHelperView.swift in Sources */,
 				31357EE220F6636D00515116 /* UIColor+craze.swift in Sources */,
 				311A502E20D90B780001D463 /* ProductsBarCollectionViewCell.swift in Sources */,
+				C52FD9E3211091D200AD3A0B /* SearchController.swift in Sources */,
 				311A50B020D90B780001D463 /* ProfileAccountView.swift in Sources */,
 				C53B46531FBC397700A8C886 /* Geometry.swift in Sources */,
 				C58BAE5820E101DD0051394A /* ModalNavigationController.swift in Sources */,

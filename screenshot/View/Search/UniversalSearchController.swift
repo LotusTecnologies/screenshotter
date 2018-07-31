@@ -67,11 +67,11 @@ class UniversalSearchController: NSObject {
     
     private func presentSearchViewController() {
         let searchNavigationController = SearchNavigationController()
-        searchNavigationController.searchViewController.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(dismissSearchViewController))
+        searchNavigationController.searchViewController.navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(named: "SearchX"), style: .plain, target: self, action: #selector(dismissSearchViewController))
         self.searchNavigationController = searchNavigationController
         
         UIApplication.shared.keyWindow?.rootViewController?.present(searchNavigationController, animated: false, completion: { [weak searchNavigationController] in
-//            searchNavigationController?.searchViewController.searchBar.becomeFirstResponder()
+            searchNavigationController?.searchViewController.presentSearchController()
         })
     }
     

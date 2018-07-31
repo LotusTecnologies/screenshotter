@@ -39,6 +39,7 @@ class SearchSubcategoriesViewController: UIViewController {
         collectionView.delegate = self
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.register(SearchCategoryCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
+        collectionView.keyboardDismissMode = .onDrag
         view.addSubview(collectionView)
         collectionView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
