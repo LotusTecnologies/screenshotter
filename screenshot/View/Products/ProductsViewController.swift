@@ -192,23 +192,6 @@ class ProductsViewController: BaseViewController {
         self.view.addGestureRecognizer(pinchZoom)
         
     }
-    func collectionView(_ collectionView: UICollectionView, shouldShowMenuForItemAt indexPath: IndexPath) -> Bool {
-        if let cell = collectionView.cellForItem(at: indexPath){
-            if let cell = cell as? ProductsCollectionViewCell, let imageView = cell.productImageView {
-                let product = self.productAtIndex(indexPath.item)
-                self.recoverLostSaleManager.presetRecoverAlertViewFor(product: product, in: self, rect: imageView.bounds, view: imageView, timeSinceLeftApp: nil, reason: .longPress)
-                return true
-            }
-        }
-        return false
-    }
-    func collectionView(_ collectionView: UICollectionView, canPerformAction action: Selector, forItemAt indexPath: IndexPath, withSender sender: Any?) -> Bool {
-        return false
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, performAction action: Selector, forItemAt indexPath: IndexPath, withSender sender: Any?) {
-        
-    }
 
     @objc func pinch( gesture:UIPinchGestureRecognizer) {
         if CrazeImageZoom.shared.isHandlingGesture, let imageView = CrazeImageZoom.shared.hostedImageView  {
@@ -409,6 +392,35 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
         }
         
         return UICollectionViewCell()
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, shouldShowMenuForItemAt indexPath: IndexPath) -> Bool {
+        if let cell = collectionView.cellForItem(at: indexPath){
+            if let cell = cell as? ProductsCollectionViewCell, let imageView = cell.productImageView {
+                let product = self.productAtIndex(indexPath.item)
+                self.recoverLostSaleManager.presetRecoverAlertViewFor(product: product, in: self, rect: imageView.bounds, view: imageView, timeSinceLeftApp: nil, reason: .longPress)
+                return true
+            }
+            else if let _ = cell as? RelatedLooksCollectionViewCell {
+                let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+                
+                self.relatedLooksManager.addScreenshotAction(actionSheet, at: indexPath)
+                
+                if actionSheet.actions.count > 0 {
+                    actionSheet.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
+                    self.present(actionSheet, animated: true)
+                    return true
+                }
+            }
+        }
+        return false
+    }
+    func collectionView(_ collectionView: UICollectionView, canPerformAction action: Selector, forItemAt indexPath: IndexPath, withSender sender: Any?) -> Bool {
+        return false
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, performAction action: Selector, forItemAt indexPath: IndexPath, withSender sender: Any?) {
+        
     }
     
     public func collectionViewMinimumSpacing() -> CGPoint {

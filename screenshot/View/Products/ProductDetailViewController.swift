@@ -90,9 +90,21 @@ class ProductDetailViewController: BaseViewController {
                 let product = self.productAtIndex(indexPath.item)
                 self.recoverLostSaleManager.presetRecoverAlertViewFor(product: product, in: self, rect: imageView.bounds, view: imageView, timeSinceLeftApp: nil, reason: .longPress)
                 return true
-            }else if let cell = cell as? ProductHeaderCollectionViewCell, let product = self.product {
+            }
+            else if let cell = cell as? ProductHeaderCollectionViewCell, let product = self.product {
                 let imageView = cell.productImageView.imageView
                 self.recoverLostSaleManager.presetRecoverAlertViewFor(product: product, in: self, rect: imageView.bounds, view: imageView, timeSinceLeftApp: nil, reason: .longPress)
+            }
+            else if let _ = cell as? RelatedLooksCollectionViewCell {
+                let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+                
+                self.relatedLooksManager.addScreenshotAction(actionSheet, at: indexPath)
+                
+                if actionSheet.actions.count > 0 {
+                    actionSheet.addAction(UIAlertAction(title: "generic.cancel".localized, style: .cancel, handler: nil))
+                    self.present(actionSheet, animated: true)
+                    return true
+                }
             }
         }
         return false

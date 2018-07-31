@@ -245,6 +245,7 @@
 "profile.tell_friend" = "Tell a Friend!";
 "profile.title" = "Profile";
 
+"screenshot.action.add" = "Add screenshot";
 "screenshot.empty.detail" = "Upload a photo or add a look from the Discover tab";
 "screenshot.empty.title" = "Shop A Photo";
 "screenshot.import.latest" = "Import your latest screenshot?";
