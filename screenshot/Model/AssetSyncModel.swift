@@ -869,8 +869,8 @@ extension AssetSyncModel {
     }
     
     func calcFallbackPrice(originalData: [String : Any]) -> Float {
-        let dataModel = DataModel.sharedInstance
-        return dataModel.parseFloat(originalData["price"]) ?? dataModel.parseFloat(originalData["sale_price"]) ?? dataModel.parseFloat(originalData["discount_price"]) ?? dataModel.parseFloat(originalData["retail_price"]) ?? 0
+        let parseFloat: (Any?) -> Float? = DataModel.sharedInstance.parseFloat
+        return parseFloat(originalData["price"]) ?? parseFloat(originalData["sale_price"]) ?? parseFloat(originalData["discount_price"]) ?? parseFloat(originalData["retail_price"]) ?? 0
     }
     
     func saveProduct(managedObjectContext: NSManagedObjectContext,
