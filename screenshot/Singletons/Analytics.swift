@@ -13,7 +13,6 @@ import Branch
 import FBSDKCoreKit
 import Whisper
 import AdSupport
-import Pushwoosh
 import Amplitude_iOS
 import SwiftLog
 
@@ -381,7 +380,6 @@ class AnalyticsTrackers : NSObject {
     let appsee = AppseeAnalyticsTracker()
     let kochava = KochavaAnalyticsTracker()
     let branch = BranchAnalyticsTracker()
-    let pushwoosh = PushwooshAnalyticsTracker()
     let amplitude = AmplitudeAnalyticsTracker()
     let recombee = RecombeeAnalyticsTracker()
     
@@ -504,24 +502,6 @@ class AnalyticsTrackers : NSObject {
             }
             Amplitude.instance().setUserId(user.identifier)
             Amplitude.instance().setUserProperties(user.analyticsProperties)
-        }
-    }
-    
-    class PushwooshAnalyticsTracker : NSObject, AnalyticsTracker {
-        func track(_ event: String, properties: [AnyHashable : Any]? = nil, sendEvenIfAdvertisingTrackingIsOptOut:Bool? = false ){
-
-            if  ASIdentifierManager.shared().isAdvertisingTrackingEnabled || sendEvenIfAdvertisingTrackingIsOptOut == true {
-                PWInAppManager.shared().postEvent(event)
-            }
-        }
-        
-        func identify(_ user: AnalyticsUser) {
-            guard ASIdentifierManager.shared().isAdvertisingTrackingEnabled else {
-                return
-            }
-            
-            PWInAppManager.shared().setUserId(user.identifier)
-
         }
     }
     
