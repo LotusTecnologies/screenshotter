@@ -1,6 +1,6 @@
 // STOP!  DO not edit the file below
 // only create by auto generting
-// created from: a34a093 
+// created from: 471b81a 
 //  Copyright (c) 2018 crazeapp. All rights reserved.
 
 
@@ -3854,6 +3854,7 @@ extension AnalyticsOpenedScreenshot {
     case `list` = "list"
     case `discover` = "discover"
     case `relatedLooks` = "relatedLooks"
+    case `inbox` = "inbox"
     }
     
   static func trackOpenedScreenshot(screenshot:Screenshot?,  source:AnalyticsOpenedScreenshotSource? ) {

@@ -155,7 +155,7 @@ extension MessageInboxViewController : UICollectionViewDelegate, UICollectionVie
                 }else if action == "screenshot" {
                     if let urlString = message.actionValue,  let _ = URL.init(string: urlString){
                         AssetSyncModel.sharedInstance.addScreenshotFrom(source: .inbox, urlString: urlString, callback: { (screenshot) in
-                            //////Analytics.trackOpenedScreenshot(screenshot: screenshot, source: .relatedLooks)
+                            Analytics.trackOpenedScreenshot(screenshot: screenshot, source: .inbox)
                             let productsViewController = ProductsViewController.init(screenshot: screenshot)
                             productsViewController.hidesBottomBarWhenPushed = true
                             //This is so 'back' doens't say 'shop photo' which looks weird when the tile is notfications
