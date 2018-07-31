@@ -184,8 +184,10 @@ class OnboardingGDPRViewController: UIViewController {
     }
     
     deinit {
-        tableView.dataSource = nil
-        tableView.delegate = nil
+        if isViewLoaded {
+            tableView.dataSource = nil
+            tableView.delegate = nil
+        }
     }
     
     // MARK: Actions

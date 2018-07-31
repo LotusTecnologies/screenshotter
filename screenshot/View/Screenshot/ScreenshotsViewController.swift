@@ -123,9 +123,10 @@ class ScreenshotsViewController: BaseViewController {
     }
     
     deinit {
-        self.collectionView?.delegate = nil
-        self.collectionView?.dataSource = nil
-        
+        if isViewLoaded {
+            self.collectionView?.delegate = nil
+            self.collectionView?.dataSource = nil
+        }
         NotificationCenter.default.removeObserver(self)
     }
 }
@@ -301,12 +302,6 @@ extension ScreenshotsViewController {
     
     @objc private func headerFooterUploadAction() {
         self.delegate?.screenshotsViewControllerWantsToPresentPicker(self, openScreenshots: false)
-    }
-    
-    @objc private func headerFooterDiscoverAction() {
-        if let tabBarController = tabBarController as? MainTabBarController {
-            tabBarController.goTo(tab: .discover)
-        }
     }
 }
 
@@ -948,10 +943,13 @@ extension ScreenshotsViewController: UICollectionViewDataSource {
                 let view = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: identifier, for: indexPath) as? ScreenshotsActionsCollectionReusableView
             {
                 view.uploadButton.addTarget(self, action: #selector(headerFooterUploadAction), for: .touchUpInside)
-                view.discoverButton.addTarget(self, action: #selector(headerFooterDiscoverAction), for: .touchUpInside)
+                
+                let minimumSpacing = self.collectionViewInteritemOffset()
                 
                 var layoutMargins: UIEdgeInsets = .zero
-                layoutMargins.top = collectionViewInteritemOffset().y
+                layoutMargins.top = minimumSpacing.y
+                layoutMargins.left = minimumSpacing.x
+                layoutMargins.right = minimumSpacing.x
                 view.layoutMargins = layoutMargins
                 
                 return view

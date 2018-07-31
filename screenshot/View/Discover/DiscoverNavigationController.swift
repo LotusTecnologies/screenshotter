@@ -38,6 +38,11 @@ class DiscoverNavigationController : UINavigationController, ViewControllerLifeC
         view.backgroundColor = .background
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        UniversalSearchController.shared.updateInboxBadgeCount()
+    }
+    
     func viewController(_ viewController: UIViewController, didDisappear animated: Bool) {
         if viewController.isKind(of: ProductsViewController.self) && topViewController == discoverScreenshotViewController {
             discoverScreenshotViewController.completeDecision()

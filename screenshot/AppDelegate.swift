@@ -311,8 +311,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     tab = .screenshots
                 case "profile":
                     tab = .profile
-//                case "cart":
-//                    tab = .cart
                 default:
                     tab = nil
                 }
@@ -860,7 +858,7 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
         if notification.request.content.categoryIdentifier == "PRICE_ALERT" {
             completionHandler([.alert, .badge, .sound])
         } else {
-            PushNotificationManager.push().notificationCenterDelegate.userNotificationCenter?(center, willPresent: notification, withCompletionHandler: completionHandler)
+            completionHandler([])
         }
     }
     

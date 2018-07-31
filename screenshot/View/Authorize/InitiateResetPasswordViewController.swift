@@ -164,7 +164,9 @@ class InitiateResetPasswordViewController: UIViewController {
     
     deinit {
         inputViewAdjustsScrollViewController.delegate = nil
-        _view.emailTextField.delegate = nil
+        if isViewLoaded {
+            _view.emailTextField.delegate = nil
+        }
     }
     
     // MARK: Actions

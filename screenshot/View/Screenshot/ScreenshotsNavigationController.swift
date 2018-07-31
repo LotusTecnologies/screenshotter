@@ -17,18 +17,11 @@ class ScreenshotsNavigationController: UINavigationController {
     weak var screenshotsNavigationControllerDelegate:ScreenshotsNavigationControllerDelegate?
     var screenshotsViewController:ScreenshotsViewController = ScreenshotsViewController()
     var activityBarButtonItem:UIBarButtonItem?
-    fileprivate var inboxBarButtonItem: BadgeBarButtonItem?
     fileprivate var restoredProductsViewController: ProductsViewController?
-    var inboxUnreadCountFRC = DataModel.sharedInstance.inboxMessageNewFrc(delegate: nil)
     
     
     init() {
         super.init(nibName: nil, bundle: nil)
-        
-        
-        inboxBarButtonItem = BadgeBarButtonItem(image: UIImage(named: "NavigationBarEmail"), style: .plain, target: self, action: #selector(presentNotificationInbox))
-        screenshotsViewController.navigationItem.leftBarButtonItem = inboxBarButtonItem
-        
         screenshotsViewController.navigationItem.rightBarButtonItem = screenshotsViewController.editButtonItem
         screenshotsViewController.delegate = self
         
@@ -49,13 +42,11 @@ class ScreenshotsNavigationController: UINavigationController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        inboxUnreadCountFRC.delegate = self
-        updateInboxBadgeCount()
+        UniversalSearchController.shared.updateInboxBadgeCount()
     }
     
     deinit {
-        AssetSyncModel.sharedInstance.networkingIndicatorDelegate = self
-        NotificationCenter.default.removeObserver(self)
+        AssetSyncModel.sharedInstance.networkingIndicatorDelegate = nil
     }
 }
 
@@ -97,24 +88,6 @@ extension ScreenshotsNavigationControllerPicker {
     
     @objc func pickerViewControllerDidFinish(){
         self.dismiss(animated: true, completion: nil)
-    }
-}
-
-typealias ScreenshotsNavigationControllerNotificationInbox = ScreenshotsNavigationController
-extension ScreenshotsNavigationControllerNotificationInbox {
-    @objc private func presentNotificationInbox() {
-        
-        let vc = MessageInboxViewController.init()
-        InboxMessage.updateExpired()
-        let navVC = UINavigationController.init(rootViewController: vc)
-//        navVC.navigationItem.leftBarButtonItem = ui
-        present(navVC, animated: true)
-       
-    }
-    
-    private func updateInboxBadgeCount() {
-        let count = self.inboxUnreadCountFRC.fetchedObjectsCount
-        self.inboxBarButtonItem?.count = UInt(count)
     }
 }
 
@@ -258,8 +231,3 @@ extension ScreenshotsNavigationControllerStateRestoration {
     }
 }
 
-extension ScreenshotsNavigationController : FetchedResultsControllerManagerDelegate {
-    func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
-        updateInboxBadgeCount()
-    }
-}

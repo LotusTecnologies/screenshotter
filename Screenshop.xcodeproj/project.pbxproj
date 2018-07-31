@@ -196,6 +196,7 @@
 		C58BAE9120E101DD0051394A /* FloatingActionButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58BAE5220E101DD0051394A /* FloatingActionButton.swift */; };
 		C58BAE9220E101DD0051394A /* HorizontalLinesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58BAE5320E101DD0051394A /* HorizontalLinesView.swift */; };
 		C58BAE9320E101DD0051394A /* MainSegmentedControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58BAE5520E101DD0051394A /* MainSegmentedControl.swift */; };
+		C5933D87210F2E1600BBCF5B /* UniversalSearchController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5933D86210F2E1600BBCF5B /* UniversalSearchController.swift */; };
 		C5CAF27A1FCC0EFD006F37DC /* ISO4217.plist in Resources */ = {isa = PBXBuildFile; fileRef = C5CAF2791FCC0EFD006F37DC /* ISO4217.plist */; };
 		C5CAF27C1FCC14C1006F37DC /* CurrencyModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CAF27B1FCC14C1006F37DC /* CurrencyModel.swift */; };
 		C5CC3E391F94A85900DA3425 /* NetworkingIndicatorProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CC3E381F94A85900DA3425 /* NetworkingIndicatorProtocol.swift */; };
@@ -445,6 +446,7 @@
 		C58BAE5220E101DD0051394A /* FloatingActionButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FloatingActionButton.swift; sourceTree = "<group>"; };
 		C58BAE5320E101DD0051394A /* HorizontalLinesView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HorizontalLinesView.swift; sourceTree = "<group>"; };
 		C58BAE5520E101DD0051394A /* MainSegmentedControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainSegmentedControl.swift; sourceTree = "<group>"; };
+		C5933D86210F2E1600BBCF5B /* UniversalSearchController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UniversalSearchController.swift; sourceTree = "<group>"; };
 		C5CAF2791FCC0EFD006F37DC /* ISO4217.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = ISO4217.plist; sourceTree = "<group>"; };
 		C5CAF27B1FCC14C1006F37DC /* CurrencyModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyModel.swift; sourceTree = "<group>"; };
 		C5CC3E381F94A85900DA3425 /* NetworkingIndicatorProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkingIndicatorProtocol.swift; sourceTree = "<group>"; };
@@ -984,6 +986,7 @@
 				C58BAE1E20E101DB0051394A /* HiddenLogoController.swift */,
 				C58BAE1F20E101DB0051394A /* EmptyListController.swift */,
 				C5D2427F20F4866A001403E4 /* DataSource.swift */,
+				C5933D86210F2E1600BBCF5B /* UniversalSearchController.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -1559,6 +1562,7 @@
 				313F80992109E3450020F37D /* MessageInboxCollectionViewCell.swift in Sources */,
 				C58BAE6E20E101DD0051394A /* ActionFeedbackGenerator.swift in Sources */,
 				C58BAE7A20E101DD0051394A /* ShadowCollectionViewCell.swift in Sources */,
+				C5933D87210F2E1600BBCF5B /* UniversalSearchController.swift in Sources */,
 				C58BAE8E20E101DD0051394A /* BorderButton.swift in Sources */,
 				C58BAE7D20E101DD0051394A /* TableViewCell.swift in Sources */,
 				C58BAE9020E101DD0051394A /* FavoriteButton.swift in Sources */,
@@ -1813,7 +1817,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 180;
+				CURRENT_PROJECT_VERSION = 181;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/dev/;
 				INFOPLIST_FILE = screenshot/dev/Info.plist;
@@ -1843,7 +1847,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 180;
+				CURRENT_PROJECT_VERSION = 181;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/dev/;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -1931,7 +1935,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 180;
+				CURRENT_PROJECT_VERSION = 181;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/dev/;
 				INFOPLIST_FILE = screenshot/dev/Info.plist;
@@ -2014,7 +2018,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 180;
+				CURRENT_PROJECT_VERSION = 181;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/prd/;
 				INFOPLIST_FILE = screenshot/prd/Info.plist;

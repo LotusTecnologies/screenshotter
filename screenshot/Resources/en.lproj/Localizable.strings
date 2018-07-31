@@ -156,6 +156,8 @@
 "checkout.order.total_pre_tax" = "Total before tax:";
 "checkout.order.total_tax" = "Estimated tax to be collected:";
 
+"changelog.title" = "What's New";
+
 "currency.auto" = "Automatic";
 
 "discover.screenshot.add" = "Shop";
@@ -360,7 +362,6 @@
 "product.sale_recovery.alert.email_sent.title" = "Email Sent!";
 "product.sale_recovery.alert.email_sent.body" = "You can now shop this item on your computer.";
 
-
 "products.details.similar" = "Similar Items";
 "products.helper.message" = "No visually similar products were detected";
 "products.helper.retry" = "Try Again";
@@ -405,6 +406,7 @@
 "profile.tell_friend" = "Tell a Friend!";
 "profile.title" = "Profile";
 
+"screenshot.action.add" = "Add screenshot";
 "screenshot.empty.detail" = "Upload a photo or add a look from the Discover tab";
 "screenshot.empty.discover" = "Browse Looks";
 "screenshot.empty.title" = "Shop A Photo";

@@ -17,6 +17,7 @@ enum ScreenshotSource : String {
     case camera
     case screenshot
     case shuffle
+    case shuffleAdded
     case share
     case tutorial
     case nativeShare = "native-share" //Andriod only - here for completment of analytics
