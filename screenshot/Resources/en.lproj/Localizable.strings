@@ -104,7 +104,7 @@
 
 "favorites.empty.detail" = "Tap the heart icon on products to add them to your favorites";
 "favorites.empty.title" = "No Favorites";
-cd "favorites.product.cart" = "Add to Cart";
+"favorites.product.cart" = "Add to Cart";
 "favorites.title" = "Favorites";
 
 "gdpr.email.message" = "When this setting is turned on, we will send you personalized emails with sales, availability updates and information about products in the app you looked at and favorited. Your email will also be used to retarget ads to you and to provide brands and retailers with anonymous data about your shopping habits.";
