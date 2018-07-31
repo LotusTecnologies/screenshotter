@@ -126,10 +126,9 @@ extension DataModel {
     }
     
     func inboxMessageFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<InboxMessage>{
-        
         let request: NSFetchRequest<InboxMessage> = InboxMessage.fetchRequest()
         request.predicate = nil
-        request.sortDescriptors = [NSSortDescriptor(key:"isExpired", ascending:true), NSSortDescriptor(key: "date", ascending: false)]
+        request.sortDescriptors = [NSSortDescriptor(key:"isExpired", ascending:true), NSSortDescriptor(key: "date", ascending: false), NSSortDescriptor(key: "uuid", ascending: false)]
         let context = self.mainMoc()
         let fetchedResultsController = FetchedResultsControllerManager<InboxMessage>(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: #keyPath(InboxMessage.sectionHeader), delegate: delegate)
         return fetchedResultsController

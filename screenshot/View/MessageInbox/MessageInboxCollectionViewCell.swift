@@ -10,7 +10,7 @@ import UIKit
 
 class MessageInboxCollectionViewCell: UICollectionViewCell {
     
-    let imageView = EmbossedView()
+    let embossedView = EmbossedView()
     let titleLabel = UILabel()
     let badge = UIView()
     let actionButton = BorderButton()
@@ -35,18 +35,18 @@ class MessageInboxCollectionViewCell: UICollectionViewCell {
 //        line.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor).isActive = true
 //        line.heightAnchor.constraint(equalToConstant: 1.0).isActive = true
         
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        self.contentView.addSubview(imageView)
-        imageView.topAnchor.constraint(equalTo: self.contentView.topAnchor, constant:.padding).isActive = true
-        imageView.heightAnchor.constraint(equalToConstant: 80).isActive = true
-        imageView.widthAnchor.constraint(equalToConstant: 80).isActive = true
-        imageView.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor, constant: .padding).isActive = true
+        embossedView.translatesAutoresizingMaskIntoConstraints = false
+        self.contentView.addSubview(embossedView)
+        embossedView.topAnchor.constraint(equalTo: self.contentView.topAnchor, constant:.padding).isActive = true
+        embossedView.heightAnchor.constraint(equalToConstant: 80).isActive = true
+        embossedView.widthAnchor.constraint(equalToConstant: 80).isActive = true
+        embossedView.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor, constant: .padding).isActive = true
         
         titleLabel.numberOfLines = 0
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         self.contentView.addSubview(titleLabel)
-        titleLabel.leadingAnchor.constraint(equalTo: self.imageView.trailingAnchor, constant:.padding).isActive = true
-        titleLabel.topAnchor.constraint(equalTo: self.imageView.topAnchor).isActive = true
+        titleLabel.leadingAnchor.constraint(equalTo: self.embossedView.trailingAnchor, constant:.padding).isActive = true
+        titleLabel.topAnchor.constraint(equalTo: self.embossedView.topAnchor).isActive = true
         titleLabel.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor, constant:-.padding).isActive = true
 
         
@@ -82,14 +82,22 @@ class MessageInboxCollectionViewCell: UICollectionViewCell {
     
     var isExpired = false {
         didSet {
-            imageView.alpha = isExpired ? 0.5 : 1.0
-            titleLabel.alpha = isExpired ? 0.5 : 1.0
+            let expiredColor = UIColor.init(hex: "#C3C7CA")
+            embossedView.imageView.alpha = isExpired ? 0.5 : 1.0
             badge.alpha = isExpired ? 0.0 : 1.0
-            actionButton.alpha = isExpired ? 0.5 : 1.0
+            
+            if isExpired {
+                actionButton.setTitleColor(expiredColor, for: .normal)
+                actionButton.tintColor = expiredColor
+            }else{
+                actionButton.setTitleColor(.crazeGreen, for: .normal)
+                actionButton.tintColor = .crazeGreen
+
+            }
         }
     }
     
-    static func attributedStringFor(taggedString:String?) -> NSAttributedString {
+    static func attributedStringFor(taggedString:String?, isExpired:Bool) -> NSAttributedString {
         var toReturn = NSMutableAttributedString()
         
         func append(char:Character, tags:[String]){
@@ -112,7 +120,16 @@ class MessageInboxCollectionViewCell: UICollectionViewCell {
                      color = UIColor.init(hex: tag)
                 }
              }
-            if underlineStyle == NSUnderlineStyle.styleNone.rawValue {
+            if isExpired {
+                let expiredColor = UIColor.init(hex: "#C3C7CA")
+                let font = UIFont.screenshopFont(.hindMedium, size: UIFont.buttonFontSize)
+                toReturn.append(NSAttributedString.init(string: String(char), attributes: [
+                    .foregroundColor: expiredColor,
+                    .backgroundColor:UIColor.clear,
+                    .font: font
+                    ])
+                )
+            }else if underlineStyle == NSUnderlineStyle.styleNone.rawValue {
                 toReturn.append(NSAttributedString.init(string: String(char), attributes: [
                     .foregroundColor: color,
                     .backgroundColor:UIColor.clear,

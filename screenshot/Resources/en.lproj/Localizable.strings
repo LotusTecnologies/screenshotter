@@ -152,6 +152,8 @@
 "inbox.section.yesterday" = "Yesterday";
 "inbox.section.daysAgo" = "%@ days ago";
 "inbox.section.expired" = "Expired";
+"inbox.empty.title" = "Stay Updated";
+"inbox.empty.subTitle" = "Price drops, sales, and other exclusive ScreenShop benefits will appear here";
 
 "legal.privacy_policy" = "Privacy Policy";
 "legal.terms_of_service" = "Terms of Service";

@@ -8,9 +8,10 @@
 
 import UIKit
 import CoreData
+import SDWebImage
 
 class MessageInboxViewController: UIViewController {
-    fileprivate let collectionView = UICollectionView(frame: .zero, collectionViewLayout: {
+    fileprivate let collectionView = CollectionView(frame: .zero, collectionViewLayout: {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         layout.minimumInteritemSpacing = 0.0
@@ -40,6 +41,16 @@ class MessageInboxViewController: UIViewController {
         collectionView.delegate = self
         collectionView.dataSource = self
         
+        collectionView.layoutMargins = UIEdgeInsets(top: .extendedPadding, left: 0, bottom: .extendedPadding, right: 0) // Needed for emptyListView
+
+        collectionView.emptyView = {
+           let empty = HelperView()
+            empty.titleLabel.text = "inbox.empty.title".localized
+            empty.subtitleLabel.text = "inbox.empty.subTitle".localized
+            empty.contentImage = UIImage.init(named: "empytInboxMailIcon")
+            return empty
+        }()
+        
         self.view.backgroundColor = .gray9
         self.title = "inbox.title".localized
         let closeX = UIImage(named: "FavoriteX")
@@ -63,7 +74,7 @@ class MessageInboxViewController: UIViewController {
         }
         let point = gesture.location(in: self.collectionView)
         if let indexPath = self.collectionView.indexPathForItem(at: point), let cell = self.collectionView.cellForItem(at: indexPath) as? MessageInboxCollectionViewCell{
-            CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: cell.imageView.imageView)
+            CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: cell.embossedView.imageView)
         }
     }
 }
@@ -89,16 +100,26 @@ extension MessageInboxViewController : UICollectionViewDelegate, UICollectionVie
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
         if let cell = cell as? MessageInboxCollectionViewCell {
-            cell.imageView.imageView.sd_cancelCurrentAnimationImagesLoad()
+            cell.embossedView.imageView.sd_cancelCurrentAnimationImagesLoad()
             let placeHolder = UIImage.init(named:"DefaultProduct")
-            cell.imageView.imageView.image = placeHolder
+            cell.embossedView.imageView.image = placeHolder
             if let message = messageInboxFRC?.object(at: indexPath) {
                 if let urlString  = message.image, let url = URL.init(string: urlString){
-                    cell.imageView.imageView.sd_setImage(with: url, placeholderImage: placeHolder, options: [.retryFailed, .highPriority], completed: nil)
-
+                    let isExpired = message.isExpired
+                    cell.embossedView.imageView.sd_setImage(with: url, placeholderImage: placeHolder, options:  [.retryFailed, .highPriority], completed: { (image, error, cache, url) in
+                        if let currentURL = cell.embossedView.imageView.sd_imageURL() {
+                            if currentURL == url {
+                                if isExpired {
+                                    if let grayscale = image?.grayscaleImage() {
+                                        cell.embossedView.imageView.image = grayscale
+                                    }
+                                }
+                            }
+                        }
+                    })
                 }
                 cell.badge.isHidden = !message.isNew
-                cell.titleLabel.attributedText = MessageInboxCollectionViewCell.attributedStringFor(taggedString: message.title)
+                cell.titleLabel.attributedText = MessageInboxCollectionViewCell.attributedStringFor(taggedString: message.title, isExpired: message.isExpired)
                 cell.actionButton.setTitle(message.buttonText, for: .normal)
                 cell.actionButton.addTarget(self, action: #selector(inboxMessageCollectionViewCellAction(_:event:)), for: .touchUpInside)
                 cell.isExpired = message.isExpired
