@@ -816,7 +816,9 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
                 }
             } else if let openingProductKey = userInfo[Constants.openingProductKey] as? String {
                 isHandled = true
-                ProductDetailViewController.present(imageURL: openingProductKey)
+                ProductDetailViewController.create(imageURL: openingProductKey, completion: { (viewController) in
+                    AppDelegate.presentModally(viewController:viewController)
+                })
             } else if let aps = userInfo["aps"] as? [String : Any],
               let category = aps["category"] as? String,
               category == "PRICE_ALERT",
@@ -827,9 +829,11 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
                 let updatedPrice = dataDict["price"] as? Float
                 let currency = dataDict["currency"] as? String ?? "USD"
                 DataModel.sharedInstance.updateProductPrice(id: id, updatedPrice: updatedPrice, updatedCurrency: currency).then(on: .main) { productOID in
-                        ProductDetailViewController.present(productOID: productOID)
-                    }.catch { error in
-                        Analytics.trackError(type: nil, domain: "Craze", code: 111, localizedDescription: error.localizedDescription)
+                    ProductDetailViewController.create(productOID: productOID, completion: { (viewController) in
+                        AppDelegate.presentModally(viewController:viewController)
+                    })
+                }.catch { error in
+                    Analytics.trackError(type: nil, domain: "Craze", code: 111, localizedDescription: error.localizedDescription)
                 }
                 let pushTypeString = dataDict["type"] as? String
                 Analytics.trackAppOpenedFromPushNotification(source: pushTypeString)
