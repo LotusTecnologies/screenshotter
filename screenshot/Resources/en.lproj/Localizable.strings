@@ -154,6 +154,8 @@
 "inbox.section.expired" = "Expired";
 "inbox.empty.title" = "Stay Updated";
 "inbox.empty.subTitle" = "Price drops, sales, and other exclusive ScreenShop benefits will appear here";
+"inbox.empty.error.subTitle" = "Enable notifications to keep up with price drops, sales and other exclusive ScreenShop benefits";
+"inbox.empty.error.button" = "Enable Notifications";
 
 "legal.privacy_policy" = "Privacy Policy";
 "legal.terms_of_service" = "Terms of Service";
