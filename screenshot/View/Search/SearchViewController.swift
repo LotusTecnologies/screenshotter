@@ -32,8 +32,35 @@ class SearchViewController: UIViewController {
         searchController.searchBar.delegate = self
         searchController.searchBar.placeholder = "search.placeholder".localized
         searchController.searchBar.searchBarStyle = .minimal
-        searchController.searchBar.showsCancelButton = false
+        
+//        searchController.searchBar.setContentCompressionResistancePriority(.required, for: .horizontal)
+        
+//        let v = UIView()
+//        v.translatesAutoresizingMaskIntoConstraints = false
+//        v.backgroundColor = .red
+//        v.addSubview(searchController.searchBar)
+//        navigationItem.titleView = v
+//        v.widthAnchor.constraint(equalToConstant: 300).isActive = true
+//        v.heightAnchor.constraint(equalToConstant: 40).isActive = true
+        
+        
         navigationItem.titleView = searchController.searchBar
+        
+//        searchController.searchBar.translatesAutoresizingMaskIntoConstraints = false
+//        searchController.searchBar.topAnchor.constraint(equalTo: v.topAnchor).isActive = true
+//        searchController.searchBar.leadingAnchor.constraint(equalTo: v.leadingAnchor).isActive = true
+//        searchController.searchBar.bottomAnchor.constraint(equalTo: v.bottomAnchor).isActive = true
+//        searchController.searchBar.trailingAnchor.constraint(equalTo: v.trailingAnchor).isActive = true
+        
+//        searchController.searchBar.widthAnchor.constraint(equalToConstant: 100).isActive = true
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+//        var frame = searchController.searchBar.frame
+//        frame.size.width = 200
+//        searchController.searchBar.frame = frame
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -79,12 +106,6 @@ extension SearchViewController: UISearchControllerDelegate {
                 searchController.searchBar.becomeFirstResponder()
                 timer.invalidate()
             }
-        }
-    }
-    
-    func willPresentSearchController(_ searchController: UISearchController) {
-        DispatchQueue.main.async {
-            searchController.searchBar.setShowsCancelButton(false, animated: false)
         }
     }
 }

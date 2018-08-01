@@ -67,7 +67,9 @@ class UniversalSearchController: NSObject {
     
     private func presentSearchViewController() {
         let searchNavigationController = SearchNavigationController()
-        searchNavigationController.searchViewController.navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(named: "SearchX"), style: .plain, target: self, action: #selector(dismissSearchViewController))
+        
+        searchNavigationController.searchViewController.navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(named: "SearchX"), edge: .left, target: self, action: #selector(dismissSearchViewController))
+        
         self.searchNavigationController = searchNavigationController
         
         UIApplication.shared.keyWindow?.rootViewController?.present(searchNavigationController, animated: false, completion: { [weak searchNavigationController] in
@@ -95,7 +97,7 @@ extension UniversalSearchController: UISearchBarDelegate {
 
 extension UIViewController {
     func applyNavigationItemSearchAndInbox() {
-        let inboxBarButtonItem = BadgeBarButtonItem(image: UIImage(named: "NavigationBarEmail"), style: .plain, target: self, action: #selector(presentNotificationInbox))
+        let inboxBarButtonItem = BadgeBarButtonItem(image: UIImage(named: "NavigationBarEmail"), edge: .left, target: self, action: #selector(presentNotificationInbox))
         
         navigationItem.leftBarButtonItem = inboxBarButtonItem
         UniversalSearchController.shared.inboxBarButtonItems.append(inboxBarButtonItem)
