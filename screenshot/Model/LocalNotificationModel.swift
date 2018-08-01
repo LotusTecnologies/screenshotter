@@ -204,7 +204,7 @@ class LocalNotificationModel {
                                                     userInfo: [Constants.openingProductKey : imageURLString],
                                                     identifier: identifier,
                                                     body: "notification.favorited.item.message".localized(withFormat: category),
-                                                    interval: 3 )
+                                                    interval: 3 * TimeInterval.oneDay)
             }.catch { (error) in
                 //"no latest favorite" or other error
         }
