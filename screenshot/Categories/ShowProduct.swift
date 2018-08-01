@@ -18,47 +18,51 @@ extension UIViewController {
 }
 
 extension ProductDetailViewController {
-    static func create(productOID: NSManagedObjectID, completion:@escaping ((ProductDetailViewController)->Void)) {
+    
+    static func create(productOID: NSManagedObjectID, completion: @escaping (ProductDetailViewController) -> Void) {
         if let product = DataModel.sharedInstance.mainMoc().object(with: productOID) as? Product {
             create(product: product, completion: completion)
         } else {
             Analytics.trackError(type: nil, domain: "Craze", code: 113, localizedDescription: "No product at OID:\(productOID)")
         }
     }
-    static func create(product: Product, completion:@escaping ((ProductDetailViewController)->Void)) {
+    
+    static func create(product: Product, completion: @escaping (ProductDetailViewController) -> Void) {
         AssetSyncModel.sharedInstance.addSubShoppable(fromProduct: product).then(on: .main) { shoppable -> Void in
             let burrowViewController = ProductDetailViewController()
             burrowViewController.product = product
             burrowViewController.shoppable = shoppable
             burrowViewController.uuid = UUID().uuidString
             let _ = burrowViewController.view
-            completion( burrowViewController )
+            completion(burrowViewController)
             }.catch { error in
                 Analytics.trackError(type: nil, domain: "Craze", code: 112, localizedDescription: "addSubShoppable error:\(error)")
         }
     }
     
-    static func create(productId: String, completion:@escaping ((ProductDetailViewController)->Void)) {
+    static func create(productId: String, completion: @escaping (ProductDetailViewController) -> Void) {
         let dataModel = DataModel.sharedInstance
         if let product = dataModel.retrieveProduct(managedObjectContext: dataModel.mainMoc(), id: productId) {
             create(product: product, completion: completion)
         } else {
-            Analytics.trackError(type: nil, domain: "Craze", code: 113, localizedDescription: "No product productId :\(productId)")
+            Analytics.trackError(type: nil, domain: "Craze", code: 113, localizedDescription: "No product id:\(productId)")
         }
     }
     
-    static func create(imageURL: String, completion:@escaping ((ProductDetailViewController)->Void)) {
+    static func create(imageURL: String, completion: @escaping (ProductDetailViewController) -> Void) {
         let dataModel = DataModel.sharedInstance
         if let product = dataModel.retrieveProduct(managedObjectContext: dataModel.mainMoc(), imageURL: imageURL) {
             create(product: product, completion: completion)
         } else {
-            Analytics.trackError(type: nil, domain: "Craze", code: 113, localizedDescription: "No imageURL\(imageURL)")
+            Analytics.trackError(type: nil, domain: "Craze", code: 113, localizedDescription: "No product imageURL:\(imageURL)")
         }
     }
+    
 }
 
 extension AppDelegate {
-    static func presentModally(viewController:UIViewController){
+    
+    static func presentModally(viewController: UIViewController) {
         let navigationController = ModalNavigationController(rootViewController: viewController)
         if let rootVC = AppDelegate.shared.window?.rootViewController {
             rootVC.present(navigationController, animated: true, completion: nil)
@@ -72,6 +76,6 @@ extension AppDelegate {
                 }
             }
         }
-
     }
+    
 }

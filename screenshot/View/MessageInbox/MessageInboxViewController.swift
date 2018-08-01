@@ -166,7 +166,7 @@ extension MessageInboxViewController : UICollectionViewDelegate, UICollectionVie
                     }
                 }else if action == "product" {
                     if let productId = message.actionValue {
-                        ProductDetailViewController.create(productId: productId) { (viewController) in
+                        ProductDetailViewController.create(productId: productId) { viewController in
                             let navigationController = ModalNavigationController(rootViewController: viewController)
                             self.present(navigationController, animated: true, completion: nil)
                         }

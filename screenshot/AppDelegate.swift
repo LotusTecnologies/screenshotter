@@ -816,9 +816,9 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
                 }
             } else if let openingProductKey = userInfo[Constants.openingProductKey] as? String {
                 isHandled = true
-                ProductDetailViewController.create(imageURL: openingProductKey, completion: { (viewController) in
-                    AppDelegate.presentModally(viewController:viewController)
-                })
+                ProductDetailViewController.create(imageURL: openingProductKey) { viewController in
+                    AppDelegate.presentModally(viewController: viewController)
+                }
             } else if let aps = userInfo["aps"] as? [String : Any],
               let category = aps["category"] as? String,
               category == "PRICE_ALERT",
