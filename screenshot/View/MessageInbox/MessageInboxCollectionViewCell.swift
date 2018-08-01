@@ -60,6 +60,7 @@ class MessageInboxCollectionViewCell: UICollectionViewCell {
         actionButton.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor, constant: .padding + .extendedPadding).isActive = true
         actionButton.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor, constant: -1 * (.padding + .extendedPadding) ).isActive = true
 
+        titleLabel.bottomAnchor.constraint(lessThanOrEqualTo: actionButton.topAnchor).isActive = true
 
         
         badge.frame = CGRect(x: 0, y: 0, width: 28, height: 28)
