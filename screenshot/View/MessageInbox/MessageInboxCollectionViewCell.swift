@@ -42,7 +42,7 @@ class MessageInboxCollectionViewCell: UICollectionViewCell {
         embossedView.widthAnchor.constraint(equalToConstant: 80).isActive = true
         embossedView.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor, constant: .padding).isActive = true
         
-        titleLabel.numberOfLines = 0
+        titleLabel.numberOfLines = 3
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         self.contentView.addSubview(titleLabel)
         titleLabel.leadingAnchor.constraint(equalTo: self.embossedView.trailingAnchor, constant:.padding).isActive = true
@@ -59,6 +59,7 @@ class MessageInboxCollectionViewCell: UICollectionViewCell {
         actionButton.bottomAnchor.constraint(equalTo: self.contentView.bottomAnchor, constant:-.padding).isActive = true
         actionButton.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor, constant: .padding + .extendedPadding).isActive = true
         actionButton.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor, constant: -1 * (.padding + .extendedPadding) ).isActive = true
+
 
         
         badge.frame = CGRect(x: 0, y: 0, width: 28, height: 28)
