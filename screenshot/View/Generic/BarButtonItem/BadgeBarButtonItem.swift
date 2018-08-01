@@ -70,21 +70,7 @@ class BadgeBarButtonItem: UIBarButtonItem {
             countContainer.layer.zPosition = 1 // Stay above bar item image
             view.addSubview(countContainer)
             countContainer.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-            if let trailingView = findImageView(in: view) {
-                var didSet = false
-                
-                if #available(iOS 11.0, *) {} else if width > 0 {
-                    didSet = true
-                    countContainer.centerXAnchor.constraint(equalTo: trailingView.leadingAnchor, constant: width).isActive = true
-                }
-                
-                if !didSet {
-                    countContainer.centerXAnchor.constraint(equalTo: trailingView.trailingAnchor).isActive = true
-                }
-            }
-            else {
-                countContainer.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-            }
+            countContainer.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
             countContainer.widthAnchor.constraint(greaterThanOrEqualTo: countContainer.heightAnchor).isActive = true
             
             countLabel.delegate = self
@@ -185,21 +171,6 @@ class BadgeBarButtonItem: UIBarButtonItem {
         else {
             tintView.tintColor = UINavigationBar.appearance().tintColor
         }
-    }
-    
-    // MARK: Image View
-    
-    fileprivate func findImageView(in view: UIView) -> UIImageView? {
-        for view in view.subviews {
-            if let imageView = view as? UIImageView {
-                return imageView
-            }
-            else if let imageView = findImageView(in: view) {
-                return imageView
-            }
-        }
-        
-        return nil
     }
 }
 
