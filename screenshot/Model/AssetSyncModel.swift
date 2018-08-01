@@ -1302,7 +1302,7 @@ extension AssetSyncModel {
                                         completion()
                                     }
                                 }else{
-                                    print("can't find segment for label \(rootShoppableLabel) in \( segments.map{$0["label"] ?? ""} )")
+                                    print("can't find segment for label \(String(describing: rootShoppableLabel)) in \( segments.map{$0["label"] ?? ""} )")
                                     completion()
                                 }
                             }).catch { (error) in
