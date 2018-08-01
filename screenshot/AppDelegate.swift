@@ -826,10 +826,11 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
                 isHandled = true
                 let updatedPrice = dataDict["price"] as? Float
                 let currency = dataDict["currency"] as? String ?? "USD"
+                let subscriptionId = dataDict["subscriptionId"] as? String
                 DataModel.sharedInstance.updateProductPrice(id: id, updatedPrice: updatedPrice, updatedCurrency: currency).then(on: .main) { productOID in
                         ProductDetailViewController.present(productOID: productOID)
                     }.catch { error in
-                        Analytics.trackError(type: nil, domain: "Craze", code: 111, localizedDescription: error.localizedDescription)
+                        Analytics.trackError(type: nil, domain: "Craze", code: 111, localizedDescription: error.localizedDescription + " subId:\(String(describing: subscriptionId))")
                 }
                 let pushTypeString = dataDict["type"] as? String
                 Analytics.trackAppOpenedFromPushNotification(source: pushTypeString)
