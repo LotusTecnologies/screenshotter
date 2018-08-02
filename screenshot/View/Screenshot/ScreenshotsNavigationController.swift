@@ -18,9 +18,9 @@ class ScreenshotsNavigationController: UINavigationController {
     var screenshotsViewController:ScreenshotsViewController = ScreenshotsViewController()
     fileprivate var restoredProductsViewController: ProductsViewController?
     
+    
     init() {
         super.init(nibName: nil, bundle: nil)
-        
         screenshotsViewController.navigationItem.rightBarButtonItem = screenshotsViewController.editButtonItem
         screenshotsViewController.delegate = self
         
@@ -193,3 +193,4 @@ extension ScreenshotsNavigationControllerStateRestoration {
         }
     }
 }
+

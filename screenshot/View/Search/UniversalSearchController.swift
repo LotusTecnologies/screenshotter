@@ -7,58 +7,37 @@
 //
 
 import UIKit
-import PushwooshInboxUI
-import Pushwoosh
 
 class UniversalSearchController: NSObject {
     static let shared = UniversalSearchController()
     
     fileprivate var inboxBarButtonItems: [BadgeBarButtonItem] = []
+    var inboxUnreadCountFRC = DataModel.sharedInstance.inboxMessageNewFrc(delegate: nil)
     
     override init() {
         super.init()
         
-        NotificationCenter.default.addObserver(self, selector: #selector(pushWooshDidReceiveInPush(_:)), name: .PWInboxMessagesDidReceiveInPush, object: nil)
-    }
-    
-    deinit {
-        NotificationCenter.default.removeObserver(self)
+        inboxUnreadCountFRC.delegate = self
     }
     
     // MARK: Inbox
     
-    @objc private func pushWooshDidReceiveInPush(_ notification: Notification) {
-        updateInboxBadgeCount()
-    }
-    
-    func updateInboxBadgeCount() {
-        PWInbox.unreadMessagesCount(completion: { [weak self] (count, error) in
-            DispatchQueue.mainAsyncIfNeeded {
-                if error == nil {
-                    self?.inboxBarButtonItems.forEach({ item in
-                        item.count = UInt(count)
-                    })
-                }
-            }
-        })
+    @objc func updateInboxBadgeCount() {
+        if InboxMessage.inboxEnabled() {
+            let count = self.inboxUnreadCountFRC.fetchedObjectsCount
+            self.inboxBarButtonItems.forEach { $0.count = UInt(count) }
+        }else{
+            self.inboxBarButtonItems.forEach { $0.count = 0 }
+        }
     }
     
     func presentNotificationInbox(from viewController: UIViewController) {
-        guard let inboxStyle = PWIInboxStyle.default() else {
-            return
-        }
-        
-        inboxStyle.backgroundColor = .background
-        inboxStyle.defaultTextColor = .gray3
-        inboxStyle.selectionColor = .gray9
-        inboxStyle.accentColor = .crazeGreen
-        inboxStyle.dateColor = .gray6
-        inboxStyle.separatorColor = .cellBorder
-        
-        if let inboxViewController = PWIInboxUI.createInboxController(with: inboxStyle) {
-            let navigationController = ModalNavigationController(rootViewController: inboxViewController)
-            viewController.present(navigationController, animated: true)
-        }
+        let vc = MessageInboxViewController.init()
+        InboxMessage.updateExpired()
+        let navVC = UINavigationController.init(rootViewController: vc)
+        viewController.present(navVC, animated: true)
+        let inboxFRC = DataModel.sharedInstance.inboxMessageFrc(delegate: nil)
+        Analytics.trackInboxOpened(tab: viewController.title ?? "", unread: self.inboxUnreadCountFRC.fetchedObjectsCount, total: inboxFRC.fetchedObjectsCount)
     }
     
     // MARK: Search
@@ -92,6 +71,12 @@ extension UniversalSearchController: UISearchBarDelegate {
             presentSearchViewController()
         }
         return false
+    }
+}
+
+extension UniversalSearchController : FetchedResultsControllerManagerDelegate {
+    func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
+        updateInboxBadgeCount()
     }
 }
 

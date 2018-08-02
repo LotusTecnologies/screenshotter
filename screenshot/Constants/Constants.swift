@@ -8,6 +8,12 @@
 
 import Foundation
 
+extension TimeInterval {
+    static var oneHour:TimeInterval = 60*60
+    static var oneDay:TimeInterval  = 86400
+    static var oneWeek: TimeInterval = 60*60*24*7
+}
+
 class Constants {
     // iTunes
     static let itunesConnectApp = "itms-apps://itunes.apple.com/app/id1254964391"
@@ -25,11 +31,7 @@ class Constants {
     static let openingProductKey = "openingProductKey"
     
     // DB
-    static let currentMomVersion = 20
-        
-    // Calculation
-    static let secondsInHour: TimeInterval = 3600
-    static let secondsInDay: TimeInterval = 86400
+    static let currentMomVersion = 22
 
     // Syte
     static let syteAccountId = 6677
@@ -40,7 +42,7 @@ class Constants {
     static let furnitureAccountSignature = "G51b+lgvD2TO4l1AjvnVI1OxokzFK5FLw5lHBksXP1c="
     static let furnitureHardcodedAuth = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmaW5nZXIiOiJ2L0NhY3YzREs5K0NxaVFTQXB1ZDFBPT0iLCJ0aW1lc3RhbXAiOjE1MTQzNjgxOTYxNzIsInV1aWQiOiI3OWIyNWJkZi1lMWI2LTVkOWEtOGJkZi1iZDMwNDkzZmE4NjYifQ.IUpV_u797rI0Asvog26y7cHG1mIuHMnDiPsJvLnIAc4"
     
-    static let syteNonUscFeed = "craze_default"
+    static let syteFeed = "craze_priority_default"
     
     
     //Discover
@@ -59,7 +61,6 @@ class Constants {
     static let shoppableDomain = "https://api.shoppable.com/v3" //"https://api.shoppable.co/v3"
     static let shoppableHosted = "https://secure.shoppable.com" //"https://secure.shoppable.co"
     static let shoppableToken = "F81iFWJ93by99pqC22c422189db74b52" //"gD1GV3cVFGC9hk8W5927b13e5e"
-    static let syteUscFeed = "shoppable_production" //"shoppable"
     static let kocchavaGUIDKey = "koscreenshot-ios-dev-wiwhb"
 #else
     static let appSeeApiKey = "0ece18b50f7d4ef9aae3e473c28030bc"
@@ -72,7 +73,6 @@ class Constants {
     static let shoppableDomain = "https://api.shoppable.com/v3"
     static let shoppableHosted = "https://secure.shoppable.com"
     static let shoppableToken = "F81iFWJ93by99pqC22c422189db74b52"
-    static let syteUscFeed = "shoppable_production"
     static let kocchavaGUIDKey = "koscreenshot-cq8h4"
 #endif
 

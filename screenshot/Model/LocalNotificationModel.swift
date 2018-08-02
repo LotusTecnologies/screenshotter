@@ -83,8 +83,10 @@ class LocalNotificationModel {
                                                               options: [UNNotificationAttachmentOptionsTypeHintKey : kUTTypeImage])
                 content.attachments = [attachment]
             } catch {
-                print("Local notification attachment error:\(error)")
-                Analytics.trackError(type: nil, domain: "Craze", code: 101, localizedDescription: "Screenshot notif identifier:\(identifier) attachment error:\(error)")
+                let localizedDescription = "Screenshot notif identifier:\(identifier) attachment error:\(error)"
+                print(localizedDescription)
+                Analytics.trackAppSentLocalPushNotification(success: false, localizedDescription: localizedDescription)
+                Analytics.trackError(type: nil, domain: "Craze", code: 101, localizedDescription: localizedDescription)
             }
         }
         
@@ -96,10 +98,12 @@ class LocalNotificationModel {
                                             trigger: trigger)
         UNUserNotificationCenter.current().add(request, withCompletionHandler: { (error) in
             if let error = error {
-                print("sendScreenshotAddedLocalNotification identifier:\(identifier)  error:\(error)")
-                Analytics.trackError(type: nil, domain: "Craze", code: 102, localizedDescription: "Screenshot notif identifier:\(identifier) schedule error:\(error)")
+                let localizedDescription = "Screenshot notif identifier:\(identifier) schedule error:\(error)"
+                print(localizedDescription)
+                Analytics.trackAppSentLocalPushNotification(success: false, localizedDescription: localizedDescription)
+                Analytics.trackError(type: nil, domain: "Craze", code: 102, localizedDescription: localizedDescription)
             } else {
-                Analytics.trackAppSentLocalPushNotification()
+                Analytics.trackAppSentLocalPushNotification(success: true, localizedDescription: nil)
             }
         })
     }
@@ -161,7 +165,7 @@ class LocalNotificationModel {
                                                     userInfo: [Constants.openingProductKey : imageURLString],
                                                     identifier: identifier,
                                                     body: "notification.tapped.product.message".localized(withFormat: productTitle),
-                                                    interval: Constants.secondsInDay)
+                                                    interval: TimeInterval.oneDay)
         }
     }
 
@@ -182,7 +186,7 @@ class LocalNotificationModel {
                                                                Constants.openingAssetIdKey : assetIdString],
                                                     identifier: identifier,
                                                     body: "notification.sale.screenshot.message".localized,
-                                                    interval: 2 * Constants.secondsInDay)
+                                                    interval: 2 * TimeInterval.oneDay)
         }
     }
     
@@ -204,7 +208,7 @@ class LocalNotificationModel {
                                                     userInfo: [Constants.openingProductKey : imageURLString],
                                                     identifier: identifier,
                                                     body: "notification.favorited.item.message".localized(withFormat: category),
-                                                    interval: 3 * Constants.secondsInDay)
+                                                    interval: 3 * TimeInterval.oneDay)
             }.catch { (error) in
                 //"no latest favorite" or other error
         }
@@ -219,7 +223,7 @@ class LocalNotificationModel {
                                             userInfo: [Constants.openingScreenKey : Constants.openingScreenValueDiscover],
                                             identifier: LocalNotificationIdentifier.inactivityDiscover.rawValue,
                                             body: "notification.inactivity.discover.message".localized,
-                                            interval: 4 * Constants.secondsInDay)
+                                            interval: 4 * TimeInterval.oneDay)
     }
     
     func cancelPendingNotifications(within: Date? = nil) {

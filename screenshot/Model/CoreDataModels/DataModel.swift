@@ -151,7 +151,16 @@ extension DataModel {
         if upsert {
             current = managedObjectContext.screenshotWith(assetId: assetId)
             wasHidden = current?.isHidden
+            
+            if  current == nil {
+                if let uploadedImageURL = uploadedImageURL {
+                    current = managedObjectContext.screenshotWith(imageUrl: uploadedImageURL)
+                    wasHidden = current?.isHidden
+                }
+            }
         }
+       
+        
         let screenshotToSave = current ?? Screenshot(context: managedObjectContext)
         
         screenshotToSave.assetId = assetId
@@ -397,7 +406,7 @@ extension DataModel {
         productToSave.originalPrice = originalPrice
         productToSave.floatPrice = floatPrice
         productToSave.floatOriginalPrice = floatOriginalPrice
-        productToSave.categories = categories
+        productToSave.categories = shoppable?.label
         productToSave.brand = brand
         productToSave.offer = offer
         productToSave.imageURL = imageURL
@@ -511,16 +520,20 @@ extension DataModel {
         }
     }
     
-    func updateProductPrice(id: String, updatedPrice: Float, updatedCurrency: String) -> Promise<Void> {
+    func updateProductPrice(id: String, updatedPrice: Float?, updatedCurrency: String) -> Promise<NSManagedObjectID> {
         return Promise { fulfill, reject in
             self.performBackgroundTask { managedObjectContext in
-                if let formattedUpdatePrice = self.formattedPrice(price: updatedPrice, currency: updatedCurrency),
-                  let product = self.retrieveProduct(managedObjectContext: managedObjectContext, id: id) {
-                    product.floatPrice = updatedPrice
-                    product.price = formattedUpdatePrice
-                    managedObjectContext.saveIfNeeded()
+                if let product = self.retrieveProduct(managedObjectContext: managedObjectContext, id: id) {
+                    if let updatedPrice = updatedPrice,
+                      let formattedUpdatePrice = self.formattedPrice(price: updatedPrice, currency: updatedCurrency) {
+                        product.floatPrice = updatedPrice
+                        product.price = formattedUpdatePrice
+                        managedObjectContext.saveIfNeeded()
+                    }
+                    fulfill(product.objectID)
+                } else {
+                    reject(NSError(domain: "Craze", code: 110, userInfo: [NSLocalizedDescriptionKey : "no product with variantID:\(id) updatedPrice:\(String(describing: updatedPrice))"]))
                 }
-                fulfill(())
             }
         }
     }
@@ -529,7 +542,7 @@ extension DataModel {
         return Promise { fulfill, reject in
             self.performBackgroundTask { managedObjectContext in
                 let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
-                let twoMonthsAgo = NSDate(timeIntervalSinceNow: -60 * Constants.secondsInDay)
+                let twoMonthsAgo = NSDate(timeIntervalSinceNow: -60 * TimeInterval.oneDay)
                 fetchRequest.predicate = NSPredicate(format: "isFavorite == TRUE AND inNotif == FALSE AND imageURL != nil AND dateFavorited > %@", twoMonthsAgo)
                 fetchRequest.sortDescriptors = [NSSortDescriptor(key: "dateFavorited", ascending: false)]
                 fetchRequest.fetchLimit = 1
@@ -558,7 +571,7 @@ extension DataModel {
         return Promise { fulfill, reject in
             self.performBackgroundTask { managedObjectContext in
                 let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
-                let aMonthAgo = NSDate(timeIntervalSinceNow: -30 * Constants.secondsInDay)
+                let aMonthAgo = NSDate(timeIntervalSinceNow: -30 * TimeInterval.oneDay)
                 fetchRequest.predicate = NSPredicate(format: "isFavorite == FALSE AND inNotif == FALSE AND imageURL != nil AND dateViewed > %@", aMonthAgo)
                 fetchRequest.sortDescriptors = [NSSortDescriptor(key: "dateViewed", ascending: false)]
                 fetchRequest.fetchLimit = 1
@@ -586,7 +599,7 @@ extension DataModel {
         return Promise { fulfill, reject in
             self.performBackgroundTask { managedObjectContext in
                 let fetchRequest: NSFetchRequest<Shoppable> = Shoppable.fetchRequest()
-                let twoMonthsAgo = NSDate(timeIntervalSinceNow: -60 * Constants.secondsInDay)
+                let twoMonthsAgo = NSDate(timeIntervalSinceNow: -60 * TimeInterval.oneDay)
                 fetchRequest.predicate = NSPredicate(format: "screenshot.lastModified > %@ AND screenshot.inNotif == FALSE AND screenshot.isHidden == FALSE AND screenshot.imageData != nil AND (SUBQUERY(products, $x, ($x.order == 0 OR $x.order == 1) AND $x.floatPrice < $x.floatOriginalPrice).@count == 2)", twoMonthsAgo)
                 fetchRequest.sortDescriptors = [NSSortDescriptor(key: "screenshot.lastModified", ascending: false)]
                 fetchRequest.fetchLimit = 1
@@ -1051,4 +1064,31 @@ extension NSManagedObjectContext {
         return nil
     }
     
+    func screenshotWith(imageUrl:String) -> Screenshot? {
+        let fetchRequest: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "uploadedImageURL == %@", imageUrl)
+        fetchRequest.sortDescriptors = nil
+        fetchRequest.fetchLimit = 1
+        
+        do {
+            let results = try self.fetch(fetchRequest)
+            return results.first
+        } catch {
+            DataModel.sharedInstance.receivedCoreDataError(error: error)
+            print("retrieveScreenshot imageUrl:\(imageUrl) results with error:\(error)")
+        }
+        return nil
+    }
+    
+    func inboxMessageWith(objectId:NSManagedObjectID) ->InboxMessage? {
+        if let m = self.object(with: objectId) as? InboxMessage {
+            do{
+                try m.validateForUpdate()
+                return m
+            }catch{
+                DataModel.sharedInstance.receivedCoreDataError(error: error)
+            }
+        }
+        return nil
+    }
 }

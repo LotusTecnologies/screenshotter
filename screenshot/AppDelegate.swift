@@ -680,6 +680,8 @@ extension AppDelegate: PushNotificationDelegate {
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         ApplicationStateModel.sharedInstance.applicationState = application.applicationState
 
+        InboxMessage.insertMessageFromPush(userInfo: userInfo)
+        
         if let aps = userInfo["aps"] as? NSDictionary, let category = aps["category"] as? String, category == "MATCHSTICK_LIKES", let likeUpdates = userInfo["likeUpdates"] as? [[String:Any]]{
             DataModel.sharedInstance.performBackgroundTask { (context) in
             
@@ -732,7 +734,7 @@ extension AppDelegate: PushNotificationDelegate {
           let dataDict = userInfo["data"] as? [String : Any],
           let id = dataDict["variantId"] as? String,
           !id.isEmpty {
-            LocalNotificationModel.shared.cancelPendingNotifications(within: Date(timeIntervalSinceNow: Constants.secondsInDay))
+            LocalNotificationModel.shared.cancelPendingNotifications(within: Date(timeIntervalSinceNow: TimeInterval.oneDay))
             let pushTypeString = dataDict["type"] as? String
             Analytics.trackAppReceivedPushNotification(source: pushTypeString)
             PushNotificationManager.push().handlePushReceived(userInfo)  // pushwoosh
@@ -782,8 +784,11 @@ extension AppDelegate {
 extension AppDelegate : UNUserNotificationCenterDelegate {
     
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        
         var isHandled = false
         if let userInfo = response.notification.request.content.userInfo as? [String : Any] {
+            InboxMessage.insertMessageFromPush(userInfo: userInfo)
+
             if let openingScreen = userInfo[Constants.openingScreenKey] as? String {
                 isHandled = true
                 if openingScreen == Constants.openingScreenValueScreenshot {
@@ -811,7 +816,9 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
                 }
             } else if let openingProductKey = userInfo[Constants.openingProductKey] as? String {
                 isHandled = true
-                ProductDetailViewController.present(imageURL: openingProductKey)
+                ProductDetailViewController.create(imageURL: openingProductKey) { viewController in
+                    AppDelegate.presentModally(viewController: viewController)
+                }
             } else if let aps = userInfo["aps"] as? [String : Any],
               let category = aps["category"] as? String,
               category == "PRICE_ALERT",
@@ -819,13 +826,15 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
               let id = dataDict["variantId"] as? String,
               !id.isEmpty {
                 isHandled = true
-                if let updatedPrice = dataDict["price"] as? Float {
-                    let currency = dataDict["currency"] as? String ?? "USD"
-                    DataModel.sharedInstance.updateProductPrice(id: id, updatedPrice: updatedPrice, updatedCurrency: currency).then(on: .main) {
-                        ProductDetailViewController.present(with: id)
+                let updatedPrice = dataDict["price"] as? Float
+                let currency = dataDict["currency"] as? String ?? "USD"
+                let subscriptionId = dataDict["subscriptionId"] as? String
+                DataModel.sharedInstance.updateProductPrice(id: id, updatedPrice: updatedPrice, updatedCurrency: currency).then(on: .main) { productOID in
+                    ProductDetailViewController.create(productOID: productOID) { viewController in
+                        AppDelegate.presentModally(viewController: viewController)
                     }
-                } else {
-                    ProductDetailViewController.present(with: id)
+                }.catch { error in
+                    Analytics.trackError(type: nil, domain: "Craze", code: 111, localizedDescription: error.localizedDescription + " subId:\(String(describing: subscriptionId))")
                 }
                 let pushTypeString = dataDict["type"] as? String
                 Analytics.trackAppOpenedFromPushNotification(source: pushTypeString)

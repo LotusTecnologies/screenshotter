@@ -110,7 +110,7 @@ class RecoverLostSaleManager: NSObject, MFMailComposeViewControllerDelegate {
                 })
             }else{
                 Analytics.trackFeatureRecoveryEmailPrompt(product: product, hasEmail: false)
-                let alert = UIAlertController.init(title: "product.sale_recovery.alert.email_sent.title".localized, message: "product.sale_recovery.alert.email_sent.body".localized, preferredStyle: .alert)
+                let alert = UIAlertController.init(title: "product.sale_recovery.alert.enter_email.title".localized, message: "product.sale_recovery.alert.enter_email.body".localized, preferredStyle: .alert)
                 alert.addTextField(configurationHandler: { (textField) in
                     textField.placeholder = "generic.email".localized
                     textField.keyboardType = .emailAddress
