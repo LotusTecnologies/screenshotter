@@ -16,8 +16,7 @@ class SearchViewController: UIViewController {
         categoriesNavigationController = UINavigationController(rootViewController: SearchCategoriesViewController())
         categoriesNavigationController.navigationBar.shadowImage = UIImage()
         
-        let tableViewController = UITableViewController(style: .plain)
-        
+        let tableViewController = SearchResultsTableViewController(style: .plain)
         searchController = SearchController(searchResultsController: tableViewController)
         
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)

@@ -122,6 +122,8 @@
 		C52FD9DD211057F600AD3A0B /* SearchCategoryCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C52FD9DC211057F600AD3A0B /* SearchCategoryCollectionViewCell.swift */; };
 		C52FD9E1211091C900AD3A0B /* SearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = C52FD9E0211091C900AD3A0B /* SearchBar.swift */; };
 		C52FD9E3211091D200AD3A0B /* SearchController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C52FD9E2211091D200AD3A0B /* SearchController.swift */; };
+		C52FD9E72113319F00AD3A0B /* SearchResultsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C52FD9E62113319F00AD3A0B /* SearchResultsTableViewController.swift */; };
+		C52FD9E921133CE500AD3A0B /* SearchResultTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C52FD9E821133CE500AD3A0B /* SearchResultTableViewCell.swift */; };
 		C53B15B11FDD1EF400658A78 /* FavoriteHeart.json in Resources */ = {isa = PBXBuildFile; fileRef = C53B15B01FDD1EF400658A78 /* FavoriteHeart.json */; };
 		C53B15BA1FDD638C00658A78 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C53B15BC1FDD638C00658A78 /* Localizable.strings */; };
 		C53B15BE1FDE585B00658A78 /* LocalizeHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53B15BD1FDE585B00658A78 /* LocalizeHelper.swift */; };
@@ -379,6 +381,8 @@
 		C52FD9DC211057F600AD3A0B /* SearchCategoryCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchCategoryCollectionViewCell.swift; sourceTree = "<group>"; };
 		C52FD9E0211091C900AD3A0B /* SearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBar.swift; sourceTree = "<group>"; };
 		C52FD9E2211091D200AD3A0B /* SearchController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchController.swift; sourceTree = "<group>"; };
+		C52FD9E62113319F00AD3A0B /* SearchResultsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResultsTableViewController.swift; sourceTree = "<group>"; };
+		C52FD9E821133CE500AD3A0B /* SearchResultTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResultTableViewCell.swift; sourceTree = "<group>"; };
 		C53B15B01FDD1EF400658A78 /* FavoriteHeart.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = FavoriteHeart.json; sourceTree = "<group>"; };
 		C53B15BB1FDD638C00658A78 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C53B15BD1FDE585B00658A78 /* LocalizeHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizeHelper.swift; sourceTree = "<group>"; };
@@ -1137,6 +1141,8 @@
 				C5933D89210F3F9100BBCF5B /* SearchViewController.swift */,
 				C5933D9121103B5900BBCF5B /* SearchSubcategoriesViewController.swift */,
 				C5933D8D2110359700BBCF5B /* UniversalSearchController.swift */,
+				C52FD9E62113319F00AD3A0B /* SearchResultsTableViewController.swift */,
+				C52FD9E821133CE500AD3A0B /* SearchResultTableViewCell.swift */,
 			);
 			path = Search;
 			sourceTree = "<group>";
@@ -1626,6 +1632,7 @@
 				316C831020C3AEBD0012A908 /* DataModel.swift in Sources */,
 				C58BAE8520E101DD0051394A /* UIButton.swift in Sources */,
 				311A505620D90B780001D463 /* ProductCollectionViewManager.swift in Sources */,
+				C52FD9E72113319F00AD3A0B /* SearchResultsTableViewController.swift in Sources */,
 				C52FD9E1211091C900AD3A0B /* SearchBar.swift in Sources */,
 				311A506B20D90B780001D463 /* InitiateResetPasswordViewController.swift in Sources */,
 				311A503020D90B780001D463 /* ProductsBarController.swift in Sources */,
@@ -1704,6 +1711,7 @@
 				311A50B020D90B780001D463 /* ProfileAccountView.swift in Sources */,
 				C53B46531FBC397700A8C886 /* Geometry.swift in Sources */,
 				C58BAE5820E101DD0051394A /* ModalNavigationController.swift in Sources */,
+				C52FD9E921133CE500AD3A0B /* SearchResultTableViewCell.swift in Sources */,
 				31C536A820B40446005810CA /* String+HTML.swift in Sources */,
 				31D372B320EE5B91007E978E /* RecoveryLostSalePopupViewController.swift in Sources */,
 				C58BAE6120E101DD0051394A /* IntrinsicContentSizePresentationController.swift in Sources */,
