@@ -383,8 +383,13 @@ class UserAccountManager : NSObject {
                         Analytics.trackDevLog(file:  NSString.init(string: #file).lastPathComponent, line: #line, message: "eror making anon account \(error)")
                         reject(error)
                     }else  if let authResult = authResult {
-                        Analytics.trackDevLog(file:  NSString.init(string: #file).lastPathComponent, line: #line, message: "made anon account")
+                        
                         let user = authResult.user
+                        Analytics.trackDevLog(file:  NSString.init(string: #file).lastPathComponent, line: #line, message: "made anon account userId:\(user.uid), analytic identifier \(AnalyticsUser.current.identifier)")
+
+                        if  user.uid.firebaseSafe() != user.uid {
+                            Analytics.trackDevLog(file:  NSString.init(string: #file).lastPathComponent, line: #line, message: "userId :\(user.uid) is not firebase safe")
+                        }
                         self.userFromLogin = user
                         self.databaseRef.child("users").child(user.uid).child("identifier").setValue(AnalyticsUser.current.identifier)
                         fulfil(())
