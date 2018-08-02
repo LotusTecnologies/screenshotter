@@ -83,8 +83,10 @@ class LocalNotificationModel {
                                                               options: [UNNotificationAttachmentOptionsTypeHintKey : kUTTypeImage])
                 content.attachments = [attachment]
             } catch {
-                print("Local notification attachment error:\(error)")
-                Analytics.trackError(type: nil, domain: "Craze", code: 101, localizedDescription: "Screenshot notif identifier:\(identifier) attachment error:\(error)")
+                let localizedDescription = "Screenshot notif identifier:\(identifier) attachment error:\(error)"
+                print(localizedDescription)
+                Analytics.trackAppSentLocalPushNotification(success: false, localizedDescription: localizedDescription)
+                Analytics.trackError(type: nil, domain: "Craze", code: 101, localizedDescription: localizedDescription)
             }
         }
         
@@ -96,10 +98,12 @@ class LocalNotificationModel {
                                             trigger: trigger)
         UNUserNotificationCenter.current().add(request, withCompletionHandler: { (error) in
             if let error = error {
-                print("sendScreenshotAddedLocalNotification identifier:\(identifier)  error:\(error)")
-                Analytics.trackError(type: nil, domain: "Craze", code: 102, localizedDescription: "Screenshot notif identifier:\(identifier) schedule error:\(error)")
+                let localizedDescription = "Screenshot notif identifier:\(identifier) schedule error:\(error)"
+                print(localizedDescription)
+                Analytics.trackAppSentLocalPushNotification(success: false, localizedDescription: localizedDescription)
+                Analytics.trackError(type: nil, domain: "Craze", code: 102, localizedDescription: localizedDescription)
             } else {
-                Analytics.trackAppSentLocalPushNotification()
+                Analytics.trackAppSentLocalPushNotification(success: true, localizedDescription: nil)
             }
         })
     }
