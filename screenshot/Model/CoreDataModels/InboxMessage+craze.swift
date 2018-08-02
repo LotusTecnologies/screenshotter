@@ -10,6 +10,12 @@ import Foundation
 import CoreData
 
 extension InboxMessage {
+    
+    static func inboxEnabled() ->Bool {
+        return PermissionsManager.shared.permissionStatus(for: .push) == .authorized &&
+            UserDefaults.standard.bool(forKey: UserDefaultsKeys.gdpr_agreedToEmail)
+    }
+    
     static func insertMessageFromPush(userInfo: [AnyHashable : Any] ){
         if let dataDict = userInfo["data"] as? [AnyHashable: Any],  let dict = dataDict["inbox"] as? [String:Any] {
             DataModel.sharedInstance.performBackgroundTask { (context) in
