@@ -43,20 +43,16 @@ class MessageInboxViewController: UIViewController {
         
         collectionView.layoutMargins = UIEdgeInsets(top: .extendedPadding, left: 0, bottom: .extendedPadding, right: 0) // Needed for emptyListView
 
-        collectionView.emptyView = {
-           let empty = HelperView()
-            empty.titleLabel.text = "inbox.empty.title".localized
-            empty.subtitleLabel.text = "inbox.empty.subTitle".localized
-            empty.contentImage = UIImage.init(named: "empytInboxMailIcon")
-            return empty
-        }()
+        collectionView.emptyView = HelperView()
+        syncEmptyViewWithNotificationState()
         
         self.view.backgroundColor = .gray9
         self.title = "inbox.title".localized
         let closeX = UIImage(named: "FavoriteX")
         self.navigationItem.leftBarButtonItem = UIBarButtonItem.init(image: closeX, style: .plain, target: self, action: #selector(back(_:)))
         
-        
+        NotificationCenter.default.addObserver(self, selector: #selector(syncEmptyViewWithNotificationState), name: .permissionsManagerDidUpdate, object: nil)
+
         let pinchZoom = UIPinchGestureRecognizer.init(target: self, action: #selector(pinch(gesture:)))
         self.view.addGestureRecognizer(pinchZoom)
     }
@@ -65,7 +61,6 @@ class MessageInboxViewController: UIViewController {
         InboxMessage.markAllAsRead()
         
     }
-    
     
     @objc func pinch( gesture:UIPinchGestureRecognizer) {
         if CrazeImageZoom.shared.isHandlingGesture, let imageView = CrazeImageZoom.shared.hostedImageView  {
@@ -76,6 +71,13 @@ class MessageInboxViewController: UIViewController {
         if let indexPath = self.collectionView.indexPathForItem(at: point), let cell = self.collectionView.cellForItem(at: indexPath) as? MessageInboxCollectionViewCell{
             CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: cell.embossedView.imageView)
         }
+    }
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.syncEmptyViewWithNotificationState()
+    }
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
 }
 
@@ -90,11 +92,16 @@ extension MessageInboxViewController : FetchedResultsControllerManagerDelegate {
 extension MessageInboxViewController : UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-
-        return self.messageInboxFRC?.numberOfSections() ?? 0
+        if InboxMessage.inboxEnabled() {
+            return self.messageInboxFRC?.numberOfSections() ?? 0
+        }
+        return 0
     }
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.messageInboxFRC?.numberOfItems(in: section) ?? 0
+        if InboxMessage.inboxEnabled() {
+            return self.messageInboxFRC?.numberOfItems(in: section) ?? 0
+        }
+        return 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -192,6 +199,60 @@ extension MessageInboxViewController : UICollectionViewDelegate, UICollectionVie
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         return CGSize.init(width: 0, height: 44)
     }
+}
+
+//Empty view:
+extension MessageInboxViewController {
     
-    
+    @objc func syncEmptyViewWithNotificationState(){
+        if let empty = collectionView.emptyView as? HelperView{
+            if !InboxMessage.inboxEnabled()
+            {
+                empty.titleLabel.text = "inbox.empty.title".localized
+                empty.subtitleLabel.text = "inbox.empty.error.subTitle".localized
+                empty.contentImage = UIImage.init(named: "empytInboxMailIconError")
+
+                if empty.controlView.subviews.count == 0 {
+                    let button = MainButton()
+                    button.setTitleColor(.white, for: .normal)
+                    button.backgroundColor = .crazeGreen
+                    button.setTitle("inbox.empty.error.button".localized, for: .normal)
+                    button.addTarget(self, action: #selector(enabledNotificationButtonPressed(_:)), for: .touchUpInside)
+                    button.translatesAutoresizingMaskIntoConstraints = false
+                    empty.controlView.addSubview(button)
+                    button.topAnchor.constraint(equalTo: empty.controlView.topAnchor).isActive = true
+                    button.leadingAnchor.constraint(equalTo: empty.controlView.leadingAnchor).isActive = true
+                    button.trailingAnchor.constraint(equalTo: empty.controlView.trailingAnchor).isActive = true
+                    button.bottomAnchor.constraint(equalTo: empty.controlView.bottomAnchor).isActive = true
+                }
+                empty.controlView.isHidden = false
+            }else{
+                empty.titleLabel.text = "inbox.empty.title".localized
+                empty.subtitleLabel.text = "inbox.empty.subTitle".localized
+                empty.contentImage = UIImage.init(named: "empytInboxMailIcon")
+                empty.controlView.isHidden = true
+            }
+        }
+    }
+    @objc func enabledNotificationButtonPressed(_ sender:Any){
+        if !UserDefaults.standard.bool(forKey: UserDefaultsKeys.gdpr_agreedToEmail) {
+            let vc = GDPRViewController.init()
+            let navVC = UINavigationController.init(rootViewController: vc)
+            let closeX = UIImage(named: "FavoriteX")
+            vc.navigationItem.leftBarButtonItem = UIBarButtonItem.init(image: closeX, style: .plain, target: self, action: #selector(dismissGDPRView(_:)))
+            self.present(navVC, animated: true, completion: nil)
+        }else if PermissionsManager.shared.permissionStatus(for: .push) != .authorized {
+            PermissionsManager.shared.requestPermission(for: .push, openSettingsIfNeeded: true)
+        }
+    }
+    @objc func dismissGDPRView(_ sender:Any){
+        self.dismiss(animated: true) {
+            if PermissionsManager.shared.permissionStatus(for: .push) == .undetermined {
+                PermissionsManager.shared.requestPermission(for: .push, openSettingsIfNeeded: false, response: { (granted) in
+                    self.collectionView.reloadData()
+                })
+            }
+            self.collectionView.reloadData()
+        }
+    }
 }
