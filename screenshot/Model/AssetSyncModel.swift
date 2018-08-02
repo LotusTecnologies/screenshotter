@@ -802,7 +802,7 @@ extension AssetSyncModel {
             fixedQueryitems.append(URLQueryItem(name: "force_currency", value: productCurrency))
         }
        
-        let sizeValue = isPlus ? "craze_plus_size" : isChild ? "kids_craze" : Constants.syteNonUscFeed
+        let sizeValue = isPlus ? "craze_plus_size" : isChild ? "kids_craze" : Constants.syteFeed
         fixedQueryitems.append(URLQueryItem(name: "feed", value: sizeValue))
         if optionsMask.rawValue & ProductsOptionsMask.genderMale.rawValue > 0 {
             fixedQueryitems.append(URLQueryItem(name: "force_gender", value: isChild ? "boy" : "male"))
