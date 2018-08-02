@@ -25,9 +25,13 @@ class UniversalSearchController {
     // MARK: Inbox
     
     
-    func updateInboxBadgeCount() {
-        let count = self.inboxUnreadCountFRC.fetchedObjectsCount
-        self.inboxBarButtonItems.forEach { $0.count = UInt(count) }
+    @objc func updateInboxBadgeCount() {
+        if InboxMessage.inboxEnabled() {
+            let count = self.inboxUnreadCountFRC.fetchedObjectsCount
+            self.inboxBarButtonItems.forEach { $0.count = UInt(count) }
+        }else{
+            self.inboxBarButtonItems.forEach { $0.count = 0 }
+        }
     }
     
     func presentNotificationInbox(from viewController: UIViewController) {

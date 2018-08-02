@@ -92,11 +92,16 @@ extension MessageInboxViewController : FetchedResultsControllerManagerDelegate {
 extension MessageInboxViewController : UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-
-        return self.messageInboxFRC?.numberOfSections() ?? 0
+        if InboxMessage.inboxEnabled() {
+            return self.messageInboxFRC?.numberOfSections() ?? 0
+        }
+        return 0
     }
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.messageInboxFRC?.numberOfItems(in: section) ?? 0
+        if InboxMessage.inboxEnabled() {
+            return self.messageInboxFRC?.numberOfItems(in: section) ?? 0
+        }
+        return 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -198,8 +203,7 @@ extension MessageInboxViewController {
     
     @objc func syncEmptyViewWithNotificationState(){
         if let empty = collectionView.emptyView as? HelperView{
-            if PermissionsManager.shared.permissionStatus(for: .push) != .authorized ||
-                !UserDefaults.standard.bool(forKey: UserDefaultsKeys.gdpr_agreedToEmail)
+            if !InboxMessage.inboxEnabled()
             {
                 empty.titleLabel.text = "inbox.empty.title".localized
                 empty.subtitleLabel.text = "inbox.empty.error.subTitle".localized
@@ -241,8 +245,11 @@ extension MessageInboxViewController {
     @objc func dismissGDPRView(_ sender:Any){
         self.dismiss(animated: true) {
             if PermissionsManager.shared.permissionStatus(for: .push) == .undetermined {
-                PermissionsManager.shared.requestPermission(for: .push, openSettingsIfNeeded: false)
+                PermissionsManager.shared.requestPermission(for: .push, openSettingsIfNeeded: false, response: { (granted) in
+                    self.collectionView.reloadData()
+                })
             }
+            self.collectionView.reloadData()
         }
     }
 }
