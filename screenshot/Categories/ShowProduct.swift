@@ -45,7 +45,69 @@ extension ProductDetailViewController {
         if let product = dataModel.retrieveProduct(managedObjectContext: dataModel.mainMoc(), id: productId) {
             create(product: product, completion: completion)
         } else {
-            Analytics.trackError(type: nil, domain: "Craze", code: 113, localizedDescription: "No product id:\(productId)")
+            NetworkingPromise.sharedInstance.getProductInfo(productId: productId).then { (dict) -> Void in
+                print(("product info: \(dict)"))
+                DataModel.sharedInstance.performBackgroundTask({ (context) in
+                    if let price = dict["price"] as? String,
+                        let imageURL = dict["imageURL"] as? String,
+                        let productDescription = dict["productDescription"] as? String,
+                        let offer = dict["offer"] as? String,
+                        let floatPriceNumber = dict["floatPrice"] as? NSNumber
+                        
+                    {
+                        let floatPrice = floatPriceNumber.floatValue
+                        let originalPrice = dict["originalPrice"] as? String
+                        var floatOriginalPrice:Float =  0
+                        if let p =  dict["floatOriginalPrice"] as? NSNumber {
+                            floatOriginalPrice = p.floatValue
+                        }
+                        let categories = dict["categories"] as? String
+                        let brand = dict["brand"] as? String
+                        let merchant = dict["merchant"] as? String
+                        let partNumber = dict["partNumber"] as? String
+                        let id = dict["id"] as? String
+                        let color = dict["color"] as? String
+                        let sku = dict["sku"] as? String
+                        let fallbackPriceNumber =  dict["fallbackPrice"] as? NSNumber
+                        let fallbackPrice = fallbackPriceNumber?.floatValue ?? 0.0
+                        var optionsMask = ProductsOptionsMask.global.rawValue
+                        if let option = dict["optionsMask"] as? NSNumber {
+                            optionsMask = option.intValue
+                        }
+                        let _ = DataModel.sharedInstance.saveProduct(managedObjectContext: context,
+                                                                           shoppable: nil, order: 0,
+                                                                           productDescription: productDescription,
+                                                                           price: price,
+                                                                           originalPrice: originalPrice,
+                                                                           floatPrice: floatPrice,
+                                                                           floatOriginalPrice: floatOriginalPrice,
+                                                                           categories: categories,
+                                                                           brand: brand,
+                                                                           offer: offer,
+                                                                           imageURL: imageURL,
+                                                                           merchant: merchant,
+                                                                           partNumber:  partNumber,
+                                                                           id: id,
+                                                                           color:  color,
+                                                                           sku: sku,
+                                                                           fallbackPrice: fallbackPrice,
+                                                                           optionsMask: Int32(optionsMask))
+                        
+                        
+                        context.saveIfNeeded()
+                        if let id = id {
+                            DispatchQueue.main.async {
+                                if let product = dataModel.retrieveProduct(managedObjectContext: DataModel.sharedInstance.mainMoc(), id: id) {
+                                    create(product: product, completion: completion)
+                                }
+                            }
+                        }
+                    }
+                })
+            }.catch { (error) in
+                Analytics.trackError(type: nil, domain: "Craze", code: 113, localizedDescription: "No product id:\(productId)")
+            }
+
         }
     }
     
