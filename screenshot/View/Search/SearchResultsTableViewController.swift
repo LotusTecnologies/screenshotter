@@ -12,7 +12,19 @@ class SearchResultsTableViewController: UITableViewController {
     var amazonItems: [AmazonItem]? {
         didSet {
             if isViewLoaded {
-//                tableView?.contentOffset = CGPoint(x: 0, y: -(tableView?.safeAreaInsets.top ?? 0))
+                tableView?.contentOffset = {
+                    var offset: CGPoint = .zero
+                    
+                    if #available(iOS 11.0, *) {
+                        offset.y = -(tableView?.safeAreaInsets.top ?? 0)
+                    }
+                    else {
+                        offset.y = -(tableView?.contentInset.top ?? 0)
+                    }
+                    
+                    return offset
+                }()
+                
                 tableView?.reloadData()
             }
         }
@@ -22,6 +34,7 @@ class SearchResultsTableViewController: UITableViewController {
         super.viewDidLoad()
         
         tableView.register(SearchResultTableViewCell.self, forCellReuseIdentifier: "cell")
+        tableView.keyboardDismissMode = .onDrag
     }
 }
 
@@ -36,11 +49,16 @@ extension SearchResultsTableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         
         if let cell = cell as? SearchResultTableViewCell, let amazonItem = amazonItems?[indexPath.row] {
-            cell.imageView?.image = UIImage(named: "FavoriteX")
+            let imageURL = URL(string: amazonItem.smallImage?.urlString ?? "")
+            let placeholderImage = UIImage(named: "DefaultProduct")
+            cell.imageView?.sd_setImage(with: imageURL, placeholderImage: placeholderImage)
+            
             cell.textLabel?.text = amazonItem.asin
 //            cell.detailTextLabel?.text = "Subtitle"
             
-            cell.detailTextLabel?.attributedText = NSAttributedString(string: "Subtitle", attributes: [
+            let price = amazonItem.offers.first?.offerListing.first?.price?.formattedPrice ?? ""
+            
+            cell.detailTextLabel?.attributedText = NSAttributedString(string: price, attributes: [
                 .foregroundColor: UIColor.red
                 ])
         }

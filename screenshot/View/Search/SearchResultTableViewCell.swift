@@ -12,7 +12,8 @@ class SearchResultTableViewCell: UITableViewCell {
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
         
-        
+        imageView?.contentMode = .scaleAspectFit
+        imageView?.widthAnchor.constraint(equalTo: contentView.heightAnchor).isActive = true
     }
     
     required init?(coder aDecoder: NSCoder) {
