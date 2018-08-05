@@ -13,7 +13,7 @@ class SearchResultTableViewCell: UITableViewCell {
         super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
         
         imageView?.contentMode = .scaleAspectFit
-        imageView?.widthAnchor.constraint(equalTo: contentView.heightAnchor).isActive = true
+//        imageView?.widthAnchor.constraint(equalTo: contentView.heightAnchor).isActive = true
     }
     
     required init?(coder aDecoder: NSCoder) {
