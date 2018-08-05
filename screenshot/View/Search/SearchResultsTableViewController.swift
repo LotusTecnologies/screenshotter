@@ -53,9 +53,9 @@ extension SearchResultsTableViewController {
             let placeholderImage = UIImage(named: "DefaultProduct")
             cell.productImageView.sd_setImage(with: imageURL, placeholderImage: placeholderImage)
             
-            cell.textLabel?.text = amazonItem.asin // ???: how to get the title
+            cell.textLabel?.text = amazonItem.itemAttributes?.brand
             
-            let description = "Cotton Lightweight Scarf" // ???: how to get the description
+            let description = amazonItem.itemAttributes?.title ?? ""
             let price = amazonItem.offers.first?.offerListing.first?.price?.formattedPrice ?? ""
             let salePrice = amazonItem.offers.first?.offerListing.first?.salePrice?.formattedPrice
             cell.detailTextLabel?.attributedText = attributedText(description: description, price: price, salePrice: salePrice)

@@ -158,6 +158,40 @@ struct AmazonOffer: XMLIndexerDeserializable {
     }
 }
 
+struct AmazonItemAttributes: XMLIndexerDeserializable {
+    let binding: String?
+    let brand: String?
+    let clothingSize: String?
+    let color: String?
+    let department: String?
+    let feature: [String]?
+    let isAdultProduct: Int?
+    let listPrice: AmazonPrice?
+    let model: String?
+    let productGroup: String?
+    let productTypeName: String?
+    let size: String?
+    let title: String?
+    
+    static func deserialize(_ node: XMLIndexer) throws -> AmazonItemAttributes {
+        return try AmazonItemAttributes(
+            binding: node["Binding"].value(),
+            brand: node["Brand"].value(),
+            clothingSize: node["ClothingSize"].value(),
+            color: node["Color"].value(),
+            department: node["Department"].value(),
+            feature: node["Feature"].value(),
+            isAdultProduct: node["IsAdultProduct"].value(),
+            listPrice: node["ListPrice"].value(),
+            model: node["Model"].value(),
+            productGroup: node["ProductGroup"].value(),
+            productTypeName: node["ProductTypeName"].value(),
+            size: node["Size"].value(),
+            title: node["Title"].value()
+        )
+    }
+}
+
 
 struct AmazonItem: XMLIndexerDeserializable {
     let asin: String // required
@@ -170,7 +204,7 @@ struct AmazonItem: XMLIndexerDeserializable {
     let mediumImage: AmazonImage?
     let largeImage: AmazonImage?
     let imageSets: [AmazonImageSet]
-//    let itemAttributes: AmazonItemAttributes?
+    let itemAttributes: AmazonItemAttributes?
 //    let variationAttributes: [AmazonVariationAttribute] // maxOccurs=1
 //    let relatedItems: AmazonRelatedItems?
 //    let collections: AmazonCollections?
@@ -200,7 +234,7 @@ struct AmazonItem: XMLIndexerDeserializable {
             mediumImage: node["MediumImage"].value(),
             largeImage: node["LargeImage"].value(),
             imageSets: node["ImageSets"]["ImageSet"].value(),
-//            itemAttributes: node["ItemAttributes"].value(),
+            itemAttributes: node["ItemAttributes"].value(),
 //            variationAttributes: node["VariationAttributes"]["VariationAttribute"].value(),
 //            relatedItems: node["RelatedItems"].value(),
 //            collections: node["Collections"].value(),

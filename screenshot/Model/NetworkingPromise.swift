@@ -877,7 +877,7 @@ extension NetworkingPromise {
         queryItems.append(URLQueryItem.init(name: "SearchIndex", value: "Fashion"))
         queryItems.append(URLQueryItem.init(name: "Availability", value: "Available"))
         queryItems.append(URLQueryItem.init(name: "Keywords", value: keywords))
-        queryItems.append(URLQueryItem.init(name: "ResponseGroup", value: "Images,Offers"))
+        queryItems.append(URLQueryItem.init(name: "ResponseGroup", value: "Images,Offers,ItemAttributes"))
         queryItems.append(URLQueryItem.init(name: "Version", value: "2013-08-01"))
         
         let dateFormatter = ISO8601DateFormatter()
