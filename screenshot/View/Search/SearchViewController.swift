@@ -69,8 +69,14 @@ extension SearchViewController: UISearchResultsUpdating {
             .then { [weak self] amazonItems in
                 self?.searchResultsViewController.amazonItems = amazonItems
             }
-            .catch { error in
+            .catch { [weak self] error in
+                // !!!: DEBUG
                 print("||| amazon error \(error)")
+                self?.searchController.searchBar.backgroundColor = .red
+                
+                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.5, execute: {
+                    self?.searchController.searchBar.backgroundColor = nil
+                })
         }
     }
 }
