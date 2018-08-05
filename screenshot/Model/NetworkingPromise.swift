@@ -878,21 +878,16 @@ extension NetworkingPromise {
         queryItems.append(URLQueryItem.init(name: "Availability", value: "Available"))
         queryItems.append(URLQueryItem.init(name: "Keywords", value: keywords))
         queryItems.append(URLQueryItem.init(name: "ResponseGroup", value: "Images,Offers"))
-
+        queryItems.append(URLQueryItem.init(name: "Version", value: "2013-08-01"))
         
         let dateFormatter = ISO8601DateFormatter()
         queryItems.append(URLQueryItem.init(name: "Timestamp", value: dateFormatter.string(from: Date())))
-//        queryItems.append(URLQueryItem.init(name: "Version", value: "2013-08-01"))
-
         
         queryItems.sort { (s1, s2) -> Bool in
-            let u1 = s1.name.decomposedStringWithCanonicalMapping.unicodeScalars
-            let u2 = s2.name.decomposedStringWithCanonicalMapping.unicodeScalars
-            for (x, y) in zip(u1, u2) {
-                if x.value < y.value { return true }
-                if x.value > y.value { return false }
-            }
-            return u1.count < u2.count
+            let u1 = NSString.init(string: "\(s1.name)=\(s1.value ?? "")")
+            let u2 = NSString.init(string: "\(s2.name)=\(s2.value ?? "")")
+            
+            return u1.compare(u2 as String, options: .literal) == ComparisonResult.orderedAscending
         }
 
         let queryItemsString = queryItems.compactMap({ (item) -> String? in
@@ -904,16 +899,15 @@ extension NetworkingPromise {
         }).joined(separator: "&")
 
         let stringToHmac = "GET\u{0A}webservices.amazon.com\u{0A}/onca/xml\u{0A}\(queryItemsString)"
-        print("stirng to hmac:\(stringToHmac)")
         let hmac_sign = stringToHmac.hmacBase64(algorithm: .SHA256, key: secretKey)
-        queryItems.append(URLQueryItem.init(name: "Signature", value: hmac_sign))
-        
+        let hmac_sign_escaped = hmac_sign.addingPercentEncoding(withAllowedCharacters: CharacterSet.init(charactersIn: "+").inverted) ?? ""
+
         components.queryItems = queryItems
         
         return Promise<[AmazonItem]> { (fulfill, reject) in
             // ???: using code 12, not sure which existing to use
             
-            guard let url = components.url else {
+            guard let urlUnsigned = components.url?.absoluteString, let url = URL.init(string: "\(urlUnsigned)&Signature=\(hmac_sign_escaped)") else {
                 reject(NSError(domain: "Craze", code: 12, userInfo: [NSLocalizedDescriptionKey : "amazon search invalid url"]))
                 return
             }
