@@ -156,15 +156,6 @@ class ProductCollectionViewManager {
     
     func productsForShoppable(_ shoppable:Shoppable, productsOptions:ProductsOptions) -> [Product] {
         
-        func stockOrder(a: Product, b: Product) -> Bool? {
-            if a.hasVariants && !b.hasVariants {
-                return true
-            } else if !a.hasVariants && b.hasVariants {
-                return false
-            } else {
-                return nil
-            }
-        }
         func titleOrder(a: Product, b: Product) -> Bool? {
             if let aDisplayTitle = a.calculatedDisplayTitle?.lowercased(),
                 let bDisplayTitle = b.calculatedDisplayTitle?.lowercased(),
@@ -187,13 +178,13 @@ class ProductCollectionViewManager {
             let productArray: [Product]
             switch productsOptions.sort {
             case .similar :
-                productArray = products.sorted { stockOrder(a: $0, b: $1) ?? ($0.order < $1.order) }
+                productArray = products.sorted { $0.order < $1.order }
             case .priceAsc :
-                productArray = products.sorted { stockOrder(a: $0, b: $1) ?? ($0.floatPrice < $1.floatPrice) }
+                productArray = products.sorted { $0.floatPrice < $1.floatPrice }
             case .priceDes :
-                productArray = products.sorted { stockOrder(a: $0, b: $1) ?? ($0.floatPrice > $1.floatPrice) }
+                productArray = products.sorted { $0.floatPrice > $1.floatPrice }
             case .brands :
-                productArray = products.sorted { stockOrder(a: $0, b: $1) ?? titleOrder(a: $0, b: $1) ?? ($0.order < $1.order) }
+                productArray = products.sorted { titleOrder(a: $0, b: $1) ?? ($0.order < $1.order) }
             }
             return productArray
         }

@@ -122,7 +122,6 @@ class OnboardingWelcomeViewController: UIViewController {
     }
     
     @objc fileprivate func continueAction() {
-        // Revert to never use USC.
         delegate?.onboardingWelcomeViewControllerDidComplete(self)
     }
 }

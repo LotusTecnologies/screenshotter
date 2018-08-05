@@ -97,13 +97,6 @@ class Analytics {
         return user.analyticsProperties
     }
     
-    static func propertiesFor(_ cart:Cart) -> [String:Any] {
-        let properties:[String:Any] = [:]
-
-
-        return properties
-    }
-    
     static func propertiesFor(_ shoppable:Shoppable) -> [String:Any] {
         var properties:[String:Any] = [:]
         
@@ -183,33 +176,6 @@ class Analytics {
         
         return properties
     }
-    static func propertiesFor(_ cartItem:CartItem) -> [String:Any] {
-        var properties:[String:Any] = [:]
-
-        if let product = cartItem.product{
-            propertiesFor(product).forEach { properties[$0] = $1 }
-        }
-        if let cart = cartItem.cart{
-            propertiesFor(cart).forEach { properties[$0] = $1 }
-        }
-        
-        properties["product-quantity"] = NSNumber(value:cartItem.quantity)
-        if let color = cartItem.color {
-            properties["product-color"] = color
-        }
-        if let size = cartItem.size {
-            properties["product-size"] = size
-        }
-        
-        properties["product-price"] = NSNumber(value:cartItem.price)
-        if let sku = cartItem.sku {
-            properties["product-sku"] = sku
-        }
-        
-        return properties
-
-    }
-
     
     static func trackTappedOnProduct(_ product: Product, atLocation location: Analytics.AnalyticsProductOpenedFromPage) {
         let displayAs:Analytics.AnalyticsProductOpenedDisplayAs = {
