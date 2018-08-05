@@ -57,9 +57,27 @@ struct AmazonPrice: XMLIndexerDeserializable {
     let formattedPrice: String // required
     
     static func deserialize(_ node: XMLIndexer) throws -> AmazonPrice {
+        let amountInt: Int? = try node["Amount"].value()
+        let curr: String? = try node["CurrencyCode"].value()
+        var amountFloat: Float?
+        if let amountInt = amountInt {
+            // See: https://en.wikipedia.org/wiki/ISO_4217
+            switch curr ?? "USD" {
+            case "BIF", "CLP", "CVE", "DJF", "GNF", "ISK", "JPY", "KMF", "KRW", "PYG", "RWF", "UGX", "UYI", "VND", "VUV", "XAF", "XOF", "XPF":
+                amountFloat = Float(amountInt)
+            case "MGA ", "MRU":
+                amountFloat = Float(amountInt) / 10.0
+            case "BHD", "IQD", "JOD", "KWD", "LYD", "OMR", "TND":
+                amountFloat = Float(amountInt) / 1_000.0
+            case "CLF":
+                amountFloat = Float(amountInt) / 10_000.0
+            default:
+                amountFloat = Float(amountInt) / 100.0
+            }
+        }
         return try AmazonPrice(
-            amount: node["Amount"].value(),
-            currencyCode: node["CurrencyCode"].value(),
+            amount: amountFloat,
+            currencyCode: curr,
             formattedPrice: node["FormattedPrice"].value()
         )
     }
