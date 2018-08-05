@@ -76,6 +76,15 @@ enum HMACAlgorithm {
 }
 
 extension String {
+    func hmacBase64(algorithm: HMACAlgorithm, key: String) -> String {
+        let cKey = key.cString(using: .utf8)
+        let cData = self.cString(using: .utf8)
+        var result = [CUnsignedChar](repeating: 0, count: Int(algorithm.digestLength()))
+        CCHmac(algorithm.toCCHmacAlgorithm(), cKey!, strlen(cKey!), cData!, strlen(cData!), &result)
+        let hmacData:NSData = NSData(bytes: result, length: (Int(algorithm.digestLength())))
+        return String.init(data: hmacData.base64EncodedData(options:.lineLength76Characters), encoding: .utf8) ?? ""
+    }
+    
     func hmac(algorithm: HMACAlgorithm, key: String) -> String {
         let cKey = key.cString(using: .utf8)
         let cData = self.cString(using: .utf8)

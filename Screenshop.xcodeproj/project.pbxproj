@@ -220,6 +220,8 @@
 		E4104DC020DC540200683FE9 /* LocalNotificationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4104DBF20DC540200683FE9 /* LocalNotificationModel.swift */; };
 		E4139D501F09083B00E8A53B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E4139D4F1F09083B00E8A53B /* Assets.xcassets */; };
 		E42AC3911F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E42AC3901F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift */; };
+		E42BCB0521061A4B0043A28A /* amazonResponse.txt in Resources */ = {isa = PBXBuildFile; fileRef = E42BCB0421061A4B0043A28A /* amazonResponse.txt */; };
+		E42BCB0721061B040043A28A /* AmazonParserModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E42BCB0621061B040043A28A /* AmazonParserModel.swift */; };
 		E44CA6FC1F41E608001CB493 /* NetworkingPromise.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44CA6FB1F41E608001CB493 /* NetworkingPromise.swift */; };
 		E49261D6206A704C006FE84E /* UIImage+craze.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49261D5206A704C006FE84E /* UIImage+craze.swift */; };
 		E4978C3C1F53610F0008B87F /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4978C3B1F53610F0008B87F /* Constants.swift */; };
@@ -486,6 +488,8 @@
 		E41D98791FE26114006EB79E /* Model 6.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 6.xcdatamodel"; sourceTree = "<group>"; };
 		E42AC3901F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenshotActivityItemProvider.swift; sourceTree = "<group>"; };
 		E42AC3921F60340B0035A07C /* Model 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 2.xcdatamodel"; sourceTree = "<group>"; };
+		E42BCB0421061A4B0043A28A /* amazonResponse.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = amazonResponse.txt; sourceTree = "<group>"; };
+		E42BCB0621061B040043A28A /* AmazonParserModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmazonParserModel.swift; sourceTree = "<group>"; };
 		E44CA6FB1F41E608001CB493 /* NetworkingPromise.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkingPromise.swift; sourceTree = "<group>"; };
 		E45C7AFE20E0235600A8B4A9 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		E47B02F01FF0EF1E0070F515 /* Model 7.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 7.xcdatamodel"; sourceTree = "<group>"; };
@@ -846,6 +850,7 @@
 				C50EE26D1FC406F1002B4259 /* Fonts */,
 				C5CAF2791FCC0EFD006F37DC /* ISO4217.plist */,
 				C53B15BC1FDD638C00658A78 /* Localizable.strings */,
+				E42BCB0421061A4B0043A28A /* amazonResponse.txt */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -901,6 +906,7 @@
 				C5CAF27B1FCC14C1006F37DC /* CurrencyModel.swift */,
 				31CE11012039570B000156EE /* FetchedResultsControllerManager.swift */,
 				E4104DBF20DC540200683FE9 /* LocalNotificationModel.swift */,
+				E42BCB0621061B040043A28A /* AmazonParserModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -1373,6 +1379,7 @@
 				C5CAF27A1FCC0EFD006F37DC /* ISO4217.plist in Resources */,
 				C5DC531B20CD3F2100E90DB8 /* Quicksand-Regular.ttf in Resources */,
 				C5DC531C20CD3F2100E90DB8 /* Quicksand-Light.ttf in Resources */,
+				E42BCB0521061A4B0043A28A /* amazonResponse.txt in Resources */,
 				C572FEFE205C00070046BFEB /* Hind-Light.ttf in Resources */,
 				C572FF02205C00070046BFEB /* Hind-Medium.ttf in Resources */,
 				E4139D501F09083B00E8A53B /* Assets.xcassets in Resources */,
@@ -1417,6 +1424,7 @@
 				"${BUILT_PRODUCTS_DIR}/PromiseKit/PromiseKit.framework",
 				"${BUILT_PRODUCTS_DIR}/RateView/RateView.framework",
 				"${BUILT_PRODUCTS_DIR}/SDWebImage/SDWebImage.framework",
+				"${BUILT_PRODUCTS_DIR}/SWXMLHash/SWXMLHash.framework",
 				"${BUILT_PRODUCTS_DIR}/SwiftLog/SwiftLog.framework",
 				"${BUILT_PRODUCTS_DIR}/Whisper/Whisper.framework",
 				"${BUILT_PRODUCTS_DIR}/leveldb-library/leveldb.framework",
@@ -1438,6 +1446,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PromiseKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RateView.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SDWebImage.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SWXMLHash.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftLog.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Whisper.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/leveldb.framework",
@@ -1541,6 +1550,7 @@
 				311A503220D90B780001D463 /* DiscoverScreenshotCollectionViewLayout.swift in Sources */,
 				C58BAE8320E101DD0051394A /* AttributedString.swift in Sources */,
 				E4104DC020DC540200683FE9 /* LocalNotificationModel.swift in Sources */,
+				E42BCB0721061B040043A28A /* AmazonParserModel.swift in Sources */,
 				5268B5261FE65E1800B7D257 /* ChangelogAlert.swift in Sources */,
 				C58BAE8620E101DD0051394A /* UIViewController.swift in Sources */,
 				316C831720C3AEBD0012A908 /* CartItem+craze.swift in Sources */,
