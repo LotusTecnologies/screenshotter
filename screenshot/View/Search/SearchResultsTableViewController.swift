@@ -51,7 +51,7 @@ extension SearchResultsTableViewController {
         if let cell = cell as? SearchResultTableViewCell, let amazonItem = amazonItems?[indexPath.row] {
             let imageURL = URL(string: amazonItem.smallImage?.urlString ?? "")
             let placeholderImage = UIImage(named: "DefaultProduct")
-            cell.imageView?.sd_setImage(with: imageURL, placeholderImage: placeholderImage)
+            cell.productImageView.sd_setImage(with: imageURL, placeholderImage: placeholderImage)
             
             cell.textLabel?.text = amazonItem.asin
 //            cell.detailTextLabel?.text = "Subtitle"
