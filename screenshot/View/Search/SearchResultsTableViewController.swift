@@ -9,6 +9,15 @@
 import UIKit
 
 class SearchResultsTableViewController: UITableViewController {
+    var amazonItems: [AmazonItem]? {
+        didSet {
+            if isViewLoaded {
+//                tableView?.contentOffset = CGPoint(x: 0, y: -(tableView?.safeAreaInsets.top ?? 0))
+                tableView?.reloadData()
+            }
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -20,15 +29,15 @@ class SearchResultsTableViewController: UITableViewController {
 
 extension SearchResultsTableViewController {
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 10
+        return amazonItems?.count ?? 0
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         
-        if let cell = cell as? SearchResultTableViewCell {
+        if let cell = cell as? SearchResultTableViewCell, let amazonItem = amazonItems?[indexPath.row] {
             cell.imageView?.image = UIImage(named: "FavoriteX")
-            cell.textLabel?.text = "Title"
+            cell.textLabel?.text = amazonItem.asin
 //            cell.detailTextLabel?.text = "Subtitle"
             
             cell.detailTextLabel?.attributedText = NSAttributedString(string: "Subtitle", attributes: [

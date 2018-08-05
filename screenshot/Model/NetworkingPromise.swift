@@ -933,12 +933,7 @@ extension NetworkingPromise {
                 let amazonParser = AmazonParserModel(xmlData: data)
                 
                 if let amazonError = amazonParser.error {
-                    let code = amazonError.code ?? "Amazon Error"
-                    let message = amazonError.message ?? "Parsing error"
-                    reject(NSError(domain: "Craze", code: 12, userInfo: [NSLocalizedDescriptionKey : "\(code): \(message)"]))
-                    
-                    // SignatureDoesNotMatch
-                    // The request signature we calculated does not match the signature you provided. Check your AWS Secret Access Key and signing method. Consult the service documentation for details.
+                    reject(NSError(domain: "Craze", code: 12, userInfo: [NSLocalizedDescriptionKey : "\(amazonError.code): \(amazonError.message)"]))
                 }
                 else if let amazonItems = amazonParser.items {
                     fulfill(amazonItems)

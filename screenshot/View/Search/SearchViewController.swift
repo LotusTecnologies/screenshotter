@@ -9,6 +9,7 @@
 import UIKit
 
 class SearchViewController: UIViewController {
+    let searchResultsViewController: SearchResultsTableViewController
     let searchController: UISearchController
     let categoriesNavigationController: UINavigationController
     
@@ -16,8 +17,8 @@ class SearchViewController: UIViewController {
         categoriesNavigationController = UINavigationController(rootViewController: SearchCategoriesViewController())
         categoriesNavigationController.navigationBar.shadowImage = UIImage()
         
-        let tableViewController = SearchResultsTableViewController(style: .plain)
-        searchController = SearchController(searchResultsController: tableViewController)
+        searchResultsViewController = SearchResultsTableViewController(style: .plain)
+        searchController = SearchController(searchResultsController: searchResultsViewController)
         
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
@@ -60,12 +61,13 @@ extension SearchViewController: UISearchBarDelegate {
 extension SearchViewController: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
         guard let text = searchController.searchBar.text, !text.isEmpty else {
+            searchResultsViewController.amazonItems = nil
             return
         }
         
         NetworkingPromise.sharedInstance.searchAmazon(keywords: text)
-            .then { amazonItems -> Void in
-                print("||| amazon items count = \(amazonItems.count)")
+            .then { [weak self] amazonItems in
+                self?.searchResultsViewController.amazonItems = amazonItems
             }
             .catch { error in
                 print("||| amazon error \(error)")

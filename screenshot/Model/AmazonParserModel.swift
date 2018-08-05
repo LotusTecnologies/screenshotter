@@ -205,8 +205,8 @@ struct AmazonItem: XMLIndexerDeserializable {
 
 
 struct AmazonErrorResponse: XMLIndexerDeserializable {
-    let code: String?
-    let message: String?
+    let code: String
+    let message: String
     
     static func deserialize(_ node: XMLIndexer) throws -> AmazonErrorResponse {
         return try AmazonErrorResponse(
@@ -216,15 +216,6 @@ struct AmazonErrorResponse: XMLIndexerDeserializable {
     }
 }
 
-/*
-<ItemSearchErrorResponse xmlns="http://ecs.amazonaws.com/doc/2005-10-05/">
-    <Error>
-        <Code>SignatureDoesNotMatch</Code>
-        <Message>The request signature we calculated does not match the signature you provided. Check your AWS Secret Access Key and signing method. Consult the service documentation for details.</Message>
-    </Error>
-    <RequestID>f82a5f66-8ba9-4bfb-831c-b2fdc3b7ea64</RequestID>
- </ItemSearchErrorResponse>
-*/
 
 class AmazonParserModel {
     let xmlIndexer: XMLIndexer
@@ -246,33 +237,4 @@ class AmazonParserModel {
         }
         return nil
     }
-    
-    
-    func xmlDataFromHardcodedFile() -> Data? {
-        guard let hardcodedPath = Bundle.main.path(forResource: "amazonResponse", ofType:"txt"),
-          let hardcodedData = try? Data(contentsOf: URL(fileURLWithPath: hardcodedPath)) else {
-            return nil
-        }
-        return hardcodedData
-    }
-    
-    func xmlString(from data: Data) -> String? {
-        let xmlString = String(data: data, encoding: .utf8)
-        return xmlString
-    }
-
-    func hardcodedParse() {
-        guard let xmlData = xmlDataFromHardcodedFile() else {
-            print("GMK no xmlData")
-            return
-        }
-        let xml = SWXMLHash.parse(xmlData)
-        if let items: [AmazonItem] = try? xml["ItemSearchResponse"]["Items"]["Item"].value() {
-            print("GMK xml:\(xml)")
-            print("GMK items:\(items)")
-        } else {
-            print("GMK extracting items array failed")
-        }
-    }
-    
 }
