@@ -59,7 +59,17 @@ extension SearchViewController: UISearchBarDelegate {
 
 extension SearchViewController: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
+        guard let text = searchController.searchBar.text, !text.isEmpty else {
+            return
+        }
         
+        NetworkingPromise.sharedInstance.searchAmazon(keywords: text)
+            .then { amazonItems -> Void in
+                print("||| amazon items count = \(amazonItems.count)")
+            }
+            .catch { error in
+                print("||| amazon error \(error)")
+        }
     }
 }
 

@@ -859,7 +859,7 @@ extension NetworkingPromise {
 //        var title:String
 //        var manufacturer:String
 //    }
-    func searchAmazon(keywords:String){
+    func searchAmazon(keywords: String) -> Promise<[AmazonItem]> {
         // RFC 3986 section 2.3
         let unreservedCharacters = CharacterSet.init(charactersIn:  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.~")
         
@@ -901,7 +901,7 @@ extension NetworkingPromise {
                 return "\(name)=\(value)"
             }
             return nil
-       }).joined(separator: "&")
+        }).joined(separator: "&")
 
         let stringToHmac = "GET\u{0A}webservices.amazon.com\u{0A}/onca/xml\u{0A}\(queryItemsString)"
         print("stirng to hmac:\(stringToHmac)")
@@ -909,21 +909,42 @@ extension NetworkingPromise {
         queryItems.append(URLQueryItem.init(name: "Signature", value: hmac_sign))
         
         components.queryItems = queryItems
-        if let url = components.url {
-            let request = URLRequest.init(url: url)
+        
+        return Promise<[AmazonItem]> { (fulfill, reject) in
+            // ???: using code 12, not sure which existing to use
             
-            print("sending request \(url.absoluteString)")
+            guard let url = components.url else {
+                reject(NSError(domain: "Craze", code: 12, userInfo: [NSLocalizedDescriptionKey : "amazon search invalid url"]))
+                return
+            }
+            
+            let request = URLRequest.init(url: url)
             let dataTask = URLSession.shared.dataTask(with: request) { (data, response, error) in
-                if let data = data,  let dataString = String.init(data: data, encoding: .utf8) {
-                    print("amazon repsonst \(dataString)")
-                    if let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
-                        let fileURL = dir.appendingPathComponent("amazonResponse.txt")
-
-                        do {
-                            try data.write(to:  fileURL)
-                        }
-                        catch {/* error handling here */}
+                guard let data = data, error == nil else {
+                    if let error = error {
+                        reject(error)
                     }
+                    else {
+                        reject(NSError(domain: "Craze", code: 12, userInfo: [NSLocalizedDescriptionKey : "amazon search no data"]))
+                    }
+                    return
+                }
+                
+                let amazonParser = AmazonParserModel(xmlData: data)
+                
+                if let amazonError = amazonParser.error {
+                    let code = amazonError.code ?? "Amazon Error"
+                    let message = amazonError.message ?? "Parsing error"
+                    reject(NSError(domain: "Craze", code: 12, userInfo: [NSLocalizedDescriptionKey : "\(code): \(message)"]))
+                    
+                    // SignatureDoesNotMatch
+                    // The request signature we calculated does not match the signature you provided. Check your AWS Secret Access Key and signing method. Consult the service documentation for details.
+                }
+                else if let amazonItems = amazonParser.items {
+                    fulfill(amazonItems)
+                }
+                else {
+                    reject(NSError(domain: "Craze", code: 12, userInfo: [NSLocalizedDescriptionKey : "amazon search unexpected data"]))
                 }
             }
             dataTask.resume()
