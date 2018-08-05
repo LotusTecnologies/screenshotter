@@ -53,17 +53,44 @@ extension SearchResultsTableViewController {
             let placeholderImage = UIImage(named: "DefaultProduct")
             cell.productImageView.sd_setImage(with: imageURL, placeholderImage: placeholderImage)
             
-            cell.textLabel?.text = amazonItem.asin
-//            cell.detailTextLabel?.text = "Subtitle"
+            cell.textLabel?.text = amazonItem.asin // ???: how to get the title
             
+            let description = "Cotton Lightweight Scarf" // ???: how to get the description
             let price = amazonItem.offers.first?.offerListing.first?.price?.formattedPrice ?? ""
-            
-            cell.detailTextLabel?.attributedText = NSAttributedString(string: price, attributes: [
-                .foregroundColor: UIColor.red
-                ])
+            let salePrice = amazonItem.offers.first?.offerListing.first?.salePrice?.formattedPrice
+            cell.detailTextLabel?.attributedText = attributedText(description: description, price: price, salePrice: salePrice)
         }
         
         return cell
+    }
+    
+    private func attributedText(description: String, price: String, salePrice: String?) -> NSAttributedString {
+        var prices = price
+        
+        if let salePrice = salePrice {
+            prices += " \(salePrice)"
+        }
+        
+        let string = "\(prices) - \(description)"
+        let attributedString = NSMutableAttributedString(string: string, attributes: [
+            .foregroundColor: UIColor.gray3
+            ])
+        
+        if let salePrice = salePrice {
+            let priceRange = NSString(string: string).range(of: price)
+            let salePriceRange = NSString(string: string).range(of: salePrice)
+            
+            if priceRange.location != NSNotFound {
+                attributedString.addAttribute(.foregroundColor, value: UIColor.gray7, range: priceRange)
+                attributedString.addAttribute(.strikethroughColor, value: UIColor.gray7, range: priceRange)
+                attributedString.addAttribute(.strikethroughStyle, value: NSUnderlineStyle.styleSingle.rawValue, range: priceRange)
+            }
+            if salePriceRange.location != NSNotFound {
+                attributedString.addAttribute(.foregroundColor, value: UIColor.crazeRed, range: salePriceRange)
+            }
+        }
+        
+        return attributedString
     }
 }
 

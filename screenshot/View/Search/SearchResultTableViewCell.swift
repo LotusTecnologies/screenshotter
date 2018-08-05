@@ -17,14 +17,15 @@ class SearchResultTableViewCell: UITableViewCell {
         if let imageView = imageView {
             imageView.image = UIImage(named: "SearchResultGuide")
             imageView.contentMode = .scaleAspectFit
+            imageView.layoutMargins = UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5)
             
             productImageView.translatesAutoresizingMaskIntoConstraints = false
             productImageView.contentMode = .scaleAspectFit
             imageView.addSubview(productImageView)
-            productImageView.topAnchor.constraint(greaterThanOrEqualTo: imageView.topAnchor, constant: 5).isActive = true
-            productImageView.leadingAnchor.constraint(greaterThanOrEqualTo: imageView.leadingAnchor, constant: 5).isActive = true
-            productImageView.bottomAnchor.constraint(lessThanOrEqualTo: imageView.bottomAnchor, constant: -5).isActive = true
-            productImageView.trailingAnchor.constraint(lessThanOrEqualTo: imageView.trailingAnchor, constant: -5).isActive = true
+            productImageView.topAnchor.constraint(greaterThanOrEqualTo: imageView.layoutMarginsGuide.topAnchor).isActive = true
+            productImageView.leadingAnchor.constraint(greaterThanOrEqualTo: imageView.layoutMarginsGuide.leadingAnchor).isActive = true
+            productImageView.bottomAnchor.constraint(lessThanOrEqualTo: imageView.layoutMarginsGuide.bottomAnchor).isActive = true
+            productImageView.trailingAnchor.constraint(lessThanOrEqualTo: imageView.layoutMarginsGuide.trailingAnchor).isActive = true
             productImageView.centerXAnchor.constraint(equalTo: imageView.centerXAnchor).isActive = true
             productImageView.centerYAnchor.constraint(equalTo: imageView.centerYAnchor).isActive = true
         }
