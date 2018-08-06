@@ -93,11 +93,17 @@ class AssetSyncModel: NSObject {
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
+    
     @objc func applicationDidBecomeActive(){
         self.lastDidBecomeActiveDate = Date()
         self.processingQ.async {
             self.shouldSendPushWhenFindFashionWithoutUserScreenshotAction = false
         }
+        self.backgroundProcessFetchedResults?.enumerateObjects({ (asset, index, pointer) in
+            if asset.isVeryRecent {
+                self.importPhotosToScreenshot(assets: [asset], source: .screenshot)
+            }
+        })
         
     }
     

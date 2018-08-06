@@ -10,6 +10,16 @@ import Foundation
 import Photos
 import PromiseKit
 extension PHAsset {
+    
+    var isVeryRecent:Bool {
+        get {
+            if let createdDate = self.creationDate {
+                return (createdDate.timeIntervalSinceNow > -60.0)
+            }
+            return false
+        }
+    }
+    
     static func assetWith(assetId:String) -> PHAsset?{
         let fetchOptions = PHFetchOptions()
         fetchOptions.predicate = NSPredicate(format: "localIdentifier == %@", assetId)
@@ -59,4 +69,6 @@ extension PHAsset {
             })
         }
     }
+    
+    
 }
