@@ -177,7 +177,7 @@ class FavoriteProductsViewController : BaseViewController {
         ScreenshotShareManager.share(product: product, in: self)
     }
     
-    @objc fileprivate func addToCartOrBuyNowProductAction(_ control: UIControl, event: UIEvent) {
+    @objc fileprivate func buyNowProductAction(_ control: UIControl, event: UIEvent) {
         guard let indexPath = tableView.indexPath(for: event), let product = self.product(at: indexPath) else {
             return
         }
@@ -295,12 +295,7 @@ extension FavoriteProductsViewController: UITableViewDataSource {
             cell.merchantLabel.text = product.merchant?.decodingHTMLEntities()
             cell.favoriteControl.isSelected = !self.unfavoriteProductsIds.contains(product.objectID)
             cell.favoriteControl.addTarget(self, action: #selector(favoriteProductAction(_:event:)), for: .touchUpInside)
-            
-           
-            cell.cartButton.setTitle("product.buy_now".localized, for: .normal)
-            
-            
-            cell.cartButton.addTarget(self, action: #selector(addToCartOrBuyNowProductAction(_:event:)), for: .touchUpInside)
+            cell.buyButton.addTarget(self, action: #selector(buyNowProductAction(_:event:)), for: .touchUpInside)
             cell.shareButton.addTarget(self, action: #selector(shareProductAction(_:event:)), for: .touchUpInside)
         }
         

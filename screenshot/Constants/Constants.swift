@@ -31,7 +31,7 @@ class Constants {
     static let openingProductKey = "openingProductKey"
     
     // DB
-    static let currentMomVersion = 22
+    static let currentMomVersion = 23
 
     // Syte
     static let syteAccountId = 6677
@@ -57,10 +57,6 @@ class Constants {
     static let buildEnvironmentSuffix = "d"
     static let appSettingsDomain = "https://api.craze-dev.com/static/config.json"
     static let whatsNewDomain = "https://api.craze-dev.com/static/whatsnew"
-    // Shoppable and Syte should point to prod until they fix their staging environment.
-    static let shoppableDomain = "https://api.shoppable.com/v3" //"https://api.shoppable.co/v3"
-    static let shoppableHosted = "https://secure.shoppable.com" //"https://secure.shoppable.co"
-    static let shoppableToken = "F81iFWJ93by99pqC22c422189db74b52" //"gD1GV3cVFGC9hk8W5927b13e5e"
     static let kocchavaGUIDKey = "koscreenshot-ios-dev-wiwhb"
 #else
     static let appSeeApiKey = "0ece18b50f7d4ef9aae3e473c28030bc"
@@ -70,9 +66,6 @@ class Constants {
     static let buildEnvironmentSuffix = ""
     static let appSettingsDomain = "https://api.craze-api.com/static/config.json"
     static let whatsNewDomain = "https://api.craze-api.com/static/whatsnew"
-    static let shoppableDomain = "https://api.shoppable.com/v3"
-    static let shoppableHosted = "https://secure.shoppable.com"
-    static let shoppableToken = "F81iFWJ93by99pqC22c422189db74b52"
     static let kocchavaGUIDKey = "koscreenshot-cq8h4"
 #endif
 

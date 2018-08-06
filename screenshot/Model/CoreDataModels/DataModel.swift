@@ -830,14 +830,6 @@ extension DataModel {
             op.queuePriority = .veryHigh // Earlier actions may have already been queued - make sure migration is at the top of the list.
             self.dbQ.addOperation(op)
         }
-        if from < 18 && to >= 18 && installDate != nil {
-            let op = BlockOperation{
-                let managedObjectContext = container.newBackgroundContext()
-                self.moveCartItemsToFavorites(managedObjectContext: managedObjectContext)
-            }
-            op.queuePriority = .veryHigh   // Earlier actions may have already been queued - make sure migration is at the top of the list.
-            self.dbQ.addOperation(op)
-        }
     }
     
     func initializeFavoritesCounts(managedObjectContext: NSManagedObjectContext) {
@@ -917,24 +909,7 @@ extension DataModel {
             print("cleanDeletedScreenshots results with error:\(error)")
         }
     }
-    
-    func moveCartItemsToFavorites(managedObjectContext: NSManagedObjectContext) {
-        let fetchRequest: NSFetchRequest<CartItem> = CartItem.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "cart.isPastOrder == FALSE")
-        fetchRequest.sortDescriptors = nil
         
-        do {
-            let results = try managedObjectContext.fetch(fetchRequest)
-            let unfavoritedProducts = Set<Product>(results.compactMap { $0.product != nil && !$0.product!.isFavorite ? $0.product : nil })
-            self.favorite(toFavorited: true, productOIDs: unfavoritedProducts.map { $0.objectID })
-            results.forEach { managedObjectContext.delete($0) }
-            try managedObjectContext.save()
-        } catch {
-            self.receivedCoreDataError(error: error)
-            print("moveCartItemsToFavorites results with error:\(error)")
-        }
-    }
-    
 }
 
 extension NSFetchedResultsController {
@@ -978,10 +953,10 @@ extension NSManagedObjectContext {
     }
     
     func productWith(objectId:NSManagedObjectID) -> Product? {
-        if let card = self.object(with: objectId) as? Product {
+        if let product = self.object(with: objectId) as? Product {
             do{
-                try card.validateForUpdate()
-                return card
+                try product.validateForUpdate()
+                return product
             }catch{
                 DataModel.sharedInstance.receivedCoreDataError(error: error)
                 
@@ -1004,10 +979,10 @@ extension NSManagedObjectContext {
     }
     
     func shoppableWith(objectId:NSManagedObjectID) -> Shoppable? {
-        if let screenshot = self.object(with: objectId) as? Shoppable {
+        if let shoppable = self.object(with: objectId) as? Shoppable {
             do{
-                try screenshot.validateForUpdate()
-                return screenshot
+                try shoppable.validateForUpdate()
+                return shoppable
             }catch{
                 DataModel.sharedInstance.receivedCoreDataError(error: error)
             }

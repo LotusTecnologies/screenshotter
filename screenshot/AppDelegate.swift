@@ -189,14 +189,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 //                        if let partNumber = productInfo["partNumber"] as? String, let price = productInfo["price"] as? Double, let title = productInfo["title"] as? String, let inStock = productInfo["inStock"] as? Bool {
 
                 if p.hasPriceAlerts, let partNumber = p.partNumber, let title = p.productTitle() {
-                    let inStock = p.hasVariants
                     let price = p.fallbackPrice
                     
                     
                     arrayOfDictionaries.append(["partNumber":partNumber,
                                                 "price":price,
-                                                "title":title,
-                                                "inStock":inStock])
+                                                "title":title])
                 }
             }
             do {

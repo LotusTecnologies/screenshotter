@@ -16,7 +16,7 @@ class FavoriteProductsTableViewCell: UITableViewCell, DynamicTypeAccessibilityLa
 
     let merchantLabel = UILabel()
     let shareButton = UIButton()
-    let cartButton = BorderButton()
+    let buyButton = BorderButton()
     
     var fontSizeStandardRangeConstraints: [NSLayoutConstraint] = []
     var fontSizeAccessibilityRangeConstraints: [NSLayoutConstraint] = []
@@ -113,18 +113,18 @@ class FavoriteProductsTableViewCell: UITableViewCell, DynamicTypeAccessibilityLa
         merchantLabel.firstBaselineAnchor.constraint(lessThanOrEqualTo: contentView.layoutMarginsGuide.bottomAnchor).isActive = true
         merchantLabel.trailingAnchor.constraint(equalTo: productImageView.trailingAnchor).isActive = true
         
-        cartButton.translatesAutoresizingMaskIntoConstraints = false
-        cartButton.setTitle("favorites.product.cart".localized, for: .normal)
-        cartButton.setTitleColor(.crazeGreen, for: .normal)
-        contentView.addSubview(cartButton)
-        cartButton.leadingAnchor.constraint(equalTo: productImageView.layoutMarginsGuide.trailingAnchor).isActive = true
-        cartButton.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor).isActive = true
-        cartButton.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
+        buyButton.translatesAutoresizingMaskIntoConstraints = false
+        buyButton.setTitle("product.buy_now".localized, for: .normal)
+        buyButton.setTitleColor(.crazeGreen, for: .normal)
+        contentView.addSubview(buyButton)
+        buyButton.leadingAnchor.constraint(equalTo: productImageView.layoutMarginsGuide.trailingAnchor).isActive = true
+        buyButton.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor).isActive = true
+        buyButton.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor).isActive = true
         
         let shareVerticalGuide = UILayoutGuide()
         contentView.addLayoutGuide(shareVerticalGuide)
         shareVerticalGuide.topAnchor.constraint(equalTo: priceLabel.bottomAnchor).isActive = true
-        shareVerticalGuide.bottomAnchor.constraint(equalTo: cartButton.topAnchor).isActive = true
+        shareVerticalGuide.bottomAnchor.constraint(equalTo: buyButton.topAnchor).isActive = true
         
         shareButton.translatesAutoresizingMaskIntoConstraints = false
         shareButton.setImage(UIImage(named: "ScreenshotShare"), for: .normal)
