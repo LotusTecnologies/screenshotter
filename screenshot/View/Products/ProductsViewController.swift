@@ -213,6 +213,10 @@ class ProductsViewController: BaseViewController {
         super.viewWillAppear(animated)
         self.updateLoadingState()
         self.collectionView?.reloadData()
+        if let assetId = self.screenshot.assetId {
+            AssetSyncModel.sharedInstance.moveScreenshotToTopOfQueue(assetId: assetId)
+        }
+
     }
     
     override func viewDidAppear(_ animated: Bool) {

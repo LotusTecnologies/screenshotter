@@ -84,6 +84,7 @@ class ProductDetailViewController: BaseViewController {
 
         
     }
+    
     func collectionView(_ collectionView: UICollectionView, shouldShowMenuForItemAt indexPath: IndexPath) -> Bool {
         if let cell = collectionView.cellForItem(at: indexPath){
             if let cell = cell as? ProductsCollectionViewCell, let imageView = cell.productImageView {
@@ -138,6 +139,9 @@ class ProductDetailViewController: BaseViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.collectionView?.reloadData()
+        if let assetId = self.shoppable?.screenshot?.assetId {
+            AssetSyncModel.sharedInstance.moveScreenshotToTopOfQueue(assetId: assetId)
+        }
     }
 }
 
