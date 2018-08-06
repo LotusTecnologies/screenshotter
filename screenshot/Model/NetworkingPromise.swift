@@ -524,7 +524,6 @@ class NetworkingPromise : NSObject {
     
     
     func getProductInfo(productId:String) -> Promise<NSDictionary>{
-        let productId = "clw7141558"
         //Use production URL even in debug.  Production is more up to date and is safe to use for get only
         guard let url = URL(string: Constants.notificationsApiEndpointProd + "/variant/" + productId) else {
             let error = NSError(domain: "Craze", code: 9, userInfo: [NSLocalizedDescriptionKey: "Cannot create URL"])
