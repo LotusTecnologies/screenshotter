@@ -18,7 +18,12 @@ class SearchCategoriesViewController: UIViewController {
         
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
-        let genderControl = UISegmentedControl(items: ["Women's", "Men's"])
+        let genderControl = UISegmentedControl(items: [
+            "search.category.gender.women".localized,
+            "search.category.gender.men".localized
+            ])
+        genderControl.selectedSegmentIndex = genderInt - 1
+        genderControl.addTarget(self, action: #selector(genderControlDidChange(_:)), for: .valueChanged)
         navigationItem.titleView = genderControl
     }
     
@@ -49,6 +54,26 @@ class SearchCategoriesViewController: UIViewController {
         collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
     }
+    
+    private var genderInt = 1 // !!!: placeholder implementation
+    
+    @objc private func genderControlDidChange(_ segmentedControl: UISegmentedControl) {
+        genderInt = segmentedControl.selectedSegmentIndex + 1
+        
+        collectionView.contentOffset = {
+            var contentOffset: CGPoint = .zero
+            
+            if #available(iOS 11.0, *) {
+                contentOffset.y = -collectionView.safeAreaInsets.top
+            }
+            else {
+                contentOffset.y = -collectionView.contentInset.top
+            }
+            
+            return contentOffset
+        }()
+        collectionView.reloadData()
+    }
 }
 
 extension SearchCategoriesViewController: UICollectionViewDataSource {
@@ -62,7 +87,7 @@ extension SearchCategoriesViewController: UICollectionViewDataSource {
         if let cell = cell as? SearchCategoryCollectionViewCell {
             let width = Int(round(cell.bounds.width))
             let height = Int(round(cell.bounds.height))
-            let url = URL(string: "https://picsum.photos/\(width)/\(height)?image=10\(indexPath.item)")
+            let url = URL(string: "https://picsum.photos/\(width)/\(height)?image=\(genderInt)0\(indexPath.item)")
             cell.imageView.sd_setImage(with: url)
             
             cell.titleLabel.text = "Category \(indexPath.item + 1)"

@@ -318,6 +318,9 @@
 
 "search.placeholder" = "Search for products...";
 
+"search.category.gender.men" = "Men's";
+"search.category.gender.women" = "Women's";
+
 "settings.contact" = "Questions? Get in touch: info@screenshopit.com";
 "settings.open_in.option.chrome" = "Chrome";
 "settings.open_in.option.embeded" = "ScreenShop";
