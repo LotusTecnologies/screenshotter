@@ -440,6 +440,18 @@ class NetworkingPromise : NSObject {
     }
     
     
+    func getProductInfo(productId:String) -> Promise<NSDictionary>{
+        //Use production URL even in debug.  Production is more up to date and is safe to use for get only
+        guard let url = URL(string: Constants.notificationsApiEndpointProd + "/variant/" + productId) else {
+            let error = NSError(domain: "Craze", code: 9, userInfo: [NSLocalizedDescriptionKey: "Cannot create URL"])
+            return Promise.init(error: error)
+            
+        }
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+
+        return URLSession.shared.dataTask(with: request).asDictionary()
+    }
     
     
     // Promises to return an AWS Subscription ARN identifying this device's subscription to our AWS cloud

@@ -173,10 +173,21 @@ extension MessageInboxViewController : UICollectionViewDelegate, UICollectionVie
                     }
                 }else if action == "product" {
                     if let productId = message.actionValue {
-                        ProductDetailViewController.create(productId: productId) { viewController in
-                            let navigationController = ModalNavigationController(rootViewController: viewController)
-                            self.present(navigationController, animated: true, completion: nil)
-                        }
+                        let cell = collectionView.cellForItem(at: indexPath) as? MessageInboxCollectionViewCell
+                        let actionButton = cell?.actionButton
+                        let actionText = message.buttonText
+                        ProductDetailViewController.create(productId: productId, startedLoadingFromServer: {
+                            actionButton?.isLoading = true
+                            actionButton?.setTitle(nil, for: .normal)
+
+                        }, completion: { (viewController) in
+                            if let viewController = viewController {
+                                let navigationController = ModalNavigationController(rootViewController: viewController)
+                                self.present(navigationController, animated: true, completion: nil)
+                            }
+                            actionButton?.setTitle(actionText, for: .normal)
+                            actionButton?.isLoading = false
+                        })
                     }
                 }
             }
