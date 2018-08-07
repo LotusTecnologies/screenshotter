@@ -93,7 +93,7 @@ extension SearchCategoriesViewController: UICollectionViewDataSource {
             let url = URL(string: "https://picsum.photos/\(width)/\(height)?image=\(genderInt)0\(indexPath.item)")
             cell.imageView.sd_setImage(with: url)
             
-            cell.titleLabel.text = searchCategory.rawValue
+            cell.titleLabel.text = searchCategory.title
         }
         
         return cell
@@ -113,7 +113,7 @@ extension SearchCategoriesViewController: UICollectionViewDelegate {
         }
         else {
             let subcategoriesViewController = SearchSubcategoriesViewController(searchCategories: searchSubcategories)
-            subcategoriesViewController.title = searchCategory.rawValue
+            subcategoriesViewController.title = searchCategory.title
             navigationController?.pushViewController(subcategoriesViewController, animated: true)
         }
     }

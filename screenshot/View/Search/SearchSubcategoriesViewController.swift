@@ -64,7 +64,7 @@ extension SearchSubcategoriesViewController: UICollectionViewDataSource {
             let url = URL(string: "https://picsum.photos/\(width)/\(height)?image=20\(indexPath.item)")
             cell.imageView.sd_setImage(with: url)
             
-            cell.titleLabel.text = searchCategories[indexPath.item].rawValue
+            cell.titleLabel.text = searchCategories[indexPath.item].title
         }
         
         return cell
