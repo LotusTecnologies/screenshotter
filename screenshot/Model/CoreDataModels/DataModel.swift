@@ -270,6 +270,7 @@ extension DataModel {
                         do{
                             try screenshot.validateForUpdate()
                             screenshot.isHidden = true
+                            screenshot.isNew = false
                             screenshot.hideWorkhorse()
                             UserAccountManager.shared.deleteScreenshot(screenshot: screenshot)
                         } catch{
