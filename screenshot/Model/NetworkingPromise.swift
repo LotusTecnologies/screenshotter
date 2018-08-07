@@ -214,9 +214,10 @@ class NetworkingPromise : NSObject {
             dataTask.resume()
         }
     }
-    func uploadToSyte(imageData: Data?, orImageUrlString:String?) -> Promise<(String, [[String : Any]])> {
+    func uploadToSyte(imageData: Data?, orImageUrlString:String?, retry:Bool) -> Promise<(String, [[String : Any]])> {
         return self.uploadToSyteURLRequest(imageData: imageData, orImageUrlString:orImageUrlString).then { request -> Promise<(String, [[String : Any]])> in
-            return self.attempt(interdelay:.seconds(2), maxRepeat: 3, body: { return self.uploadToSyteWorkHorse(request: request) }, retryableError: { (error) -> (Bool) in
+            let maxRepeat = retry ? 2 : 0
+            return self.attempt(interdelay:.seconds(2), maxRepeat: maxRepeat, body: { return self.uploadToSyteWorkHorse(request: request) }, retryableError: { (error) -> (Bool) in
                 let nsError = error as NSError
                 let retryable:Bool =  ((nsError.code == UploadToSyteError.emptyObject.errorCode  || nsError.code == UploadToSyteError.noShoppables.errorCode ) && nsError.domain == UploadToSyteError.errorDomain)
                 if retryable {

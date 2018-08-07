@@ -496,7 +496,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                 //                    return Promise.init(value: (c, image))
                 //                })
                 imageData = self.data(for: image)
-                return NetworkingPromise.sharedInstance.uploadToSyte(imageData: imageData, orImageUrlString: nil)
+                return NetworkingPromise.sharedInstance.uploadToSyte(imageData: imageData, orImageUrlString: nil, retry:false)
                 }.then(on: self.processingQ) { uploadedImageURL, syteJson -> Promise<(Data?, String, [[String : Any]])> in
                     let isRecognized = true
                     Analytics.trackReceivedResponseFromClarifai(isFashion: true, isFurniture: false)
@@ -590,7 +590,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                     //                    return Promise.init(value: (c, image))
                     //                })
                     imageData = self.data(for: image)
-                    return NetworkingPromise.sharedInstance.uploadToSyte(imageData: imageData, orImageUrlString: nil)
+                    return NetworkingPromise.sharedInstance.uploadToSyte(imageData: imageData, orImageUrlString: nil, retry:false)
                 }.then (on: self.processingQ) { args -> Promise<Bool> in
                     let (uploadedImageUrl, json) = args
                     // Store screenshot and syteJson to DB.
@@ -732,7 +732,7 @@ extension AssetSyncModel {
             }).then(on: self.processingQ) { (arg) -> Promise<(String, [[String : Any]])> in
                 
                 let (localImageData, orImageUrlString) = arg
-                return (gottenUploadedURLString != nil && gottenSegments != nil) ? Promise(value: (gottenUploadedURLString!, gottenSegments!)) : NetworkingPromise.sharedInstance.uploadToSyte(imageData: localImageData, orImageUrlString:orImageUrlString)
+                return (gottenUploadedURLString != nil && gottenSegments != nil) ? Promise(value: (gottenUploadedURLString!, gottenSegments!)) : NetworkingPromise.sharedInstance.uploadToSyte(imageData: localImageData, orImageUrlString:orImageUrlString, retry:true)
                 
                 }.then(on: self.processingQ) { uploadedURLString, segments -> Void in
                     let categoriesArray = segments.map({ (segment: [String : Any]) -> String? in segment["label"] as? String}).compactMap({$0})
@@ -1180,7 +1180,7 @@ extension AssetSyncModel {
                     }
                     if alreadyExsistingSubShoppable?.products?.count ?? 0 == 0 {
                         self.userInitiatedQueue.addOperation(AsyncOperation.init(timeout: 90, assetId: nil, shoppableId: productImageUrl, completion: { (completion) in
-                            NetworkingPromise.sharedInstance.uploadToSyte(imageData: nil, orImageUrlString: productImageUrl).then(execute: { (uploadedURLString, segments) -> Void in
+                            NetworkingPromise.sharedInstance.uploadToSyte(imageData: nil, orImageUrlString: productImageUrl, retry:true).then(execute: { (uploadedURLString, segments) -> Void in
                                 var segment:[String:Any]? = nil
                                 
                                 
