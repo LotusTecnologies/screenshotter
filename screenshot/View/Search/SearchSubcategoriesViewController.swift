@@ -9,14 +9,16 @@
 import UIKit
 
 class SearchSubcategoriesViewController: UIViewController {
+    let searchCategories: [SearchCategory]
     private let collectionViewLayout: UICollectionViewFlowLayout
     private let collectionView: UICollectionView
     
-    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+    init(searchCategories: [SearchCategory]) {
+        self.searchCategories = searchCategories
         collectionViewLayout = UICollectionViewFlowLayout()
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: collectionViewLayout)
         
-        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+        super.init(nibName: nil, bundle: nil)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -50,7 +52,7 @@ class SearchSubcategoriesViewController: UIViewController {
 
 extension SearchSubcategoriesViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 10
+        return searchCategories.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -62,7 +64,7 @@ extension SearchSubcategoriesViewController: UICollectionViewDataSource {
             let url = URL(string: "https://picsum.photos/\(width)/\(height)?image=20\(indexPath.item)")
             cell.imageView.sd_setImage(with: url)
             
-            cell.titleLabel.text = "Category \(indexPath.item + 1)"
+            cell.titleLabel.text = searchCategories[indexPath.item].rawValue
         }
         
         return cell

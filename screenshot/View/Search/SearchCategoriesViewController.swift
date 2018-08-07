@@ -89,7 +89,7 @@ extension SearchCategoriesViewController: UICollectionViewDataSource {
         {
             let width = Int(round(cell.bounds.width))
             let height = Int(round(cell.bounds.height))
-            let genderInt = currentSearchClass.rawValue + 1
+            let genderInt = currentSearchClass.intValue + 1
             let url = URL(string: "https://picsum.photos/\(width)/\(height)?image=\(genderInt)0\(indexPath.item)")
             cell.imageView.sd_setImage(with: url)
             
@@ -102,8 +102,19 @@ extension SearchCategoriesViewController: UICollectionViewDataSource {
 
 extension SearchCategoriesViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let subcategoriesViewController = SearchSubcategoriesViewController()
-        subcategoriesViewController.title = "Category \(indexPath.item + 1)"
-        navigationController?.pushViewController(subcategoriesViewController, animated: true)
+        guard let searchCategory = currentSearchClass.dataSource.section(indexPath.item),
+            let searchSubcategories = currentSearchClass.dataSource.rows(indexPath.item)
+            else {
+                return
+        }
+        
+        if searchSubcategories.isEmpty {
+            // TODO:
+        }
+        else {
+            let subcategoriesViewController = SearchSubcategoriesViewController(searchCategories: searchSubcategories)
+            subcategoriesViewController.title = searchCategory.rawValue
+            navigationController?.pushViewController(subcategoriesViewController, animated: true)
+        }
     }
 }
