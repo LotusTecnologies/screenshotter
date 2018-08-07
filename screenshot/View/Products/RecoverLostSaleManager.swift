@@ -41,7 +41,7 @@ class RecoverLostSaleManager: NSObject, MFMailComposeViewControllerDelegate {
             if let objectId = clickOnProductObjectId {
                 if let product = DataModel.sharedInstance.mainMoc().productWith(objectId: objectId) {
                     self.timeLeftApp = nil
-                    self.delegate?.recoverLostSaleManager(self, returnedFrom: product, timeSinceLeftApp: Int(round( abs(date.timeIntervalSinceNow) )))
+//                    self.delegate?.recoverLostSaleManager(self, returnedFrom: product, timeSinceLeftApp: Int(round( abs(date.timeIntervalSinceNow) )))
                 }
             }
         }
