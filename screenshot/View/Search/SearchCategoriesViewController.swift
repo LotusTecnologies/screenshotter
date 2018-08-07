@@ -18,11 +18,8 @@ class SearchCategoriesViewController: UIViewController {
         
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
-        let genderControl = UISegmentedControl(items: [
-            "search.category.gender.women".localized,
-            "search.category.gender.men".localized
-            ])
-        genderControl.selectedSegmentIndex = genderInt - 1
+        let genderControl = UISegmentedControl(items: searchClasses.map({ $0.possessiveTitle }))
+        genderControl.selectedSegmentIndex = 0
         genderControl.addTarget(self, action: #selector(genderControlDidChange(_:)), for: .valueChanged)
         navigationItem.titleView = genderControl
     }
@@ -55,10 +52,13 @@ class SearchCategoriesViewController: UIViewController {
         collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
     }
     
-    private var genderInt = 1 // !!!: placeholder implementation
+    // MARK: Search Class
+    
+    private let searchClasses: [SearchClass] = [.women, .men]
+    private var currentSearchClass: SearchClass = .women
     
     @objc private func genderControlDidChange(_ segmentedControl: UISegmentedControl) {
-        genderInt = segmentedControl.selectedSegmentIndex + 1
+        currentSearchClass = searchClasses[segmentedControl.selectedSegmentIndex]
         
         collectionView.contentOffset = {
             var contentOffset: CGPoint = .zero
@@ -78,19 +78,22 @@ class SearchCategoriesViewController: UIViewController {
 
 extension SearchCategoriesViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 20
+        return currentSearchClass.dataSource.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
         
-        if let cell = cell as? SearchCategoryCollectionViewCell {
+        if let cell = cell as? SearchCategoryCollectionViewCell,
+            let searchCategory = currentSearchClass.dataSource.section(indexPath.item)
+        {
             let width = Int(round(cell.bounds.width))
             let height = Int(round(cell.bounds.height))
+            let genderInt = currentSearchClass.rawValue + 1
             let url = URL(string: "https://picsum.photos/\(width)/\(height)?image=\(genderInt)0\(indexPath.item)")
             cell.imageView.sd_setImage(with: url)
             
-            cell.titleLabel.text = "Category \(indexPath.item + 1)"
+            cell.titleLabel.text = searchCategory.rawValue
         }
         
         return cell
