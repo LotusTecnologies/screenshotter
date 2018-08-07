@@ -16,6 +16,7 @@ import AdSupport
 import Amplitude_iOS
 import SwiftLog
 
+
 extension Bool {
     func toStringLiteral() -> String {
         return self ? "true" : "false"

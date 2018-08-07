@@ -56,7 +56,7 @@ class NetworkingPromise : NSObject {
         }
     }
 
-    func uploadToSyteWorkhorse(imageData: Data?, orImageUrlString:String?) -> Promise<URLRequest> {
+    func uploadToSyteURLRequest(imageData: Data?, orImageUrlString:String?) -> Promise<URLRequest> {
         var httpBody:Data?
         var payloadType:String = ""
         if let urlToSendToSyte = orImageUrlString {
@@ -89,58 +89,144 @@ class NetworkingPromise : NSObject {
         return Promise(value: request)
     }
 
-    func uploadToSyte(imageData: Data?, orImageUrlString:String?) -> Promise<(String, [[String : Any]])> {
-        return self.uploadToSyteWorkhorse(imageData: imageData, orImageUrlString:orImageUrlString).then { request -> Promise<(String, [[String : Any]])> in
-                return Promise { fulfill, reject in
-                    let sessionConfiguration = URLSessionConfiguration.default
-                    //        sessionConfiguration.timeoutIntervalForResource = 60  // On GPRS, even 60 seconds timeout.
-                    sessionConfiguration.timeoutIntervalForRequest = 60
-                    let dataTask = URLSession(configuration: sessionConfiguration).dataTask(with: request) { data, response, error in
-                        if let error = error {
-                            reject(error)
-                            return
-                        }
-                        guard let response = response as? HTTPURLResponse else {
-                            print("uploadToSyte invalid response")
-                            Analytics.trackReceivedUploadErrorFromSyte(imageUrl: orImageUrlString, httpStatusCode: 0, reason: "no response")
-                            reject(NSError(domain: "Craze", code: 4, userInfo: [NSLocalizedDescriptionKey : "uploadToSyte invalid response"]))
-                            return
-                        }
-                        let statusCode = response.statusCode
-                        guard statusCode >= 200 && statusCode < 300 else {
-                            if let data = data, let dataString = String(data: data, encoding: .utf8) {
-                                print("uploadToSyte invalid status code:\(statusCode)   dataString:\(dataString)   url:\(String(describing: response.url))   headers:\(response.allHeaderFields)")
-                                Analytics.trackReceivedUploadErrorFromSyte(imageUrl: orImageUrlString, httpStatusCode: statusCode, reason: dataString)
-                            } else {
-                                print("uploadToSyte invalid status code:\(statusCode)   no dataString   url:\(String(describing: response.url))   headers:\(response.allHeaderFields)")
-                                Analytics.trackReceivedUploadErrorFromSyte(imageUrl: orImageUrlString, httpStatusCode: statusCode, reason: "no data")
-                            }
-                            reject(NSError(domain: "Craze", code: 4, userInfo: [NSLocalizedDescriptionKey : "uploadToSyte invalid status code:\(statusCode)"]))
-                            return
-                        }
-                        guard let data = data else {
-                            Analytics.trackReceivedUploadErrorFromSyte(imageUrl: orImageUrlString, httpStatusCode: 200, reason: "no data")
-                            reject(NSError(domain: "Craze", code: 4, userInfo: [NSLocalizedDescriptionKey : "uploadToSyte no data"]))
-                            return
-                        }
-                        guard let responseObjectDict = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [String: Any] else {
-                            print("uploadToSyte invalid response object dictionary")
-                            Analytics.trackReceivedUploadErrorFromSyte(imageUrl: orImageUrlString, httpStatusCode: 200, reason: "bad dictionary")
-                            reject(NSError(domain: "Craze", code: 4, userInfo: [NSLocalizedDescriptionKey : "uploadToSyte invalid response object dictionary"]))
-                            return
-                        }
-                        guard let uploadedURLString = responseObjectDict.keys.first,
-                            let segments = responseObjectDict[uploadedURLString] as? [[String : Any]],
-                            segments.count > 0 else {
-                                let emptyError = NSError(domain: "Craze", code: 4, userInfo: [NSLocalizedDescriptionKey : "uploadToSyte returned no segments"])
-                                print("uploadToSyte no segments. responseObjectDict:\(responseObjectDict)")
-                                reject(emptyError)
-                                return
-                        }
-                        fulfill((uploadedURLString, segments))
-                    }
-                    dataTask.resume()
+    
+    enum UploadToSyteError : Error {
+        case unknown
+        case invalidResponse
+        case not200
+        case noData
+        case cannotParseJson
+        case jsonIsNotObjectWithStringKeys
+        case emptyObject
+        case shopablesIsNotArrayWithStringKeys
+        case noShoppables
+        public static var errorDomain: String {
+            return "io.crazeapp.screenshot.networkPromise.uploadToSyte"
+        }
+        public var errorCode: Int {
+            switch self {
+            case .unknown:
+                return -1
+            case .invalidResponse:
+                return 1
+            case .not200:
+                return 2
+            case .noData:
+                return 3
+            case .cannotParseJson:
+                return 4
+            case .jsonIsNotObjectWithStringKeys:
+                return 5
+            case .emptyObject:
+                return 6
+            case .shopablesIsNotArrayWithStringKeys:
+                return 7
+            case .noShoppables:
+                return 8
+            
+            
+            }
+        }
+        public var localizedDescription: String {
+            switch self {
+            case .unknown:
+                return "uploadToSyte internal coding error"
+            case .invalidResponse:
+                return "uploadToSyte invalid response"
+            case .not200:
+                return "uploadToSyte invalid status code"
+            case .noData:
+                return "uploadToSyte no data"
+            case .cannotParseJson:
+                return "uploadToSyte invalid json"
+            case .jsonIsNotObjectWithStringKeys:
+                return "uploadToSyte invalid response object dictionary"
+            case .emptyObject:
+                return "uploadToSyte empty object"
+            case .shopablesIsNotArrayWithStringKeys:
+                return "shopables is not an array with string"
+            case .noShoppables:
+                return "uploadToSyte returned no segments"
+            }
+        }
+    
+    }
+    func parseSyteResponse(data:Data?, response:URLResponse?, error:Error?) -> (NSError?, (String, [[String : Any]])?) {
+        if let error = error {
+            return (error as NSError, nil)
+        }
+        guard let response = response as? HTTPURLResponse else {
+            let error = UploadToSyteError.invalidResponse
+            return (NSError(domain: UploadToSyteError.errorDomain, code: error.errorCode, userInfo: [NSLocalizedDescriptionKey : error.localizedDescription]), nil)
+        }
+
+        guard response.statusCode >= 200 && response.statusCode < 300 else {
+            let error = UploadToSyteError.not200
+            var reason = error.localizedDescription
+            if let data = data, let dataString = String(data: data, encoding: .utf8) {
+                reason = dataString
+            }
+            return (NSError(domain: UploadToSyteError.errorDomain, code: error.errorCode, userInfo: [NSLocalizedDescriptionKey : reason,"statusCode":response.statusCode]), nil)
+        }
+        guard let data = data else {
+            let error = UploadToSyteError.noData
+            return (NSError(domain: UploadToSyteError.errorDomain, code: error.errorCode, userInfo: [NSLocalizedDescriptionKey : error.localizedDescription,"statusCode":response.statusCode]), nil)
+
+        }
+        guard let responseObject = (try? JSONSerialization.jsonObject(with: data, options: [])) else{
+            let error = UploadToSyteError.cannotParseJson
+            return (NSError(domain: UploadToSyteError.errorDomain, code: error.errorCode, userInfo: [NSLocalizedDescriptionKey : error.localizedDescription,"statusCode":response.statusCode]), nil)
+        }
+        guard let responseObjectDict = responseObject as? [String: Any] else {
+            let error = UploadToSyteError.jsonIsNotObjectWithStringKeys
+            return (NSError(domain: UploadToSyteError.errorDomain, code: error.errorCode, userInfo: [NSLocalizedDescriptionKey : error.localizedDescription,"statusCode":response.statusCode]), nil)
+        }
+        guard let uploadedURLString = responseObjectDict.keys.first else {
+            let error = UploadToSyteError.emptyObject
+            return (NSError(domain: UploadToSyteError.errorDomain, code: error.errorCode, userInfo: [NSLocalizedDescriptionKey : error.localizedDescription,"statusCode":response.statusCode]), nil)
+        }
+        guard let segments = responseObjectDict[uploadedURLString] as? [[String : Any]] else{
+            let error = UploadToSyteError.shopablesIsNotArrayWithStringKeys
+            return (NSError(domain: UploadToSyteError.errorDomain, code: error.errorCode, userInfo: [NSLocalizedDescriptionKey : error.localizedDescription,"statusCode":response.statusCode]), nil)
+        }
+        guard segments.count > 0 else {
+            let error = UploadToSyteError.noShoppables
+            return (NSError(domain: UploadToSyteError.errorDomain, code: error.errorCode, userInfo: [NSLocalizedDescriptionKey : error.localizedDescription,"statusCode":response.statusCode]), nil)
+        }
+        return (nil, (uploadedURLString, segments))
+    }
+    func uploadToSyteWorkHorse( request:URLRequest) -> Promise<(String, [[String : Any]])> {
+        return Promise { fulfill, reject in
+            let sessionConfiguration = URLSessionConfiguration.default
+            //        sessionConfiguration.timeoutIntervalForResource = 60  // On GPRS, even 60 seconds timeout.
+            sessionConfiguration.timeoutIntervalForRequest = 60
+            let dataTask = URLSession(configuration: sessionConfiguration).dataTask(with: request) { data, response, error in
+                let (error, tuple) = self.parseSyteResponse(data: data, response: response, error: error)
+                if let error = error {
+                    reject(error)
+                }else if let tuple = tuple{
+                    fulfill(tuple)
+                }else{
+                    //unexpected
+                    reject(UploadToSyteError.unknown)
                 }
+            }
+            dataTask.resume()
+        }
+    }
+    func uploadToSyte(imageData: Data?, orImageUrlString:String?) -> Promise<(String, [[String : Any]])> {
+        return self.uploadToSyteURLRequest(imageData: imageData, orImageUrlString:orImageUrlString).then { request -> Promise<(String, [[String : Any]])> in
+            return self.attempt(interdelay:.seconds(2), maxRepeat: 3, body: { return self.uploadToSyteWorkHorse(request: request) }, retryableError: { (error) -> (Bool) in
+                let nsError = error as NSError
+                let retryable:Bool =  ((nsError.code == UploadToSyteError.emptyObject.errorCode  || nsError.code == UploadToSyteError.noShoppables.errorCode ) && nsError.domain == UploadToSyteError.errorDomain)
+                if retryable {
+                    Analytics.trackDevLog(file:  NSString.init(string: #file).lastPathComponent, line: #line, message: "retrying {} or {id:[]} response from syte")
+                }
+                return retryable
+            }).catch(execute: { (error) in
+                let nsError = error as NSError
+                Analytics.trackReceivedUploadErrorFromSyte(imageUrl: orImageUrlString, httpStatusCode: (nsError.userInfo["statusCode"] as? Int), reason: error.localizedDescription)
+            })
         }
     }
     
@@ -235,13 +321,18 @@ class NetworkingPromise : NSObject {
     }
     
     // See: https://github.com/mxcl/PromiseKit/blob/master/Documentation/CommonPatterns.md
-    func attempt<T>(interdelay: DispatchTimeInterval = .seconds(2), maxRepeat: Int = 3, body: @escaping () -> Promise<T>) -> Promise<T> {
+    func attempt<T>(interdelay: DispatchTimeInterval = .seconds(2), maxRepeat: Int = 3, body: @escaping () -> Promise<T>, retryableError: ((Error)->(Bool))? = nil) -> Promise<T> {
         var attempts = 0
         
         func attempt() -> Promise<T> {
             attempts += 1
             return body().recover { error -> Promise<T> in
                 guard attempts < maxRepeat else { throw error }
+                if let retryableError = retryableError {
+                    if !retryableError(error) {
+                        throw error
+                    }
+                }
                 return after(interval: interdelay).then {
                     return attempt()
                 }
