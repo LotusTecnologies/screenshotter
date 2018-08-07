@@ -107,7 +107,7 @@ class AssetSyncModel: NSObject {
                             self.importPhotosToScreenshot(assets: [asset], source: .screenshot)
                         }
                     }else{
-                        
+                        // will be added when "clarifai" style processing is done
                     }
                 })
             }
