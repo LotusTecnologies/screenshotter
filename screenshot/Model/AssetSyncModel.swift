@@ -93,11 +93,25 @@ class AssetSyncModel: NSObject {
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
+    
     @objc func applicationDidBecomeActive(){
         self.lastDidBecomeActiveDate = Date()
         self.processingQ.async {
             self.shouldSendPushWhenFindFashionWithoutUserScreenshotAction = false
         }
+        self.backgroundProcessFetchedResults?.enumerateObjects({ (asset, index, pointer) in
+            if asset.isVeryRecent {
+                DataModel.sharedInstance.performBackgroundTask({ (context) in
+                    if let screenshot = context.screenshotWith(assetId: asset.localIdentifier) {
+                        if screenshot.isRecognized && screenshot.isNew{
+                            self.importPhotosToScreenshot(assets: [asset], source: .screenshot)
+                        }
+                    }else{
+                        // will be added when "clarifai" style processing is done
+                    }
+                })
+            }
+        })
         
     }
     
@@ -527,14 +541,18 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                         
                     }
                 }.then (on: self.processingQ) { imageData, gottenUploadedURLString, gottenSegments -> Void in
-                    // Screenshot taken while app in background (or killed)
-                    AccumulatorModel.screenshot.addAssetId(asset.localIdentifier)
-                    AccumulatorModel.screenshotUninformed.incrementUninformedCount()
-                    if  ApplicationStateModel.sharedInstance.isBackground() {
-                        DispatchQueue.main.async {
-                            // The accumulator updates the count in an async block.
-                            // Without a delay the count is wrong when setting the content.badge.
-                            LocalNotificationModel.shared.sendScreenshotAddedLocalNotification(assetId: asset.localIdentifier, imageData: imageData)
+                    if let lastDidBecomeActiveDate = self.lastDidBecomeActiveDate, let creationDate = asset.creationDate,  creationDate.timeIntervalSince(lastDidBecomeActiveDate) > -60.0 && ApplicationStateModel.sharedInstance.isActive(){
+                        self.uploadPhoto(asset: asset, source: .screenshot)
+                    }else{
+                        // Screenshot taken while app in background (or killed)
+                        AccumulatorModel.screenshot.addAssetId(asset.localIdentifier)
+                        AccumulatorModel.screenshotUninformed.incrementUninformedCount()
+                        if  ApplicationStateModel.sharedInstance.isBackground() {
+                            DispatchQueue.main.async {
+                                // The accumulator updates the count in an async block.
+                                // Without a delay the count is wrong when setting the content.badge.
+                                LocalNotificationModel.shared.sendScreenshotAddedLocalNotification(assetId: asset.localIdentifier, imageData: imageData)
+                            }
                         }
                     }
                 }.catch { error in
@@ -620,13 +638,18 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                 }.then(on: self.processingQ) { aBool -> Void in
                     self.performBackgroundTask(assetId: nil, shoppableId: nil) { (managedObjectContext) in
                         if let _ = managedObjectContext.screenshotWith(assetId: asset.localIdentifier) {
-                            AccumulatorModel.screenshot.addAssetId(asset.localIdentifier)
-                            AccumulatorModel.screenshotUninformed.incrementUninformedCount()
-                            if self.shouldSendPushWhenFindFashionWithoutUserScreenshotAction && ApplicationStateModel.sharedInstance.isBackground(){
-                                self.processingQ.async {
-                                    if self.shouldSendPushWhenFindFashionWithoutUserScreenshotAction && ApplicationStateModel.sharedInstance.isBackground(){  //need to check twice due to async craziness
-                                        self.shouldSendPushWhenFindFashionWithoutUserScreenshotAction = false
-                                        LocalNotificationModel.shared.sendScreenshotAddedLocalNotification(assetId: asset.localIdentifier, imageData: imageData)
+                            
+                            if let lastDidBecomeActiveDate = self.lastDidBecomeActiveDate, let creationDate = asset.creationDate,  creationDate.timeIntervalSince(lastDidBecomeActiveDate) > -60.0 && ApplicationStateModel.sharedInstance.isActive(){
+                                self.uploadPhoto(asset: asset, source: .screenshot)
+                            }else{
+                                AccumulatorModel.screenshot.addAssetId(asset.localIdentifier)
+                                AccumulatorModel.screenshotUninformed.incrementUninformedCount()
+                                if self.shouldSendPushWhenFindFashionWithoutUserScreenshotAction && ApplicationStateModel.sharedInstance.isBackground(){
+                                    self.processingQ.async {
+                                        if self.shouldSendPushWhenFindFashionWithoutUserScreenshotAction && ApplicationStateModel.sharedInstance.isBackground(){  //need to check twice due to async craziness
+                                            self.shouldSendPushWhenFindFashionWithoutUserScreenshotAction = false
+                                            LocalNotificationModel.shared.sendScreenshotAddedLocalNotification(assetId: asset.localIdentifier, imageData: imageData)
+                                        }
                                     }
                                 }
                             }

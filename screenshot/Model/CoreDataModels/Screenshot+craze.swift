@@ -68,27 +68,10 @@ extension Screenshot {
                 shoppablesSet.forEach { context.delete($0) }
             }
             shoppablesCount = -1
+            isNew = false
             syteJson = nil
             shareLink = nil
             uploadedImageURL = nil
-        }
-    }
-    
-    public func setHide() {
-        let managedObjectID = self.objectID
-        DataModel.sharedInstance.performBackgroundTask { (managedObjectContext) in
-            do {
-                guard let screenshot = managedObjectContext.object(with: managedObjectID) as? Screenshot,
-                    screenshot.isHidden == false else {
-                        return
-                }
-                screenshot.isHidden = true
-                screenshot.hideWorkhorse()
-                try managedObjectContext.save()
-            } catch {
-                DataModel.sharedInstance.receivedCoreDataError(error: error)
-                print("setHide objectID:\(managedObjectID) results with error:\(error)")
-            }
         }
     }
     
