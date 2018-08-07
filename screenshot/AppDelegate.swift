@@ -829,8 +829,8 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
                 let updatedPrice = dataDict["price"] as? Float
                 let currency = dataDict["currency"] as? String ?? "USD"
                 let subscriptionId = dataDict["subscriptionId"] as? String
-                DataModel.sharedInstance.updateProductPrice(id: id, updatedPrice: updatedPrice, updatedCurrency: currency).then(on: .main) { productOID in
-                    ProductDetailViewController.create(productOID: productOID) { viewController in
+                DataModel.sharedInstance.updateProductPrice(id: id, updatedPrice: updatedPrice, updatedCurrency: currency).then(on: .main) { id in
+                    ProductDetailViewController.create(productId: id, startedLoadingFromServer: {}) { viewController in
                         if let viewController = viewController {
                             AppDelegate.presentModally(viewController: viewController)
                         }
