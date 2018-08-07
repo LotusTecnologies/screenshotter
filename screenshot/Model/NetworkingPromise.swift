@@ -396,7 +396,7 @@ class NetworkingPromise : NSObject {
         params["rotationRate"] = 0.99
         params["filter"] = "'displayable' == true"
         params["returnProperties"] = true
-        params["includedProperties"] = "rekognition-labels,genders,itemTypes,rekognition-celebs"
+        params["includedProperties"] = "rekognition-labels,genders,itemTypes,rekognition-celebs,uid"
         if gender == .female {
             params["filter"] = "'displayable' == true AND \"female\" in 'genders'"
         }else if gender == .male{
@@ -411,18 +411,25 @@ class NetworkingPromise : NSObject {
                      UserDefaults.standard.set(true, forKey: UserDefaultsKeys.discoverDontFilter)
                 }
                 recomms.forEach({ (matchstick) in
-                    if let index = matchstick["id"] as? String {
+                    if let index = matchstick["id"] as? String
+                    {
                         var properties:[String:[String]] = [:]
                         
+                        var imageURL = "https://s3.amazonaws.com/screenshop-ordered-matchsticks/\(index).jpg"
+
                         if let values = matchstick["values"] as? [String:Any]{
                             values.forEach({ (key, value) in
                                 if let value = value as? [String] {
                                     properties[key] = value
                                 }
                             })
+                            if let uid = values["uid"] {
+                                imageURL = "https://s3.amazonaws.com/screenshop-ordered-matchsticks/byUUID/\(uid).jpg"
+                            }
                         }
                         
-                        toReturn.append(RecombeeRecommendation.init(imageURL: "https://s3.amazonaws.com/screenshop-ordered-matchsticks/\(index).jpg", remoteId: "\(index)", properties:properties))
+                        
+                        toReturn.append(RecombeeRecommendation.init(imageURL: imageURL, remoteId: "\(index)", properties:properties))
                     }
                 })
             }
