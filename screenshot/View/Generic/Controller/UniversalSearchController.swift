@@ -27,7 +27,7 @@ class UniversalSearchController {
     
     @objc func updateInboxBadgeCount() {
         if InboxMessage.inboxEnabled() {
-            let count = self.inboxUnreadCountFRC.fetchedObjectsCount
+            let count = self.inboxUnreadCountFRC.fetchedObjects.filter{ $0.showAfterDate ?? Date.init(timeIntervalSince1970: 0) < Date() }.count
             self.inboxBarButtonItems.forEach { $0.count = UInt(count) }
         }else{
             self.inboxBarButtonItems.forEach { $0.count = 0 }
