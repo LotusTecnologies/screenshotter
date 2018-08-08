@@ -11,6 +11,18 @@ import CoreData
 
 extension InboxMessage {
     
+    static func deletePendingMessage(in context:NSManagedObjectContext) {
+        let fetchRequest:NSFetchRequest<InboxMessage> = InboxMessage.fetchRequest()
+        fetchRequest.predicate = NSPredicate.init(format: "showAfterDate < %@", NSDate())
+        do{
+            let result = try context.fetch(fetchRequest)
+            result.forEach { context.delete($0) }
+            
+        }catch{
+            DataModel.sharedInstance.receivedCoreDataError(error: error)
+        }
+    }
+    
     static func inboxEnabled() ->Bool {
         return PermissionsManager.shared.permissionStatus(for: .push) == .authorized &&
             UserDefaults.standard.bool(forKey: UserDefaultsKeys.gdpr_agreedToEmail)
@@ -21,6 +33,71 @@ extension InboxMessage {
             DataModel.sharedInstance.performBackgroundTask { (context) in
                 InboxMessage.createUpdateWith(lookupDict: nil, dictionary: dict, create: true, update: false, context: context)
                 context.saveIfNeeded()
+            }
+        }
+    }
+    
+    
+    static func createUpdateWith(lookupDict:[String:InboxMessage]?, actionType:String, actionValue:String, buttonText:String, image:String, title:String, uuid:String, expireDate:Date, date:Date, showAfterDate:Date, tracking:[String:String]?, create:Bool, update:Bool, context:NSManagedObjectContext){
+        let lookup = lookupDict ?? InboxMessage.lookupWith(uuids: [uuid], in: context)
+        let foundMessage = lookup[uuid]
+        if foundMessage != nil && update == false {
+            return
+        }
+        if foundMessage == nil && create == false {
+            return
+        }
+        
+        let message = lookup[uuid] ?? InboxMessage(context: context)
+        
+        if message.uuid != uuid {
+            message.uuid = uuid
+        }
+        if message.actionType != actionType {
+            message.actionType = actionType
+        }
+        if message.actionValue != actionValue {
+            message.actionValue = actionValue
+        }
+        if message.buttonText != buttonText {
+            message.buttonText = buttonText
+        }
+        if message.image != image {
+            message.image = image
+        }
+        if message.title != title {
+            message.title = title
+        }
+        if message.title != title {
+            message.title = title
+        }
+        if message.date != date {
+            message.date = date
+        }
+        if message.expireDate != expireDate {
+            message.expireDate = expireDate
+        }
+        
+        if let tracking = tracking {
+            if JSONSerialization.isValidJSONObject(tracking), let jsonData = try? JSONSerialization.data(withJSONObject: tracking, options: []), let jsonString = String.init(data:jsonData, encoding:.utf8) {
+                if message.trackingJSON != jsonString {
+                    message.trackingJSON = jsonString
+                }
+            }
+        }else {
+            if message.trackingJSON != nil {
+                message.trackingJSON = nil
+            }
+        }
+        message.isExpired = expireDate.timeIntervalSinceNow < 0
+        if expireDate.timeIntervalSinceNow < -TimeInterval.oneWeek {
+            context.delete(message)
+        }
+        if let installDate = UserDefaults.standard.object(forKey: UserDefaultsKeys.dateInstalled) as? Date {
+            if date < installDate {
+                if message.isNew != false {
+                    message.isNew = false
+                }
             }
         }
     }
@@ -37,70 +114,24 @@ extension InboxMessage {
             let dateNumber = dictionary["date"] as? NSNumber
         {
             
-            let lookup = lookupDict ?? InboxMessage.lookupWith(uuids: [uuid], in: context)
-            let foundMessage = lookup[uuid]
-            if foundMessage != nil && update == false {
-                return
-            }
-            if foundMessage == nil && create == false {
-                return
-            }
-            
-            let message = lookup[uuid] ?? InboxMessage(context: context)
-            
             let expireDate = Date.init(timeIntervalSince1970: TimeInterval(expireNumber.intValue))
             let date = Date.init(timeIntervalSince1970: TimeInterval(dateNumber.intValue))
+             let tracking = dictionary["tracking"] as? [String:String]
             
-            if message.uuid != uuid {
-                message.uuid = uuid
-            }
-            if message.actionType != actionType {
-                message.actionType = actionType
-            }
-            if message.actionValue != actionValue {
-                message.actionValue = actionValue
-            }
-            if message.buttonText != buttonText {
-                message.buttonText = buttonText
-            }
-            if message.image != image {
-                message.image = image
-            }
-            if message.title != title {
-                message.title = title
-            }
-            if message.title != title {
-                message.title = title
-            }
-            if message.date != date {
-                message.date = date
-            }
-            if message.expireDate != expireDate {
-                message.expireDate = expireDate
-            }
-            
-            if let tracking = dictionary["tracking"] as? [String:String] {
-                if JSONSerialization.isValidJSONObject(tracking), let jsonData = try? JSONSerialization.data(withJSONObject: tracking, options: []), let jsonString = String.init(data:jsonData, encoding:.utf8) {
-                    if message.trackingJSON != jsonString {
-                        message.trackingJSON = jsonString
-                    }
-                }
-            }else {
-                if message.trackingJSON != nil {
-                    message.trackingJSON = nil
-                }
-            }
-            message.isExpired = expireDate.timeIntervalSinceNow < 0
-            if expireDate.timeIntervalSinceNow < -TimeInterval.oneWeek {
-                context.delete(message)
-            }
-            if let installDate = UserDefaults.standard.object(forKey: UserDefaultsKeys.dateInstalled) as? Date {
-                if date < installDate {
-                    if message.isNew != false {
-                        message.isNew = false
-                    }
-                }
-            }
+            createUpdateWith(lookupDict: lookupDict,
+                             actionType: actionType,
+                             actionValue: actionValue,
+                             buttonText: buttonText,
+                             image: image,
+                             title: title,
+                             uuid: uuid,
+                             expireDate: expireDate,
+                             date: date,
+                             showAfterDate: Date.init(timeIntervalSince1970: 0),
+                             tracking: tracking,
+                             create: create,
+                             update: update,
+                             context: context)
         }
     }
     

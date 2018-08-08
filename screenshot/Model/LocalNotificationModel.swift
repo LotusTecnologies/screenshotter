@@ -152,21 +152,30 @@ class LocalNotificationModel {
             print("postLatestTapped no push permission")
             return
         }
-        var imageURLString = ""
-        var productTitle = ""
+
         let identifier = LocalNotificationIdentifier.tappedProduct.rawValue
-        DataModel.sharedInstance.retrieveLatestTapped()
-            .then { imageURL, title -> Promise<URL> in
-                imageURLString = imageURL
-                productTitle = title ?? productTitle
-                return NetworkingPromise.sharedInstance.downloadTmp(from: imageURLString, identifier: identifier)
-            }.then { copiedTmpURL -> Void in
-                self.scheduleImageLocalNotification(copiedTmpURL: copiedTmpURL,
-                                                    userInfo: [Constants.openingProductKey : imageURLString],
-                                                    identifier: identifier,
-                                                    body: "notification.tapped.product.message".localized(withFormat: productTitle),
-                                                    interval: TimeInterval.oneDay)
-        }
+        DataModel.sharedInstance.performBackgroundTask({ (context) in
+
+            if let product = DataModel.sharedInstance.retrieveLatestTapped(in: context), let imageURLString = product.imageURL, let productTitle = product.productTitle(), let productId = product.id {
+                product.inNotif = true
+                context.saveIfNeeded()
+                let message = "notification.tapped.product.message".localized(withFormat: productTitle)
+                NetworkingPromise.sharedInstance.downloadTmp(from: imageURLString, identifier: identifier).then(execute: { (copiedTmpURL) -> Void in
+                    let displayFromNow = TimeInterval.oneDay
+                    self.scheduleImageLocalNotification(copiedTmpURL: copiedTmpURL,
+                                                        userInfo: [Constants.openingProductKey : imageURLString],
+                                                        identifier: identifier,
+                                                        body: message,
+                                                        interval: TimeInterval.oneDay)
+                    DataModel.sharedInstance.performBackgroundTask({ (context) in
+                        let date = Date.init(timeIntervalSinceNow:displayFromNow)
+                        let expire = Date.init(timeIntervalSinceNow:displayFromNow + 7 * .oneDay)
+                        
+                        InboxMessage.createUpdateWith(lookupDict: nil, actionType: "product", actionValue: productId, buttonText: "Buy Now", image: imageURLString, title: message, uuid: UUID().uuidString, expireDate: expire, date: date, showAfterDate: date, tracking: nil, create: true, update: false, context: context)
+                    })
+                })
+            }
+        })
     }
 
     func postSaleScreenshot() {
@@ -174,20 +183,31 @@ class LocalNotificationModel {
             print("postSaleScreenshot no push permission")
             return
         }
-        var assetIdString = ""
         let identifier = LocalNotificationIdentifier.saleScreenshot.rawValue
-        DataModel.sharedInstance.retrieveSaleScreenshot()
-            .then { assetId, imageData -> Promise<URL> in
-                assetIdString = assetId
-                return NetworkingPromise.sharedInstance.saveToTmp(data: imageData, identifier: identifier, originalExtension: "")
-            }.then { copiedTmpURL -> Void in
-                self.scheduleImageLocalNotification(copiedTmpURL: copiedTmpURL,
-                                                    userInfo: [Constants.openingScreenKey  : Constants.openingScreenValueScreenshot,
-                                                               Constants.openingAssetIdKey : assetIdString],
-                                                    identifier: identifier,
-                                                    body: "notification.sale.screenshot.message".localized,
-                                                    interval: 2 * TimeInterval.oneDay)
-        }
+        DataModel.sharedInstance.performBackgroundTask({ (context) in
+            
+            if let screenshot = DataModel.sharedInstance.retrieveSaleScreenshot(in:context), let assetIdString = screenshot.assetId, let imageData = screenshot.imageData {
+                let message = "notification.sale.screenshot.message".localized
+                NetworkingPromise.sharedInstance.saveToTmp(data: imageData, identifier: identifier, originalExtension: "").then(execute: { (copiedTmpURL) -> Void in
+                    let displayFromNow = 2 * TimeInterval.oneDay
+
+                    self.scheduleImageLocalNotification(copiedTmpURL: copiedTmpURL,
+                                                        userInfo: [Constants.openingScreenKey  : Constants.openingScreenValueScreenshot,
+                                                                   Constants.openingAssetIdKey : assetIdString],
+                                                        identifier: identifier,
+                                                        body: message,
+                                                        interval: displayFromNow)
+                    
+                    DataModel.sharedInstance.performBackgroundTask({ (context) in
+                        let date = Date.init(timeIntervalSinceNow:displayFromNow)
+                        let expire = Date.init(timeIntervalSinceNow:displayFromNow + 7 * .oneDay)
+
+                        InboxMessage.createUpdateWith(lookupDict: nil, actionType: "screenshot", actionValue: assetIdString, buttonText: "View Items", image: copiedTmpURL.absoluteString, title: message, uuid: UUID().uuidString, expireDate:expire, date: date, showAfterDate: date, tracking: nil, create: true, update: false, context: context)
+                    })
+                })
+            }
+            
+        })
     }
     
     func postLatestFavorite() {
@@ -195,23 +215,32 @@ class LocalNotificationModel {
             print("postLatestFavorite no push permission")
             return
         }
-        var imageURLString = ""
-        var category = "fav"
         let identifier = LocalNotificationIdentifier.favoritedItem.rawValue
-        DataModel.sharedInstance.retrieveLatestFavorite()
-            .then { imageURL, categories -> Promise<URL> in
-                imageURLString = imageURL
-                category = categories ?? category
-                return NetworkingPromise.sharedInstance.downloadTmp(from: imageURLString, identifier: identifier)
-            }.then { copiedTmpURL -> Void in
-                self.scheduleImageLocalNotification(copiedTmpURL: copiedTmpURL,
-                                                    userInfo: [Constants.openingProductKey : imageURLString],
-                                                    identifier: identifier,
-                                                    body: "notification.favorited.item.message".localized(withFormat: category),
-                                                    interval: 3 * TimeInterval.oneDay)
-            }.catch { (error) in
-                //"no latest favorite" or other error
-        }
+        DataModel.sharedInstance.performBackgroundTask({ (context) in
+            if let latest = DataModel.sharedInstance.retrieveLatestFavorite(in: context), let imageURLString = latest.imageURL, let productId = latest.id {
+                let category = latest.shoppable?.label ?? latest.shoppable?.parentShoppable?.label ?? latest.categories ?? "fav"
+                latest.inNotif = true
+                context.saveIfNeeded()
+
+                let message = "notification.favorited.item.message".localized(withFormat: category)
+                
+                    NetworkingPromise.sharedInstance.downloadTmp(from: imageURLString, identifier: identifier).then(execute: { (copiedTmpURL) -> Void in
+                        let displayFromNow = 3 * TimeInterval.oneDay
+
+                        self.scheduleImageLocalNotification(copiedTmpURL: copiedTmpURL,
+                                                            userInfo: [Constants.openingProductKey : imageURLString],
+                                                            identifier: identifier,
+                                                            body: message,
+                                                            interval: displayFromNow)
+                        DataModel.sharedInstance.performBackgroundTask({ (context) in
+                            let date = Date.init(timeIntervalSinceNow:displayFromNow)
+                            let expire = Date.init(timeIntervalSinceNow:displayFromNow + 7 * .oneDay)
+
+                            InboxMessage.createUpdateWith(lookupDict: nil, actionType: "product", actionValue: productId, buttonText: "Show me!", image: imageURLString, title: message, uuid: UUID().uuidString, expireDate: expire, date: date, showAfterDate: date, tracking: nil, create: true, update: false, context: context)
+                        })
+                    })
+            }
+        })
     }
     
     func scheduleInactivityDiscoverLocalNotification() {
@@ -227,6 +256,10 @@ class LocalNotificationModel {
     }
     
     func cancelPendingNotifications(within: Date? = nil) {
+        DataModel.sharedInstance.performBackgroundTask { (context) in
+            InboxMessage.deletePendingMessage(in:context)
+            context.saveIfNeeded()
+        }
         UNUserNotificationCenter.current().getPendingNotificationRequests { notificationRequestArray in
             var toCancel = [LocalNotificationIdentifier.tappedProduct.rawValue, LocalNotificationIdentifier.saleScreenshot.rawValue, LocalNotificationIdentifier.favoritedItem.rawValue, LocalNotificationIdentifier.inactivityDiscover.rawValue]
             let toCancelPotentialSet = Set<String>(toCancel)
