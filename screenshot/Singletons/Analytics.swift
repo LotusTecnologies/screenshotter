@@ -238,10 +238,20 @@ class Analytics {
         }else{
             propertiesString = String.init(describing: prop)
         }
-        if eventName == "Log", let line = properties["line"] as? Int, let file = properties["file"] as? NSString, let message =  properties["message"] as? String {
-            logw("[\(eventName) - \(message)] - \( file.lastPathComponent ):\( line )")
-        }else{
-            logw("[\(eventName)] - \( propertiesString )")
+        
+        
+        
+        func tryToLog(_ string:String) throws{
+            logw(string)
+        }
+        
+        do{
+            if eventName == "Log", let line = properties["line"] as? Int, let file = properties["file"] as? NSString, let message =  properties["message"] as? String {
+                try tryToLog("[\(eventName) - \(message)] - \( file.lastPathComponent ):\( line )")
+            }else{
+                try tryToLog("[\(eventName)] - \( propertiesString )")
+            }
+        }catch  {
         }
         
     
