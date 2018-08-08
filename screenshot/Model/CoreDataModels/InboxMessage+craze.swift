@@ -13,7 +13,7 @@ extension InboxMessage {
     
     static func deletePendingMessage(in context:NSManagedObjectContext) {
         let fetchRequest:NSFetchRequest<InboxMessage> = InboxMessage.fetchRequest()
-        fetchRequest.predicate = NSPredicate.init(format: "showAfterDate < %@", NSDate())
+        fetchRequest.predicate = NSPredicate.init(format: "showAfterDate > %@", NSDate())
         do{
             let result = try context.fetch(fetchRequest)
             result.forEach { context.delete($0) }
@@ -76,6 +76,9 @@ extension InboxMessage {
         }
         if message.expireDate != expireDate {
             message.expireDate = expireDate
+        }
+        if message.showAfterDate != showAfterDate {
+            message.showAfterDate = showAfterDate
         }
         
         if let tracking = tracking {

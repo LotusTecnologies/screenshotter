@@ -10,6 +10,7 @@ import UIKit
 import MobileCoreServices // kUTTypeImage
 import UserNotifications
 import PromiseKit
+import SDWebImage
 
 enum LocalNotificationIdentifier: String {
     case screenshotAdded        = "CrazeLocal"
@@ -156,12 +157,12 @@ class LocalNotificationModel {
         let identifier = LocalNotificationIdentifier.tappedProduct.rawValue
         DataModel.sharedInstance.performBackgroundTask({ (context) in
 
-            if let product = DataModel.sharedInstance.retrieveLatestTapped(in: context), let imageURLString = product.imageURL, let productTitle = product.productTitle(), let productId = product.id {
+            if let product = DataModel.sharedInstance.retrieveLatestTapped(in: context), let imageURLString = product.imageURL, let productTitle = product.productTitle(), let offer = product.offer {
                 product.inNotif = true
                 context.saveIfNeeded()
                 let message = "notification.tapped.product.message".localized(withFormat: productTitle)
                 NetworkingPromise.sharedInstance.downloadTmp(from: imageURLString, identifier: identifier).then(execute: { (copiedTmpURL) -> Void in
-                    let displayFromNow = TimeInterval.oneDay
+                    let displayFromNow = TimeInterval(30)
                     self.scheduleImageLocalNotification(copiedTmpURL: copiedTmpURL,
                                                         userInfo: [Constants.openingProductKey : imageURLString],
                                                         identifier: identifier,
@@ -171,7 +172,8 @@ class LocalNotificationModel {
                         let date = Date.init(timeIntervalSinceNow:displayFromNow)
                         let expire = Date.init(timeIntervalSinceNow:displayFromNow + 7 * .oneDay)
                         
-                        InboxMessage.createUpdateWith(lookupDict: nil, actionType: "product", actionValue: productId, buttonText: "Buy Now", image: imageURLString, title: message, uuid: UUID().uuidString, expireDate: expire, date: date, showAfterDate: date, tracking: nil, create: true, update: false, context: context)
+                        InboxMessage.createUpdateWith(lookupDict: nil, actionType: "link", actionValue: offer, buttonText: "Buy Now", image: imageURLString, title: message, uuid: UUID().uuidString, expireDate: expire, date: date, showAfterDate: date, tracking: nil, create: true, update: false, context: context)
+                        context.saveIfNeeded()
                     })
                 })
             }
@@ -189,20 +191,24 @@ class LocalNotificationModel {
             if let screenshot = DataModel.sharedInstance.retrieveSaleScreenshot(in:context), let assetIdString = screenshot.assetId, let imageData = screenshot.imageData {
                 let message = "notification.sale.screenshot.message".localized
                 NetworkingPromise.sharedInstance.saveToTmp(data: imageData, identifier: identifier, originalExtension: "").then(execute: { (copiedTmpURL) -> Void in
-                    let displayFromNow = 2 * TimeInterval.oneDay
-
+                    let displayFromNow = TimeInterval(40)
                     self.scheduleImageLocalNotification(copiedTmpURL: copiedTmpURL,
                                                         userInfo: [Constants.openingScreenKey  : Constants.openingScreenValueScreenshot,
                                                                    Constants.openingAssetIdKey : assetIdString],
                                                         identifier: identifier,
                                                         body: message,
                                                         interval: displayFromNow)
-                    
+                    var urlString = screenshot.uploadedImageURL ?? copiedTmpURL.absoluteString
+                    if let image =  UIImage.init(data: imageData), let url = URL.init(string: urlString) {
+                        SDWebImageManager.shared().saveImage(toCache:image, for:url)
+                    }
+
                     DataModel.sharedInstance.performBackgroundTask({ (context) in
                         let date = Date.init(timeIntervalSinceNow:displayFromNow)
                         let expire = Date.init(timeIntervalSinceNow:displayFromNow + 7 * .oneDay)
 
-                        InboxMessage.createUpdateWith(lookupDict: nil, actionType: "screenshot", actionValue: assetIdString, buttonText: "View Items", image: copiedTmpURL.absoluteString, title: message, uuid: UUID().uuidString, expireDate:expire, date: date, showAfterDate: date, tracking: nil, create: true, update: false, context: context)
+                        InboxMessage.createUpdateWith(lookupDict: nil, actionType: "screenshot", actionValue: assetIdString, buttonText: "View Items", image: urlString, title: message, uuid: UUID().uuidString, expireDate:expire, date: date, showAfterDate: date, tracking: nil, create: true, update: false, context: context)
+                        context.saveIfNeeded()
                     })
                 })
             }
@@ -225,7 +231,7 @@ class LocalNotificationModel {
                 let message = "notification.favorited.item.message".localized(withFormat: category)
                 
                     NetworkingPromise.sharedInstance.downloadTmp(from: imageURLString, identifier: identifier).then(execute: { (copiedTmpURL) -> Void in
-                        let displayFromNow = 3 * TimeInterval.oneDay
+                        let displayFromNow = TimeInterval(50.0)
 
                         self.scheduleImageLocalNotification(copiedTmpURL: copiedTmpURL,
                                                             userInfo: [Constants.openingProductKey : imageURLString],
@@ -237,6 +243,7 @@ class LocalNotificationModel {
                             let expire = Date.init(timeIntervalSinceNow:displayFromNow + 7 * .oneDay)
 
                             InboxMessage.createUpdateWith(lookupDict: nil, actionType: "product", actionValue: productId, buttonText: "Show me!", image: imageURLString, title: message, uuid: UUID().uuidString, expireDate: expire, date: date, showAfterDate: date, tracking: nil, create: true, update: false, context: context)
+                            context.saveIfNeeded()
                         })
                     })
             }
