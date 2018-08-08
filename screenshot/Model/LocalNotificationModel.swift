@@ -162,7 +162,7 @@ class LocalNotificationModel {
                 context.saveIfNeeded()
                 let message = "notification.tapped.product.message".localized(withFormat: productTitle)
                 NetworkingPromise.sharedInstance.downloadTmp(from: imageURLString, identifier: identifier).then(execute: { (copiedTmpURL) -> Void in
-                    let displayFromNow = TimeInterval(30)
+                    let displayFromNow = TimeInterval.oneDay
                     self.scheduleImageLocalNotification(copiedTmpURL: copiedTmpURL,
                                                         userInfo: [Constants.openingProductKey : imageURLString],
                                                         identifier: identifier,
@@ -191,7 +191,7 @@ class LocalNotificationModel {
             if let screenshot = DataModel.sharedInstance.retrieveSaleScreenshot(in:context), let assetIdString = screenshot.assetId, let imageData = screenshot.imageData {
                 let message = "notification.sale.screenshot.message".localized
                 NetworkingPromise.sharedInstance.saveToTmp(data: imageData, identifier: identifier, originalExtension: "").then(execute: { (copiedTmpURL) -> Void in
-                    let displayFromNow = TimeInterval(40)
+                    let displayFromNow = 2 * TimeInterval.oneDay
                     self.scheduleImageLocalNotification(copiedTmpURL: copiedTmpURL,
                                                         userInfo: [Constants.openingScreenKey  : Constants.openingScreenValueScreenshot,
                                                                    Constants.openingAssetIdKey : assetIdString],
@@ -231,7 +231,7 @@ class LocalNotificationModel {
                 let message = "notification.favorited.item.message".localized(withFormat: category)
                 
                     NetworkingPromise.sharedInstance.downloadTmp(from: imageURLString, identifier: identifier).then(execute: { (copiedTmpURL) -> Void in
-                        let displayFromNow = TimeInterval(50.0)
+                        let displayFromNow = 3 * TimeInterval.oneDay
 
                         self.scheduleImageLocalNotification(copiedTmpURL: copiedTmpURL,
                                                             userInfo: [Constants.openingProductKey : imageURLString],
