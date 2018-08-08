@@ -198,7 +198,7 @@ class LocalNotificationModel {
                                                         identifier: identifier,
                                                         body: message,
                                                         interval: displayFromNow)
-                    var urlString = screenshot.uploadedImageURL ?? copiedTmpURL.absoluteString
+                    let urlString = screenshot.uploadedImageURL ?? copiedTmpURL.absoluteString
                     if let image =  UIImage.init(data: imageData), let url = URL.init(string: urlString) {
                         SDWebImageManager.shared().saveImage(toCache:image, for:url)
                     }
