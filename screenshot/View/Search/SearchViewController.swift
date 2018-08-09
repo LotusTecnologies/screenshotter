@@ -13,6 +13,9 @@ class SearchViewController: UIViewController {
     let searchController: UISearchController
     let categoriesNavigationController: UINavigationController
     
+    private let productsOptions = ProductsOptions(provider: .amazon)
+    private let filterBarButtonItem = UIBarButtonItem(image: UIImage(named: "ProductsFilter"), style: .plain, target: nil, action: nil)
+    
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         categoriesNavigationController = UINavigationController(rootViewController: SearchCategoriesViewController())
         categoriesNavigationController.navigationBar.shadowImage = UIImage()
@@ -24,15 +27,19 @@ class SearchViewController: UIViewController {
         
         definesPresentationContext = true
         
+        productsOptions.delegate = self
+        
         searchController.delegate = self
         searchController.searchResultsUpdater = self
         searchController.dimsBackgroundDuringPresentation = true
         searchController.hidesNavigationBarDuringPresentation = false
         
-        searchController.searchBar.delegate = self
         searchController.searchBar.placeholder = "search.placeholder".localized
         searchController.searchBar.searchBarStyle = .minimal
         navigationItem.titleView = searchController.searchBar
+        
+        filterBarButtonItem.target = self
+        filterBarButtonItem.action = #selector(presentOptions)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -52,20 +59,31 @@ class SearchViewController: UIViewController {
         categoriesNavigationController.view.bottomAnchor.constraint(equalTo: view.layoutMarginsGuide.bottomAnchor).isActive = true
         categoriesNavigationController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
     }
-}
-
-extension SearchViewController: UISearchBarDelegate {
     
+    deinit {
+        productsOptions.delegate = nil
+        searchController.delegate = nil
+        searchController.searchResultsUpdater = nil
+    }
 }
 
 extension SearchViewController: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
         guard let text = searchController.searchBar.text, !text.isEmpty else {
             searchResultsViewController.amazonItems = nil
+            navigationItem.rightBarButtonItem = nil
             return
         }
         
-        NetworkingPromise.sharedInstance.searchAmazon(keywords: text)
+        if navigationItem.rightBarButtonItem != filterBarButtonItem {
+            navigationItem.setRightBarButton(filterBarButtonItem, animated: true)
+        }
+        
+        searchAmazon(text)
+    }
+    
+    private func searchAmazon(_ keywords: String) {
+        NetworkingPromise.sharedInstance.searchAmazon(keywords: keywords, options: (productsOptions.sort, productsOptions.gender, productsOptions.size))
             .then { [weak self] amazonItems in
                 self?.searchResultsViewController.amazonItems = amazonItems
             }
@@ -96,5 +114,28 @@ extension SearchViewController: UISearchControllerDelegate {
                 timer.invalidate()
             }
         }
+    }
+}
+
+extension SearchViewController: ProductsOptionsDelegate {
+    @objc private func presentOptions() {
+        Analytics.trackOpenedFiltersView()
+        present(productsOptions.viewController, animated: true)
+    }
+    
+    @objc private func dismissOptions() {
+        productsOptions.viewController.presentingViewController?.dismiss(animated: true)
+    }
+    
+    func productsOptionsDidComplete(_ productsOptions: ProductsOptions, withModelChange changed: Bool) {
+        if let text = searchController.searchBar.text, !text.isEmpty {
+            searchAmazon(text)
+        }
+        
+        dismissOptions()
+    }
+    
+    func productsOptionsDidCancel(_ productsOptions: ProductsOptions) {
+        dismissOptions()
     }
 }

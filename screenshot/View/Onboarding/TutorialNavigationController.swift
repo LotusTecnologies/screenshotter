@@ -181,7 +181,7 @@ extension TutorialNavigationController: OnboardingDetailsViewControllerDelegate 
         let gender = viewController.gender
         let size = viewController.size
         
-        if let gender = gender, let g = ProductsOptionsGender.from(string: gender) {
+        if let gender = gender, let g = ProductsOptionsGender(stringValue: gender) {
             DiscoverManager.shared.updateGender(gender: g)
         }
         

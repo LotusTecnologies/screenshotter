@@ -859,7 +859,7 @@ extension NetworkingPromise {
 //        var title:String
 //        var manufacturer:String
 //    }
-    func searchAmazon(keywords: String) -> Promise<[AmazonItem]> {
+    func searchAmazon(keywords: String, options: (sort: ProductsOptionsSort, gender: ProductsOptionsGender, size: ProductsOptionsSize)? = nil) -> Promise<[AmazonItem]> {
         // RFC 3986 section 2.3
         let unreservedCharacters = CharacterSet.init(charactersIn:  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.~")
         
@@ -870,15 +870,56 @@ extension NetworkingPromise {
         components.path = "/onca/xml"
         var queryItems:[URLQueryItem] = []
         
+        var querySearchIndex = "Fashion"
+        var querySort: String?
+        
+        if let (sort, gender, size) = options {
+            switch sort {
+            case .similar:
+                querySort = "relevancerank"
+            case .priceAsc:
+                querySort = "price"
+            case .priceDes:
+                querySort = "-price"
+            case .review:
+                querySort = "reviewrank"
+            case .popularity:
+                querySort = "popularity-rank"
+            default:
+                break
+            }
+            
+            if gender == .male {
+                if size == .adult {
+                    querySearchIndex = "FashionMen"
+                }
+                else if size == .child {
+                    querySearchIndex = "FashionBoys"
+                }
+            }
+            else if gender == .female {
+                if size == .adult {
+                    querySearchIndex = "FashionWomen"
+                }
+                else if size == .child {
+                    querySearchIndex = "FashionGirls"
+                }
+            }
+        }
+        
         queryItems.append(URLQueryItem.init(name: "Service", value: "AWSECommerceService"))
         queryItems.append(URLQueryItem.init(name: "Operation", value: "ItemSearch"))
         queryItems.append(URLQueryItem.init(name: "AWSAccessKeyId", value: "AKIAIQQSEU7DPKUSEXTA"))
         queryItems.append(URLQueryItem.init(name: "AssociateTag", value: "041897-20"))
-        queryItems.append(URLQueryItem.init(name: "SearchIndex", value: "Fashion"))
+        queryItems.append(URLQueryItem.init(name: "SearchIndex", value: querySearchIndex))
         queryItems.append(URLQueryItem.init(name: "Availability", value: "Available"))
         queryItems.append(URLQueryItem.init(name: "Keywords", value: keywords))
         queryItems.append(URLQueryItem.init(name: "ResponseGroup", value: "Images,Offers,ItemAttributes"))
         queryItems.append(URLQueryItem.init(name: "Version", value: "2013-08-01"))
+        
+        if let querySort = querySort {
+            queryItems.append(URLQueryItem.init(name: "Sort", value: querySort))
+        }
         
         let dateFormatter = ISO8601DateFormatter()
         queryItems.append(URLQueryItem.init(name: "Timestamp", value: dateFormatter.string(from: Date())))

@@ -526,10 +526,7 @@ extension ProductsViewControllerOptionsView: ProductsOptionsDelegate {
     }
     
     func dismissOptions() {
-        if let _  = self.presentedViewController as? ProductsOptionsViewController {
-            dismiss(animated: true)
-        }
-        
+        productsOptions.viewController.presentingViewController?.dismiss(animated: true)
     }
     
     func clearProductListAndStateLoading() {

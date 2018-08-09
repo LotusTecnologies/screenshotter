@@ -186,7 +186,7 @@ class ProductCollectionViewManager {
             }
             let productArray: [Product]
             switch productsOptions.sort {
-            case .similar :
+            case .similar:
                 productArray = products.sorted { stockOrder(a: $0, b: $1) ?? ($0.order < $1.order) }
             case .priceAsc :
                 productArray = products.sorted { stockOrder(a: $0, b: $1) ?? ($0.floatPrice < $1.floatPrice) }
@@ -194,6 +194,8 @@ class ProductCollectionViewManager {
                 productArray = products.sorted { stockOrder(a: $0, b: $1) ?? ($0.floatPrice > $1.floatPrice) }
             case .brands :
                 productArray = products.sorted { stockOrder(a: $0, b: $1) ?? titleOrder(a: $0, b: $1) ?? ($0.order < $1.order) }
+            default:
+                productArray = products.sorted { stockOrder(a: $0, b: $1) ?? ($0.order < $1.order) }
             }
             return productArray
         }

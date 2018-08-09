@@ -249,10 +249,10 @@ class OnboardingDetailsViewController: UIViewController {
 
     
     func syncGenderAndSizeOptions() {
-        if let genderString = self.gender, let gender = ProductsOptionsGender.from(string: genderString) {
+        if let genderString = self.gender, let gender = ProductsOptionsGender(stringValue: genderString) {
             UserDefaults.standard.set(gender.rawValue, forKey: UserDefaultsKeys.productGender)
         }
-        if let sizeString = self.size, let size = ProductsOptionsSize.from(string: sizeString) {
+        if let sizeString = self.size, let size = ProductsOptionsSize(stringValue: sizeString) {
             UserDefaults.standard.set(size.rawValue, forKey: UserDefaultsKeys.productSize)
         }
     }
