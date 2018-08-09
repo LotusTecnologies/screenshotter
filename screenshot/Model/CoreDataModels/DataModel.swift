@@ -270,6 +270,7 @@ extension DataModel {
                         do{
                             try screenshot.validateForUpdate()
                             screenshot.isHidden = true
+                            screenshot.isNew = false
                             screenshot.hideWorkhorse()
                             UserAccountManager.shared.deleteScreenshot(screenshot: screenshot)
                         } catch{
@@ -421,6 +422,79 @@ extension DataModel {
         return productToSave
     }
     
+    func saveOrphanedProduct(managedObjectContext: NSManagedObjectContext, serverDict dict: NSDictionary) -> Product? {
+        if let price = dict["price"] as? String,
+          let imageURL = dict["imageUrl"] as? String,
+          let productDescription = dict["productDescription"] as? String,
+          let offer = dict["offer"] as? String,
+          let floatPriceNumber = dict["floatPrice"] as? NSNumber {
+            let floatPrice = floatPriceNumber.floatValue
+            let originalPrice = dict["originalPrice"] as? String
+            var floatOriginalPrice: Float =  0
+            if let p = dict["floatOriginalPrice"] as? NSNumber {
+                floatOriginalPrice = p.floatValue
+            }
+            let categories = dict["categories"] as? String
+            let brand = dict["brand"] as? String
+            let merchant = dict["merchant"] as? String
+            let partNumber = dict["partNumber"] as? String
+            let id = dict["id"] as? String
+            let color = dict["color"] as? String
+            let sku = dict["sku"] as? String
+            let fallbackPriceNumber =  dict["fallbackPrice"] as? NSNumber
+            let fallbackPrice = fallbackPriceNumber?.floatValue ?? 0.0
+            var optionsMask = ProductsOptionsMask.global.rawValue
+            if let option = dict["optionsMask"] as? NSNumber {
+                optionsMask = option.intValue
+            }
+            let orphanedProduct = saveProduct(managedObjectContext: managedObjectContext,
+                                              shoppable: nil,
+                                              order: 0,
+                                              productDescription: productDescription,
+                                              price: price,
+                                              originalPrice: originalPrice,
+                                              floatPrice: floatPrice,
+                                              floatOriginalPrice: floatOriginalPrice,
+                                              categories: categories,
+                                              brand: brand,
+                                              offer: offer,
+                                              imageURL: imageURL,
+                                              merchant: merchant,
+                                              partNumber: partNumber,
+                                              id: id,
+                                              color: color,
+                                              sku: sku,
+                                              fallbackPrice: fallbackPrice,
+                                              optionsMask: Int32(optionsMask))
+            managedObjectContext.saveIfNeeded()
+            return orphanedProduct
+        }
+        return nil
+    }
+    
+    func saveOrphanedProduct(serverDict: NSDictionary) -> Promise<NSManagedObjectID> {
+        return Promise { fulfill, reject in
+            self.performBackgroundTask { managedObjectContext in
+                if let orphanedProduct = self.saveOrphanedProduct(managedObjectContext: managedObjectContext, serverDict: serverDict) {
+                    fulfill(orphanedProduct.objectID)
+                } else {
+                    reject(NSError(domain: "Craze", code: 120, userInfo: [NSLocalizedDescriptionKey : "save orphaned product fail"]))
+                }
+            }
+        }
+    }
+    
+    // Returns a Product that is from the mainMoc for the main thread.
+    func mainSafeOrphanedProduct(serverDict: NSDictionary) -> Promise<Product> {
+        return saveOrphanedProduct(serverDict: serverDict).then(on: .main) { orphanedProductOID -> Promise<Product> in
+            if let orphanedProduct = self.mainMoc().object(with: orphanedProductOID) as? Product {
+                return Promise(value: orphanedProduct)
+            } else {
+                return Promise(error: NSError(domain: "Craze", code: 121, userInfo: [NSLocalizedDescriptionKey : "retrieve orphaned product fail"]))
+            }
+        }
+    }
+    
     func retrieveProduct(managedObjectContext: NSManagedObjectContext, partNumber: String) -> Product? {
         let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "partNumber == %@", partNumber)
@@ -520,20 +594,17 @@ extension DataModel {
         }
     }
     
-    func updateProductPrice(id: String, updatedPrice: Float?, updatedCurrency: String) -> Promise<NSManagedObjectID> {
+    func updateProductPrice(id: String, updatedPrice: Float?, updatedCurrency: String) -> Promise<String> {
         return Promise { fulfill, reject in
             self.performBackgroundTask { managedObjectContext in
-                if let product = self.retrieveProduct(managedObjectContext: managedObjectContext, id: id) {
-                    if let updatedPrice = updatedPrice,
-                      let formattedUpdatePrice = self.formattedPrice(price: updatedPrice, currency: updatedCurrency) {
-                        product.floatPrice = updatedPrice
-                        product.price = formattedUpdatePrice
-                        managedObjectContext.saveIfNeeded()
-                    }
-                    fulfill(product.objectID)
-                } else {
-                    reject(NSError(domain: "Craze", code: 110, userInfo: [NSLocalizedDescriptionKey : "no product with variantID:\(id) updatedPrice:\(String(describing: updatedPrice))"]))
+                if let updatedPrice = updatedPrice,
+                  let formattedUpdatePrice = self.formattedPrice(price: updatedPrice, currency: updatedCurrency),
+                  let product = self.retrieveProduct(managedObjectContext: managedObjectContext, id: id) {
+                    product.floatPrice = updatedPrice
+                    product.price = formattedUpdatePrice
+                    managedObjectContext.saveIfNeeded()
                 }
+                fulfill(id)
             }
         }
     }
@@ -830,14 +901,6 @@ extension DataModel {
             op.queuePriority = .veryHigh // Earlier actions may have already been queued - make sure migration is at the top of the list.
             self.dbQ.addOperation(op)
         }
-        if from < 18 && to >= 18 && installDate != nil {
-            let op = BlockOperation{
-                let managedObjectContext = container.newBackgroundContext()
-                self.moveCartItemsToFavorites(managedObjectContext: managedObjectContext)
-            }
-            op.queuePriority = .veryHigh   // Earlier actions may have already been queued - make sure migration is at the top of the list.
-            self.dbQ.addOperation(op)
-        }
     }
     
     func initializeFavoritesCounts(managedObjectContext: NSManagedObjectContext) {
@@ -917,24 +980,7 @@ extension DataModel {
             print("cleanDeletedScreenshots results with error:\(error)")
         }
     }
-    
-    func moveCartItemsToFavorites(managedObjectContext: NSManagedObjectContext) {
-        let fetchRequest: NSFetchRequest<CartItem> = CartItem.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "cart.isPastOrder == FALSE")
-        fetchRequest.sortDescriptors = nil
         
-        do {
-            let results = try managedObjectContext.fetch(fetchRequest)
-            let unfavoritedProducts = Set<Product>(results.compactMap { $0.product != nil && !$0.product!.isFavorite ? $0.product : nil })
-            self.favorite(toFavorited: true, productOIDs: unfavoritedProducts.map { $0.objectID })
-            results.forEach { managedObjectContext.delete($0) }
-            try managedObjectContext.save()
-        } catch {
-            self.receivedCoreDataError(error: error)
-            print("moveCartItemsToFavorites results with error:\(error)")
-        }
-    }
-    
 }
 
 extension NSFetchedResultsController {
@@ -978,10 +1024,10 @@ extension NSManagedObjectContext {
     }
     
     func productWith(objectId:NSManagedObjectID) -> Product? {
-        if let card = self.object(with: objectId) as? Product {
+        if let product = self.object(with: objectId) as? Product {
             do{
-                try card.validateForUpdate()
-                return card
+                try product.validateForUpdate()
+                return product
             }catch{
                 DataModel.sharedInstance.receivedCoreDataError(error: error)
                 
@@ -1004,10 +1050,10 @@ extension NSManagedObjectContext {
     }
     
     func shoppableWith(objectId:NSManagedObjectID) -> Shoppable? {
-        if let screenshot = self.object(with: objectId) as? Shoppable {
+        if let shoppable = self.object(with: objectId) as? Shoppable {
             do{
-                try screenshot.validateForUpdate()
-                return screenshot
+                try shoppable.validateForUpdate()
+                return shoppable
             }catch{
                 DataModel.sharedInstance.receivedCoreDataError(error: error)
             }

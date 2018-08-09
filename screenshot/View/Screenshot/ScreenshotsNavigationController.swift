@@ -87,8 +87,10 @@ extension ScreenshotsNavigationControllerPicker {
 
 extension ScreenshotsNavigationController :ScreenshotsViewControllerDelegate{
     func screenshotsViewController(_ viewController:ScreenshotsViewController, didSelectItemAt:IndexPath) {
-        if let screenshot = viewController.screenshot(at: didSelectItemAt.item) {
-            presentScreenshot(screenshot)
+        if viewController == self.topViewController {
+            if let screenshot = viewController.screenshot(at: didSelectItemAt.item) {
+                presentScreenshot(screenshot)
+            }
         }
     }
     

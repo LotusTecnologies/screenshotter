@@ -19,10 +19,6 @@ class UserDefaultsKeys  {
     static let referralChannel = "ReferralChannel"
     static let campaign = "Campaign"
 
-    // USC
-    static let isUSC = "IsUSC"
-    static let abUSC = "AbUSC"
-
     // Screenshot
     static let newScreenshotsCount = "NewScreenshotsCount"
     static let newScreenshotsAssetIds = "NewScreenshotsAssetIds"

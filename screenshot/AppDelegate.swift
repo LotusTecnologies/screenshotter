@@ -188,14 +188,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 //                        if let partNumber = productInfo["partNumber"] as? String, let price = productInfo["price"] as? Double, let title = productInfo["title"] as? String, let inStock = productInfo["inStock"] as? Bool {
 
                 if p.hasPriceAlerts, let partNumber = p.partNumber, let title = p.productTitle() {
-                    let inStock = p.hasVariants
                     let price = p.fallbackPrice
                     
                     
                     arrayOfDictionaries.append(["partNumber":partNumber,
                                                 "price":price,
-                                                "title":title,
-                                                "inStock":inStock])
+                                                "title":title])
                 }
             }
             do {
@@ -816,7 +814,9 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
             } else if let openingProductKey = userInfo[Constants.openingProductKey] as? String {
                 isHandled = true
                 ProductDetailViewController.create(imageURL: openingProductKey) { viewController in
-                    AppDelegate.presentModally(viewController: viewController)
+                    if let viewController = viewController {
+                        AppDelegate.presentModally(viewController: viewController)
+                    }
                 }
             } else if let aps = userInfo["aps"] as? [String : Any],
               let category = aps["category"] as? String,
@@ -828,9 +828,11 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
                 let updatedPrice = dataDict["price"] as? Float
                 let currency = dataDict["currency"] as? String ?? "USD"
                 let subscriptionId = dataDict["subscriptionId"] as? String
-                DataModel.sharedInstance.updateProductPrice(id: id, updatedPrice: updatedPrice, updatedCurrency: currency).then(on: .main) { productOID in
-                    ProductDetailViewController.create(productOID: productOID) { viewController in
-                        AppDelegate.presentModally(viewController: viewController)
+                DataModel.sharedInstance.updateProductPrice(id: id, updatedPrice: updatedPrice, updatedCurrency: currency).then(on: .main) { id in
+                    ProductDetailViewController.create(productId: id, startedLoadingFromServer: {}) { viewController in
+                        if let viewController = viewController {
+                            AppDelegate.presentModally(viewController: viewController)
+                        }
                     }
                 }.catch { error in
                     Analytics.trackError(type: nil, domain: "Craze", code: 111, localizedDescription: error.localizedDescription + " subId:\(String(describing: subscriptionId))")

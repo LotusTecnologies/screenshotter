@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14135" systemVersion="17G65" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="InboxMessage" representedClassName="InboxMessage" syncable="YES" codeGenerationType="class">
+        <attribute name="actionType" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="actionValue" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="buttonText" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="expireDate" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="image" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="isExpired" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isNew" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="trackingJSON" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="uuid" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="Matchstick" representedClassName="Matchstick" syncable="YES" codeGenerationType="class">
+        <attribute name="dateSkipped" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="imageData" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES" syncable="YES"/>
+        <attribute name="imageUrl" attributeType="String" syncable="YES"/>
+        <attribute name="isDisplaying" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isFemale" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isMale" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="propertiesJson" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="receivedAt" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="recombeeRecommended" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="remoteId" attributeType="String" syncable="YES"/>
+        <attribute name="syteJson" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="trackingInfo" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="was404" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="wasAdded" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
+    </entity>
+    <entity name="Product" representedClassName="Product" syncable="YES" codeGenerationType="class">
+        <attribute name="altImageURLs" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="brand" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="categories" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="color" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="dateCheckedStock" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="dateFavorited" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="dateRetrieved" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="dateSortProductBar" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="dateViewed" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="detailedDescription" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="fallbackPrice" optional="YES" attributeType="Float" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="floatOriginalPrice" optional="YES" attributeType="Float" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="floatPrice" optional="YES" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="hasPriceAlerts" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="hideFromProductBar" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="id" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="imageURL" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="inNotif" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isFavorite" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="merchant" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="offer" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="optionsMask" attributeType="Integer 32" defaultValueString="73" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="order" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="originalPrice" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="partNumber" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="price" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="productDescription" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="sku" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="screenshot" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Screenshot" inverseName="favorites" inverseEntity="Screenshot" syncable="YES"/>
+        <relationship name="shoppable" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Shoppable" inverseName="products" inverseEntity="Shoppable" syncable="YES"/>
+    </entity>
+    <entity name="ProductFilter" representedClassName="ProductFilter" syncable="YES" codeGenerationType="class">
+        <attribute name="dateSet" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="optionsMask" attributeType="Integer 32" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="productCount" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="rating" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <relationship name="shoppable" maxCount="1" deletionRule="Nullify" destinationEntity="Shoppable" inverseName="productFilters" inverseEntity="Shoppable" syncable="YES"/>
+    </entity>
+    <entity name="Screenshot" representedClassName="Screenshot" syncable="YES" codeGenerationType="class">
+        <attribute name="assetId" attributeType="String" syncable="YES"/>
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="favoritesCount" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="imageData" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES" syncable="YES"/>
+        <attribute name="inNotif" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isFromShare" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isHidden" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isNew" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="isRecognized" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" elementID="isFashion" syncable="YES"/>
+        <attribute name="lastFavorited" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="lastModified" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="screenshotId" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="shareId" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="shareLink" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="shoppablesCount" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="sourceString" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="submittedDate" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="submittedFeedbackCount" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="submittedFeedbackCountDate" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="submittedFeedbackCountGoal" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="submittedFeedbackCountGoalDate" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="syteJson" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="trackingInfo" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="uploadedImageURL" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="favorites" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Product" inverseName="screenshot" inverseEntity="Product" syncable="YES"/>
+        <relationship name="shoppables" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Shoppable" inverseName="screenshot" inverseEntity="Shoppable" syncable="YES"/>
+    </entity>
+    <entity name="Shoppable" representedClassName="Shoppable" syncable="YES" codeGenerationType="class">
+        <attribute name="b0x" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="b0y" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="b1x" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="b1y" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="imageUrl" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="label" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="offersURL" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="order" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="productCount" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="productFilterCount" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="relatedImagesArray" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="relatedImagesURLString" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="parentShoppable" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Shoppable" inverseName="subShoppables" inverseEntity="Shoppable" syncable="YES"/>
+        <relationship name="productFilters" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="ProductFilter" inverseName="shoppable" inverseEntity="ProductFilter" syncable="YES"/>
+        <relationship name="products" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Product" inverseName="shoppable" inverseEntity="Product" syncable="YES"/>
+        <relationship name="screenshot" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Screenshot" inverseName="shoppables" inverseEntity="Screenshot" syncable="YES"/>
+        <relationship name="subShoppables" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Shoppable" inverseName="parentShoppable" inverseEntity="Shoppable" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="InboxMessage" positionX="-171" positionY="36" width="128" height="210"/>
+        <element name="Matchstick" positionX="-380" positionY="-117" width="128" height="255"/>
+        <element name="Product" positionX="-101" positionY="396" width="128" height="525"/>
+        <element name="ProductFilter" positionX="160" positionY="276" width="128" height="120"/>
+        <element name="Screenshot" positionX="-191" positionY="-114" width="128" height="435"/>
+        <element name="Shoppable" positionX="-38" positionY="18" width="128" height="300"/>
+    </elements>
+</model>
