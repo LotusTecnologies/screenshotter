@@ -143,7 +143,7 @@ struct AmazonOfferListing: XMLIndexerDeserializable {
 struct AmazonOffer: XMLIndexerDeserializable {
 //    let merchant: AmazonMerchant?
 //    let offerAttributes: AmazonOfferAttributes?
-    let offerListing: [AmazonOfferListing]
+    let offerListing: [AmazonOfferListing]?
 //    let loyaltyPoints: AmazonLoyaltyPoints?
 //    let promotions: AmazonPromotions?
 
@@ -203,14 +203,14 @@ struct AmazonItem: XMLIndexerDeserializable {
     let smallImage: AmazonImage?
     let mediumImage: AmazonImage?
     let largeImage: AmazonImage?
-    let imageSets: [AmazonImageSet]
+    let imageSets: [AmazonImageSet]?
     let itemAttributes: AmazonItemAttributes?
 //    let variationAttributes: [AmazonVariationAttribute] // maxOccurs=1
 //    let relatedItems: AmazonRelatedItems?
 //    let collections: AmazonCollections?
 //    let subjects: [String] // maxOccurs=1
     let offerSummary: AmazonOfferSummary?
-    let offers: [AmazonOffer]
+    let offers: [AmazonOffer]?
 //    let rentalOffers: [AmazonRentalOffer]
 //    let variationSummary: AmazonVariationSummary?
 //    let variations: [AmazonVariation]
