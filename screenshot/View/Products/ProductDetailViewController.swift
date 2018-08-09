@@ -86,16 +86,7 @@ class ProductDetailViewController: BaseViewController {
     }
     func collectionView(_ collectionView: UICollectionView, shouldShowMenuForItemAt indexPath: IndexPath) -> Bool {
         if let cell = collectionView.cellForItem(at: indexPath){
-            if let cell = cell as? ProductsCollectionViewCell, let imageView = cell.productImageView {
-                let product = self.productAtIndex(indexPath.item)
-                self.recoverLostSaleManager.presetRecoverAlertViewFor(product: product, in: self, rect: imageView.bounds, view: imageView, timeSinceLeftApp: nil, reason: .longPress)
-                return true
-            }
-            else if let cell = cell as? ProductHeaderCollectionViewCell, let product = self.product {
-                let imageView = cell.productImageView.imageView
-                self.recoverLostSaleManager.presetRecoverAlertViewFor(product: product, in: self, rect: imageView.bounds, view: imageView, timeSinceLeftApp: nil, reason: .longPress)
-            }
-            else if let _ = cell as? RelatedLooksCollectionViewCell {
+            if let _ = cell as? RelatedLooksCollectionViewCell {
                 let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
                 
                 self.relatedLooksManager.addScreenshotAction(actionSheet, at: indexPath)
@@ -511,12 +502,12 @@ extension ProductDetailViewController: RecoverLostSaleManagerDelegate {
         if product == self.product {
             if let cell = self.collectionView?.cellForItem(at: IndexPath.init(row: 0, section: 0)) as? ProductHeaderCollectionViewCell {
                 let view = cell.productImageView
-                self.recoverLostSaleManager.presetRecoverAlertViewFor(product: product, in: self, rect: view.bounds, view:view, timeSinceLeftApp:timeSinceLeftApp, reason: .returnedFromProductLink)
+                self.recoverLostSaleManager.presetRecoverAlertViewFor(product: product, in: self, rect: view.bounds, view:view, timeSinceLeftApp:timeSinceLeftApp)
             }
         }else {
             if let index = self.products.index(of: product) {
                 if let cell = self.collectionView?.cellForItem(at: IndexPath.init(row: index, section: 1)) as? ProductsCollectionViewCell, let view = cell.productImageView{
-                    self.recoverLostSaleManager.presetRecoverAlertViewFor(product: product, in: self, rect: view.bounds, view:view, timeSinceLeftApp:timeSinceLeftApp, reason: .returnedFromProductLink)
+                    self.recoverLostSaleManager.presetRecoverAlertViewFor(product: product, in: self, rect: view.bounds, view:view, timeSinceLeftApp:timeSinceLeftApp)
                 }
             }
         }
