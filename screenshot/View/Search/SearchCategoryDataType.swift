@@ -14,9 +14,19 @@ struct SearchRoot: Encodable {
 }
 
 struct SearchBranch: Encodable {
-    let name: SearchCategory
+    let category: SearchCategory
     let image: String?
-    let categories: [SearchBranch]?
+    let subcategories: [SearchBranch]?
+    
+    init(category: SearchCategory, image: String?, subcategories: [SearchBranch]?) {
+        self.category = category
+        self.image = image
+        self.subcategories = subcategories
+    }
+    
+    init(_ category: SearchCategory) {
+        self.init(category: category, image: nil, subcategories: nil)
+    }
 }
 
 enum SearchClass: String {
@@ -197,7 +207,7 @@ enum SearchCategory: String, Encodable {
 }
 
 extension SearchClass {
-    var dataSource: DataSource<SearchCategory, SearchCategory> {
+    var dataSource: [SearchBranch] {
         switch self {
         case .men:
             return SearchClass.menDataSource
@@ -206,7 +216,22 @@ extension SearchClass {
         }
     }
     
-    static private let menDataSource = DataSource<SearchCategory, SearchCategory>(data: [
+    static private let menDataSource = [
+        SearchBranch(category: .tops, image: nil, subcategories: [
+            SearchBranch(.dress),
+            SearchBranch(.casual),
+            SearchBranch(.polos),
+            SearchBranch(.teesAndTanks)
+            ]),
+        SearchBranch(category: .bottoms, image: nil, subcategories: [
+            SearchBranch(.jeans),
+            SearchBranch(.pants),
+            SearchBranch(.shorts),
+            SearchBranch(.sweatpants)
+            ])
+    ]
+    
+    static private let _menDataSource = DataSource<SearchCategory, SearchCategory>(data: [
         (.tops, [
             .dress,
             .casual,
@@ -259,7 +284,21 @@ extension SearchClass {
         (.sleepwear, [])
         ])
     
-    static private let womenDataSource = DataSource<SearchCategory, SearchCategory>(data: [
+    static private let womenDataSource = [
+        SearchBranch(category: .tops, image: nil, subcategories: [
+            SearchBranch(.blousesAndButtonUps),
+            SearchBranch(.cropTops),
+            SearchBranch(.bodySuits),
+            SearchBranch(.graphicTees)
+            ]),
+        SearchBranch(category: .swimwear, image: nil, subcategories: [
+            SearchBranch(.bikinis),
+            SearchBranch(.onePieces),
+            SearchBranch(.coverUps)
+            ])
+    ]
+    
+    static private let _womenDataSource = DataSource<SearchCategory, SearchCategory>(data: [
         (.tops, [
             .blousesAndButtonUps,
             .cropTops,

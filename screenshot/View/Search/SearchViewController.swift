@@ -11,15 +11,12 @@ import UIKit
 class SearchViewController: UIViewController {
     let searchResultsViewController: SearchResultsTableViewController
     let searchController: UISearchController
-    let categoriesNavigationController: UINavigationController
+    let categoriesNavigationController = SearchCategoriesNavigationController()
     
     private let productsOptions = ProductsOptions(provider: .amazon)
     private let filterBarButtonItem = UIBarButtonItem(image: UIImage(named: "ProductsFilter"), style: .plain, target: nil, action: nil)
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-        categoriesNavigationController = UINavigationController(rootViewController: SearchCategoriesViewController())
-        categoriesNavigationController.navigationBar.shadowImage = UIImage()
-        
         searchResultsViewController = SearchResultsTableViewController(style: .plain)
         searchController = SearchController(searchResultsController: searchResultsViewController)
         
