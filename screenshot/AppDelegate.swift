@@ -534,11 +534,6 @@ extension AppDelegate : KochavaTrackerDelegate {
                 return
             }
             
-            if let shareId = params["shareId"] as? String {
-                AssetSyncModel.sharedInstance.downloadScreenshot(shareId: shareId)
-                self.showScreenshotListTop()
-            }
-            
             if let channel = params["~channel"] as? String {
                 UserDefaults.standard.set(channel, forKey: UserDefaultsKeys.referralChannel)
             }
@@ -559,7 +554,24 @@ extension AppDelegate : KochavaTrackerDelegate {
             }else if let mode = params["mode"] as? String, let oobCode = params["oobCode"] as? String {
                 let _ = UserAccountManager.shared.applicationOpenLinkedWith(mode: mode, code: oobCode)
             }
+            
+            if let shareId = params["shareId"] as? String {
+                AssetSyncModel.sharedInstance.downloadScreenshot(shareId: shareId)
+                self.showScreenshotListTop()
+            } else if //let merchant = params["merchant"] as? String,
+                let id = params["variant_id"] as? String {
+                print("GMK variant id:\(id)")
+                DispatchQueue.main.async { // Wait until next run loop, just to be sure.
+                    ProductDetailViewController.create(productId: id, startedLoadingFromServer: {}) { viewController in
+                        if let viewController = viewController {
+                            AppDelegate.presentModally(viewController: viewController)
+                        }
+                    }
+                }
+            }
+
         }
+        Branch.getInstance().validateSDKIntegration()
         
         FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
         
