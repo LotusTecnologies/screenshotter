@@ -16,16 +16,18 @@ struct SearchRoot: Encodable {
 struct SearchBranch: Encodable {
     let category: SearchCategory
     let image: String?
+    let keyword: String
     let subcategories: [SearchBranch]?
     
-    init(category: SearchCategory, image: String?, subcategories: [SearchBranch]?) {
+    init(category: SearchCategory, image: String?, keyword: String, subcategories: [SearchBranch]?) {
         self.category = category
         self.image = image
+        self.keyword = keyword
         self.subcategories = subcategories
     }
     
     init(_ category: SearchCategory) {
-        self.init(category: category, image: nil, subcategories: nil)
+        self.init(category: category, image: nil, keyword: "", subcategories: nil)
     }
 }
 
@@ -217,13 +219,13 @@ extension SearchClass {
     }
     
     static private let menDataSource = [
-        SearchBranch(category: .tops, image: nil, subcategories: [
+        SearchBranch(category: .tops, image: nil, keyword: "", subcategories: [
             SearchBranch(.dress),
             SearchBranch(.casual),
             SearchBranch(.polos),
             SearchBranch(.teesAndTanks)
             ]),
-        SearchBranch(category: .bottoms, image: nil, subcategories: [
+        SearchBranch(category: .bottoms, image: nil, keyword: "", subcategories: [
             SearchBranch(.jeans),
             SearchBranch(.pants),
             SearchBranch(.shorts),
@@ -231,162 +233,17 @@ extension SearchClass {
             ])
     ]
     
-    static private let _menDataSource = DataSource<SearchCategory, SearchCategory>(data: [
-        (.tops, [
-            .dress,
-            .casual,
-            .polos,
-            .teesAndTanks,
-            .graphicTees,
-            .hoodiesAndSweatshirts,
-            .sweaters
-            ]
-        ),
-        (.bottoms, [
-            .jeans,
-            .pants,
-            .shorts,
-            .sweatpants
-            ]
-        ),
-        (.jackets, [
-            .bombers,
-            .denim,
-            .leather,
-            .suits,
-            .coats,
-            .lightweight
-            ]
-        ),
-        (.shoes, [
-            .dress,
-            .sneakers,
-            .boots,
-            .sandals
-            ]
-        ),
-        (.swimwear, []),
-        (.accessories, [
-            .sunglasses,
-            .watches,
-            .hats,
-            .belts,
-            .jewelry,
-            .scarves
-            ]
-        ),
-        (.active, [
-            .jackets,
-            .tops,
-            .bottoms
-            ]
-        ),
-        (.sleepwear, [])
-        ])
-    
     static private let womenDataSource = [
-        SearchBranch(category: .tops, image: nil, subcategories: [
+        SearchBranch(category: .tops, image: nil, keyword: "", subcategories: [
             SearchBranch(.blousesAndButtonUps),
             SearchBranch(.cropTops),
             SearchBranch(.bodySuits),
             SearchBranch(.graphicTees)
             ]),
-        SearchBranch(category: .swimwear, image: nil, subcategories: [
+        SearchBranch(category: .swimwear, image: nil, keyword: "", subcategories: [
             SearchBranch(.bikinis),
             SearchBranch(.onePieces),
             SearchBranch(.coverUps)
             ])
     ]
-    
-    static private let _womenDataSource = DataSource<SearchCategory, SearchCategory>(data: [
-        (.tops, [
-            .blousesAndButtonUps,
-            .cropTops,
-            .bodySuits,
-            .graphicTees,
-            .strapless,
-            .offTheShoulder,
-            .longSleeves,
-            .tankTops,
-            .hoodiesAndSweatshirts,
-            .sweaters
-            ]
-        ),
-        (.swimwear, [
-            .bikinis,
-            .onePieces,
-            .coverUps
-            ]
-        ),
-        (.dresses, [
-            .casual,
-            .cocktail,
-            .midis,
-            .maxis,
-            .minis,
-            .sundresses,
-            .gowns
-            ]
-        ),
-        (.jackets, [
-            .blazers,
-            .bombers,
-            .denim,
-            .puffers,
-            .leather,
-            .parkas,
-            .dusterCoats
-            ]
-        ),
-        (.bottoms, [
-            .jeans,
-            .skirts,
-            .shorts,
-            .leggings,
-            .sweatpants,
-            .overalls,
-            .pants
-            ]
-        ),
-        (.shoes, [
-            .booties,
-            .boots,
-            .highHeels,
-            .lowHeels,
-            .blockHeels,
-            .wedges,
-            .flats,
-            .sneakers,
-            .sandals,
-            .slippers,
-            .loafers
-            ]
-        ),
-        (.active, [
-            .sportsBras,
-            .leggings,
-            .shorts,
-            .tops,
-            .trackSuits,
-            .sweats
-            ]
-        ),
-        (.accessories, [
-            .belts,
-            .scarves,
-            .sunglasses,
-            .hats,
-            .jewelry,
-            .watches
-            ]
-        ),
-        (.sleepwear, [
-            .sets,
-            .tops,
-            .bottoms,
-            .slippers,
-            .onesies
-            ]
-        )
-        ])
 }

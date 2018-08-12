@@ -181,6 +181,12 @@ extension SearchResultsViewController: UITableViewDataSource {
 
 extension SearchResultsViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard let amazonItem = amazonItems?[indexPath.row] else {
+            return
+        }
         
+        OpenWebPage.present(urlString: amazonItem.detailPageURL, fromViewController: self)
+        
+        tableView.deselectRow(at: indexPath, animated: true)
     }
 }
