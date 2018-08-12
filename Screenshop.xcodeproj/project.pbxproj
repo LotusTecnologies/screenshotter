@@ -209,6 +209,7 @@
 		C5CAF27C1FCC14C1006F37DC /* CurrencyModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CAF27B1FCC14C1006F37DC /* CurrencyModel.swift */; };
 		C5CC3E391F94A85900DA3425 /* NetworkingIndicatorProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CC3E381F94A85900DA3425 /* NetworkingIndicatorProtocol.swift */; };
 		C5CF0FCB2120239C007963BA /* SearchCategoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CF0FCA2120239C007963BA /* SearchCategoryModel.swift */; };
+		C5CF0FCD2120551B007963BA /* String+Format.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CF0FCC2120551B007963BA /* String+Format.swift */; };
 		C5D2428020F4866A001403E4 /* DataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5D2427F20F4866A001403E4 /* DataSource.swift */; };
 		C5DC531A20CD3F2100E90DB8 /* Quicksand-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C5DC531620CD3F2000E90DB8 /* Quicksand-Medium.ttf */; };
 		C5DC531B20CD3F2100E90DB8 /* Quicksand-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C5DC531720CD3F2000E90DB8 /* Quicksand-Regular.ttf */; };
@@ -470,6 +471,7 @@
 		C5CAF27B1FCC14C1006F37DC /* CurrencyModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyModel.swift; sourceTree = "<group>"; };
 		C5CC3E381F94A85900DA3425 /* NetworkingIndicatorProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkingIndicatorProtocol.swift; sourceTree = "<group>"; };
 		C5CF0FCA2120239C007963BA /* SearchCategoryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchCategoryModel.swift; sourceTree = "<group>"; };
+		C5CF0FCC2120551B007963BA /* String+Format.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Format.swift"; sourceTree = "<group>"; };
 		C5D2427F20F4866A001403E4 /* DataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSource.swift; sourceTree = "<group>"; };
 		C5DC531620CD3F2000E90DB8 /* Quicksand-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Medium.ttf"; sourceTree = "<group>"; };
 		C5DC531720CD3F2000E90DB8 /* Quicksand-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Regular.ttf"; sourceTree = "<group>"; };
@@ -1169,6 +1171,7 @@
 				E49261D5206A704C006FE84E /* UIImage+craze.swift */,
 				317BFBB1207DFCD300E61D7C /* Random.swift */,
 				31A0781A207E182100D70DC3 /* URL+craze.swift */,
+				C5CF0FCC2120551B007963BA /* String+Format.swift */,
 			);
 			path = Categories;
 			sourceTree = "<group>";
@@ -1668,6 +1671,7 @@
 				311A504820D90B780001D463 /* ShoppablesToolbar.swift in Sources */,
 				C58BAE7220E101DD0051394A /* InputViewAdjustsScrollViewController.swift in Sources */,
 				311A504720D90B780001D463 /* ShoppableCollectionViewCell.swift in Sources */,
+				C5CF0FCD2120551B007963BA /* String+Format.swift in Sources */,
 				C5233F0B1F6FF05800F25C7C /* LifeCycleProtocol.swift in Sources */,
 				31C0C80620A15EAA002EE95B /* CrazeImageZoom.swift in Sources */,
 				C5933D8E2110359800BBCF5B /* UniversalSearchController.swift in Sources */,
