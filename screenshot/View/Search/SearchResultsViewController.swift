@@ -136,11 +136,28 @@ extension SearchResultsViewController: UITableViewDataSource {
             let placeholderImage = UIImage(named: "DefaultProduct")
             cell.productImageView.sd_setImage(with: imageURL, placeholderImage: placeholderImage)
             
-            cell.textLabel?.text = amazonItem.itemAttributes?.brand
+            cell.textLabel?.text = title(amazonItem: amazonItem)
             cell.detailTextLabel?.attributedText = detailAttributedText(amazonItem: amazonItem)
         }
         
         return cell
+    }
+    
+    private func title(amazonItem: AmazonItem) -> String? {
+        if let string = amazonItem.itemAttributes?.brand?.nonEmptyValue {
+            return string
+        }
+        else {
+            let model = amazonItem.itemAttributes?.model?.nonEmptyValue
+            let group = amazonItem.itemAttributes?.productGroup?.nonEmptyValue
+            
+            if let model = model, let group = group {
+                return "\(model) - \(group)"
+            }
+            else {
+                return model ?? group
+            }
+        }
     }
     
     private func detailAttributedText(amazonItem: AmazonItem) -> NSAttributedString? {
