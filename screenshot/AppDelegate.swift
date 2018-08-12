@@ -533,11 +533,6 @@ extension AppDelegate : KochavaTrackerDelegate {
                 return
             }
             
-            if let shareId = params["shareId"] as? String {
-                AssetSyncModel.sharedInstance.downloadScreenshot(shareId: shareId)
-                self.showScreenshotListTop()
-            }
-            
             if let channel = params["~channel"] as? String {
                 UserDefaults.standard.set(channel, forKey: UserDefaultsKeys.referralChannel)
             }
@@ -558,7 +553,29 @@ extension AppDelegate : KochavaTrackerDelegate {
             }else if let mode = params["mode"] as? String, let oobCode = params["oobCode"] as? String {
                 let _ = UserAccountManager.shared.applicationOpenLinkedWith(mode: mode, code: oobCode)
             }
+            
+            var variantId: String? = params["variant_id"] as? String
+            if variantId == nil,
+              let nonBranchLink = params["+non_branch_link"] as? String,
+              let nonBranchQueryItems = URLComponents(string: nonBranchLink)?.queryItems,
+              let nonBranchVariantId = nonBranchQueryItems.first(where: {$0.name == "variant_id"})?.value {
+                variantId = nonBranchVariantId
+            }
+            //let merchant = params["merchant"] as? String
+            
+            if let shareId = params["shareId"] as? String {
+                AssetSyncModel.sharedInstance.downloadScreenshot(shareId: shareId)
+                self.showScreenshotListTop()
+            } else if let id = variantId {
+                ProductDetailViewController.create(productId: id, startedLoadingFromServer: {}) { viewController in
+                    if let viewController = viewController {
+                        AppDelegate.presentModally(viewController: viewController)
+                    }
+                }
+            }
+
         }
+//        Branch.getInstance().validateSDKIntegration()
         
         FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
         

@@ -213,6 +213,10 @@ class ProductsViewController: BaseViewController {
         super.viewWillAppear(animated)
         self.updateLoadingState()
         self.collectionView?.reloadData()
+        if let assetId = self.screenshot.assetId {
+            AssetSyncModel.sharedInstance.moveScreenshotToTopOfQueue(assetId: assetId)
+        }
+
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -396,12 +400,7 @@ extension ProductsViewControllerCollectionView : UICollectionViewDelegateFlowLay
     
     func collectionView(_ collectionView: UICollectionView, shouldShowMenuForItemAt indexPath: IndexPath) -> Bool {
         if let cell = collectionView.cellForItem(at: indexPath){
-            if let cell = cell as? ProductsCollectionViewCell, let imageView = cell.productImageView {
-                let product = self.productAtIndex(indexPath.item)
-                self.recoverLostSaleManager.presetRecoverAlertViewFor(product: product, in: self, rect: imageView.bounds, view: imageView, timeSinceLeftApp: nil, reason: .longPress)
-                return true
-            }
-            else if let _ = cell as? RelatedLooksCollectionViewCell {
+            if let _ = cell as? RelatedLooksCollectionViewCell {
                 let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
                 
                 self.relatedLooksManager.addScreenshotAction(actionSheet, at: indexPath)
@@ -918,7 +917,7 @@ extension ProductsViewController: RecoverLostSaleManagerDelegate {
     func recoverLostSaleManager(_ manager: RecoverLostSaleManager, returnedFrom product: Product, timeSinceLeftApp: Int) {
         if let index = self.products.index(of: product) {
             if let cell = self.collectionView?.cellForItem(at: IndexPath.init(row: index, section: 0)) as? ProductsCollectionViewCell, let view = cell.productImageView{
-                self.recoverLostSaleManager.presetRecoverAlertViewFor(product: product, in: self, rect: view.bounds, view:view, timeSinceLeftApp:timeSinceLeftApp, reason: .returnedFromProductLink)
+                self.recoverLostSaleManager.presetRecoverAlertViewFor(product: product, in: self, rect: view.bounds, view:view, timeSinceLeftApp:timeSinceLeftApp)
             }
         }
         

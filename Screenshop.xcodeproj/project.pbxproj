@@ -104,7 +104,7 @@
 		31C536A820B40446005810CA /* String+HTML.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C536A720B40446005810CA /* String+HTML.swift */; };
 		31CE11002035AC44000156EE /* UIApplication+openInChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE10FF2035AC44000156EE /* UIApplication+openInChrome.swift */; };
 		31CE11022039570B000156EE /* FetchedResultsControllerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE11012039570B000156EE /* FetchedResultsControllerManager.swift */; };
-		31D372B320EE5B91007E978E /* RecoveryLostSalePopupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31D372B220EE5B91007E978E /* RecoveryLostSalePopupViewController.swift */; };
+		31D372B320EE5B91007E978E /* SimilarItemsPopupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31D372B220EE5B91007E978E /* SimilarItemsPopupViewController.swift */; };
 		31EF9B092029D542006D3B35 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 31EF9B082029D542006D3B35 /* StoreKit.framework */; };
 		523C11391F5C195D001BD969 /* RatingFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523C11381F5C195D001BD969 /* RatingFlow.swift */; };
 		523CA4861F5EF93300873D78 /* UserDefaultsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528D18691F5EEF8C00078223 /* UserDefaultsKeys.swift */; };
@@ -215,8 +215,6 @@
 		C5DC531B20CD3F2100E90DB8 /* Quicksand-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C5DC531720CD3F2000E90DB8 /* Quicksand-Regular.ttf */; };
 		C5DC531C20CD3F2100E90DB8 /* Quicksand-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C5DC531820CD3F2000E90DB8 /* Quicksand-Light.ttf */; };
 		C5DC531D20CD3F2100E90DB8 /* Quicksand-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C5DC531920CD3F2100E90DB8 /* Quicksand-Bold.ttf */; };
-		C5E6C318208F23AA006E9C54 /* CheckoutSupportedStates.plist in Resources */ = {isa = PBXBuildFile; fileRef = C5E6C317208F23AA006E9C54 /* CheckoutSupportedStates.plist */; };
-		C5E6C31A208F2415006E9C54 /* CheckoutSupportedCountries.plist in Resources */ = {isa = PBXBuildFile; fileRef = C5E6C319208F2415006E9C54 /* CheckoutSupportedCountries.plist */; };
 		C5F73C9E1FE244C800E49F2B /* Permissions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F73C9D1FE244C800E49F2B /* Permissions.swift */; };
 		E4104DC020DC540200683FE9 /* LocalNotificationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4104DBF20DC540200683FE9 /* LocalNotificationModel.swift */; };
 		E4139D501F09083B00E8A53B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E4139D4F1F09083B00E8A53B /* Assets.xcassets */; };
@@ -224,6 +222,7 @@
 		E42BCB0521061A4B0043A28A /* (null) in Resources */ = {isa = PBXBuildFile; };
 		E42BCB0721061B040043A28A /* AmazonParserModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E42BCB0621061B040043A28A /* AmazonParserModel.swift */; };
 		E44CA6FC1F41E608001CB493 /* NetworkingPromise.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44CA6FB1F41E608001CB493 /* NetworkingPromise.swift */; };
+		E464F8DC211B25E1009B51AB /* Screenshop.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = E4D6D8A61F61B047009DD999 /* Screenshop.entitlements */; };
 		E49261D6206A704C006FE84E /* UIImage+craze.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49261D5206A704C006FE84E /* UIImage+craze.swift */; };
 		E4978C3C1F53610F0008B87F /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4978C3B1F53610F0008B87F /* Constants.swift */; };
 		E4CD8E691FA9E81B006F2CDA /* ApplicationStateModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CD8E681FA9E81B006F2CDA /* ApplicationStateModel.swift */; };
@@ -332,6 +331,7 @@
 		311A50D720E3E3560001D463 /* DiscoverManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverManager.swift; sourceTree = "<group>"; };
 		311A50D920E4BE470001D463 /* Model 20.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 20.xcdatamodel"; sourceTree = "<group>"; };
 		311C5988210EE01600F44F12 /* MessageInboxHeaderCollectionReusableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageInboxHeaderCollectionReusableView.swift; sourceTree = "<group>"; };
+		311C59AA211ACB0700F44F12 /* Model 24.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 24.xcdatamodel"; sourceTree = "<group>"; };
 		31254460209079C7009410D5 /* screenshot-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "screenshot-Bridging-Header.h"; sourceTree = "<group>"; };
 		3125448E209871B4009410D5 /* Analytics+api.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Analytics+api.swift"; sourceTree = "<group>"; };
 		31357EE120F6636D00515116 /* UIColor+craze.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+craze.swift"; sourceTree = "<group>"; };
@@ -363,7 +363,7 @@
 		31CE10FF2035AC44000156EE /* UIApplication+openInChrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplication+openInChrome.swift"; sourceTree = "<group>"; };
 		31CE11012039570B000156EE /* FetchedResultsControllerManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FetchedResultsControllerManager.swift; sourceTree = "<group>"; };
 		31CE110C203BEFC1000156EE /* Model 10.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 10.xcdatamodel"; sourceTree = "<group>"; };
-		31D372B220EE5B91007E978E /* RecoveryLostSalePopupViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryLostSalePopupViewController.swift; sourceTree = "<group>"; };
+		31D372B220EE5B91007E978E /* SimilarItemsPopupViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimilarItemsPopupViewController.swift; sourceTree = "<group>"; };
 		31EF9B082029D542006D3B35 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		493CE8354B6ACA06E709778B /* Pods-Screenshop.prdrelease.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Screenshop.prdrelease.xcconfig"; path = "Pods/Target Support Files/Pods-Screenshop/Pods-Screenshop.prdrelease.xcconfig"; sourceTree = "<group>"; };
 		523C11381F5C195D001BD969 /* RatingFlow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RatingFlow.swift; sourceTree = "<group>"; };
@@ -477,8 +477,6 @@
 		C5DC531720CD3F2000E90DB8 /* Quicksand-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Regular.ttf"; sourceTree = "<group>"; };
 		C5DC531820CD3F2000E90DB8 /* Quicksand-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Light.ttf"; sourceTree = "<group>"; };
 		C5DC531920CD3F2100E90DB8 /* Quicksand-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Bold.ttf"; sourceTree = "<group>"; };
-		C5E6C317208F23AA006E9C54 /* CheckoutSupportedStates.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = CheckoutSupportedStates.plist; sourceTree = "<group>"; };
-		C5E6C319208F2415006E9C54 /* CheckoutSupportedCountries.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = CheckoutSupportedCountries.plist; sourceTree = "<group>"; };
 		C5F73C9D1FE244C800E49F2B /* Permissions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Permissions.swift; sourceTree = "<group>"; };
 		E402A7C72084D59B00094F14 /* Model 15.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 15.xcdatamodel"; sourceTree = "<group>"; };
 		E4104DBF20DC540200683FE9 /* LocalNotificationModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocalNotificationModel.swift; sourceTree = "<group>"; };
@@ -503,8 +501,8 @@
 		E4D495D11F49834900312614 /* upload_symbols.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = upload_symbols.sh; sourceTree = "<group>"; };
 		E4D5900D1F8367A3006A3C89 /* Model 4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 4.xcdatamodel"; sourceTree = "<group>"; };
 		E4D644301F66D0FE00F5AA48 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		E4D6D8A51F61AF3A009DD999 /* screenshot.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = screenshot.entitlements; sourceTree = "<group>"; };
-		E4D6D8A61F61B047009DD999 /* screenshot.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = screenshot.entitlements; sourceTree = "<group>"; };
+		E4D6D8A51F61AF3A009DD999 /* Screenshop.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = Screenshop.entitlements; sourceTree = "<group>"; };
+		E4D6D8A61F61B047009DD999 /* Screenshop.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = Screenshop.entitlements; sourceTree = "<group>"; };
 		E4D7B6F92057C8C800F7AE9A /* Model 11.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 11.xcdatamodel"; sourceTree = "<group>"; };
 		E4DB2B7B1F7E1D4600320BE5 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		E4E990D4200E01AE00B85505 /* Model 9.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 9.xcdatamodel"; sourceTree = "<group>"; };
@@ -666,7 +664,7 @@
 				311A4F9520D90B740001D463 /* ProductHeaderCollectionViewCell.swift */,
 				311A4F9620D90B740001D463 /* ProductCollectionViewManager.swift */,
 				311A50C820DAB2EF0001D463 /* RecoverLostSaleManager.swift */,
-				31D372B220EE5B91007E978E /* RecoveryLostSalePopupViewController.swift */,
+				31D372B220EE5B91007E978E /* SimilarItemsPopupViewController.swift */,
 				311A4F9720D90B740001D463 /* ProductsRateView.swift */,
 				311A4F9820D90B740001D463 /* SectionBackgroundCollectionViewFlowLayout.swift */,
 			);
@@ -845,8 +843,6 @@
 			isa = PBXGroup;
 			children = (
 				E4139D4F1F09083B00E8A53B /* Assets.xcassets */,
-				C5E6C319208F2415006E9C54 /* CheckoutSupportedCountries.plist */,
-				C5E6C317208F23AA006E9C54 /* CheckoutSupportedStates.plist */,
 				C53B15B01FDD1EF400658A78 /* FavoriteHeart.json */,
 				C50EE26D1FC406F1002B4259 /* Fonts */,
 				C5CAF2791FCC0EFD006F37DC /* ISO4217.plist */,
@@ -1232,7 +1228,7 @@
 			children = (
 				311A4F5220D90AED0001D463 /* GoogleService-Info.plist */,
 				E41BB9321F61BDD200A74F04 /* Info.plist */,
-				E4D6D8A61F61B047009DD999 /* screenshot.entitlements */,
+				E4D6D8A61F61B047009DD999 /* Screenshop.entitlements */,
 			);
 			path = dev;
 			sourceTree = "<group>";
@@ -1242,7 +1238,7 @@
 			children = (
 				E45C7AFE20E0235600A8B4A9 /* GoogleService-Info.plist */,
 				E41BB9341F61BDD900A74F04 /* Info.plist */,
-				E4D6D8A51F61AF3A009DD999 /* screenshot.entitlements */,
+				E4D6D8A51F61AF3A009DD999 /* Screenshop.entitlements */,
 			);
 			path = prd;
 			sourceTree = "<group>";
@@ -1376,23 +1372,21 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C53B15B11FDD1EF400658A78 /* FavoriteHeart.json in Resources */,
-				C572FF01205C00070046BFEB /* Hind-SemiBold.ttf in Resources */,
-				C5CAF27A1FCC0EFD006F37DC /* ISO4217.plist in Resources */,
-				C5DC531B20CD3F2100E90DB8 /* Quicksand-Regular.ttf in Resources */,
-				C5DC531C20CD3F2100E90DB8 /* Quicksand-Light.ttf in Resources */,
-				E42BCB0521061A4B0043A28A /* (null) in Resources */,
-				C572FEFE205C00070046BFEB /* Hind-Light.ttf in Resources */,
-				C572FF02205C00070046BFEB /* Hind-Medium.ttf in Resources */,
 				E4139D501F09083B00E8A53B /* Assets.xcassets in Resources */,
-				C572FF00205C00070046BFEB /* Hind-Regular.ttf in Resources */,
-				C572FEFF205C00070046BFEB /* Hind-Bold.ttf in Resources */,
+				E464F8DC211B25E1009B51AB /* Screenshop.entitlements in Resources */,
 				E4DB2B7C1F7E1D4600320BE5 /* LaunchScreen.storyboard in Resources */,
 				C53B15BA1FDD638C00658A78 /* Localizable.strings in Resources */,
-				C5E6C318208F23AA006E9C54 /* CheckoutSupportedStates.plist in Resources */,
-				C5DC531D20CD3F2100E90DB8 /* Quicksand-Bold.ttf in Resources */,
-				C5E6C31A208F2415006E9C54 /* CheckoutSupportedCountries.plist in Resources */,
+				C572FF00205C00070046BFEB /* Hind-Regular.ttf in Resources */,
+				C572FF02205C00070046BFEB /* Hind-Medium.ttf in Resources */,
+				C572FEFE205C00070046BFEB /* Hind-Light.ttf in Resources */,
+				C572FEFF205C00070046BFEB /* Hind-Bold.ttf in Resources */,
+				C572FF01205C00070046BFEB /* Hind-SemiBold.ttf in Resources */,
+				C5DC531B20CD3F2100E90DB8 /* Quicksand-Regular.ttf in Resources */,
 				C5DC531A20CD3F2100E90DB8 /* Quicksand-Medium.ttf in Resources */,
+				C5DC531C20CD3F2100E90DB8 /* Quicksand-Light.ttf in Resources */,
+				C5DC531D20CD3F2100E90DB8 /* Quicksand-Bold.ttf in Resources */,
+				C53B15B11FDD1EF400658A78 /* FavoriteHeart.json in Resources */,
+				C5CAF27A1FCC0EFD006F37DC /* ISO4217.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1726,7 +1720,7 @@
 				C58BAE5820E101DD0051394A /* ModalNavigationController.swift in Sources */,
 				C52FD9E921133CE500AD3A0B /* SearchResultTableViewCell.swift in Sources */,
 				31C536A820B40446005810CA /* String+HTML.swift in Sources */,
-				31D372B320EE5B91007E978E /* RecoveryLostSalePopupViewController.swift in Sources */,
+				31D372B320EE5B91007E978E /* SimilarItemsPopupViewController.swift in Sources */,
 				C58BAE6120E101DD0051394A /* IntrinsicContentSizePresentationController.swift in Sources */,
 				C58BAE5920E101DD0051394A /* BaseViewController.swift in Sources */,
 				C58BAE8D20E101DD0051394A /* LoadingButton.swift in Sources */,
@@ -1886,7 +1880,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_CODE_COVERAGE = NO;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = screenshot/dev/screenshot.entitlements;
+				CODE_SIGN_ENTITLEMENTS = screenshot/dev/Screenshop.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
@@ -1896,8 +1890,9 @@
 				INFOPLIST_FILE = screenshot/dev/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" -Xfrontend -warn-long-function-bodies=200";
-				PRODUCT_BUNDLE_IDENTIFIER = io.crazeapp.screenshot.dev;
+				PRODUCT_BUNDLE_IDENTIFIER = io.crazeapp.screenshot;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG DEV";
 				SWIFT_OBJC_BRIDGING_HEADER = "screenshot/screenshot-Bridging-Header.h";
@@ -1916,7 +1911,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_CODE_COVERAGE = NO;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = screenshot/dev/screenshot.entitlements;
+				CODE_SIGN_ENTITLEMENTS = screenshot/dev/Screenshop.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
@@ -1927,7 +1922,7 @@
 				INFOPLIST_FILE = screenshot/dev/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" -Xfrontend -warn-long-function-bodies=200";
-				PRODUCT_BUNDLE_IDENTIFIER = io.crazeapp.screenshot.dev;
+				PRODUCT_BUNDLE_IDENTIFIER = io.crazeapp.screenshot;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "RELEASE DEV";
@@ -2004,7 +1999,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_CODE_COVERAGE = NO;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = screenshot/prd/screenshot.entitlements;
+				CODE_SIGN_ENTITLEMENTS = screenshot/dev/Screenshop.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
@@ -2016,6 +2011,7 @@
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" -Xfrontend -warn-long-function-bodies=200";
 				PRODUCT_BUNDLE_IDENTIFIER = io.crazeapp.screenshot;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG DEV";
 				SWIFT_OBJC_BRIDGING_HEADER = "screenshot/screenshot-Bridging-Header.h";
@@ -2087,7 +2083,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_CODE_COVERAGE = NO;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = screenshot/prd/screenshot.entitlements;
+				CODE_SIGN_ENTITLEMENTS = screenshot/prd/Screenshop.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
@@ -2099,6 +2095,7 @@
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" -Xfrontend -warn-long-function-bodies=200";
 				PRODUCT_BUNDLE_IDENTIFIER = io.crazeapp.screenshot;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "RELEASE PRD";
 				SWIFT_OBJC_BRIDGING_HEADER = "screenshot/screenshot-Bridging-Header.h";
@@ -2393,6 +2390,7 @@
 		C5278FBD1F3C38510090E422 /* Model.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				311C59AA211ACB0700F44F12 /* Model 24.xcdatamodel */,
 				E42DE587211733D20094A141 /* Model 23.xcdatamodel */,
 				31571D6E21084015002E0599 /* Model 22.xcdatamodel */,
 				31BFAFF020FDAFBF00D7C891 /* Model 21.xcdatamodel */,
@@ -2417,7 +2415,7 @@
 				E42AC3921F60340B0035A07C /* Model 2.xcdatamodel */,
 				C5278FBE1F3C38510090E422 /* Model.xcdatamodel */,
 			);
-			currentVersion = E42DE587211733D20094A141 /* Model 23.xcdatamodel */;
+			currentVersion = 311C59AA211ACB0700F44F12 /* Model 24.xcdatamodel */;
 			path = Model.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
