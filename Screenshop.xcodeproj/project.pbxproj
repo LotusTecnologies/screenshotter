@@ -104,7 +104,7 @@
 		31C536A820B40446005810CA /* String+HTML.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C536A720B40446005810CA /* String+HTML.swift */; };
 		31CE11002035AC44000156EE /* UIApplication+openInChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE10FF2035AC44000156EE /* UIApplication+openInChrome.swift */; };
 		31CE11022039570B000156EE /* FetchedResultsControllerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE11012039570B000156EE /* FetchedResultsControllerManager.swift */; };
-		31D372B320EE5B91007E978E /* RecoveryLostSalePopupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31D372B220EE5B91007E978E /* RecoveryLostSalePopupViewController.swift */; };
+		31D372B320EE5B91007E978E /* SimilarItemsPopupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31D372B220EE5B91007E978E /* SimilarItemsPopupViewController.swift */; };
 		31EF9B092029D542006D3B35 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 31EF9B082029D542006D3B35 /* StoreKit.framework */; };
 		523C11391F5C195D001BD969 /* RatingFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 523C11381F5C195D001BD969 /* RatingFlow.swift */; };
 		523CA4861F5EF93300873D78 /* UserDefaultsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528D18691F5EEF8C00078223 /* UserDefaultsKeys.swift */; };
@@ -318,6 +318,7 @@
 		311A50D720E3E3560001D463 /* DiscoverManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverManager.swift; sourceTree = "<group>"; };
 		311A50D920E4BE470001D463 /* Model 20.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 20.xcdatamodel"; sourceTree = "<group>"; };
 		311C5988210EE01600F44F12 /* MessageInboxHeaderCollectionReusableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageInboxHeaderCollectionReusableView.swift; sourceTree = "<group>"; };
+		311C59AA211ACB0700F44F12 /* Model 24.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 24.xcdatamodel"; sourceTree = "<group>"; };
 		31254460209079C7009410D5 /* screenshot-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "screenshot-Bridging-Header.h"; sourceTree = "<group>"; };
 		3125448E209871B4009410D5 /* Analytics+api.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Analytics+api.swift"; sourceTree = "<group>"; };
 		31357EE120F6636D00515116 /* UIColor+craze.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+craze.swift"; sourceTree = "<group>"; };
@@ -349,7 +350,7 @@
 		31CE10FF2035AC44000156EE /* UIApplication+openInChrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplication+openInChrome.swift"; sourceTree = "<group>"; };
 		31CE11012039570B000156EE /* FetchedResultsControllerManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FetchedResultsControllerManager.swift; sourceTree = "<group>"; };
 		31CE110C203BEFC1000156EE /* Model 10.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 10.xcdatamodel"; sourceTree = "<group>"; };
-		31D372B220EE5B91007E978E /* RecoveryLostSalePopupViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryLostSalePopupViewController.swift; sourceTree = "<group>"; };
+		31D372B220EE5B91007E978E /* SimilarItemsPopupViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimilarItemsPopupViewController.swift; sourceTree = "<group>"; };
 		31EF9B082029D542006D3B35 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		493CE8354B6ACA06E709778B /* Pods-Screenshop.prdrelease.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Screenshop.prdrelease.xcconfig"; path = "Pods/Target Support Files/Pods-Screenshop/Pods-Screenshop.prdrelease.xcconfig"; sourceTree = "<group>"; };
 		523C11381F5C195D001BD969 /* RatingFlow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RatingFlow.swift; sourceTree = "<group>"; };
@@ -637,7 +638,7 @@
 				311A4F9520D90B740001D463 /* ProductHeaderCollectionViewCell.swift */,
 				311A4F9620D90B740001D463 /* ProductCollectionViewManager.swift */,
 				311A50C820DAB2EF0001D463 /* RecoverLostSaleManager.swift */,
-				31D372B220EE5B91007E978E /* RecoveryLostSalePopupViewController.swift */,
+				31D372B220EE5B91007E978E /* SimilarItemsPopupViewController.swift */,
 				311A4F9720D90B740001D463 /* ProductsRateView.swift */,
 				311A4F9820D90B740001D463 /* SectionBackgroundCollectionViewFlowLayout.swift */,
 			);
@@ -1644,7 +1645,7 @@
 				C53B46531FBC397700A8C886 /* Geometry.swift in Sources */,
 				C58BAE5820E101DD0051394A /* ModalNavigationController.swift in Sources */,
 				31C536A820B40446005810CA /* String+HTML.swift in Sources */,
-				31D372B320EE5B91007E978E /* RecoveryLostSalePopupViewController.swift in Sources */,
+				31D372B320EE5B91007E978E /* SimilarItemsPopupViewController.swift in Sources */,
 				C58BAE6120E101DD0051394A /* IntrinsicContentSizePresentationController.swift in Sources */,
 				C58BAE5920E101DD0051394A /* BaseViewController.swift in Sources */,
 				C58BAE8D20E101DD0051394A /* LoadingButton.swift in Sources */,
@@ -2314,6 +2315,7 @@
 		C5278FBD1F3C38510090E422 /* Model.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				311C59AA211ACB0700F44F12 /* Model 24.xcdatamodel */,
 				E42DE587211733D20094A141 /* Model 23.xcdatamodel */,
 				31571D6E21084015002E0599 /* Model 22.xcdatamodel */,
 				31BFAFF020FDAFBF00D7C891 /* Model 21.xcdatamodel */,
@@ -2338,7 +2340,7 @@
 				E42AC3921F60340B0035A07C /* Model 2.xcdatamodel */,
 				C5278FBE1F3C38510090E422 /* Model.xcdatamodel */,
 			);
-			currentVersion = E42DE587211733D20094A141 /* Model 23.xcdatamodel */;
+			currentVersion = 311C59AA211ACB0700F44F12 /* Model 24.xcdatamodel */;
 			path = Model.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

@@ -15,9 +15,10 @@ protocol RecoverLostSaleManagerDelegate:class {
     func recoverLostSaleManager(_ manager:RecoverLostSaleManager, returnedFrom product:Product, timeSinceLeftApp:Int)
 }
 
-class RecoverLostSaleManager: NSObject, MFMailComposeViewControllerDelegate {
+class RecoverLostSaleManager: NSObject {
     private var timeLeftApp:Date?
     private var clickOnProductObjectId:NSManagedObjectID?
+    var productCollectionViewManager = ProductCollectionViewManager()
 
     
     weak var delegate:RecoverLostSaleManagerDelegate?
@@ -40,14 +41,16 @@ class RecoverLostSaleManager: NSObject, MFMailComposeViewControllerDelegate {
         if let date = timeLeftApp, abs(date.timeIntervalSinceNow) < maxTime, abs(date.timeIntervalSinceNow) > minTime {
             if let objectId = clickOnProductObjectId {
                 if let product = DataModel.sharedInstance.mainMoc().productWith(objectId: objectId) {
+                    
                     self.timeLeftApp = nil
-//                    self.delegate?.recoverLostSaleManager(self, returnedFrom: product, timeSinceLeftApp: Int(round( abs(date.timeIntervalSinceNow) )))
+                    self.delegate?.recoverLostSaleManager(self, returnedFrom: product, timeSinceLeftApp: Int(round( abs(date.timeIntervalSinceNow) )))
                 }
             }
         }
     }
     
     public func didClick(on product:Product){
+        let _ = AssetSyncModel.sharedInstance.addSubShoppable(fromProduct: product)
         self.clickOnProductObjectId = product.objectID
         timeLeftApp = Date.init()
     }
@@ -63,117 +66,44 @@ class RecoverLostSaleManager: NSObject, MFMailComposeViewControllerDelegate {
     
     var isPresented = false
     
-    public func presetRecoverAlertViewFor(product:Product, in viewController:UIViewController, rect:CGRect, view:UIView, timeSinceLeftApp:Int?, reason:Analytics.AnalyticsFeatureRecoveryAppearedReason){
-        
-        guard let _ = product.price, let _ = product.imageURL, let _ = product.calculatedDisplayTitle, let _ = product.offer else {
+    public func presetRecoverAlertViewFor(product:Product, in viewController:UIViewController, rect:CGRect, view:UIView, timeSinceLeftApp:Int?){
+        let productObjectId = product.objectID
+        let productFloatPrice = product.floatPrice
+        guard let _ = product.price, productFloatPrice != 0, let productImageURL = product.imageURL, let _ = product.calculatedDisplayTitle, let _ = product.offer else {
             //lacking required properties of product
             return
         }
-        let abtest = RecoveryLostSalePopupViewController.ABTest.init(seed: AnalyticsUser.current.randomSeed)
+        let screenshot = product.screenshot ?? product.shoppable?.screenshot
 
-//        let abtest = RecoveryLostSalePopupViewController.ABTest.init(seed: UUID.init().toRandomSeed())
-        
-        Analytics.trackFeatureRecoveryAppeared(product: product, secondsSinceLeftApp: timeSinceLeftApp, abTestColor: abtest.backgroundColor.hexString(), abTestHeadline: abtest.headlineText, abTestButton: abtest.buttonText, reason: reason )
-
-        self.presentingVC = viewController
-        let productObjectId = product.objectID
-        let vc = RecoveryLostSalePopupViewController.init(abTest:abtest, emailProductAction: {
-            self.clickOnProductObjectId = nil
-
-            var email = AnalyticsUser.current.email
-            if email == nil {
-                email = UserAccountManager.shared.email
-            }
-            if email == nil {
-                email = UserDefaults.standard.string(forKey: UserDefaultsKeys.email)
-            }
-            
-            if let email = email {
-                Analytics.trackFeatureRecoveryEmailPrompt(product: product, hasEmail: true)
-                NetworkingPromise.sharedInstance.sendProductEmailWithRetry(product: product, email: email ).then(execute: { (dict) -> Void in
-                    print("send email: \(dict)")
-                    DataModel.sharedInstance.performBackgroundTask({ (context) in
-                        let product = context.productWith(objectId: productObjectId)
-                        Analytics.trackFeatureRecoveryEmailSent(product: product)
-
-                    })
-
-                }).catch(execute: { (e) in
-                    if case let PMKURLError.badResponse(_, data, _) = e, let d = data, let errorString = String.init(data: d, encoding: .utf8) {
-                        print("error sending email: \(errorString)")
-                    }
-
-                    print("error sending email: \(e)")
+        if let shoppable = (screenshot?.shoppables as? Set<Shoppable>)?.first(where: {$0.imageUrl == productImageURL}) {
+            if let products = (shoppable.products as? Set<Product>)?.filter({ $0.floatPrice != 0 && $0.floatPrice < productFloatPrice && $0.isSimmilar(product) }).prefix(10), products.count >= 3 {
+                Analytics.trackFeatureLowerPricesAppeared(product: product, secondsSinceLeftApp: timeSinceLeftApp)
+                let vc = SimilarItemsPopupViewController.init(dismissAction: {
+                    let product = DataModel.sharedInstance.mainMoc().productWith(objectId: productObjectId)
+                    Analytics.trackFeatureLowerPricesDismiss(product: product)
+                    self.isPresented = false
+                    viewController.dismiss(animated: true, completion: nil)
                 })
-                viewController.dismiss(animated: true, completion: {
-                    self.showEmailSentAlert(in: viewController, email:email)
-                })
-            }else{
-                Analytics.trackFeatureRecoveryEmailPrompt(product: product, hasEmail: false)
-                let alert = UIAlertController.init(title: "product.sale_recovery.alert.enter_email.title".localized, message: "product.sale_recovery.alert.enter_email.body".localized, preferredStyle: .alert)
-                alert.addTextField(configurationHandler: { (textField) in
-                    textField.placeholder = "generic.email".localized
-                    textField.keyboardType = .emailAddress
-                    textField.addTarget(self, action: #selector(self.textChange(_:)), for: .editingChanged)
-                })
-
-                let sendAction = UIAlertAction.init(title: "generic.send".localized, style: .default, handler: { (a) in
-                    if let textFields = alert.textFields, let textField = textFields.first, let email = textField.text {
-                        if email.lengthOfBytes(using: .utf8) > 0 {
-                            NetworkingPromise.sharedInstance.sendProductEmailWithRetry(product: product, email: email ).then(execute: { (dict) -> Void in
-                                DataModel.sharedInstance.performBackgroundTask({ (context) in
-                                    let product = context.productWith(objectId: productObjectId)
-                                    Analytics.trackFeatureRecoveryEmailSent(product: product)                                    
-                                })
-                            }).catch(execute: { (e) in
-                                print("error sending email: \(e)")
-                            })
-                            self.showEmailSentAlert(in: viewController, email:email)
-                        }
-                    }
-                })
-                sendAction.isEnabled = false
-                alert.addAction(sendAction)
-                self.sendAction = sendAction
-                alert.addAction(UIAlertAction.init(title: "generic.cancel".localized, style: .cancel, handler: { (a) in
-
-                }))
+                self.presentingVC = viewController
+                vc.products = Array(products).sorted{ $0.order < $1.order }
+                vc.modalPresentationStyle = .popover
                 
-                viewController.dismiss(animated: true, completion: {
-                    viewController.present(alert, animated: true)
-                })
+                vc.popoverPresentationController?.backgroundColor = vc.view.backgroundColor
+                vc.popoverPresentationController?.permittedArrowDirections = [.up, .down]
+                vc.popoverPresentationController?.delegate = self
+                vc.popoverPresentationController?.sourceRect = rect.insetBy(dx: 20, dy: 20)
+                vc.popoverPresentationController?.sourceView = view
+                
+                viewController.present(vc, animated: true)
+                
+                
+            }else{
+                Analytics.trackFeatureLowerPricesDidNotAppear(product: product, secondsSinceLeftApp: timeSinceLeftApp, reason: .notEnoughCheaperProducts)
             }
-            
-        }, dismissAction: {
-            self.clickOnProductObjectId = nil
-            viewController.dismiss(animated: true, completion: nil)
-
-        })
-//        vc.view.layer.shadowOffset = CGSizeMake(50, 50);
-//        vc.view.layer.shadowColor = [[UIColor blackColor] CGColor];
-
-        vc.modalPresentationStyle = .popover
-
-        vc.popoverPresentationController?.backgroundColor = vc.view.backgroundColor
-        vc.popoverPresentationController?.permittedArrowDirections = [.up, .down]
-        vc.popoverPresentationController?.delegate = self
-        vc.popoverPresentationController?.sourceRect = rect.insetBy(dx: 20, dy: 20)
-        vc.popoverPresentationController?.sourceView = view
-        
-        viewController.present(vc, animated: true) {
-            self.isPresented = true
+        }else{
+            Analytics.trackFeatureLowerPricesDidNotAppear(product: product, secondsSinceLeftApp: timeSinceLeftApp, reason: .notLoadedYet)
         }
-    }
-    
-    @objc func textChange(_ sender:Any){
-        func isValid(email:String?) -> Bool {
-            let form = FormRow.Email()
-            form.value = email
-            return form.isValid()
-        }
-        if let textField = sender as? UITextField{
-            self.sendAction?.isEnabled = isValid(email: textField.text)
-        }
+       
     }
     
 }
@@ -185,6 +115,12 @@ extension RecoverLostSaleManager :UIPopoverPresentationControllerDelegate {
     
     func popoverPresentationControllerShouldDismissPopover(_ popoverPresentationController: UIPopoverPresentationController) -> Bool {
         self.isPresented = false
+        var product:Product? = nil
+        if let clickOnProductObjectId = self.clickOnProductObjectId {
+            product = DataModel.sharedInstance.mainMoc().productWith(objectId: clickOnProductObjectId)
+        }
+
+        Analytics.trackFeatureLowerPricesDismiss(product: product)
         return true
         
     }

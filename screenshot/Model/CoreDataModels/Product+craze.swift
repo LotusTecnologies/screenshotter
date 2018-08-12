@@ -80,4 +80,15 @@ extension Product {
         return productDescription?.productTitle()
     }
     
+    func isSimmilar(_ product:Product?) -> Bool{
+        if let product = product {
+            let similar = (product.price == self.price && product.merchant == self.merchant && product.productTitle() == self.productTitle() )
+            var sameId = false
+            if let id1 = self.id, let id2 = product.id, !id1.isEmpty, !id2.isEmpty {
+                sameId = id1 == id2
+            }
+            return  similar || sameId
+        }
+        return false
+    }
 }
