@@ -23,10 +23,10 @@ class SearchResultsViewController: UIViewController {
                     var offset: CGPoint = .zero
                     
                     if #available(iOS 11.0, *) {
-                        offset.y = -(tableView.safeAreaInsets.top ?? 0)
+                        offset.y = -tableView.safeAreaInsets.top
                     }
                     else {
-                        offset.y = -(tableView.contentInset.top ?? 0)
+                        offset.y = -tableView.contentInset.top
                     }
                     
                     return offset

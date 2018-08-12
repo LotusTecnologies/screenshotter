@@ -80,18 +80,25 @@ extension SearchViewController: UISearchResultsUpdating {
     }
     
     private func searchAmazon(_ keywords: String) {
+        guard let lastChar = keywords.last, lastChar != " " else {
+            if keywords.trimmingCharacters(in: .whitespaces).isEmpty {
+                searchResultsViewController.amazonItems = []
+            }
+            return
+        }
+        
+        searchResultsViewController.amazonItems = nil
+        
         NetworkingPromise.sharedInstance.searchAmazon(keywords: keywords, options: (productsOptions.sort, productsOptions.gender, productsOptions.size))
-            .then { [weak self] amazonItems in
-                self?.searchResultsViewController.amazonItems = amazonItems
+            .then { [weak self] amazonItems -> Void in
+                if keywords == self?.searchController.searchBar.text {
+                    self?.searchResultsViewController.amazonItems = amazonItems
+                }
             }
             .catch { [weak self] error in
-                // !!!: DEBUG
-                print("||| amazon error \(error)")
-                self?.searchController.searchBar.backgroundColor = .red
-                
-                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.5, execute: {
-                    self?.searchController.searchBar.backgroundColor = nil
-                })
+                if keywords == self?.searchController.searchBar.text {
+                    self?.searchResultsViewController.amazonItems = []
+                }
         }
     }
 }

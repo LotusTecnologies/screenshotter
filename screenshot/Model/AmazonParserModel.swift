@@ -280,6 +280,9 @@ class AmazonParserModel {
         if let error: AmazonErrorResponse = try? xmlIndexer["ItemSearchErrorResponse"]["Error"].value() {
             return error
         }
+        else if let error: AmazonErrorResponse = try? xmlIndexer["ItemSearchResponse"]["Items"]["Request"]["Errors"]["Error"].value() {
+            return error
+        }
         return nil
     }
     
