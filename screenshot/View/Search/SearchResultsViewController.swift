@@ -8,7 +8,7 @@
 
 import UIKit
 
-class SearchResultsViewController: UITableViewController {
+class SearchResultsViewController: UIViewController {
     var amazonItems: [AmazonItem]? {
         didSet {
             if let amazonItems = amazonItems {
@@ -19,24 +19,25 @@ class SearchResultsViewController: UITableViewController {
             }
             
             if isViewLoaded {
-                tableView?.contentOffset = {
+                tableView.contentOffset = {
                     var offset: CGPoint = .zero
                     
                     if #available(iOS 11.0, *) {
-                        offset.y = -(tableView?.safeAreaInsets.top ?? 0)
+                        offset.y = -(tableView.safeAreaInsets.top ?? 0)
                     }
                     else {
-                        offset.y = -(tableView?.contentInset.top ?? 0)
+                        offset.y = -(tableView.contentInset.top ?? 0)
                     }
                     
                     return offset
                 }()
                 
-                tableView?.reloadData()
+                tableView.reloadData()
             }
         }
     }
     
+    private let tableView = UITableView(frame: .zero, style: .plain)
     private let loadingIndicator = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
     private let emptyLabel = UILabel()
     
@@ -45,15 +46,23 @@ class SearchResultsViewController: UITableViewController {
         
         view.backgroundColor = .white
         
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.dataSource = self
+        tableView.delegate = self
         tableView.backgroundColor = view.backgroundColor
         tableView.register(SearchResultTableViewCell.self, forCellReuseIdentifier: "cell")
         tableView.keyboardDismissMode = .onDrag
+        view.addSubview(tableView)
+        tableView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
         loadingIndicator.translatesAutoresizingMaskIntoConstraints = false
-        loadingIndicator.color = .gray7
+        loadingIndicator.color = .gray5
         view.addSubview(loadingIndicator)
         loadingIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        NSLayoutConstraint(item: loadingIndicator, attribute: .centerY, relatedBy: .equal, toItem: view, attribute: .centerY, multiplier: 0.7, constant: 0).isActive = true
+        NSLayoutConstraint(item: loadingIndicator, attribute: .centerY, relatedBy: .equal, toItem: view, attribute: .centerY, multiplier: 0.8, constant: 0).isActive = true
         
         emptyLabel.translatesAutoresizingMaskIntoConstraints = false
         emptyLabel.text = "search.results.empty".localized
@@ -63,11 +72,16 @@ class SearchResultsViewController: UITableViewController {
         emptyLabel.minimumScaleFactor = 0.7
         view.addSubview(emptyLabel)
         emptyLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        NSLayoutConstraint(item: emptyLabel, attribute: .centerY, relatedBy: .equal, toItem: view, attribute: .centerY, multiplier: 0.7, constant: 0).isActive = true
+        NSLayoutConstraint(item: emptyLabel, attribute: .centerY, relatedBy: .equal, toItem: view, attribute: .centerY, multiplier: 0.8, constant: 0).isActive = true
         emptyLabel.leadingAnchor.constraint(greaterThanOrEqualTo: view.layoutMarginsGuide.leadingAnchor).isActive = true
         emptyLabel.trailingAnchor.constraint(lessThanOrEqualTo: view.layoutMarginsGuide.trailingAnchor).isActive = true
         
         syncState()
+    }
+    
+    deinit {
+        tableView.dataSource = nil
+        tableView.delegate = nil
     }
     
     // MARK: State
@@ -87,16 +101,19 @@ class SearchResultsViewController: UITableViewController {
     private func syncState() {
         switch state {
         case .loading:
+            tableView.isHidden = true
             loadingIndicator.isHidden = false
             loadingIndicator.startAnimating()
             emptyLabel.isHidden = true
             
         case .results:
+            tableView.isHidden = false
             loadingIndicator.isHidden = true
             loadingIndicator.stopAnimating()
             emptyLabel.isHidden = true
             
         case .empty:
+            tableView.isHidden = true
             loadingIndicator.isHidden = true
             loadingIndicator.stopAnimating()
             emptyLabel.isHidden = false
@@ -106,12 +123,12 @@ class SearchResultsViewController: UITableViewController {
 
 // MARK: - Data Source
 
-extension SearchResultsViewController {
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+extension SearchResultsViewController: UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return amazonItems?.count ?? 0
     }
     
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         
         if let cell = cell as? SearchResultTableViewCell, let amazonItem = amazonItems?[indexPath.row] {
@@ -162,8 +179,8 @@ extension SearchResultsViewController {
 
 // MARK: - Delegate
 
-extension SearchResultsViewController {
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+extension SearchResultsViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
     }
 }

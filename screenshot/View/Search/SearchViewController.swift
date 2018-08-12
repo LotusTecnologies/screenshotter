@@ -17,7 +17,7 @@ class SearchViewController: UIViewController {
     private let filterBarButtonItem = UIBarButtonItem(image: UIImage(named: "ProductsFilter"), style: .plain, target: nil, action: nil)
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-        searchResultsViewController = SearchResultsViewController(style: .plain)
+        searchResultsViewController = SearchResultsViewController()
         searchController = SearchController(searchResultsController: searchResultsViewController)
         
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)

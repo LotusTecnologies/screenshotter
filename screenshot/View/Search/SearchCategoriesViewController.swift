@@ -145,13 +145,13 @@ extension SearchCategoriesViewController {
             return .female
         }()
         
-        let searchResultsViewController = SearchResultsViewController(style: .plain)
+        let searchResultsViewController = SearchResultsViewController()
         searchResultsViewController.title = searchCategory.title
         navigationController?.pushViewController(searchResultsViewController, animated: true)
         
         NetworkingPromise.sharedInstance.searchAmazon(keywords: text, options: (.default, gender, .adult))
             .then { [weak searchResultsViewController] amazonItems -> Void in
-//                searchResultsViewController?.amazonItems = amazonItems
+                searchResultsViewController?.amazonItems = amazonItems
             }
             .catch { error in
                 // TODO:
