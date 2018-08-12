@@ -609,91 +609,60 @@ extension DataModel {
         }
     }
     
-    func retrieveLatestFavorite() -> Promise<(String, String?)> {
-        return Promise { fulfill, reject in
-            self.performBackgroundTask { managedObjectContext in
-                let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
-                let twoMonthsAgo = NSDate(timeIntervalSinceNow: -60 * TimeInterval.oneDay)
-                fetchRequest.predicate = NSPredicate(format: "isFavorite == TRUE AND inNotif == FALSE AND imageURL != nil AND dateFavorited > %@", twoMonthsAgo)
-                fetchRequest.sortDescriptors = [NSSortDescriptor(key: "dateFavorited", ascending: false)]
-                fetchRequest.fetchLimit = 1
-                
-                do {
-                    let results = try managedObjectContext.fetch(fetchRequest)
-                    if let latest = results.first,
-                      let imageURL = latest.imageURL {
-                        latest.inNotif = true
-                        managedObjectContext.saveIfNeeded()
-                        let category = latest.shoppable?.label ?? latest.shoppable?.parentShoppable?.label ?? latest.categories
-                        fulfill((imageURL, category))
-                    } else {
-                        reject(NSError(domain: "Craze", code: 93, userInfo: [NSLocalizedDescriptionKey : "no latest favorite"]))
-                    }
-                } catch {
-                    self.receivedCoreDataError(error: error)
-                    print("retrieveLatestFavorite results with error:\(error)")
-                    reject(error)
-                }
+    func retrieveLatestFavorite(in context:NSManagedObjectContext) -> Product? {
+        let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
+        let twoMonthsAgo = NSDate(timeIntervalSinceNow: -60 * TimeInterval.oneDay)
+        fetchRequest.predicate = NSPredicate(format: "isFavorite == TRUE AND inNotif == FALSE AND imageURL != nil AND dateFavorited > %@", twoMonthsAgo)
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "dateFavorited", ascending: false)]
+        fetchRequest.fetchLimit = 1
+        do {
+            let results = try context.fetch(fetchRequest)
+            if let latest = results.first {
+                return latest
             }
+        } catch {
+            self.receivedCoreDataError(error: error)
+            
         }
+        return nil
     }
     
-    func retrieveLatestTapped() -> Promise<(String, String?)> {
-        return Promise { fulfill, reject in
-            self.performBackgroundTask { managedObjectContext in
-                let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
-                let aMonthAgo = NSDate(timeIntervalSinceNow: -30 * TimeInterval.oneDay)
-                fetchRequest.predicate = NSPredicate(format: "isFavorite == FALSE AND inNotif == FALSE AND imageURL != nil AND dateViewed > %@", aMonthAgo)
-                fetchRequest.sortDescriptors = [NSSortDescriptor(key: "dateViewed", ascending: false)]
-                fetchRequest.fetchLimit = 1
-                
-                do {
-                    let results = try managedObjectContext.fetch(fetchRequest)
-                    if let latest = results.first,
-                      let imageURL = latest.imageURL {
-                        latest.inNotif = true
-                        managedObjectContext.saveIfNeeded()
-                        fulfill((imageURL, latest.productTitle()))
-                    } else {
-                        reject(NSError(domain: "Craze", code: 94, userInfo: [NSLocalizedDescriptionKey : "no latest tapped"]))
-                    }
-                } catch {
-                    self.receivedCoreDataError(error: error)
-                    print("retrieveLatestTapped results with error:\(error)")
-                    reject(error)
-                }
-            }
+    func retrieveLatestTapped(in context:NSManagedObjectContext) -> Product? {
+        let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
+        let aMonthAgo = NSDate(timeIntervalSinceNow: -30 * TimeInterval.oneDay)
+        fetchRequest.predicate = NSPredicate(format: "isFavorite == FALSE AND inNotif == FALSE AND imageURL != nil AND dateViewed > %@", aMonthAgo)
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "dateViewed", ascending: false)]
+        fetchRequest.fetchLimit = 1
+        
+        do {
+            let results = try context.fetch(fetchRequest)
+            return results.first
+        } catch {
+            self.receivedCoreDataError(error: error)
+            print("retrieveLatestTapped results with error:\(error)")
+            
         }
+        return nil
     }
     
-    func retrieveSaleScreenshot() -> Promise<(String, Data)> {
-        return Promise { fulfill, reject in
-            self.performBackgroundTask { managedObjectContext in
-                let fetchRequest: NSFetchRequest<Shoppable> = Shoppable.fetchRequest()
-                let twoMonthsAgo = NSDate(timeIntervalSinceNow: -60 * TimeInterval.oneDay)
-                fetchRequest.predicate = NSPredicate(format: "screenshot.lastModified > %@ AND screenshot.inNotif == FALSE AND screenshot.isHidden == FALSE AND screenshot.imageData != nil AND (SUBQUERY(products, $x, ($x.order == 0 OR $x.order == 1) AND $x.floatPrice < $x.floatOriginalPrice).@count == 2)", twoMonthsAgo)
-                fetchRequest.sortDescriptors = [NSSortDescriptor(key: "screenshot.lastModified", ascending: false)]
-                fetchRequest.fetchLimit = 1
-                
-                do {
-                    let results = try managedObjectContext.fetch(fetchRequest)
-                    if let latestShoppable = results.first,
-                      let latestScreenshot = latestShoppable.screenshot,
-                      let assetId = latestScreenshot.assetId,
-                      let imageData = latestScreenshot.imageData {
-                        latestScreenshot.inNotif = true
-                        managedObjectContext.saveIfNeeded()
-                        fulfill((assetId, imageData))
-                    } else {
-                        reject(NSError(domain: "Craze", code: 96, userInfo: [NSLocalizedDescriptionKey : "no recent sale screenshot"]))
-                    }
-                } catch {
-                    self.receivedCoreDataError(error: error)
-                    print("retrieveSaleScreenshot results with error:\(error)")
-                    reject(error)
-                }
+    func retrieveSaleScreenshot(in context:NSManagedObjectContext) -> Screenshot? {
+        let fetchRequest: NSFetchRequest<Shoppable> = Shoppable.fetchRequest()
+        let twoMonthsAgo = NSDate(timeIntervalSinceNow: -60 * TimeInterval.oneDay)
+        fetchRequest.predicate = NSPredicate(format: "screenshot.lastModified > %@ AND screenshot.inNotif == FALSE AND screenshot.isHidden == FALSE AND screenshot.imageData != nil AND (SUBQUERY(products, $x, ($x.order == 0 OR $x.order == 1) AND $x.floatPrice < $x.floatOriginalPrice).@count == 2)", twoMonthsAgo)
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "screenshot.lastModified", ascending: false)]
+        fetchRequest.fetchLimit = 1
+        
+        do {
+            let results = try context.fetch(fetchRequest)
+            if let latestShoppable = results.first,
+                let latestScreenshot = latestShoppable.screenshot {
+                return latestScreenshot
             }
+        } catch {
+            self.receivedCoreDataError(error: error)
+            print("retrieveSaleScreenshot results with error:\(error)")
         }
+        return nil
     }
     
    
