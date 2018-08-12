@@ -144,11 +144,62 @@ class AsyncOperationTag: Equatable {
 class AsyncOperationQueue : OperationQueue {
     fileprivate let uuid = UUID.init()
     
+    private static var observerContext = 0
+    
+    var operationPrioritySorting:((AsyncOperation, AsyncOperation) -> Bool?)? {
+        didSet{
+            setAllOperationPriority(operations:self.operations)
+        }
+    }
+    override init() {
+        super.init()
+        self.addObserver(self, forKeyPath: "operations", options: .new, context: &AsyncOperationQueue.observerContext)
+        
+    }
+    deinit {
+        self.removeObserver(self, forKeyPath: "operations", context: &AsyncOperationQueue.observerContext)
+    }
+    
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        
+        if context == &AsyncOperationQueue.observerContext {
+            setAllOperationPriority(operations:self.operations)
+        }else {
+            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
+        }
+    }
+    
+    private func setAllOperationPriority(operations:[Operation]) {
+        if let sort = self.operationPrioritySorting {
+            let sortedOperations = operations.filter{ $0.isCancelled == false && $0.isFinished == false && $0.isExecuting == false}.sorted { (op1, op2) -> Bool in
+                if let op1 = op1 as? AsyncOperation,
+                    let op2 = op2 as? AsyncOperation{
+                    if let result = sort(op1, op2) {
+                        return result
+                    }
+                }
+                return op1.hash > op2.hash
+            }
+            
+            var priorities:[Operation.QueuePriority] =  [.veryHigh, .high, .normal, .low, .veryLow]
+            sortedOperations.forEach { (op) in
+                if let priority = priorities.first{
+                    op.queuePriority = priority
+                    priorities.remove(at: 0)
+                }else{
+                    op.queuePriority = .veryLow
+                }
+            }
+        }
+    }
+    
     override func addOperation(_ op: Operation) {
         if let op = op as? AsyncOperation {
             op.queueUuid = self.uuid
             AsyncOperationMonitorCenter.shared.registerStarted(queueUUID: uuid, tags: op.tags)
         }
+        let array = self.operations + [op]
+        setAllOperationPriority(operations: array)
         super.addOperation(op)
     }
 
@@ -167,6 +218,8 @@ class AsyncOperation: Operation {
     fileprivate let uuid = UUID.init()
     fileprivate var queueUuid:UUID?
 
+    var userInfo:[AnyHashable:Any] = [:]
+    
     override var isExecuting: Bool {
         return _executing
     }
@@ -265,7 +318,11 @@ extension AsyncOperation {
         if let shoppableId = shoppableId {
             tags.append(AsyncOperationTag.init(type: .shoppableId, value: shoppableId))
         }
+      
         self.init(timeout: timeout, tags: tags, completion: completion)
+        if let assetId = assetId {
+            userInfo = ["assetId":assetId]
+        }
     }
     
     convenience init(timeout:TimeInterval?, partNumbers:[String], completion:@escaping ((@escaping() -> ()) -> ())) {
