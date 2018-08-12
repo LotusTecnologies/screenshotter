@@ -185,6 +185,8 @@ class ProductCollectionViewManager {
                 productArray = products.sorted { $0.floatPrice > $1.floatPrice }
             case .brands :
                 productArray = products.sorted { titleOrder(a: $0, b: $1) ?? ($0.order < $1.order) }
+            default:
+                productArray = products.sorted { $0.order < $1.order }
             }
             return productArray
         }

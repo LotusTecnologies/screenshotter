@@ -59,7 +59,7 @@ enum OpenWebPage : String {
         case .safari:
             return UIApplication.shared.canOpenURL(url)
         case .chrome:
-            return  UIApplication.shared.canOpenInChrome(url: url)
+            return UIApplication.shared.canOpenInChrome(url: url)
         }
     }
     

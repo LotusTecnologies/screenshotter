@@ -24,11 +24,18 @@ import Foundation
  
  */
 
-/// The section enum must maintain its order.
-class DataSource<S: RawRepresentable & Hashable, R: RawRepresentable> where S.RawValue == Int, R.RawValue == Int {
+class DataSource<S: RawRepresentable & Hashable, R: RawRepresentable & Equatable> {
     private var data: [(section: S, rows: [R])] = []
     
+    /// S enum must maintain order
     init(data: [S: [R]]) {
+        data.forEach { (section, rows) in
+            addSection(section, rows: rows)
+        }
+    }
+    
+    /// Array maintains order
+    init(data: [(S, [R])]) {
         data.forEach { (section, rows) in
             addSection(section, rows: rows)
         }
@@ -44,12 +51,11 @@ class DataSource<S: RawRepresentable & Hashable, R: RawRepresentable> where S.Ra
         return data.index(where: { $0.section == section })
     }
     
-    func addSection(_ section: S, rows: [R]) {
+    func addSection(_ section: S, rows: [R], at index: Int = .max) {
         guard sectionIndex(section) == nil else {
             return
         }
-        data.insert((section, rows), at: 0)
-        data.sort(by: { $0.section.rawValue < $1.section.rawValue })
+        data.insert((section, rows), at: (index == .max) ? count : index)
     }
     
     func removeSection(_ section: S) {

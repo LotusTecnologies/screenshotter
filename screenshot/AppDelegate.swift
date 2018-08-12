@@ -146,7 +146,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if PermissionsManager.shared.permissionStatus(for: .push) == .authorized {
             PermissionsManager.shared.requestPermission(for: .push)
         }
-        
         return true
     }
     

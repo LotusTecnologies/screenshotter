@@ -818,3 +818,157 @@ class NetworkingPromise : NSObject {
     }
 
 }
+
+//Amazon
+extension NetworkingPromise {
+    func searchAmazon(keywords: String, options: (sort: ProductsOptionsSort, gender: ProductsOptionsGender, size: ProductsOptionsSize)? = nil) -> Promise<[AmazonItem]> {
+        // RFC 3986 section 2.3
+        let unreservedCharacters = CharacterSet.init(charactersIn:  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.~")
+        
+        let secretKey = "DS2XiI+TpojibQxtMSFkfHGdLkcQVHaoM2mVGVh/"
+        var components = URLComponents.init()
+        components.scheme = "http"
+        components.host = "webservices.amazon.com"
+        components.path = "/onca/xml"
+        var queryItems:[URLQueryItem] = []
+        
+        var querySearchIndex = "Fashion"
+        var querySort: String?
+        
+        if let (sort, gender, size) = options {
+            switch sort {
+            case .similar:
+                querySort = "relevancerank"
+            case .priceAsc:
+                querySort = "price"
+            case .priceDes:
+                querySort = "-price"
+            case .review:
+                querySort = "reviewrank"
+            case .popularity:
+                querySort = "popularity-rank"
+            default:
+                break
+            }
+            
+            if gender == .male {
+                if size == .adult {
+                    querySearchIndex = "FashionMen"
+                }
+                else if size == .child {
+                    querySearchIndex = "FashionBoys"
+                }
+            }
+            else if gender == .female {
+                if size == .adult {
+                    querySearchIndex = "FashionWomen"
+                }
+                else if size == .child {
+                    querySearchIndex = "FashionGirls"
+                }
+            }
+        }
+        
+        queryItems.append(URLQueryItem.init(name: "Service", value: "AWSECommerceService"))
+        queryItems.append(URLQueryItem.init(name: "Operation", value: "ItemSearch"))
+        queryItems.append(URLQueryItem.init(name: "AWSAccessKeyId", value: "AKIAIQQSEU7DPKUSEXTA"))
+        queryItems.append(URLQueryItem.init(name: "AssociateTag", value: "041897-20"))
+        queryItems.append(URLQueryItem.init(name: "SearchIndex", value: querySearchIndex))
+        queryItems.append(URLQueryItem.init(name: "Availability", value: "Available"))
+        queryItems.append(URLQueryItem.init(name: "Keywords", value: keywords))
+        queryItems.append(URLQueryItem.init(name: "ResponseGroup", value: "Images,Offers,ItemAttributes"))
+        queryItems.append(URLQueryItem.init(name: "Version", value: "2013-08-01"))
+        
+        if let querySort = querySort {
+            queryItems.append(URLQueryItem.init(name: "Sort", value: querySort))
+        }
+        
+        let dateFormatter = ISO8601DateFormatter()
+        queryItems.append(URLQueryItem.init(name: "Timestamp", value: dateFormatter.string(from: Date())))
+        
+        queryItems.sort { (s1, s2) -> Bool in
+            let u1 = NSString.init(string: "\(s1.name)=\(s1.value ?? "")")
+            let u2 = NSString.init(string: "\(s2.name)=\(s2.value ?? "")")
+            
+            return u1.compare(u2 as String, options: .literal) == ComparisonResult.orderedAscending
+        }
+
+        let queryItemsString = queryItems.compactMap({ (item) -> String? in
+            if let name = item.name.addingPercentEncoding(withAllowedCharacters: unreservedCharacters),
+                let value = item.value?.addingPercentEncoding(withAllowedCharacters: unreservedCharacters) {
+                return "\(name)=\(value)"
+            }
+            return nil
+        }).joined(separator: "&")
+
+        let stringToHmac = "GET\u{0A}webservices.amazon.com\u{0A}/onca/xml\u{0A}\(queryItemsString)"
+        let hmac_sign = stringToHmac.hmacBase64(algorithm: .SHA256, key: secretKey)
+        let hmac_sign_escaped = hmac_sign.addingPercentEncoding(withAllowedCharacters: CharacterSet.init(charactersIn: "+").inverted) ?? ""
+
+        components.queryItems = queryItems
+        
+        return Promise<[AmazonItem]> { (fulfill, reject) in
+            guard let urlUnsigned = components.url?.absoluteString, let url = URL.init(string: "\(urlUnsigned)&Signature=\(hmac_sign_escaped)") else {
+                reject(NSError(domain: "Craze", code: 12, userInfo: [NSLocalizedDescriptionKey : "amazon search invalid url"]))
+                return
+            }
+            
+            let request = URLRequest.init(url: url)
+            let dataTask = URLSession.shared.dataTask(with: request) { (data, response, error) in
+                guard let data = data, error == nil else {
+                    if let error = error {
+                        reject(error)
+                    }
+                    else {
+                        reject(NSError(domain: "Craze", code: 12, userInfo: [NSLocalizedDescriptionKey : "amazon search no data"]))
+                    }
+                    return
+                }
+                
+                let amazonParser = AmazonParserModel(xmlData: data)
+                
+                if let amazonError = amazonParser.error {
+                    reject(NSError(domain: "Craze", code: 12, userInfo: [NSLocalizedDescriptionKey : "\(amazonError.code): \(amazonError.message)"]))
+                }
+                else if let amazonItems = amazonParser.items {
+                    fulfill(amazonItems)
+                }
+                else {
+                    reject(NSError(domain: "Craze", code: 12, userInfo: [NSLocalizedDescriptionKey : "amazon search unexpected data"]))
+                }
+            }
+            dataTask.resume()
+        }
+    }
+}
+
+// MARK: - Search Category
+
+extension NetworkingPromise {
+    func fetchSearchCategories() -> Promise<SearchRoot> {
+        return Promise<SearchRoot> { fulfill, reject in
+            guard let url = URL(string: "https://s3.amazonaws.com/search-bar/search.json") else {
+                reject(NSError(domain: "Craze", code: 13, userInfo: [NSLocalizedDescriptionKey: "search category invalid url"]))
+                return
+            }
+            
+            let dataTask = URLSession.shared.dataTask(with: url) { (data, response, error) in
+                if let error = error {
+                    reject(error)
+                }
+                else if let data = data {
+                    if let searchRoot: SearchRoot = try? JSONDecoder().decode(SearchRoot.self, from: data) {
+                        fulfill(searchRoot)
+                    }
+                    else {
+                        reject(NSError(domain: "Craze", code: 13, userInfo: [NSLocalizedDescriptionKey: "search category invalid data"]))
+                    }
+                }
+                else {
+                    reject(NSError(domain: "Craze", code: 13, userInfo: [NSLocalizedDescriptionKey: "search category no data"]))
+                }
+            }
+            dataTask.resume()
+        }
+    }
+}

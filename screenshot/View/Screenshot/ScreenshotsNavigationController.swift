@@ -16,7 +16,6 @@ protocol ScreenshotsNavigationControllerDelegate: NSObjectProtocol {
 class ScreenshotsNavigationController: UINavigationController {
     weak var screenshotsNavigationControllerDelegate:ScreenshotsNavigationControllerDelegate?
     var screenshotsViewController:ScreenshotsViewController = ScreenshotsViewController()
-    var activityBarButtonItem:UIBarButtonItem?
     fileprivate var restoredProductsViewController: ProductsViewController?
     
     
@@ -28,7 +27,6 @@ class ScreenshotsNavigationController: UINavigationController {
         self.restorationIdentifier = "ScreenshotsNavigationController"
         
         self.viewControllers = [self.screenshotsViewController]
-        AssetSyncModel.sharedInstance.networkingIndicatorDelegate = self
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -43,10 +41,6 @@ class ScreenshotsNavigationController: UINavigationController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         UniversalSearchController.shared.updateInboxBadgeCount()
-    }
-    
-    deinit {
-        AssetSyncModel.sharedInstance.networkingIndicatorDelegate = nil
     }
 }
 
@@ -163,37 +157,6 @@ extension ScreenshotsNavigationControllerPushPermission {
         
         UserDefaults.standard.set(true, forKey: UserDefaultsKeys.onboardingPresentedPushAlert)
         UserDefaults.standard.synchronize()
-    }
-}
-
-extension ScreenshotsNavigationController : NetworkingIndicatorProtocol {
-    func networkingIndicatorDidStart(type: NetworkingIndicatorType) {
-        if self.activityBarButtonItem == nil {
-            let activityView = UIActivityIndicatorView.init(activityIndicatorStyle: .white)
-            activityView.color = .crazeRed
-            activityView.startAnimating()
-            
-            let barButtonItem = UIBarButtonItem(customView: activityView)
-            self.activityBarButtonItem = barButtonItem
-           
-            if let currentItem = self.screenshotsViewController.navigationItem.leftBarButtonItems?.first {
-                self.screenshotsViewController.navigationItem.leftBarButtonItems = [currentItem, barButtonItem]
-            }
-        }
-        
-        self.activityBarButtonItem?.tag += 1
-    }
-    
-    func networkingIndicatorDidComplete(type: NetworkingIndicatorType) {
-        self.activityBarButtonItem?.tag -= 1
-        
-        if self.activityBarButtonItem?.tag == 0 {
-            if let currentItem = self.screenshotsViewController.navigationItem.leftBarButtonItems?.first {
-                self.screenshotsViewController.navigationItem.leftBarButtonItems = [currentItem]
-            }
-            
-            self.activityBarButtonItem = nil
-        }
     }
 }
 

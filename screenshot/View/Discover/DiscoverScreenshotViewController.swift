@@ -47,8 +47,6 @@ class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonit
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
         restorationIdentifier = String(describing: type(of: self))
-        
-        addNavigationItemLogo()
     }
     
     func updateViewsLoadingState(){

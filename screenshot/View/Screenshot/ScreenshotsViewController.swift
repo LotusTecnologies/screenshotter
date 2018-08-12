@@ -53,7 +53,6 @@ class ScreenshotsViewController: BaseViewController {
         self.editButtonItem.target = self
         self.editButtonItem.action = #selector(editButtonAction)
         self.navigationItem.backBarButtonItem = UIBarButtonItem.init(title: "", style: .plain, target: nil, action: nil)
-        self.addNavigationItemLogo()
     }
     
     required init?(coder aDecoder: NSCoder) {

@@ -356,7 +356,7 @@ extension ProductDetailViewController: ProductsOptionsDelegate {
     }
     
     @objc private func dismissOptions() {
-        dismiss(animated: true)
+        productsOptions.viewController.presentingViewController?.dismiss(animated: true)
     }
     
     func productsOptionsDidComplete(_ productsOptions: ProductsOptions, withModelChange changed: Bool) {

@@ -138,8 +138,6 @@ class ProfileViewController: BaseTableViewController {
         
         NotificationCenter.default.addObserver(self, selector: #selector(applicationDidBecomeActive(_:)), name: .UIApplicationDidBecomeActive, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(applicationWillEnterForeground(_:)), name: .UIApplicationWillEnterForeground, object: nil)
-        
-        addNavigationItemLogo()
     }
     
     convenience init() {
