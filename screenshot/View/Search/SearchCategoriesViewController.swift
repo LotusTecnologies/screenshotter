@@ -131,8 +131,9 @@ extension SearchCategoriesViewController: UICollectionViewDelegateFlowLayout {
 // MARK: - Search
 
 extension SearchCategoriesViewController {
-    func searchAndPushResults(searchCategory: SearchCategory, parentSearchCategory: SearchCategory? = nil) {
-        let text = searchQuery(searchCategory, parentSearchCategory)
+    func searchAndPushResults(searchCategory: SearchCategory) {
+        let title = searchCategory.title
+        let text = searchQuery(searchCategory)
         let gender: ProductsOptionsGender = {
             if let currentSearchClass = currentSearchClass {
                 switch currentSearchClass {
@@ -153,6 +154,7 @@ extension SearchCategoriesViewController {
                 
                 let searchResultsViewController = SearchResultsTableViewController(style: .plain)
                 searchResultsViewController.amazonItems = amazonItems
+                searchResultsViewController.title = title
                 strongSelf.navigationController?.pushViewController(searchResultsViewController, animated: true)
             }
             .catch { error in
@@ -160,11 +162,31 @@ extension SearchCategoriesViewController {
         }
     }
     
-    private func searchQuery(_ searchCategory: SearchCategory, _ parentSearchCategory: SearchCategory? = nil) -> String {
+    private func searchQuery(_ searchCategory: SearchCategory) -> String {
+        func singular(_ text: String) -> String {
+            return text.split(separator: " ").reduce("", { (query, word) -> String in
+                var singularWord = word
+                let returnedWord: String
+                
+                if let letter = singularWord.popLast(), letter == "s", singularWord.last != "s" {
+                    returnedWord = String(singularWord)
+                }
+                else {
+                    returnedWord = String(word)
+                }
+                
+                return query.isEmpty ? returnedWord : "\(query) \(returnedWord)"
+            })
+        }
         
+        var query = "\(singular(searchCategory.title))"
         
-        // TODO:
+        if let parentSearchCategory = parentBranch?.category {
+            if !query.contains(parentSearchCategory.title) {
+                query += " \(singular(parentSearchCategory.title))"
+            }
+        }
         
-        return searchCategory.title
+        return query
     }
 }

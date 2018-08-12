@@ -22,10 +22,12 @@ class SearchCategoriesNavigationController: UINavigationController {
         
         let genderControl = UISegmentedControl(items: searchClasses.map({ $0.possessiveTitle }))
         genderControl.selectedSegmentIndex = 0
-        genderControl.addTarget(self, action: #selector(genderControlDidChange(_:)), for: .valueChanged)
+        genderControl.addTarget(self, action: #selector(syncBranches(_:)), for: .valueChanged)
         searchCategoriesViewController.navigationItem.titleView = genderControl
-        
         searchCategoriesViewController.columns = 2
+        syncBranches(genderControl)
+        
+        viewControllers = [searchCategoriesViewController]
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -34,7 +36,7 @@ class SearchCategoriesNavigationController: UINavigationController {
     
     // MARK: Options
     
-    @objc private func genderControlDidChange(_ segmentedControl: UISegmentedControl) {
+    @objc private func syncBranches(_ segmentedControl: UISegmentedControl) {
         currentSearchClass = searchClasses[segmentedControl.selectedSegmentIndex]
         searchCategoriesViewController.branches = currentSearchClass.dataSource
     }
