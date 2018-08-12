@@ -134,7 +134,6 @@
 		C53B465E1FBC685D00A8C886 /* EnvironmentHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53B465D1FBC685D00A8C886 /* EnvironmentHelper.swift */; };
 		C54124C220A8308600CA03DB /* AccumulatorModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54124C120A8308600CA03DB /* AccumulatorModel.swift */; };
 		C547068C20FC6085003BD1D1 /* FavoriteNotificationTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C547068B20FC6084003BD1D1 /* FavoriteNotificationTableViewCell.swift */; };
-		C54F0BCA211868230097B15D /* SearchCategoryDataType.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54F0BC9211868230097B15D /* SearchCategoryDataType.swift */; };
 		C553563C1F8369DF00849E64 /* DeviceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C553563B1F8369DE00849E64 /* DeviceHelper.swift */; };
 		C5709E451FC57B4500AB2D04 /* EnumProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5709E441FC57B4500AB2D04 /* EnumProtocol.swift */; };
 		C572FEFE205C00070046BFEB /* Hind-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C572FEF9205C00050046BFEB /* Hind-Light.ttf */; };
@@ -209,6 +208,7 @@
 		C5CAF27A1FCC0EFD006F37DC /* ISO4217.plist in Resources */ = {isa = PBXBuildFile; fileRef = C5CAF2791FCC0EFD006F37DC /* ISO4217.plist */; };
 		C5CAF27C1FCC14C1006F37DC /* CurrencyModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CAF27B1FCC14C1006F37DC /* CurrencyModel.swift */; };
 		C5CC3E391F94A85900DA3425 /* NetworkingIndicatorProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CC3E381F94A85900DA3425 /* NetworkingIndicatorProtocol.swift */; };
+		C5CF0FCB2120239C007963BA /* SearchCategoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CF0FCA2120239C007963BA /* SearchCategoryModel.swift */; };
 		C5D2428020F4866A001403E4 /* DataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5D2427F20F4866A001403E4 /* DataSource.swift */; };
 		C5DC531A20CD3F2100E90DB8 /* Quicksand-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C5DC531620CD3F2000E90DB8 /* Quicksand-Medium.ttf */; };
 		C5DC531B20CD3F2100E90DB8 /* Quicksand-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C5DC531720CD3F2000E90DB8 /* Quicksand-Regular.ttf */; };
@@ -395,7 +395,6 @@
 		C53B465D1FBC685D00A8C886 /* EnvironmentHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnvironmentHelper.swift; sourceTree = "<group>"; };
 		C54124C120A8308600CA03DB /* AccumulatorModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccumulatorModel.swift; sourceTree = "<group>"; };
 		C547068B20FC6084003BD1D1 /* FavoriteNotificationTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FavoriteNotificationTableViewCell.swift; sourceTree = "<group>"; };
-		C54F0BC9211868230097B15D /* SearchCategoryDataType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchCategoryDataType.swift; sourceTree = "<group>"; };
 		C553563B1F8369DE00849E64 /* DeviceHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceHelper.swift; sourceTree = "<group>"; };
 		C5709E441FC57B4500AB2D04 /* EnumProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnumProtocol.swift; sourceTree = "<group>"; };
 		C572FEF9205C00050046BFEB /* Hind-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Hind-Light.ttf"; sourceTree = "<group>"; };
@@ -470,6 +469,7 @@
 		C5CAF2791FCC0EFD006F37DC /* ISO4217.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = ISO4217.plist; sourceTree = "<group>"; };
 		C5CAF27B1FCC14C1006F37DC /* CurrencyModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyModel.swift; sourceTree = "<group>"; };
 		C5CC3E381F94A85900DA3425 /* NetworkingIndicatorProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkingIndicatorProtocol.swift; sourceTree = "<group>"; };
+		C5CF0FCA2120239C007963BA /* SearchCategoryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchCategoryModel.swift; sourceTree = "<group>"; };
 		C5D2427F20F4866A001403E4 /* DataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSource.swift; sourceTree = "<group>"; };
 		C5DC531620CD3F2000E90DB8 /* Quicksand-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Medium.ttf"; sourceTree = "<group>"; };
 		C5DC531720CD3F2000E90DB8 /* Quicksand-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Regular.ttf"; sourceTree = "<group>"; };
@@ -905,6 +905,7 @@
 				31CE11012039570B000156EE /* FetchedResultsControllerManager.swift */,
 				E4104DBF20DC540200683FE9 /* LocalNotificationModel.swift */,
 				E42BCB0621061B040043A28A /* AmazonParserModel.swift */,
+				C5CF0FCA2120239C007963BA /* SearchCategoryModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -1142,7 +1143,6 @@
 				C52FD9DC211057F600AD3A0B /* SearchCategoryCollectionViewCell.swift */,
 				C5933D8F21103B3400BBCF5B /* SearchCategoriesViewController.swift */,
 				C515A412211DAF9800482B21 /* SearchCategoriesNavigationController.swift */,
-				C54F0BC9211868230097B15D /* SearchCategoryDataType.swift */,
 				C5933D8B210F42DA00BBCF5B /* SearchNavigationController.swift */,
 				C5933D89210F3F9100BBCF5B /* SearchViewController.swift */,
 				C5933D8D2110359700BBCF5B /* UniversalSearchController.swift */,
@@ -1554,7 +1554,6 @@
 				C58BAE8620E101DD0051394A /* UIViewController.swift in Sources */,
 				31A0781E20830D9A00D70DC3 /* UserFeedback.swift in Sources */,
 				C53B46511FBC396900A8C886 /* Appearance.swift in Sources */,
-				C54F0BCA211868230097B15D /* SearchCategoryDataType.swift in Sources */,
 				E4978C3C1F53610F0008B87F /* Constants.swift in Sources */,
 				C58BAE7720E101DD0051394A /* ErrorCollectionViewCell.swift in Sources */,
 				C5F73C9E1FE244C800E49F2B /* Permissions.swift in Sources */,
@@ -1712,6 +1711,7 @@
 				311A50C020D90B780001D463 /* OnboardingDetailsViewController.swift in Sources */,
 				C58BAE7E20E101DD0051394A /* TextExplanationTableViewCell.swift in Sources */,
 				311A506120D90B780001D463 /* ScreenshotsActionsCollectionReusableView.swift in Sources */,
+				C5CF0FCB2120239C007963BA /* SearchCategoryModel.swift in Sources */,
 				311A50BB20D90B780001D463 /* OnboardingGDPRViewController.swift in Sources */,
 				311A503520D90B780001D463 /* DiscoverScreenshotHelperView.swift in Sources */,
 				31357EE220F6636D00515116 /* UIColor+craze.swift in Sources */,

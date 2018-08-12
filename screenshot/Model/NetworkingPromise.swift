@@ -821,19 +821,6 @@ class NetworkingPromise : NSObject {
 
 //Amazon
 extension NetworkingPromise {
-//    struct AmazonItemLink {
-//        var url:String
-//        var description:String
-//    }
-//    struct AmazonItem {
-//        var itemLinks:[AmazonItemLink] = []
-//        var DetailPageURL:String
-//        var ASIN:String
-//        var ParentASIN:String
-//        var ProductGroup:String
-//        var title:String
-//        var manufacturer:String
-//    }
     func searchAmazon(keywords: String, options: (sort: ProductsOptionsSort, gender: ProductsOptionsGender, size: ProductsOptionsSize)? = nil) -> Promise<[AmazonItem]> {
         // RFC 3986 section 2.3
         let unreservedCharacters = CharacterSet.init(charactersIn:  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.~")
@@ -921,8 +908,6 @@ extension NetworkingPromise {
         components.queryItems = queryItems
         
         return Promise<[AmazonItem]> { (fulfill, reject) in
-            // ???: using code 12, not sure which existing to use
-            
             guard let urlUnsigned = components.url?.absoluteString, let url = URL.init(string: "\(urlUnsigned)&Signature=\(hmac_sign_escaped)") else {
                 reject(NSError(domain: "Craze", code: 12, userInfo: [NSLocalizedDescriptionKey : "amazon search invalid url"]))
                 return
@@ -955,4 +940,35 @@ extension NetworkingPromise {
             dataTask.resume()
         }
     }
- }
+}
+
+// MARK: - Search Category
+
+extension NetworkingPromise {
+    func fetchSearchCategories() -> Promise<SearchRoot> {
+        return Promise<SearchRoot> { fulfill, reject in
+            guard let url = URL(string: "https://s3.amazonaws.com/search-bar/search.json") else {
+                reject(NSError(domain: "Craze", code: 13, userInfo: [NSLocalizedDescriptionKey: "search category invalid url"]))
+                return
+            }
+            
+            let dataTask = URLSession.shared.dataTask(with: url) { (data, response, error) in
+                if let error = error {
+                    reject(error)
+                }
+                else if let data = data {
+                    if let searchRoot: SearchRoot = try? JSONDecoder().decode(SearchRoot.self, from: data) {
+                        fulfill(searchRoot)
+                    }
+                    else {
+                        reject(NSError(domain: "Craze", code: 13, userInfo: [NSLocalizedDescriptionKey: "search category invalid data"]))
+                    }
+                }
+                else {
+                    reject(NSError(domain: "Craze", code: 13, userInfo: [NSLocalizedDescriptionKey: "search category no data"]))
+                }
+            }
+            dataTask.resume()
+        }
+    }
+}

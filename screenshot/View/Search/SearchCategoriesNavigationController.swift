@@ -38,6 +38,16 @@ class SearchCategoriesNavigationController: UINavigationController {
     
     @objc private func syncBranches(_ segmentedControl: UISegmentedControl) {
         currentSearchClass = searchClasses[segmentedControl.selectedSegmentIndex]
-        searchCategoriesViewController.branches = currentSearchClass.dataSource
+        
+        guard let searchRoot = SearchCategoryModel.shared.root else {
+            return
+        }
+        
+        switch currentSearchClass {
+        case .men:
+            searchCategoriesViewController.branches = searchRoot.men
+        case .women:
+            searchCategoriesViewController.branches = searchRoot.women
+        }
     }
 }

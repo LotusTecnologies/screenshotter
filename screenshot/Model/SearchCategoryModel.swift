@@ -1,37 +1,26 @@
 //
-//  SearchCategoryDataType.swift
+//  SearchCategoryModel.swift
 //  Screenshop
 //
-//  Created by Corey Werner on 8/6/18.
+//  Created by Corey Werner on 8/12/18.
 //  Copyright © 2018 crazeapp. All rights reserved.
 //
 
 import Foundation
 
-struct SearchRoot: Encodable {
+struct SearchRoot: Decodable {
     let men: [SearchBranch]
     let women: [SearchBranch]
 }
 
-struct SearchBranch: Encodable {
+struct SearchBranch: Decodable {
     let category: SearchCategory
     let image: String?
-    let keyword: String
+    let keyword: String?
     let subcategories: [SearchBranch]?
-    
-    init(category: SearchCategory, image: String?, keyword: String, subcategories: [SearchBranch]?) {
-        self.category = category
-        self.image = image
-        self.keyword = keyword
-        self.subcategories = subcategories
-    }
-    
-    init(_ category: SearchCategory, keyword: String) {
-        self.init(category: category, image: nil, keyword: keyword, subcategories: nil)
-    }
 }
 
-enum SearchClass: String {
+enum SearchClass: String, Decodable {
     case men
     case women
     
@@ -58,7 +47,7 @@ enum SearchClass: String {
     }
 }
 
-enum SearchCategory: String, Encodable {
+enum SearchCategory: String, Decodable {
     case accessories
     case active
     case belts
@@ -208,42 +197,17 @@ enum SearchCategory: String, Encodable {
     }
 }
 
-extension SearchClass {
-    var dataSource: [SearchBranch] {
-        switch self {
-        case .men:
-            return SearchClass.menDataSource
-        case .women:
-            return SearchClass.womenDataSource
+class SearchCategoryModel {
+    static let shared = SearchCategoryModel()
+    private(set) var root: SearchRoot?
+    
+    func fetchCategories() {
+        NetworkingPromise.sharedInstance.fetchSearchCategories()
+            .then { searchRoot in
+                self.root = searchRoot
+            }
+            .catch { error in
+                
         }
     }
-    
-    static private let menDataSource = [
-        SearchBranch(category: .tops, image: nil, keyword: "mens tops", subcategories: [
-            SearchBranch(.dress, keyword: "dress shirts"),
-            SearchBranch(.casual, keyword: "casual shirts"),
-            SearchBranch(.polos, keyword: "polos"),
-            SearchBranch(.teesAndTanks, keyword: "tees and tank tops")
-            ]),
-        SearchBranch(category: .bottoms, image: nil, keyword: "mens bottoms", subcategories: [
-            SearchBranch(.jeans, keyword: "jeans"),
-            SearchBranch(.pants, keyword: "pants"),
-            SearchBranch(.shorts, keyword: "shorts"),
-            SearchBranch(.sweatpants, keyword: "sweatpants")
-            ])
-    ]
-    
-    static private let womenDataSource = [
-        SearchBranch(category: .tops, image: nil, keyword: "tops", subcategories: [
-            SearchBranch(.blousesAndButtonUps, keyword: "blouses and button ups"),
-            SearchBranch(.cropTops, keyword: "crop tops"),
-            SearchBranch(.bodySuits, keyword: "body suits"),
-            SearchBranch(.graphicTees, keyword: "graphic tees")
-            ]),
-        SearchBranch(category: .swimwear, image: nil, keyword: "swimwear", subcategories: [
-            SearchBranch(.bikinis, keyword: "bikini swimwear"),
-            SearchBranch(.onePieces, keyword: "one piece swimwear"),
-            SearchBranch(.coverUps, keyword: "cover up swimwear")
-            ])
-    ]
 }

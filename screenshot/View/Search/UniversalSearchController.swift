@@ -17,6 +17,7 @@ class UniversalSearchController: NSObject {
     override init() {
         super.init()
         
+        SearchCategoryModel.shared.fetchCategories()
         inboxUnreadCountFRC.delegate = self
     }
     
