@@ -85,6 +85,8 @@
 	<string>This allows you to invite friends from your address book.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>We scan your screenshots to match for similar products.</string>
+	<key>Pushwoosh_APPID</key>
+	<string>3D767-313B8</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Hind-Bold.ttf</string>
@@ -119,6 +121,10 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<true/>
+	<key>branch_app_domain</key>
+	<string>crazeshop.net</string>
 	<key>branch_key</key>
 	<dict>
 		<key>live</key>
@@ -126,9 +132,5 @@
 		<key>test</key>
 		<string>key_test_nhuLfd9jmgzQdyMXBQwnzfinzyh6aPfx</string>
 	</dict>
-	<key>UIViewControllerBasedStatusBarAppearance</key>
-	<true/>
-	<key>Pushwoosh_APPID</key>
-	<string>3D767-313B8</string>
 </dict>
 </plist>
