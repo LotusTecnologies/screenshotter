@@ -1,5 +1,5 @@
 //
-//  SearchResultsTableViewController.swift
+//  SearchResultsViewController.swift
 //  Screenshop
 //
 //  Created by Corey Werner on 8/2/18.
@@ -8,9 +8,16 @@
 
 import UIKit
 
-class SearchResultsTableViewController: UITableViewController {
+class SearchResultsViewController: UITableViewController {
     var amazonItems: [AmazonItem]? {
         didSet {
+            if let amazonItems = amazonItems {
+                state = amazonItems.isEmpty ? .empty : .results
+            }
+            else {
+                state = .loading
+            }
+            
             if isViewLoaded {
                 tableView?.contentOffset = {
                     var offset: CGPoint = .zero
@@ -30,17 +37,76 @@ class SearchResultsTableViewController: UITableViewController {
         }
     }
     
+    private let loadingIndicator = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
+    private let emptyLabel = UILabel()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        view.backgroundColor = .white
+        
+        tableView.backgroundColor = view.backgroundColor
         tableView.register(SearchResultTableViewCell.self, forCellReuseIdentifier: "cell")
         tableView.keyboardDismissMode = .onDrag
+        
+        loadingIndicator.translatesAutoresizingMaskIntoConstraints = false
+        loadingIndicator.color = .gray7
+        view.addSubview(loadingIndicator)
+        loadingIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        NSLayoutConstraint(item: loadingIndicator, attribute: .centerY, relatedBy: .equal, toItem: view, attribute: .centerY, multiplier: 0.7, constant: 0).isActive = true
+        
+        emptyLabel.translatesAutoresizingMaskIntoConstraints = false
+        emptyLabel.text = "search.results.empty".localized
+        emptyLabel.font = .systemFont(ofSize: 18, weight: .semibold)
+        emptyLabel.textColor = .gray3
+        emptyLabel.adjustsFontSizeToFitWidth = true
+        emptyLabel.minimumScaleFactor = 0.7
+        view.addSubview(emptyLabel)
+        emptyLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        NSLayoutConstraint(item: emptyLabel, attribute: .centerY, relatedBy: .equal, toItem: view, attribute: .centerY, multiplier: 0.7, constant: 0).isActive = true
+        emptyLabel.leadingAnchor.constraint(greaterThanOrEqualTo: view.layoutMarginsGuide.leadingAnchor).isActive = true
+        emptyLabel.trailingAnchor.constraint(lessThanOrEqualTo: view.layoutMarginsGuide.trailingAnchor).isActive = true
+        
+        syncState()
+    }
+    
+    // MARK: State
+    
+    private enum State {
+        case loading
+        case results
+        case empty
+    }
+    
+    private var state: State = .loading {
+        didSet {
+            syncState()
+        }
+    }
+    
+    private func syncState() {
+        switch state {
+        case .loading:
+            loadingIndicator.isHidden = false
+            loadingIndicator.startAnimating()
+            emptyLabel.isHidden = true
+            
+        case .results:
+            loadingIndicator.isHidden = true
+            loadingIndicator.stopAnimating()
+            emptyLabel.isHidden = true
+            
+        case .empty:
+            loadingIndicator.isHidden = true
+            loadingIndicator.stopAnimating()
+            emptyLabel.isHidden = false
+        }
     }
 }
 
 // MARK: - Data Source
 
-extension SearchResultsTableViewController {
+extension SearchResultsViewController {
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return amazonItems?.count ?? 0
     }
@@ -96,7 +162,7 @@ extension SearchResultsTableViewController {
 
 // MARK: - Delegate
 
-extension SearchResultsTableViewController {
+extension SearchResultsViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
     }

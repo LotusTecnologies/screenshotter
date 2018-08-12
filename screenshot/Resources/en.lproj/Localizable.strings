@@ -392,6 +392,8 @@
 "search.category.watches" = "Watches";
 "search.category.wedges" = "Wedges";
 
+"search.results.empty" = "No Results";
+
 "settings.contact" = "Questions? Get in touch: info@screenshopit.com";
 "settings.open_in.option.chrome" = "Chrome";
 "settings.open_in.option.embeded" = "ScreenShop";

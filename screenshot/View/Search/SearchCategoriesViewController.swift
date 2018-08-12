@@ -132,7 +132,6 @@ extension SearchCategoriesViewController: UICollectionViewDelegateFlowLayout {
 
 extension SearchCategoriesViewController {
     func searchAndPushResults(searchCategory: SearchCategory) {
-        let title = searchCategory.title
         let text = searchQuery(searchCategory)
         let gender: ProductsOptionsGender = {
             if let currentSearchClass = currentSearchClass {
@@ -146,16 +145,13 @@ extension SearchCategoriesViewController {
             return .female
         }()
         
+        let searchResultsViewController = SearchResultsViewController(style: .plain)
+        searchResultsViewController.title = searchCategory.title
+        navigationController?.pushViewController(searchResultsViewController, animated: true)
+        
         NetworkingPromise.sharedInstance.searchAmazon(keywords: text, options: (.default, gender, .adult))
-            .then { [weak self] amazonItems -> Void in
-                guard let strongSelf = self else {
-                    return
-                }
-                
-                let searchResultsViewController = SearchResultsTableViewController(style: .plain)
-                searchResultsViewController.amazonItems = amazonItems
-                searchResultsViewController.title = title
-                strongSelf.navigationController?.pushViewController(searchResultsViewController, animated: true)
+            .then { [weak searchResultsViewController] amazonItems -> Void in
+//                searchResultsViewController?.amazonItems = amazonItems
             }
             .catch { error in
                 // TODO:

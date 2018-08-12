@@ -9,7 +9,7 @@
 import UIKit
 
 class SearchViewController: UIViewController {
-    let searchResultsViewController: SearchResultsTableViewController
+    let searchResultsViewController: SearchResultsViewController
     let searchController: UISearchController
     let categoriesNavigationController = SearchCategoriesNavigationController()
     
@@ -17,7 +17,7 @@ class SearchViewController: UIViewController {
     private let filterBarButtonItem = UIBarButtonItem(image: UIImage(named: "ProductsFilter"), style: .plain, target: nil, action: nil)
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-        searchResultsViewController = SearchResultsTableViewController(style: .plain)
+        searchResultsViewController = SearchResultsViewController(style: .plain)
         searchController = SearchController(searchResultsController: searchResultsViewController)
         
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
