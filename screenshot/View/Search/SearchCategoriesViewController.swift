@@ -107,7 +107,7 @@ extension SearchCategoriesViewController: UICollectionViewDelegate {
             navigationController?.pushViewController(subcategoriesViewController, animated: true)
         }
         else {
-            searchAndPushResults(searchCategory: branch.category)
+            searchAndPushResults(searchBranch: branch)
         }
     }
 }
@@ -131,8 +131,7 @@ extension SearchCategoriesViewController: UICollectionViewDelegateFlowLayout {
 // MARK: - Search
 
 extension SearchCategoriesViewController {
-    func searchAndPushResults(searchCategory: SearchCategory) {
-        let text = searchQuery(searchCategory)
+    func searchAndPushResults(searchBranch: SearchBranch) {
         let gender: ProductsOptionsGender = {
             if let currentSearchClass = currentSearchClass {
                 switch currentSearchClass {
@@ -146,43 +145,15 @@ extension SearchCategoriesViewController {
         }()
         
         let searchResultsViewController = SearchResultsViewController()
-        searchResultsViewController.title = searchCategory.title
+        searchResultsViewController.title = searchBranch.category.title
         navigationController?.pushViewController(searchResultsViewController, animated: true)
         
-        NetworkingPromise.sharedInstance.searchAmazon(keywords: text, options: (.default, gender, .adult))
+        NetworkingPromise.sharedInstance.searchAmazon(keywords: searchBranch.keyword, options: (.default, gender, .adult))
             .then { [weak searchResultsViewController] amazonItems -> Void in
                 searchResultsViewController?.amazonItems = amazonItems
             }
             .catch { error in
                 // TODO:
         }
-    }
-    
-    private func searchQuery(_ searchCategory: SearchCategory) -> String {
-        func singular(_ text: String) -> String {
-            return text.split(separator: " ").reduce("", { (query, word) -> String in
-                var singularWord = word
-                let returnedWord: String
-                
-                if let letter = singularWord.popLast(), letter == "s", singularWord.last != "s" {
-                    returnedWord = String(singularWord)
-                }
-                else {
-                    returnedWord = String(word)
-                }
-                
-                return query.isEmpty ? returnedWord : "\(query) \(returnedWord)"
-            })
-        }
-        
-        var query = "\(singular(searchCategory.title))"
-        
-        if let parentSearchCategory = parentBranch?.category {
-            if !query.contains(parentSearchCategory.title) {
-                query += " \(singular(parentSearchCategory.title))"
-            }
-        }
-        
-        return query
     }
 }

@@ -26,8 +26,8 @@ struct SearchBranch: Encodable {
         self.subcategories = subcategories
     }
     
-    init(_ category: SearchCategory) {
-        self.init(category: category, image: nil, keyword: "", subcategories: nil)
+    init(_ category: SearchCategory, keyword: String) {
+        self.init(category: category, image: nil, keyword: keyword, subcategories: nil)
     }
 }
 
@@ -219,31 +219,31 @@ extension SearchClass {
     }
     
     static private let menDataSource = [
-        SearchBranch(category: .tops, image: nil, keyword: "", subcategories: [
-            SearchBranch(.dress),
-            SearchBranch(.casual),
-            SearchBranch(.polos),
-            SearchBranch(.teesAndTanks)
+        SearchBranch(category: .tops, image: nil, keyword: "mens tops", subcategories: [
+            SearchBranch(.dress, keyword: "dress shirts"),
+            SearchBranch(.casual, keyword: "casual shirts"),
+            SearchBranch(.polos, keyword: "polos"),
+            SearchBranch(.teesAndTanks, keyword: "tees and tank tops")
             ]),
-        SearchBranch(category: .bottoms, image: nil, keyword: "", subcategories: [
-            SearchBranch(.jeans),
-            SearchBranch(.pants),
-            SearchBranch(.shorts),
-            SearchBranch(.sweatpants)
+        SearchBranch(category: .bottoms, image: nil, keyword: "mens bottoms", subcategories: [
+            SearchBranch(.jeans, keyword: "jeans"),
+            SearchBranch(.pants, keyword: "pants"),
+            SearchBranch(.shorts, keyword: "shorts"),
+            SearchBranch(.sweatpants, keyword: "sweatpants")
             ])
     ]
     
     static private let womenDataSource = [
-        SearchBranch(category: .tops, image: nil, keyword: "", subcategories: [
-            SearchBranch(.blousesAndButtonUps),
-            SearchBranch(.cropTops),
-            SearchBranch(.bodySuits),
-            SearchBranch(.graphicTees)
+        SearchBranch(category: .tops, image: nil, keyword: "tops", subcategories: [
+            SearchBranch(.blousesAndButtonUps, keyword: "blouses and button ups"),
+            SearchBranch(.cropTops, keyword: "crop tops"),
+            SearchBranch(.bodySuits, keyword: "body suits"),
+            SearchBranch(.graphicTees, keyword: "graphic tees")
             ]),
-        SearchBranch(category: .swimwear, image: nil, keyword: "", subcategories: [
-            SearchBranch(.bikinis),
-            SearchBranch(.onePieces),
-            SearchBranch(.coverUps)
+        SearchBranch(category: .swimwear, image: nil, keyword: "swimwear", subcategories: [
+            SearchBranch(.bikinis, keyword: "bikini swimwear"),
+            SearchBranch(.onePieces, keyword: "one piece swimwear"),
+            SearchBranch(.coverUps, keyword: "cover up swimwear")
             ])
     ]
 }
