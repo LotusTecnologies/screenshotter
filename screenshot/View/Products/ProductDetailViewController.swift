@@ -470,7 +470,7 @@ extension ProductDetailViewController : AsyncOperationMonitorDelegate, FetchedRe
     }
     func updateProductsWithShoppable(){
         if let shoppable = self.shoppable{
-            self.products = self.productCollectionViewManager.productsForShoppable(shoppable, productsOptions: self.productsOptions).filter{ $0.price != self.product?.price || $0.merchant != self.product?.merchant || $0.productTitle() != self.product?.productTitle()}
+            self.products = self.productCollectionViewManager.productsForShoppable(shoppable, productsOptions: self.productsOptions).filter{ !$0.isSimmilar( self.product) }
         }else{
             self.products = []
         }

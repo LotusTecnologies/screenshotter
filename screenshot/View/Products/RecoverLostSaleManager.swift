@@ -76,7 +76,7 @@ class RecoverLostSaleManager: NSObject {
         let screenshot = product.screenshot ?? product.shoppable?.screenshot
 
         if let shoppable = (screenshot?.shoppables as? Set<Shoppable>)?.first(where: {$0.imageUrl == productImageURL}) {
-            if let products = (shoppable.products as? Set<Product>)?.filter({ $0.floatPrice < productFloatPrice}), products.count >= 10 {
+            if let products = (shoppable.products as? Set<Product>)?.filter({ $0.floatPrice != 0 && $0.floatPrice < productFloatPrice && $0.isSimmilar(product) }).prefix(10), products.count >= 3 {
                 Analytics.trackFeatureLowerPricesAppeared(product: product, secondsSinceLeftApp: timeSinceLeftApp)
                 let vc = SimilarItemsPopupViewController.init(dismissAction: {
                     let product = DataModel.sharedInstance.mainMoc().productWith(objectId: productObjectId)
@@ -85,7 +85,7 @@ class RecoverLostSaleManager: NSObject {
                     viewController.dismiss(animated: true, completion: nil)
                 })
                 self.presentingVC = viewController
-                vc.products = Array(products).sorted{ $0.floatPrice < $1.floatPrice }
+                vc.products = Array(products).sorted{ $0.order < $1.order }
                 vc.modalPresentationStyle = .popover
                 
                 vc.popoverPresentationController?.backgroundColor = vc.view.backgroundColor
