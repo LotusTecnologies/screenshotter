@@ -67,11 +67,7 @@ extension SearchCategoriesViewController: UICollectionViewDataSource {
         if let cell = cell as? SearchCategoryCollectionViewCell {
             let branch = branches[indexPath.item]
             
-            let width = Int(round(cell.bounds.width))
-            let height = Int(round(cell.bounds.height))
-            let url = URL(string: "https://picsum.photos/\(width)/\(height)?image=10\(indexPath.item)")
-            cell.imageView.sd_setImage(with: url)
-            
+            cell.imageView.sd_setImage(with: URL(string: branch.image ?? ""))
             cell.titleLabel.text = branch.category.title
         }
         
