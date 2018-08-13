@@ -42,7 +42,6 @@ extension Product {
                 for product in results {
                     product.dateViewed = now
                     product.dateSortProductBar = product.getSortDateForProductBar()
-                    product.hideFromProductBar = false
                 }
                 try managedObjectContext.save()
             } catch {

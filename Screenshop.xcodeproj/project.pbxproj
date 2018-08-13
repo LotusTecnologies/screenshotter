@@ -13,9 +13,6 @@
 		311A502420D90B780001D463 /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A4F5920D90B730001D463 /* WebViewController.swift */; };
 		311A502520D90B780001D463 /* OpenWebPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A4F5A20D90B730001D463 /* OpenWebPage.swift */; };
 		311A502620D90B780001D463 /* CurrencyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A4F5C20D90B730001D463 /* CurrencyViewController.swift */; };
-		311A502E20D90B780001D463 /* ProductsBarCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A4F6620D90B730001D463 /* ProductsBarCollectionViewCell.swift */; };
-		311A502F20D90B780001D463 /* ProductsBarCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A4F6720D90B730001D463 /* ProductsBarCollectionView.swift */; };
-		311A503020D90B780001D463 /* ProductsBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A4F6820D90B730001D463 /* ProductsBarController.swift */; };
 		311A503120D90B780001D463 /* DiscoverScreenshotViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A4F6A20D90B730001D463 /* DiscoverScreenshotViewController.swift */; };
 		311A503220D90B780001D463 /* DiscoverScreenshotCollectionViewLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A4F6B20D90B730001D463 /* DiscoverScreenshotCollectionViewLayout.swift */; };
 		311A503320D90B780001D463 /* DiscoverNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A4F6C20D90B730001D463 /* DiscoverNavigationController.swift */; };
@@ -55,7 +52,6 @@
 		311A506320D90B780001D463 /* ScreenshotCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A4FA720D90B750001D463 /* ScreenshotCollectionViewCell.swift */; };
 		311A506420D90B780001D463 /* ScreenshotNotificationCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A4FA820D90B750001D463 /* ScreenshotNotificationCollectionViewCell.swift */; };
 		311A506520D90B780001D463 /* ScreenshotsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A4FA920D90B750001D463 /* ScreenshotsViewController.swift */; };
-		311A506620D90B780001D463 /* ScreenshotProductBarCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A4FAA20D90B750001D463 /* ScreenshotProductBarCollectionViewCell.swift */; };
 		311A506720D90B780001D463 /* ScreenshotsHelperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A4FAB20D90B750001D463 /* ScreenshotsHelperView.swift */; };
 		311A506820D90B780001D463 /* ScreenshotsDeleteButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A4FAC20D90B750001D463 /* ScreenshotsDeleteButton.swift */; };
 		311A506920D90B780001D463 /* PickerCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A4FAE20D90B760001D463 /* PickerCollectionViewCell.swift */; };
@@ -219,7 +215,6 @@
 		E4104DC020DC540200683FE9 /* LocalNotificationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4104DBF20DC540200683FE9 /* LocalNotificationModel.swift */; };
 		E4139D501F09083B00E8A53B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E4139D4F1F09083B00E8A53B /* Assets.xcassets */; };
 		E42AC3911F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E42AC3901F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift */; };
-		E42BCB0521061A4B0043A28A /* (null) in Resources */ = {isa = PBXBuildFile; };
 		E42BCB0721061B040043A28A /* AmazonParserModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E42BCB0621061B040043A28A /* AmazonParserModel.swift */; };
 		E44CA6FC1F41E608001CB493 /* NetworkingPromise.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44CA6FB1F41E608001CB493 /* NetworkingPromise.swift */; };
 		E464F8DC211B25E1009B51AB /* Screenshop.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = E4D6D8A61F61B047009DD999 /* Screenshop.entitlements */; };
@@ -265,9 +260,6 @@
 		311A4F5920D90B730001D463 /* WebViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
 		311A4F5A20D90B730001D463 /* OpenWebPage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpenWebPage.swift; sourceTree = "<group>"; };
 		311A4F5C20D90B730001D463 /* CurrencyViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CurrencyViewController.swift; sourceTree = "<group>"; };
-		311A4F6620D90B730001D463 /* ProductsBarCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductsBarCollectionViewCell.swift; sourceTree = "<group>"; };
-		311A4F6720D90B730001D463 /* ProductsBarCollectionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductsBarCollectionView.swift; sourceTree = "<group>"; };
-		311A4F6820D90B730001D463 /* ProductsBarController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductsBarController.swift; sourceTree = "<group>"; };
 		311A4F6A20D90B730001D463 /* DiscoverScreenshotViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DiscoverScreenshotViewController.swift; sourceTree = "<group>"; };
 		311A4F6B20D90B730001D463 /* DiscoverScreenshotCollectionViewLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DiscoverScreenshotCollectionViewLayout.swift; sourceTree = "<group>"; };
 		311A4F6C20D90B730001D463 /* DiscoverNavigationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DiscoverNavigationController.swift; sourceTree = "<group>"; };
@@ -307,7 +299,6 @@
 		311A4FA720D90B750001D463 /* ScreenshotCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenshotCollectionViewCell.swift; sourceTree = "<group>"; };
 		311A4FA820D90B750001D463 /* ScreenshotNotificationCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenshotNotificationCollectionViewCell.swift; sourceTree = "<group>"; };
 		311A4FA920D90B750001D463 /* ScreenshotsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenshotsViewController.swift; sourceTree = "<group>"; };
-		311A4FAA20D90B750001D463 /* ScreenshotProductBarCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenshotProductBarCollectionViewCell.swift; sourceTree = "<group>"; };
 		311A4FAB20D90B750001D463 /* ScreenshotsHelperView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenshotsHelperView.swift; sourceTree = "<group>"; };
 		311A4FAC20D90B750001D463 /* ScreenshotsDeleteButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenshotsDeleteButton.swift; sourceTree = "<group>"; };
 		311A4FAE20D90B760001D463 /* PickerCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PickerCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -472,6 +463,7 @@
 		C5CC3E381F94A85900DA3425 /* NetworkingIndicatorProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkingIndicatorProtocol.swift; sourceTree = "<group>"; };
 		C5CF0FCA2120239C007963BA /* SearchCategoryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchCategoryModel.swift; sourceTree = "<group>"; };
 		C5CF0FCC2120551B007963BA /* String+Format.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Format.swift"; sourceTree = "<group>"; };
+		C5CF0FCE212176A0007963BA /* Model 25.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 25.xcdatamodel"; sourceTree = "<group>"; };
 		C5D2427F20F4866A001403E4 /* DataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSource.swift; sourceTree = "<group>"; };
 		C5DC531620CD3F2000E90DB8 /* Quicksand-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Medium.ttf"; sourceTree = "<group>"; };
 		C5DC531720CD3F2000E90DB8 /* Quicksand-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Regular.ttf"; sourceTree = "<group>"; };
@@ -549,7 +541,6 @@
 				311A501420D90B770001D463 /* Onboarding */,
 				311A4F7220D90B740001D463 /* Partners */,
 				311A4F8C20D90B740001D463 /* Products */,
-				311A4F6520D90B730001D463 /* ProductsBar */,
 				311A500820D90B770001D463 /* Profile */,
 				311A4FA420D90B750001D463 /* Screenshot */,
 				311A4FA120D90B750001D463 /* ScreenshotDisplay */,
@@ -581,16 +572,6 @@
 				311A4F5C20D90B730001D463 /* CurrencyViewController.swift */,
 			);
 			path = Currency;
-			sourceTree = "<group>";
-		};
-		311A4F6520D90B730001D463 /* ProductsBar */ = {
-			isa = PBXGroup;
-			children = (
-				311A4F6620D90B730001D463 /* ProductsBarCollectionViewCell.swift */,
-				311A4F6720D90B730001D463 /* ProductsBarCollectionView.swift */,
-				311A4F6820D90B730001D463 /* ProductsBarController.swift */,
-			);
-			path = ProductsBar;
 			sourceTree = "<group>";
 		};
 		311A4F6920D90B730001D463 /* Discover */ = {
@@ -709,7 +690,6 @@
 				311A4FA720D90B750001D463 /* ScreenshotCollectionViewCell.swift */,
 				311A4FA820D90B750001D463 /* ScreenshotNotificationCollectionViewCell.swift */,
 				311A4FA920D90B750001D463 /* ScreenshotsViewController.swift */,
-				311A4FAA20D90B750001D463 /* ScreenshotProductBarCollectionViewCell.swift */,
 				311A4FAB20D90B750001D463 /* ScreenshotsHelperView.swift */,
 				311A4FAC20D90B750001D463 /* ScreenshotsDeleteButton.swift */,
 			);
@@ -1576,7 +1556,6 @@
 				C58BAE6020E101DD0051394A /* Label.swift in Sources */,
 				311A503620D90B780001D463 /* Loader.swift in Sources */,
 				318FE266204C09C500277DD4 /* AsyncOperation.swift in Sources */,
-				311A506620D90B780001D463 /* ScreenshotProductBarCollectionViewCell.swift in Sources */,
 				C58BAE7820E101DD0051394A /* SpinnerCollectionViewCell.swift in Sources */,
 				C58BAE7320E101DD0051394A /* ScreenshotShareManager.swift in Sources */,
 				C58BAE8120E101DD0051394A /* UICollectionView.swift in Sources */,
@@ -1640,7 +1619,6 @@
 				C52FD9E72113319F00AD3A0B /* SearchResultsViewController.swift in Sources */,
 				C52FD9E1211091C900AD3A0B /* SearchBar.swift in Sources */,
 				311A506B20D90B780001D463 /* InitiateResetPasswordViewController.swift in Sources */,
-				311A503020D90B780001D463 /* ProductsBarController.swift in Sources */,
 				311A4F5520D90B020001D463 /* UserAccountManager.swift in Sources */,
 				311A502320D90B780001D463 /* WebView.swift in Sources */,
 				C58BAE5F20E101DD0051394A /* DynamicTypeAccessibilityLayout.swift in Sources */,
@@ -1702,7 +1680,6 @@
 				316C831820C3AEBD0012A908 /* Matchstick+craze.swift in Sources */,
 				C58BAE7420E101DD0051394A /* ViewControllerAnimatedTransitioning.swift in Sources */,
 				311A505820D90B780001D463 /* SectionBackgroundCollectionViewFlowLayout.swift in Sources */,
-				311A502F20D90B780001D463 /* ProductsBarCollectionView.swift in Sources */,
 				311A506A20D90B780001D463 /* ScreenshotPickerViewController.swift in Sources */,
 				C58BAE6C20E101DD0051394A /* ActivityBadgeView.swift in Sources */,
 				311A504A20D90B780001D463 /* GDPRViewController.swift in Sources */,
@@ -1713,7 +1690,6 @@
 				311A50BB20D90B780001D463 /* OnboardingGDPRViewController.swift in Sources */,
 				311A503520D90B780001D463 /* DiscoverScreenshotHelperView.swift in Sources */,
 				31357EE220F6636D00515116 /* UIColor+craze.swift in Sources */,
-				311A502E20D90B780001D463 /* ProductsBarCollectionViewCell.swift in Sources */,
 				C52FD9E3211091D200AD3A0B /* SearchController.swift in Sources */,
 				311A50B020D90B780001D463 /* ProfileAccountView.swift in Sources */,
 				C53B46531FBC397700A8C886 /* Geometry.swift in Sources */,
@@ -2390,6 +2366,7 @@
 		C5278FBD1F3C38510090E422 /* Model.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				C5CF0FCE212176A0007963BA /* Model 25.xcdatamodel */,
 				311C59AA211ACB0700F44F12 /* Model 24.xcdatamodel */,
 				E42DE587211733D20094A141 /* Model 23.xcdatamodel */,
 				31571D6E21084015002E0599 /* Model 22.xcdatamodel */,
@@ -2415,7 +2392,7 @@
 				E42AC3921F60340B0035A07C /* Model 2.xcdatamodel */,
 				C5278FBE1F3C38510090E422 /* Model.xcdatamodel */,
 			);
-			currentVersion = 311C59AA211ACB0700F44F12 /* Model 24.xcdatamodel */;
+			currentVersion = C5CF0FCE212176A0007963BA /* Model 25.xcdatamodel */;
 			path = Model.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

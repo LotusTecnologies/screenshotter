@@ -93,18 +93,6 @@ extension DataModel {
         return fetchedResultsController
     }
     
-    
-    func productBarFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<Product> {
-        let request: NSFetchRequest = Product.fetchRequest()
-        request.sortDescriptors = [NSSortDescriptor(key: "dateSortProductBar", ascending: false)]
-        let date = NSDate.init(timeIntervalSinceNow:  -TimeInterval.oneWeek)
-        request.predicate = NSCompoundPredicate.init(andPredicateWithSubpredicates: [NSPredicate(format: "hideFromProductBar != true"), NSCompoundPredicate.init(orPredicateWithSubpredicates: [ NSPredicate(format: "isFavorite == true"), NSPredicate(format: "dateViewed != nil")]), NSPredicate(format:"dateSortProductBar > %@", date)])
-        
-        let context = self.mainMoc()
-        let fetchedResultsController:FetchedResultsControllerManager<Product> = FetchedResultsControllerManager<Product>.init(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
-        return fetchedResultsController
-    }
-    
     func matchstickFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<Matchstick> {
         let request: NSFetchRequest = Matchstick.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(key: "receivedAt", ascending: true)]
