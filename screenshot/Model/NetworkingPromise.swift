@@ -821,7 +821,10 @@ class NetworkingPromise : NSObject {
 
 //Amazon
 extension NetworkingPromise {
-    func searchAmazon(keywords: String, options: (sort: ProductsOptionsSort, gender: ProductsOptionsGender, size: ProductsOptionsSize)? = nil) -> Promise<[AmazonItem]> {
+    // https://docs.aws.amazon.com/AWSECommerceService/latest/DG/LocaleUS.html
+    // https://docs.aws.amazon.com/AWSECommerceService/latest/DG/ItemSearch.html
+    /// Page = 1...10
+    func searchAmazon(keywords: String, page: Int = 1, options: (sort: ProductsOptionsSort, gender: ProductsOptionsGender, size: ProductsOptionsSize)? = nil) -> Promise<[AmazonItem]> {
         // RFC 3986 section 2.3
         let unreservedCharacters = CharacterSet.init(charactersIn:  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.~")
         
@@ -878,6 +881,7 @@ extension NetworkingPromise {
         queryItems.append(URLQueryItem.init(name: "Keywords", value: keywords))
         queryItems.append(URLQueryItem.init(name: "ResponseGroup", value: "Images,Offers,ItemAttributes"))
         queryItems.append(URLQueryItem.init(name: "Version", value: "2013-08-01"))
+        queryItems.append(URLQueryItem.init(name: "ItemPage", value: "\(page)"))
         
         if let querySort = querySort {
             queryItems.append(URLQueryItem.init(name: "Sort", value: querySort))
