@@ -11,8 +11,6 @@ PODS:
   - Branch (0.25.1):
     - Branch/Core (= 0.25.1)
   - Branch/Core (0.25.1)
-  - EggRating (0.1.6):
-    - RateView
   - FBSDKCoreKit (4.35.0):
     - Bolts (~> 1.7)
   - FBSDKLoginKit (4.35.0):
@@ -68,7 +66,6 @@ PODS:
   - Pushwoosh (5.8.1)
   - PushwooshInboxUI (5.5.4):
     - Pushwoosh (> 5.5)
-  - RateView (1.2)
   - SDWebImage (4.4.2):
     - SDWebImage/Core (= 4.4.2)
   - SDWebImage/Core (4.4.2)
@@ -81,7 +78,6 @@ DEPENDENCIES:
   - Analytics (~> 3.0)
   - Appsee
   - Branch
-  - EggRating
   - FBSDKLoginKit
   - Firebase/Auth
   - Firebase/Core
@@ -104,7 +100,6 @@ SPEC REPOS:
     - Appsee
     - Bolts
     - Branch
-    - EggRating
     - FBSDKCoreKit
     - FBSDKLoginKit
     - Firebase
@@ -124,7 +119,6 @@ SPEC REPOS:
     - PromiseKit
     - Pushwoosh
     - PushwooshInboxUI
-    - RateView
     - SDWebImage
     - SwiftLog
     - SWXMLHash
@@ -136,7 +130,6 @@ SPEC CHECKSUMS:
   Appsee: ab8b0317b0a5217d08637f61dbddaba2c9748f2a
   Bolts: ac6567323eac61e203f6a9763667d0f711be34c8
   Branch: 0f01403ad0cac16269540d05ed001f60249e045d
-  EggRating: 378f25f5ac0629e7edfb011f5c5177c63f135e6e
   FBSDKCoreKit: 1a5b2e3ceb5ca827a53c54aa5f4a3480efff80d2
   FBSDKLoginKit: 00a3d65d1226852f9d76dcddff01981e5e6d9c38
   Firebase: 355bd535bfdacaa82a7fe8d9784115edefd6fc03
@@ -156,12 +149,11 @@ SPEC CHECKSUMS:
   PromiseKit: 743e497a5f505a470d3bbbf4ce0663c1268af0a4
   Pushwoosh: 166d50f7a094a0d94030ac6c87d8ff403caebaf7
   PushwooshInboxUI: 2b6aa7dea3109b9ceaff0959fb82b6896b230ca3
-  RateView: d4d12e9bb76dc23a77a56f4e5c5fb530a3f3f998
   SDWebImage: 624d6e296c69b244bcede364c72ae0430ac14681
   SwiftLog: f6c4f9a4ade06263555ab34b2c0f72025ffcda9e
   SWXMLHash: f4522438189f72b41e39676d19469a8969d60dd1
   Whisper: 169760fc4bab0abf24d5529f9276f95c25cf1025
 
-PODFILE CHECKSUM: 658545a7bcf3ddb5e14ab48993aa524dcb696ef7
+PODFILE CHECKSUM: 4e17484a48de8eabdc1f32b2dea76df3055a9f2a
 
 COCOAPODS: 1.5.3
