@@ -62,6 +62,7 @@ class Constants {
     static let appSettingsDomain = "https://api.craze-dev.com/static/config.json"
     static let whatsNewDomain = "https://api.craze-dev.com/static/whatsnew"
     static let kocchavaGUIDKey = "koscreenshot-ios-dev-wiwhb"
+    static let searchCategoriesDomain = "https://s3.amazonaws.com/search-bar/search.json"
 #else
     static let appSeeApiKey = "0ece18b50f7d4ef9aae3e473c28030bc"
     static let screenShotLambdaDomain = "https://q598b771ed.execute-api.us-east-1.amazonaws.com/production/"
@@ -71,6 +72,7 @@ class Constants {
     static let appSettingsDomain = "https://api.craze-api.com/static/config.json"
     static let whatsNewDomain = "https://api.craze-api.com/static/whatsnew"
     static let kocchavaGUIDKey = "koscreenshot-cq8h4"
+    static let searchCategoriesDomain = "https://s3.amazonaws.com/search-bar/search.json"
 #endif
 
 }
