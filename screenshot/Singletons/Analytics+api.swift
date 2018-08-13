@@ -1,6 +1,6 @@
 // STOP!  DO not edit the file below
 // only create by auto generting
-// created from: f521fb3 
+// created from: ed77d43 
 //  Copyright (c) 2018 crazeapp. All rights reserved.
 
 
@@ -4164,6 +4164,7 @@ extension AnalyticsTimedLocalNotificationCancelled {
     case `favoritedItem` = "favoritedItem"
     case `tappedProduct` = "tappedProduct"
     case `saleCount` = "saleCount"
+    case `similarLooks` = "similarLooks"
     }
     
   static func trackTimedLocalNotificationCancelled(source:AnalyticsTimedLocalNotificationCancelledSource ) {
@@ -4197,6 +4198,7 @@ extension AnalyticsAppOpenedFromTimedLocalNotification {
     case `favoritedItem` = "favoritedItem"
     case `tappedProduct` = "tappedProduct"
     case `saleCount` = "saleCount"
+    case `similarLooks` = "similarLooks"
     }
     
   static func trackAppOpenedFromTimedLocalNotification(source:AnalyticsAppOpenedFromTimedLocalNotificationSource ) {
@@ -4230,6 +4232,7 @@ extension AnalyticsTimedLocalNotificationScheduled {
     case `favoritedItem` = "favoritedItem"
     case `tappedProduct` = "tappedProduct"
     case `saleCount` = "saleCount"
+    case `similarLooks` = "similarLooks"
     }
     
   static func trackTimedLocalNotificationScheduled(source:AnalyticsTimedLocalNotificationScheduledSource ) {

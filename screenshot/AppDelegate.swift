@@ -807,7 +807,7 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
                 isHandled = true
                 if openingScreen == Constants.openingScreenValueScreenshot {
                     if let openingAssetId = userInfo[Constants.openingAssetIdKey] as? String {
-                        if response.notification.request.identifier == LocalNotificationIdentifier.saleScreenshot.rawValue {
+                        if [LocalNotificationIdentifier.saleScreenshot.rawValue, LocalNotificationIdentifier.similarLooks.rawValue].contains(response.notification.request.identifier)  {
                             // Go into screenshot for saleScreenshot local notification.
                             showScreenshotListTop()
                             let dataModel = DataModel.sharedInstance
@@ -866,6 +866,8 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
         
         completionHandler()
         switch response.notification.request.identifier {
+        case LocalNotificationIdentifier.similarLooks.rawValue:
+            Analytics.trackAppOpenedFromTimedLocalNotification(source: .similarLooks)
         case LocalNotificationIdentifier.inactivityDiscover.rawValue:
             Analytics.trackAppOpenedFromTimedLocalNotification(source: .inactivityDiscover)
         case LocalNotificationIdentifier.favoritedItem.rawValue:
