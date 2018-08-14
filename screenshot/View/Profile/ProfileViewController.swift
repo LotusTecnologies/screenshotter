@@ -45,17 +45,17 @@ class ProfileViewController: BaseTableViewController {
     }
     
     private let dataSource = DataSource<Section, Row>(data: [
-        .account: [],
-        .invite: [],
-        .options: [
+        (.account, []),
+        (.invite, []),
+        (.options, [
             .optionCurrency,
             .optionOpenIn
-        ],
-        .permissions: [
+        ]),
+        (.permissions, [
             .permissionPhoto,
             .permissionPush,
             .permissionGDRP
-        ]
+        ])
     ])
     
     weak var delegate: ProfileViewControllerDelegate?
