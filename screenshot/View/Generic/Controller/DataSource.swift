@@ -27,12 +27,6 @@ import Foundation
 class DataSource<S: RawRepresentable & Hashable, R: RawRepresentable & Equatable> {
     private var data: [(section: S, rows: [R])] = []
     
-    /// S enum must maintain order
-    init(data: [S: [R]]) {
-        data.forEach { (section, rows) in
-            addSection(section, rows: rows)
-        }
-    }
     
     /// Array maintains order
     init(data: [(S, [R])]) {
