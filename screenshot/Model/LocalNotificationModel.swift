@@ -224,7 +224,7 @@ class LocalNotificationModel {
         let identifier = LocalNotificationIdentifier.favoritedItem.rawValue
         DataModel.sharedInstance.performBackgroundTask({ (context) in
             if let latest = DataModel.sharedInstance.retrieveLatestFavorite(in: context), let imageURLString = latest.imageURL, let productId = latest.id {
-                let category = latest.shoppable?.label ?? latest.shoppable?.parentShoppable?.label ?? latest.categories ?? "fav"
+                let category = latest.shoppable?.label?.normalizedStyeCategory() ?? latest.shoppable?.parentShoppable?.label?.normalizedStyeCategory() ?? latest.label?.normalizedStyeCategory() ?? latest.categories?.normalizedStyeCategory() ?? "fav"
                 latest.inNotif = true
                 context.saveIfNeeded()
 
