@@ -15,6 +15,13 @@ class MessageInboxCollectionViewCell: UICollectionViewCell {
     let badge = UIView()
     let actionButton = BorderButton()
     
+    var buttonColor = UIColor.crazeGreen {
+        didSet {
+            //same reset as isExpired
+            let isExpired = self.isExpired
+            self.isExpired = isExpired
+        }
+    }
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -50,8 +57,8 @@ class MessageInboxCollectionViewCell: UICollectionViewCell {
         titleLabel.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor, constant:-.padding).isActive = true
 
         
-        actionButton.setTitleColor(.crazeGreen, for: .normal)
-        actionButton.tintColor = .crazeGreen
+        actionButton.setTitleColor(self.buttonColor, for: .normal)
+        actionButton.tintColor = self.buttonColor
         actionButton.translatesAutoresizingMaskIntoConstraints = false
         self.contentView.addSubview(actionButton)
         actionButton.heightAnchor.constraint(equalToConstant: 48).isActive = true
@@ -91,8 +98,8 @@ class MessageInboxCollectionViewCell: UICollectionViewCell {
                 actionButton.setTitleColor(expiredColor, for: .normal)
                 actionButton.tintColor = expiredColor
             }else{
-                actionButton.setTitleColor(.crazeGreen, for: .normal)
-                actionButton.tintColor = .crazeGreen
+                actionButton.setTitleColor(self.buttonColor, for: .normal)
+                actionButton.tintColor = self.buttonColor
 
             }
         }

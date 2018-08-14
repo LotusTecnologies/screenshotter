@@ -155,6 +155,8 @@
 "inbox.empty.subTitle" = "Price drops, sales, and other exclusive ScreenShop benefits will appear here";
 "inbox.empty.error.subTitle" = "Enable notifications to keep up with price drops, sales and other exclusive ScreenShop benefits";
 "inbox.empty.error.button" = "Enable Notifications";
+"inbox.unsupported.message" = "<bold>You need to update the app to see this notification!</bold>";
+"inbox.unsupported.button" = "Update Now";
 
 "legal.privacy_policy" = "Privacy Policy";
 "legal.terms_of_service" = "Terms of Service";
