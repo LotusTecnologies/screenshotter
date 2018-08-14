@@ -1108,7 +1108,7 @@ extension AssetSyncModel {
         let productImageUrl = fromProduct.imageURL
         let shoppable = fromProduct.shoppable
         let optionsMask = ProductsOptionsMask.init(rawValue: Int(fromProduct.optionsMask))
-        let label = shoppable?.label ?? fromProduct.categories
+        let label = shoppable?.label ?? fromProduct.label ?? fromProduct.categories
         return self.addSubShoppable(productImageUrl: productImageUrl, label:label, shoppable: shoppable, optionsMask: optionsMask)
     }
     

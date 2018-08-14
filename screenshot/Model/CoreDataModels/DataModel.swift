@@ -384,7 +384,8 @@ extension DataModel {
         productToSave.originalPrice = originalPrice
         productToSave.floatPrice = floatPrice
         productToSave.floatOriginalPrice = floatOriginalPrice
-        productToSave.categories = shoppable?.label
+        productToSave.categories = categories
+        productToSave.label = shoppable?.label
         productToSave.brand = brand
         productToSave.offer = offer
         productToSave.imageURL = imageURL
