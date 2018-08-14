@@ -238,29 +238,6 @@ extension DataModel {
         return nil
     }
     
-    public func hideFromProductBar(_ productObjectIDs: [NSManagedObjectID]) {
-        performBackgroundTask { (managedObjectContext) in
-            do {
-                productObjectIDs.forEach { productObjectId in
-                    if let product = managedObjectContext.object(with: productObjectId) as? Product {
-                        do{
-                            try product.validateForUpdate()
-                            product.hideFromProductBar = true
-                        } catch{
-
-                        }
-                        
-                        
-                    }
-                }
-                try managedObjectContext.save()
-            } catch {
-                self.receivedCoreDataError(error: error)
-                print("hideFromProductBar productObjectIDs catch error:\(error)")
-            }
-        }
-    }
-    
     public func hide(screenshotOIDArray: [NSManagedObjectID], kind:Analytics.AnalyticsScreenshotDeletedKind) {
         performBackgroundTask { (managedObjectContext) in
             do {
@@ -776,7 +753,6 @@ extension DataModel {
                         let now = Date()
                         product.dateFavorited = now
                         product.dateSortProductBar = product.getSortDateForProductBar()
-                        product.hideFromProductBar = false
                         if let screenshot = product.shoppable?.screenshot {
                             screenshot.addToFavorites(product)
                             if let favoritesCount = screenshot.favorites?.count {

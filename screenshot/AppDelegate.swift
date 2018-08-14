@@ -29,8 +29,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     let appSettings: AppSettings = AppSettings()
     var appLaunchedForFirstTime = false
     
-    fileprivate var frameworkSetupLaunchOptions: [UIApplicationLaunchOptionsKey : Any]?
-    
     fileprivate lazy var mainTabBarController: MainTabBarController = {
         let viewController = MainTabBarController(delegate:self)
         return viewController
@@ -72,7 +70,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
 
         fetchAppSettings()
-        frameworkSetupMainViewDidLoad()
         
         UIApplication.migrateUserDefaultsKeys()
         UIApplication.appearanceSetup()
@@ -498,8 +495,7 @@ extension AppDelegate : KochavaTrackerDelegate {
     }
     
     fileprivate func frameworkSetup(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) {
-        frameworkSetupLaunchOptions = launchOptions
-                
+        
         Appsee.start(Constants.appSeeApiKey)
         Appsee.addEvent("App Launched", withProperties: ["version": Bundle.displayVersionBuild])
         
@@ -583,15 +579,8 @@ extension AppDelegate : KochavaTrackerDelegate {
         PushNotificationManager.push().delegate = self
         // UNUserNotificationCenter.current().delegate = PushNotificationManager.push().notificationCenterDelegate // Set to self in willFinishLaunching; forwards the calls to pushwoosh.
         PushNotificationManager.push().sendAppOpen()
-        
     }
     
-    fileprivate func frameworkSetupMainViewDidLoad() {
-        RatingFlow.sharedInstance.start()
-        
-        
-        frameworkSetupLaunchOptions = nil
-    }
 }
 
 extension AppDelegate {

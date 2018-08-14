@@ -12,7 +12,6 @@ target 'Screenshop' do
     pod 'Analytics', '~> 3.0'
     pod 'Appsee'
     pod 'Branch'
-    pod 'EggRating'
     pod 'lottie-ios'
     pod 'Whisper'
     pod 'PushwooshInboxUI'
