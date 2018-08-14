@@ -10,7 +10,11 @@ import Foundation
 import CoreData
 
 extension InboxMessage {
-    
+    enum ActionType : String {
+        case link
+        case screenshot
+        case product
+    }
     static func deletePendingMessage(in context:NSManagedObjectContext) {
         let fetchRequest:NSFetchRequest<InboxMessage> = InboxMessage.fetchRequest()
         fetchRequest.predicate = NSPredicate.init(format: "showAfterDate > %@", NSDate())

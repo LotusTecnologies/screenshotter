@@ -111,25 +111,47 @@ extension MessageInboxViewController : UICollectionViewDelegate, UICollectionVie
             let placeHolder = UIImage.init(named:"DefaultProduct")
             cell.embossedView.imageView.image = placeHolder
             if let message = messageInboxFRC?.object(at: indexPath) {
-                if let urlString  = message.image, let url = URL.init(string: urlString){
-                    let isExpired = message.isExpired
-                    cell.embossedView.imageView.sd_setImage(with: url, placeholderImage: placeHolder, options:  [.retryFailed, .highPriority], completed: { (image, error, cache, url) in
-                        if let currentURL = cell.embossedView.imageView.sd_imageURL() {
-                            if currentURL == url {
-                                if isExpired {
-                                    if let grayscale = image?.grayscaleImage() {
-                                        cell.embossedView.imageView.image = grayscale
+                cell.embossedView.imageView.sd_cancelCurrentImageLoad()
+                if let actionString = message.actionType, let _ = InboxMessage.ActionType.init(rawValue: actionString){
+                    
+                    if let urlString = message.image, let url = URL.init(string: urlString) {
+                        let isExpired = message.isExpired
+                        cell.embossedView.imageView.sd_setImage(with: url, placeholderImage: placeHolder, options:  [.retryFailed, .highPriority], completed: { (image, error, cache, url) in
+                            if let currentURL = cell.embossedView.imageView.sd_imageURL() {
+                                if currentURL == url {
+                                    if isExpired {
+                                        if let grayscale = image?.grayscaleImage() {
+                                            cell.embossedView.imageView.image = grayscale
+                                        }
                                     }
                                 }
                             }
-                        }
-                    })
+                        })
+                    }
+                    cell.titleLabel.attributedText = MessageInboxCollectionViewCell.attributedStringFor(taggedString: message.title, isExpired: message.isExpired)
+                    cell.actionButton.setTitle(message.buttonText, for: .normal)
+                    cell.buttonColor = .crazeGreen
+                }else{
+                    var image = UIImage.init(named: "InboxUnsupportedMessageIcon")
+                    if message.isExpired {
+                        image = image?.grayscaleImage()
+                    }
+                    cell.embossedView.imageView.image = image
+                    let text = "inbox.unsupported.message.markup".localized
+                    let buttonText = "inbox.unsupported.button".localized
+                    cell.titleLabel.attributedText = MessageInboxCollectionViewCell.attributedStringFor(taggedString: text, isExpired: message.isExpired)
+                    cell.actionButton.setTitle(buttonText, for: .normal)
+                    let pinkColor = UIColor.init(hex: "#ED145A")
+                    cell.buttonColor = pinkColor
                 }
+                
+               
+                
                 cell.badge.isHidden = !message.isNew
-                cell.titleLabel.attributedText = MessageInboxCollectionViewCell.attributedStringFor(taggedString: message.title, isExpired: message.isExpired)
-                cell.actionButton.setTitle(message.buttonText, for: .normal)
                 cell.actionButton.addTarget(self, action: #selector(inboxMessageCollectionViewCellAction(_:event:)), for: .touchUpInside)
                 cell.isExpired = message.isExpired
+
+               
             }
             
             
@@ -151,15 +173,16 @@ extension MessageInboxViewController : UICollectionViewDelegate, UICollectionVie
                 order = Int(round((location - CGFloat(indexPath.section + 1)*44.0) / MessageInboxCollectionViewCell.height))
             }
             Analytics.trackInboxTappedMessage(tracking: tracking, action: message.actionType, isExpired: message.isExpired, order: order)
-            if let action = message.actionType {
-                if action == "link"{
+            if let action = message.actionType, let actionEnum = InboxMessage.ActionType.init(rawValue: action) {
+                switch actionEnum {
+                case .link:
                     if let urlString = message.actionValue,  let url = URL.init(string: urlString){
                         if OpenWebPage.safari.canOpen(url: url){
                             OpenWebPage.present(urlString: urlString, fromViewController: self)
                             message.markAsRead()
                         }
                     }
-                }else if action == "screenshot" {
+                case .screenshot:
                     if let urlString = message.actionValue,  let _ = URL.init(string: urlString){
                         AssetSyncModel.sharedInstance.addScreenshotFrom(source: .inbox, urlString: urlString, callback: { (screenshot) in
                             Analytics.trackOpenedScreenshot(screenshot: screenshot, source: .inbox)
@@ -171,7 +194,7 @@ extension MessageInboxViewController : UICollectionViewDelegate, UICollectionVie
                             message.markAsRead()
                         })
                     }
-                }else if action == "product" {
+                case .product:
                     if let productId = message.actionValue {
                         let cell = collectionView.cellForItem(at: indexPath) as? MessageInboxCollectionViewCell
                         let actionButton = cell?.actionButton
@@ -189,6 +212,10 @@ extension MessageInboxViewController : UICollectionViewDelegate, UICollectionVie
                             actionButton?.isLoading = false
                         })
                     }
+                }
+            }else{
+                if let url = URL.init(string: "https://itunes.apple.com/us/app/screenshop-by-craze/id1254964391"), UIApplication.shared.canOpenURL(url){
+                    UIApplication.shared.openInChrome(url: url)
                 }
             }
         }
