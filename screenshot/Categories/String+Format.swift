@@ -43,10 +43,10 @@ extension String {
                                "Scarfs":"Scarves",
                                "WalletsPurses":"Purses",
                                "GlovesAndMitten":"Gloves",
-                               "PouchBag":"Bag",
+                               "PouchBag":"Bags",
                                "Makeup":"Makeup"]
         var transforms = ["Footwear":"Shoes",
-                          "Jewellery":"Jewelery",  //Jewellery is british
+                          "Jewellery":"Jewelry",  //Jewellery is british
                           "Pants":"Pants",
                           "Shoe":"Shoes",
                           "Shirt":"Shirts",
@@ -55,7 +55,7 @@ extension String {
                           "Bag":"Bags",
                           "Boot":"Boots",
                           "Jacket":"Jackets",
-                          "necklace":"Neckleaces",
+                          "necklace":"Necklaces",
                           "Skirt":"Skirts",
                           "Bracelet":"Bracelets",
                           "Coat":"Coats",
@@ -80,7 +80,7 @@ extension String {
                           "Glove":"Gloves",
                           "Mitten":"Mittens",
                           "Mittens":"Mittens",
-                          "Jewelery":"Jewelery",
+                          "Jewelery":"Jewelry",
                           "Jeans":"Jeans"]
 
         
