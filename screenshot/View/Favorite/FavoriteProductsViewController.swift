@@ -84,8 +84,8 @@ class FavoriteProductsViewController : BaseViewController {
         self.productsFRC = DataModel.sharedInstance.favoritedProductsFrc(delegate: self)
         
         dataSource = DataSource<Section, Row>(data: [
-            .notification: [],
-            .favorite: []
+            (.notification, []),
+            (.favorite, [])
             ])
         self.tableView.reloadData()
     }

@@ -951,7 +951,7 @@ extension NetworkingPromise {
 extension NetworkingPromise {
     func fetchSearchCategories() -> Promise<SearchRoot> {
         return Promise<SearchRoot> { fulfill, reject in
-            guard let url = URL(string: "https://s3.amazonaws.com/search-bar/search.json") else {
+            guard let url = URL(string: Constants.searchCategoriesDomain) else {
                 reject(NSError(domain: "Craze", code: 13, userInfo: [NSLocalizedDescriptionKey: "search category invalid url"]))
                 return
             }

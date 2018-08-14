@@ -216,6 +216,14 @@ class LocalNotificationModel {
         })
     }
     
+    func category(product: Product) -> String {
+        if let shoppable = product.shoppable,
+          let category = shoppable.label?.normalizedSyteCategory() ?? shoppable.parentShoppable?.label?.normalizedSyteCategory() {
+            return category
+        }
+        return product.label?.normalizedSyteCategory() ?? product.categories?.normalizedSyteCategory() ?? "fav"
+    }
+    
     func postLatestFavorite() {
         guard PermissionsManager.shared.hasPermission(for: .push) else {
             print("postLatestFavorite no push permission")
@@ -224,7 +232,7 @@ class LocalNotificationModel {
         let identifier = LocalNotificationIdentifier.favoritedItem.rawValue
         DataModel.sharedInstance.performBackgroundTask({ (context) in
             if let latest = DataModel.sharedInstance.retrieveLatestFavorite(in: context), let imageURLString = latest.imageURL, let productId = latest.id {
-                let category = latest.shoppable?.label ?? latest.shoppable?.parentShoppable?.label ?? latest.categories ?? "fav"
+                let category = self.category(product: latest)
                 latest.inNotif = true
                 context.saveIfNeeded()
 

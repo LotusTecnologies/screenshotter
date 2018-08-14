@@ -105,8 +105,6 @@ extension ScreenshotsNavigationController :ScreenshotsViewControllerDelegate{
             }
             screenshot.setViewed()
         }
-        
-        RatingFlow.sharedInstance.recordSignificantEvent()
     }
     
     func screenshotsViewControllerWantsToPresentPicker(_  viewController:ScreenshotsViewController, openScreenshots:Bool){

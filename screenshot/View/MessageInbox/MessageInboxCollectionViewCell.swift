@@ -15,6 +15,11 @@ class MessageInboxCollectionViewCell: UICollectionViewCell {
     let badge = UIView()
     let actionButton = BorderButton()
     
+    var buttonColor = UIColor.crazeGreen {
+        didSet {
+            syncButtonColor()
+        }
+    }
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -50,8 +55,8 @@ class MessageInboxCollectionViewCell: UICollectionViewCell {
         titleLabel.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor, constant:-.padding).isActive = true
 
         
-        actionButton.setTitleColor(.crazeGreen, for: .normal)
-        actionButton.tintColor = .crazeGreen
+        actionButton.setTitleColor(self.buttonColor, for: .normal)
+        actionButton.tintColor = self.buttonColor
         actionButton.translatesAutoresizingMaskIntoConstraints = false
         self.contentView.addSubview(actionButton)
         actionButton.heightAnchor.constraint(equalToConstant: 48).isActive = true
@@ -82,19 +87,22 @@ class MessageInboxCollectionViewCell: UICollectionViewCell {
     }
     static let height:CGFloat =  80 + 48 + 2 * CGFloat.padding + CGFloat.padding
     
+    private func syncButtonColor(){
+        
+        let expiredColor = UIColor.init(hex: "#C3C7CA")
+        if isExpired {
+            actionButton.setTitleColor(expiredColor, for: .normal)
+            actionButton.tintColor = expiredColor
+        }else{
+            actionButton.setTitleColor(self.buttonColor, for: .normal)
+            actionButton.tintColor = self.buttonColor
+            
+        }
+    }
     var isExpired = false {
         didSet {
-            let expiredColor = UIColor.init(hex: "#C3C7CA")
             badge.alpha = isExpired ? 0.0 : 1.0
-            
-            if isExpired {
-                actionButton.setTitleColor(expiredColor, for: .normal)
-                actionButton.tintColor = expiredColor
-            }else{
-                actionButton.setTitleColor(.crazeGreen, for: .normal)
-                actionButton.tintColor = .crazeGreen
-
-            }
+           syncButtonColor()
         }
     }
     
