@@ -145,8 +145,8 @@ extension SearchCategoriesViewController {
         navigationController?.pushViewController(searchResultsViewController, animated: true)
         
         NetworkingPromise.sharedInstance.searchAmazon(keywords: searchBranch.keyword ?? "", options: (.default, gender, .adult))
-            .then { [weak searchResultsViewController] amazonItems -> Void in
-                searchResultsViewController?.amazonItems = amazonItems
+            .then { [weak searchResultsViewController] amazonResponse -> Void in
+                searchResultsViewController?.amazonItems = amazonResponse.items
             }
             .catch { error in
                 // TODO:

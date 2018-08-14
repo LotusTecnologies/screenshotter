@@ -13,6 +13,7 @@ class SearchViewController: UIViewController {
     let searchController: UISearchController
     let categoriesNavigationController = SearchCategoriesNavigationController()
     
+    private let searchPaginationController = SearchPaginationController()
     private let productsOptions = ProductsOptions(provider: .amazon)
     private let filterBarButtonItem = UIBarButtonItem(image: UIImage(named: "ProductsFilter"), style: .plain, target: nil, action: nil)
     
@@ -24,7 +25,12 @@ class SearchViewController: UIViewController {
         
         definesPresentationContext = true
         
+        searchResultsViewController.delegate = self
+        
         productsOptions.delegate = self
+        
+        searchPaginationController.delegate = self
+        syncSearchPagination(productsOptions)
         
         searchController.delegate = self
         searchController.searchResultsUpdater = self
@@ -58,9 +64,17 @@ class SearchViewController: UIViewController {
     }
     
     deinit {
+        searchResultsViewController.delegate = nil
         productsOptions.delegate = nil
+        searchPaginationController.delegate = nil
         searchController.delegate = nil
         searchController.searchResultsUpdater = nil
+    }
+}
+
+extension SearchViewController: SearchResultsViewControllerDelegate {
+    func searchResultsViewControllerRequestNextItems(_ viewController: SearchResultsViewController) {
+        searchPaginationController.next()
     }
 }
 
@@ -89,17 +103,19 @@ extension SearchViewController: UISearchResultsUpdating {
         
         searchResultsViewController.amazonItems = nil
         
-        NetworkingPromise.sharedInstance.searchAmazon(keywords: keywords, options: (productsOptions.sort, productsOptions.gender, productsOptions.size))
-            .then { [weak self] amazonItems -> Void in
-                if keywords == self?.searchController.searchBar.text {
-                    self?.searchResultsViewController.amazonItems = amazonItems
-                }
-            }
-            .catch { [weak self] error in
-                if keywords == self?.searchController.searchBar.text {
-                    self?.searchResultsViewController.amazonItems = []
-                }
-        }
+        searchPaginationController.search(keywords)
+        
+//        NetworkingPromise.sharedInstance.searchAmazon(keywords: keywords, options: (productsOptions.sort, productsOptions.gender, productsOptions.size))
+//            .then { [weak self] amazonResponse -> Void in
+//                if keywords == self?.searchController.searchBar.text {
+//                    self?.searchResultsViewController.amazonItems = amazonResponse.items
+//                }
+//            }
+//            .catch { [weak self] error in
+//                if keywords == self?.searchController.searchBar.text {
+//                    self?.searchResultsViewController.amazonItems = []
+//                }
+//        }
     }
 }
 
@@ -132,6 +148,8 @@ extension SearchViewController: ProductsOptionsDelegate {
     }
     
     func productsOptionsDidComplete(_ productsOptions: ProductsOptions, withModelChange changed: Bool) {
+        syncSearchPagination(productsOptions)
+        
         if let text = searchController.searchBar.text, !text.isEmpty {
             searchAmazon(text)
         }
@@ -141,5 +159,25 @@ extension SearchViewController: ProductsOptionsDelegate {
     
     func productsOptionsDidCancel(_ productsOptions: ProductsOptions) {
         dismissOptions()
+    }
+}
+
+extension SearchViewController: SearchPaginationControllerDelegate {
+    func searchPaginationControllerKeywords(_ controller: SearchPaginationController) -> String? {
+        return searchController.searchBar.text
+    }
+    
+    func searchPaginationController(_ controller: SearchPaginationController, items: [AmazonItem], page: Int) {
+        searchResultsViewController.amazonItems = items
+    }
+    
+    func searchPaginationControllerFinalPage(_ controller: SearchPaginationController) {
+        
+    }
+    
+    private func syncSearchPagination(_ productsOptions: ProductsOptions) {
+        searchPaginationController.gender = productsOptions.gender
+        searchPaginationController.sort = productsOptions.sort
+        searchPaginationController.size = productsOptions.size
     }
 }

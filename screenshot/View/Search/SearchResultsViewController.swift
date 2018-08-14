@@ -8,7 +8,13 @@
 
 import UIKit
 
+protocol SearchResultsViewControllerDelegate: NSObjectProtocol {
+    func searchResultsViewControllerRequestNextItems(_ viewController: SearchResultsViewController)
+}
+
 class SearchResultsViewController: UIViewController {
+    weak var delegate: SearchResultsViewControllerDelegate?
+    
     var amazonItems: [AmazonItem]? {
         didSet {
             if let amazonItems = amazonItems {
@@ -121,7 +127,7 @@ class SearchResultsViewController: UIViewController {
     }
 }
 
-// MARK: - Data Source
+// MARK: - Table View Data Source
 
 extension SearchResultsViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -217,7 +223,7 @@ extension SearchResultsViewController: UITableViewDataSource {
     }
 }
 
-// MARK: - Delegate
+// MARK: - Table View Delegate
 
 extension SearchResultsViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -228,5 +234,16 @@ extension SearchResultsViewController: UITableViewDelegate {
         OpenWebPage.present(urlString: amazonItem.detailPageURL, fromViewController: self)
         
         tableView.deselectRow(at: indexPath, animated: true)
+    }
+}
+
+// MARK: - Scroll View Delegate
+
+extension SearchResultsViewController: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        // ???: might not work for iOS 10
+        if scrollView.contentOffset.y + scrollView.bounds.height >= scrollView.contentSize.height {
+            self.delegate?.searchResultsViewControllerRequestNextItems(self)
+        }
     }
 }

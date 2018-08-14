@@ -824,7 +824,7 @@ extension NetworkingPromise {
     // https://docs.aws.amazon.com/AWSECommerceService/latest/DG/LocaleUS.html
     // https://docs.aws.amazon.com/AWSECommerceService/latest/DG/ItemSearch.html
     /// Page = 1...10
-    func searchAmazon(keywords: String, page: Int = 1, options: (sort: ProductsOptionsSort, gender: ProductsOptionsGender, size: ProductsOptionsSize)? = nil) -> Promise<[AmazonItem]> {
+    func searchAmazon(keywords: String, page: Int = 1, options: (sort: ProductsOptionsSort, gender: ProductsOptionsGender, size: ProductsOptionsSize)? = nil) -> Promise<AmazonResponse> {
         // RFC 3986 section 2.3
         let unreservedCharacters = CharacterSet.init(charactersIn:  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.~")
         
@@ -911,7 +911,7 @@ extension NetworkingPromise {
 
         components.queryItems = queryItems
         
-        return Promise<[AmazonItem]> { (fulfill, reject) in
+        return Promise<AmazonResponse> { (fulfill, reject) in
             guard let urlUnsigned = components.url?.absoluteString, let url = URL.init(string: "\(urlUnsigned)&Signature=\(hmac_sign_escaped)") else {
                 reject(NSError(domain: "Craze", code: 12, userInfo: [NSLocalizedDescriptionKey : "amazon search invalid url"]))
                 return
@@ -934,8 +934,8 @@ extension NetworkingPromise {
                 if let amazonError = amazonParser.error {
                     reject(NSError(domain: "Craze", code: 12, userInfo: [NSLocalizedDescriptionKey : "\(amazonError.code): \(amazonError.message)"]))
                 }
-                else if let amazonItems = amazonParser.items {
-                    fulfill(amazonItems)
+                else if let amazonResponse = amazonParser.response {
+                    fulfill(amazonResponse)
                 }
                 else {
                     reject(NSError(domain: "Craze", code: 12, userInfo: [NSLocalizedDescriptionKey : "amazon search unexpected data"]))
