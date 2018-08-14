@@ -137,7 +137,7 @@ extension MessageInboxViewController : UICollectionViewDelegate, UICollectionVie
                         image = image?.grayscaleImage()
                     }
                     cell.embossedView.imageView.image = image
-                    let text = "inbox.unsupported.message".localized
+                    let text = "inbox.unsupported.message.markup".localized
                     let buttonText = "inbox.unsupported.button".localized
                     cell.titleLabel.attributedText = MessageInboxCollectionViewCell.attributedStringFor(taggedString: text, isExpired: message.isExpired)
                     cell.actionButton.setTitle(buttonText, for: .normal)

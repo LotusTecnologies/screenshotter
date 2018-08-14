@@ -17,9 +17,7 @@ class MessageInboxCollectionViewCell: UICollectionViewCell {
     
     var buttonColor = UIColor.crazeGreen {
         didSet {
-            //same reset as isExpired
-            let isExpired = self.isExpired
-            self.isExpired = isExpired
+            syncButtonColor()
         }
     }
     
@@ -89,19 +87,22 @@ class MessageInboxCollectionViewCell: UICollectionViewCell {
     }
     static let height:CGFloat =  80 + 48 + 2 * CGFloat.padding + CGFloat.padding
     
+    private func syncButtonColor(){
+        
+        let expiredColor = UIColor.init(hex: "#C3C7CA")
+        if isExpired {
+            actionButton.setTitleColor(expiredColor, for: .normal)
+            actionButton.tintColor = expiredColor
+        }else{
+            actionButton.setTitleColor(self.buttonColor, for: .normal)
+            actionButton.tintColor = self.buttonColor
+            
+        }
+    }
     var isExpired = false {
         didSet {
-            let expiredColor = UIColor.init(hex: "#C3C7CA")
             badge.alpha = isExpired ? 0.0 : 1.0
-            
-            if isExpired {
-                actionButton.setTitleColor(expiredColor, for: .normal)
-                actionButton.tintColor = expiredColor
-            }else{
-                actionButton.setTitleColor(self.buttonColor, for: .normal)
-                actionButton.tintColor = self.buttonColor
-
-            }
+           syncButtonColor()
         }
     }
     
