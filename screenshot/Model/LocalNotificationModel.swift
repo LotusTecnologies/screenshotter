@@ -218,10 +218,10 @@ class LocalNotificationModel {
     
     func category(product: Product) -> String {
         if let shoppable = product.shoppable,
-          let category = shoppable.label?.normalizedStyeCategory() ?? shoppable.parentShoppable?.label?.normalizedStyeCategory() {
+          let category = shoppable.label?.normalizedSyteCategory() ?? shoppable.parentShoppable?.label?.normalizedSyteCategory() {
             return category
         }
-        return product.label?.normalizedStyeCategory() ?? product.categories?.normalizedStyeCategory() ?? "fav"
+        return product.label?.normalizedSyteCategory() ?? product.categories?.normalizedSyteCategory() ?? "fav"
     }
     
     func postLatestFavorite() {

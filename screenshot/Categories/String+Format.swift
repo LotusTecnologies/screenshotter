@@ -13,7 +13,7 @@ extension String {
         return isEmpty ? nil : self
     }
     
-    func normalizedStyeCategory() -> String? {
+    func normalizedSyteCategory() -> String? {
         var validCategories = ["Shoes":"Shoes",
                                "Shirts":"Shirts",
                                "Trousers":"Trousers",
