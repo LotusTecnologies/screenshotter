@@ -159,9 +159,6 @@ extension SearchResultsViewController: UITableViewDataSource {
             let placeholderImage = UIImage(named: "DefaultProduct")
             cell.productImageView.sd_setImage(with: imageURL, placeholderImage: placeholderImage)
             
-//            cell.textLabel?.text = title(amazonItem: amazonItem)
-//            cell.detailTextLabel?.attributedText = detailAttributedText(amazonItem: amazonItem)
-            
             cell.titleLabel.text = title(amazonItem: amazonItem)
             cell.descriptionLabel.attributedText = detailAttributedText(amazonItem: amazonItem)
         }
