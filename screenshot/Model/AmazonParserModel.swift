@@ -202,8 +202,8 @@ struct AmazonItem: XMLIndexerDeserializable {
     let salesRank: String?
     let smallImage: AmazonImage?
     let mediumImage: AmazonImage?
-    let largeImage: AmazonImage?
-    let imageSets: [AmazonImageSet]?
+//    let largeImage: AmazonImage?
+//    let imageSets: [AmazonImageSet]?
     let itemAttributes: AmazonItemAttributes?
 //    let variationAttributes: [AmazonVariationAttribute] // maxOccurs=1
 //    let relatedItems: AmazonRelatedItems?
@@ -232,8 +232,8 @@ struct AmazonItem: XMLIndexerDeserializable {
             salesRank: node["SalesRank"].value(),
             smallImage: node["SmallImage"].value(),
             mediumImage: node["MediumImage"].value(),
-            largeImage: node["LargeImage"].value(),
-            imageSets: node["ImageSets"]["ImageSet"].value(),
+//            largeImage: node["LargeImage"].value(),
+//            imageSets: node["ImageSets"]["ImageSet"].value(),
             itemAttributes: node["ItemAttributes"].value(),
 //            variationAttributes: node["VariationAttributes"]["VariationAttribute"].value(),
 //            relatedItems: node["RelatedItems"].value(),
@@ -251,6 +251,22 @@ struct AmazonItem: XMLIndexerDeserializable {
 //            tracks: node["Tracks"]["Disc"]["Track"].value(),
 //            browseNodes: node["BrowseNodes"].value(),
 //            alternateVersions: node["AlternateVersions"]["AlternateVersion"].value()
+        )
+    }
+}
+
+struct AmazonResponse: XMLIndexerDeserializable {
+    let items: [AmazonItem]?
+    let itemPage: Int?
+//    let keywords: String?
+    let totalPages: Int?
+    
+    static func deserialize(_ node: XMLIndexer) throws -> AmazonResponse {
+        return try AmazonResponse(
+            items: node["Item"].value(),
+            itemPage: node["Request"]["ItemSearchRequest"]["ItemPage"].value(),
+//            keywords: node["Request"]["ItemSearchRequest"]["Keywords"].value(),
+            totalPages: node["TotalPages"].value()
         )
     }
 }
@@ -289,6 +305,13 @@ class AmazonParserModel {
     var items: [AmazonItem]? {
         if let items: [AmazonItem] = try? xmlIndexer["ItemSearchResponse"]["Items"]["Item"].value() {
             return items
+        }
+        return nil
+    }
+    
+    var response: AmazonResponse? {
+        if let response: AmazonResponse = try? xmlIndexer["ItemSearchResponse"]["Items"].value() {
+            return response
         }
         return nil
     }
