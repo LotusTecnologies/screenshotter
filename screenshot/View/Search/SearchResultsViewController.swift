@@ -47,6 +47,8 @@ class SearchResultsViewController: UIViewController {
         tableView.backgroundColor = view.backgroundColor
         tableView.register(SearchResultTableViewCell.self, forCellReuseIdentifier: "cell")
         tableView.keyboardDismissMode = .onDrag
+        tableView.rowHeight = UITableViewAutomaticDimension
+        tableView.estimatedRowHeight = 80
         view.addSubview(tableView)
         tableView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
@@ -161,6 +163,7 @@ extension SearchResultsViewController: UITableViewDataSource {
             
             cell.titleLabel.text = title(amazonItem: amazonItem)
             cell.descriptionLabel.attributedText = detailAttributedText(amazonItem: amazonItem)
+            cell.accessoryType = .disclosureIndicator
         }
         
         return cell
