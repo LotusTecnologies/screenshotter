@@ -13,6 +13,7 @@ class SearchViewController: UIViewController {
     let searchController: UISearchController
     let categoriesNavigationController = SearchCategoriesNavigationController()
     
+    private let searchPaginationController = SearchPaginationController()
     private let productsOptions = ProductsOptions(provider: .amazon)
     private let filterBarButtonItem = UIBarButtonItem(image: UIImage(named: "ProductsFilter"), style: .plain, target: nil, action: nil)
     
@@ -24,13 +25,17 @@ class SearchViewController: UIViewController {
         
         definesPresentationContext = true
         
+        searchResultsViewController.delegate = self
+        
         productsOptions.delegate = self
         
-        searchController.delegate = self
-        searchController.searchResultsUpdater = self
+        searchPaginationController.delegate = self
+        syncSearchPagination(productsOptions)
+        
         searchController.dimsBackgroundDuringPresentation = true
         searchController.hidesNavigationBarDuringPresentation = false
         
+        searchController.searchBar.delegate = self
         searchController.searchBar.placeholder = "search.placeholder".localized
         searchController.searchBar.searchBarStyle = .minimal
         navigationItem.titleView = searchController.searchBar
@@ -51,59 +56,28 @@ class SearchViewController: UIViewController {
         categoriesNavigationController.didMove(toParentViewController: self)
         
         categoriesNavigationController.view.translatesAutoresizingMaskIntoConstraints = false
-        categoriesNavigationController.view.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor).isActive = true
         categoriesNavigationController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        categoriesNavigationController.view.bottomAnchor.constraint(equalTo: view.layoutMarginsGuide.bottomAnchor).isActive = true
         categoriesNavigationController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        
+        if #available(iOS 11.0, *) {
+            categoriesNavigationController.view.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor).isActive = true
+            categoriesNavigationController.view.bottomAnchor.constraint(equalTo: view.layoutMarginsGuide.bottomAnchor).isActive = true
+        }
+        else {
+            categoriesNavigationController.view.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor).isActive = true
+            categoriesNavigationController.view.bottomAnchor.constraint(equalTo: bottomLayoutGuide.topAnchor).isActive = true
+        }
     }
     
     deinit {
+        searchResultsViewController.delegate = nil
         productsOptions.delegate = nil
-        searchController.delegate = nil
-        searchController.searchResultsUpdater = nil
-    }
-}
-
-extension SearchViewController: UISearchResultsUpdating {
-    func updateSearchResults(for searchController: UISearchController) {
-        guard let text = searchController.searchBar.text, !text.isEmpty else {
-            searchResultsViewController.amazonItems = nil
-            navigationItem.rightBarButtonItem = nil
-            return
-        }
-        
-        if navigationItem.rightBarButtonItem != filterBarButtonItem {
-            navigationItem.setRightBarButton(filterBarButtonItem, animated: true)
-        }
-        
-        searchAmazon(text)
+        searchPaginationController.delegate = nil
+        searchController.searchBar.delegate = nil
     }
     
-    private func searchAmazon(_ keywords: String) {
-        guard let lastChar = keywords.last, lastChar != " " else {
-            if keywords.trimmingCharacters(in: .whitespaces).isEmpty {
-                searchResultsViewController.amazonItems = []
-            }
-            return
-        }
-        
-        searchResultsViewController.amazonItems = nil
-        
-        NetworkingPromise.sharedInstance.searchAmazon(keywords: keywords, options: (productsOptions.sort, productsOptions.gender, productsOptions.size))
-            .then { [weak self] amazonItems -> Void in
-                if keywords == self?.searchController.searchBar.text {
-                    self?.searchResultsViewController.amazonItems = amazonItems
-                }
-            }
-            .catch { [weak self] error in
-                if keywords == self?.searchController.searchBar.text {
-                    self?.searchResultsViewController.amazonItems = []
-                }
-        }
-    }
-}
-
-extension SearchViewController: UISearchControllerDelegate {
+    // MARK: Search Controller
+    
     func presentSearchController() {
         searchController.isActive = true
         
@@ -121,6 +95,41 @@ extension SearchViewController: UISearchControllerDelegate {
     }
 }
 
+extension SearchViewController: SearchResultsViewControllerDelegate {
+    func searchResultsViewControllerRequestNextItems(_ viewController: SearchResultsViewController) {
+        searchPaginationController.next()
+    }
+}
+
+extension SearchViewController: UISearchBarDelegate {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        guard !searchText.isEmpty else {
+            searchResultsViewController.amazonItems = nil
+            navigationItem.rightBarButtonItem = nil
+            return
+        }
+        
+        if navigationItem.rightBarButtonItem != filterBarButtonItem {
+            navigationItem.setRightBarButton(filterBarButtonItem, animated: true)
+        }
+        
+        searchAmazon(searchText)
+    }
+    
+    private func searchAmazon(_ keywords: String) {
+        guard let lastChar = keywords.last, lastChar != " " else {
+            if keywords.trimmingCharacters(in: .whitespaces).isEmpty {
+                searchResultsViewController.amazonItems = []
+            }
+            return
+        }
+        
+        searchResultsViewController.amazonItems = nil
+        
+        searchPaginationController.search(keywords)
+    }
+}
+
 extension SearchViewController: ProductsOptionsDelegate {
     @objc private func presentOptions() {
         Analytics.trackOpenedFiltersView()
@@ -132,6 +141,8 @@ extension SearchViewController: ProductsOptionsDelegate {
     }
     
     func productsOptionsDidComplete(_ productsOptions: ProductsOptions, withModelChange changed: Bool) {
+        syncSearchPagination(productsOptions)
+        
         if let text = searchController.searchBar.text, !text.isEmpty {
             searchAmazon(text)
         }
@@ -141,5 +152,26 @@ extension SearchViewController: ProductsOptionsDelegate {
     
     func productsOptionsDidCancel(_ productsOptions: ProductsOptions) {
         dismissOptions()
+    }
+}
+
+extension SearchViewController: SearchPaginationControllerDelegate {
+    func searchPaginationControllerKeywords(_ controller: SearchPaginationController) -> String? {
+        return searchController.searchBar.text
+    }
+    
+    func searchPaginationController(_ controller: SearchPaginationController, items: [AmazonItem], page: Int) {
+        searchResultsViewController.isPaginationAtEnd = page == controller.maxPages
+        searchResultsViewController.amazonItems = controller.items
+        
+        if page == 1 {
+            searchResultsViewController.tableView.resetContentOffset()
+        }
+    }
+    
+    private func syncSearchPagination(_ productsOptions: ProductsOptions) {
+        searchPaginationController.gender = productsOptions.gender
+        searchPaginationController.sort = productsOptions.sort
+        searchPaginationController.size = productsOptions.size
     }
 }

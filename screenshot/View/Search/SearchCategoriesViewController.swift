@@ -75,18 +75,7 @@ extension SearchCategoriesViewController: UICollectionViewDataSource {
     }
     
     private func collectionViewReset() {
-        collectionView.contentOffset = {
-            var contentOffset: CGPoint = .zero
-            
-            if #available(iOS 11.0, *) {
-                contentOffset.y = -collectionView.safeAreaInsets.top
-            }
-            else {
-                contentOffset.y = -collectionView.contentInset.top
-            }
-            
-            return contentOffset
-        }()
+        collectionView.resetContentOffset()
         collectionView.reloadData()
     }
 }
@@ -145,8 +134,8 @@ extension SearchCategoriesViewController {
         navigationController?.pushViewController(searchResultsViewController, animated: true)
         
         NetworkingPromise.sharedInstance.searchAmazon(keywords: searchBranch.keyword ?? "", options: (.default, gender, .adult))
-            .then { [weak searchResultsViewController] amazonItems -> Void in
-                searchResultsViewController?.amazonItems = amazonItems
+            .then { [weak searchResultsViewController] amazonResponse -> Void in
+                searchResultsViewController?.amazonItems = amazonResponse.items
             }
             .catch { error in
                 // TODO:
