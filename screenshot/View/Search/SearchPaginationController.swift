@@ -16,9 +16,28 @@ protocol SearchPaginationControllerDelegate: NSObjectProtocol {
 class SearchPaginationController {
     weak var delegate: SearchPaginationControllerDelegate?
     
-    var sort: ProductsOptionsSort = .similar
-    var gender: ProductsOptionsGender = .auto
-    var size: ProductsOptionsSize = .adult
+    private var didFiltersChange = false
+    var sort: ProductsOptionsSort = .similar {
+        willSet {
+            if newValue != sort {
+                didFiltersChange = true
+            }
+        }
+    }
+    var gender: ProductsOptionsGender = .auto {
+        willSet {
+            if newValue != gender {
+                didFiltersChange = true
+            }
+        }
+    }
+    var size: ProductsOptionsSize = .adult {
+        willSet {
+            if newValue != size {
+                didFiltersChange = true
+            }
+        }
+    }
     
     private(set) var keywords: String?
     private(set) var page = 0
@@ -33,8 +52,9 @@ class SearchPaginationController {
     }
     
     func search(_ keywords: String) {
-        if self.keywords != keywords {
+        if self.keywords != keywords || didFiltersChange {
             self.keywords = keywords
+            didFiltersChange = false
             pagedItems = [:]
             page = 1
         }
