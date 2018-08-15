@@ -17,6 +17,10 @@ class SearchCategoriesViewController: UIViewController {
     }
     var columns = 1
     
+    private let searchResultsViewController = SearchResultsViewController()
+    private let searchPaginationController = SearchPaginationController()
+    private var keywords = ""
+    
     private let collectionViewLayout: UICollectionViewFlowLayout
     private let collectionView: UICollectionView
     
@@ -29,6 +33,10 @@ class SearchCategoriesViewController: UIViewController {
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: collectionViewLayout)
         
         super.init(nibName: nil, bundle: nil)
+        
+        
+        searchResultsViewController.delegate = self
+        searchPaginationController.delegate = self
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -53,6 +61,11 @@ class SearchCategoriesViewController: UIViewController {
         collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+    }
+    
+    deinit {
+        searchResultsViewController.delegate = nil
+        searchPaginationController.delegate = nil
     }
 }
 
@@ -117,7 +130,9 @@ extension SearchCategoriesViewController: UICollectionViewDelegateFlowLayout {
 
 extension SearchCategoriesViewController {
     func searchAndPushResults(searchBranch: SearchBranch) {
-        let gender: ProductsOptionsGender = {
+        keywords = searchBranch.keyword ?? ""
+        
+        searchPaginationController.gender = {
             if let currentSearchClass = currentSearchClass {
                 switch currentSearchClass {
                 case .men:
@@ -128,17 +143,30 @@ extension SearchCategoriesViewController {
             }
             return .female
         }()
+        searchPaginationController.search(keywords)
         
-        let searchResultsViewController = SearchResultsViewController()
         searchResultsViewController.title = searchBranch.category.title
         navigationController?.pushViewController(searchResultsViewController, animated: true)
-        
-        NetworkingPromise.sharedInstance.searchAmazon(keywords: searchBranch.keyword ?? "", options: (.default, gender, .adult))
-            .then { [weak searchResultsViewController] amazonResponse -> Void in
-                searchResultsViewController?.amazonItems = amazonResponse.items
-            }
-            .catch { error in
-                // TODO:
-        }
+    }
+}
+
+// MARK: - Search Results
+
+extension SearchCategoriesViewController: SearchResultsViewControllerDelegate {
+    func searchResultsViewControllerRequestNextItems(_ viewController: SearchResultsViewController) {
+        searchPaginationController.next()
+    }
+}
+
+// MARK: - Search Pagination
+
+extension SearchCategoriesViewController: SearchPaginationControllerDelegate {
+    func searchPaginationControllerKeywords(_ controller: SearchPaginationController) -> String? {
+        return keywords
+    }
+    
+    func searchPaginationController(_ controller: SearchPaginationController, items: [AmazonItem], page: Int) {
+        searchResultsViewController.isPaginationEnabled = page < controller.maxPages
+        searchResultsViewController.amazonItems = controller.items
     }
 }
