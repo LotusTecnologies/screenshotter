@@ -32,7 +32,7 @@ class SearchViewController: UIViewController {
         searchPaginationController.delegate = self
         syncSearchPagination(productsOptions)
         
-        searchController.dimsBackgroundDuringPresentation = true
+        searchController.dimsBackgroundDuringPresentation = false
         searchController.hidesNavigationBarDuringPresentation = false
         
         searchController.searchBar.delegate = self
