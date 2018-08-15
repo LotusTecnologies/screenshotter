@@ -119,7 +119,7 @@ class SearchResultsViewController: UIViewController {
     
     // MARK: Pagination
     
-    var isPaginationAtEnd = false
+    var isPaginationEnabled = false
     
     private var hasPaginationIndicator: Bool {
         return tableView.tableFooterView != nil
@@ -263,7 +263,7 @@ extension SearchResultsViewController: UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let isAtBottom = scrollView.contentOffset.y + scrollView.bounds.height >= scrollView.contentSize.height
         
-        if isAtBottom, !hasPaginationIndicator, !isPaginationAtEnd, let items = amazonItems, !items.isEmpty {
+        if isAtBottom, !hasPaginationIndicator, isPaginationEnabled, let items = amazonItems, !items.isEmpty {
             startPaginationIndicator()
             self.delegate?.searchResultsViewControllerRequestNextItems(self)
         }

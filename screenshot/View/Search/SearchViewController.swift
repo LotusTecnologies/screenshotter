@@ -161,7 +161,7 @@ extension SearchViewController: SearchPaginationControllerDelegate {
     }
     
     func searchPaginationController(_ controller: SearchPaginationController, items: [AmazonItem], page: Int) {
-        searchResultsViewController.isPaginationAtEnd = page == controller.maxPages
+        searchResultsViewController.isPaginationEnabled = page < controller.maxPages
         searchResultsViewController.amazonItems = controller.items
         
         if page == 1 {
