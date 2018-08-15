@@ -120,19 +120,25 @@ class SearchResultsViewController: UIViewController {
     var isPaginationAtEnd = false
     
     private var hasPaginationIndicator: Bool {
-        return tableView.tableFooterView == paginationIndicator
+        return tableView.tableFooterView != nil
     }
     
     private func startPaginationIndicator() {
         if !hasPaginationIndicator {
-            tableView.tableFooterView = paginationIndicator
+            let view = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: 60))
+            view.addSubview(paginationIndicator)
+            paginationIndicator.translatesAutoresizingMaskIntoConstraints = false
+            paginationIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+            paginationIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
             paginationIndicator.startAnimating()
+            tableView.tableFooterView = view
         }
     }
     
     private func stopPaginationIndicator() {
         if hasPaginationIndicator {
             paginationIndicator.stopAnimating()
+            paginationIndicator.removeFromSuperview()
             tableView.tableFooterView = nil
         }
     }
