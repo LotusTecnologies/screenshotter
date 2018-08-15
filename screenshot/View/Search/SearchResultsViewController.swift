@@ -132,12 +132,15 @@ extension SearchResultsViewController: UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         
         if let cell = cell as? SearchResultTableViewCell, let amazonItem = amazonItems?[indexPath.row] {
-            let imageURL = URL(string: amazonItem.smallImage?.urlString ?? "")
+            let imageURL = URL(string: amazonItem.mediumImage?.urlString ?? "")
             let placeholderImage = UIImage(named: "DefaultProduct")
             cell.productImageView.sd_setImage(with: imageURL, placeholderImage: placeholderImage)
             
-            cell.textLabel?.text = title(amazonItem: amazonItem)
-            cell.detailTextLabel?.attributedText = detailAttributedText(amazonItem: amazonItem)
+//            cell.textLabel?.text = title(amazonItem: amazonItem)
+//            cell.detailTextLabel?.attributedText = detailAttributedText(amazonItem: amazonItem)
+            
+            cell.titleLabel.text = title(amazonItem: amazonItem)
+            cell.descriptionLabel.attributedText = detailAttributedText(amazonItem: amazonItem)
         }
         
         return cell
