@@ -67,6 +67,15 @@ class SearchCategoriesViewController: UIViewController {
         searchResultsViewController.delegate = nil
         searchPaginationController.delegate = nil
     }
+    
+    // MARK: Keyboard
+    
+    private func dismissKeyboard() {
+        guard let searchBarTextField = UIResponder.current as? UITextField else  {
+            return
+        }
+        searchBarTextField.resignFirstResponder()
+    }
 }
 
 extension SearchCategoriesViewController: UICollectionViewDataSource {
@@ -107,6 +116,8 @@ extension SearchCategoriesViewController: UICollectionViewDelegate {
         else {
             searchAndPushResults(searchBranch: branch)
         }
+        
+        dismissKeyboard()
     }
 }
 
