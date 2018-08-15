@@ -75,18 +75,7 @@ extension SearchCategoriesViewController: UICollectionViewDataSource {
     }
     
     private func collectionViewReset() {
-        collectionView.contentOffset = {
-            var contentOffset: CGPoint = .zero
-            
-            if #available(iOS 11.0, *) {
-                contentOffset.y = -collectionView.safeAreaInsets.top
-            }
-            else {
-                contentOffset.y = -collectionView.contentInset.top
-            }
-            
-            return contentOffset
-        }()
+        collectionView.resetContentOffset()
         collectionView.reloadData()
     }
 }

@@ -11,7 +11,6 @@ import UIKit
 protocol SearchPaginationControllerDelegate: NSObjectProtocol {
     func searchPaginationControllerKeywords(_ controller: SearchPaginationController) -> String?
     func searchPaginationController(_ controller: SearchPaginationController, items: [AmazonItem], page: Int)
-    func searchPaginationControllerFinalPage(_ controller: SearchPaginationController)
 }
 
 class SearchPaginationController {
@@ -24,11 +23,12 @@ class SearchPaginationController {
     private(set) var keywords: String?
     private(set) var page = 0
     private var totalPages: Int?
-    private var maxPages: Int {
+    var maxPages: Int {
         return min(10, totalPages ?? 10) // Amazon max page request
     }
     private var pagedItems: [Int:[AmazonItem]] = [:]
-    private var items: [AmazonItem] {
+    
+    var items: [AmazonItem] {
         return pagedItems.sorted(by: { $0.key < $1.key }).reduce([], { $0 + $1.value })
     }
     
@@ -44,7 +44,6 @@ class SearchPaginationController {
         
         if page > maxPages {
             page = maxPages
-            delegate?.searchPaginationControllerFinalPage(self)
             return
         }
         
@@ -59,10 +58,11 @@ class SearchPaginationController {
                         return
                     }
                     
-                    strongSelf.totalPages = amazonResponse.totalPages
-                    strongSelf.pagedItems[strongSelf.page] = amazonItems
+                    let page = amazonResponse.itemPage ?? 1
                     
-                    strongSelf.delegate?.searchPaginationController(strongSelf, items: strongSelf.items, page: strongSelf.page)
+                    strongSelf.totalPages = amazonResponse.totalPages
+                    strongSelf.pagedItems[page] = amazonItems
+                    strongSelf.delegate?.searchPaginationController(strongSelf, items: amazonItems, page: page)
                 }
             }
             .catch { [weak self] error in

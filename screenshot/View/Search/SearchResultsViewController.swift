@@ -25,27 +25,16 @@ class SearchResultsViewController: UIViewController {
             }
             
             if isViewLoaded {
-                tableView.contentOffset = {
-                    var offset: CGPoint = .zero
-                    
-                    if #available(iOS 11.0, *) {
-                        offset.y = -tableView.safeAreaInsets.top
-                    }
-                    else {
-                        offset.y = -tableView.contentInset.top
-                    }
-                    
-                    return offset
-                }()
-                
                 tableView.reloadData()
+                stopPaginationIndicator()
             }
         }
     }
     
-    private let tableView = UITableView(frame: .zero, style: .plain)
+    let tableView = UITableView(frame: .zero, style: .plain)
     private let loadingIndicator = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
     private let emptyLabel = UILabel()
+    private let paginationIndicator = UIActivityIndicatorView(activityIndicatorStyle: .gray)
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -123,6 +112,28 @@ class SearchResultsViewController: UIViewController {
             loadingIndicator.isHidden = true
             loadingIndicator.stopAnimating()
             emptyLabel.isHidden = false
+        }
+    }
+    
+    // MARK: Pagination
+    
+    var isPaginationAtEnd = false
+    
+    private var hasPaginationIndicator: Bool {
+        return tableView.tableFooterView == paginationIndicator
+    }
+    
+    private func startPaginationIndicator() {
+        if !hasPaginationIndicator {
+            tableView.tableFooterView = paginationIndicator
+            paginationIndicator.startAnimating()
+        }
+    }
+    
+    private func stopPaginationIndicator() {
+        if hasPaginationIndicator {
+            paginationIndicator.stopAnimating()
+            tableView.tableFooterView = nil
         }
     }
 }
@@ -241,8 +252,10 @@ extension SearchResultsViewController: UITableViewDelegate {
 
 extension SearchResultsViewController: UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        // ???: might not work for iOS 10
-        if scrollView.contentOffset.y + scrollView.bounds.height >= scrollView.contentSize.height {
+        let isAtBottom = scrollView.contentOffset.y + scrollView.bounds.height >= scrollView.contentSize.height
+        
+        if isAtBottom, !hasPaginationIndicator, !isPaginationAtEnd, let items = amazonItems, !items.isEmpty {
+            startPaginationIndicator()
             self.delegate?.searchResultsViewControllerRequestNextItems(self)
         }
     }
