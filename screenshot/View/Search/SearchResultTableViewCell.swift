@@ -30,10 +30,10 @@ class SearchResultTableViewCell: UITableViewCell {
         productImageView.widthAnchor.constraint(equalToConstant: imageViewWidth).isActive = true
         productImageView.heightAnchor.constraint(equalToConstant: imageViewWidth).isActive = true
         
-        let verticalLabelSpace: CGFloat = 3
+        let verticalLabelSpace: CGFloat = 2
         
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.font = .systemFont(ofSize: 17, weight: .semibold)
+        titleLabel.font = .systemFont(ofSize: 16, weight: .semibold)
         contentView.addSubview(titleLabel)
         titleLabel.topAnchor.constraint(greaterThanOrEqualTo: contentView.topAnchor, constant: layoutMargins.top).isActive = true
         titleLabel.leadingAnchor.constraint(equalTo: productImageView.trailingAnchor, constant: layoutMargins.left).isActive = true
