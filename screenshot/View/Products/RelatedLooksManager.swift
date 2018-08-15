@@ -19,6 +19,7 @@ class RelatedLooksManager: NSObject {
     var relatedLooks:Promise<[String]>?
     weak var delegate:RelatedLooksManagerDelegate?
 
+    var minimumDelay:TimeInterval = 1.2
 
     func hasRelatedLooksSection() -> Bool {
         if let error = self.relatedLooks?.error {
@@ -152,11 +153,12 @@ class RelatedLooksManager: NSObject {
         if self.relatedLooks == nil {
             if let products = self.delegate?.relatedLooksManagerGetProducts(self), let shoppabe = products.first?.shoppable, let relatedlooksURL = shoppabe.relatedImagesUrl()  {
                 Analytics.trackShoppableRelatedLooksLoaded(shoppable: shoppabe)
-                let atLeastXSeconds = Promise.init(resolvers: { (fulfil, reject) in
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.2, execute: {
+                let atLeastXSeconds = minimumDelay > 0 ? Promise.init(resolvers: { (fulfil, reject) in
+                    DispatchQueue.main.asyncAfter(deadline: .now() + minimumDelay, execute: {
                         fulfil(true);
                     })
-                })
+                }) : Promise.init(value: true)
+                
                 let loadRequest:Promise<[String]> = Promise.init(resolvers: { (fulfil, reject) in
                     
                     let objectId = shoppabe.objectID
