@@ -74,6 +74,8 @@
 		311A50D120DBD9EE0001D463 /* ResendCodeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A50D020DBD9EE0001D463 /* ResendCodeManager.swift */; };
 		311A50D820E3E3570001D463 /* DiscoverManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A50D720E3E3560001D463 /* DiscoverManager.swift */; };
 		311C5989210EE01600F44F12 /* MessageInboxHeaderCollectionReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311C5988210EE01600F44F12 /* MessageInboxHeaderCollectionReusableView.swift */; };
+		312159052125496200130E31 /* DiscoverFilterControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 312159042125496200130E31 /* DiscoverFilterControl.swift */; };
+		31215907212553BB00130E31 /* DiscoverFilterCategories.json in Resources */ = {isa = PBXBuildFile; fileRef = 31215906212553BB00130E31 /* DiscoverFilterCategories.json */; };
 		3125446B2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		3125446C2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		3125446D2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
@@ -323,6 +325,8 @@
 		311C5988210EE01600F44F12 /* MessageInboxHeaderCollectionReusableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageInboxHeaderCollectionReusableView.swift; sourceTree = "<group>"; };
 		311C59AA211ACB0700F44F12 /* Model 24.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 24.xcdatamodel"; sourceTree = "<group>"; };
 		3121590321253AC900130E31 /* Model 27.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 27.xcdatamodel"; sourceTree = "<group>"; };
+		312159042125496200130E31 /* DiscoverFilterControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverFilterControl.swift; sourceTree = "<group>"; };
+		31215906212553BB00130E31 /* DiscoverFilterCategories.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = DiscoverFilterCategories.json; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.javascript; };
 		31254460209079C7009410D5 /* screenshot-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "screenshot-Bridging-Header.h"; sourceTree = "<group>"; };
 		3125448E209871B4009410D5 /* Analytics+api.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Analytics+api.swift"; sourceTree = "<group>"; };
 		31357EE120F6636D00515116 /* UIColor+craze.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+craze.swift"; sourceTree = "<group>"; };
@@ -578,6 +582,7 @@
 			isa = PBXGroup;
 			children = (
 				311A4F6A20D90B730001D463 /* DiscoverScreenshotViewController.swift */,
+				312159042125496200130E31 /* DiscoverFilterControl.swift */,
 				311A4F6B20D90B730001D463 /* DiscoverScreenshotCollectionViewLayout.swift */,
 				311A4F6C20D90B730001D463 /* DiscoverNavigationController.swift */,
 				318DC5F120FB5ECA00C16190 /* DiscoverGenderOptionViewController.swift */,
@@ -826,6 +831,7 @@
 				C53B15B01FDD1EF400658A78 /* FavoriteHeart.json */,
 				C50EE26D1FC406F1002B4259 /* Fonts */,
 				C5CAF2791FCC0EFD006F37DC /* ISO4217.plist */,
+				31215906212553BB00130E31 /* DiscoverFilterCategories.json */,
 				C53B15BC1FDD638C00658A78 /* Localizable.strings */,
 			);
 			path = Resources;
@@ -1351,6 +1357,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				31215907212553BB00130E31 /* DiscoverFilterCategories.json in Resources */,
 				E4139D501F09083B00E8A53B /* Assets.xcassets in Resources */,
 				E464F8DC211B25E1009B51AB /* Screenshop.entitlements in Resources */,
 				E4DB2B7C1F7E1D4600320BE5 /* LaunchScreen.storyboard in Resources */,
@@ -1577,6 +1584,7 @@
 				C58BAE5A20E101DD0051394A /* BaseTableViewController.swift in Sources */,
 				311A505E20D90B780001D463 /* SettingsViewController.swift in Sources */,
 				52FA93911F6FF106000C7A71 /* UpdatePrompt.swift in Sources */,
+				312159052125496200130E31 /* DiscoverFilterControl.swift in Sources */,
 				311A503320D90B780001D463 /* DiscoverNavigationController.swift in Sources */,
 				E42AC3911F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift in Sources */,
 				C515A413211DAF9800482B21 /* SearchCategoriesNavigationController.swift in Sources */,

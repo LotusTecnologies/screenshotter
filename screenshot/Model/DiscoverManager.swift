@@ -45,7 +45,9 @@ class DiscoverManager {
         return nil
         }() {
         didSet{
+            
             UserDefaults.standard.set(discoverCategoryFilter, forKey: UserDefaultsKeys.discoverCategoryFilter)
+            
         }
     }
 
@@ -160,17 +162,29 @@ class DiscoverManager {
         })
     }
     
-    func updateFilter(category:String) {
-        self.reloadingFilterQueue.addOperation(AsyncOperation.init(timeout: 90, tags: [AsyncOperationTag.init(type: .filterChange, value: "DiscoverManager")], completion: { (completion) in
-            self.discoverCategoryFilter = category
-            DataModel.sharedInstance.performBackgroundTask({ (context) in
-                let displayingFetchRequest:NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
-                let displayingFetchRequestPredicate = Matchstick.predicateForDisplayingMatchstick()
-                displayingFetchRequest.predicate = displayingFetchRequestPredicate
-                if let displaying = try? context.fetch(displayingFetchRequest) {
-                    displaying.forEach{ $0.isDisplaying = false }
-                }
+    func updateFilterAndGetMoreIfNeeded(_ completion:@escaping (()->())){
+        DataModel.sharedInstance.performBackgroundTask({ (context) in
+            let displayingFetchRequest:NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
+            let displayingFetchRequestPredicate = Matchstick.predicateForDisplayingMatchstick()
+            displayingFetchRequest.predicate = displayingFetchRequestPredicate
+            if let displaying = try? context.fetch(displayingFetchRequest) {
+                displaying.forEach{ $0.isDisplaying = false }
+            }
+            context.saveIfNeeded()
+
+            let queuedFetchRequest:NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
+            let queuedFetchRequestPredicate = Matchstick.predicateForQueuedMatchstick(gender: self.gender, category: self.discoverCategoryFilter)
+            queuedFetchRequest.predicate = queuedFetchRequestPredicate
+            queuedFetchRequest.sortDescriptors = [NSSortDescriptor.init(key: "recombeeRecommended", ascending: false)]
+            
+            if let queued = try? context.fetch(queuedFetchRequest), queued.count >= Matchstick.recombeeQueueLowMark {
+                self.fillQueues(in: context)
                 context.saveIfNeeded()
+                DispatchQueue.main.async {
+                    completion()
+                }
+                return;
+            }else{
                 self.recombeRequest(count: 3).always {
                     DataModel.sharedInstance.performBackgroundTask({ (context) in
                         self.fillQueues(in: context)
@@ -180,31 +194,20 @@ class DiscoverManager {
                         }
                     })
                 }
-            })
+            }
+        })
+    }
+    func updateFilter(category:String?) {
+        self.reloadingFilterQueue.addOperation(AsyncOperation.init(timeout: 90, tags: [AsyncOperationTag.init(type: .filterChange, value: "DiscoverManager")], completion: { (completion) in
+            self.discoverCategoryFilter = category
+            self.updateFilterAndGetMoreIfNeeded(completion)
         }))
     }
     
     func updateGender(gender:ProductsOptionsGender) {
         self.reloadingFilterQueue.addOperation(AsyncOperation.init(timeout: 90, tags: [AsyncOperationTag.init(type: .filterChange, value: "DiscoverManager")], completion: { (completion) in
            self.gender = gender
-            DataModel.sharedInstance.performBackgroundTask({ (context) in
-                let displayingFetchRequest:NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
-                let displayingFetchRequestPredicate = Matchstick.predicateForDisplayingMatchstick()
-                displayingFetchRequest.predicate = displayingFetchRequestPredicate
-                if let displaying = try? context.fetch(displayingFetchRequest) {
-                    displaying.forEach{ $0.isDisplaying = false }
-                }
-                context.saveIfNeeded()
-                self.recombeRequest(count: 3).always {
-                    DataModel.sharedInstance.performBackgroundTask({ (context) in
-                        self.fillQueues(in: context)
-                        context.saveIfNeeded()
-                        DispatchQueue.main.async {
-                            completion()
-                        }
-                    })
-                }
-            })
+           self.updateFilterAndGetMoreIfNeeded(completion)
         }))
     }
     

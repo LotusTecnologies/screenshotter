@@ -23,7 +23,10 @@ class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonit
     fileprivate let addButton = UIButton()
     fileprivate var cardHelperView: DiscoverScreenshotHelperView?
     fileprivate let emptyView = HelperView()
-    
+    fileprivate let clearFilterView = HelperView()
+
+    fileprivate let discoverFilterControl = DiscoverFilterControl()
+
     weak var delegate: DiscoverScreenshotViewControllerDelegate?
     
     private var loading = Loader()
@@ -56,6 +59,7 @@ class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonit
         collectionView.isHidden = isFilterReloading
         loading.isHidden = !isFilterReloading
         emptyView.isHidden = isFilterReloading
+        clearFilterView.isHidden = isFilterReloading
         if isFilterReloading {
             loading.startAnimation()
         }else{
@@ -85,6 +89,16 @@ class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonit
         loading.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
         loading.centerYAnchor.constraint(equalTo: self.view.centerYAnchor).isActive = true
         
+        discoverFilterControl.addTarget(self, action: #selector(didChangeCategoryFilter(_:)), for: .valueChanged)
+        discoverFilterControl.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(discoverFilterControl)
+        discoverFilterControl.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor, constant:5.0).isActive = true
+        
+        discoverFilterControl.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        discoverFilterControl.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        discoverFilterControl.heightAnchor.constraint(equalToConstant: DiscoverFilterControl.defaultHeight).isActive = true
+
+        
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.dataSource = self
         collectionView.delegate = self
@@ -93,7 +107,7 @@ class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonit
         collectionView.scrollsToTop = false
         collectionView.register(DiscoverScreenshotCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
         view.addSubview(collectionView)
-        collectionView.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor).isActive = true
+        collectionView.topAnchor.constraint(equalTo: discoverFilterControl.bottomAnchor).isActive = true
         collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
@@ -143,10 +157,25 @@ class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonit
         emptyView.contentImage = UIImage(named: "DiscoverScreenshotEmptyListGraphic")
         emptyView.layoutMargins = UIEdgeInsets(top: .extendedPadding, left: .extendedPadding, bottom: .extendedPadding, right: .extendedPadding)
         view.insertSubview(emptyView, belowSubview: collectionView)
-        emptyView.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor).isActive = true
+        emptyView.topAnchor.constraint(equalTo: discoverFilterControl.topAnchor).isActive = true
         emptyView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         emptyView.bottomAnchor.constraint(equalTo: passButton.topAnchor).isActive = true
         emptyView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        
+        
+        
+        clearFilterView.translatesAutoresizingMaskIntoConstraints = false
+        clearFilterView.titleLabel.text = "discover.screenshot.empty.title".localized
+        clearFilterView.subtitleLabel.text = "discover.screenshot.empty.detail".localized
+        clearFilterView.contentImage = UIImage(named: "DiscoverScreenshotEmptyListGraphic")
+        clearFilterView.layoutMargins = UIEdgeInsets(top: .extendedPadding, left: .extendedPadding, bottom: .extendedPadding, right: .extendedPadding)
+        view.insertSubview(clearFilterView, belowSubview: collectionView)
+        clearFilterView.topAnchor.constraint(equalTo: discoverFilterControl.topAnchor).isActive = true
+        clearFilterView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        clearFilterView.bottomAnchor.constraint(equalTo: passButton.topAnchor).isActive = true
+        clearFilterView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        
+        
         
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "NavigationBarFilter"), style: .plain, target: self, action: #selector(filterAction(_:)))
 
@@ -177,6 +206,16 @@ class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonit
                 
             }
         }
+    }
+    @objc func didChangeCategoryFilter(_ sender:Any){
+        let category = self.discoverFilterControl.selectedCategory
+        if category.isAll {
+            DiscoverManager.shared.updateFilter(category: nil)
+        }else{
+            DiscoverManager.shared.updateFilter(category: category.filterName)
+        }
+        self.updateViewsLoadingState()
+        
     }
     
     deinit {
@@ -343,6 +382,7 @@ class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonit
                 
                 if self.matchsticks.count == 1 {
                     emptyView.alpha = abs(percent)
+                    clearFilterView.alpha = abs(percent)
                 }
                 
                 if !tempButtonDisable {
@@ -485,6 +525,7 @@ class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonit
     
     fileprivate func syncEmptyListViews() {
         emptyView.alpha = isListEmpty ? 1 : 0
+        clearFilterView.alpha = isListEmpty ? 1 : 0
         syncInteractionElements()
     }
     

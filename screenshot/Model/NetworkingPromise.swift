@@ -404,7 +404,7 @@ class NetworkingPromise : NSObject {
         }
         
         if let category = category {
-            filter += " AND \"\(category)\" in 'genders'"
+            filter += " AND \"\(category)\" in 'tags'"
         }
         
         params["filter"] = filter
@@ -414,7 +414,7 @@ class NetworkingPromise : NSObject {
             if let recomms = dict["recomms"] as? [[String:Any]]{
                 if recomms.count == 0 {
                     //turn off filter...
-                     UserDefaults.standard.set(true, forKey: UserDefaultsKeys.discoverDontFilter)
+//                     UserDefaults.standard.set(true, forKey: UserDefaultsKeys.discoverDontFilter)
                 }
                 recomms.forEach({ (matchstick) in
                     if let index = matchstick["id"] as? String
