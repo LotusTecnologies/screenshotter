@@ -217,6 +217,11 @@ class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonit
         DiscoverManager.shared.discoverViewDidAppear()
         syncEmptyListViews()
     }
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        discoverFilterControl.scrollToSelected()
+
+    }
     @objc func selectAllFilter(_ sender:Any){
         self.discoverFilterControl.selectAllFilter()
         DiscoverManager.shared.updateFilter(category: nil)

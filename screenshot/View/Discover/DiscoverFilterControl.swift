@@ -61,10 +61,10 @@ class DiscoverFilterControl: UIControl {
         var color:UIColor
         var isAll:Bool
         static func getFromFile() -> [TagCategory] {
-            func parse(data:Data) -> [TagCategory] {
-                var toReturn:[TagCategory] = []
-                if let json = try? JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [[String:Any]] {
-                    if let json = json {
+            func parse(data:Data) -> [TagCategory]? {
+                do {
+                    var toReturn:[TagCategory] = []
+                    if let json = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [[String:Any]] {
                         for dict in json {
                             if let displayName = dict["displayName"] as? String,
                                 let filterName = dict["filterName"] as? String,
@@ -74,20 +74,23 @@ class DiscoverFilterControl: UIControl {
                                 toReturn.append(TagCategory.init(displayName: displayName, filterName: filterName, color: color, isAll: isAll))
                             }
                         }
+                        
                     }
-                    
+                    return toReturn
+                }catch{
+                    return nil
                 }
-                return toReturn
+                
             }
             if let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
                 let dbURL = documentDirectory.appendingPathComponent("DiscoverFilterCategories.json")
                 
-                if let data = try? Data.init(contentsOf: dbURL) {
-                    return parse(data: data)
+                if let data = try? Data.init(contentsOf: dbURL),  let result =  parse(data: data) {
+                    return result
                 }
             }
-            if let bundleUrl = Bundle.main.url(forResource: "DiscoverFilterCategories", withExtension: "json"), let data = try? Data.init(contentsOf: bundleUrl) {
-                return parse(data: data)
+            if let bundleUrl = Bundle.main.url(forResource: "DiscoverFilterCategories", withExtension: "json"), let data = try? Data.init(contentsOf: bundleUrl), let result =  parse(data: data) {
+                return result
             }
             return []
         }
@@ -161,13 +164,34 @@ class DiscoverFilterControl: UIControl {
             b.contentEdgeInsets = .init(top: 2.0, left: .padding, bottom: 2.0, right: .padding)
             b.heightAnchor.constraint(equalTo: self.heightAnchor, multiplier: 1.0, constant: 0.0).isActive = true
             b.addTarget(self, action: #selector(didPressButton(_:)), for: .touchUpInside)
+            if t == self.selectedCategory {
+                b.isSelected = true
+            }
             buttons.append(b)
             lastAnchor = b.trailingAnchor
             
         }
         
         buttons.last?.trailingAnchor.constraint(equalTo: containterView.trailingAnchor, constant:-.padding).isActive = true
+        
+       
      }
+    func scrollToSelected(){
+       if let b = self.buttons.first(where:{ $0.isSelected} ) {
+        let visibleRect = b.frame
+        let frame = self.bounds
+        let x = visibleRect.origin.x + visibleRect.size.width/2.0 - frame.size.width/2.0
+        let maxX = scrollView.contentSize.width - frame.width
+        
+        let centeredRect = CGRect.init(
+            x: min(x, maxX),
+            y: 0,
+            width:  frame.size.width,
+            height:  frame.size.height)
+
+            scrollView.scrollRectToVisible(centeredRect, animated: false)
+        }
+    }
     @objc func didPressButton(_ sender:Any){
         if let button = sender as? DiscoverFilterButton {
             self.selectedCategory = button.tagCategory
