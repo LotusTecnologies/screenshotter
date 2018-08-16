@@ -8,7 +8,7 @@
 
 import Foundation
 import CoreData
-
+import UIKit
 
 extension Product {
     
@@ -73,6 +73,25 @@ extension Product {
     
     public func imageURLs() -> [URL] {
         return altImageURLs?.components(separatedBy: ",").compactMap {URL(string: $0)} ?? []
+    }
+    func priceAndSalePriceAttributedString(fontSize:CGFloat) -> NSAttributedString? {
+        let string = NSMutableAttributedString.init()
+        let font = UIFont.screenshopFont(.hind, size: fontSize)
+        if let originalPrice = self.originalPrice {
+            string.append( NSAttributedString.init(string: originalPrice, attributes: [.strikethroughStyle:NSUnderlineStyle.styleSingle.rawValue, .foregroundColor: UIColor.gray, .font:font ]) )
+            string.append(NSAttributedString.init(string: " ", attributes: [ : ]) )
+            if let price = self.price {
+                string.append(NSAttributedString.init(string: price, attributes: [.foregroundColor: UIColor.crazeRed, .font:font   ]) )
+            }
+
+        }else{
+            if let price = self.price {
+                string.append(NSAttributedString.init(string: price, attributes: [ .foregroundColor: UIColor.gray , .font:font ]) )
+            }
+        }
+        
+        
+        return string
     }
     
     func productTitle() -> String? {

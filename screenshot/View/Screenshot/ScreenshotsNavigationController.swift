@@ -89,7 +89,10 @@ extension ScreenshotsNavigationController :ScreenshotsViewControllerDelegate{
     func screenshotsViewController(_ viewController:ScreenshotsViewController, didSelectItemAt:IndexPath) {
         if viewController == self.topViewController {
             if let screenshot = viewController.screenshot(at: didSelectItemAt.item) {
-                presentScreenshot(screenshot)
+                let vc = ScreenshotSimilarLooksViewController.init(screenshot: screenshot)
+                self.pushViewController(vc, animated: true)
+
+//                presentScreenshot(screenshot)
             }
         }
     }

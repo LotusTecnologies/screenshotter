@@ -11,7 +11,7 @@ import PromiseKit
 
 protocol RelatedLooksManagerDelegate : NSObjectProtocol {
     func relatedLooksManagerReloadSection(_ relatedLooksManager:RelatedLooksManager)
-    func relatedLooksManagerGetProducts(_ relatedLooksManager:RelatedLooksManager) -> [Product]?
+    func relatedLooksManagerGetShoppable(_ relatedLooksManager:RelatedLooksManager) -> Shoppable?
     func relatedLooksManager(_ relatedLooksManager:RelatedLooksManager, present viewController:UIViewController)
 
 }
@@ -28,8 +28,8 @@ class RelatedLooksManager: NSObject {
                 return false
             }
         }
-        if let products =  self.delegate?.relatedLooksManagerGetProducts(self),  let _ = products.first?.shoppable?.relatedImagesUrl()  {
-            return products.count > 0
+        if let shoppable =  self.delegate?.relatedLooksManagerGetShoppable(self),  let _ = shoppable.relatedImagesUrl()  {
+            return true
         }
         return false
     }
@@ -40,7 +40,7 @@ class RelatedLooksManager: NSObject {
             if let relatedLooks = self.relatedLooks?.value {
                 return relatedLooks.count
             }else {
-                if let products = self.delegate?.relatedLooksManagerGetProducts(self), let _ = products.first?.shoppable?.relatedImagesUrl() {
+                if let shoppable = self.delegate?.relatedLooksManagerGetShoppable(self), let _ = shoppable.relatedImagesUrl() {
                     return 1 //loading or error
                 }else{
                     return 0
@@ -151,7 +151,7 @@ class RelatedLooksManager: NSObject {
     
     func loadRelatedLooksIfNeeded() {
         if self.relatedLooks == nil {
-            if let products = self.delegate?.relatedLooksManagerGetProducts(self), let shoppabe = products.first?.shoppable, let relatedlooksURL = shoppabe.relatedImagesUrl()  {
+            if let shoppabe = self.delegate?.relatedLooksManagerGetShoppable(self), let relatedlooksURL = shoppabe.relatedImagesUrl()  {
                 Analytics.trackShoppableRelatedLooksLoaded(shoppable: shoppabe)
                 let atLeastXSeconds = minimumDelay > 0 ? Promise.init(resolvers: { (fulfil, reject) in
                     DispatchQueue.main.asyncAfter(deadline: .now() + minimumDelay, execute: {
@@ -214,7 +214,7 @@ class RelatedLooksManager: NSObject {
                 }
                 self.relatedLooks = promise
             }else{
-                let shopable = self.delegate?.relatedLooksManagerGetProducts(self)?.first?.shoppable
+                let shopable = self.delegate?.relatedLooksManagerGetShoppable(self)
                 Analytics.trackShoppableRelatedLooksNotLoaded(shoppable: shopable)
                 let error = NSError.init(domain: "related_looks", code: 1, userInfo: [NSLocalizedDescriptionKey:"no url", "retryable":false])
                 self.relatedLooks = Promise.init(error: error)

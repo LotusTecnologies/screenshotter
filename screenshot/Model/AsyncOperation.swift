@@ -142,7 +142,7 @@ class AsyncOperationTag: Equatable {
 }
 
 class AsyncOperationQueue : OperationQueue {
-    fileprivate let uuid = UUID.init()
+    let uuid = UUID.init()
     
     private static var observerContext = 0
     
