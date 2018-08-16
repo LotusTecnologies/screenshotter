@@ -200,6 +200,8 @@ class DiscoverManager {
     func updateFilter(category:String?) {
         self.reloadingFilterQueue.addOperation(AsyncOperation.init(timeout: 90, tags: [AsyncOperationTag.init(type: .filterChange, value: "DiscoverManager")], completion: { (completion) in
             self.discoverCategoryFilter = category
+            Analytics.trackMatchsticksFilterCategory(gender: self.gender.analyticsStringValue, category: self.discoverCategoryFilter)
+
             self.updateFilterAndGetMoreIfNeeded(completion)
         }))
     }
@@ -207,6 +209,7 @@ class DiscoverManager {
     func updateGender(gender:ProductsOptionsGender) {
         self.reloadingFilterQueue.addOperation(AsyncOperation.init(timeout: 90, tags: [AsyncOperationTag.init(type: .filterChange, value: "DiscoverManager")], completion: { (completion) in
            self.gender = gender
+            Analytics.trackMatchsticksFilterGender(gender: self.gender.analyticsStringValue, category: self.discoverCategoryFilter)
            self.updateFilterAndGetMoreIfNeeded(completion)
         }))
     }
@@ -246,6 +249,10 @@ class DiscoverManager {
                     context.saveIfNeeded()
                 }
             })
+            
+            if queued.count == 0, let category = self.discoverCategoryFilter {
+                Analytics.trackMatchsticksFilterNoResults(gender: self.gender.analyticsStringValue, category: category)
+            }
             
             let currentQueueSize = (queued.count - itemsAdded)
             let queueItemsNeeded =  (Matchstick.queueSize - currentQueueSize)
