@@ -176,8 +176,8 @@ class DiscoverManager {
             let queuedFetchRequestPredicate = Matchstick.predicateForQueuedMatchstick(gender: self.gender, category: self.discoverCategoryFilter)
             queuedFetchRequest.predicate = queuedFetchRequestPredicate
             queuedFetchRequest.sortDescriptors = [NSSortDescriptor.init(key: "recombeeRecommended", ascending: false)]
-            
-            if let queued = try? context.fetch(queuedFetchRequest), queued.count >= Matchstick.recombeeQueueLowMark {
+            queuedFetchRequest.fetchLimit = Matchstick.recombeeQueueLowMark
+            if let count = try? context.count(for: queuedFetchRequest), count >= Matchstick.recombeeQueueLowMark {
                 self.fillQueues(in: context)
                 context.saveIfNeeded()
                 DispatchQueue.main.async {
@@ -221,7 +221,8 @@ class DiscoverManager {
         let queuedFetchRequestPredicate = Matchstick.predicateForQueuedMatchstick(gender: self.gender, category: self.discoverCategoryFilter)
         queuedFetchRequest.predicate = queuedFetchRequestPredicate
         queuedFetchRequest.sortDescriptors = [NSSortDescriptor.init(key: "recombeeRecommended", ascending: false)]
-
+        queuedFetchRequest.fetchLimit = Matchstick.recombeeQueueSize + Matchstick.displayingSize
+        
         if let displaying = try? context.fetch(displayingFetchRequest), let queued = try? context.fetch(queuedFetchRequest) {
 
             let displayingMatchStickNeeded = (Matchstick.displayingSize - displaying.count)
@@ -240,6 +241,9 @@ class DiscoverManager {
                         downloadingAndDownloaded += 1
                         self.downloadIfNeeded(imageURL: imageUrl, priority: .low)
                     }
+                }
+                if itemsAdded == displayingMatchStickNeeded {
+                    context.saveIfNeeded()
                 }
             })
             

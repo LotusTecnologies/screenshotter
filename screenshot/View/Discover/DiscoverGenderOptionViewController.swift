@@ -100,7 +100,7 @@ class DiscoverGenderOptionViewController: UIViewController {
     
     @objc func buttonPress(_ sender:Any){
         if let sender = sender as? UIButton {
-            let gender:ProductsOptionsGender = {
+            let gender:ProductsOptionsGender = self.updatedGender ?? {
                 if let genderNumber = UserDefaults.standard.value(forKey: UserDefaultsKeys.productGender) as? NSNumber {
                     return ProductsOptionsGender.init(intValue: genderNumber.intValue)
                 }
