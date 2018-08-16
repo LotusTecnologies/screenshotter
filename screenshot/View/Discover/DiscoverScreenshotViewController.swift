@@ -58,13 +58,21 @@ class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonit
         addButton.isHidden = isFilterReloading
         collectionView.isHidden = isFilterReloading
         loading.isHidden = !isFilterReloading
-        emptyView.isHidden = isFilterReloading
-        clearFilterView.isHidden = isFilterReloading
+        if DiscoverManager.shared.discoverCategoryFilter == nil {
+            emptyView.isHidden = isFilterReloading
+            clearFilterView.isHidden = true
+        }else{
+            emptyView.isHidden = true
+            clearFilterView.isHidden = isFilterReloading
+            clearFilterView.titleLabel.text = "No more \(self.discoverFilterControl.selectedCategory.displayName) outfits"
+
+        }
         if isFilterReloading {
             loading.startAnimation()
         }else{
             loading.stopAnimation()
         }
+        
     }
     func asyncOperationMonitorDidChange(_ monitor: AsyncOperationMonitor) {
         updateViewsLoadingState()
@@ -157,7 +165,7 @@ class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonit
         emptyView.contentImage = UIImage(named: "DiscoverScreenshotEmptyListGraphic")
         emptyView.layoutMargins = UIEdgeInsets(top: .extendedPadding, left: .extendedPadding, bottom: .extendedPadding, right: .extendedPadding)
         view.insertSubview(emptyView, belowSubview: collectionView)
-        emptyView.topAnchor.constraint(equalTo: discoverFilterControl.topAnchor).isActive = true
+        emptyView.topAnchor.constraint(equalTo: discoverFilterControl.bottomAnchor).isActive = true
         emptyView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         emptyView.bottomAnchor.constraint(equalTo: passButton.topAnchor).isActive = true
         emptyView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
@@ -165,12 +173,22 @@ class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonit
         
         
         clearFilterView.translatesAutoresizingMaskIntoConstraints = false
-        clearFilterView.titleLabel.text = "discover.screenshot.empty.title".localized
-        clearFilterView.subtitleLabel.text = "discover.screenshot.empty.detail".localized
-        clearFilterView.contentImage = UIImage(named: "DiscoverScreenshotEmptyListGraphic")
+        clearFilterView.titleLabel.text = "No more outfits"
+        clearFilterView.contentImage = UIImage(named: "DiscoverNoMoreInFilter")
+        let button = MainButton()
+        button.addTarget(self, action: #selector(selectAllFilter(_:)), for: .touchUpInside)
+        button.backgroundColor = .crazeRed
+        button.setTitle("Show All", for: .normal)
+        button.setTitleColor(.white, for: .normal)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        clearFilterView.controlView.addSubview( button )
+        button.topAnchor.constraint(equalTo: clearFilterView.controlView.topAnchor).isActive = true
+        button.leadingAnchor.constraint(equalTo: clearFilterView.controlView.leadingAnchor).isActive = true
+        button.trailingAnchor.constraint(equalTo: clearFilterView.controlView.trailingAnchor).isActive = true
+        button.bottomAnchor.constraint(equalTo: clearFilterView.controlView.bottomAnchor).isActive = true
         clearFilterView.layoutMargins = UIEdgeInsets(top: .extendedPadding, left: .extendedPadding, bottom: .extendedPadding, right: .extendedPadding)
         view.insertSubview(clearFilterView, belowSubview: collectionView)
-        clearFilterView.topAnchor.constraint(equalTo: discoverFilterControl.topAnchor).isActive = true
+        clearFilterView.topAnchor.constraint(equalTo: discoverFilterControl.bottomAnchor).isActive = true
         clearFilterView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         clearFilterView.bottomAnchor.constraint(equalTo: passButton.topAnchor).isActive = true
         clearFilterView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
@@ -179,6 +197,13 @@ class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonit
         
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "NavigationBarFilter"), style: .plain, target: self, action: #selector(filterAction(_:)))
 
+        let isFilterReloading = true
+        passButton.isHidden = isFilterReloading
+        addButton.isHidden = isFilterReloading
+        collectionView.isHidden = isFilterReloading
+        loading.isHidden = !isFilterReloading
+        emptyView.isHidden = isFilterReloading
+        clearFilterView.isHidden = isFilterReloading
         
         let pinchZoom = UIPinchGestureRecognizer.init(target: self, action: #selector(pinch(gesture:)))
         self.view.addGestureRecognizer(pinchZoom)
@@ -192,7 +217,12 @@ class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonit
         DiscoverManager.shared.discoverViewDidAppear()
         syncEmptyListViews()
     }
-    
+    @objc func selectAllFilter(_ sender:Any){
+        self.discoverFilterControl.selectAllFilter()
+        DiscoverManager.shared.updateFilter(category: nil)
+        self.updateViewsLoadingState()
+    }
+
     @objc func filterAction(_ sender:Any){
         if let sender = sender as? UIBarButtonItem {
             let vc = DiscoverGenderOptionViewController.init()
@@ -381,8 +411,10 @@ class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonit
                 }
                 
                 if self.matchsticks.count == 1 {
-                    emptyView.alpha = abs(percent)
+                    
+                    emptyView.alpha =  abs(percent)
                     clearFilterView.alpha = abs(percent)
+                   
                 }
                 
                 if !tempButtonDisable {
@@ -521,11 +553,15 @@ class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonit
         passButton.isDisabled(!isButtonEnabled || tempButtonDisable)
         addButton.isDisabled(!isButtonEnabled || tempButtonDisable)
         collectionView.isUserInteractionEnabled = isInteractionEnabled
+        self.matchsticks = self.matchstickFrc?.fetchedObjects ?? []
+        self.collectionView.reloadData()
     }
     
     fileprivate func syncEmptyListViews() {
         emptyView.alpha = isListEmpty ? 1 : 0
         clearFilterView.alpha = isListEmpty ? 1 : 0
+        clearFilterView.titleLabel.text = "No more \(self.discoverFilterControl.selectedCategory.displayName) outfits"
+        
         syncInteractionElements()
     }
     

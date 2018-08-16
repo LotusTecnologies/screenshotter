@@ -119,6 +119,14 @@ class DiscoverFilterControl: UIControl {
         return TagCategory.init(displayName: "All", filterName: "", color: UIColor.init(hex: "E62A41"), isAll: true)
         
     }()
+    func selectAllFilter(){
+        if let all = self.allTagCategories.first(where: {$0.isAll } ) {
+            self.scrollView.setContentOffset(.zero, animated: true)
+            self.selectedCategory = all
+            self.buttons.forEach { $0.isSelected = (self.selectedCategory == $0.tagCategory)}
+        }
+        
+    }
     private let scrollView = UIScrollView()
     private let containterView = UIView()
     
