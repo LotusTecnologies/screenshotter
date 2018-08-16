@@ -37,6 +37,18 @@ class DiscoverManager {
             UserDefaults.standard.set(gender.rawValue, forKey: UserDefaultsKeys.productGender)
         }
     }
+    
+    var discoverCategoryFilter:String? = {
+        if let discoverCategoryFilter = UserDefaults.standard.value(forKey: UserDefaultsKeys.discoverCategoryFilter) as? String {
+            return discoverCategoryFilter
+        }
+        return nil
+        }() {
+        didSet{
+            UserDefaults.standard.set(discoverCategoryFilter, forKey: UserDefaultsKeys.discoverCategoryFilter)
+        }
+    }
+
     func createFilterChangingMonitor(delegate:AsyncOperationMonitorDelegate) -> AsyncOperationMonitor {
         return AsyncOperationMonitor.init(tags: [AsyncOperationTag.init(type: .filterChange, value: "DiscoverManager")], queues: [self.reloadingFilterQueue], delegate: delegate)
     }
@@ -141,11 +153,35 @@ class DiscoverManager {
     
     @discardableResult private func recombeRequest(count:Int) -> Promise<Void>{
         let dateRequested = Date()
-        return NetworkingPromise.sharedInstance.recombeeRecommendation(count:count, gender:self.gender).then(execute: { (recommendations) -> Promise<Void> in
+        return NetworkingPromise.sharedInstance.recombeeRecommendation(count:count, gender:self.gender, category:self.discoverCategoryFilter).then(execute: { (recommendations) -> Promise<Void> in
             return self.recombeeRecommendation(recommendations, dateRequested: dateRequested)
         }).catch(execute: { (error) in
             print("recombee error: \(error)")
         })
+    }
+    
+    func updateFilter(category:String) {
+        self.reloadingFilterQueue.addOperation(AsyncOperation.init(timeout: 90, tags: [AsyncOperationTag.init(type: .filterChange, value: "DiscoverManager")], completion: { (completion) in
+            self.discoverCategoryFilter = category
+            DataModel.sharedInstance.performBackgroundTask({ (context) in
+                let displayingFetchRequest:NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
+                let displayingFetchRequestPredicate = Matchstick.predicateForDisplayingMatchstick()
+                displayingFetchRequest.predicate = displayingFetchRequestPredicate
+                if let displaying = try? context.fetch(displayingFetchRequest) {
+                    displaying.forEach{ $0.isDisplaying = false }
+                }
+                context.saveIfNeeded()
+                self.recombeRequest(count: 3).always {
+                    DataModel.sharedInstance.performBackgroundTask({ (context) in
+                        self.fillQueues(in: context)
+                        context.saveIfNeeded()
+                        DispatchQueue.main.async {
+                            completion()
+                        }
+                    })
+                }
+            })
+        }))
     }
     
     func updateGender(gender:ProductsOptionsGender) {
@@ -179,17 +215,9 @@ class DiscoverManager {
         displayingFetchRequest.sortDescriptors = nil
         
         let queuedFetchRequest:NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
-        let queuedFetchRequestPredicate = Matchstick.predicateForQueuedMatchstick()
+        let queuedFetchRequestPredicate = Matchstick.predicateForQueuedMatchstick(gender: self.gender, category: self.discoverCategoryFilter)
         queuedFetchRequest.predicate = queuedFetchRequestPredicate
-        switch self.gender {
-        case .auto:
         queuedFetchRequest.sortDescriptors = [NSSortDescriptor.init(key: "recombeeRecommended", ascending: false)]
-        case .female:
-        queuedFetchRequest.sortDescriptors = [NSSortDescriptor.init(key: "isFemale", ascending: false), NSSortDescriptor.init(key: "recombeeRecommended", ascending: false)]
-        case .male:
-        queuedFetchRequest.sortDescriptors = [NSSortDescriptor.init(key: "isMale", ascending: false), NSSortDescriptor.init(key: "recombeeRecommended", ascending: false)]
-        }
-        
 
         if let displaying = try? context.fetch(displayingFetchRequest), let queued = try? context.fetch(queuedFetchRequest) {
 

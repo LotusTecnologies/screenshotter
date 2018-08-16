@@ -388,20 +388,26 @@ class NetworkingPromise : NSObject {
         var remoteId:String
         var properties:[String:[String]] = [:]
     }
-    func recombeeRecommendation(count:Int, gender:ProductsOptionsGender) -> Promise<[RecombeeRecommendation]>{
+    func recombeeRecommendation(count:Int, gender:ProductsOptionsGender, category:String?) -> Promise<[RecombeeRecommendation]>{
         let userId = AnalyticsUser.current.identifier
         var params:[String:Any] = [:]
         params["count"] = count
         params["cascadeCreate"] = true
         params["rotationRate"] = 0.99
-        params["filter"] = "'displayable' == true"
+        var filter = "'displayable' == true"
         params["returnProperties"] = true
-        params["includedProperties"] = "rekognition-labels,genders,itemTypes,rekognition-celebs,uid"
+        params["includedProperties"] = "rekognition-labels,genders,itemTypes,rekognition-celebs,uid,tags"
         if gender == .female {
-            params["filter"] = "'displayable' == true AND \"female\" in 'genders'"
+            filter += " AND \"female\" in 'genders'"
         }else if gender == .male{
-            params["filter"] = "'displayable' == true AND \"male\" in 'genders'"
+            filter += " AND \"male\" in 'genders'"
         }
+        
+        if let category = category {
+            filter += " AND \"\(category)\" in 'genders'"
+        }
+        
+        params["filter"] = filter
         params["rotationTime"] = 60*60*24*2 // 2 days rotation
         return NetworkingPromise.sharedInstance.recombeeRequest(path: "recomms/users/\(userId)/items/", method: "GET", params: params).then { (dict) -> Promise<[RecombeeRecommendation]> in
             var toReturn:[RecombeeRecommendation] = []

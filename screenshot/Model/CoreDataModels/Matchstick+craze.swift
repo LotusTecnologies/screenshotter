@@ -13,8 +13,22 @@ extension Matchstick {
     static func predicateForDisplayingMatchstick() -> NSPredicate {
         return NSPredicate.init(format: "isDisplaying == true")
     }
-    static func predicateForQueuedMatchstick() -> NSPredicate {
-        return NSPredicate.init(format: "dateSkipped = nil AND was404 != true AND wasAdded != true AND isDisplaying != true")
+    static func predicateForQueuedMatchstick(gender:ProductsOptionsGender, category:String?) -> NSPredicate {
+        let basic = NSPredicate.init(format: "dateSkipped = nil AND was404 != true AND wasAdded != true AND isDisplaying != true")
+        var genderPredicate = NSPredicate.init(value: true)
+        if gender == .female {
+            genderPredicate = NSPredicate.init(format: "isFemale == true")
+        }else if gender == .male {
+            genderPredicate = NSPredicate.init(format: "isMale == true")
+        }
+        var categoryPredicate = NSPredicate.init(value: true)
+        
+        if let category = category {
+            categoryPredicate = NSPredicate.init(format: "tags CONTAINS %@", "[\(category)]")
+        }
+    
+        
+        return NSCompoundPredicate.init(andPredicateWithSubpredicates: [basic, genderPredicate, categoryPredicate])
     }
 
     static var skipRotationTime = TimeInterval.oneWeek

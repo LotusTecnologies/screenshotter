@@ -31,7 +31,7 @@ class Constants {
     static let openingProductKey = "openingProductKey"
     
     // DB
-    static let currentMomVersion = 26
+    static let currentMomVersion = 27
 
     // Syte
     static let syteAccountId = 6677
