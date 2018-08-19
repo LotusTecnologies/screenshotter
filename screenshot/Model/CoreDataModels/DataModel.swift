@@ -926,7 +926,35 @@ extension DataModel {
             print("cleanDeletedScreenshots results with error:\(error)")
         }
     }
-        
+    
+    func cleanDB() {
+        performBackgroundTask { (managedObjectContext) in
+            let screenshotRequest: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
+            screenshotRequest.predicate = NSPredicate(format: "isHidden == TRUE")
+            
+            do {
+                let screenshots = try managedObjectContext.fetch(screenshotRequest)
+                let favoriteRequest: NSFetchRequest<Product> = Product.fetchRequest()
+                favoriteRequest.predicate = NSPredicate(format: "isFavorite == TRUE AND screenshot IN %@", screenshots)
+                let favorites = try managedObjectContext.fetch(favoriteRequest)
+                for favorite in favorites {
+                    favorite.screenshot = nil
+                    favorite.shoppable = nil
+                }
+                for screenshot in screenshots {
+                    managedObjectContext.delete(screenshot)
+                }
+                let shoppableRequest: NSFetchRequest<Shoppable> = Shoppable.fetchRequest()
+                shoppableRequest.predicate = NSPredicate(format: "isFavorite == TRUE AND screenshot IN %@", screenshots)
+                let shoppables = try managedObjectContext.fetch(shoppableRequest)
+                try managedObjectContext.save()
+            } catch {
+                self.receivedCoreDataError(error: error)
+                print("cleanDB results with error:\(error)")
+            }
+        }
+    }
+    
 }
 
 extension NSFetchedResultsController {
