@@ -74,9 +74,9 @@
 		311A50D120DBD9EE0001D463 /* ResendCodeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A50D020DBD9EE0001D463 /* ResendCodeManager.swift */; };
 		311A50D820E3E3570001D463 /* DiscoverManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311A50D720E3E3560001D463 /* DiscoverManager.swift */; };
 		311C5989210EE01600F44F12 /* MessageInboxHeaderCollectionReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311C5988210EE01600F44F12 /* MessageInboxHeaderCollectionReusableView.swift */; };
-		3125446B2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
-		3125446C2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
-		3125446D2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
+		3125446B2091C3A0009410D5 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
+		3125446C2091C3A0009410D5 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
+		3125446D2091C3A0009410D5 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
 		3125448F209871B4009410D5 /* Analytics+api.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3125448E209871B4009410D5 /* Analytics+api.swift */; };
 		31357EE220F6636D00515116 /* UIColor+craze.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31357EE120F6636D00515116 /* UIColor+craze.swift */; };
 		31377FA22122EA5B0052D6EE /* ScreenshotSimilarLooksViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31377FA12122EA5B0052D6EE /* ScreenshotSimilarLooksViewController.swift */; };
@@ -112,6 +112,7 @@
 		52E547441FE2487B00627D6D /* ScreenshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E547431FE2487B00627D6D /* ScreenshotHelper.swift */; };
 		52FA93911F6FF106000C7A71 /* UpdatePrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52FA93901F6FF106000C7A71 /* UpdatePrompt.swift */; };
 		A1BB93398D02CA6BE20E4B49 /* Pods_Screenshop.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC53E8002BDC1493B0EF237F /* Pods_Screenshop.framework */; };
+		C50131A3212406C200DB2FEB /* UIScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50131A2212406C200DB2FEB /* UIScrollView.swift */; };
 		C515A413211DAF9800482B21 /* SearchCategoriesNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515A412211DAF9800482B21 /* SearchCategoriesNavigationController.swift */; };
 		C5233F0B1F6FF05800F25C7C /* LifeCycleProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5233F0A1F6FF05800F25C7C /* LifeCycleProtocol.swift */; };
 		C5278FEB1F3C38510090E422 /* AssetSyncModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5278FB91F3C38510090E422 /* AssetSyncModel.swift */; };
@@ -207,6 +208,7 @@
 		C5CC3E391F94A85900DA3425 /* NetworkingIndicatorProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CC3E381F94A85900DA3425 /* NetworkingIndicatorProtocol.swift */; };
 		C5CF0FCB2120239C007963BA /* SearchCategoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CF0FCA2120239C007963BA /* SearchCategoryModel.swift */; };
 		C5CF0FCD2120551B007963BA /* String+Format.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CF0FCC2120551B007963BA /* String+Format.swift */; };
+		C5CF0FD02122FAE8007963BA /* SearchPaginationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CF0FCF2122FAE8007963BA /* SearchPaginationController.swift */; };
 		C5D2428020F4866A001403E4 /* DataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5D2427F20F4866A001403E4 /* DataSource.swift */; };
 		C5DC531A20CD3F2100E90DB8 /* Quicksand-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C5DC531620CD3F2000E90DB8 /* Quicksand-Medium.ttf */; };
 		C5DC531B20CD3F2100E90DB8 /* Quicksand-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C5DC531720CD3F2000E90DB8 /* Quicksand-Regular.ttf */; };
@@ -371,6 +373,7 @@
 		5D46F5FB952185827C62CED4 /* Pods-Screenshop.devdebug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Screenshop.devdebug.xcconfig"; path = "Pods/Target Support Files/Pods-Screenshop/Pods-Screenshop.devdebug.xcconfig"; sourceTree = "<group>"; };
 		77779D7BFEE5D04A53C2725F /* Pods-Screenshop.devrelease.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Screenshop.devrelease.xcconfig"; path = "Pods/Target Support Files/Pods-Screenshop/Pods-Screenshop.devrelease.xcconfig"; sourceTree = "<group>"; };
 		C43822AEF9F923C6F6F8E840 /* Pods-Screenshop.prddebug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Screenshop.prddebug.xcconfig"; path = "Pods/Target Support Files/Pods-Screenshop/Pods-Screenshop.prddebug.xcconfig"; sourceTree = "<group>"; };
+		C50131A2212406C200DB2FEB /* UIScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIScrollView.swift; sourceTree = "<group>"; };
 		C515A412211DAF9800482B21 /* SearchCategoriesNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchCategoriesNavigationController.swift; sourceTree = "<group>"; };
 		C5233F0A1F6FF05800F25C7C /* LifeCycleProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifeCycleProtocol.swift; sourceTree = "<group>"; };
 		C5278FB91F3C38510090E422 /* AssetSyncModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssetSyncModel.swift; sourceTree = "<group>"; };
@@ -467,6 +470,7 @@
 		C5CF0FCA2120239C007963BA /* SearchCategoryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchCategoryModel.swift; sourceTree = "<group>"; };
 		C5CF0FCC2120551B007963BA /* String+Format.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Format.swift"; sourceTree = "<group>"; };
 		C5CF0FCE212176A0007963BA /* Model 25.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 25.xcdatamodel"; sourceTree = "<group>"; };
+		C5CF0FCF2122FAE8007963BA /* SearchPaginationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchPaginationController.swift; sourceTree = "<group>"; };
 		C5D2427F20F4866A001403E4 /* DataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSource.swift; sourceTree = "<group>"; };
 		C5DC531620CD3F2000E90DB8 /* Quicksand-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Medium.ttf"; sourceTree = "<group>"; };
 		C5DC531720CD3F2000E90DB8 /* Quicksand-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Regular.ttf"; sourceTree = "<group>"; };
@@ -1100,6 +1104,7 @@
 				C58BAE4720E101DD0051394A /* BarItem.swift */,
 				C58BAE4820E101DD0051394A /* Font.swift */,
 				C58BAE4920E101DD0051394A /* UIApplication.swift */,
+				C50131A2212406C200DB2FEB /* UIScrollView.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -1138,6 +1143,7 @@
 				C5933D8D2110359700BBCF5B /* UniversalSearchController.swift */,
 				C52FD9E62113319F00AD3A0B /* SearchResultsViewController.swift */,
 				C52FD9E821133CE500AD3A0B /* SearchResultTableViewCell.swift */,
+				C5CF0FCF2122FAE8007963BA /* SearchPaginationController.swift */,
 			);
 			path = Search;
 			sourceTree = "<group>";
@@ -1406,7 +1412,7 @@
 				"${BUILT_PRODUCTS_DIR}/FBSDKCoreKit/FBSDKCoreKit.framework",
 				"${BUILT_PRODUCTS_DIR}/FBSDKLoginKit/FBSDKLoginKit.framework",
 				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher/GTMSessionFetcher.framework",
-				"${BUILT_PRODUCTS_DIR}/GoogleToolboxForMac/GoogleToolboxForMac.framework",
+				"${BUILT_PRODUCTS_DIR}/GoogleUtilities/GoogleUtilities.framework",
 				"${BUILT_PRODUCTS_DIR}/Hero/Hero.framework",
 				"${BUILT_PRODUCTS_DIR}/PromiseKit/PromiseKit.framework",
 				"${BUILT_PRODUCTS_DIR}/SDWebImage/SDWebImage.framework",
@@ -1426,7 +1432,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKCoreKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKLoginKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMSessionFetcher.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleToolboxForMac.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleUtilities.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Hero.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/PromiseKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SDWebImage.framework",
@@ -1514,6 +1520,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C58BAE5720E101DD0051394A /* ScrollRevealController.swift in Sources */,
+				C5CF0FD02122FAE8007963BA /* SearchPaginationController.swift in Sources */,
 				525691881FD5DD51008D728D /* UsageStreak.swift in Sources */,
 				311A502420D90B780001D463 /* WebViewController.swift in Sources */,
 				311A50BD20D90B780001D463 /* OnboardingWelcomeViewController.swift in Sources */,
@@ -1521,7 +1528,7 @@
 				C54124C220A8308600CA03DB /* AccumulatorModel.swift in Sources */,
 				C53B46581FBC3DFA00A8C886 /* NotificationCenterKeys.swift in Sources */,
 				C58BAE7F20E101DD0051394A /* TextFieldTableViewCell.swift in Sources */,
-				3125446C2091C3A0009410D5 /* (null) in Sources */,
+				3125446C2091C3A0009410D5 /* BuildFile in Sources */,
 				C58BAE6D20E101DD0051394A /* SaleView.swift in Sources */,
 				311A506820D90B780001D463 /* ScreenshotsDeleteButton.swift in Sources */,
 				311A50C920DAB2EF0001D463 /* RecoverLostSaleManager.swift in Sources */,
@@ -1598,6 +1605,7 @@
 				C58BAE8420E101DD0051394A /* UIResponder.swift in Sources */,
 				C5278FEE1F3C38510090E422 /* Model.xcdatamodeld in Sources */,
 				317BFBB2207DFCD300E61D7C /* Random.swift in Sources */,
+				C50131A3212406C200DB2FEB /* UIScrollView.swift in Sources */,
 				C58BAE6420E101DD0051394A /* BadgeBarButtonItem.swift in Sources */,
 				311A505120D90B780001D463 /* ProductDetailViewController.swift in Sources */,
 				311A505320D90B780001D463 /* ProductsCollectionViewCell.swift in Sources */,
@@ -1631,7 +1639,7 @@
 				311A4F5520D90B020001D463 /* UserAccountManager.swift in Sources */,
 				311A502320D90B780001D463 /* WebView.swift in Sources */,
 				C58BAE5F20E101DD0051394A /* DynamicTypeAccessibilityLayout.swift in Sources */,
-				3125446D2091C3A0009410D5 /* (null) in Sources */,
+				3125446D2091C3A0009410D5 /* BuildFile in Sources */,
 				C58BAE8F20E101DD0051394A /* MainButton.swift in Sources */,
 				C58BAE7B20E101DD0051394A /* CollectionView.swift in Sources */,
 				C53B15BE1FDE585B00658A78 /* LocalizeHelper.swift in Sources */,
@@ -1660,7 +1668,7 @@
 				311A505C20D90B780001D463 /* FavoriteProductsViewController.swift in Sources */,
 				311A506520D90B780001D463 /* ScreenshotsViewController.swift in Sources */,
 				31377FA22122EA5B0052D6EE /* ScreenshotSimilarLooksViewController.swift in Sources */,
-				3125446B2091C3A0009410D5 /* (null) in Sources */,
+				3125446B2091C3A0009410D5 /* BuildFile in Sources */,
 				311A50C520D90B780001D463 /* Form.swift in Sources */,
 				311A506E20D90B780001D463 /* RegisterConfirmationViewController.swift in Sources */,
 				31CE11002035AC44000156EE /* UIApplication+openInChrome.swift in Sources */,
@@ -1869,7 +1877,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 187;
+				CURRENT_PROJECT_VERSION = 188;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/dev/;
 				INFOPLIST_FILE = screenshot/dev/Info.plist;
@@ -1900,7 +1908,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 187;
+				CURRENT_PROJECT_VERSION = 188;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/dev/;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -1988,7 +1996,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 187;
+				CURRENT_PROJECT_VERSION = 188;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/dev/;
 				INFOPLIST_FILE = screenshot/dev/Info.plist;
@@ -2072,7 +2080,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 187;
+				CURRENT_PROJECT_VERSION = 188;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/prd/;
 				INFOPLIST_FILE = screenshot/prd/Info.plist;

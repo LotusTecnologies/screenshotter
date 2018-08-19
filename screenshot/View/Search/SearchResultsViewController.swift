@@ -8,7 +8,13 @@
 
 import UIKit
 
+protocol SearchResultsViewControllerDelegate: NSObjectProtocol {
+    func searchResultsViewControllerRequestNextItems(_ viewController: SearchResultsViewController)
+}
+
 class SearchResultsViewController: UIViewController {
+    weak var delegate: SearchResultsViewControllerDelegate?
+    
     var amazonItems: [AmazonItem]? {
         didSet {
             if let amazonItems = amazonItems {
@@ -19,27 +25,16 @@ class SearchResultsViewController: UIViewController {
             }
             
             if isViewLoaded {
-                tableView.contentOffset = {
-                    var offset: CGPoint = .zero
-                    
-                    if #available(iOS 11.0, *) {
-                        offset.y = -tableView.safeAreaInsets.top
-                    }
-                    else {
-                        offset.y = -tableView.contentInset.top
-                    }
-                    
-                    return offset
-                }()
-                
                 tableView.reloadData()
+                stopPaginationIndicator()
             }
         }
     }
     
-    private let tableView = UITableView(frame: .zero, style: .plain)
+    let tableView = UITableView(frame: .zero, style: .plain)
     private let loadingIndicator = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
     private let emptyLabel = UILabel()
+    private let paginationIndicator = UIActivityIndicatorView(activityIndicatorStyle: .gray)
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -52,6 +47,8 @@ class SearchResultsViewController: UIViewController {
         tableView.backgroundColor = view.backgroundColor
         tableView.register(SearchResultTableViewCell.self, forCellReuseIdentifier: "cell")
         tableView.keyboardDismissMode = .onDrag
+        tableView.rowHeight = UITableViewAutomaticDimension
+        tableView.estimatedRowHeight = 80
         view.addSubview(tableView)
         tableView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
@@ -119,9 +116,37 @@ class SearchResultsViewController: UIViewController {
             emptyLabel.isHidden = false
         }
     }
+    
+    // MARK: Pagination
+    
+    var isPaginationEnabled = false
+    
+    private var hasPaginationIndicator: Bool {
+        return tableView.tableFooterView != nil
+    }
+    
+    private func startPaginationIndicator() {
+        if !hasPaginationIndicator {
+            let view = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: 60))
+            view.addSubview(paginationIndicator)
+            paginationIndicator.translatesAutoresizingMaskIntoConstraints = false
+            paginationIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+            paginationIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+            paginationIndicator.startAnimating()
+            tableView.tableFooterView = view
+        }
+    }
+    
+    private func stopPaginationIndicator() {
+        if hasPaginationIndicator {
+            paginationIndicator.stopAnimating()
+            paginationIndicator.removeFromSuperview()
+            tableView.tableFooterView = nil
+        }
+    }
 }
 
-// MARK: - Data Source
+// MARK: - Table View Data Source
 
 extension SearchResultsViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -132,12 +157,13 @@ extension SearchResultsViewController: UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         
         if let cell = cell as? SearchResultTableViewCell, let amazonItem = amazonItems?[indexPath.row] {
-            let imageURL = URL(string: amazonItem.smallImage?.urlString ?? "")
+            let imageURL = URL(string: amazonItem.mediumImage?.urlString ?? "")
             let placeholderImage = UIImage(named: "DefaultProduct")
             cell.productImageView.sd_setImage(with: imageURL, placeholderImage: placeholderImage)
             
-            cell.textLabel?.text = title(amazonItem: amazonItem)
-            cell.detailTextLabel?.attributedText = detailAttributedText(amazonItem: amazonItem)
+            cell.titleLabel.text = title(amazonItem: amazonItem)
+            cell.descriptionLabel.attributedText = detailAttributedText(amazonItem: amazonItem)
+            cell.accessoryType = .disclosureIndicator
         }
         
         return cell
@@ -217,7 +243,7 @@ extension SearchResultsViewController: UITableViewDataSource {
     }
 }
 
-// MARK: - Delegate
+// MARK: - Table View Delegate
 
 extension SearchResultsViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -228,5 +254,18 @@ extension SearchResultsViewController: UITableViewDelegate {
         OpenWebPage.present(urlString: amazonItem.detailPageURL, fromViewController: self)
         
         tableView.deselectRow(at: indexPath, animated: true)
+    }
+}
+
+// MARK: - Scroll View Delegate
+
+extension SearchResultsViewController: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let isAtBottom = scrollView.contentOffset.y + scrollView.bounds.height >= scrollView.contentSize.height
+        
+        if isAtBottom, !hasPaginationIndicator, isPaginationEnabled, let items = amazonItems, !items.isEmpty {
+            startPaginationIndicator()
+            self.delegate?.searchResultsViewControllerRequestNextItems(self)
+        }
     }
 }

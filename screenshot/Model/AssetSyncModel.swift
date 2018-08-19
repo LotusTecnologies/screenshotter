@@ -150,9 +150,10 @@ extension AssetSyncModel {
     public func addScreenshotFrom(source:ScreenshotSource, urlString:String, callback: ((_ screenshot: Screenshot) -> Void)? = nil) {
 
         if Thread.isMainThread {
-            if let mainScreenshot = DataModel.sharedInstance.mainMoc().screenshotWith(assetId: urlString) as? Screenshot {
+            if let mainScreenshot = DataModel.sharedInstance.mainMoc().screenshotWith(assetId: urlString) {
                 if let callback =  callback{
                     callback(mainScreenshot)
+                    return;
                 }
             }
         }

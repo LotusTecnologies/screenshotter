@@ -10,25 +10,43 @@ import UIKit
 
 class SearchResultTableViewCell: UITableViewCell {
     let productImageView = UIImageView()
+    let titleLabel = UILabel()
+    let descriptionLabel = UILabel()
     
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
-        super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
         
-        if let imageView = imageView {
-            imageView.image = UIImage(named: "SearchResultGuide")
-            imageView.contentMode = .scaleAspectFit
-            imageView.layoutMargins = UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5)
-            
-            productImageView.translatesAutoresizingMaskIntoConstraints = false
-            productImageView.contentMode = .scaleAspectFit
-            imageView.addSubview(productImageView)
-            productImageView.topAnchor.constraint(greaterThanOrEqualTo: imageView.layoutMarginsGuide.topAnchor).isActive = true
-            productImageView.leadingAnchor.constraint(greaterThanOrEqualTo: imageView.layoutMarginsGuide.leadingAnchor).isActive = true
-            productImageView.bottomAnchor.constraint(lessThanOrEqualTo: imageView.layoutMarginsGuide.bottomAnchor).isActive = true
-            productImageView.trailingAnchor.constraint(lessThanOrEqualTo: imageView.layoutMarginsGuide.trailingAnchor).isActive = true
-            productImageView.centerXAnchor.constraint(equalTo: imageView.centerXAnchor).isActive = true
-            productImageView.centerYAnchor.constraint(equalTo: imageView.centerYAnchor).isActive = true
-        }
+        let imageViewWidth: CGFloat = 70
+        let layoutMargins = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
+        
+        separatorInset = UIEdgeInsets(top: 0, left: (layoutMargins.left * 2) + imageViewWidth, bottom: 0, right: 0)
+        
+        productImageView.translatesAutoresizingMaskIntoConstraints = false
+        productImageView.contentMode = .scaleAspectFit
+        contentView.addSubview(productImageView)
+        productImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: layoutMargins.top).isActive = true
+        productImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: layoutMargins.left).isActive = true
+        productImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -layoutMargins.bottom).isActive = true
+        productImageView.widthAnchor.constraint(equalToConstant: imageViewWidth).isActive = true
+        productImageView.heightAnchor.constraint(equalToConstant: imageViewWidth).isActive = true
+        
+        let verticalLabelSpace: CGFloat = 2
+        
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        titleLabel.font = .systemFont(ofSize: 16, weight: .semibold)
+        contentView.addSubview(titleLabel)
+        titleLabel.topAnchor.constraint(greaterThanOrEqualTo: contentView.topAnchor, constant: layoutMargins.top).isActive = true
+        titleLabel.leadingAnchor.constraint(equalTo: productImageView.trailingAnchor, constant: layoutMargins.left).isActive = true
+        titleLabel.bottomAnchor.constraint(equalTo: contentView.centerYAnchor, constant: -verticalLabelSpace).isActive = true
+        titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -layoutMargins.right).isActive = true
+        
+        descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
+        descriptionLabel.font = .systemFont(ofSize: 15, weight: .regular)
+        contentView.addSubview(descriptionLabel)
+        descriptionLabel.topAnchor.constraint(equalTo: contentView.centerYAnchor, constant: verticalLabelSpace).isActive = true
+        descriptionLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor).isActive = true
+        descriptionLabel.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -layoutMargins.bottom).isActive = true
+        descriptionLabel.trailingAnchor.constraint(equalTo: titleLabel.trailingAnchor).isActive = true
     }
     
     required init?(coder aDecoder: NSCoder) {

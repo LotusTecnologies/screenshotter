@@ -18,18 +18,27 @@ class ScreenshotSimilarLooksCollectionViewCell: UICollectionViewCell {
     var product2Byline = UILabel()
     var isLoaded = false {
         didSet{
+            let animationKey = "fadeInAndOut";
             let color = isLoaded ? UIColor.clear : UIColor.lightGray
             [product1ImageView, product2ImageView, product1Title, product2Title, product1Byline, product2Byline].forEach{
                 $0.backgroundColor = color
-                if isLoaded {
-                    if $0.layer.animation(forKey: <#T##String#>)
+                var animation = $0.layer.animation(forKey: animationKey)
+                if !isLoaded {
+                    if animation == nil {
+                        let a = CABasicAnimation.init(keyPath: #keyPath(CALayer.opacity))
+                        a.duration = 1.0
+                        a.fromValue = 1.0
+                        a.toValue = 0.2
+                        a.isRemovedOnCompletion = false;
+                        a.autoreverses = true
+                        a.repeatCount = HUGE
+                        $0.layer.add(a, forKey: animationKey)
+                        animation = a
+                    }
+                    
+                }else{
+                    $0.layer.removeAnimation(forKey: animationKey)
                 }
-            }
-            
-            
-            
-            if isLoaded {
-                
             }
             
         }
@@ -87,25 +96,25 @@ class ScreenshotSimilarLooksCollectionViewCell: UICollectionViewCell {
         product2ImageView.heightAnchor.constraint(equalToConstant: 50.0).isActive = true
 
         
-        product1Title.bottomAnchor.constraint(equalTo: product1ImageView.centerYAnchor).isActive = true
+        product1Title.bottomAnchor.constraint(equalTo: product1ImageView.centerYAnchor, constant:-1).isActive = true
         product1Title.leadingAnchor.constraint(equalTo: product1ImageView.trailingAnchor, constant: halfPadding).isActive = true
         product1Title.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: halfPadding).isActive = true
-        product1Title.heightAnchor.constraint(greaterThanOrEqualToConstant: 10).isActive = true
+        product1Title.heightAnchor.constraint(greaterThanOrEqualToConstant: 12).isActive = true
         
-        product1Byline.topAnchor.constraint(equalTo: product1ImageView.centerYAnchor).isActive = true
+        product1Byline.topAnchor.constraint(equalTo: product1ImageView.centerYAnchor, constant:1).isActive = true
         product1Byline.leadingAnchor.constraint(equalTo: product1ImageView.trailingAnchor, constant: halfPadding).isActive = true
         product1Byline.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: halfPadding ).isActive = true
-        product1Byline.heightAnchor.constraint(greaterThanOrEqualToConstant: 10).isActive = true
+        product1Byline.heightAnchor.constraint(greaterThanOrEqualToConstant: 12).isActive = true
         
-        product2Title.bottomAnchor.constraint(equalTo: product2ImageView.centerYAnchor).isActive = true
+        product2Title.bottomAnchor.constraint(equalTo: product2ImageView.centerYAnchor,  constant:-1).isActive = true
         product2Title.leadingAnchor.constraint(equalTo: product2ImageView.trailingAnchor, constant: halfPadding).isActive = true
         product2Title.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: halfPadding).isActive = true
-        product2Title.heightAnchor.constraint(greaterThanOrEqualToConstant: 10).isActive = true
+        product2Title.heightAnchor.constraint(greaterThanOrEqualToConstant: 12).isActive = true
         
-        product2Byline.topAnchor.constraint(equalTo: product2ImageView.centerYAnchor).isActive = true
+        product2Byline.topAnchor.constraint(equalTo: product2ImageView.centerYAnchor, constant:1).isActive = true
         product2Byline.leadingAnchor.constraint(equalTo: product2ImageView.trailingAnchor, constant: halfPadding).isActive = true
         product2Byline.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: halfPadding).isActive = true
-        product2Byline.heightAnchor.constraint(greaterThanOrEqualToConstant: 10).isActive = true
+        product2Byline.heightAnchor.constraint(greaterThanOrEqualToConstant: 12).isActive = true
         
         
         

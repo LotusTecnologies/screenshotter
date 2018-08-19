@@ -17,6 +17,10 @@ class SearchCategoriesViewController: UIViewController {
     }
     var columns = 1
     
+    private let searchResultsViewController = SearchResultsViewController()
+    private let searchPaginationController = SearchPaginationController()
+    private var keywords = ""
+    
     private let collectionViewLayout: UICollectionViewFlowLayout
     private let collectionView: UICollectionView
     
@@ -29,6 +33,10 @@ class SearchCategoriesViewController: UIViewController {
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: collectionViewLayout)
         
         super.init(nibName: nil, bundle: nil)
+        
+        
+        searchResultsViewController.delegate = self
+        searchPaginationController.delegate = self
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -54,6 +62,20 @@ class SearchCategoriesViewController: UIViewController {
         collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
     }
+    
+    deinit {
+        searchResultsViewController.delegate = nil
+        searchPaginationController.delegate = nil
+    }
+    
+    // MARK: Keyboard
+    
+    private func dismissKeyboard() {
+        guard let searchBarTextField = UIResponder.current as? UITextField else  {
+            return
+        }
+        searchBarTextField.resignFirstResponder()
+    }
 }
 
 extension SearchCategoriesViewController: UICollectionViewDataSource {
@@ -75,18 +97,7 @@ extension SearchCategoriesViewController: UICollectionViewDataSource {
     }
     
     private func collectionViewReset() {
-        collectionView.contentOffset = {
-            var contentOffset: CGPoint = .zero
-            
-            if #available(iOS 11.0, *) {
-                contentOffset.y = -collectionView.safeAreaInsets.top
-            }
-            else {
-                contentOffset.y = -collectionView.contentInset.top
-            }
-            
-            return contentOffset
-        }()
+        collectionView.resetContentOffset()
         collectionView.reloadData()
     }
 }
@@ -105,6 +116,8 @@ extension SearchCategoriesViewController: UICollectionViewDelegate {
         else {
             searchAndPushResults(searchBranch: branch)
         }
+        
+        dismissKeyboard()
     }
 }
 
@@ -128,7 +141,9 @@ extension SearchCategoriesViewController: UICollectionViewDelegateFlowLayout {
 
 extension SearchCategoriesViewController {
     func searchAndPushResults(searchBranch: SearchBranch) {
-        let gender: ProductsOptionsGender = {
+        keywords = searchBranch.keyword ?? ""
+        
+        searchPaginationController.gender = {
             if let currentSearchClass = currentSearchClass {
                 switch currentSearchClass {
                 case .men:
@@ -139,17 +154,30 @@ extension SearchCategoriesViewController {
             }
             return .female
         }()
+        searchPaginationController.search(keywords)
         
-        let searchResultsViewController = SearchResultsViewController()
         searchResultsViewController.title = searchBranch.category.title
         navigationController?.pushViewController(searchResultsViewController, animated: true)
-        
-        NetworkingPromise.sharedInstance.searchAmazon(keywords: searchBranch.keyword ?? "", options: (.default, gender, .adult))
-            .then { [weak searchResultsViewController] amazonItems -> Void in
-                searchResultsViewController?.amazonItems = amazonItems
-            }
-            .catch { error in
-                // TODO:
-        }
+    }
+}
+
+// MARK: - Search Results
+
+extension SearchCategoriesViewController: SearchResultsViewControllerDelegate {
+    func searchResultsViewControllerRequestNextItems(_ viewController: SearchResultsViewController) {
+        searchPaginationController.next()
+    }
+}
+
+// MARK: - Search Pagination
+
+extension SearchCategoriesViewController: SearchPaginationControllerDelegate {
+    func searchPaginationControllerKeywords(_ controller: SearchPaginationController) -> String? {
+        return keywords
+    }
+    
+    func searchPaginationController(_ controller: SearchPaginationController, items: [AmazonItem], page: Int) {
+        searchResultsViewController.isPaginationEnabled = page < controller.maxPages
+        searchResultsViewController.amazonItems = controller.items
     }
 }
