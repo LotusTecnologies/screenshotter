@@ -195,7 +195,7 @@ class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonit
         
         
         
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "NavigationBarFilter"), style: .plain, target: self, action: #selector(filterAction(_:)))
+//        self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "NavigationBarFilter"), style: .plain, target: self, action: #selector(showGenderPopup(_:)))
 
         let isFilterReloading = true
         passButton.isHidden = isFilterReloading
@@ -228,7 +228,7 @@ class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonit
         self.updateViewsLoadingState()
     }
 
-    @objc func filterAction(_ sender:Any){
+    @objc func showGenderPopup(_ sender:Any){
         if let sender = sender as? UIBarButtonItem {
             let vc = DiscoverGenderOptionViewController.init()
             vc.modalPresentationStyle = .popover
@@ -244,11 +244,19 @@ class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonit
     }
     @objc func didChangeCategoryFilter(_ sender:Any){
         let category = self.discoverFilterControl.selectedCategory
-        if category.isAll {
+        if category.filterName == "" {
             DiscoverManager.shared.updateFilter(category: nil)
         }else{
             DiscoverManager.shared.updateFilter(category: category.filterName)
         }
+         if category.genderName == "male"{
+            DiscoverManager.shared.updateGender(gender: .male)
+         }else if category.genderName == "female" {
+            DiscoverManager.shared.updateGender(gender: .female)
+         }else{
+            DiscoverManager.shared.updateGender(gender: .auto)
+        }
+        
         self.updateViewsLoadingState()
         
     }

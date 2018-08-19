@@ -306,15 +306,11 @@ class DiscoverManager {
     }
     
     func discoverViewDidAppear() {
-        self.reloadingFilterQueue.addOperation(AsyncOperation.init(timeout: 90, tags: [AsyncOperationTag.init(type: .filterChange, value: "DiscoverManager")], completion: { (completion) in
-            DataModel.sharedInstance.performBackgroundTask { (context) in
-                self.fillQueues(in: context)
-                context.saveIfNeeded()
-                DispatchQueue.mainAsyncIfNeeded {
-                    completion()
-                }
-            }
-        }))
+        
+        DataModel.sharedInstance.performBackgroundTask { (context) in
+            self.fillQueues(in: context)
+            context.saveIfNeeded()
+        }
     }
     func downloadIfNeeded(imageURL:String, priority:Operation.QueuePriority) {
         if let op = self.currentOperationWith(imageUrl: imageURL){

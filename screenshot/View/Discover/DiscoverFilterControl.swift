@@ -58,8 +58,10 @@ class DiscoverFilterControl: UIControl {
     struct TagCategory : Equatable{
         var displayName:String
         var filterName:String
+        var genderName:String
+
         var color:UIColor
-        var isAll:Bool
+
         static func getFromFile() -> [TagCategory] {
             func parse(data:Data) -> [TagCategory]? {
                 do {
@@ -68,10 +70,10 @@ class DiscoverFilterControl: UIControl {
                         for dict in json {
                             if let displayName = dict["displayName"] as? String,
                                 let filterName = dict["filterName"] as? String,
-                                let colorString = dict["color"] as? String,
-                                let isAll = dict["isAll"] as? Bool {
+                                let genderName = dict["genderName"] as? String,
+                                let colorString = dict["color"] as? String{
                                 let color = UIColor.init(hex: colorString)
-                                toReturn.append(TagCategory.init(displayName: displayName, filterName: filterName, color: color, isAll: isAll))
+                                toReturn.append(TagCategory.init(displayName: displayName, filterName: filterName, genderName:genderName, color: color))
                             }
                         }
                         
@@ -85,7 +87,7 @@ class DiscoverFilterControl: UIControl {
             if let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
                 let dbURL = documentDirectory.appendingPathComponent("DiscoverFilterCategories.json")
                 
-                if let data = try? Data.init(contentsOf: dbURL),  let result =  parse(data: data) {
+                if let data = try? Data.init(contentsOf: dbURL),  let result =  parse(data: data), result.count > 0  {
                     return result
                 }
             }
@@ -111,7 +113,7 @@ class DiscoverFilterControl: UIControl {
             }
         }
         for t in self.allTagCategories {
-            if t.isAll {
+            if t.genderName == "" && t.filterName == "" {
                 return t
             }
         }
@@ -119,11 +121,11 @@ class DiscoverFilterControl: UIControl {
         if let t =  self.allTagCategories.first{
             return t
         }
-        return TagCategory.init(displayName: "All", filterName: "", color: UIColor.init(hex: "E62A41"), isAll: true)
+        return TagCategory.init(displayName: "All", filterName: "", genderName: "", color: UIColor.init(hex: "E62A41"))
         
     }()
     func selectAllFilter(){
-        if let all = self.allTagCategories.first(where: {$0.isAll } ) {
+        if let all = self.allTagCategories.first(where: {$0.filterName == "" && $0.genderName == "" } ) {
             self.scrollView.setContentOffset(.zero, animated: true)
             self.selectedCategory = all
             self.buttons.forEach { $0.isSelected = (self.selectedCategory == $0.tagCategory)}
