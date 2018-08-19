@@ -155,6 +155,11 @@ extension AssetSyncModel {
                     callback(mainScreenshot)
                     return;
                 }
+            }else if let mainScreenshot = DataModel.sharedInstance.mainMoc().screenshotWith(imageUrl: urlString){
+                if let callback =  callback{
+                    callback(mainScreenshot)
+                    return;
+                }
             }
         }
         

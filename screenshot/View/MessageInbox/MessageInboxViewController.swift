@@ -215,10 +215,11 @@ extension MessageInboxViewController : UICollectionViewDelegate, UICollectionVie
                 case .similarLooks:
                     if let urlString = message.actionValue,  let _ = URL.init(string: urlString){
                         AssetSyncModel.sharedInstance.addScreenshotFrom(source: .inbox, urlString: urlString, callback: { (screenshot) in
-//                            Analytics.trackOpenedScreenshot(screenshot: screenshot, source: .inbox)
-                            let productsViewController = ScreenshotSimilarLooksViewController.init(screenshot: screenshot)
+                            
+                            let vc = ScreenshotSimilarLooksViewController.init(screenshot: screenshot)
+                            Analytics.trackOpenedScreenshot(screenshot: screenshot, source: .inbox)
                             self.navigationItem.backBarButtonItem = UIBarButtonItem.init(title: "", style: .plain, target: nil, action: nil)
-                            self.navigationController?.pushViewController(productsViewController, animated: true)
+                            self.navigationController?.pushViewController(vc, animated: true)
                             message.markAsRead()
                         })
                     }
