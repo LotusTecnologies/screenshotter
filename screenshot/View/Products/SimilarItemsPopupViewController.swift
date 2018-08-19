@@ -77,7 +77,24 @@ class SimilarItemsPopupViewController: UIViewController {
         closeButton.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         closeButton.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
- 
+        let pinchZoom = UIPinchGestureRecognizer.init(target: self, action: #selector(pinch(gesture:)))
+        self.view.addGestureRecognizer(pinchZoom)
+        
+    }
+    
+    @objc func pinch( gesture:UIPinchGestureRecognizer) {
+        if CrazeImageZoom.shared.isHandlingGesture, let imageView = CrazeImageZoom.shared.hostedImageView  {
+            CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: imageView)
+            return
+        }
+        let point = gesture.location(in: self.collectionView)
+        let collectionView = self.collectionView
+        if let indexPath = collectionView.indexPathForItem(at: point),  let cell = collectionView.cellForItem(at: indexPath){
+            
+            if let cell = cell as? ProductsCollectionViewCell, let imageView = cell.productImageView {
+                CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: imageView)
+            }
+        }
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -112,6 +129,8 @@ extension SimilarItemsPopupViewController: UICollectionViewDelegateFlowLayout, U
         let cell = self.productCollectionViewManager.collectionView(collectionView, cellForItemAt: indexPath, with: product)
         if let cell = cell as? ProductsCollectionViewCell {
             cell.actionButton.isHidden = true
+            cell.favoriteControl.addTarget(self, action: #selector(productCollectionViewCellFavoriteAction(_:event:)), for: .touchUpInside)
+
         }
         return cell
     }
@@ -119,6 +138,24 @@ extension SimilarItemsPopupViewController: UICollectionViewDelegateFlowLayout, U
         let product = self.products[indexPath.row]
         Analytics.trackFeatureLowerPricesClicked(product: product)
         self.presentProduct(product, atLocation: .saleRecoveryPrompt)
+    }
+    @objc func productCollectionViewCellFavoriteAction(_ favoriteControl: FavoriteControl, event: UIEvent) {
+        guard let indexPath = collectionView.indexPath(for: event) else {
+            return
+        }
+        
+        let isFavorited = favoriteControl.isSelected
+        let product = self.products[indexPath.row]
+
+        product.setFavorited(toFavorited: isFavorited)
+        
+        if isFavorited {
+            Analytics.trackProductFavorited(product: product, page: .similarItemsPopup)
+            LocalNotificationModel.shared.registerCrazeFavoritedPriceAlert(id: product.id, merchant: product.merchant, lastPrice: product.floatPrice)
+        }else{
+            Analytics.trackProductUnfavorited(product: product, page: .similarItemsPopup)
+            LocalNotificationModel.shared.deregisterCrazeFavoritedPriceAlert(id: product.id, merchant: product.merchant)
+        }
     }
 
 }

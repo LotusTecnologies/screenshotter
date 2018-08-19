@@ -18,6 +18,8 @@ class SearchCategoriesNavigationController: UINavigationController {
     init() {
         super.init(nibName: nil, bundle: nil)
         
+        navigationBar.backgroundColor = .white
+        navigationBar.setBackgroundImage(UIImage(), for: .default)
         navigationBar.shadowImage = UIImage()
         
         let genderControl = UISegmentedControl(items: searchClasses.map({ $0.possessiveTitle }))

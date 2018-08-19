@@ -1,6 +1,6 @@
 // STOP!  DO not edit the file below
 // only create by auto generting
-// created from: a88be3e 
+// created from: fe06807 
 //  Copyright (c) 2018 crazeapp. All rights reserved.
 
 
