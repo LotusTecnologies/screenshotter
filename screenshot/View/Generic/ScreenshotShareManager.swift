@@ -106,6 +106,7 @@ class ScreenshotShareManager {
                             Analytics.trackShareSocial(screenshot: screenshot)
                         }
                     }
+                    activityViewController.setValue("screenshots.share.subject".localized, forKey: "Subject")
                     activityViewController.popoverPresentationController?.sourceView = viewController.view
                     viewController.present(activityViewController, animated: true, completion: nil)
                 }
