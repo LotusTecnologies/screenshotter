@@ -663,6 +663,28 @@ extension DataModel {
     }
    
    
+    func cutOffDate() -> NSDate {
+        var dates: [Date] = []
+        
+        var installDate: Date
+        if let UserDefaultsInstallDate = UserDefaults.standard.object(forKey: UserDefaultsKeys.dateInstalled) as? Date {
+            installDate = UserDefaultsInstallDate
+        } else {
+            installDate = Date()
+            UserDefaults.standard.set(installDate, forKey: UserDefaultsKeys.dateInstalled)
+        }
+        
+        dates.append(installDate)
+        dates.append(Date(timeIntervalSinceNow: -.oneDay))
+        
+        if let date = UserDefaults.standard.value(forKey: UserDefaultsKeys.processBackgroundImagesForFashionAfterDate) as? Date {
+            dates.append(date)
+        }
+        
+        let cutOffDate = dates.max() ?? installDate
+        return cutOffDate as NSDate
+    }
+    
     func saveMatchstick(managedObjectContext: NSManagedObjectContext,
                         remoteId: String,
                         imageUrl: String,
@@ -927,27 +949,43 @@ extension DataModel {
         }
     }
     
+    // Clean out unneeded screenshots, shoppables and products.
+    // Only safe to call if not currently looking at a burrow.
     func cleanDB() {
         performBackgroundTask { (managedObjectContext) in
-            let screenshotRequest: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
-            screenshotRequest.predicate = NSPredicate(format: "isHidden == TRUE")
-            
             do {
+                let screenshotRequest: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
+                screenshotRequest.predicate = NSPredicate(format: "isHidden == TRUE AND createdAt < %@", self.cutOffDate())
                 let screenshots = try managedObjectContext.fetch(screenshotRequest)
+                
+                let shoppableRequest: NSFetchRequest<Shoppable> = Shoppable.fetchRequest()
+                shoppableRequest.predicate = NSPredicate(format: "screenshot == nil", screenshots)
+                let shoppables = try managedObjectContext.fetch(shoppableRequest)
+
                 let favoriteRequest: NSFetchRequest<Product> = Product.fetchRequest()
-                favoriteRequest.predicate = NSPredicate(format: "isFavorite == TRUE AND screenshot IN %@", screenshots)
+                favoriteRequest.predicate = NSPredicate(format: "isFavorite == TRUE AND (screenshot IN %@ OR shoppable IN %@)", screenshots, shoppables)
                 let favorites = try managedObjectContext.fetch(favoriteRequest)
                 for favorite in favorites {
                     favorite.screenshot = nil
                     favorite.shoppable = nil
                 }
+                
                 for screenshot in screenshots {
                     managedObjectContext.delete(screenshot)
                 }
-                let shoppableRequest: NSFetchRequest<Shoppable> = Shoppable.fetchRequest()
-                shoppableRequest.predicate = NSPredicate(format: "isFavorite == TRUE AND screenshot IN %@", screenshots)
-                let shoppables = try managedObjectContext.fetch(shoppableRequest)
-                try managedObjectContext.save()
+                for shoppable in shoppables {
+                    managedObjectContext.delete(shoppable)
+                }
+                
+                let productRequest: NSFetchRequest<Product> = Product.fetchRequest()
+                productRequest.predicate = NSPredicate(format: "shoppable == nil AND isFavorite == FALSE AND inNotif == FALSE")
+                let products = try managedObjectContext.fetch(productRequest)
+
+                for product in products {
+                    managedObjectContext.delete(product)
+                }
+
+                managedObjectContext.saveIfNeeded()
             } catch {
                 self.receivedCoreDataError(error: error)
                 print("cleanDB results with error:\(error)")
