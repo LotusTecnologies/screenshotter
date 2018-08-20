@@ -1,6 +1,10 @@
 // STOP!  DO not edit the file below
 // only create by auto generting
+<<<<<<< HEAD
 // created from: eaf100b 
+=======
+// created from: ed77d43 
+>>>>>>> origin/SCREEN-236-similar-looks
 //  Copyright (c) 2018 crazeapp. All rights reserved.
 
 
