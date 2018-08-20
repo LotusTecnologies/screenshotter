@@ -26,7 +26,7 @@ class AssetSyncModel: NSObject {
     var isRecentlyForeground = false
     var backgroundProcessFetchedResults:PHFetchResult<PHAsset>?
     var lastDidBecomeActiveDate:Date?
-    var screenshotQueuePriotiyList:[String:Int] = [:]
+    var screenshotQueuePriotiyList:[String:Date] = [:]
     
     let uploadScreenshotWithClarifaiQueue:AsyncOperationQueue = {
         var queue = AsyncOperationQueue()
@@ -1538,11 +1538,11 @@ extension Screenshot {
 
 //Queue priority
 extension AssetSyncModel {
-    static func operationPrioritySorting(screenshotQueuePriotiyList:[String:Int], op1:AsyncOperation, op2:AsyncOperation) -> Bool?{
+    static func operationPrioritySorting(screenshotQueuePriotiyList:[String:Date], op1:AsyncOperation, op2:AsyncOperation) -> Bool?{
         if let screenshotId1 = op1.userInfo["assetId"] as? String,
             let screenshotId2 = op2.userInfo["assetId"] as? String{
-            let index1 = screenshotQueuePriotiyList[screenshotId1] ?? 0
-            let index2 = screenshotQueuePriotiyList[screenshotId2] ?? 0
+            let index1 = screenshotQueuePriotiyList[screenshotId1] ?? Date.init(timeIntervalSince1970: 0 )
+            let index2 = screenshotQueuePriotiyList[screenshotId2] ?? Date.init(timeIntervalSince1970: 0 )
             if index1 == index2 {
                 return nil
             }
@@ -1552,7 +1552,7 @@ extension AssetSyncModel {
     }
 
     func moveScreenshotToTopOfQueue(assetId:String){
-        self.screenshotQueuePriotiyList[assetId] = Int(Date().timeIntervalSince1970 * 1000)
+        self.screenshotQueuePriotiyList[assetId] = Date()
         let copy = self.screenshotQueuePriotiyList
         self.syteProcessingQueue.operationPrioritySorting = { op1, op2 -> Bool? in
             AssetSyncModel.operationPrioritySorting(screenshotQueuePriotiyList: copy, op1: op1, op2: op2)
