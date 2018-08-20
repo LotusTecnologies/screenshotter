@@ -188,11 +188,12 @@ class LocalNotificationModel {
         let identifier = LocalNotificationIdentifier.saleScreenshot.rawValue
         DataModel.sharedInstance.performBackgroundTask({ (context) in
             if let screenshot = DataModel.sharedInstance.retrieveSaleScreenshot(in:context), let assetIdString = screenshot.assetId, let imageData = screenshot.imageData {
+                let screenshotObjectId = screenshot.objectID
                 if let firstShoppable = screenshot.firstShoppable {
                     RelatedLooksManager.loadRelatedLooked(shoppable: firstShoppable).then(execute: { (realtedLooks) -> Void in
                         let message = "notification.sale.screenshot.message".localized
                         NetworkingPromise.sharedInstance.saveToTmp(data: imageData, identifier: identifier, originalExtension: "").then(execute: { (copiedTmpURL) -> Void in
-                            let displayFromNow = TimeInterval(2) //* TimeInterval.oneDay
+                            let displayFromNow = 2 * TimeInterval.oneDay
                             self.scheduleImageLocalNotification(copiedTmpURL: copiedTmpURL,
                                                                 userInfo: [Constants.openingScreenKey  : Constants.openingScreenValueScreenshot,
                                                                            Constants.openingAssetIdKey : assetIdString],
@@ -205,6 +206,9 @@ class LocalNotificationModel {
                             }
                             
                             DataModel.sharedInstance.performBackgroundTask({ (context) in
+                                if let screenshot = context.screenshotWith(objectId: screenshotObjectId) {
+                                    screenshot.inNotif = true
+                                }
                                 let date = Date.init(timeIntervalSinceNow:displayFromNow)
                                 let expire = Date.init(timeIntervalSinceNow:displayFromNow + 7 * .oneDay)
                                 
