@@ -308,7 +308,7 @@ class LocalNotificationModel {
                         if let date = intervalTrigger.nextTriggerDate() {
                             let expire = Date(timeInterval: 7 * .oneDay, since: date)
                             dataModel.performBackgroundTask { context in
-                                InboxMessage.createUpdateWith(lookupDict: nil, actionType: "screenshot", actionValue: assetIdString, buttonText: "notification.similar.looks.message.button".localized, image: urlString, title: "notification.similar.looks.message.markup".localized, uuid: UUID().uuidString, expireDate:expire, date: date, showAfterDate: date, tracking: nil, create: true, update: false, context: context)
+                                InboxMessage.createUpdateWith(lookupDict: nil, actionType: "similarLooks", actionValue: assetIdString, buttonText: "notification.similar.looks.message.button".localized, image: urlString, title: "notification.similar.looks.message.markup".localized, uuid: UUID().uuidString, expireDate:expire, date: date, showAfterDate: date, tracking: nil, create: true, update: false, context: context)
                                 context.saveIfNeeded()
                             }
                         }
