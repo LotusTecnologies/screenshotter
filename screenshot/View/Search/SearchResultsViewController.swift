@@ -74,6 +74,9 @@ class SearchResultsViewController: UIViewController {
         emptyLabel.trailingAnchor.constraint(lessThanOrEqualTo: view.layoutMarginsGuide.trailingAnchor).isActive = true
         
         syncState()
+        
+        let pinchZoom = UIPinchGestureRecognizer.init(target: self, action: #selector(pinch(gesture:)))
+        self.view.addGestureRecognizer(pinchZoom)
     }
     
     deinit {
@@ -81,6 +84,17 @@ class SearchResultsViewController: UIViewController {
         tableView.delegate = nil
     }
     
+    
+    @objc func pinch( gesture:UIPinchGestureRecognizer) {
+        if CrazeImageZoom.shared.isHandlingGesture, let imageView = CrazeImageZoom.shared.hostedImageView  {
+            CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: imageView)
+            return
+        }
+        let point = gesture.location(in: self.tableView)
+        if let indexPath = self.tableView.indexPathForRow(at: point), let cell = self.tableView.cellForRow(at: indexPath) as? SearchResultTableViewCell{
+            CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: cell.productImageView)
+        }
+    }
     // MARK: State
     
     private enum State {
