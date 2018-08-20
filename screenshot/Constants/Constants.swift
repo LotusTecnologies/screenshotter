@@ -25,6 +25,8 @@ class Constants {
     // Local notification constants.
     static let openingScreenKey = "openingScreenKey"
     static let openingScreenValueScreenshot = "openingScreenValueScreenshot"
+    static let openingScreenValueScreenshotSimilarLooks = "openingScreenValueScreenshotSimilarLooks"
+
     static let openingScreenValueDiscover = "openingScreenValueDiscover"
     static let openingAssetIdKey = "openingAssetIdKey"
     static let tutorialScreenshotAssetId = "tutorialScreenshotAssetId"

@@ -802,6 +802,8 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
                             let dataModel = DataModel.sharedInstance
                             if let mainTabBarController = self.window?.rootViewController as? MainTabBarController,
                               let screenshot = dataModel.retrieveScreenshot(managedObjectContext: dataModel.mainMoc(), assetId: openingAssetId) {
+                                
+                                if
                                 mainTabBarController.screenshotsNavigationController.presentScreenshot(screenshot)
                             }
                         } else {
@@ -812,6 +814,11 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
                     } else {
                         showScreenshotListTop()
                     }
+                }else if openingScreen == Constants.openingScreenValueScreenshotSimilarLooks {
+                    if let openingAssetId = userInfo[Constants.openingAssetIdKey] as? String {
+                        
+                    }
+                    
                 } else if openingScreen == Constants.openingScreenValueDiscover {
                     if let mainTabBarController = self.window?.rootViewController as? MainTabBarController {
                         mainTabBarController.goTo(tab: .discover)
