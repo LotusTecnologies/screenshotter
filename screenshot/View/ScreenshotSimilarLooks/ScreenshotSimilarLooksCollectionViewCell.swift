@@ -16,6 +16,7 @@ class ScreenshotSimilarLooksCollectionViewCell: UICollectionViewCell {
     var product2Title = UILabel()
     var product1Byline = UILabel()
     var product2Byline = UILabel()
+    var imageUrl:String = ""
     var isLoaded = false {
         didSet{
             let animationKey = "fadeInAndOut";

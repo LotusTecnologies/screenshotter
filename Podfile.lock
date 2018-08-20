@@ -11,6 +11,7 @@ PODS:
   - Branch (0.25.3):
     - Branch/Core (= 0.25.3)
   - Branch/Core (0.25.3)
+  - Cache (5.1.0)
   - FBSDKCoreKit (4.35.0):
     - Bolts (~> 1.7)
   - FBSDKLoginKit (4.35.0):
@@ -105,6 +106,7 @@ DEPENDENCIES:
   - Analytics (~> 3.0)
   - Appsee
   - Branch
+  - Cache
   - FBSDKLoginKit
   - Firebase/Auth
   - Firebase/Core
@@ -127,6 +129,7 @@ SPEC REPOS:
     - Appsee
     - Bolts
     - Branch
+    - Cache
     - FBSDKCoreKit
     - FBSDKLoginKit
     - Firebase
@@ -159,6 +162,7 @@ SPEC CHECKSUMS:
   Appsee: f0ed48d4a1cbf7f76b4b02edd03acc59df4d2e24
   Bolts: ac6567323eac61e203f6a9763667d0f711be34c8
   Branch: 9917f91a5381bc88ed8e4f080a18213267cf44e6
+  Cache: 7737c595aae7d94c7c0feca2c887288624e3b07e
   FBSDKCoreKit: 1a5b2e3ceb5ca827a53c54aa5f4a3480efff80d2
   FBSDKLoginKit: 00a3d65d1226852f9d76dcddff01981e5e6d9c38
   Firebase: 8c957f9cb3852b519180fb378801b7eeeba4d288
@@ -185,6 +189,6 @@ SPEC CHECKSUMS:
   SWXMLHash: 661b67bc94a01fe71a6ad4ca690cf2cafa5d1d6f
   Whisper: 169760fc4bab0abf24d5529f9276f95c25cf1025
 
-PODFILE CHECKSUM: 4e17484a48de8eabdc1f32b2dea76df3055a9f2a
+PODFILE CHECKSUM: 873ee3545bd8a0d70727b21be8c56474f7de0033
 
 COCOAPODS: 1.5.3

@@ -7,10 +7,54 @@
 //
 
 import UIKit
+import Cache
+import PromiseKit
 
 class ScreenshotSimilarLooksViewController: BaseViewController {
     var screenshot:Screenshot
 
+    var productsCache:Storage<[[String:Any]]>? = {
+        let diskConfig = DiskConfig(
+            // The name of disk storage, this will be used as folder name within directory
+            name: "similarLooksTopToSaleProduct",
+            // Expiry date that will be applied by default for every added object
+            // if it's not overridden in the `setObject(forKey:expiry:)` method
+            expiry: .date(Date().addingTimeInterval(1 * TimeInterval.oneDay)),
+            // Maximum size of the disk cache storage (in bytes)
+            maxSize: 10000,
+            // Where to store the disk cache. If nil, it is placed in `cachesDirectory` directory.
+            directory: try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask,
+                                                    appropriateFor: nil, create: true).appendingPathComponent("MyPreferences"),
+            // Data protection is used to store files in an encrypted format on disk and to decrypt them on demand
+            protectionType: .complete
+        )
+        let memoryConfig = MemoryConfig(
+            expiry: .date(Date().addingTimeInterval(2*60)),
+            countLimit: 50,
+            totalCostLimit: 0
+        )
+        let transformer = Transformer<[[String:Any]]>.init(toData: { (array) -> Data in
+            if JSONSerialization.isValidJSONObject(array), let data = try? JSONSerialization.data(withJSONObject: array, options: []) {
+                return data
+            }else{
+                return "[]".data(using: .utf8) ?? Data.init()
+            }
+        }, fromData: { (data) -> [[String : Any]] in
+            if let array = try? JSONSerialization.jsonObject(with: data, options: []) as? [[String:Any]], let a = array {
+                return a
+            }
+            return []
+        })
+        
+        let storage = try? Storage(
+            diskConfig: diskConfig,
+            memoryConfig: memoryConfig,
+            transformer: transformer
+        )
+        
+        return storage;
+    }()
+    var downloadPromises:[String:Promise<[[String:Any]]>] = [:]
     var relatedLooksManager:RelatedLooksManager = {
        let r = RelatedLooksManager()
         r.minimumDelay = 0
@@ -27,7 +71,7 @@ class ScreenshotSimilarLooksViewController: BaseViewController {
         c.register(ErrorCollectionViewCell.self, forCellWithReuseIdentifier: "relatedLooks-error")
         return c
     }()
-    var timer:Timer?
+
     static func collectionViewInteritemOffset() -> CGPoint {
         let shadowInsets = ScreenshotCollectionViewCell.shadowInsets
         let x: CGFloat = .padding - shadowInsets.left - shadowInsets.right
@@ -64,14 +108,11 @@ class ScreenshotSimilarLooksViewController: BaseViewController {
         self.relatedLooksManager.loadRelatedLooksIfNeeded()
         
         
-        self.timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(reCheckVisibleCells), userInfo: nil, repeats: true)
 
         let pinchZoom = UIPinchGestureRecognizer.init(target: self, action: #selector(pinch(gesture:)))
         self.view.addGestureRecognizer(pinchZoom)
     }
-    deinit {
-        self.timer?.invalidate()
-    }
+
     @objc func pinch( gesture:UIPinchGestureRecognizer) {
         if CrazeImageZoom.shared.isHandlingGesture, let imageView = CrazeImageZoom.shared.hostedImageView  {
             CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: imageView)
@@ -125,47 +166,39 @@ extension ScreenshotSimilarLooksViewController : UICollectionViewDataSource {
         return self.relatedLooksManager.numberOfItems()
     }
     
-    @objc func reCheckVisibleCells() {
-        for cell in self.collectionView.visibleCells {
-            if let indexPath = self.collectionView.indexPath(for: cell), let relatedLook = self.relatedLooksManager.relatedLook(at: indexPath.row), let cell = cell as? ScreenshotSimilarLooksCollectionViewCell, !cell.isLoaded , let s = DataModel.sharedInstance.mainMoc().screenshotWith(imageUrl: relatedLook){
-                self.setup(cell: cell, screenshot: s)
-            }
-        }
-    }
-    
-    func setup(cell:ScreenshotSimilarLooksCollectionViewCell, screenshot:Screenshot){
-        if let products = (screenshot.shoppables as? Set<Shoppable>)?.compactMap({ (s) -> [Product]? in
-            return (s.products as? Set<Product>)?.filter{ $0.isSale() }.sorted(by: { $0.order > $1.order })
-        }){
-            var product2:Product? = nil
-            if let product1 = products.first?.first{
-                if products.count > 1 {
-                    product2 = products[1].first
-                }
-                if product2 == nil {
-                    if products.first?.count ?? 0 > 1 {
-                        product2 = products.first?[1]
-                    }
-                }
-                if let product2 = product2 {
-                    if let imageURL = product1.imageURL, let url = URL.init(string: imageURL){
-                        cell.product1ImageView.sd_setImage(with: url)
-                    }
-                    if let imageURL = product2.imageURL,let url = URL.init(string: imageURL){
-                        cell.product2ImageView.sd_setImage(with: url)
-                    }
-                    cell.product1Title.text = product1.calculatedDisplayTitle
-                    cell.product2Title.text = product2.calculatedDisplayTitle
-                    cell.product1Byline.attributedText = product1.priceAndSalePriceAttributedString(fontSize:11)
-                    cell.product2Byline.attributedText = product2.priceAndSalePriceAttributedString(fontSize:11)
-                    cell.isLoaded = true
-                }
-            }
-        }
-    }
     @objc func didPressRetryRelatedLooks(_ sender:Any) {
         self.relatedLooksManager.didPressRetryRelatedLooks(sender)
     }
+    
+    func downloadForRelatedLook(imageUrl:String) -> Promise<[[String:Any]]>{
+        if let promise = downloadPromises[imageUrl]{
+            if promise.isPending || promise.isFulfilled {
+                return promise
+            }
+        }
+        let p = Promise<[[String:Any]]>.init(resolvers: { (fulfil, reject) in
+            if let productsCache = self.productsCache {
+            productsCache.async.object(forKey: imageUrl, completion: { (result) in
+                switch result {
+                case .value(let array):
+                    fulfil(array)
+                case .error( _):
+                    NetworkingPromise.sharedInstance.similarLooksTopToSaleProduct(imageUrl: imageUrl).then { (arrayOfTopProducts) -> Void in
+                        self.productsCache?.async.setObject(arrayOfTopProducts, forKey: imageUrl, completion: { (_) in
+                            fulfil(arrayOfTopProducts)
+                        })
+                    }
+                }
+            })
+            }else{
+                reject(NSError.init(domain: "ScreenshotSimilarLooksViewController", code: #line, userInfo: [:]))
+            }
+        })
+        downloadPromises[imageUrl] = p
+        return p
+      
+    }
+    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
         if let error = self.relatedLooksManager.relatedLooks?.error {
@@ -193,15 +226,26 @@ extension ScreenshotSimilarLooksViewController : UICollectionViewDataSource {
                 cell.product2Title.text = ""
                 cell.product1Byline.text = ""
                 cell.product2Byline.text = ""
+                cell.imageUrl = relatedLook
                 cell.isLoaded = false
                 if let url = URL.init(string: relatedLook) {
                     cell.embossedView.imageView.sd_setImage(with: url)
-                    
-                    if let s = DataModel.sharedInstance.mainMoc().screenshotWith(assetId: relatedLook) {
-                        self.setup(cell: cell, screenshot: s)
-                    }else{
-                        AssetSyncModel.sharedInstance.addFromRelatedLook(urlString: relatedLook)
-                        
+                    self.downloadForRelatedLook(imageUrl: relatedLook).then { (products) -> Void in
+                        if products.count > 1 && cell.imageUrl == relatedLook{
+                            let product1 = products[0];
+                            let product2 = products[1];
+                            cell.product1Title.text = self.calculatedDisplayTitle(product1)
+                            cell.product2Title.text = self.calculatedDisplayTitle(product2)
+                            cell.product1Byline.attributedText = self.priceAndSalePriceAttributedString(product1, fontSize:11)
+                            cell.product2Byline.attributedText = self.priceAndSalePriceAttributedString(product2, fontSize:11)
+                            if let urlString = product1["imageUrl"] as? String, let url = URL.init(string: urlString) {
+                                cell.product1ImageView.sd_setImage(with: url, completed: nil)
+                            }
+                            if let urlString = product2["imageUrl"] as? String, let url = URL.init(string: urlString) {
+                                cell.product2ImageView.sd_setImage(with: url, completed: nil)
+                            }
+                            cell.isLoaded = true
+                        }
                     }
                 }
             }
@@ -215,6 +259,37 @@ extension ScreenshotSimilarLooksViewController : UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
         return cell
 
+    }
+    
+    func calculatedDisplayTitle(_ dict:[String:Any]) ->String{
+        if let displayBrand = dict["brand"] as? String,
+            !displayBrand.isEmpty {
+            return displayBrand
+        } else if let merchant = dict["merchant"] as? String{
+            return merchant
+        }
+        return ""
+    }
+    func priceAndSalePriceAttributedString(_ dict:[String:Any], fontSize:CGFloat) -> NSAttributedString{
+        let string = NSMutableAttributedString.init()
+        let originalPrice = dict["originalPrice"] as? String
+        let price = dict["price"] as? String
+        let font = UIFont.screenshopFont(.hind, size: fontSize)
+        if let originalPrice = originalPrice {
+            string.append( NSAttributedString.init(string: originalPrice, attributes: [.strikethroughStyle:NSUnderlineStyle.styleSingle.rawValue, .foregroundColor: UIColor.gray, .font:font ]) )
+            string.append(NSAttributedString.init(string: " ", attributes: [ : ]) )
+            if let price = price {
+                string.append(NSAttributedString.init(string: price, attributes: [.foregroundColor: UIColor.crazeRed, .font:font   ]) )
+            }
+            
+        }else{
+            if let price = price {
+                string.append(NSAttributedString.init(string: price, attributes: [ .foregroundColor: UIColor.gray , .font:font ]) )
+            }
+        }
+        
+        
+        return string
     }
 }
 extension ScreenshotSimilarLooksViewController : RelatedLooksManagerDelegate {

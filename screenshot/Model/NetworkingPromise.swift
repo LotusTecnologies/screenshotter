@@ -976,3 +976,52 @@ extension NetworkingPromise {
         }
     }
 }
+extension NetworkingPromise {
+
+
+    func similarLooksTopToSaleProduct(imageUrl:String) -> Promise<[[String:Any]]> {
+        return self.uploadToSyte(imageData: nil, orImageUrlString: imageUrl, retry: false).then { (uploadedImageURL, syteJson) -> Promise<[[[String:Any]]]> in
+            var promises:[Promise<[[String:Any]]>] = []
+            
+            syteJson.forEach({ (dict) in
+                if let urlString = dict["offers"] as? String, let url = URL.init(string: urlString){
+                    let downloadPromise:Promise<[[String:Any]]> = self.downloadProducts(url: url).then(execute: { (dict) -> Promise<[[String:Any]]> in
+                        return Promise.init(value: (dict["ads"] as? [[String : Any]] ?? []));
+                    })
+                    
+                    promises.append(downloadPromise)
+                }
+            })
+            
+            let allDone = when(fulfilled: promises)
+            return allDone
+            }.then(execute: { responseArray -> Promise<[[String:Any]]> in
+                
+                
+                var products:[[String:Any]] = []
+                
+                for productsArray in responseArray {
+                    var order = 0
+                    for product in productsArray {
+                        order += 1
+                        if let _ = product["price"] as? String,
+                            let _ = product["originalPrice"] as? String,
+                            let price = DataModel.sharedInstance.parseFloat(product["floatPrice"]),
+                            let originalPrice  = DataModel.sharedInstance.parseFloat(product["floatOriginalPrice"]) {
+                            if price < originalPrice {
+                                var objectCopy = product
+                                objectCopy["order"] = order
+                                products.append(objectCopy)
+                            }
+                        }
+                    }
+                }
+                products.sort(by: { ($0["order"] as? Int) ?? 99  < ($1["order"] as? Int) ?? 99 } )
+                
+
+                
+                return Promise.init(value: products);
+            })
+        
+    }
+}
