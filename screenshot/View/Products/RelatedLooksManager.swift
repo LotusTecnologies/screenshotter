@@ -77,16 +77,17 @@ class RelatedLooksManager: NSObject {
         }
         return nil
     }
+    func isErrorRetryable(error:Error) -> Bool {
+        let nsError = error as NSError
+        if let retryable = nsError.userInfo["retryable"] as? Bool {
+            return retryable
+        }else{
+            return true
+        }
+    }
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
     
-        func isErrorRetryable(error:Error) -> Bool {
-            let nsError = error as NSError
-            if let retryable = nsError.userInfo["retryable"] as? Bool {
-                return retryable
-            }else{
-                return true
-            }
-        }
+       
         
         
         if let relatedLooks = self.relatedLooks?.value, relatedLooks.count > indexPath.row {
@@ -149,55 +150,69 @@ class RelatedLooksManager: NSObject {
         }
     }
     
+    
+    static func loadRelatedLooked(shoppable:Shoppable) -> Promise<[String]> {
+        let objectId = shoppable.objectID
+        let relatedImagesArray = shoppable.relatedImagesArray
+        let relatedlooksURL = shoppable.relatedImagesUrl()
+        let loadRequest:Promise<[String]> = Promise.init(resolvers: { (fulfil, reject) in
+            
+            if let arrayString = relatedImagesArray, let data = arrayString.data(using: .utf8), let array = try? JSONSerialization.jsonObject(with:data, options: []), let a = array as? [String]{
+                fulfil(a)
+            }else{
+                if let relatedlooksURL = relatedlooksURL {
+                    URLSession.shared.dataTask(with: URLRequest.init(url: relatedlooksURL)).asDictionary().then(execute: { (dict) -> Void in
+                        
+                        if let array = dict["related_looks"] as? [ String] {
+                            if array.count > 0 {
+                                DataModel.sharedInstance.performBackgroundTask({ (context) in
+                                    if let shopable = context.shoppableWith(objectId: objectId){
+                                        if let data = try? JSONSerialization.data(withJSONObject: array, options: []),  let string =  String.init(data: data, encoding:.utf8) {
+                                            shopable.relatedImagesArray = string
+                                        }
+                                    }
+                                    context.saveIfNeeded()
+                                    DispatchQueue.main.async {
+                                        fulfil(array)
+                                    }
+                                    
+                                })
+                            }else{
+                                let error = NSError.init(domain: "related_looks", code: 3, userInfo: [NSLocalizedDescriptionKey:"no results", "retryable":false])
+                                reject(error)
+                            }
+                            
+                        }else{
+                            let error = NSError.init(domain: "related_looks", code: 2, userInfo: [NSLocalizedDescriptionKey:"bad response", "retryable":true])
+                            reject(error)
+                            
+                        }
+                        
+                    }).catch(execute: { (error) in
+                        reject(error)
+                    })
+                }else{
+                    let error = NSError.init(domain: "related_looks", code: 1, userInfo: [NSLocalizedDescriptionKey:"no url", "retryable":false])
+                    reject(error)
+
+                }
+            }
+        });
+        return loadRequest
+    }
+    
     func loadRelatedLooksIfNeeded() {
         if self.relatedLooks == nil {
-            if let shoppabe = self.delegate?.relatedLooksManagerGetShoppable(self), let relatedlooksURL = shoppabe.relatedImagesUrl()  {
-                Analytics.trackShoppableRelatedLooksLoaded(shoppable: shoppabe)
+            if let shoppable = self.delegate?.relatedLooksManagerGetShoppable(self), let _ = shoppable.relatedImagesUrl()  {
+                Analytics.trackShoppableRelatedLooksLoaded(shoppable: shoppable)
                 let atLeastXSeconds = minimumDelay > 0 ? Promise.init(resolvers: { (fulfil, reject) in
                     DispatchQueue.main.asyncAfter(deadline: .now() + minimumDelay, execute: {
                         fulfil(true);
                     })
                 }) : Promise.init(value: true)
                 
-                let loadRequest:Promise<[String]> = Promise.init(resolvers: { (fulfil, reject) in
-                    
-                    let objectId = shoppabe.objectID
-                    if let arrayString = shoppabe.relatedImagesArray, let data = arrayString.data(using: .utf8), let array = try? JSONSerialization.jsonObject(with:data, options: []), let a = array as? [String]{
-                        fulfil(a)
-                    }else{
-                        URLSession.shared.dataTask(with: URLRequest.init(url: relatedlooksURL)).asDictionary().then(execute: { (dict) -> Void in
-                            
-                            if let array = dict["related_looks"] as? [ String] {
-                                if array.count > 0 {
-                                    DataModel.sharedInstance.performBackgroundTask({ (context) in
-                                        if let shopable = context.shoppableWith(objectId: objectId){
-                                            if let data = try? JSONSerialization.data(withJSONObject: array, options: []),  let string =  String.init(data: data, encoding:.utf8) {
-                                                shopable.relatedImagesArray = string
-                                            }
-                                        }
-                                        context.saveIfNeeded()
-                                        DispatchQueue.main.async {
-                                            fulfil(array)
-                                        }
-                                        
-                                    })
-                                }else{
-                                    let error = NSError.init(domain: "related_looks", code: 3, userInfo: [NSLocalizedDescriptionKey:"no results", "retryable":false])
-                                    reject(error)
-                                }
-                                
-                            }else{
-                                let error = NSError.init(domain: "related_looks", code: 2, userInfo: [NSLocalizedDescriptionKey:"bad response", "retryable":true])
-                                reject(error)
-                                
-                            }
-                            
-                        }).catch(execute: { (error) in
-                            reject(error)
-                        })
-                    }
-                });
-                
+                let loadRequest:Promise<[String]> = RelatedLooksManager.loadRelatedLooked(shoppable: shoppable)
+
                 let promise = Promise.init(resolvers: { (fulfil, reject) in
                     
                     atLeastXSeconds.always {

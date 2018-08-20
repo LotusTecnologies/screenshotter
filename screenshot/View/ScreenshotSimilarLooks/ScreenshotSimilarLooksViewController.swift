@@ -24,7 +24,7 @@ class ScreenshotSimilarLooksViewController: BaseViewController {
         let c = CollectionView.init(frame: .zero, collectionViewLayout: layout)
         c.register(ScreenshotSimilarLooksCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
         c.register(SpinnerCollectionViewCell.self, forCellWithReuseIdentifier: "relatedLooks-spinner")
-
+        c.register(ErrorCollectionViewCell.self, forCellWithReuseIdentifier: "relatedLooks-error")
         return c
     }()
     var timer:Timer?
@@ -112,7 +112,8 @@ extension ScreenshotSimilarLooksViewController : UICollectionViewDelegateFlowLay
         }
         
         let minimumSpacing:CGPoint = ScreenshotSimilarLooksViewController.collectionViewInteritemOffset()
-        return collectionView.bounds.insetBy(dx: minimumSpacing.x, dy: minimumSpacing.y).insetBy(dx: collectionView.contentInset.left + collectionView.contentInset.right, dy: collectionView.contentInset.top + collectionView.contentInset.bottom) .size
+        let tabBar = self.tabBarController?.tabBar.bounds.size.height ?? 0
+        return collectionView.bounds.insetBy(dx: minimumSpacing.x, dy: minimumSpacing.y).insetBy(dx: collectionView.contentInset.left + collectionView.contentInset.right, dy: collectionView.contentInset.top + collectionView.contentInset.bottom + tabBar).size
     }
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         let minimumSpacing:CGPoint = ScreenshotSimilarLooksViewController.collectionViewInteritemOffset()
@@ -126,7 +127,7 @@ extension ScreenshotSimilarLooksViewController : UICollectionViewDataSource {
     
     @objc func reCheckVisibleCells() {
         for cell in self.collectionView.visibleCells {
-            if let indexPath = self.collectionView.indexPath(for: cell), let relatedLook = self.relatedLooksManager.relatedLook(at: indexPath.row), let cell = cell as? ScreenshotSimilarLooksCollectionViewCell, !cell.isLoaded , let s = DataModel.sharedInstance.mainMoc().screenshotWith(assetId: relatedLook){
+            if let indexPath = self.collectionView.indexPath(for: cell), let relatedLook = self.relatedLooksManager.relatedLook(at: indexPath.row), let cell = cell as? ScreenshotSimilarLooksCollectionViewCell, !cell.isLoaded , let s = DataModel.sharedInstance.mainMoc().screenshotWith(imageUrl: relatedLook){
                 self.setup(cell: cell, screenshot: s)
             }
         }
@@ -162,11 +163,24 @@ extension ScreenshotSimilarLooksViewController : UICollectionViewDataSource {
             }
         }
     }
-    
+    @objc func didPressRetryRelatedLooks(_ sender:Any) {
+        self.relatedLooksManager.didPressRetryRelatedLooks(sender)
+    }
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
         if let error = self.relatedLooksManager.relatedLooks?.error {
-            
+            if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "relatedLooks-error", for: indexPath) as? ErrorCollectionViewCell {
+                if self.relatedLooksManager.isErrorRetryable(error:error) {
+                    cell.button.setTitle("generic.retry".localized, for: .normal)
+                    cell.button.addTarget(self, action: #selector(didPressRetryRelatedLooks(_:)), for: .touchUpInside)
+                    cell.label.text = "products.related_looks.error.connection".localized
+                }else{
+                    cell.button.setTitle("generic.dismiss".localized, for: .normal)
+                    cell.button.addTarget(self, action: #selector(didPressRetryRelatedLooks(_:)), for: .touchUpInside)
+                    cell.label.text = "products.related_looks.error.no_looks".localized
+                }
+                return cell
+            }
         }else if let relatedLook = self.relatedLooksManager.relatedLook(at: indexPath.row) {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
             if let cell = cell as? ScreenshotSimilarLooksCollectionViewCell {
@@ -208,7 +222,7 @@ extension ScreenshotSimilarLooksViewController : RelatedLooksManagerDelegate {
         self.collectionView.reloadData()
     }
     func relatedLooksManagerGetShoppable(_ relatedLooksManager: RelatedLooksManager) -> Shoppable? {
-        return self.screenshot.shoppables?.sortedArray(using: [NSSortDescriptor(key: "order", ascending: true), NSSortDescriptor(key: "b0x", ascending: true), NSSortDescriptor(key: "b0y", ascending: true), NSSortDescriptor(key: "b1x", ascending: true), NSSortDescriptor(key: "b1y", ascending: true), NSSortDescriptor(key: "offersURL", ascending: true)]).first as? Shoppable
+        return self.screenshot.firstShoppable
     }
     func relatedLooksManager(_ relatedLooksManager:RelatedLooksManager, present viewController:UIViewController){
         self.present(viewController, animated: true, completion: nil)

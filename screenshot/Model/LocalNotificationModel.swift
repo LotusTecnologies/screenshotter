@@ -187,30 +187,34 @@ class LocalNotificationModel {
         }
         let identifier = LocalNotificationIdentifier.saleScreenshot.rawValue
         DataModel.sharedInstance.performBackgroundTask({ (context) in
-            
             if let screenshot = DataModel.sharedInstance.retrieveSaleScreenshot(in:context), let assetIdString = screenshot.assetId, let imageData = screenshot.imageData {
-                let message = "notification.sale.screenshot.message".localized
-                NetworkingPromise.sharedInstance.saveToTmp(data: imageData, identifier: identifier, originalExtension: "").then(execute: { (copiedTmpURL) -> Void in
-                    let displayFromNow = 2 * TimeInterval.oneDay
-                    self.scheduleImageLocalNotification(copiedTmpURL: copiedTmpURL,
-                                                        userInfo: [Constants.openingScreenKey  : Constants.openingScreenValueScreenshot,
-                                                                   Constants.openingAssetIdKey : assetIdString],
-                                                        identifier: identifier,
-                                                        body: message,
-                                                        interval: displayFromNow)
-                    let urlString = screenshot.uploadedImageURL ?? copiedTmpURL.absoluteString
-                    if let image =  UIImage.init(data: imageData), let url = URL.init(string: urlString) {
-                        SDWebImageManager.shared().saveImage(toCache:image, for:url)
-                    }
-
-                    DataModel.sharedInstance.performBackgroundTask({ (context) in
-                        let date = Date.init(timeIntervalSinceNow:displayFromNow)
-                        let expire = Date.init(timeIntervalSinceNow:displayFromNow + 7 * .oneDay)
-
-                        InboxMessage.createUpdateWith(lookupDict: nil, actionType: "screenshot", actionValue: assetIdString, buttonText: "View Items", image: urlString, title: message, uuid: UUID().uuidString, expireDate:expire, date: date, showAfterDate: date, tracking: nil, create: true, update: false, context: context)
-                        context.saveIfNeeded()
+                if let firstShoppable = screenshot.firstShoppable {
+                    RelatedLooksManager.loadRelatedLooked(shoppable: firstShoppable).then(execute: { (realtedLooks) -> Void in
+                        let message = "notification.sale.screenshot.message".localized
+                        NetworkingPromise.sharedInstance.saveToTmp(data: imageData, identifier: identifier, originalExtension: "").then(execute: { (copiedTmpURL) -> Void in
+                            let displayFromNow = TimeInterval(2) //* TimeInterval.oneDay
+                            self.scheduleImageLocalNotification(copiedTmpURL: copiedTmpURL,
+                                                                userInfo: [Constants.openingScreenKey  : Constants.openingScreenValueScreenshot,
+                                                                           Constants.openingAssetIdKey : assetIdString],
+                                                                identifier: identifier,
+                                                                body: message,
+                                                                interval: displayFromNow)
+                            let urlString = screenshot.uploadedImageURL ?? copiedTmpURL.absoluteString
+                            if let image =  UIImage.init(data: imageData), let url = URL.init(string: urlString) {
+                                SDWebImageManager.shared().saveImage(toCache:image, for:url)
+                            }
+                            
+                            DataModel.sharedInstance.performBackgroundTask({ (context) in
+                                let date = Date.init(timeIntervalSinceNow:displayFromNow)
+                                let expire = Date.init(timeIntervalSinceNow:displayFromNow + 7 * .oneDay)
+                                
+                                InboxMessage.createUpdateWith(lookupDict: nil, actionType: "similarLooks", actionValue: assetIdString, buttonText: "View Items", image: urlString, title: message, uuid: UUID().uuidString, expireDate:expire, date: date, showAfterDate: date, tracking: nil, create: true, update: false, context: context)
+                                context.saveIfNeeded()
+                            })
+                        })
+                        
                     })
-                })
+                }
             }
             
         })
