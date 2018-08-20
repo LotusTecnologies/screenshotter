@@ -23,6 +23,8 @@ class ScreenshotSimilarLooksViewController: BaseViewController {
         layout.minimumLineSpacing = minimumSpacing.y
         let c = CollectionView.init(frame: .zero, collectionViewLayout: layout)
         c.register(ScreenshotSimilarLooksCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
+        c.register(SpinnerCollectionViewCell.self, forCellWithReuseIdentifier: "relatedLooks-spinner")
+
         return c
     }()
     var timer:Timer?
@@ -95,13 +97,22 @@ class ScreenshotSimilarLooksViewController: BaseViewController {
 }
 extension ScreenshotSimilarLooksViewController : UICollectionViewDelegateFlowLayout {
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        var size = CGSize.zero
-        let columns = CGFloat(2)
-        let padding = CGFloat.padding
-        size.width = floor((collectionView.bounds.size.width - (padding * (columns + 1))) / columns)
-        size.height = ScreenshotSimilarLooksCollectionViewCell.cellHeight(for: size.width)
-
-        return size
+        if let _ = self.relatedLooksManager.relatedLooks?.error {
+           
+        }else if let _ = self.relatedLooksManager.relatedLook(at: indexPath.row) {
+            var size = CGSize.zero
+            let columns = CGFloat(2)
+            let padding = CGFloat.padding
+            size.width = floor((collectionView.bounds.size.width - (padding * (columns + 1))) / columns)
+            size.height = ScreenshotSimilarLooksCollectionViewCell.cellHeight(for: size.width)
+            
+            return size
+        }else{
+            
+        }
+        
+        let minimumSpacing:CGPoint = ScreenshotSimilarLooksViewController.collectionViewInteritemOffset()
+        return collectionView.bounds.insetBy(dx: minimumSpacing.x, dy: minimumSpacing.y).insetBy(dx: collectionView.contentInset.left + collectionView.contentInset.right, dy: collectionView.contentInset.top + collectionView.contentInset.bottom) .size
     }
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         let minimumSpacing:CGPoint = ScreenshotSimilarLooksViewController.collectionViewInteritemOffset()
@@ -153,30 +164,41 @@ extension ScreenshotSimilarLooksViewController : UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let relatedLook = self.relatedLooksManager.relatedLook(at: indexPath.row)
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
-        if let cell = cell as? ScreenshotSimilarLooksCollectionViewCell {
-            cell.embossedView.imageView.sd_cancelCurrentImageLoad()
-            cell.product1ImageView.sd_cancelCurrentImageLoad()
-            cell.product2ImageView.sd_cancelCurrentImageLoad()
-            cell.product1ImageView.image = nil
-            cell.product2ImageView.image = nil
-            cell.product1Title.text = ""
-            cell.product2Title.text = ""
-            cell.product1Byline.text = ""
-            cell.product2Byline.text = ""
-            cell.isLoaded = false
-            if let relatedLook = relatedLook,  let url = URL.init(string: relatedLook) {
-                cell.embossedView.imageView.sd_setImage(with: url)
-                
-                if let s = DataModel.sharedInstance.mainMoc().screenshotWith(assetId: relatedLook) {
-                    self.setup(cell: cell, screenshot: s)
-                }else{
-                    AssetSyncModel.sharedInstance.addFromRelatedLook(urlString: relatedLook)
-
+        
+        if let error = self.relatedLooksManager.relatedLooks?.error {
+            
+        }else if let relatedLook = self.relatedLooksManager.relatedLook(at: indexPath.row) {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
+            if let cell = cell as? ScreenshotSimilarLooksCollectionViewCell {
+                cell.embossedView.imageView.sd_cancelCurrentImageLoad()
+                cell.product1ImageView.sd_cancelCurrentImageLoad()
+                cell.product2ImageView.sd_cancelCurrentImageLoad()
+                cell.product1ImageView.image = nil
+                cell.product2ImageView.image = nil
+                cell.product1Title.text = ""
+                cell.product2Title.text = ""
+                cell.product1Byline.text = ""
+                cell.product2Byline.text = ""
+                cell.isLoaded = false
+                if let url = URL.init(string: relatedLook) {
+                    cell.embossedView.imageView.sd_setImage(with: url)
+                    
+                    if let s = DataModel.sharedInstance.mainMoc().screenshotWith(assetId: relatedLook) {
+                        self.setup(cell: cell, screenshot: s)
+                    }else{
+                        AssetSyncModel.sharedInstance.addFromRelatedLook(urlString: relatedLook)
+                        
+                    }
                 }
             }
+            return cell
+        }else{
+            if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "relatedLooks-spinner", for: indexPath) as? SpinnerCollectionViewCell{
+                cell.spinner.color = .gray3
+                return cell
+            }
         }
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
         return cell
 
     }
