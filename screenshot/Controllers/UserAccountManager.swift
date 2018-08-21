@@ -604,6 +604,31 @@ class UserAccountManager : NSObject {
         }
     }
 
+    @discardableResult func setToken() -> Promise<Void> {
+        Analytics.trackDevLog(file:  NSString.init(string: #file).lastPathComponent, line: #line, message: "setToken")
+        
+        return Promise { fulfill, reject in
+            let promise = makeAnonAccountPromise ?? Promise.init(value:())
+            promise.then(execute: { () -> Void in
+                if let user = self.user,
+                let token = UserDefaults.standard.object(forKey: UserDefaultsKeys.deviceToken) as? NSData {
+                    let pushTokenString = UIDevice.current.pushString(data: token as Data)
+                    self.databaseRef.child("users").child(user.uid).child("pushTokenString").setValue(pushTokenString)
+                    Analytics.trackDevLog(file:  NSString.init(string: #file).lastPathComponent, line: #line, message: "setToken sucess")
+                    
+                    fulfill(())
+                }else{
+                    Analytics.trackDevLog(file:  NSString.init(string: #file).lastPathComponent, line: #line, message: "unexpected")
+                    reject(NSError.init(domain: "UserAccountManager", code: #line, userInfo: [:]))
+                }
+            }).catch(execute: { (error) in
+                Analytics.trackDevLog(file:  NSString.init(string: #file).lastPathComponent, line: #line, message: "unexpected")
+                
+                reject(NSError.init(domain: "UserAccountManager", code: #line, userInfo: [:]))
+            })
+        }
+    }
+    
     func logout() -> Promise<Void>{
                         Analytics.trackDevLog(file:  NSString.init(string: #file).lastPathComponent, line: #line, message: "logout")
         return Promise { fulfill, reject in
