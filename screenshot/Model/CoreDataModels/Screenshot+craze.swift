@@ -51,27 +51,13 @@ extension Screenshot {
     
     // hideWorkhorse is not meant to be called from UI code,
     // but may be called on the main queue, even if generally called on a background queue.
-    // It does not actually hide the screenshot.
-    func hideWorkhorse(deleteImage: Bool = true) {
+    func hideWorkhorse() {
+        if let favoriteSet = favorites as? Set<Product>,
+            favoriteSet.count > 0 {
+            favoriteSet.forEach { $0.shoppable = nil; $0.screenshot = nil }
+        }
         if let context = self.managedObjectContext {
-            if let favoriteSet = favorites as? Set<Product>,
-                favoriteSet.count > 0 {
-                favoriteSet.forEach { $0.shoppable = nil }
-            } else if deleteImage {
-                if isFromShare {
-                    context.delete(self)
-                    return
-                }
-                imageData = nil
-            }
-            if let shoppablesSet = shoppables as? Set<Shoppable> {
-                shoppablesSet.forEach { context.delete($0) }
-            }
-            shoppablesCount = -1
-            isNew = false
-            syteJson = nil
-            shareLink = nil
-            uploadedImageURL = nil
+            context.delete(self)
         }
     }
     

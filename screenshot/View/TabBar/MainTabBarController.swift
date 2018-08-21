@@ -338,6 +338,11 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         }
     }
     
+    func isSafeFromViewingBurrow() -> Bool {
+        // No modals and screenshots tab is at its root.
+        return presentedViewController == nil && screenshotsNavigationController.viewControllers.count <= 1
+    }
+    
     // MARK: - Screenshots
     
     func screenshotsNavigationControllerDidGrantPushPermissions(_ navigationController: ScreenshotsNavigationController) {

@@ -407,24 +407,7 @@ extension AssetSyncModel {
 extension AssetSyncModel: PHPhotoLibraryChangeObserver {
     func updatePhotoGalleryFetch() {
         let fetchOptions = PHFetchOptions()
-        var dates:[Date] = []
-        
-        var installDate: Date
-        if let UserDefaultsInstallDate = UserDefaults.standard.object(forKey: UserDefaultsKeys.dateInstalled) as? Date {
-            installDate = UserDefaultsInstallDate
-        } else {
-            installDate = Date()
-            UserDefaults.standard.set(installDate, forKey: UserDefaultsKeys.dateInstalled)
-        }
-        
-        dates.append(installDate)
-        dates.append(Date(timeIntervalSinceNow: -60*60*24))
-        
-        if let date = UserDefaults.standard.value(forKey: UserDefaultsKeys.processBackgroundImagesForFashionAfterDate) as? Date {
-            dates.append(date)
-        }
-        
-        let cutOffDate = (dates.max { a, b -> Bool in a < b  } ?? installDate )as NSDate
+        let cutOffDate = DataModel.sharedInstance.cutOffDate()
         
         fetchOptions.predicate = NSPredicate(format: "creationDate > %@ AND (mediaSubtype & %d) != 0", cutOffDate, PHAssetMediaSubtype.photoScreenshot.rawValue)
         fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]

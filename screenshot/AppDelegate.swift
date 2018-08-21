@@ -242,6 +242,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             application.endBackgroundTask(self.bgTask)
             self.bgTask = UIBackgroundTaskInvalid
         }
+        
+        if mainTabBarController.isSafeFromViewingBurrow() {
+            DataModel.sharedInstance.cleanDB()
+        }
     }
     
     func applicationWillEnterForeground(_ application: UIApplication) {
