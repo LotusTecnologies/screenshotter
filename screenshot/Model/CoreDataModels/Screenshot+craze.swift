@@ -156,5 +156,10 @@ extension Screenshot {
        
     }
     
+    var firstShoppable:Shoppable? {
+        return self.shoppables?.sortedArray(using: [NSSortDescriptor(key: "order", ascending: true), NSSortDescriptor(key: "b0x", ascending: true), NSSortDescriptor(key: "b0y", ascending: true), NSSortDescriptor(key: "b1x", ascending: true), NSSortDescriptor(key: "b1y", ascending: true), NSSortDescriptor(key: "offersURL", ascending: true)]).first as? Shoppable
+
+    }
+    
 }
 

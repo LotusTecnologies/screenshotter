@@ -79,9 +79,17 @@ class AssetSyncModel: NSObject {
         return queue
     }()
     
+    var relatedLooksQueue:AsyncOperationQueue = {
+        var queue = AsyncOperationQueue()
+        queue.name = "relatedLooksQueue"
+        queue.maxConcurrentOperationCount = 2
+        queue.qualityOfService = .userInteractive
+        return queue
+    }()
+    
     let queues:[AsyncOperationQueue]
     override init() {
-        queues = [userInitiatedQueue,coreDataProcessingQueue, downloadProductQueue, syteProcessingQueue, uploadScreenshotWithClarifaiQueueFromUserScreenshot, uploadScreenshotWithClarifaiQueue ]
+        queues = [userInitiatedQueue,coreDataProcessingQueue, downloadProductQueue, syteProcessingQueue, uploadScreenshotWithClarifaiQueueFromUserScreenshot, uploadScreenshotWithClarifaiQueue, relatedLooksQueue ]
         super.init()
         registerForPhotoChanges()
         NotificationCenter.default.addObserver(self, selector: #selector(applicationUserDidTakeScreenshot), name: .UIApplicationUserDidTakeScreenshot, object: nil)
@@ -141,7 +149,22 @@ extension AssetSyncModel {
     }
     public func addScreenshotFrom(source:ScreenshotSource, urlString:String, callback: ((_ screenshot: Screenshot) -> Void)? = nil) {
 
-        self.userInitiatedQueue.addOperation(AsyncOperation.init(timeout: 30, assetId: urlString, shoppableId: nil, completion: { (completion) in
+        if Thread.isMainThread {
+            if let mainScreenshot = DataModel.sharedInstance.mainMoc().screenshotWith(assetId: urlString) {
+                if let callback =  callback{
+                    callback(mainScreenshot)
+                    return;
+                }
+            }else if let mainScreenshot = DataModel.sharedInstance.mainMoc().screenshotWith(imageUrl: urlString){
+                if let callback =  callback{
+                    callback(mainScreenshot)
+                    return;
+                }
+            }
+        }
+        
+        
+        self.relatedLooksQueue.addOperation(AsyncOperation.init(timeout: 30, assetId: urlString, shoppableId: nil, completion: { (completion) in
             self.performBackgroundTask(assetId: urlString, shoppableId: nil) { (managedObjectContext) in
                 if let screenshot = managedObjectContext.screenshotWith(assetId: urlString) {
                     if screenshot.source != source {
@@ -161,6 +184,7 @@ extension AssetSyncModel {
                     }
                     managedObjectContext.saveIfNeeded()
                 }else{
+                   
                     SDWebImageManager.shared().loadImage(with: URL.init(string: urlString), options: [SDWebImageOptions.fromCacheOnly], progress: nil, completed: { (image, data, error, cache, bool, url) in
                         
                         let imageData:Data? =  {
@@ -735,6 +759,11 @@ extension AssetSyncModel {
             localImageData = data
         } else {
             localImageData = imageData
+        }
+        
+        let count = AsyncOperationMonitorCenter.shared.countFor(tag: AsyncOperationTag.init(type: .assetId, value: assetId), queue: self.syteProcessingQueue.uuid)
+        if count > 0 {
+            return
         }
         
         DispatchQueue.main.async {

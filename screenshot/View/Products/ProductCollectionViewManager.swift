@@ -43,7 +43,7 @@ class ProductCollectionViewManager {
         }else if sectionType == .relatedLooks {
             let columns:CGFloat = 2
             size.width = floor((collectionView.bounds.size.width - (padding * (columns + 1))) / columns)
-            size.height = size.width * CGFloat(Double.goldenRatio)
+            size.height = size.width * CGFloat.goldenRatio
         }else if sectionType == .error {
             size.width = collectionView.bounds.size.width
             size.height = 200

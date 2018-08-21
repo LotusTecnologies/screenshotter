@@ -796,14 +796,21 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
                 isHandled = true
                 if openingScreen == Constants.openingScreenValueScreenshot {
                     if let openingAssetId = userInfo[Constants.openingAssetIdKey] as? String {
-                        if response.notification.request.identifier == LocalNotificationIdentifier.saleScreenshot.rawValue {
+                        if response.notification.request.identifier == LocalNotificationIdentifier.saleScreenshot.rawValue   {
                             // Go into screenshot for saleScreenshot local notification.
                             showScreenshotListTop()
-                            let dataModel = DataModel.sharedInstance
                             if let mainTabBarController = self.window?.rootViewController as? MainTabBarController,
-                              let screenshot = dataModel.retrieveScreenshot(managedObjectContext: dataModel.mainMoc(), assetId: openingAssetId) {
+                                let screenshot = DataModel.sharedInstance.mainMoc().screenshotWith(assetId: openingAssetId) {
                                 mainTabBarController.screenshotsNavigationController.presentScreenshot(screenshot)
                             }
+                        }else if response.notification.request.identifier == LocalNotificationIdentifier.similarLooks.rawValue   {
+                            showScreenshotListTop()
+                            if let mainTabBarController = self.window?.rootViewController as? MainTabBarController,
+                                let screenshot = DataModel.sharedInstance.mainMoc().screenshotWith(assetId: openingAssetId) {
+                                let vc = ScreenshotSimilarLooksViewController.init(screenshot: screenshot)
+                                mainTabBarController.screenshotsNavigationController.pushViewController(vc, animated: false)
+                            }
+                            
                         } else {
                             // Show screenshot as first in screenshots list for screenshotAdded local notification.
                             AssetSyncModel.sharedInstance.importPhotosToScreenshot(assetIds: [openingAssetId], source: .screenshot)
@@ -812,7 +819,7 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
                     } else {
                         showScreenshotListTop()
                     }
-                } else if openingScreen == Constants.openingScreenValueDiscover {
+                }else if openingScreen == Constants.openingScreenValueDiscover {
                     if let mainTabBarController = self.window?.rootViewController as? MainTabBarController {
                         mainTabBarController.goTo(tab: .discover)
                     }
@@ -855,6 +862,8 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
         
         completionHandler()
         switch response.notification.request.identifier {
+        case LocalNotificationIdentifier.similarLooks.rawValue:
+            Analytics.trackAppOpenedFromTimedLocalNotification(source: .similarLooks)
         case LocalNotificationIdentifier.inactivityDiscover.rawValue:
             Analytics.trackAppOpenedFromTimedLocalNotification(source: .inactivityDiscover)
         case LocalNotificationIdentifier.favoritedItem.rawValue:

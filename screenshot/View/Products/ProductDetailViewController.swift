@@ -488,8 +488,8 @@ extension ProductDetailViewController: RelatedLooksManagerDelegate {
         self.present(viewController, animated: true, completion: nil)
     }
     
-    func relatedLooksManagerGetProducts(_ relatedLooksManager: RelatedLooksManager) -> [Product]? {
-        return self.products
+    func relatedLooksManagerGetShoppable(_ relatedLooksManager: RelatedLooksManager) -> Shoppable? {
+        return self.products.first?.shoppable
     }
     
     func relatedLooksManagerReloadSection(_ relatedLooksManager:RelatedLooksManager){

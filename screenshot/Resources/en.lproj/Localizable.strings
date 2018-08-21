@@ -172,6 +172,9 @@
 "notification.favorited.item.message" = "We have items similar to the %@ you checked out recently that you’ll LOVE!";
 "notification.inactivity.discover.message" = "Check out the latest fashion trends on Discover!";
 "notification.sale.screenshot.message" = "Get the look now! Items in your screenshot are on sale.";
+"notification.similar.looks.message" = "You’ll love these hot new looks similar to your screenshot";
+"notification.similar.looks.message.button" = "Show Me!";
+"notification.similar.looks.message.markup" = "You’ll <#ED145A>love</#ED145A> these hot new looks similar to your screenshot";
 "notification.tapped.product.message" = "Grab this before it sells out -  %@";
 
 "onboarding.details.avatar.camera" = "Take a Photo";

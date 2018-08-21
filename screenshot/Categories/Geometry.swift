@@ -75,8 +75,8 @@ extension CGFloat {
     }
 }
 
-extension Double {
-    public static var goldenRatio:Double {
+extension CGFloat {
+    public static var goldenRatio:CGFloat {
         get {
             return 1.6180339887498948482
         }

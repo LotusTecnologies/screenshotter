@@ -643,7 +643,25 @@ extension DataModel {
         return nil
     }
     
-   
+    func retrieveSimilarLook(in context:NSManagedObjectContext) -> Screenshot? {
+        let fetchRequest: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
+        let twoMonthsAgo = NSDate(timeIntervalSinceNow: -60 * TimeInterval.oneDay)
+        fetchRequest.predicate = NSPredicate(format: "lastModified > %@ AND inNotif == FALSE AND isHidden == FALSE AND imageData != nil", twoMonthsAgo)
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "lastModified", ascending: false)]
+        fetchRequest.fetchLimit = 1
+        
+        do {
+            let results = try context.fetch(fetchRequest)
+            if let latestScreenshot = results.first {
+                return latestScreenshot
+            }
+        } catch {
+            self.receivedCoreDataError(error: error)
+            print("retrieveSimilarLook results with error:\(error)")
+        }
+        return nil
+    }
+
     
     func parseFloat(_ anyValueOptional: Any?) -> Float? {
         if anyValueOptional == nil {

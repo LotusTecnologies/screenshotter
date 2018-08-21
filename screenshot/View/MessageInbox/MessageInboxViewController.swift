@@ -212,6 +212,17 @@ extension MessageInboxViewController : UICollectionViewDelegate, UICollectionVie
                             actionButton?.isLoading = false
                         })
                     }
+                case .similarLooks:
+                    if let urlString = message.actionValue,  let _ = URL.init(string: urlString){
+                        AssetSyncModel.sharedInstance.addScreenshotFrom(source: .inbox, urlString: urlString, callback: { (screenshot) in
+                            
+                            let vc = ScreenshotSimilarLooksViewController.init(screenshot: screenshot)
+                            Analytics.trackOpenedScreenshot(screenshot: screenshot, source: .inbox)
+                            self.navigationItem.backBarButtonItem = UIBarButtonItem.init(title: "", style: .plain, target: nil, action: nil)
+                            self.navigationController?.pushViewController(vc, animated: true)
+                            message.markAsRead()
+                        })
+                    }
                 }
             }else{
                 if let url = URL.init(string: "https://itunes.apple.com/us/app/screenshop-by-craze/id1254964391"), UIApplication.shared.canOpenURL(url){

@@ -79,6 +79,8 @@
 		3125446D2091C3A0009410D5 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
 		3125448F209871B4009410D5 /* Analytics+api.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3125448E209871B4009410D5 /* Analytics+api.swift */; };
 		31357EE220F6636D00515116 /* UIColor+craze.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31357EE120F6636D00515116 /* UIColor+craze.swift */; };
+		31377FA22122EA5B0052D6EE /* ScreenshotSimilarLooksViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31377FA12122EA5B0052D6EE /* ScreenshotSimilarLooksViewController.swift */; };
+		31377FA42123F3400052D6EE /* ScreenshotSimilarLooksCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31377FA32123F3400052D6EE /* ScreenshotSimilarLooksCollectionViewCell.swift */; };
 		313F80972109E29B0020F37D /* MessageInboxViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 313F80962109E29B0020F37D /* MessageInboxViewController.swift */; };
 		313F80992109E3450020F37D /* MessageInboxCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 313F80982109E3450020F37D /* MessageInboxCollectionViewCell.swift */; };
 		314C488A205E86E700B8381D /* PHAsset+craze.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314C4889205E86E700B8381D /* PHAsset+craze.swift */; };
@@ -328,6 +330,8 @@
 		3125448E209871B4009410D5 /* Analytics+api.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Analytics+api.swift"; sourceTree = "<group>"; };
 		31357EE120F6636D00515116 /* UIColor+craze.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+craze.swift"; sourceTree = "<group>"; };
 		31377F9F2122C6FE0052D6EE /* Model 26.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 26.xcdatamodel"; sourceTree = "<group>"; };
+		31377FA12122EA5B0052D6EE /* ScreenshotSimilarLooksViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotSimilarLooksViewController.swift; sourceTree = "<group>"; };
+		31377FA32123F3400052D6EE /* ScreenshotSimilarLooksCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotSimilarLooksCollectionViewCell.swift; sourceTree = "<group>"; };
 		313F80962109E29B0020F37D /* MessageInboxViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageInboxViewController.swift; sourceTree = "<group>"; };
 		313F80982109E3450020F37D /* MessageInboxCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageInboxCollectionViewCell.swift; sourceTree = "<group>"; };
 		314C4889205E86E700B8381D /* PHAsset+craze.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PHAsset+craze.swift"; sourceTree = "<group>"; };
@@ -548,6 +552,7 @@
 				311A4FA420D90B750001D463 /* Screenshot */,
 				311A4FA120D90B750001D463 /* ScreenshotDisplay */,
 				311A4FAD20D90B760001D463 /* ScreenshotPicker */,
+				31377FA02122E81F0052D6EE /* ScreenshotSimilarLooks */,
 				C5933D88210F3EBD00BBCF5B /* Search */,
 				311A4F9F20D90B750001D463 /* Settings */,
 				311A4F8920D90B740001D463 /* ShareToDiscoverPrompt */,
@@ -795,6 +800,15 @@
 				311A502120D90B770001D463 /* Form.swift */,
 			);
 			path = Form;
+			sourceTree = "<group>";
+		};
+		31377FA02122E81F0052D6EE /* ScreenshotSimilarLooks */ = {
+			isa = PBXGroup;
+			children = (
+				31377FA12122EA5B0052D6EE /* ScreenshotSimilarLooksViewController.swift */,
+				31377FA32123F3400052D6EE /* ScreenshotSimilarLooksCollectionViewCell.swift */,
+			);
+			path = ScreenshotSimilarLooks;
 			sourceTree = "<group>";
 		};
 		313F80952109E28B0020F37D /* MessageInbox */ = {
@@ -1395,6 +1409,7 @@
 				"${BUILT_PRODUCTS_DIR}/Analytics/Analytics.framework",
 				"${BUILT_PRODUCTS_DIR}/Bolts/Bolts.framework",
 				"${BUILT_PRODUCTS_DIR}/Branch/Branch.framework",
+				"${BUILT_PRODUCTS_DIR}/Cache/Cache.framework",
 				"${BUILT_PRODUCTS_DIR}/FBSDKCoreKit/FBSDKCoreKit.framework",
 				"${BUILT_PRODUCTS_DIR}/FBSDKLoginKit/FBSDKLoginKit.framework",
 				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher/GTMSessionFetcher.framework",
@@ -1415,6 +1430,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Analytics.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Bolts.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Branch.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Cache.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKCoreKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKLoginKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMSessionFetcher.framework",
@@ -1537,6 +1553,7 @@
 				C5F73C9E1FE244C800E49F2B /* Permissions.swift in Sources */,
 				31A0781B207E182100D70DC3 /* URL+craze.swift in Sources */,
 				31CE11022039570B000156EE /* FetchedResultsControllerManager.swift in Sources */,
+				31377FA42123F3400052D6EE /* ScreenshotSimilarLooksCollectionViewCell.swift in Sources */,
 				311A505520D90B780001D463 /* ProductHeaderCollectionViewCell.swift in Sources */,
 				C58BAE8C20E101DD0051394A /* RoundButton.swift in Sources */,
 				311A503420D90B780001D463 /* DiscoverScreenshotCollectionViewCell.swift in Sources */,
@@ -1652,6 +1669,7 @@
 				C58BAE6F20E101DD0051394A /* HelperView.swift in Sources */,
 				311A505C20D90B780001D463 /* FavoriteProductsViewController.swift in Sources */,
 				311A506520D90B780001D463 /* ScreenshotsViewController.swift in Sources */,
+				31377FA22122EA5B0052D6EE /* ScreenshotSimilarLooksViewController.swift in Sources */,
 				3125446B2091C3A0009410D5 /* BuildFile in Sources */,
 				311A50C520D90B780001D463 /* Form.swift in Sources */,
 				311A506E20D90B780001D463 /* RegisterConfirmationViewController.swift in Sources */,
