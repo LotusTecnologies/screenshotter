@@ -294,18 +294,16 @@ class LocalNotificationModel {
                         threePmSunday.weekday = 1
                         threePmSunday.hour = 15
                         let displayDateTrigger = UNCalendarNotificationTrigger(dateMatching: threePmSunday, repeats: false)
-                        print("GMK displayDateTrigger.nextTriggerDate:\(displayDateTrigger.nextTriggerDate())")
-                        let intervalTrigger = displayDateTrigger
                         self.scheduleImageLocalNotification(copiedTmpURL: copiedTmpURL,
                                                             userInfo: [Constants.openingScreenKey  : Constants.openingScreenValueScreenshot,
                                                                        Constants.openingAssetIdKey : assetIdString],
                                                             identifier: identifier,
                                                             body: "notification.similar.looks.message".localized,
-                                                            trigger: intervalTrigger)
+                                                            trigger: displayDateTrigger)
                         if let image =  UIImage.init(data: imageData), let url = URL.init(string: urlString) {
                             SDWebImageManager.shared().saveImage(toCache:image, for:url)
                         }
-                        if let date = intervalTrigger.nextTriggerDate() {
+                        if let date = displayDateTrigger.nextTriggerDate() {
                             let expire = Date(timeInterval: 7 * .oneDay, since: date)
                             dataModel.performBackgroundTask { context in
                                 InboxMessage.createUpdateWith(lookupDict: nil, actionType: "similarLooks", actionValue: assetIdString, buttonText: "notification.similar.looks.message.button".localized, image: urlString, title: "notification.similar.looks.message.markup".localized, uuid: UUID().uuidString, expireDate:expire, date: date, showAfterDate: date, tracking: nil, create: true, update: false, context: context)
