@@ -189,8 +189,7 @@ class DiscoverManager {
         case .male:
         queuedFetchRequest.sortDescriptors = [NSSortDescriptor.init(key: "isMale", ascending: false), NSSortDescriptor.init(key: "recombeeRecommended", ascending: false)]
         }
-        queuedFetchRequest.fetchLimit = Matchstick.recombeeQueueSize + Matchstick.displayingSize
-
+        
 
         if let displaying = try? context.fetch(displayingFetchRequest), let queued = try? context.fetch(queuedFetchRequest) {
 
