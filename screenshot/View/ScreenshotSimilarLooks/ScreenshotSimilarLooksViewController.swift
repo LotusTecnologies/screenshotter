@@ -230,8 +230,8 @@ extension ScreenshotSimilarLooksViewController : UICollectionViewDataSource {
                 cell.isLoaded = false
                 
                 cell.product1Button.addTarget(self, action: #selector(didPressProduct1(_:event:)), for: .touchUpInside)
-                cell.product1Button.addTarget(self, action: #selector(didPressProduct2(_:event:)), for: .touchUpInside)
-                cell.product1Button.addTarget(self, action: #selector(didPressRelatedLooks(_:event:)), for: .touchUpInside)
+                cell.product2Button.addTarget(self, action: #selector(didPressProduct2(_:event:)), for: .touchUpInside)
+                cell.screenshotButton.addTarget(self, action: #selector(didPressRelatedLooks(_:event:)), for: .touchUpInside)
                 if let url = URL.init(string: relatedLook) {
                     cell.embossedView.imageView.sd_setImage(with: url)
                     self.downloadForRelatedLook(imageUrl: relatedLook).then { (products) -> Void in
@@ -265,26 +265,37 @@ extension ScreenshotSimilarLooksViewController : UICollectionViewDataSource {
 
     }
     @objc func didPressProduct1(_ sender: Any, event: UIEvent) {
-        guard let indexPath = collectionView?.indexPath(for: event) else {
+        guard let indexPath = collectionView.indexPath(for: event) else {
             return
         }
-        let relatedLook = self.relatedLooksManager.relatedLook(at: indexPath.row)
-        self.productsCache.sync
+       
+        if  let relatedLook = self.relatedLooksManager.relatedLook(at: indexPath.row), let productsCache = try? self.productsCache?.object(forKey: relatedLook), let products = productsCache,  products.count > 0, let offer = products[0]["offer"] as? String{
+            OpenWebPage.present(urlString: offer, fromViewController: self)
+        }
+        
     }
     @objc func didPressProduct2(_ sender: Any, event: UIEvent) {
-        guard let indexPath = collectionView?.indexPath(for: event) else {
+        guard let indexPath = collectionView.indexPath(for: event) else {
             return
         }
-        let relatedLook = self.relatedLooksManager.relatedLook(at: indexPath.row)
-
+        if  let relatedLook = self.relatedLooksManager.relatedLook(at: indexPath.row), let productsCache = try? self.productsCache?.object(forKey: relatedLook), let products = productsCache,  products.count > 1, let offer = products[1]["offer"] as? String{
+            OpenWebPage.present(urlString: offer, fromViewController: self)
+        }
     }
     @objc func didPressRelatedLooks(_ sender: Any, event: UIEvent) {
-        guard let indexPath = collectionView?.indexPath(for: event) else {
+        guard let indexPath = collectionView.indexPath(for: event) else {
             return
         }
-        let relatedLook = self.relatedLooksManager.relatedLook(at: indexPath.row)
-        
-        
+        if let relatedLook = self.relatedLooksManager.relatedLook(at: indexPath.row) {
+            AssetSyncModel.sharedInstance.addFromRelatedLook(urlString: relatedLook, callback: { (screenshot) in
+                Analytics.trackOpenedScreenshot(screenshot: screenshot, source: .relatedLooks)
+                let productsViewController = ProductsViewController.init(screenshot: screenshot)
+                //This is so 'back' doens't say 'shop photo' which looks weird when the tile is shop photo
+                self.navigationItem.backBarButtonItem = UIBarButtonItem.init(title: "", style: .plain, target: nil, action: nil)
+                self.navigationController?.pushViewController(productsViewController, animated: true)
+                
+            })
+        }
         
     }
     func calculatedDisplayTitle(_ dict:[String:Any]) ->String{
