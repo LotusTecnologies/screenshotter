@@ -295,7 +295,7 @@ class LocalNotificationModel {
                         threePmSunday.hour = 15
                         let displayDateTrigger = UNCalendarNotificationTrigger(dateMatching: threePmSunday, repeats: false)
                         print("GMK displayDateTrigger.nextTriggerDate:\(displayDateTrigger.nextTriggerDate())")
-                        let intervalTrigger = UNTimeIntervalNotificationTrigger(timeInterval: 10, repeats: false) // TODO: GMK Remove me.
+                        let intervalTrigger = displayDateTrigger
                         self.scheduleImageLocalNotification(copiedTmpURL: copiedTmpURL,
                                                             userInfo: [Constants.openingScreenKey  : Constants.openingScreenValueScreenshot,
                                                                        Constants.openingAssetIdKey : assetIdString],
