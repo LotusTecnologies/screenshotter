@@ -228,6 +228,10 @@ extension ScreenshotSimilarLooksViewController : UICollectionViewDataSource {
                 cell.product2Byline.text = ""
                 cell.imageUrl = relatedLook
                 cell.isLoaded = false
+                
+                cell.product1Button.addTarget(self, action: #selector(didPressProduct1(_:event:)), for: .touchUpInside)
+                cell.product1Button.addTarget(self, action: #selector(didPressProduct2(_:event:)), for: .touchUpInside)
+                cell.product1Button.addTarget(self, action: #selector(didPressRelatedLooks(_:event:)), for: .touchUpInside)
                 if let url = URL.init(string: relatedLook) {
                     cell.embossedView.imageView.sd_setImage(with: url)
                     self.downloadForRelatedLook(imageUrl: relatedLook).then { (products) -> Void in
@@ -260,7 +264,29 @@ extension ScreenshotSimilarLooksViewController : UICollectionViewDataSource {
         return cell
 
     }
-    
+    @objc func didPressProduct1(_ sender: Any, event: UIEvent) {
+        guard let indexPath = collectionView?.indexPath(for: event) else {
+            return
+        }
+        let relatedLook = self.relatedLooksManager.relatedLook(at: indexPath.row)
+        self.productsCache.sync
+    }
+    @objc func didPressProduct2(_ sender: Any, event: UIEvent) {
+        guard let indexPath = collectionView?.indexPath(for: event) else {
+            return
+        }
+        let relatedLook = self.relatedLooksManager.relatedLook(at: indexPath.row)
+
+    }
+    @objc func didPressRelatedLooks(_ sender: Any, event: UIEvent) {
+        guard let indexPath = collectionView?.indexPath(for: event) else {
+            return
+        }
+        let relatedLook = self.relatedLooksManager.relatedLook(at: indexPath.row)
+        
+        
+        
+    }
     func calculatedDisplayTitle(_ dict:[String:Any]) ->String{
         if let displayBrand = dict["brand"] as? String,
             !displayBrand.isEmpty {

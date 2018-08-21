@@ -16,6 +16,11 @@ class ScreenshotSimilarLooksCollectionViewCell: UICollectionViewCell {
     var product2Title = UILabel()
     var product1Byline = UILabel()
     var product2Byline = UILabel()
+    
+    var product1Button = UIButton()
+    var product2Button = UIButton()
+    var screenshotButton = UIButton()
+    
     var imageUrl:String = ""
     var isLoaded = false {
         didSet{
@@ -118,6 +123,31 @@ class ScreenshotSimilarLooksCollectionViewCell: UICollectionViewCell {
         product2Byline.heightAnchor.constraint(greaterThanOrEqualToConstant: 12).isActive = true
         
         
+        product1Button.translatesAutoresizingMaskIntoConstraints = false
+        product2Button.translatesAutoresizingMaskIntoConstraints = false
+        screenshotButton.translatesAutoresizingMaskIntoConstraints = false
+
+        self.contentView.addSubview(product1Button)
+        self.contentView.addSubview(product2Button)
+        self.contentView.addSubview(screenshotButton)
+        
+        screenshotButton.topAnchor.constraint(equalTo: embossedView.topAnchor).isActive = true
+        screenshotButton.leadingAnchor.constraint(equalTo: embossedView.leadingAnchor).isActive = true
+        screenshotButton.trailingAnchor.constraint(equalTo: embossedView.trailingAnchor).isActive = true
+        screenshotButton.bottomAnchor.constraint(equalTo: embossedView.bottomAnchor).isActive = true
+        
+        
+        product1Button.topAnchor.constraint(equalTo: product1ImageView.topAnchor).isActive = true
+        product1Button.leadingAnchor.constraint(equalTo: product1ImageView.leadingAnchor).isActive = true
+        product1Button.trailingAnchor.constraint(equalTo: product1Title.trailingAnchor).isActive = true
+        product1Button.bottomAnchor.constraint(equalTo: product1ImageView.bottomAnchor).isActive = true
+
+        
+        product2Button.topAnchor.constraint(equalTo: product2ImageView.topAnchor).isActive = true
+        product2Button.leadingAnchor.constraint(equalTo: product2ImageView.leadingAnchor).isActive = true
+        product2Button.trailingAnchor.constraint(equalTo: product2Title.trailingAnchor).isActive = true
+        product2Button.bottomAnchor.constraint(equalTo: product2ImageView.bottomAnchor).isActive = true
+
         
         
     }
