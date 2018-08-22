@@ -54,7 +54,7 @@ class DiscoverFilterControl: UIControl {
         let tagCategory:TagCategory
     }
     
-    static let defaultHeight:CGFloat = 36.0
+    
     struct TagCategory : Equatable{
         var displayName:String
         var filterName:String
@@ -97,25 +97,26 @@ class DiscoverFilterControl: UIControl {
             return []
         }
         public static func == (lhs: DiscoverFilterControl.TagCategory, rhs: DiscoverFilterControl.TagCategory) -> Bool {
-            return lhs.filterName == rhs.filterName
+            return lhs.filterName == rhs.filterName && lhs.genderName == rhs.genderName
         }
 
     }
+    
+    static let defaultHeight:CGFloat = 36.0
+
     var allTagCategories:[TagCategory] = {
         return TagCategory.getFromFile()
     }()
     lazy var selectedCategory:TagCategory = {
-        if let categoryString = UserDefaults.standard.string(forKey: UserDefaultsKeys.discoverCategoryFilter) {
-            for t in self.allTagCategories {
-                if t.filterName == categoryString {
-                    return t
-                }
-            }
+        let genderString = UserDefaults.standard.string(forKey: UserDefaultsKeys.discoverGenderFilter) ?? ""
+        let categoryString = UserDefaults.standard.string(forKey: UserDefaultsKeys.discoverCategoryFilter) ?? ""
+        
+        if let t = self.allTagCategories.first(where: {$0.filterName == categoryString && $0.genderName == genderString}) {
+            return t
         }
-        for t in self.allTagCategories {
-            if t.genderName == "" && t.filterName == "" {
-                return t
-            }
+        
+        if let t = self.allTagCategories.first(where: {$0.filterName == "" && $0.genderName == ""}) {
+            return t
         }
         
         if let t =  self.allTagCategories.first{

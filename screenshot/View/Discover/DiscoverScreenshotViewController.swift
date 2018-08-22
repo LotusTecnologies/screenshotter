@@ -53,23 +53,35 @@ class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonit
     }
     
     func updateViewsLoadingState(){
-        let isFilterReloading = self.filterReloadMonitor?.didStart ?? false
-        passButton.isHidden = isFilterReloading
-        addButton.isHidden = isFilterReloading
-        collectionView.isHidden = isFilterReloading
-        loading.isHidden = !isFilterReloading
-        if DiscoverManager.shared.discoverCategoryFilter == nil {
-            emptyView.isHidden = isFilterReloading
-            clearFilterView.isHidden = true
+        print ("is loading \(String(describing: self.filterReloadMonitor?.didStart))")
+        if self.matchsticks.count == 0 {
+            let isFilterReloading = self.filterReloadMonitor?.didStart ?? false
+            passButton.isHidden = isFilterReloading
+            addButton.isHidden = isFilterReloading
+            collectionView.isHidden = isFilterReloading
+            loading.isHidden = !isFilterReloading
+            if DiscoverManager.shared.isUnfiltered {
+                emptyView.isHidden = isFilterReloading
+                clearFilterView.isHidden = true
+            }else{
+                emptyView.isHidden = true
+                clearFilterView.isHidden = isFilterReloading
+                let name = discoverFilterControl.selectedCategory.displayName
+                clearFilterView.titleLabel.text = "discover.no_more".localized(withFormat: name)
+                
+            }
+            if isFilterReloading {
+                loading.startAnimation()
+            }else{
+                loading.stopAnimation()
+            }
         }else{
+            passButton.isHidden = false
+            addButton.isHidden = false
+            collectionView.isHidden = false
+            loading.isHidden = true
             emptyView.isHidden = true
-            clearFilterView.isHidden = isFilterReloading
-            clearFilterView.titleLabel.text = "No more \(self.discoverFilterControl.selectedCategory.displayName) outfits"
-
-        }
-        if isFilterReloading {
-            loading.startAnimation()
-        }else{
+            clearFilterView.isHidden = true
             loading.stopAnimation()
         }
         
@@ -173,12 +185,12 @@ class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonit
         
         
         clearFilterView.translatesAutoresizingMaskIntoConstraints = false
-        clearFilterView.titleLabel.text = "No more outfits"
+        clearFilterView.titleLabel.text = "discover.no_more.default".localized
         clearFilterView.contentImage = UIImage(named: "DiscoverNoMoreInFilter")
         let button = MainButton()
         button.addTarget(self, action: #selector(selectAllFilter(_:)), for: .touchUpInside)
         button.backgroundColor = .crazeRed
-        button.setTitle("Show All", for: .normal)
+        button.setTitle("discover.no_more.show_all".localized, for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
         clearFilterView.controlView.addSubview( button )
@@ -225,6 +237,8 @@ class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonit
     @objc func selectAllFilter(_ sender:Any){
         self.discoverFilterControl.selectAllFilter()
         DiscoverManager.shared.updateFilter(category: nil)
+        DiscoverManager.shared.updateGender(gender: "")
+
         self.updateViewsLoadingState()
     }
 
@@ -244,17 +258,19 @@ class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonit
     }
     @objc func didChangeCategoryFilter(_ sender:Any){
         let category = self.discoverFilterControl.selectedCategory
+        self.matchsticks = []
+        self.collectionView.reloadData()
         if category.filterName == "" {
             DiscoverManager.shared.updateFilter(category: nil)
         }else{
             DiscoverManager.shared.updateFilter(category: category.filterName)
         }
          if category.genderName == "male"{
-            DiscoverManager.shared.updateGender(gender: .male)
+            DiscoverManager.shared.updateGender(gender: "male")
          }else if category.genderName == "female" {
-            DiscoverManager.shared.updateGender(gender: .female)
+            DiscoverManager.shared.updateGender(gender: "female")
          }else{
-            DiscoverManager.shared.updateGender(gender: .auto)
+            DiscoverManager.shared.updateGender(gender: "")
         }
         
         self.updateViewsLoadingState()
@@ -691,11 +707,18 @@ extension DiscoverScreenshotViewController : UICollectionViewDelegate {
 extension DiscoverScreenshotViewController : FetchedResultsControllerManagerDelegate {
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
         if isViewLoaded {
-            if change.insertedRows.count > 0 {
+            
+            if change.insertedRows.count > 0 || self.matchstickFrc?.fetchedObjectsCount ?? 0 == 0 {
+                var hadMatchsticks = self.matchsticks.count > 0
                 self.matchsticks = self.matchstickFrc?.fetchedObjects ?? []
+                var nowHasMatchsticks = (self.matchsticks.count > 0)
                 self.collectionView.reloadData()
+                if hadMatchsticks != nowHasMatchsticks {
+                    updateViewsLoadingState()
+                }
             }
             syncEmptyListViews()
+
         }
     }
 }

@@ -388,7 +388,7 @@ class NetworkingPromise : NSObject {
         var remoteId:String
         var properties:[String:[String]] = [:]
     }
-    func recombeeRecommendation(count:Int, gender:ProductsOptionsGender, category:String?) -> Promise<[RecombeeRecommendation]>{
+    func recombeeRecommendation(count:Int, gender:String, category:String?) -> Promise<[RecombeeRecommendation]>{
         let userId = AnalyticsUser.current.identifier
         var params:[String:Any] = [:]
         params["count"] = count
@@ -397,13 +397,12 @@ class NetworkingPromise : NSObject {
         var filter = "'displayable' == true"
         params["returnProperties"] = true
         params["includedProperties"] = "rekognition-labels,genders,itemTypes,rekognition-celebs,uid,tags"
-        if gender == .female {
+        if gender == "female" {
             filter += " AND \"female\" in 'genders'"
-        }else if gender == .male{
+        }else if gender == "male"{
             filter += " AND \"male\" in 'genders'"
         }
-        
-        if let category = category {
+        if let category = category, !category.isEmpty {
             filter += " AND \"\(category)\" in 'tags'"
         }
         
