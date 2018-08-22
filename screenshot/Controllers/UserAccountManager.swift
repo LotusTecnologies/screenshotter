@@ -787,6 +787,7 @@ extension UserAccountManager {
         if let user = self.user{
             
             self.setupInboxSync()
+            self.setToken()
             promiseArray.append(Promise<Void>.init(resolvers: { (fulfil, reject) in
                 self.databaseRef.child("users").child(user.uid).child("avatarURL").observeSingleEvent(of: .value) { (snapshot) in
                     if let url = snapshot.value as? String  {

@@ -665,8 +665,11 @@ extension AppDelegate: PushNotificationDelegate {
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         PushNotificationManager.push().handlePushRegistration(deviceToken)
         
+        
         UserDefaults.standard.set(deviceToken, forKey: UserDefaultsKeys.deviceToken)
         UserDefaults.standard.synchronize()
+        UserAccountManager.shared.setToken()
+    
         Analytics.trackUserProperties(analyticsUser: AnalyticsUser.current)
         SilentPushSubscriptionManager.sharedInstance.updateSubscriptionsIfNeeded()
         
