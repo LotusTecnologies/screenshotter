@@ -81,6 +81,9 @@
 "discover.screenshot.helper.title" = "Discover Fashion";
 "discover.screenshot.pass" = "Pass";
 "discover.title" = "Discover";
+"discover.no_more" = "No more %@ outfits";
+"discover.no_more.show_all" = "Show All";
+"discover.no_more.default" = "No more outfits";
 
 "email.setup.message.bug" = "You need to setup an email on your device in order to send a bug report.";
 "email.setup.message.contactUs" = "To continue, setup an email on your device";

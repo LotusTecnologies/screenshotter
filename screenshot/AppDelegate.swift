@@ -70,6 +70,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
 
         fetchAppSettings()
+        downloadDiscoverJsonIfNeeded()
         
         UIApplication.migrateUserDefaultsKeys()
         UIApplication.appearanceSetup()
@@ -786,6 +787,34 @@ extension AppDelegate {
             NotificationCenter.default.post(name: .fetchedAppSettings, object: nil, userInfo:nil)  //this can cause UI changes and must be on main
         }
     }
+    
+    fileprivate func downloadDiscoverJsonIfNeeded(){
+        var needToDownload = true
+        if let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
+            let dbURL = documentDirectory.appendingPathComponent("DiscoverFilterCategories.json")
+            
+            if let attr = try? FileManager.default.attributesOfItem(atPath: dbURL.path) {
+                if let date = attr[.creationDate] as? Date {
+                    if abs(date.timeIntervalSinceNow) <  2 * .oneDay {
+                        needToDownload = false
+                    }
+                }
+            }
+            if needToDownload, let url = URL.init(string: "https://s3.amazonaws.com/screenshop-ordered-discover/DiscoverFilterCategories.json") {
+                let request =  URLRequest.init(url: url )
+                let task = URLSession.shared.downloadTask(with: request) { (tempLocalUrl, response, error) in
+                    if let response = response as? HTTPURLResponse, response.statusCode == 200,  let tempLocalUrl = tempLocalUrl, error == nil {
+                        try? FileManager.default.copyItem(at: tempLocalUrl, to: dbURL)
+                    }
+                }
+                task.resume()
+            }
+        }
+        
+//
+
+    }
+    
 }
 
 extension AppDelegate : UNUserNotificationCenterDelegate {

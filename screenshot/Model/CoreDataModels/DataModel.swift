@@ -726,6 +726,7 @@ extension DataModel {
             
             matchstickToSave.isMale = properties["genders"]?.contains("male")  ?? false
             matchstickToSave.isFemale = properties["genders"]?.contains("female") ?? false
+            matchstickToSave.tags = (properties["tags"])?.map{ "[\($0)]" }.joined(separator: ",")
         }
         matchstickToSave.receivedAt = Date()
         
