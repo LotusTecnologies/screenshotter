@@ -31,6 +31,8 @@ class DiscoverManager {
         queue.maxConcurrentOperationCount = 1
         return queue
     }()
+    let recombeeTrackLastQueue = DispatchQueue(label: "io.crazeapp.screenshot.recombeeTrackLastQueue")
+
     var gender:String = {
             return UserDefaults.standard.string(forKey: UserDefaultsKeys.discoverGenderFilter) ?? ""
         }() {
@@ -162,20 +164,28 @@ class DiscoverManager {
         
     }
     
+    var lastRecombeeRequest = UUID()
     private func recombeRequest(count:Int){
-        let dateRequested = Date()
-        self.recombeeRequestQueue.operations.forEach{ $0.cancel() }
-        self.recombeeRequestQueue.addOperation(AsyncOperation.init(timeout: nil, tags: [AsyncOperationTag.init(type: .filterChange, value: "DiscoverManager")], completion: { (completion) in
-            
-            NetworkingPromise.sharedInstance.recombeeRecommendation(count:count, gender:self.gender, category:self.discoverCategoryFilter).then(execute: { (recommendations) -> Promise<Void> in
-                return self.recombeeRecommendation(recommendations, dateRequested: dateRequested)
-            }).catch(execute: { (error) in
-                print("recombee error: \(error)")
-            }).always{
-                completion()
+        self.recombeeTrackLastQueue.async {
+            let dateRequested = Date()
+            let uuid = UUID()
+            self.lastRecombeeRequest = uuid
+            self.recombeeRequestQueue.addOperation(AsyncOperation.init(timeout: nil, tags: [AsyncOperationTag.init(type: .filterChange, value: "DiscoverManager")], completion: { (completion) in
+                if uuid == self.lastRecombeeRequest {
+                    NetworkingPromise.sharedInstance.recombeeRecommendation(count:count, gender:self.gender, category:self.discoverCategoryFilter).then(execute: { (recommendations) -> Promise<Void> in
+                        return self.recombeeRecommendation(recommendations, dateRequested: dateRequested)
+                    }).catch(execute: { (error) in
+                        print("recombee error: \(error)")
+                    }).always{
+                        completion()
+                        
+                    }
+                }else{
+                    completion()
+                }
                 
-            }
-        }))
+            }))
+        }
     }
     
     func updateFilterAndGetMoreIfNeeded(){
