@@ -62,6 +62,7 @@ class SilentPushSubscriptionManager : NSObject {
         if agreedToImageDetection && hasDeviceToken && [hasARN, enabledSilentPush].contains(false) {
             updateSubscriptions().then { _ -> Void in
                 UserDefaults.standard.set(true, forKey: UserDefaultsKeys.enabledSilentPush)
+                UserAccountManager.shared.setToken()
             }
         }
     }
