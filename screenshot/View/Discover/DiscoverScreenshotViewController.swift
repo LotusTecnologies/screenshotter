@@ -53,7 +53,6 @@ class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonit
     }
     
     func updateViewsLoadingState(){
-        print ("is loading \(String(describing: self.filterReloadMonitor?.didStart))")
         if self.matchsticks.count == 0 {
             let isFilterReloading = self.filterReloadMonitor?.didStart ?? false
             passButton.isHidden = isFilterReloading
@@ -709,9 +708,9 @@ extension DiscoverScreenshotViewController : FetchedResultsControllerManagerDele
         if isViewLoaded {
             
             if change.insertedRows.count > 0 || self.matchstickFrc?.fetchedObjectsCount ?? 0 == 0 {
-                var hadMatchsticks = self.matchsticks.count > 0
+                let hadMatchsticks = self.matchsticks.count > 0
                 self.matchsticks = self.matchstickFrc?.fetchedObjects ?? []
-                var nowHasMatchsticks = (self.matchsticks.count > 0)
+                let nowHasMatchsticks = (self.matchsticks.count > 0)
                 self.collectionView.reloadData()
                 if hadMatchsticks != nowHasMatchsticks {
                     updateViewsLoadingState()

@@ -52,11 +52,9 @@ class DiscoverManager {
     }
     
     func performBackgroundTask(_ block: @escaping (NSManagedObjectContext) -> Void) {
-        print("databaseQueue: started :\(self.databaseQueue.operationCount + 1)")
         self.databaseQueue.addOperation(AsyncOperation.init(timeout: nil, tags: [AsyncOperationTag.init(type: .filterChange, value: "DiscoverManager")], completion: { (completion) in
             DataModel.sharedInstance.performBackgroundTask({ (context) in
                 block(context);
-                print("databaseQueue: ended :\(self.databaseQueue.operationCount - 1)")
                 completion()
             })
         }))
@@ -166,7 +164,6 @@ class DiscoverManager {
     
     private func recombeRequest(count:Int, alwaysAdd:Bool){
         let dateRequested = Date()
-        print("recombeeRequestQueue: started :\(self.recombeeRequestQueue.operationCount + 1)")
         self.recombeeRequestQueue.operations.forEach{ $0.cancel() }
         self.recombeeRequestQueue.addOperation(AsyncOperation.init(timeout: nil, tags: [AsyncOperationTag.init(type: .filterChange, value: "DiscoverManager")], completion: { (completion) in
             return NetworkingPromise.sharedInstance.recombeeRecommendation(count:count, gender:self.gender, category:self.discoverCategoryFilter).then(execute: { (recommendations) -> Promise<Void> in
@@ -174,8 +171,6 @@ class DiscoverManager {
             }).catch(execute: { (error) in
                 print("recombee error: \(error)")
             }).always{
-                print("recombeeRequestQueue: ended :\(self.recombeeRequestQueue.operationCount - 1)")
-                
                 completion()
                 
             }
@@ -234,7 +229,6 @@ class DiscoverManager {
 //        queuedFetchRequest.fetchLimit = Matchstick.recombeeQueueSize + Matchstick.displayingSize
         
         if let displaying = try? context.fetch(displayingFetchRequest), let queued = try? context.fetch(queuedFetchRequest) {
-            print("queue matchstick count:\(queued.count)");
             let displayingMatchStickNeeded = (Matchstick.displayingSize - displaying.count)
             var itemsAdded = 0
             let downloaded = queued.filter{ $0.imageData != nil }
@@ -365,12 +359,10 @@ class DiscoverManager {
                         
                     }.always {
                         completed()
-                        print("downloadMatchsitckQueue: ended :\(self.downloadMatchsitckQueue.operationCount - 1)")
 
                 }
             })
             operation.queuePriority = priority
-            print("downloadMatchsitckQueue: started :\(self.downloadMatchsitckQueue.operationCount + 1)")
             downloadMatchsitckQueue.addOperation(operation)
         }
     }
