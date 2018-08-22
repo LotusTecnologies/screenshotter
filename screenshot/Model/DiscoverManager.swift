@@ -154,19 +154,20 @@ class DiscoverManager {
         let isRecombeeId = (Int(assetId) != nil)
         if isRecombeeId {
             NetworkingPromise.sharedInstance.recombeeRequest(path: event.path(), method: "POST", params: event.postData(itemId: assetId)).always {
-                self.recombeRequest(count:1, alwaysAdd:false)
+                self.recombeRequest(count:1)
             }
         }else{
-            self.recombeRequest(count:1, alwaysAdd:false)
+            self.recombeRequest(count:1)
         }
         
     }
     
-    private func recombeRequest(count:Int, alwaysAdd:Bool){
+    private func recombeRequest(count:Int){
         let dateRequested = Date()
         self.recombeeRequestQueue.operations.forEach{ $0.cancel() }
         self.recombeeRequestQueue.addOperation(AsyncOperation.init(timeout: nil, tags: [AsyncOperationTag.init(type: .filterChange, value: "DiscoverManager")], completion: { (completion) in
-            return NetworkingPromise.sharedInstance.recombeeRecommendation(count:count, gender:self.gender, category:self.discoverCategoryFilter).then(execute: { (recommendations) -> Promise<Void> in
+            
+            NetworkingPromise.sharedInstance.recombeeRecommendation(count:count, gender:self.gender, category:self.discoverCategoryFilter).then(execute: { (recommendations) -> Promise<Void> in
                 return self.recombeeRecommendation(recommendations, dateRequested: dateRequested)
             }).catch(execute: { (error) in
                 print("recombee error: \(error)")
@@ -299,7 +300,7 @@ class DiscoverManager {
             
             let recombeeCount = queued.filter{ $0.recombeeRecommended != nil && $0.isDisplaying == false }.count
             if recombeeCount <= Matchstick.recombeeQueueLowMark {
-                self.recombeRequest(count:Matchstick.recombeeQueueSize - recombeeCount, alwaysAdd: queued.count == 0)
+                self.recombeRequest(count:Matchstick.recombeeQueueSize - recombeeCount)
             }
         }
     }

@@ -374,6 +374,7 @@ class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonit
             collectionView.deleteItems(at: [currentIndexPath])
         })
         
+        updateViewsLoadingState()
         setInteractiveElementsOffWithDelay()
     }
     
@@ -581,8 +582,6 @@ class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonit
         passButton.isDisabled(!isButtonEnabled || tempButtonDisable)
         addButton.isDisabled(!isButtonEnabled || tempButtonDisable)
         collectionView.isUserInteractionEnabled = isInteractionEnabled
-        self.matchsticks = self.matchstickFrc?.fetchedObjects ?? []
-        self.collectionView.reloadData()
     }
     
     fileprivate func syncEmptyListViews() {
