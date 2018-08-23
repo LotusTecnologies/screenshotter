@@ -795,12 +795,10 @@ extension AppDelegate {
         var needToDownload = true
         if let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
             let dbURL = documentDirectory.appendingPathComponent("DiscoverFilterCategories.json")
-            if let attr = try? FileManager.default.attributesOfItem(atPath: dbURL.path) {
-                if let date = attr[.creationDate] as? Date {
-                    if -date.timeIntervalSinceNow < 2 * .oneDay {
-                        needToDownload = false
-                    }
-                }
+            if let attr = try? FileManager.default.attributesOfItem(atPath: dbURL.path),
+              let date = attr[.creationDate] as? Date,
+              -date.timeIntervalSinceNow < 2 * .oneDay {
+                needToDownload = false
             }
             if needToDownload, let url = URL(string: "https://s3.amazonaws.com/screenshop-ordered-discover/DiscoverFilterCategories.json") {
                 let request = URLRequest(url: url )
