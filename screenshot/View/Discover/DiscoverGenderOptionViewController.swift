@@ -12,13 +12,8 @@ class DiscoverGenderOptionViewController: UIViewController {
 
     var femaleButton = UIButton()
     var maleButton = UIButton()
-    let gender:ProductsOptionsGender = {
-        if let genderNumber = UserDefaults.standard.value(forKey: UserDefaultsKeys.productGender) as? NSNumber {
-            return ProductsOptionsGender.init(intValue: genderNumber.intValue)
-        }
-        return .auto
-    }()
-    var updatedGender:ProductsOptionsGender?
+    let gender = UserDefaults.standard.string(forKey: UserDefaultsKeys.discoverGenderFilter) ?? ""
+    var updatedGender:String?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -88,10 +83,10 @@ class DiscoverGenderOptionViewController: UIViewController {
         maleButton.layer.borderColor = UIColor.lightGray.cgColor
         maleButton.layer.borderWidth = 1.0
 
-        if updatedGender == .male {
+        if updatedGender == "male" {
             maleButton.layer.borderColor = UIColor.red.cgColor
             maleButton.layer.borderWidth = 3.0
-        }else if updatedGender == .female {
+        }else if updatedGender == "female" {
             femaleButton.layer.borderColor = UIColor.red.cgColor
             femaleButton.layer.borderWidth = 3.0
         }
@@ -100,24 +95,19 @@ class DiscoverGenderOptionViewController: UIViewController {
     
     @objc func buttonPress(_ sender:Any){
         if let sender = sender as? UIButton {
-            let gender:ProductsOptionsGender = {
-                if let genderNumber = UserDefaults.standard.value(forKey: UserDefaultsKeys.productGender) as? NSNumber {
-                    return ProductsOptionsGender.init(intValue: genderNumber.intValue)
-                }
-                return .auto
-            }()
+            let gender = self.updatedGender ?? UserDefaults.standard.string(forKey: UserDefaultsKeys.discoverGenderFilter) ?? ""
             
-            var genderOfButton:ProductsOptionsGender?
+            var genderOfButton:String?
             if sender == femaleButton {
-                genderOfButton = .female
+                genderOfButton = "female"
             }else if sender == maleButton{
-                genderOfButton = .male
+                genderOfButton = "male"
              }
             
             if let genderOfButton = genderOfButton {
                 
                 if gender == genderOfButton {
-                    self.updatedGender = .auto
+                    self.updatedGender = ""
                 }else{
                     self.updatedGender = genderOfButton
                 }

@@ -23,6 +23,8 @@ target 'Screenshop' do
     pod 'FBSDKLoginKit'
     pod 'SwiftLog', '~> 1.0.0'
     pod 'SWXMLHash'
+    pod 'Cache'
+
 end
 
 post_install do |installer|

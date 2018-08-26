@@ -70,6 +70,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
 
         fetchAppSettings()
+        downloadDiscoverJsonIfNeeded()
         
         UIApplication.migrateUserDefaultsKeys()
         UIApplication.appearanceSetup()
@@ -241,6 +242,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         bgTask = application.beginBackgroundTask(withName: "liveAsLongAsCan") { // TODO: Die before killed by system?
             application.endBackgroundTask(self.bgTask)
             self.bgTask = UIBackgroundTaskInvalid
+        }
+        
+        if mainTabBarController.isSafeFromViewingBurrow() {
+            DataModel.sharedInstance.cleanDB()
         }
     }
     
@@ -785,6 +790,28 @@ extension AppDelegate {
             NotificationCenter.default.post(name: .fetchedAppSettings, object: nil, userInfo:nil)  //this can cause UI changes and must be on main
         }
     }
+    
+    fileprivate func downloadDiscoverJsonIfNeeded(){
+        var needToDownload = true
+        if let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
+            let dbURL = documentDirectory.appendingPathComponent("DiscoverFilterCategories.json")
+            if let attr = try? FileManager.default.attributesOfItem(atPath: dbURL.path),
+              let date = attr[.creationDate] as? Date,
+              -date.timeIntervalSinceNow < 2 * .oneDay {
+                needToDownload = false
+            }
+            if needToDownload, let url = URL(string: "https://s3.amazonaws.com/screenshop-ordered-discover/DiscoverFilterCategories.json") {
+                let request = URLRequest(url: url )
+                let task = URLSession.shared.downloadTask(with: request) { tempLocalUrl, response, error in
+                    if let response = response as? HTTPURLResponse, response.statusCode == 200, let tempLocalUrl = tempLocalUrl, error == nil {
+                        try? FileManager.default.copyItem(at: tempLocalUrl, to: dbURL)
+                    }
+                }
+                task.resume()
+            }
+        }
+    }
+    
 }
 
 extension AppDelegate : UNUserNotificationCenterDelegate {
@@ -799,14 +826,21 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
                 isHandled = true
                 if openingScreen == Constants.openingScreenValueScreenshot {
                     if let openingAssetId = userInfo[Constants.openingAssetIdKey] as? String {
-                        if response.notification.request.identifier == LocalNotificationIdentifier.saleScreenshot.rawValue {
+                        if response.notification.request.identifier == LocalNotificationIdentifier.saleScreenshot.rawValue   {
                             // Go into screenshot for saleScreenshot local notification.
                             showScreenshotListTop()
-                            let dataModel = DataModel.sharedInstance
                             if let mainTabBarController = self.window?.rootViewController as? MainTabBarController,
-                              let screenshot = dataModel.retrieveScreenshot(managedObjectContext: dataModel.mainMoc(), assetId: openingAssetId) {
+                                let screenshot = DataModel.sharedInstance.mainMoc().screenshotWith(assetId: openingAssetId) {
                                 mainTabBarController.screenshotsNavigationController.presentScreenshot(screenshot)
                             }
+                        }else if response.notification.request.identifier == LocalNotificationIdentifier.similarLooks.rawValue   {
+                            showScreenshotListTop()
+                            if let mainTabBarController = self.window?.rootViewController as? MainTabBarController,
+                                let screenshot = DataModel.sharedInstance.mainMoc().screenshotWith(assetId: openingAssetId) {
+                                let vc = ScreenshotSimilarLooksViewController.init(screenshot: screenshot)
+                                mainTabBarController.screenshotsNavigationController.pushViewController(vc, animated: false)
+                            }
+                            
                         } else {
                             // Show screenshot as first in screenshots list for screenshotAdded local notification.
                             AssetSyncModel.sharedInstance.importPhotosToScreenshot(assetIds: [openingAssetId], source: .screenshot)
@@ -815,7 +849,7 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
                     } else {
                         showScreenshotListTop()
                     }
-                } else if openingScreen == Constants.openingScreenValueDiscover {
+                }else if openingScreen == Constants.openingScreenValueDiscover {
                     if let mainTabBarController = self.window?.rootViewController as? MainTabBarController {
                         mainTabBarController.goTo(tab: .discover)
                     }
@@ -858,6 +892,8 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
         
         completionHandler()
         switch response.notification.request.identifier {
+        case LocalNotificationIdentifier.similarLooks.rawValue:
+            Analytics.trackAppOpenedFromTimedLocalNotification(source: .similarLooks)
         case LocalNotificationIdentifier.inactivityDiscover.rawValue:
             Analytics.trackAppOpenedFromTimedLocalNotification(source: .inactivityDiscover)
         case LocalNotificationIdentifier.favoritedItem.rawValue:

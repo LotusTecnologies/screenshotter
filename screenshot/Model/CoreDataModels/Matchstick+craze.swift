@@ -13,15 +13,29 @@ extension Matchstick {
     static func predicateForDisplayingMatchstick() -> NSPredicate {
         return NSPredicate.init(format: "isDisplaying == true")
     }
-    static func predicateForQueuedMatchstick() -> NSPredicate {
-        return NSPredicate.init(format: "dateSkipped = nil AND was404 != true AND wasAdded != true AND isDisplaying != true")
+    static func predicateForQueuedMatchstick(gender:String, category:String?) -> NSPredicate {
+        let basic = NSPredicate.init(format: "dateSkipped = nil AND was404 != true AND wasAdded != true AND isDisplaying != true")
+        var genderPredicate = NSPredicate.init(value: true)
+        if gender == "female" {
+            genderPredicate = NSPredicate.init(format: "isFemale == true")
+        }else if gender == "male" {
+            genderPredicate = NSPredicate.init(format: "isMale == true")
+        }
+        var categoryPredicate = NSPredicate.init(value: true)
+        
+        if let category = category, !category.isEmpty{
+            categoryPredicate = NSPredicate.init(format: "tags CONTAINS %@", "[\(category)]")
+        }
+    
+        
+        return NSCompoundPredicate.init(andPredicateWithSubpredicates: [basic, genderPredicate, categoryPredicate])
     }
 
     static var skipRotationTime = TimeInterval.oneWeek
     static var displayingSize = 2
-    static var queueSize = 10  //Must have at least this ammount  - if not grab random numbers
-    static var recombeeQueueSize = 30  // want to have this amount of recombee recommendations
-    static var recombeeQueueLowMark = 20 // if less than this amount make request for recombee recomendations (recombeeQueueSize - current)
+    static var queueSize = 5  //Must have at least this ammount  - if not grab random numbers
+    static var recombeeQueueSize = 10  // want to have this amount of recombee recommendations
+    static var recombeeQueueLowMark = 5 // if less than this amount make request for recombee recomendations (recombeeQueueSize - current)
 
     var isInGarbage:Bool {
         if self.wasAdded || self.was404 {

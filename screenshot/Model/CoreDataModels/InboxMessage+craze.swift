@@ -14,6 +14,7 @@ extension InboxMessage {
         case link
         case screenshot
         case product
+        case similarLooks
     }
     static func deletePendingMessage(in context:NSManagedObjectContext) {
         let fetchRequest:NSFetchRequest<InboxMessage> = InboxMessage.fetchRequest()
