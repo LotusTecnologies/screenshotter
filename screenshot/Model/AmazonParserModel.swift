@@ -201,8 +201,8 @@ struct AmazonItem: XMLIndexerDeserializable {
 //    let itemLinks: AmazonItemLinks?
     let salesRank: String?
     let smallImage: AmazonImage?
-    let mediumImage: AmazonImage?
-//    let largeImage: AmazonImage?
+//    let mediumImage: AmazonImage?
+    let largeImage: AmazonImage?
 //    let imageSets: [AmazonImageSet]?
     let itemAttributes: AmazonItemAttributes?
 //    let variationAttributes: [AmazonVariationAttribute] // maxOccurs=1
@@ -231,8 +231,8 @@ struct AmazonItem: XMLIndexerDeserializable {
 //            itemLinks: node["ItemLinks"].value(),
             salesRank: node["SalesRank"].value(),
             smallImage: node["SmallImage"].value(),
-            mediumImage: node["MediumImage"].value(),
-//            largeImage: node["LargeImage"].value(),
+//            mediumImage: node["MediumImage"].value(),
+            largeImage: node["LargeImage"].value(),
 //            imageSets: node["ImageSets"]["ImageSet"].value(),
             itemAttributes: node["ItemAttributes"].value(),
 //            variationAttributes: node["VariationAttributes"]["VariationAttribute"].value(),

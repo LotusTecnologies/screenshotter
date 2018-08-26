@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SDWebImage
 
 protocol SearchResultsViewControllerDelegate: NSObjectProtocol {
     func searchResultsViewControllerRequestNextItems(_ viewController: SearchResultsViewController)
@@ -92,7 +93,29 @@ class SearchResultsViewController: UIViewController {
         }
         let point = gesture.location(in: self.tableView)
         if let indexPath = self.tableView.indexPathForRow(at: point), let cell = self.tableView.cellForRow(at: indexPath) as? SearchResultTableViewCell{
-            CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: cell.productImageView)
+            if  let amazonItem = amazonItems?[indexPath.row]{
+                let largeImage = URL.init(string: amazonItem.largeImage?.urlString ?? "")
+                var currentImage = UIImage(named: "DefaultProduct")
+                if let smallImageString = amazonItem.smallImage?.urlString, let smallURL = URL.init(string: smallImageString) {
+                    let key = SDWebImageManager.shared().cacheKey(for: smallURL)
+                    if let image = SDWebImageManager.shared().imageCache?.imageFromCache(forKey: key){
+                        currentImage = image
+                    }else{
+                        cell.productImageView.sd_setImage(with: smallURL, completed: nil)
+                    }
+                }
+                CrazeImageZoom.shared.gestureStateChanged(gesture, imageView: cell.productImageView) { (imageView) -> UIView in
+                    let newImageView = UIImageView.init(image: currentImage)
+                    newImageView.contentMode = imageView.contentMode
+                    let point = imageView.convert(imageView.bounds.origin, to: UIApplication.shared.keyWindow)
+                    let imageViewStartingRect = CGRect.init(origin: point, size: imageView.bounds.size)
+                    newImageView.frame = imageViewStartingRect
+                    if let largeImage = largeImage {
+                        newImageView.sd_setImage(with: largeImage, placeholderImage: currentImage, options: [], completed: nil)
+                    }
+                    return newImageView
+                }
+            }
         }
     }
     // MARK: State
@@ -171,7 +194,7 @@ extension SearchResultsViewController: UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         
         if let cell = cell as? SearchResultTableViewCell, let amazonItem = amazonItems?[indexPath.row] {
-            let imageURL = URL(string: amazonItem.mediumImage?.urlString ?? "")
+            let imageURL = URL(string: amazonItem.smallImage?.urlString ?? "")
             let placeholderImage = UIImage(named: "DefaultProduct")
             cell.productImageView.sd_setImage(with: imageURL, placeholderImage: placeholderImage)
             
