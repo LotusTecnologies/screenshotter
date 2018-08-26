@@ -1100,12 +1100,18 @@ extension UserAccountManager {
         }
     }
     public func deleteImage(url:URL) ->Promise<Void>{
+        let absoluteString = url.absoluteString
+
+        guard let start = absoluteString.range(of: "%2Fimages%2F"), let end = absoluteString.range(of: ".jpg")  else{
+            return Promise.init(error: NSError.init(domain: "UserAccountManager", code: #line, userInfo: [:]))
+        }
+        
+        let uuid = absoluteString[start.upperBound ..< end.lowerBound]
 
         return Promise { fulfill, reject in
             self.getUrlBeforeAccessingStorage().then(execute: { (user) -> (Void) in
-                let absoluteString = url.absoluteString
-                let start = absoluteString.find
-                let name = UUID().uuidString
+                
+                let name = uuid
                 let deleteRef = self.storageRef.child("user").child(user.uid).child("images").child("\(name).jpg")
                 
                 deleteRef.delete(completion: { (error) in

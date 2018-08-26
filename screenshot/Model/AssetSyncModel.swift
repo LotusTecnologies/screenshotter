@@ -576,6 +576,13 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                     }
                 }
             }.catch { error in
+                let nsError = error as NSError
+                if nsError.domain == NetworkingPromise.UploadToSyteError.errorDomain{
+                    if let uploadFirebaseURL = uploadFirebaseURL {
+                        let _ = UserAccountManager.shared.deleteImage(url: uploadFirebaseURL)
+                    }
+                }
+
                 print("uploadScreenshotWithClarifai catch error:\(error)")
             }.always(on: self.serialQ) {
                 completeOperation()
