@@ -1082,28 +1082,50 @@ extension String {
 }
 
 extension UserAccountManager {
-    public func uploadImage(data:Data) -> Promise<URL> {
-        func getUser() -> Promise<User> {
-            return Promise { fulfill, reject in
-                if let user = self.user {
-                    fulfill(user)
-                }else {
-                    self.makeAnonAccount().then(execute: { () -> () in
-                        if let user = self.user{
-                            fulfill(user)
-                        }else{
-                            reject(NSError.init(domain: "UserAccountManager", code: #line, userInfo: [:]))
-                        }
-                    }).catch(execute: { (error) in
-                        reject(error)
-                    })
-                }
+    private func getUrlBeforeAccessingStorage()->Promise<User>{
+        return Promise { fulfill, reject in
+            if let user = self.user {
+                fulfill(user)
+            }else {
+                self.makeAnonAccount().then(execute: { () -> () in
+                    if let user = self.user{
+                        fulfill(user)
+                    }else{
+                        reject(NSError.init(domain: "UserAccountManager", code: #line, userInfo: [:]))
+                    }
+                }).catch(execute: { (error) in
+                    reject(error)
+                })
             }
         }
-        
+    }
+    public func deleteImage(url:URL) ->Promise<Void>{
+
+        return Promise { fulfill, reject in
+            self.getUrlBeforeAccessingStorage().then(execute: { (user) -> (Void) in
+                let absoluteString = url.absoluteString
+                let start = absoluteString.find
+                let name = UUID().uuidString
+                let deleteRef = self.storageRef.child("user").child(user.uid).child("images").child("\(name).jpg")
+                
+                deleteRef.delete(completion: { (error) in
+                    if let e = error{
+                        reject(e)
+                    }else{
+                        fulfill(())
+                    }
+                })
+            }).catch(execute: { (error) in
+                reject(error)
+            })
+        }
+    }
+    
+    public func uploadImage(data:Data) -> Promise<URL> {
+     
         var uploadTask:StorageUploadTask? = nil
         let upload:Promise<URL> = Promise { fulfill, reject in
-            getUser().then(execute: { (user) -> (Void) in
+            self.getUrlBeforeAccessingStorage().then(execute: { (user) -> (Void) in
                 let name = UUID().uuidString
                 let uploadRef = self.storageRef.child("user").child(user.uid).child("images").child("\(name).jpg")
                 

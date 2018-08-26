@@ -498,7 +498,9 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
             return
         }
         var imageData: Data?
+        var uploadFirebaseURL:URL?
         self.uploadScreenshotWithClarifaiQueueFromUserScreenshot.addOperation(AsyncOperation.init(timeout: 20.0,  assetId: asset.localIdentifier, shoppableId: nil, completion: { (completeOperation) in
+
             Promise.init { fulfill, reject in
                 self.performBackgroundTask(assetId: asset.localIdentifier, shoppableId: nil) { (managedObjectContext) in
                     if let _ = managedObjectContext.screenshotWith(assetId: asset.localIdentifier) {
@@ -511,14 +513,25 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                 }
             }.then (on: self.processingQ)  { () -> (Promise<UIImage>) in
                 return asset.image(allowFromICloud: false)
-            }.then (on: self.processingQ) { image -> Promise<(String, [[String : Any]])> in
+            }.then  (on: self.processingQ)  { image -> (Promise<Data>) in
+                if let imgData = self.data(for: image){
+                    imageData = imgData
+                    return Promise.init(value: imgData)
+                }else{
+                    return Promise.init(error: NSError.init(domain: "AssetSyncModel", code: #line, userInfo: [NSLocalizedDescriptionKey:"no image found for asset"]))
+                }
+            }.then  (on: self.processingQ)  { imageData -> (Promise<(Data?, String?)>) in
+                return UserAccountManager.shared.uploadImage(data: imageData).then(execute: { (url) ->  (Promise<(Data?, String?)>) in
+                    uploadFirebaseURL = url
+                    return Promise.init(value: (nil, url.absoluteString))
+                }).recover(execute: { (error) -> (Promise<(Data?, String?)>) in
+                    return Promise.init(value: (imageData, nil))
+                })
+            }.then (on: self.processingQ) { (imageData, orImageUrlString) -> Promise<(String, [[String : Any]])> in
                 Analytics.trackSentImageToClarifai()
-                //                return ClarifaiModel.sharedInstance.classify(image: image).then(execute: { (c) -> Promise<(ClarifaiModel.ImageClassification, UIImage)>  in
-                //                    return Promise.init(value: (c, image))
-                //                })
-                imageData = self.data(for: image)
-                return NetworkingPromise.sharedInstance.uploadToSyte(imageData: imageData, orImageUrlString: nil, retry:false)
-                }.then(on: self.processingQ) { uploadedImageURL, syteJson -> Promise<(Data?, String, [[String : Any]])> in
+
+                return NetworkingPromise.sharedInstance.uploadToSyte(imageData: imageData, orImageUrlString: orImageUrlString, retry:false)
+            }.then(on: self.processingQ) { uploadedImageURL, syteJson -> Promise<(Data?, String, [[String : Any]])> in
                     let isRecognized = true
                     Analytics.trackReceivedResponseFromClarifai(isFashion: true, isFurniture: false)
                     return Promise { fulfill, reject in
@@ -547,25 +560,25 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                         }
                         
                     }
-                }.then (on: self.processingQ) { imageData, gottenUploadedURLString, gottenSegments -> Void in
-                    if let lastDidBecomeActiveDate = self.lastDidBecomeActiveDate, let creationDate = asset.creationDate,  creationDate.timeIntervalSince(lastDidBecomeActiveDate) > -60.0 && ApplicationStateModel.sharedInstance.isActive(){
-                        self.uploadPhoto(asset: asset, source: .screenshot)
-                    }else{
-                        // Screenshot taken while app in background (or killed)
-                        AccumulatorModel.screenshot.addAssetId(asset.localIdentifier)
-                        AccumulatorModel.screenshotUninformed.incrementUninformedCount()
-                        if  ApplicationStateModel.sharedInstance.isBackground() {
-                            DispatchQueue.main.async {
-                                // The accumulator updates the count in an async block.
-                                // Without a delay the count is wrong when setting the content.badge.
-                                LocalNotificationModel.shared.sendScreenshotAddedLocalNotification(assetId: asset.localIdentifier, imageData: imageData)
-                            }
+            }.then (on: self.processingQ) { imageData, gottenUploadedURLString, gottenSegments -> Void in
+                if let lastDidBecomeActiveDate = self.lastDidBecomeActiveDate, let creationDate = asset.creationDate,  creationDate.timeIntervalSince(lastDidBecomeActiveDate) > -60.0 && ApplicationStateModel.sharedInstance.isActive(){
+                    self.uploadPhoto(asset: asset, source: .screenshot)
+                }else{
+                    // Screenshot taken while app in background (or killed)
+                    AccumulatorModel.screenshot.addAssetId(asset.localIdentifier)
+                    AccumulatorModel.screenshotUninformed.incrementUninformedCount()
+                    if  ApplicationStateModel.sharedInstance.isBackground() {
+                        DispatchQueue.main.async {
+                            // The accumulator updates the count in an async block.
+                            // Without a delay the count is wrong when setting the content.badge.
+                            LocalNotificationModel.shared.sendScreenshotAddedLocalNotification(assetId: asset.localIdentifier, imageData: imageData)
                         }
                     }
-                }.catch { error in
-                    print("uploadScreenshotWithClarifai catch error:\(error)")
-                }.always(on: self.serialQ) {
-                    completeOperation()
+                }
+            }.catch { error in
+                print("uploadScreenshotWithClarifai catch error:\(error)")
+            }.always(on: self.serialQ) {
+                completeOperation()
             }
         }))
     }
