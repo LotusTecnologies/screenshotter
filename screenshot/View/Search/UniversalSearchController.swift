@@ -55,6 +55,8 @@ class UniversalSearchController: NSObject {
         UIApplication.shared.keyWindow?.rootViewController?.present(searchNavigationController, animated: false, completion: { [weak searchNavigationController] in
             searchNavigationController?.searchViewController.presentSearchController()
         })
+        
+        Analytics.trackSearchTapped()
     }
     
     @objc private func dismissSearchViewController() {

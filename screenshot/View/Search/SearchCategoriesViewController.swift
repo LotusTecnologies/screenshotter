@@ -118,6 +118,8 @@ extension SearchCategoriesViewController: UICollectionViewDelegate {
         }
         
         dismissKeyboard()
+        
+        Analytics.trackSearchTappedCategory(category: branch.category.title)
     }
 }
 
