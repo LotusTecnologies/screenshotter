@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Corey Werner on 1/24/18.
-//  Copyright © 2018 crazeapp. All rights reserved.
+//  Copyright (c) 2018 crazeapp. All rights reserved.
 //
 
 import Foundation
@@ -36,6 +36,11 @@ class DiscoverNavigationController : UINavigationController, ViewControllerLifeC
         super.viewDidLoad()
         
         view.backgroundColor = .background
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        UniversalSearchController.shared.updateInboxBadgeCount()
     }
     
     func viewController(_ viewController: UIViewController, didDisappear animated: Bool) {

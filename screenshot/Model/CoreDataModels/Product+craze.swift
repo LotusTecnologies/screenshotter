@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Jonathan Rose on 6/3/18.
-//  Copyright © 2018 crazeapp. All rights reserved.
+//  Copyright (c) 2018 crazeapp. All rights reserved.
 //
 
 import Foundation
@@ -42,7 +42,6 @@ extension Product {
                 for product in results {
                     product.dateViewed = now
                     product.dateSortProductBar = product.getSortDateForProductBar()
-                    product.hideFromProductBar = false
                 }
                 try managedObjectContext.save()
             } catch {
@@ -80,8 +79,15 @@ extension Product {
         return productDescription?.productTitle()
     }
     
-    var isSupportingUSC: Bool {
-        return UIApplication.isUSC && partNumber != nil
+    func isSimmilar(_ product:Product?) -> Bool{
+        if let product = product {
+            let similar = (product.price == self.price && product.merchant == self.merchant && product.productTitle() == self.productTitle() )
+            var sameId = false
+            if let id1 = self.id, let id2 = product.id, !id1.isEmpty, !id2.isEmpty {
+                sameId = id1 == id2
+            }
+            return  similar || sameId
+        }
+        return false
     }
-    
 }

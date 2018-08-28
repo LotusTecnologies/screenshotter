@@ -3,35 +3,32 @@
 //  screenshot
 //
 //  Created by Jacob Relkin on 9/5/17.
-//  Copyright © 2017 crazeapp. All rights reserved.
+//  Copyright (c) 2017 crazeapp. All rights reserved.
 //
 
 import Foundation
 import UIKit
 
-extension Notification.Name {
-    static let isUSCUpdated = Notification.Name(rawValue: "io.crazeapp.screenshot.isUSCUpdated")
-}
 
 class UserDefaultsKeys  {
     // User
     static let email = "Email"
     static let name = "Name"
+    static let avatarURL = "AvatarURL"
     static let userID = "UserID"
     static let referralChannel = "ReferralChannel"
     static let campaign = "Campaign"
-
-    // USC
-    static let isUSC = "IsUSC"
-    static let abUSC = "AbUSC"
 
     // Screenshot
     static let newScreenshotsCount = "NewScreenshotsCount"
     static let newScreenshotsAssetIds = "NewScreenshotsAssetIds"
     static let uninformedScreenshotsCount = "UninformedScreenshotsCount"
+    static let screenshottingPresentedScreenshotAlert = "ScreenshottingPresentedScreenshotAlert"
     
     // Favorites
     static let uninformedFavoritesCount = "UninformedFavoritesCount"
+    static let hasFavorited = "HasFavorited"
+    static let favoritesDismissedNotification = "FavoritesDismissedNotification"
 
     // Product
     static let productGender = "ProductGender"
@@ -40,6 +37,7 @@ class UserDefaultsKeys  {
     static let productSort = "ProductSort"
     static let productCurrency = "ProductCurrency"
     static let productCategory = "ProductCategory"
+    static let screenshottingPresentedProductAlert = "ScreenshottingPresentedProductAlert"
     
     static let openWebPage = "OpenProductPageInSetting"  //open in safari, SFSafiriViewController, chrome, etc
     
@@ -52,6 +50,7 @@ class UserDefaultsKeys  {
     enum CampaignCompleted : String {
         case campaign_2018_04_20 // A kim video to encourage users to submit to discover
     }
+
     
     // Gift Card
     static let isGiftCardHidden = "IsGiftCardHidden"
@@ -60,6 +59,7 @@ class UserDefaultsKeys  {
     static let dateInstalled = "DateInstalled"
     static let dateLastSound = "DateLastSound"
     static let dateLastAppSession = "DateLastAppSession"
+    static let sessionCount = "SessionCount"
     static let significantEventCount = "SignificantEventCount"
     static let deviceToken = "deviceToken"
     static let versionLastAskedToUpdate = "versionLastAskedToUpdate"
@@ -70,13 +70,16 @@ class UserDefaultsKeys  {
     // DB
     static let lastDbVersionMigrated = "LastDbVersionMigrated"
     
-    // Clarifai
-    static let isModelDownloaded = "IsModelDownloaded"
-    
     // Discover
     static let discoverScreenshotPresentedHelper = "discoverScreenshotPresentedHelper"
-    
+    static let screenshottingPresentedDiscoverAlert = "ScreenshottingPresentedDiscoverAlert"
+    static let discoverCurrentIndex = "discoverCurrentIndex"
+    static let discoverDontFilter = "discoverDontFilter"
+    static let discoverCategoryFilter = "discoverCategoryFilter"
+    static let discoverGenderFilter = "discoverGenderFilter"
+
     // Game
+    @available(*, deprecated)
     static let gameScore = "GameScore"
     
     // Silent Push
@@ -92,6 +95,10 @@ class UserDefaultsKeys  {
     
     //Debug
     static let showsDebugAnalyticsUI = "ShowsDebugAnalyticsUI"
+    
+    //GDPR
+    static let gdpr_agreedToEmail = "gdpr_agreedToEmail"
+    static let gdpr_agreedToImageDetection = "gdpr_agreedToImageDetection"
 
 }
 

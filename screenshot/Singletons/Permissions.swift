@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Corey Werner on 12/14/17.
-//  Copyright © 2017 crazeapp. All rights reserved.
+//  Copyright (c) 2017 crazeapp. All rights reserved.
 //
 
 import UIKit
@@ -11,6 +11,7 @@ import AVFoundation
 import CoreLocation
 import Photos
 import UserNotifications
+import Pushwoosh
 
 enum PermissionType {
     case camera
@@ -33,20 +34,7 @@ final class PermissionsManager : NSObject, CLLocationManagerDelegate {
     
     // MARK: Status
     
-    private var pushStatus: PermissionStatus = .undetermined {
-        didSet {
-            let enabled = pushStatus == .authorized
-            
-            let tokenString = (UserDefaults.standard.object(forKey: UserDefaultsKeys.deviceToken) as? Data)?.description
-            
-            if enabled {
-                Analytics.trackAPNEnabled(token: tokenString)
-            }
-            else {
-                Analytics.trackAPNDisabled(token: tokenString)
-            }
-        }
-    }
+    private var pushStatus: PermissionStatus = .undetermined
     
     func permissionStatus(for type: PermissionType) -> PermissionStatus {
         switch type {
@@ -116,6 +104,24 @@ final class PermissionsManager : NSObject, CLLocationManagerDelegate {
     }
     
     // MARK: Request
+    
+    func requestPermissions(_ types: [PermissionType], completion:@escaping (()->())) {
+        var types = types
+        guard !types.isEmpty else {
+            completion()
+            return
+        }
+        let type = types.removeFirst()
+        
+        if PermissionsManager.shared.hasPermission(for: type) {
+            requestPermissions(types, completion: completion)
+        }
+        else {
+            PermissionsManager.shared.requestPermission(for: type) { granted in
+                self.requestPermissions(types, completion: completion)
+            }
+        }
+    }
     
     func requestPermission(for type: PermissionType, response: PermissionBlock? = nil) {
         func requestResponse(_ granted: Bool) {
@@ -195,14 +201,21 @@ final class PermissionsManager : NSObject, CLLocationManagerDelegate {
     }
     
     fileprivate func requestPushPermission(with response: PermissionBlock?) {
+        PushNotificationManager.push().registerForPushNotifications()
         let options: UNAuthorizationOptions = [.alert, .badge, .sound]
         
         UNUserNotificationCenter.current().requestAuthorization(options: options) { (granted, error) in
             self.pushStatus = granted ? .authorized : .denied
-            
+            let tokenString = (UserDefaults.standard.object(forKey: UserDefaultsKeys.deviceToken) as? Data)?.description
+            if granted {
+                Analytics.trackAPNEnabled(token: tokenString)
+            }
+            else {
+                Analytics.trackAPNDisabled(token: tokenString)
+            }
             if granted {
                 DispatchQueue.main.async {
-                    UIApplication.shared.registerForRemoteNotifications()
+                    PushNotificationManager.push().registerForPushNotifications()
                 }
             }
             

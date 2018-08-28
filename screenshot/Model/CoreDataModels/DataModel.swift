@@ -1,15 +1,14 @@
-//
+//&& //
 //  DataModel.swift
 //  screenshot
 //
 //  Created by Gershon Kagan on 8/9/17.
-//  Copyright © 2017 crazeapp. All rights reserved.
+//  Copyright (c) 2017 crazeapp. All rights reserved.
 //
 
 import UIKit
 import CoreData
 import PromiseKit
-import SwiftKeychainWrapper
 
 class DataModel: NSObject {
     
@@ -94,7 +93,7 @@ class DataModel: NSObject {
                         self.postDbMigration(from: lastDbVersionMigrated, to: Constants.currentMomVersion, container: self.persistentContainer)
                         UserDefaults.standard.set(Constants.currentMomVersion, forKey: UserDefaultsKeys.lastDbVersionMigrated)
                     }
-                    MatchstickModel.shared.prepareMatchsticks()
+                    DiscoverManager.shared.discoverViewDidAppear() //make sure some stuff is there when the user arrives
                     self.dbQ.isSuspended = false
                     
                     fulfill(true)
@@ -136,15 +135,34 @@ extension DataModel {
 extension DataModel {
     
     // Save a new Screenshot to Core Data.
-    func saveScreenshot(managedObjectContext: NSManagedObjectContext,
+    func saveScreenshot(upsert:Bool,
+                        managedObjectContext: NSManagedObjectContext,
                         assetId: String,
                         createdAt: Date?,
                         isRecognized: Bool,
                         source: ScreenshotSource,
                         isHidden: Bool,
                         imageData: Data?,
-                        classification: String?) -> Screenshot {
-        let screenshotToSave = Screenshot(context: managedObjectContext)
+                        uploadedImageURL: String?,
+                        syteJsonString: String?) -> Screenshot {
+        
+        var current:Screenshot? = nil;
+        var wasHidden:Bool? = nil
+        if upsert {
+            current = managedObjectContext.screenshotWith(assetId: assetId)
+            wasHidden = current?.isHidden
+            
+            if  current == nil {
+                if let uploadedImageURL = uploadedImageURL {
+                    current = managedObjectContext.screenshotWith(imageUrl: uploadedImageURL)
+                    wasHidden = current?.isHidden
+                }
+            }
+        }
+       
+        
+        let screenshotToSave = current ?? Screenshot(context: managedObjectContext)
+        
         screenshotToSave.assetId = assetId
         screenshotToSave.createdAt = createdAt
         screenshotToSave.isRecognized = isRecognized
@@ -152,16 +170,13 @@ extension DataModel {
         screenshotToSave.isHidden = isHidden
         screenshotToSave.isNew = true
         screenshotToSave.imageData = imageData
-        
+        screenshotToSave.uploadedImageURL = uploadedImageURL
+        screenshotToSave.syteJson = syteJsonString
+
         screenshotToSave.lastModified = Date()
-        if let classification = classification {
-            screenshotToSave.syteJson = classification // Dual-purposing syteJson field
-        }
-        do {
-            try managedObjectContext.save()
-        } catch {
-            self.receivedCoreDataError(error: error)
-            print("Failed to saveScreenshot")
+        
+        if current == nil || (wasHidden == true && isHidden == false) {
+            Analytics.trackScreenshotCreated(screenshot: screenshotToSave)
         }
         return screenshotToSave
     }
@@ -223,46 +238,33 @@ extension DataModel {
         return nil
     }
     
-    public func hideFromProductBar(_ productObjectIDs: [NSManagedObjectID]) {
-        performBackgroundTask { (managedObjectContext) in
-            do {
-                productObjectIDs.forEach { productObjectId in
-                    if let product = managedObjectContext.object(with: productObjectId) as? Product {
-                        do{
-                            try product.validateForUpdate()
-                            product.hideFromProductBar = true
-                        } catch{
-
-                        }
-                        
-                        
-                    }
-                }
-                try managedObjectContext.save()
-            } catch {
-                self.receivedCoreDataError(error: error)
-                print("hideFromProductBar productObjectIDs catch error:\(error)")
-            }
-        }
-    }
-    
-    public func hide(screenshotOIDArray: [NSManagedObjectID]) {
+    public func hide(screenshotOIDArray: [NSManagedObjectID], kind:Analytics.AnalyticsScreenshotDeletedKind) {
         performBackgroundTask { (managedObjectContext) in
             do {
                 screenshotOIDArray.forEach { screenshotOID in
                     if let screenshot = managedObjectContext.object(with: screenshotOID) as? Screenshot {
-                        Analytics.trackScreenshotDeleted(screenshot: screenshot, kind: .multi)
+                        Analytics.trackScreenshotDeleted(screenshot: screenshot, kind: kind)
                         do{
                             try screenshot.validateForUpdate()
                             screenshot.isHidden = true
+                            screenshot.isNew = false
                             screenshot.hideWorkhorse()
+                            UserAccountManager.shared.deleteScreenshot(screenshot: screenshot)
                         } catch{
                             
                         }
-                        
-                        
                     }
                 }
+                let request:NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
+                request.predicate = NSPredicate(format: "isHidden == FALSE AND isRecognized == TRUE AND sourceString != %@", ScreenshotSource.shuffle.rawValue)
+                if let count =  try? managedObjectContext.count(for: request) {
+                    if count == 0{
+                        //convert from different enums
+                        let kind:Analytics.AnalyticsScreenshotDeletedAllKind = (kind == .single) ? .single : .multi
+                        Analytics.trackScreenshotDeletedAll(amountJustDeleted: screenshotOIDArray.count, kind:kind)
+                    }
+                }
+
                 try managedObjectContext.save()
             } catch {
                 self.receivedCoreDataError(error: error)
@@ -283,6 +285,11 @@ extension DataModel {
                        b1x: Double,
                        b1y: Double,
                        optionsMask: ProductsOptionsMask) -> Shoppable {
+        
+        if let current =  (screenshot.shoppables as? Set<Shoppable>)?.first(where: { $0.offersURL == offersURL } ){
+            return current
+        }
+        
         let shoppableToSave = Shoppable(context: managedObjectContext)
         shoppableToSave.screenshot = screenshot
         let spellingMap = ["Bodypart" : "Body Part",
@@ -347,7 +354,7 @@ extension DataModel {
     
     // Save a new Product to Core Data.
     func saveProduct(managedObjectContext: NSManagedObjectContext,
-                     shoppable: Shoppable,
+                     shoppable: Shoppable?,
                      order: Int16,
                      productDescription: String?,
                      price: String?,
@@ -360,10 +367,15 @@ extension DataModel {
                      imageURL: String?,
                      merchant: String?,
                      partNumber: String?,
+                     id: String?,
                      color: String?,
                      sku: String?,
                      fallbackPrice: Float,
                      optionsMask: Int32) -> Product {
+        if let current =  (shoppable?.products as? Set<Product>)?.first(where: { $0.offer == offer } ){
+            return current
+        }
+        
         let productToSave = Product(context: managedObjectContext)
         productToSave.shoppable = shoppable
         productToSave.order = order
@@ -373,17 +385,92 @@ extension DataModel {
         productToSave.floatPrice = floatPrice
         productToSave.floatOriginalPrice = floatOriginalPrice
         productToSave.categories = categories
+        productToSave.label = shoppable?.label
         productToSave.brand = brand
         productToSave.offer = offer
         productToSave.imageURL = imageURL
         productToSave.merchant = merchant
         productToSave.partNumber = partNumber
+        productToSave.id = id
         productToSave.color = color
         productToSave.sku = sku
         productToSave.fallbackPrice = fallbackPrice
         productToSave.optionsMask = optionsMask
         productToSave.dateRetrieved = Date()
         return productToSave
+    }
+    
+    func saveOrphanedProduct(managedObjectContext: NSManagedObjectContext, serverDict dict: NSDictionary) -> Product? {
+        if let price = dict["price"] as? String,
+          let imageURL = dict["imageUrl"] as? String,
+          let productDescription = dict["productDescription"] as? String,
+          let offer = dict["offer"] as? String,
+          let floatPriceNumber = dict["floatPrice"] as? NSNumber {
+            let floatPrice = floatPriceNumber.floatValue
+            let originalPrice = dict["originalPrice"] as? String
+            var floatOriginalPrice: Float =  0
+            if let p = dict["floatOriginalPrice"] as? NSNumber {
+                floatOriginalPrice = p.floatValue
+            }
+            let categories = dict["categories"] as? String
+            let brand = dict["brand"] as? String
+            let merchant = dict["merchant"] as? String
+            let partNumber = dict["partNumber"] as? String
+            let id = dict["id"] as? String
+            let color = dict["color"] as? String
+            let sku = dict["sku"] as? String
+            let fallbackPriceNumber =  dict["fallbackPrice"] as? NSNumber
+            let fallbackPrice = fallbackPriceNumber?.floatValue ?? 0.0
+            var optionsMask = ProductsOptionsMask.global.rawValue
+            if let option = dict["optionsMask"] as? NSNumber {
+                optionsMask = option.intValue
+            }
+            let orphanedProduct = saveProduct(managedObjectContext: managedObjectContext,
+                                              shoppable: nil,
+                                              order: 0,
+                                              productDescription: productDescription,
+                                              price: price,
+                                              originalPrice: originalPrice,
+                                              floatPrice: floatPrice,
+                                              floatOriginalPrice: floatOriginalPrice,
+                                              categories: categories,
+                                              brand: brand,
+                                              offer: offer,
+                                              imageURL: imageURL,
+                                              merchant: merchant,
+                                              partNumber: partNumber,
+                                              id: id,
+                                              color: color,
+                                              sku: sku,
+                                              fallbackPrice: fallbackPrice,
+                                              optionsMask: Int32(optionsMask))
+            managedObjectContext.saveIfNeeded()
+            return orphanedProduct
+        }
+        return nil
+    }
+    
+    func saveOrphanedProduct(serverDict: NSDictionary) -> Promise<NSManagedObjectID> {
+        return Promise { fulfill, reject in
+            self.performBackgroundTask { managedObjectContext in
+                if let orphanedProduct = self.saveOrphanedProduct(managedObjectContext: managedObjectContext, serverDict: serverDict) {
+                    fulfill(orphanedProduct.objectID)
+                } else {
+                    reject(NSError(domain: "Craze", code: 120, userInfo: [NSLocalizedDescriptionKey : "save orphaned product fail"]))
+                }
+            }
+        }
+    }
+    
+    // Returns a Product that is from the mainMoc for the main thread.
+    func mainSafeOrphanedProduct(serverDict: NSDictionary) -> Promise<Product> {
+        return saveOrphanedProduct(serverDict: serverDict).then(on: .main) { orphanedProductOID -> Promise<Product> in
+            if let orphanedProduct = self.mainMoc().object(with: orphanedProductOID) as? Product {
+                return Promise(value: orphanedProduct)
+            } else {
+                return Promise(error: NSError(domain: "Craze", code: 121, userInfo: [NSLocalizedDescriptionKey : "retrieve orphaned product fail"]))
+            }
+        }
     }
     
     func retrieveProduct(managedObjectContext: NSManagedObjectContext, partNumber: String) -> Product? {
@@ -402,66 +489,179 @@ extension DataModel {
         return nil
     }
     
-    func deleteVariants(managedObjectContext: NSManagedObjectContext, product: Product, shouldUpdateDateChecked: Bool = true) {
-        if shouldUpdateDateChecked {
-            product.dateCheckedStock = Date()
+    func retrieveProduct(managedObjectContext: NSManagedObjectContext, id: String) -> Product? {
+        let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "id == %@", id)
+        fetchRequest.sortDescriptors = nil //[NSSortDescriptor(key: "createdAt", ascending: false)]
+        fetchRequest.fetchLimit = 1
+        
+        do {
+            let results = try managedObjectContext.fetch(fetchRequest)
+            return results.first
+        } catch {
+            self.receivedCoreDataError(error: error)
+            print("retrieveProduct id:\(id) results with error:\(error)")
         }
-        if product.hasVariants {
-            let variants = product.availableVariants as? Set<Variant>
-            variants?.forEach { managedObjectContext.delete($0) }
-            product.hasVariants = false
-        }
+        return nil
     }
     
-    func partNumbers(screenshotOID: NSManagedObjectID) -> Promise<[String]> {
-        return Promise { fulfill, reject in
-            self.performBackgroundTask { managedObjectContext in
-                let fetchRequest: NSFetchRequest<NSDictionary> = NSFetchRequest(entityName: "Product")
-                fetchRequest.resultType = .dictionaryResultType
-                fetchRequest.returnsObjectsAsFaults = false
-                fetchRequest.includesSubentities = false
-                fetchRequest.returnsDistinctResults = true
-                fetchRequest.propertiesToFetch = ["partNumber"]
-                fetchRequest.fetchLimit = 600
-                let optionsMaskInt = ProductsOptionsMask.global.rawValue
-                let anHourAgo = NSDate(timeIntervalSinceNow: -60 * 60)
-                fetchRequest.predicate = NSPredicate(format: "shoppable.screenshot == %@ AND (optionsMask & %d) == %d AND ( dateCheckedStock == nil || dateCheckedStock < %@ )", screenshotOID, optionsMaskInt, optionsMaskInt, anHourAgo)
-                fetchRequest.sortDescriptors = nil
-                
-                do {
-                    let results = try managedObjectContext.fetch(fetchRequest)
-                    let partNumbers = results.compactMap { $0["partNumber"] as? String }
-                    if partNumbers.count > 0 {
-                        fulfill(partNumbers)
-                        return
-                    }
-                } catch {
-                    self.receivedCoreDataError(error: error)
-                    print("partNumbers results with error:\(error)")
-                }
-                let error = NSError(domain: "Craze", code: 78, userInfo: [NSLocalizedDescriptionKey : "No partNumbers to check."])
-                reject(error)
+    func retrieveProduct(managedObjectContext: NSManagedObjectContext, imageURL: String) -> Product? {
+        let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "imageURL == %@", imageURL)
+        fetchRequest.sortDescriptors = nil //[NSSortDescriptor(key: "createdAt", ascending: false)]
+        fetchRequest.fetchLimit = 1
+        
+        do {
+            let results = try managedObjectContext.fetch(fetchRequest)
+            return results.first
+        } catch {
+            self.receivedCoreDataError(error: error)
+            print("retrieveProduct imageURL:\(imageURL) results with error:\(error)")
+        }
+        return nil
+    }
+    
+    func markProductNotInNotif(imageURL: String) {
+        self.performBackgroundTask { managedObjectContext in
+            let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
+            fetchRequest.predicate = NSPredicate(format: "imageURL == %@", imageURL)
+            fetchRequest.sortDescriptors = nil //[NSSortDescriptor(key: "createdAt", ascending: false)]
+            
+            do {
+                let results = try managedObjectContext.fetch(fetchRequest)
+                results.forEach { $0.inNotif = false }
+                managedObjectContext.saveIfNeeded()
+            } catch {
+                self.receivedCoreDataError(error: error)
+                print("markProductNotInNotif imageURL:\(imageURL) results with error:\(error)")
             }
         }
     }
     
-    func markOutOfStock(managedObjectContext: NSManagedObjectContext, partNumbers: [String]) {
-        guard partNumbers.count > 0 else {
-            return
-        }
-        
-        let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "partNumber IN %@", partNumbers)
-        
-        do {
-            let results = try managedObjectContext.fetch(fetchRequest)
-            results.forEach { deleteVariants(managedObjectContext: managedObjectContext, product: $0) }
-            managedObjectContext.saveIfNeeded()
-        } catch {
-            self.receivedCoreDataError(error: error)
-            print("markOutOfStock results with error:\(error)")
+    func markScreenshotNotInNotif(assetId: String) {
+        self.performBackgroundTask { managedObjectContext in
+            let fetchRequest: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
+            fetchRequest.predicate = NSPredicate(format: "assetId == %@", assetId)
+            fetchRequest.sortDescriptors = nil //[NSSortDescriptor(key: "createdAt", ascending: false)]
+            
+            do {
+                let results = try managedObjectContext.fetch(fetchRequest)
+                results.forEach { $0.inNotif = false }
+                managedObjectContext.saveIfNeeded()
+            } catch {
+                self.receivedCoreDataError(error: error)
+                print("markScreenshotNotInNotif assetId:\(assetId) results with error:\(error)")
+            }
         }
     }
+    
+    func markProductHasPriceAlerts(id: String) {
+        self.performBackgroundTask { managedObjectContext in
+            let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
+            fetchRequest.predicate = NSPredicate(format: "id == %@ AND hasPriceAlerts == FALSE", id)
+            fetchRequest.sortDescriptors = nil //[NSSortDescriptor(key: "createdAt", ascending: false)]
+            
+            do {
+                let results = try managedObjectContext.fetch(fetchRequest)
+                results.forEach { $0.hasPriceAlerts = true }
+                managedObjectContext.saveIfNeeded()
+            } catch {
+                self.receivedCoreDataError(error: error)
+                print("markProductHasPriceAlerts id:\(id) results with error:\(error)")
+            }
+        }
+    }
+    
+    func updateProductPrice(id: String, updatedPrice: Float?, updatedCurrency: String) -> Promise<String> {
+        return Promise { fulfill, reject in
+            self.performBackgroundTask { managedObjectContext in
+                if let updatedPrice = updatedPrice,
+                  let formattedUpdatePrice = self.formattedPrice(price: updatedPrice, currency: updatedCurrency),
+                  let product = self.retrieveProduct(managedObjectContext: managedObjectContext, id: id) {
+                    product.floatPrice = updatedPrice
+                    product.price = formattedUpdatePrice
+                    managedObjectContext.saveIfNeeded()
+                }
+                fulfill(id)
+            }
+        }
+    }
+    
+    func retrieveLatestFavorite(in context:NSManagedObjectContext) -> Product? {
+        let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
+        let twoMonthsAgo = NSDate(timeIntervalSinceNow: -60 * TimeInterval.oneDay)
+        fetchRequest.predicate = NSPredicate(format: "isFavorite == TRUE AND inNotif == FALSE AND imageURL != nil AND dateFavorited > %@", twoMonthsAgo)
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "dateFavorited", ascending: false)]
+        fetchRequest.fetchLimit = 1
+        do {
+            let results = try context.fetch(fetchRequest)
+            if let latest = results.first {
+                return latest
+            }
+        } catch {
+            self.receivedCoreDataError(error: error)
+            
+        }
+        return nil
+    }
+    
+    func retrieveLatestTapped(in context:NSManagedObjectContext) -> Product? {
+        let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
+        let aMonthAgo = NSDate(timeIntervalSinceNow: -30 * TimeInterval.oneDay)
+        fetchRequest.predicate = NSPredicate(format: "isFavorite == FALSE AND inNotif == FALSE AND imageURL != nil AND dateViewed > %@", aMonthAgo)
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "dateViewed", ascending: false)]
+        fetchRequest.fetchLimit = 1
+        
+        do {
+            let results = try context.fetch(fetchRequest)
+            return results.first
+        } catch {
+            self.receivedCoreDataError(error: error)
+            print("retrieveLatestTapped results with error:\(error)")
+            
+        }
+        return nil
+    }
+    
+    func retrieveSaleScreenshot(in context:NSManagedObjectContext) -> Screenshot? {
+        let fetchRequest: NSFetchRequest<Shoppable> = Shoppable.fetchRequest()
+        let twoMonthsAgo = NSDate(timeIntervalSinceNow: -60 * TimeInterval.oneDay)
+        fetchRequest.predicate = NSPredicate(format: "screenshot.lastModified > %@ AND screenshot.inNotif == FALSE AND screenshot.isHidden == FALSE AND screenshot.imageData != nil AND (SUBQUERY(products, $x, ($x.order == 0 OR $x.order == 1) AND $x.floatPrice < $x.floatOriginalPrice).@count == 2)", twoMonthsAgo)
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "screenshot.lastModified", ascending: false)]
+        fetchRequest.fetchLimit = 1
+        
+        do {
+            let results = try context.fetch(fetchRequest)
+            if let latestShoppable = results.first,
+                let latestScreenshot = latestShoppable.screenshot {
+                return latestScreenshot
+            }
+        } catch {
+            self.receivedCoreDataError(error: error)
+            print("retrieveSaleScreenshot results with error:\(error)")
+        }
+        return nil
+    }
+    
+    func retrieveSimilarLook(in context:NSManagedObjectContext) -> Screenshot? {
+        let fetchRequest: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
+        let twoMonthsAgo = NSDate(timeIntervalSinceNow: -60 * TimeInterval.oneDay)
+        fetchRequest.predicate = NSPredicate(format: "lastModified > %@ AND inNotif == FALSE AND isHidden == FALSE AND imageData != nil", twoMonthsAgo)
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "lastModified", ascending: false)]
+        fetchRequest.fetchLimit = 1
+        
+        do {
+            let results = try context.fetch(fetchRequest)
+            if let latestScreenshot = results.first {
+                return latestScreenshot
+            }
+        } catch {
+            self.receivedCoreDataError(error: error)
+            print("retrieveSimilarLook results with error:\(error)")
+        }
+        return nil
+    }
+
     
     func parseFloat(_ anyValueOptional: Any?) -> Float? {
         if anyValueOptional == nil {
@@ -479,220 +679,58 @@ extension DataModel {
         }
         return nil
     }
-
-    // Save a new Variant to Core Data.
-    func saveVariant(managedObjectContext: NSManagedObjectContext,
-                     product: Product,
-                     color: String?,
-                     size: String?,
-                     price: Float,
-                     sku: String,
-                     url: String?,
-                     imageURLs: String?) -> Variant {
-        let variantToSave = Variant(context: managedObjectContext)
-        variantToSave.product = product
-        variantToSave.color = color
-        variantToSave.size = size
-        variantToSave.price = price
-        variantToSave.sku = sku
-        variantToSave.url = url
-        variantToSave.imageURLs = imageURLs
-        return variantToSave
-    }
-    
-    func saveVariantsFromDictionary(managedObjectContext: NSManagedObjectContext, rootProduct: Product, dict: NSDictionary, shouldSave: Bool = true) -> Bool {
-        rootProduct.altImageURLs = (dict["alt_images"] as? [String])?.joined(separator: ",")
-        rootProduct.detailedDescription = dict["description"] as? String
-        rootProduct.name = dict["name"] as? String
-        rootProduct.url = dict["url"] as? String
-        if let dictPrice = self.parseFloat(dict["price"]) ?? self.parseFloat(dict["discount_price"]) ?? self.parseFloat(dict["retail_price"]) {
-            rootProduct.fallbackPrice = dictPrice
-        }
+   
+   
+    func cutOffDate() -> NSDate {
+        var dates: [Date] = []
         
-        var hasVariants = false
-        let colors = dict["colors"] as? [[String : Any]]
-        colors?.forEach { color in
-            let colorString = color["color"] as? String
-            let colorPrice = self.parseFloat(color["sale_price"]) ?? self.parseFloat(color["retail_price"]) ?? rootProduct.fallbackPrice
-            let colorImageURLs = (color["images"] as? [String])?.joined(separator: ",")
-            let sizes = color["sizes"] as? [[String : Any]]
-            sizes?.forEach { size in
-                if let sku = size["id"] as? String,
-                    !sku.isEmpty {
-                    let _ = self.saveVariant(managedObjectContext: managedObjectContext,
-                                             product: rootProduct,
-                                             color: colorString,
-                                             size: size["size"] as? String,
-                                             price: self.parseFloat(size["price"])
-                                                ?? self.parseFloat(size["discount_price"])
-                                                ?? self.parseFloat(size["retail_price"])
-                                                ?? colorPrice,
-                                             sku: sku,
-                                             url: size["url"] as? String,
-                                             imageURLs: colorImageURLs)
-                    hasVariants = true
-                    if rootProduct.sku == sku,
-                        let updatedColor = colorString,
-                        !updatedColor.isEmpty,
-                        rootProduct.color != updatedColor {
-                        rootProduct.color = updatedColor
-                    }
-                }
-            }
-        }
-        rootProduct.hasVariants = hasVariants
-        rootProduct.dateCheckedStock = Date()
-        if shouldSave {
-            managedObjectContext.saveIfNeeded()
-        }
-        return hasVariants
-    }
-    
-    func retrieveAddableCart(managedObjectContext: NSManagedObjectContext) -> Cart? {
-        let fetchRequest: NSFetchRequest<Cart> = Cart.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "isPastOrder == FALSE")
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "dateModified", ascending: false)]
-        fetchRequest.fetchBatchSize = 1
-        fetchRequest.fetchLimit = 1
-        
-        do {
-            let results = try managedObjectContext.fetch(fetchRequest)
-            if let mostRecentAddableCart = results.first {
-                return mostRecentAddableCart
-            }
-        } catch {
-            self.receivedCoreDataError(error: error)
-            print("retrieveAddableCart results with error:\(error)")
-        }
-        return nil
-    }
-    
-    func retrieveCart(managedObjectContext: NSManagedObjectContext, remoteId: String) -> Cart? {
-        let fetchRequest: NSFetchRequest<Cart> = Cart.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "remoteId == %@", remoteId)
-        fetchRequest.sortDescriptors = nil
-        fetchRequest.fetchBatchSize = 1
-        fetchRequest.fetchLimit = 1
-        
-        do {
-            let results = try managedObjectContext.fetch(fetchRequest)
-            if let cart = results.first {
-                return cart
-            }
-        } catch {
-            self.receivedCoreDataError(error: error)
-            print("retrieveAddableCart results with error:\(error)")
-        }
-        return nil
-    }
-    
-    func retrieveOrCreateAddableCart(managedObjectContext: NSManagedObjectContext) -> Cart? {
-        if let mostRecentAddableCart = retrieveAddableCart(managedObjectContext: managedObjectContext) {
-            return mostRecentAddableCart
+        var installDate: Date
+        if let UserDefaultsInstallDate = UserDefaults.standard.object(forKey: UserDefaultsKeys.dateInstalled) as? Date {
+            installDate = UserDefaultsInstallDate
         } else {
-            do {
-                let cartToSave = Cart(context: managedObjectContext)
-                cartToSave.dateModified = Date()
-                try managedObjectContext.save()
-                // Return quickly; add remoteId leisurely.
-                ShoppingCartModel.shared.addRemoteId(cartOID: cartToSave.objectID)
-                return cartToSave
-            } catch {
-                self.receivedCoreDataError(error: error)
-                print("retrieveOrCreateAddableCart results with error:\(error)")
-            }
-            return nil
+            installDate = Date()
+            UserDefaults.standard.set(installDate, forKey: UserDefaultsKeys.dateInstalled)
         }
-    }
-
-    func retrieveItems(managedObjectContext: NSManagedObjectContext, remoteId: String) -> [CartItem]? {
-        let fetchRequest: NSFetchRequest<CartItem> = CartItem.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "cart.remoteId == %@", remoteId)
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "dateModified", ascending: false)]
-
-        do {
-            let results = try managedObjectContext.fetch(fetchRequest)
-            return results
-        } catch {
-            self.receivedCoreDataError(error: error)
-            print("retrieveItems results with error:\(error)")
+        
+        dates.append(installDate)
+        dates.append(Date(timeIntervalSinceNow: -.oneDay))
+        
+        if let date = UserDefaults.standard.value(forKey: UserDefaultsKeys.processBackgroundImagesForFashionAfterDate) as? Date {
+            dates.append(date)
         }
-        return nil
-    }
-    
-    // Errors if cart not previously created. Okay if cart has no remoteId.
-    func retrieveForCheckout() -> Promise<([String : Any], NSManagedObjectID)> {
-        return Promise { fulfill, reject in
-            performBackgroundTask { (managedObjectContext) in
-                guard let cart = self.retrieveAddableCart(managedObjectContext: managedObjectContext),
-                  let items = cart.items?.sortedArray(using: []) as? [CartItem],
-                  items.count > 0 else {
-                    let error = NSError(domain: "Craze", code: 38, userInfo: [NSLocalizedDescriptionKey : "No cart with cartItems before checkout."])
-                    reject(error)
-                    return
-                }
-                var purchaseItems: [[String : Any]] = []
-                for item in items {
-                    let quantity = item.quantity
-                    if let sku = item.sku,
-                        !sku.isEmpty,
-                        quantity > 0 {
-                        purchaseItems.append(["sku" : sku, "qty" : quantity])
-                    }
-                }
-                guard purchaseItems.count > 0 else {
-                    let error = NSError(domain: "Craze", code: 39, userInfo: [NSLocalizedDescriptionKey : "No cartItems with sku and positive quantity to checkout."])
-                    reject(error)
-                    return
-                }
-                fulfill((["id" : cart.remoteId ?? "", "items" : purchaseItems], cart.objectID))
-            }
-        }
-    }
-    
-    // Errors if cart has no remoteId.
-    func retrieveForNativeCheckout() -> Promise<String> {
-        return Promise { fulfill, reject in
-            performBackgroundTask { (managedObjectContext) in
-                if let cart = self.retrieveAddableCart(managedObjectContext: managedObjectContext),
-                  let remoteId = cart.remoteId,
-                  !remoteId.isEmpty {
-                    fulfill(remoteId)
-                } else {
-                    let error = NSError(domain: "Craze", code: 80, userInfo: [NSLocalizedDescriptionKey : "nativeCheckout with no remoteId"])
-                    reject(error)
-                }
-            }
-        }
-    }
-    
-    func add(remoteId: String, toCartOID: NSManagedObjectID) {
-        performBackgroundTask { (managedObjectContext) in
-            do {
-                guard let cart = managedObjectContext.object(with: toCartOID) as? Cart,
-                  cart.remoteId == nil else {
-                        return
-                }
-                cart.remoteId = remoteId
-                try managedObjectContext.save()
-            } catch {
-                DataModel.sharedInstance.receivedCoreDataError(error: error)
-                print("add remoteId:\(remoteId) toCartOID:\(toCartOID) results with error:\(error)")
-            }
-        }
+        
+        let cutOffDate = dates.max() ?? installDate
+        return cutOffDate as NSDate
     }
     
     func saveMatchstick(managedObjectContext: NSManagedObjectContext,
                         remoteId: String,
                         imageUrl: String,
-                        syteJson: String,
-                        trackingInfo: String?) -> Matchstick {
+                        properties:[String:[String]]?
+                        ) -> Matchstick? {
+        let fetchRequest: NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "imageUrl == %@", imageUrl)
+        fetchRequest.sortDescriptors = nil
+        
+        let results = try? managedObjectContext.fetch(fetchRequest)
+        if let first = results?.first {
+            return first
+        }
         let matchstickToSave = Matchstick(context: managedObjectContext)
         matchstickToSave.remoteId = remoteId
         matchstickToSave.imageUrl = imageUrl
-        matchstickToSave.syteJson = syteJson
+        if let properties = properties {
+            if JSONSerialization.isValidJSONObject(properties), let data = try? JSONSerialization.data(withJSONObject: properties, options: []), let string = String.init(data: data, encoding: .utf8) {
+                matchstickToSave.propertiesJson = string
+            }
+            
+            matchstickToSave.isMale = properties["genders"]?.contains("male")  ?? false
+            matchstickToSave.isFemale = properties["genders"]?.contains("female") ?? false
+            matchstickToSave.tags = (properties["tags"])?.map{ "[\($0)]" }.joined(separator: ",")
+        }
         matchstickToSave.receivedAt = Date()
-        matchstickToSave.trackingInfo = trackingInfo
+        
+
         return matchstickToSave
     }
     
@@ -701,234 +739,12 @@ extension DataModel {
         fetchRequest.predicate = NSPredicate(format: "imageUrl == %@", imageUrl)
         fetchRequest.sortDescriptors = nil
         
-        do {
-            let results = try managedObjectContext.fetch(fetchRequest)
-            for matchstick in results {
-                matchstick.imageData = imageData
-                matchstick.receivedAt = Date()
-            }
-            try managedObjectContext.save()
-        } catch {
-            self.receivedCoreDataError(error: error)
-            print("addImageDataToMatchstick imageUrl:\(imageUrl) results with error:\(error)")
+        if let results = try? managedObjectContext.fetch(fetchRequest), let matchstick = results.first {
+            matchstick.imageData = imageData
         }
-    }
-    
-    func retrieveMatchstickImageUrlsWithNoData(managedObjectContext: NSManagedObjectContext) -> [String] {
-        let fetchRequest: NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "imageData == nil")
-        fetchRequest.sortDescriptors = nil
-        
-        do {
-            let results = try managedObjectContext.fetch(fetchRequest)
-            if let imageUrls = results.compactMap({$0.imageUrl}).compactMap({$0.copy()}) as? [String] {
-                return imageUrls
-            }
-        } catch {
-            self.receivedCoreDataError(error: error)
-            print("retrieveMatchstickImageUrlsWithNoData results with error:\(error)")
-        }
-        return []
-    }
-    
-    // Returns a Promise of the saved Card that should be used only on the main thread.
-    func saveCard(fullName: String,
-                  number: String,
-                  displayNumber: String,
-                  brand: String,
-                  expirationMonth: Int16,
-                  expirationYear: Int16,
-                  street: String,
-                  city: String,
-                  country: String,
-                  zipCode: String,
-                  state: String?,
-                  email: String?,
-                  phone: String,
-                  isSaved: Bool) -> Promise<Card> {
-        return Promise<NSManagedObjectID> { fulfill, reject in
-            performBackgroundTask { (managedObjectContext) in
-                let cardToSave = Card(context: managedObjectContext)
-                cardToSave.fullName = fullName
-                cardToSave.displayNumber = displayNumber
-                cardToSave.brand = brand
-                cardToSave.expirationMonth = expirationMonth
-                cardToSave.expirationYear = expirationYear
-                cardToSave.street = street
-                cardToSave.city = city
-                cardToSave.country = country
-                cardToSave.zipCode = zipCode
-                cardToSave.state = state
-                cardToSave.email = email
-                cardToSave.phone = phone
-                cardToSave.isSaved = isSaved
-                let now = Date()
-                cardToSave.dateAdded = now
-                cardToSave.dateModified = now
-                do {
-                    try managedObjectContext.save()
-                    let key = cardToSave.cardNumberKeychainKey()
-                    DispatchQueue.global(qos: .utility).async {
-                        KeychainWrapper.standard.set(number, forKey: key)
-                    }
-                    fulfill(cardToSave.objectID)
-                } catch {
-                    DataModel.sharedInstance.receivedCoreDataError(error: error)
-                    reject(error)
-                }
-            }
-            }.then { cardOID -> Promise<Card> in // Defaults to executing on main thread. Good.
-                guard let savedCard = self.mainMoc().object(with: cardOID) as? Card else {
-                    let error = NSError(domain: "Craze", code: 90, userInfo: [NSLocalizedDescriptionKey: "Cannot retrieve recent savedCard oid:\(cardOID)"])
-                    return Promise(error: error)
-                }
-                return Promise(value: savedCard)
-        }
+       
     }
 
-    // Must be run from main thread!!
-    func hasSavedCards() -> Bool {
-        let fetchRequest: NSFetchRequest<Card> = Card.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "isSaved == TRUE")
-        fetchRequest.sortDescriptors = nil
-        fetchRequest.fetchLimit = 1
-        fetchRequest.includesSubentities = false
-        fetchRequest.includesPropertyValues = false
-        
-        do {
-            let count = try mainMoc().count(for: fetchRequest)
-            return count > 0
-        } catch {
-            self.receivedCoreDataError(error: error)
-            print("hasSavedCards results with error:\(error)")
-        }
-        return false
-    }
-
-    // Must be run from main thread!!
-    func hasShippingAddresses() -> Bool {
-        let fetchRequest: NSFetchRequest<ShippingAddress> = ShippingAddress.fetchRequest()
-        fetchRequest.predicate = nil
-        fetchRequest.sortDescriptors = nil
-        fetchRequest.fetchLimit = 1
-        fetchRequest.includesSubentities = false
-        fetchRequest.includesPropertyValues = false
-        
-        do {
-            let count = try mainMoc().count(for: fetchRequest)
-            return count > 0
-        } catch {
-            self.receivedCoreDataError(error: error)
-            print("hasShippingAddresses results with error:\(error)")
-        }
-        return false
-    }
-    
-    var selectedCardURL: URL? {
-        set {
-            UserDefaults.standard.set(newValue, forKey: "checkoutPrimaryCardURL")
-            UserDefaults.standard.synchronize()
-        }
-        get {
-            return UserDefaults.standard.url(forKey: "checkoutPrimaryCardURL")
-        }
-    }
-    
-    var selectedShippingAddressURL: URL? {
-        set {
-            UserDefaults.standard.set(newValue, forKey: "checkoutPrimaryAddressURL")
-            UserDefaults.standard.synchronize()
-        }
-        get {
-            return UserDefaults.standard.url(forKey: "checkoutPrimaryAddressURL")
-        }
-    }
-
-    // Returns a Promise of the saved ShippingAddress that should be used only on the main thread.
-    func saveShippingAddress(firstName: String?,
-                             lastName: String?,
-                             street: String,
-                             city: String,
-                             country: String,
-                             zipCode: String,
-                             state: String?,
-                             phone: String) -> Promise<ShippingAddress> {
-        return Promise<NSManagedObjectID> { fulfill, reject in
-            performBackgroundTask { (managedObjectContext) in
-                let shippingAddressToSave = ShippingAddress(context: managedObjectContext)
-                shippingAddressToSave.firstName = firstName
-                shippingAddressToSave.lastName = lastName
-                shippingAddressToSave.street = street
-                shippingAddressToSave.city = city
-                shippingAddressToSave.country = country
-                shippingAddressToSave.zipCode = zipCode
-                shippingAddressToSave.state = state
-                shippingAddressToSave.phone = phone
-                let now = Date()
-                shippingAddressToSave.dateAdded = now
-                shippingAddressToSave.dateModified = now
-                do {
-                    try managedObjectContext.save()
-                    fulfill(shippingAddressToSave.objectID)
-                } catch {
-                    DataModel.sharedInstance.receivedCoreDataError(error: error)
-                    reject(error)
-                }
-            }
-            }.then { shippingAddressOID -> Promise<ShippingAddress> in // Defaults to executing on main thread. Good.
-                guard let savedShippingAddress = self.mainMoc().object(with: shippingAddressOID) as? ShippingAddress else {
-                    let error = NSError(domain: "Craze", code: 91, userInfo: [NSLocalizedDescriptionKey: "Cannot retrieve recent savedShippingAddress oid:\(shippingAddressOID)"])
-                    return Promise(error: error)
-                }
-                return Promise(value: savedShippingAddress)
-        }
-    }
-
-    func saveShippingAddress(fullName: String,
-                             street: String,
-                             city: String,
-                             country: String,
-                             zipCode: String,
-                             state: String?,
-                             phone: String) -> Promise<ShippingAddress> {
-        let tuple = NetworkingPromise.sharedInstance.divideByLastSpace(fullName: fullName)
-        return saveShippingAddress(firstName: tuple.0,
-                                   lastName: tuple.1,
-                                   street: street,
-                                   city: city,
-                                   country: country,
-                                   zipCode: zipCode,
-                                   state: state,
-                                   phone: phone)
-    }
-    
-    func deleteTemporaryCards(managedObjectContext: NSManagedObjectContext) {
-        let fetchRequest: NSFetchRequest<Card> = Card.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "isSaved == FALSE")
-        fetchRequest.sortDescriptors = nil
-        
-        do {
-            let results = try managedObjectContext.fetch(fetchRequest)
-            for card in results {
-                if card.objectID.uriRepresentation() == selectedCardURL {
-                    selectedCardURL = nil
-                }
-                
-                managedObjectContext.delete(card)
-            }
-            try managedObjectContext.save()
-        } catch {
-            self.receivedCoreDataError(error: error)
-            print("deleteTemporaryCards results with error:\(error)")
-        }
-    }
-    
-    func deleteAllTemporaryCards() {
-        performBackgroundTask { (managedObjectContext) in
-            self.deleteTemporaryCards(managedObjectContext: managedObjectContext)
-        }
-    }
-    
     // See: https://stackoverflow.com/questions/42733574/nspersistentcontainer-concurrency-for-saving-to-core-data
     // I thought dataModel.persistentContainer.performBackgroundTask ran against a single internal serial queue.
     // But it only runs against a private queue, and each call may have its own private queue running in parallel.
@@ -954,11 +770,6 @@ extension DataModel {
                 let results = try managedObjectContext.fetch(fetchRequest)
                 for product in results {
                     product.isFavorite = toFavorited
-                    if toFavorited {
-                        product.track()
-                    }else{
-                        product.untrack()
-                    }
                     if toFavorited == false {
                         product.dateViewed  = nil
                     }
@@ -966,7 +777,6 @@ extension DataModel {
                         let now = Date()
                         product.dateFavorited = now
                         product.dateSortProductBar = product.getSortDateForProductBar()
-                        product.hideFromProductBar = false
                         if let screenshot = product.shoppable?.screenshot {
                             screenshot.addToFavorites(product)
                             if let favoritesCount = screenshot.favorites?.count {
@@ -976,6 +786,8 @@ extension DataModel {
                             }
                             screenshot.lastFavorited = now
                         }
+                        UserAccountManager.shared.uploadFavorites(product: product)
+
                     } else {
                         product.dateFavorited = nil
                         if let screenshot = product.shoppable?.screenshot {
@@ -987,55 +799,19 @@ extension DataModel {
                                 screenshot.lastFavorited = nil
                             }
                         }
+                        UserAccountManager.shared.deleteFavorite(product: product)
                     }
                 }
                 try managedObjectContext.save()
                 
                 if toFavorited {
-                    let score = UserDefaults.standard.integer(forKey: UserDefaultsKeys.gameScore)
-                    UserDefaults.standard.set(score + 1, forKey: UserDefaultsKeys.gameScore)
-                    AccumulatorModel.favorite.incrementUninformedCount()
+                    AccumulatorModel.favoriteUninformed.incrementUninformedCount()
                 }else{
-                    AccumulatorModel.favorite.decrementUninformedCount(by:1)
+                    AccumulatorModel.favoriteUninformed.decrementUninformedCount(by:1)
                 }
             } catch {
                 self.receivedCoreDataError(error: error)
                 print("favorite toFavorited:\(toFavorited) results with error:\(error)")
-            }
-        }
-    }
-    
-    public func unfavorite(favoriteArray: [Product]) {
-        let moiArray = favoriteArray.map { $0.objectID }
-        self.unfavorite(favoriteArray: moiArray)
-    }
-    
-    public func unfavorite(favoriteArray: [NSManagedObjectID]) {
-        let moiArray = favoriteArray
-        
-        
-        self.performBackgroundTask { (managedObjectContext) in
-            let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
-            fetchRequest.predicate = NSPredicate(format: "SELF IN %@", moiArray)
-            fetchRequest.sortDescriptors = nil
-            
-            do {
-                let results = try managedObjectContext.fetch(fetchRequest)
-                for product in results {
-                    if let screenshot = product.screenshot {
-                        screenshot.removeFromFavorites(product)
-                        screenshot.favoritesCount -= 1
-                    }
-                    product.isFavorite = false
-                    product.dateFavorited = nil
-                    AccumulatorModel.favorite.decrementUninformedCount(by:results.count)
-                    product.untrack()
-                }
-                try managedObjectContext.save()
-                
-            } catch {
-                self.receivedCoreDataError(error: error)
-                print("unfavorite objectIDs:\(moiArray) results with error:\(error)")
             }
         }
     }
@@ -1083,43 +859,12 @@ extension DataModel {
         return count
     }
     
-    func countMatchsticks(managedObjectContext: NSManagedObjectContext) -> Int {
-        let fetchRequest: NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
-        fetchRequest.predicate = nil
-        fetchRequest.resultType = .countResultType
-        fetchRequest.includesSubentities = false
-        
-        var count: Int = 0
-        do {
-            count = try managedObjectContext.count(for: fetchRequest)
-        } catch {
-            self.receivedCoreDataError(error: error)
-            print("countMatchsticks results with error:\(error)")
-        }
-        return count
-    }
-    
-    func isNextMatchsticksNeeded(matchstickCount: Int) -> Bool {
-        let lowWatermark = 20
-        return matchstickCount <= lowWatermark
-    }
-    
-    // Returns a promise of the count of matchsticks in the DB,
-    // and, crucially, errors if above the low water mark,
-    // allowing chained promises to not execute.
-    public func nextMatchsticksIfNeeded() -> Promise<Int> {
-        return Promise { fulfill, reject in
-            performBackgroundTask { (managedObjectContext) in
-                let matchstickCount = self.countMatchsticks(managedObjectContext: managedObjectContext)
-                if self.isNextMatchsticksNeeded(matchstickCount: matchstickCount) {
-                    fulfill(matchstickCount)
-                } else {
-                    // Not really an error. Just an easy way to cancel further processing.
-                    let error = NSError(domain: "Craze", code: 24, userInfo: [NSLocalizedDescriptionKey : "Good. We have enough, \(matchstickCount) matchsticks."])
-                    reject(error)
-                }
-            }
-        }
+    func formattedPrice(price: Float, currency: String) -> String? {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        let localeIdentifier = Locale.identifier(fromComponents: [NSLocale.Key.currencyCode.rawValue: currency])
+        formatter.locale = Locale(identifier: localeIdentifier)
+        return formatter.string(from: NSNumber(value: price))
     }
     
     // MARK: DB Migration
@@ -1139,18 +884,8 @@ extension DataModel {
                 let managedObjectContext = container.newBackgroundContext()
                 self.initializeFavoritesSets(managedObjectContext: managedObjectContext)
                 self.cleanDeletedScreenshots(managedObjectContext: managedObjectContext)
-                self.fixProductFiltersNoClassification(managedObjectContext: managedObjectContext)
-                self.fixProductsNoClassification(managedObjectContext: managedObjectContext)
             }
             op.queuePriority = .veryHigh // Earlier actions may have already been queued - make sure migration is at the top of the list.
-            self.dbQ.addOperation(op)
-        }
-        if from < 18 && to >= 18 && installDate != nil {
-            let op = BlockOperation{
-                let managedObjectContext = container.newBackgroundContext()
-                self.moveCartItemsToFavorites(managedObjectContext: managedObjectContext)
-            }
-            op.queuePriority = .veryHigh   // Earlier actions may have already been queued - make sure migration is at the top of the list.
             self.dbQ.addOperation(op)
         }
     }
@@ -1233,56 +968,47 @@ extension DataModel {
         }
     }
     
-    func fixProductFiltersNoClassification(managedObjectContext: NSManagedObjectContext) {
-        let noClassificationPredicate = NSPredicate(format: "(optionsMask & 192) == 0")
-        let fetchRequest: NSFetchRequest<ProductFilter> = ProductFilter.fetchRequest()
-        fetchRequest.predicate = noClassificationPredicate
-        fetchRequest.sortDescriptors = nil
-        
-        do {
-            let results = try managedObjectContext.fetch(fetchRequest)
-            for productFilter in results {
-                productFilter.optionsMask |= Int32(ProductsOptionsMask.categoryFashion.rawValue)
+    // Clean out unneeded screenshots, shoppables and products.
+    // Only safe to call if not currently looking at a burrow.
+    func cleanDB() {
+        performBackgroundTask { (managedObjectContext) in
+            do {
+                let screenshotRequest: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
+                screenshotRequest.predicate = NSPredicate(format: "isHidden == TRUE AND createdAt < %@", self.cutOffDate())
+                let screenshots = try managedObjectContext.fetch(screenshotRequest)
+                
+                let shoppableRequest: NSFetchRequest<Shoppable> = Shoppable.fetchRequest()
+                shoppableRequest.predicate = NSPredicate(format: "screenshot == nil", screenshots)
+                let shoppables = try managedObjectContext.fetch(shoppableRequest)
+
+                let favoriteRequest: NSFetchRequest<Product> = Product.fetchRequest()
+                favoriteRequest.predicate = NSPredicate(format: "isFavorite == TRUE AND (screenshot IN %@ OR shoppable IN %@)", screenshots, shoppables)
+                let favorites = try managedObjectContext.fetch(favoriteRequest)
+                for favorite in favorites {
+                    favorite.screenshot = nil
+                    favorite.shoppable = nil
+                }
+                
+                for screenshot in screenshots {
+                    managedObjectContext.delete(screenshot)
+                }
+                for shoppable in shoppables {
+                    managedObjectContext.delete(shoppable)
+                }
+                
+                let productRequest: NSFetchRequest<Product> = Product.fetchRequest()
+                productRequest.predicate = NSPredicate(format: "shoppable == nil AND isFavorite == FALSE AND inNotif == FALSE")
+                let products = try managedObjectContext.fetch(productRequest)
+
+                for product in products {
+                    managedObjectContext.delete(product)
+                }
+
+                managedObjectContext.saveIfNeeded()
+            } catch {
+                self.receivedCoreDataError(error: error)
+                print("cleanDB results with error:\(error)")
             }
-            try managedObjectContext.save()
-        } catch {
-            self.receivedCoreDataError(error: error)
-            print("fixProductFiltersNoClassification results with error:\(error)")
-        }
-    }
-    
-    func fixProductsNoClassification(managedObjectContext: NSManagedObjectContext) {
-        let noClassificationPredicate = NSPredicate(format: "(optionsMask & 192) == 0")
-        let fetchRequest: NSFetchRequest<Product> = Product.fetchRequest()
-        fetchRequest.predicate = noClassificationPredicate
-        fetchRequest.sortDescriptors = nil
-        
-        do {
-            let results = try managedObjectContext.fetch(fetchRequest)
-            for product in results {
-                product.optionsMask |= Int32(ProductsOptionsMask.categoryFashion.rawValue)
-            }
-            try managedObjectContext.save()
-        } catch {
-            self.receivedCoreDataError(error: error)
-            print("fixProductsNoClassification results with error:\(error)")
-        }
-    }
-    
-    func moveCartItemsToFavorites(managedObjectContext: NSManagedObjectContext) {
-        let fetchRequest: NSFetchRequest<CartItem> = CartItem.fetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "cart.isPastOrder == FALSE")
-        fetchRequest.sortDescriptors = nil
-        
-        do {
-            let results = try managedObjectContext.fetch(fetchRequest)
-            let unfavoritedProducts = Set<Product>(results.compactMap { $0.product != nil && !$0.product!.isFavorite ? $0.product : nil })
-            self.favorite(toFavorited: true, productOIDs: unfavoritedProducts.map { $0.objectID })
-            results.forEach { managedObjectContext.delete($0) }
-            try managedObjectContext.save()
-        } catch {
-            self.receivedCoreDataError(error: error)
-            print("moveCartItemsToFavorites results with error:\(error)")
         }
     }
     
@@ -1329,10 +1055,10 @@ extension NSManagedObjectContext {
     }
     
     func productWith(objectId:NSManagedObjectID) -> Product? {
-        if let card = self.object(with: objectId) as? Product {
+        if let product = self.object(with: objectId) as? Product {
             do{
-                try card.validateForUpdate()
-                return card
+                try product.validateForUpdate()
+                return product
             }catch{
                 DataModel.sharedInstance.receivedCoreDataError(error: error)
                 
@@ -1355,10 +1081,10 @@ extension NSManagedObjectContext {
     }
     
     func shoppableWith(objectId:NSManagedObjectID) -> Shoppable? {
-        if let screenshot = self.object(with: objectId) as? Shoppable {
+        if let shoppable = self.object(with: objectId) as? Shoppable {
             do{
-                try screenshot.validateForUpdate()
-                return screenshot
+                try shoppable.validateForUpdate()
+                return shoppable
             }catch{
                 DataModel.sharedInstance.receivedCoreDataError(error: error)
             }
@@ -1366,44 +1092,6 @@ extension NSManagedObjectContext {
         return nil
     }
     
-    func cartItemWith(objectId: NSManagedObjectID) -> CartItem? {
-        if let cartItem = object(with: objectId) as? CartItem {
-            do {
-                try cartItem.validateForUpdate()
-                return cartItem
-            }
-            catch {
-                DataModel.sharedInstance.receivedCoreDataError(error: error)
-            }
-        }
-        return nil
-    }
-    
-    func cardWith(objectId:NSManagedObjectID) -> Card? {
-        if let card = self.object(with: objectId) as? Card {
-            do{
-                try card.validateForUpdate()
-                return card
-            }catch{
-                DataModel.sharedInstance.receivedCoreDataError(error: error)
-                
-            }
-        }
-        return nil
-    }
-    
-    func shippingAddressWith(objectId:NSManagedObjectID) -> ShippingAddress? {
-        if let shippingAddress = self.object(with: objectId) as? ShippingAddress {
-            do{
-                try shippingAddress.validateForUpdate()
-                return shippingAddress
-            }catch{
-                DataModel.sharedInstance.receivedCoreDataError(error: error)
-                
-            }
-        }
-        return nil
-    }
     
     func findOrCreateScreenshotWith(assetId:String) -> Screenshot {
         if let screenshot = self.screenshotWith(assetId: assetId) {
@@ -1453,4 +1141,31 @@ extension NSManagedObjectContext {
         return nil
     }
     
+    func screenshotWith(imageUrl:String) -> Screenshot? {
+        let fetchRequest: NSFetchRequest<Screenshot> = Screenshot.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "uploadedImageURL == %@", imageUrl)
+        fetchRequest.sortDescriptors = nil
+        fetchRequest.fetchLimit = 1
+        
+        do {
+            let results = try self.fetch(fetchRequest)
+            return results.first
+        } catch {
+            DataModel.sharedInstance.receivedCoreDataError(error: error)
+            print("retrieveScreenshot imageUrl:\(imageUrl) results with error:\(error)")
+        }
+        return nil
+    }
+    
+    func inboxMessageWith(objectId:NSManagedObjectID) ->InboxMessage? {
+        if let m = self.object(with: objectId) as? InboxMessage {
+            do{
+                try m.validateForUpdate()
+                return m
+            }catch{
+                DataModel.sharedInstance.receivedCoreDataError(error: error)
+            }
+        }
+        return nil
+    }
 }

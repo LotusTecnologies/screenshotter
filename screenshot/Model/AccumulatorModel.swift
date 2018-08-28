@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Corey Werner on 5/13/18.
-//  Copyright © 2018 crazeapp. All rights reserved.
+//  Copyright (c) 2018 crazeapp. All rights reserved.
 //
 
 import Foundation
@@ -11,14 +11,14 @@ import UIKit
 
 extension Notification.Name {
     static let ScreenshotUninformedAccumulatorModelDidChange = Notification.Name(rawValue: "io.crazeapp.screenshot.ScreenshotUninformedAccumulatorModelDidChange")
-    static let FavoriteAccumulatorModelDidChange =  Notification.Name(rawValue: "io.crazeapp.screenshot.FavoriteAccumulatorModelDidChange")
+    static let FavoriteUninformedAccumulatorModelDidChange =  Notification.Name(rawValue: "io.crazeapp.screenshot.FavoriteUninformedAccumulatorModelDidChange")
 }
+
 class AccumulatorModel: NSObject {
     static let screenshot = ScreenshotAccumulatorModel()
     static let screenshotUninformed = ScreenshotUninformedAccumulatorModel()
 
-    static let favorite = FavoriteAccumulatorModel()
-    
+    static let favoriteUninformed = FavoriteUninformedAccumulatorModel()
 }
 
 class ScreenshotAccumulatorModel: NSObject {
@@ -72,15 +72,9 @@ class ScreenshotAccumulatorModel: NSObject {
             self.assetIds.insert(assetId)
         }
     }
-    
-   
-    
 }
 
-class FavoriteAccumulatorModel: NSObject {
-    
-    // MARK: Uninformed Favorites
-    
+class FavoriteUninformedAccumulatorModel: NSObject {
     var uninformedCount: Int {
         return UserDefaults.standard.integer(forKey: UserDefaultsKeys.uninformedFavoritesCount)
     }
@@ -88,10 +82,10 @@ class FavoriteAccumulatorModel: NSObject {
     func incrementUninformedCount() {
         DispatchQueue.mainAsyncIfNeeded {
             UserDefaults.standard.set(self.uninformedCount + 1, forKey: UserDefaultsKeys.uninformedFavoritesCount)
-            NotificationCenter.default.post(name: .FavoriteAccumulatorModelDidChange, object: nil)
-
+            NotificationCenter.default.post(name: .FavoriteUninformedAccumulatorModelDidChange, object: nil)
         }
     }
+    
     func decrementUninformedCount(by:Int) {
         DispatchQueue.mainAsyncIfNeeded {
             var newCount = self.uninformedCount - by
@@ -99,28 +93,22 @@ class FavoriteAccumulatorModel: NSObject {
                 newCount = 0
             }
             UserDefaults.standard.set(newCount, forKey: UserDefaultsKeys.uninformedFavoritesCount)
-            NotificationCenter.default.post(name: .FavoriteAccumulatorModelDidChange, object: nil)
-            
+            NotificationCenter.default.post(name: .FavoriteUninformedAccumulatorModelDidChange, object: nil)
         }
     }
     
     func resetUninformedCount() {
         DispatchQueue.mainAsyncIfNeeded {
-            
             UserDefaults.standard.set(0, forKey: UserDefaultsKeys.uninformedFavoritesCount)
-            NotificationCenter.default.post(name: .FavoriteAccumulatorModelDidChange, object: nil)
+            NotificationCenter.default.post(name: .FavoriteUninformedAccumulatorModelDidChange, object: nil)
         }
     }
 }
 
-
-
 class ScreenshotUninformedAccumulatorModel: NSObject {
-    
     var uninformedCount: Int {
         return UserDefaults.standard.integer(forKey: UserDefaultsKeys.uninformedScreenshotsCount)
     }
-    
     
     func decrementUninformedCount(by:Int) {
         DispatchQueue.mainAsyncIfNeeded {
@@ -130,9 +118,9 @@ class ScreenshotUninformedAccumulatorModel: NSObject {
             }
             UserDefaults.standard.set(newCount, forKey: UserDefaultsKeys.uninformedScreenshotsCount)
             NotificationCenter.default.post(name: .ScreenshotUninformedAccumulatorModelDidChange, object: nil)
-            
         }
     }
+    
     func incrementUninformedCount() {
         DispatchQueue.mainAsyncIfNeeded {
             UserDefaults.standard.set(self.uninformedCount + 1, forKey: UserDefaultsKeys.uninformedScreenshotsCount)
@@ -146,5 +134,4 @@ class ScreenshotUninformedAccumulatorModel: NSObject {
             NotificationCenter.default.post(name: .ScreenshotUninformedAccumulatorModelDidChange, object: nil)
         }
     }
-    
 }

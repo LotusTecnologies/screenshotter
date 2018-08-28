@@ -3,11 +3,12 @@
 //  screenshot
 //
 //  Created by Jonathan Rose on 6/3/18.
-//  Copyright © 2018 crazeapp. All rights reserved.
+//  Copyright (c) 2018 crazeapp. All rights reserved.
 //
 
 import Foundation
 import CoreData
+
 
 extension DataModel {
     func screenshotFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<Screenshot>  {
@@ -92,52 +93,33 @@ extension DataModel {
         return fetchedResultsController
     }
     
-    
-    func productBarFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<Product> {
-        let request: NSFetchRequest = Product.fetchRequest()
-        request.sortDescriptors = [NSSortDescriptor(key: "dateSortProductBar", ascending: false)]
-        let date = NSDate.init(timeIntervalSinceNow:  -60*60*24*7)
-        request.predicate = NSCompoundPredicate.init(andPredicateWithSubpredicates: [NSPredicate(format: "hideFromProductBar != true"), NSCompoundPredicate.init(orPredicateWithSubpredicates: [ NSPredicate(format: "isFavorite == true"), NSPredicate(format: "dateViewed != nil")]), NSPredicate(format:"dateSortProductBar > %@", date)])
-        
-        let context = self.mainMoc()
-        let fetchedResultsController:FetchedResultsControllerManager<Product> = FetchedResultsControllerManager<Product>.init(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
-        return fetchedResultsController
-    }
-    
     func matchstickFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<Matchstick> {
         let request: NSFetchRequest = Matchstick.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(key: "receivedAt", ascending: true)]
-        request.predicate = NSPredicate(format: "imageData != nil")
+        request.predicate = Matchstick.predicateForDisplayingMatchstick()
         let context = self.mainMoc()
         let fetchedResultsController:FetchedResultsControllerManager<Matchstick> = FetchedResultsControllerManager<Matchstick>.init(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate:delegate)
         
         return fetchedResultsController
     }
     
-    func cartItemFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<CartItem>  {
-        let request: NSFetchRequest<CartItem> = CartItem.fetchRequest()
-        request.predicate = NSPredicate(format: "cart.isPastOrder == FALSE")
-        request.sortDescriptors = [NSSortDescriptor(key: "errorMask", ascending: false), NSSortDescriptor(key: "dateModified", ascending: false)]
+    func inboxMessageNewFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<InboxMessage>{
+        
+        let request: NSFetchRequest<InboxMessage> = InboxMessage.fetchRequest()
+        request.predicate = NSPredicate.init(format: "isNew == true AND isExpired == false")
+        request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: false)]
         let context = self.mainMoc()
-        let fetchedResultsController = FetchedResultsControllerManager<CartItem>(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
+        let fetchedResultsController = FetchedResultsControllerManager<InboxMessage>(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
         return fetchedResultsController
     }
     
-    func cardFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<Card>  {
-        let request: NSFetchRequest<Card> = Card.fetchRequest()
-        request.predicate = nil
-        request.sortDescriptors = [NSSortDescriptor(key: "dateAdded", ascending: false)]
+    func inboxMessageFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<InboxMessage>{
+        let request: NSFetchRequest<InboxMessage> = InboxMessage.fetchRequest()
+        request.predicate = NSPredicate.init(format: "showAfterDate < %@", NSDate())
+        request.sortDescriptors = [NSSortDescriptor(key:"isExpired", ascending:true), NSSortDescriptor(key: "date", ascending: false), NSSortDescriptor(key: "uuid", ascending: false)]
         let context = self.mainMoc()
-        let fetchedResultsController = FetchedResultsControllerManager<Card>(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
+        let fetchedResultsController = FetchedResultsControllerManager<InboxMessage>(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: #keyPath(InboxMessage.sectionHeader), delegate: delegate)
         return fetchedResultsController
     }
     
-    func shippingAddressFrc(delegate:FetchedResultsControllerManagerDelegate?) -> FetchedResultsControllerManager<ShippingAddress>  {
-        let request: NSFetchRequest<ShippingAddress> = ShippingAddress.fetchRequest()
-        request.predicate = nil
-        request.sortDescriptors = [NSSortDescriptor(key: "dateAdded", ascending: false)]
-        let context = self.mainMoc()
-        let fetchedResultsController = FetchedResultsControllerManager<ShippingAddress>(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, delegate: delegate)
-        return fetchedResultsController
-    }
 }

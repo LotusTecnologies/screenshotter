@@ -3,29 +3,15 @@
 //  screenshot
 //
 //  Created by Jonathan Rose on 6/7/18.
-//  Copyright © 2018 crazeapp. All rights reserved.
+//  Copyright (c) 2018 crazeapp. All rights reserved.
 //
 
 import Foundation
 import PromiseKit
 import Hero
-protocol ProductCollectionViewManagerDelegate : class {
-    var rootProduct:Product? { get }
-    var products:[Product] { get }
-    var loadingState:ProductsViewControllerState { get }
-    var relatedLooks:Promise<[String]>? { get }
-    func hasRelatedLooksSection() -> Bool
-    var collectionView:UICollectionView? {get}
-
-}
 
 class ProductCollectionViewManager {
-    
-    
-    weak var delegate:ProductCollectionViewManagerDelegate?
-    
     var loader:Loader?
-
     
     public func setup(collectionView:UICollectionView){
         collectionView.register(ProductsCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
@@ -57,7 +43,7 @@ class ProductCollectionViewManager {
         }else if sectionType == .relatedLooks {
             let columns:CGFloat = 2
             size.width = floor((collectionView.bounds.size.width - (padding * (columns + 1))) / columns)
-            size.height = size.width * CGFloat(Double.goldenRatio)
+            size.height = size.width * CGFloat.goldenRatio
         }else if sectionType == .error {
             size.width = collectionView.bounds.size.width
             size.height = 200
@@ -66,9 +52,16 @@ class ProductCollectionViewManager {
         
         return size
     }
-    public func collectionView(_ collectionView: UICollectionView, viewForHeaderWith text:String, indexPath: IndexPath) -> UICollectionReusableView {
+    public func collectionView(_ collectionView: UICollectionView, viewForHeaderWith text:String, hasBackgroundAndLine:Bool, hasFilterButton:Bool, indexPath: IndexPath) -> UICollectionReusableView {
         if let cell = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionElementKindSectionHeader, withReuseIdentifier: "header", for: indexPath) as? ProductsViewHeaderReusableView{
-                cell.label.text = text
+            cell.label.text = text
+            cell.line.isHidden = !hasBackgroundAndLine
+            cell.filterButton.isHidden = !hasFilterButton
+            if hasBackgroundAndLine, let image = UIImage.init(named: "confetti") {
+                cell.backgroundColor = UIColor.init(patternImage: image )
+            }else {
+                cell.backgroundColor = .clear
+            }
             return cell
         }
         return UICollectionReusableView()
@@ -85,8 +78,10 @@ class ProductCollectionViewManager {
             cell.productImageView.setImage(withURLString: product.imageURL)
             cell.favoriteControl.isSelected = product.isFavorite
             cell.priceLabel.text = product.price
-            cell.merchantLabel.text = product.merchant
-            cell.titleLabel.text = product.productTitle()
+            cell.originalPrice = product.originalPrice
+            cell.merchantLabel.text = product.merchant?.decodingHTMLEntities()
+            cell.titleLabel.text = product.productTitle()?.decodingHTMLEntities()
+            cell.isSale = product.isSale()
         }
         return cell
     }
@@ -107,7 +102,6 @@ class ProductCollectionViewManager {
         cell.imageUrl = product.imageURL
         cell.isSale = product.isSale()
         cell.favoriteControl.isSelected = product.isFavorite
-        cell.actionType = .buy
     }
     
     
@@ -140,7 +134,7 @@ class ProductCollectionViewManager {
         let verPadding: CGFloat = .extendedPadding
         let horPadding: CGFloat = .padding
 
-       let helperView = HelperView()
+        let helperView = HelperView()
         helperView.translatesAutoresizingMaskIntoConstraints = false
         helperView.layoutMargins = UIEdgeInsets(top: verPadding, left: horPadding, bottom: verPadding, right: horPadding)
         helperView.titleLabel.text = "products.helper.title".localized
@@ -162,15 +156,6 @@ class ProductCollectionViewManager {
     
     func productsForShoppable(_ shoppable:Shoppable, productsOptions:ProductsOptions) -> [Product] {
         
-        func stockOrder(a: Product, b: Product) -> Bool? {
-            if a.hasVariants && !b.hasVariants {
-                return true
-            } else if !a.hasVariants && b.hasVariants {
-                return false
-            } else {
-                return nil
-            }
-        }
         func titleOrder(a: Product, b: Product) -> Bool? {
             if let aDisplayTitle = a.calculatedDisplayTitle?.lowercased(),
                 let bDisplayTitle = b.calculatedDisplayTitle?.lowercased(),
@@ -184,21 +169,24 @@ class ProductCollectionViewManager {
                 return nil
             }
         }
+
         if let mask = shoppable.getLast()?.rawValue,
-            var products = shoppable.products?.filtered(using: NSPredicate(format: "(optionsMask & %d) == %d", mask, mask)) as? Set<Product> {
+          var products = shoppable.products?.filtered(using: NSPredicate(format: "(optionsMask & %d) == %d", mask, mask)) as? Set<Product> {
             if productsOptions.sale == .sale {
                 products = products.filter { $0.floatPrice < $0.floatOriginalPrice }
             }
             let productArray: [Product]
             switch productsOptions.sort {
             case .similar :
-                productArray = products.sorted { stockOrder(a: $0, b: $1) ?? ($0.order < $1.order) }
+                productArray = products.sorted { $0.order < $1.order }
             case .priceAsc :
-                productArray = products.sorted { stockOrder(a: $0, b: $1) ?? ($0.floatPrice < $1.floatPrice) }
+                productArray = products.sorted { $0.floatPrice < $1.floatPrice }
             case .priceDes :
-                productArray = products.sorted { stockOrder(a: $0, b: $1) ?? ($0.floatPrice > $1.floatPrice) }
+                productArray = products.sorted { $0.floatPrice > $1.floatPrice }
             case .brands :
-                productArray = products.sorted { stockOrder(a: $0, b: $1) ?? titleOrder(a: $0, b: $1) ?? ($0.order < $1.order) }
+                productArray = products.sorted { titleOrder(a: $0, b: $1) ?? ($0.order < $1.order) }
+            default:
+                productArray = products.sorted { $0.order < $1.order }
             }
             return productArray
         }
@@ -229,3 +217,4 @@ class ProductCollectionViewManager {
         }
     }
 }
+

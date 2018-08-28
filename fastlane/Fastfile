@@ -14,19 +14,19 @@ platform :ios do
 
   lane :prd do
     increment_build_number
-    commit_version_bump(force: true, xcodeproj: "screenshot.xcodeproj")
+    commit_version_bump(force: true, xcodeproj: "Screenshop.xcodeproj")
     push_to_git_remote
 
     gym(scheme: "prdScreenshot") # Build your app - more options available
     testflight(skip_waiting_for_build_processing: true) # to only upload the build
-    version = get_version_number(xcodeproj: "screenshot.xcodeproj", target: "screenshot", configuration: "prdRelease")
+    version = get_version_number(xcodeproj: "Screenshop.xcodeproj", target: "Screenshop", configuration: "prdRelease")
     add_git_tag(tag: "#{version}/#{lane_context[SharedValues::BUILD_NUMBER]}")
     push_to_git_remote
   end
 
   lane :dev do
     increment_build_number
-    commit_version_bump(force: true, xcodeproj: "screenshot.xcodeproj")
+    commit_version_bump(force: true, xcodeproj: "Screenshop.xcodeproj")
     push_to_git_remote
 
     gym(scheme: "devScreenshot") # Build your app - more options available

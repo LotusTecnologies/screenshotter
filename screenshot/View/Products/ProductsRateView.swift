@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Corey Werner on 12/12/17.
-//  Copyright © 2017 crazeapp. All rights reserved.
+//  Copyright (c) 2017 crazeapp. All rights reserved.
 //
 
 import Foundation
@@ -60,17 +60,6 @@ class ProductsRateView : UIView {
         
         addSubview(BorderView(edge: .top))
 
-        
-        weak var weakSelf = self
-        NotificationCenter.default.addObserver(forName: Notification.Name.InAppPurchaseManagerDidUpdate, object: nil, queue: .main) { (notification) in
-            DispatchQueue.main.async {
-                if let strongWeakSelf = weakSelf {
-                    let rating  = strongWeakSelf.rating
-                    strongWeakSelf.setRating(rating)
-                }
-            }
-            
-        }
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -89,31 +78,20 @@ class ProductsRateView : UIView {
     // MARK: Content
     
     func syncBackgroundColor() {
-        if InAppPurchaseManager.sharedInstance.isInProcessOfBuying() {
+         if hasRating {
             backgroundColor = .crazeGreen
-        } else if hasRating {
-            if InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist){
-                backgroundColor = .crazeGreen
-            }else{
-                 backgroundColor = .crazeGreen
-            }
         }else{
              backgroundColor = .white
         }
     }
     
     private func syncLabel() {
-       if hasRating {
-            if InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist){
-                label.textColor = .white
-                label.text = "products.rate.talk_to_stylist".localized
-                label.textAlignment = .center
-                
-            }else{
-                label.textColor = .white
-                label.text = "products.rate.rated".localized
-                label.textAlignment = .center
-            }
+        if hasRating {
+            
+            label.textColor = .white
+            label.text = "products.rate.rated".localized
+            label.textAlignment = .center
+            
             
         } else {
             label.textColor = .gray3
@@ -158,15 +136,7 @@ class ProductsRateView : UIView {
     
     func setRating(_ rating: UInt, animated: Bool = false) {
         self.rating = rating
-        if InAppPurchaseManager.sharedInstance.isInProcessOfBuying() {
-            voteUpButton.isSelected = false
-            voteDownButton.isSelected = false
-            voteUpButton.alpha = 0
-            voteDownButton.alpha = 0
-            labelTrailingConstraint.isActive = true
-            syncLabel()
-            syncBackgroundColor()
-        }else if animated && hasRating {
+        if animated && hasRating {
             let duration: TimeInterval = .defaultAnimationDuration
             
             UIView.animate(withDuration: duration, animations: {

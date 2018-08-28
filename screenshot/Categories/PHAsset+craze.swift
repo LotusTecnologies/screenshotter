@@ -3,13 +3,23 @@
 //  screenshot
 //
 //  Created by Jonathan Rose on 3/18/18.
-//  Copyright © 2018 crazeapp. All rights reserved.
+//  Copyright (c) 2018 crazeapp. All rights reserved.
 //
 
 import Foundation
 import Photos
 import PromiseKit
 extension PHAsset {
+    
+    var isVeryRecent:Bool {
+        get {
+            if let createdDate = self.creationDate {
+                return (createdDate.timeIntervalSinceNow > -60.0)
+            }
+            return false
+        }
+    }
+    
     static func assetWith(assetId:String) -> PHAsset?{
         let fetchOptions = PHFetchOptions()
         fetchOptions.predicate = NSPredicate(format: "localIdentifier == %@", assetId)
@@ -59,4 +69,6 @@ extension PHAsset {
             })
         }
     }
+    
+    
 }

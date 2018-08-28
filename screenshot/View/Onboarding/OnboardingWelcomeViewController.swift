@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Corey Werner on 5/15/18.
-//  Copyright © 2018 crazeapp. All rights reserved.
+//  Copyright (c) 2018 crazeapp. All rights reserved.
 //
 
 import UIKit
@@ -122,8 +122,6 @@ class OnboardingWelcomeViewController: UIViewController {
     }
     
     @objc fileprivate func continueAction() {
-        // Revert to never use USC.
-//        let _ = NetworkingPromise.sharedInstance.geoLocateIsUSC()
         delegate?.onboardingWelcomeViewControllerDidComplete(self)
     }
 }

@@ -1,0 +1,59 @@
+ [{
+  "displayName": "All",
+  "filterName": "",
+  "genderName":"",
+  "color": "E62A41",
+  "isAll": true
+  },
+  {
+  "displayName": "Party",
+  "filterName": "party",
+  "genderName":"",
+  "color": "7DE1CF"
+  }, {
+  "displayName": "Summer",
+  "filterName": "summer",
+  "genderName":"",
+  "color": "FFBC39"
+  }, {
+  "displayName": "Beach",
+  "filterName": "beach",
+  "genderName":"",
+  "color": "E62A41"
+  }, {
+  "displayName": "Winter",
+  "filterName": "winter",
+  "genderName":"",
+  "color": "7DE1CF"
+  }, {
+  "displayName": "Fall",
+  "filterName": "fall",
+  "genderName":"",
+  "color": "FFBC39"
+  }, {
+  "displayName": "Work",
+  "filterName": "work",
+  "genderName":"",
+  "color": "E62A41"
+  }, {
+  "displayName": "Formal",
+  "filterName": "formal",
+  "genderName":"",
+  "color": "7DE1CF"
+  }, {
+  "displayName": "Athleisure",
+  "filterName": "athleisure",
+  "genderName":"",
+  "color": "FFBC39"
+  }, {
+  "displayName": "Streetwear",
+  "filterName": "streetwear",
+  "genderName":"",
+  "color": "E62A41"
+  }, {
+  "displayName": "Men's",
+  "filterName": "",
+  "genderName":"male",
+  "color": "7DE1CF"
+  }
+  ]

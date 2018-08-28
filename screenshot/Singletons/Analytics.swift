@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Jacob Relkin on 9/26/17.
-//  Copyright © 2017 crazeapp. All rights reserved.
+//  Copyright (c) 2017 crazeapp. All rights reserved.
 //
 
 import Foundation
@@ -14,6 +14,8 @@ import FBSDKCoreKit
 import Whisper
 import AdSupport
 import Amplitude_iOS
+import SwiftLog
+
 
 extension Bool {
     func toStringLiteral() -> String {
@@ -39,21 +41,20 @@ class Analytics {
             
         }
     }
+   
     
-    static func uscExperience() -> String {
-//        let uscExperience: String
-//        if UserDefaults.standard.object(forKey: UserDefaultsKeys.isUSC) == nil {
-//            uscExperience = "unset"
-//        } else if UserDefaults.standard.bool(forKey: UserDefaultsKeys.isUSC) {
-//            uscExperience = "full-usc"
-//        } else if UserDefaults.standard.bool(forKey: UserDefaultsKeys.abUSC) {
-//            uscExperience = "usc-feed-external-ui"
-//        } else {
-//            uscExperience = "non-usc"
-//        }
-//        return uscExperience
-        // Revert to never use USC.
-        return "non-usc"
+    static func propertiesForAllEvents() -> [String:Any] {
+        var properties:[String:Any] = [:]
+        
+        let dateInstalled = (UserDefaults.standard.object(forKey:  UserDefaultsKeys.dateInstalled) as? Date ) ?? Date()
+        let timeSinceInstall:Double = abs(dateInstalled.timeIntervalSinceNow)
+        let daysSinceInstall = Int(round(timeSinceInstall / TimeInterval.oneDay))
+        
+        properties["user-age"] = daysSinceInstall
+        
+        properties["user-sessionCount"] = UserDefaults.standard.integer(forKey: UserDefaultsKeys.sessionCount)
+        
+        return properties
     }
     
     static func propertiesFor(_ matchstick:Matchstick) -> [String:Any] {
@@ -61,6 +62,10 @@ class Analytics {
         
         if let uploadedImageURL = matchstick.imageUrl {
             properties["screenshot-imageURL"] = uploadedImageURL
+        }
+        
+        if let remoteId = matchstick.remoteId {
+            properties["screenshot-id"] = remoteId
         }
         
         self.addScreenshotProperitesFrom(trackingData: matchstick.trackingInfo, toProperties: &properties)
@@ -84,8 +89,6 @@ class Analytics {
             properties["screenshot-submittedToDiscoverDate"] = submittedDate
         }
         
-        properties["usc-experience"] = uscExperience()
-
         self.addScreenshotProperitesFrom(trackingData: screenshot.trackingInfo, toProperties: &properties)
         
         return properties
@@ -93,45 +96,6 @@ class Analytics {
     
     static func propertiesFor(_ user:AnalyticsUser) -> [String:Any] {
         return user.analyticsProperties
-    }
-    
-    static func propertiesFor(_ cart:Cart) -> [String:Any] {
-        var properties:[String:Any] = [:]
-
-        properties["cart-uniqueItems"] = cart.items?.count ?? 0
-        
-        var totalItemCount = 0
-        if let items = cart.items {
-            items.forEach { (cartItem) in
-                if let c = cartItem as? CartItem {
-                    totalItemCount += Int(c.quantity)
-                }
-            }
-        }
-        
-        properties["cart-items"] = totalItemCount
-
-        properties["cart-shippingTotal"] = cart.shippingTotal
-        properties["cart-subtotal"] = cart.subtotal
-        properties["cart-taxEstimated"] = cart.estimatedTax
-        properties["cart-orderTotal"] = cart.estimatedTotalOrder
-        
-        properties["cart-remoteId"] = cart.remoteId
-        
-        if let dateModified = cart.dateModified {
-            properties["cart-dateModified"] = dateModified
-        }
-        if let dateSubmitted = cart.dateSubmitted {
-            properties["cart-dateSubmitted"] = dateSubmitted
-        }
-        properties["cart-isPastOrder"] = cart.isPastOrder
-        if let orderNumber = cart.orderNumber {
-            properties["cart-orderNumber"] = orderNumber
-        }
-        
-        properties["usc-experience"] = uscExperience()
-
-        return properties
     }
     
     static func propertiesFor(_ shoppable:Shoppable) -> [String:Any] {
@@ -167,7 +131,11 @@ class Analytics {
     }
     static func propertiesFor(_ product:Product) -> [String:Any] {
         var properties:[String:Any] = [:]
+        if let title = product.productTitle() {
+            properties["product-title"] = title
+        }
         if let brand = product.brand {
+            
             properties["product-brand"] = brand
         }
         if let merchant = product.merchant {
@@ -189,7 +157,6 @@ class Analytics {
         let options = ProductsOptionsMask.init(rawValue: Int(product.optionsMask))
         properties["product-filter-size"] = options.size.analyticsStringValue
         properties["product-filter-gender"] = options.gender.analyticsStringValue
-        properties["product-filter-category"] = options.category.analyticsStringValue
         
         if let priceString = product.price {
             properties["product-price-display"] = priceString
@@ -210,53 +177,20 @@ class Analytics {
         
         return properties
     }
-    static func propertiesFor(_ cartItem:CartItem) -> [String:Any] {
-        var properties:[String:Any] = [:]
-
-        if let product = cartItem.product{
-            propertiesFor(product).forEach { properties[$0] = $1 }
-        }
-        if let cart = cartItem.cart{
-            propertiesFor(cart).forEach { properties[$0] = $1 }
-        }
-        
-        properties["product-quantity"] = NSNumber(value:cartItem.quantity)
-        if let color = cartItem.color {
-            properties["product-color"] = color
-        }
-        if let size = cartItem.size {
-            properties["product-size"] = size
-        }
-        
-        properties["product-price"] = NSNumber(value:cartItem.price)
-        if let sku = cartItem.sku {
-            properties["product-sku"] = sku
-        }
-        
-        
-
-        return properties
-
-    }
-
     
     static func trackTappedOnProduct(_ product: Product, atLocation location: Analytics.AnalyticsProductOpenedFromPage) {
-        let willShowShoppingCartPage = product.isSupportingUSC
         let displayAs:Analytics.AnalyticsProductOpenedDisplayAs = {
-            if willShowShoppingCartPage {
-                return .productPage
-            }else{
-                if let urlString = product.offer, let url = URL(string:urlString) {
-                    let willOpenWith = OpenWebPage.using(url:url)
-                    if let a = Analytics.AnalyticsProductOpenedDisplayAs.init(rawValue: willOpenWith.analyticsString()){
-                        return a
-                    }else{
-                        return .error
-                    }
+            if let urlString = product.offer, let url = URL(string:urlString) {
+                let willOpenWith = OpenWebPage.using(url:url)
+                if let a = Analytics.AnalyticsProductOpenedDisplayAs.init(rawValue: willOpenWith.analyticsString()){
+                    return a
                 }else{
                     return .error
                 }
+            }else{
+                return .error
             }
+            
         }()
         
         Analytics.trackProductOpened(product: product, order: nil, sort: nil, displayAs: displayAs, fromPage: location)
@@ -287,6 +221,44 @@ class Analytics {
             }
         }
         
+        let prop = properties.mapValues { (a) -> Any in
+            if let a = a as? String {
+                return a
+            }else if let a = a as? NSNumber {
+                return a
+            }else if let  a = a as? Date {
+                return String.init(describing: a)
+            }else{
+                return String.init(describing: a)
+            }
+        }        
+        var propertiesString = ""
+        if JSONSerialization.isValidJSONObject(prop), let jsonData = try? JSONSerialization.data(withJSONObject: prop, options: []), let string = String.init(data: jsonData, encoding: .utf8) {
+            propertiesString = string
+        }else{
+            propertiesString = String.init(describing: prop)
+        }
+        
+        
+        
+        func tryToLog(_ string:String) throws{
+            logw(string)
+        }
+        
+        do{
+            if eventName == "Log", let line = properties["line"] as? Int, let file = properties["file"] as? NSString, let message =  properties["message"] as? String {
+                try tryToLog("[\(eventName) - \(message)] - \( file.lastPathComponent ):\( line )")
+            }else{
+                try tryToLog("[\(eventName)] - \( propertiesString )")
+            }
+        }catch  {
+        }
+        
+    
+        
+    }
+    init() {
+        Log.logger.printToConsole = false
     }
 
 }
@@ -301,6 +273,13 @@ public class AnalyticsUser : NSObject {
     let identifier: String
     let name: String?
     let email: String?
+    
+    var randomSeed: UInt64{
+        if let uuid = UUID.init(uuidString: identifier ){
+            return uuid.toRandomSeed()
+        }
+        return 0
+    }
     
     init(name: String?, email: String?) {
         self.name = name
@@ -323,6 +302,10 @@ public class AnalyticsUser : NSObject {
         
         if let name = name {
             props["name"] = name
+        }
+        
+        if let firebaseId = UserAccountManager.shared.user?.uid {
+            props["firebaseId"] = firebaseId
         }
         
         if let channel = UserDefaults.standard.string(forKey: UserDefaultsKeys.referralChannel) {
@@ -352,12 +335,7 @@ public class AnalyticsUser : NSObject {
             return ageInDays
         }()
         props["userAge"] = "\(userAge)"
-        if InAppPurchaseManager.sharedInstance.didPurchase(_inAppPurchaseProduct: .personalStylist) {
-            props["personalStylistPurchased"] = "true"
-        }
         
-        
-
         return props
     }
     
@@ -378,10 +356,57 @@ class AnalyticsTrackers : NSObject {
 
     let appsee = AppseeAnalyticsTracker()
     let kochava = KochavaAnalyticsTracker()
-    let amplitude = AmplitudeAnalyticsTracker()
     let branch = BranchAnalyticsTracker()
-
+    let amplitude = AmplitudeAnalyticsTracker()
+    let recombee = RecombeeAnalyticsTracker()
     
+    class RecombeeAnalyticsTracker : NSObject {
+        enum RecombeeEvent:String {
+            case addBookmark
+            case positiveRating
+            case negativeRating
+            case detailView    // burrow
+            case addToCart     // went to safari
+            
+            func path() -> String{
+                switch self {
+                case .addBookmark:
+                    return "bookmarks/"
+                case .positiveRating, .negativeRating:
+                    return "ratings/"
+                case .detailView:
+                    return "detailviews/"
+                case .addToCart:
+                    return "cartadditions/"
+                }
+            }
+            func postData(itemId:String) -> [String:Any]? {
+                var toReturn:[String:Any] = [:]
+                toReturn["userId"] = AnalyticsUser.current.identifier
+                toReturn["itemId"] = itemId
+                toReturn["cascadeCreate"] = true
+                switch self {
+                case .addBookmark:
+                    break;
+                case .positiveRating:
+                    toReturn["rating"] = NSNumber.init(value: 0.5)
+                case .negativeRating:
+                    toReturn["rating"] = NSNumber.init(value: -0.5)
+                case .detailView:
+                    break;
+                case .addToCart:
+                    break;
+                }
+                return toReturn
+            }
+        }
+        
+        func track(event:RecombeeEvent, itemId:String){
+        let _ = NetworkingPromise.sharedInstance.recombeeRequest(path: event.path(), method: "POST", params: event.postData(itemId: itemId))
+        }
+       
+    }
+
     class AppseeAnalyticsTracker : NSObject, AnalyticsTracker {
         func track(_ event: String, properties: [AnyHashable : Any]? = nil, sendEvenIfAdvertisingTrackingIsOptOut:Bool? = false ){
             if  ASIdentifierManager.shared().isAdvertisingTrackingEnabled || sendEvenIfAdvertisingTrackingIsOptOut == true {
@@ -435,9 +460,16 @@ class AnalyticsTrackers : NSObject {
     
     
     class AmplitudeAnalyticsTracker : NSObject, AnalyticsTracker {
+
         func track(_ event: String, properties: [AnyHashable : Any]?, sendEvenIfAdvertisingTrackingIsOptOut: Bool?) {
             if  ASIdentifierManager.shared().isAdvertisingTrackingEnabled || sendEvenIfAdvertisingTrackingIsOptOut == true {
-                Amplitude.instance().logEvent(event, withEventProperties: properties)
+                DispatchQueue.mainAsyncIfNeeded {
+                    var outOfSession = (UIApplication.shared.applicationState == .background)
+                    if event == "sessionStarted" || event == "sessionEnded" {
+                        outOfSession = false
+                    }
+                    Amplitude.instance().logEvent(event, withEventProperties: properties, outOfSession: outOfSession)
+                }
             }
         }
         
@@ -448,8 +480,6 @@ class AnalyticsTrackers : NSObject {
             Amplitude.instance().setUserId(user.identifier)
             Amplitude.instance().setUserProperties(user.analyticsProperties)
         }
-        
-        
     }
     
     class KochavaAnalyticsTracker : NSObject, AnalyticsTracker {

@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Gershon Kagan on 9/11/17.
-//  Copyright © 2017 crazeapp. All rights reserved.
+//  Copyright (c) 2017 crazeapp. All rights reserved.
 //
 
 import UIKit
@@ -15,6 +15,8 @@ import Branch
 import PromiseKit
 import Amplitude_iOS
 import AdSupport
+import Pushwoosh
+import Firebase
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -25,8 +27,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var bgTask: UIBackgroundTaskIdentifier = UIBackgroundTaskInvalid
     var shouldLoadDiscoverNextLoad = false
     let appSettings: AppSettings = AppSettings()
-    
-    fileprivate var frameworkSetupLaunchOptions: [UIApplicationLaunchOptionsKey : Any]?
+    var appLaunchedForFirstTime = false
     
     fileprivate lazy var mainTabBarController: MainTabBarController = {
         let viewController = MainTabBarController(delegate:self)
@@ -43,8 +44,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         UNUserNotificationCenter.current().delegate = self
         
+        let _ = UserAccountManager.shared.application(application, didFinishLaunchingWithOptions: launchOptions)
         
         window = UIWindow(frame: UIScreen.main.bounds)
+        if UserDefaults.standard.value(forKey: UserDefaultsKeys.lastDbVersionMigrated) == nil {
+            appLaunchedForFirstTime = true
+        }
         
         if DataModel.sharedInstance.storeNeedsMigration() {
             window?.rootViewController = LoadingViewController()
@@ -65,12 +70,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
 
         fetchAppSettings()
-        frameworkSetupMainViewDidLoad()
+        downloadDiscoverJsonIfNeeded()
         
         UIApplication.migrateUserDefaultsKeys()
         UIApplication.appearanceSetup()
         UserFeedback.shared.applicationDidFinishLaunching() // only setups notificationCenter observing. does nothing now
-
+        PWInAppManager.shared().setUserId(AnalyticsUser.current.identifier)
         return true
     }
     
@@ -95,15 +100,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         })
     }
-    
+   
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         ApplicationStateModel.sharedInstance.applicationState = application.applicationState
         
         frameworkSetup(application, didFinishLaunchingWithOptions: launchOptions)
         
         SilentPushSubscriptionManager.sharedInstance.updateSubscriptionsIfNeeded()
-        
+        LocalNotificationModel.setup()
+
         NotificationCenter.default.addObserver(self, selector: #selector(badgeNumberDidChange(_:)), name: .ScreenshotUninformedAccumulatorModelDidChange, object: nil)
+        
+        if self.appLaunchedForFirstTime == true {
+            Analytics.trackAppOpenedFirstTime()
+        }
         
         if application.applicationState == .background,
             let remoteNotification = launchOptions?[.remoteNotification] as? [String: AnyObject],
@@ -112,18 +122,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             contentAvailable.intValue == 1 {
             Analytics.trackWokeFromSilentPush()
         } else {
+            
             Analytics.trackSessionStarted() // Roi Tal from AppSee suggested
         }
         
+        Analytics.trackDevLog(file:  NSString.init(string: #file).lastPathComponent, line: #line, message: "application didFinishLaunchingWithOptions")
+
         if let launchOptions = launchOptions, let url = launchOptions[UIApplicationLaunchOptionsKey.url] as? URL {
-            
+            Analytics.trackDevLog(file:  NSString.init(string: #file).lastPathComponent, line: #line, message: "application didFinishLaunchingWithOptions with url \(url)")
+
             if self.isSendToDebugURL(url) {
                 self.sendDebugDataToDebugApp(url:url)
                 return true
             }
+            if UserAccountManager.shared.application(application, open: url, options: [:]) {
+                return true
+            }
         }
+        FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
 
-        
+        if PermissionsManager.shared.permissionStatus(for: .push) == .authorized {
+            PermissionsManager.shared.requestPermission(for: .push)
+        }
         return true
     }
     
@@ -132,7 +152,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func isSendToDebugURL(_ url:URL) -> Bool{
-        //we use this uuid so we will never accidentently detect a wrong openURL even from branch or other thrid parties
+        //we use this uuid so we will never accidentently detect a wrong openURL even from branch or other third parties
         return url.absoluteString.contains("sendDebugInfo-b32963e7-ad86-4f80-8f2a-131d76ece793")
 
     }
@@ -166,14 +186,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 //                        if let partNumber = productInfo["partNumber"] as? String, let price = productInfo["price"] as? Double, let title = productInfo["title"] as? String, let inStock = productInfo["inStock"] as? Bool {
 
                 if p.hasPriceAlerts, let partNumber = p.partNumber, let title = p.productTitle() {
-                    let inStock = p.hasVariants
                     let price = p.fallbackPrice
                     
                     
                     arrayOfDictionaries.append(["partNumber":partNumber,
                                                 "price":price,
-                                                "title":title,
-                                                "inStock":inStock])
+                                                "title":title])
                 }
             }
             do {
@@ -225,6 +243,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             application.endBackgroundTask(self.bgTask)
             self.bgTask = UIBackgroundTaskInvalid
         }
+        
+        if mainTabBarController.isSafeFromViewingBurrow() {
+            DataModel.sharedInstance.cleanDB()
+        }
     }
     
     func applicationWillEnterForeground(_ application: UIApplication) {
@@ -261,10 +283,79 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         var handled = Branch.getInstance().application(app, open: url, options:options)
         
         if !handled {
+            handled = UserAccountManager.shared.application(app, open: url, options: options)
+        }
+        if !handled {
             handled = FBSDKApplicationDelegate.sharedInstance().application(app, open: url, options: options)
         }
-        
+        if !handled {
+            handled = self.handleDeepLink(application: app, url: url, options: options)
+        }
+        print("open url: \(url.absoluteString)")
         return handled
+    }
+    
+    func handleDeepLink(application:UIApplication, url:URL, options:[UIApplicationOpenURLOptionsKey : Any] ) -> Bool {
+        let urlString = url.absoluteString
+        if urlString.hasPrefix("screenshop://openTab/") {
+            if let mainTabBarController = self.window?.rootViewController as? MainTabBarController {
+                let page = urlString.components(separatedBy: "/").last?.lowercased()
+                var tab: MainTabBarController.TabIndex? = nil
+                switch page {
+                case "favorites", "favorite":
+                    tab = .favorites
+                case "discover", "matchstick":
+                    tab = .discover
+                case "screenshots", "main":
+                    tab = .screenshots
+                case "profile":
+                    tab = .profile
+                default:
+                    tab = nil
+                }
+                if let tab = tab {
+                    mainTabBarController.goTo(tab: tab)
+                    return true
+                }
+            }
+        }
+        else if urlString.hasPrefix("screenshop://openWebLink/") {
+            let pathComponents = url.pathComponents
+            if pathComponents.count >= 4 {
+                let browser = pathComponents[1]
+                let link = String(urlString.suffix(from: "screenshop://openWebLink/\(browser)/".endIndex))
+                if browser == "default" {
+                    if let vc = AppDelegate.shared.window?.rootViewController {
+                        OpenWebPage.present(urlString: link, fromViewController: vc)
+                        return true
+                    }
+                }
+            }
+        }
+        else if urlString.hasPrefix("screenshop://addScreenshot/") {
+            let prefix = "screenshop://addScreenshot/"
+            
+            if let prefixRange = urlString.range(of: prefix) {
+                var screenshotUrlString = urlString
+                screenshotUrlString.removeSubrange(prefixRange)
+                AssetSyncModel.sharedInstance.uploadPhoto(imageUrlString: screenshotUrlString, source: .pushWoosh)
+                
+                if let mainTabBarController = self.window?.rootViewController as? MainTabBarController {
+                    mainTabBarController.dismiss(animated: true)
+                }
+                
+                PWInbox.loadMessages { (messages, error) in
+                    let codes = messages?.compactMap({ message -> String? in
+                        return message.isActionPerformed ? message.code : nil
+                    })
+                    
+                    if let codes = codes {
+                        PWInbox.deleteMessages(withCodes: codes)
+                    }
+                }
+            }
+        }
+        return false
     }
     
     func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([Any]?) -> Void) -> Bool {
@@ -363,19 +454,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             
             viewController = navigationController.discoverScreenshotViewController
             
-        case s(SettingsNavigationController.self):
+        case s(ProfileNavigationController.self):
             guard let tabBarController = restorationViewControllers[s(MainTabBarController.self)] as? MainTabBarController else {
                 return nil
             }
             
-            viewController = tabBarController.settingsNavigationController
+            viewController = tabBarController.profileNavigationController
             
-        case s(SettingsViewController.self):
-            guard let navigationController = restorationViewControllers[s(SettingsNavigationController.self)] as? SettingsNavigationController else {
+        case s(ProfileViewController.self):
+            guard let navigationController = restorationViewControllers[s(ProfileNavigationController.self)] as? ProfileNavigationController else {
                 return nil
             }
             
-            viewController = navigationController.settingsViewController
+            viewController = navigationController.profileViewController
             
         default:
             viewController = nil
@@ -386,6 +477,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
         return viewController
+    }
+    
+    // MARK: Hidden Logo
+    
+    private let hiddenLogoController = HiddenLogoController()
+    
+    func syncHiddenLogo() {
+        hiddenLogoController.syncView()
     }
 }
 
@@ -401,19 +500,19 @@ extension AppDelegate : KochavaTrackerDelegate {
     }
     
     fileprivate func frameworkSetup(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) {
-        frameworkSetupLaunchOptions = launchOptions
-                
+        
         Appsee.start(Constants.appSeeApiKey)
         Appsee.addEvent("App Launched", withProperties: ["version": Bundle.displayVersionBuild])
         
         Amplitude.instance().initializeApiKey(Constants.amplitudeApiKey)
-        
+        Amplitude.instance().trackingSessionEvents = true
+
         var trackerParametersDictionary: [AnyHashable: Any] = [:]
         trackerParametersDictionary[kKVAParamAppGUIDStringKey] = Constants.kocchavaGUIDKey
         trackerParametersDictionary[kKVAParamLogLevelEnumKey] = kKVALogLevelEnumInfo
         
         KochavaTracker.shared.configure(withParametersDictionary: trackerParametersDictionary, delegate: self)
-        
+                
         
         if UIApplication.isDev {
             Branch.setUseTestBranchKey(true)
@@ -422,22 +521,17 @@ extension AppDelegate : KochavaTrackerDelegate {
         if !ASIdentifierManager.shared().isAdvertisingTrackingEnabled {
             Branch.setTrackingDisabled(true)
         }
-        
+        Analytics.trackDevLog(file:  NSString.init(string: #file).lastPathComponent, line: #line, message: "framework setup: \(String(describing: launchOptions))")
         Branch.getInstance()?.initSession(launchOptions: launchOptions) { params, error in
             // params are the deep linked params associated with the link that the user clicked -> was re-directed to this app
             // params will be empty if no data found
 
             guard error == nil, let params = params as? [String : AnyObject] else {
                 if let e = error as NSError? {
+                    Analytics.trackDevLog(file:  NSString.init(string: #file).lastPathComponent, line: #line, message: "branch error: \(e)")
                     Analytics.trackError(type: nil, domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
                 }
                 return
-            }
-            
-            if let shareId = params["shareId"] as? String {
-
-                AssetSyncModel.sharedInstance.downloadScreenshot(shareId: shareId)
-                self.showScreenshotListTop()
             }
             
             if let channel = params["~channel"] as? String {
@@ -447,18 +541,51 @@ extension AppDelegate : KochavaTrackerDelegate {
             if let campaign = params["~campaign"] as? String {
                 UserDefaults.standard.set(campaign, forKey: UserDefaultsKeys.campaign)
             }
+            
+            Analytics.trackDevLog(file:  NSString.init(string: #file).lastPathComponent, line: #line, message: "branch params: \(params)")
+            if let nonBranchLink = params["+non_branch_link"]  as? String {
+                if nonBranchLink.contains("validate"), let url = URL.init(string: nonBranchLink) {
+                    let _ = UserAccountManager.shared.application(application, open:url, options: [:])
+                }
+            }else if let referring_link = params["~referring_link"] as? String{
+                if referring_link.contains("validate"), let url = URL.init(string: referring_link){
+                    let _ = UserAccountManager.shared.application(application, open:url, options: [:])
+                }
+            }else if let mode = params["mode"] as? String, let oobCode = params["oobCode"] as? String {
+                let _ = UserAccountManager.shared.applicationOpenLinkedWith(mode: mode, code: oobCode)
+            }
+            
+            var variantId: String? = params["variant_id"] as? String
+            if variantId == nil,
+              let nonBranchLink = params["+non_branch_link"] as? String,
+              let nonBranchQueryItems = URLComponents(string: nonBranchLink)?.queryItems,
+              let nonBranchVariantId = nonBranchQueryItems.first(where: {$0.name == "variant_id"})?.value {
+                variantId = nonBranchVariantId
+            }
+            //let merchant = params["merchant"] as? String
+            
+            if let shareId = params["shareId"] as? String {
+                AssetSyncModel.sharedInstance.downloadScreenshot(shareId: shareId)
+                self.showScreenshotListTop()
+            } else if let id = variantId {
+                ProductDetailViewController.create(productId: id, startedLoadingFromServer: {}) { viewController in
+                    if let viewController = viewController {
+                        AppDelegate.presentModally(viewController: viewController)
+                    }
+                }
+            }
+
         }
+//        Branch.getInstance().validateSDKIntegration()
         
-    
         FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
+        
+        // Pushwoosh
+        PushNotificationManager.push().delegate = self
+        // UNUserNotificationCenter.current().delegate = PushNotificationManager.push().notificationCenterDelegate // Set to self in willFinishLaunching; forwards the calls to pushwoosh.
+        PushNotificationManager.push().sendAppOpen()
     }
     
-    fileprivate func frameworkSetupMainViewDidLoad() {
-        RatingFlow.sharedInstance.start()
-        
-        
-        frameworkSetupLaunchOptions = nil
-    }
 }
 
 extension AppDelegate {
@@ -526,11 +653,28 @@ extension AppDelegate : TutorialNavigationControllerDelegate {
 
 // MARK: - Push Notifications
 
-extension AppDelegate {
+extension AppDelegate: PushNotificationDelegate {
+    
+    //this event is fired when the push gets received
+    func onPushReceived(_ pushManager: PushNotificationManager!, withNotification pushNotification: [AnyHashable : Any]!, onStart: Bool) {
+        print("pushwoosh notification received: \(pushNotification)")
+        // shows a push is received. Implement passive reaction to a push here, such as UI update or data download.
+    }
+    
+    //this event is fired when user taps the notification
+    func onPushAccepted(_ pushManager: PushNotificationManager!, withNotification pushNotification: [AnyHashable : Any]!, onStart: Bool) {
+        print("pushwoosh notification accepted: \(pushNotification)")
+        // shows a user tapped the notification. Implement user interaction, such as showing push details
+    }
+    
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        PushNotificationManager.push().handlePushRegistration(deviceToken)
+        
         
         UserDefaults.standard.set(deviceToken, forKey: UserDefaultsKeys.deviceToken)
         UserDefaults.standard.synchronize()
+        UserAccountManager.shared.setToken()
+    
         Analytics.trackUserProperties(analyticsUser: AnalyticsUser.current)
         SilentPushSubscriptionManager.sharedInstance.updateSubscriptionsIfNeeded()
         
@@ -538,13 +682,17 @@ extension AppDelegate {
     }
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
-         let e = error as NSError
+        PushNotificationManager.push().handlePushRegistrationFailure(error)
+        
+        let e = error as NSError
         Analytics.trackError(type: nil, domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
     }
 
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         ApplicationStateModel.sharedInstance.applicationState = application.applicationState
 
+        InboxMessage.insertMessageFromPush(userInfo: userInfo)
+        
         if let aps = userInfo["aps"] as? NSDictionary, let category = aps["category"] as? String, category == "MATCHSTICK_LIKES", let likeUpdates = userInfo["likeUpdates"] as? [[String:Any]]{
             DataModel.sharedInstance.performBackgroundTask { (context) in
             
@@ -588,33 +736,42 @@ extension AppDelegate {
                         UserFeedback.shared.cancelNotifications()
                         UserFeedback.shared.scheduleNotifications()
                     }
-                   completionHandler(.newData)
+                   completionHandler(.newData) // Rose explains .newData is really telling Apple it was worthwhile being woken
                 }
             }
-        }else{
-            if let aps = userInfo["aps"] as? NSDictionary, let category = aps["category"] as? String, category == "PRICE_ALERT",  let partNumber = userInfo["partNumber"] as? String{
-                let product = DataModel.sharedInstance.retrieveProduct(managedObjectContext: DataModel.sharedInstance.mainMoc(), partNumber: partNumber)
-                Analytics.trackProductPriceAlertRecieved(product: product)
-            }
+        } else if let aps = userInfo["aps"] as? [String : Any],
+          let category = aps["category"] as? String,
+          category == "PRICE_ALERT",
+          let dataDict = userInfo["data"] as? [String : Any],
+          let id = dataDict["variantId"] as? String,
+          !id.isEmpty {
+            LocalNotificationModel.shared.cancelPendingNotifications(within: Date(timeIntervalSinceNow: TimeInterval.oneDay))
+            let pushTypeString = dataDict["type"] as? String
+            Analytics.trackAppReceivedPushNotification(source: pushTypeString)
+            PushNotificationManager.push().handlePushReceived(userInfo)  // pushwoosh
+            completionHandler(.newData)
+        } else {
             // Only spin up a background task if we are already in the background
             if application.applicationState == .background {
                 if bgTask != UIBackgroundTaskInvalid {
                     application.endBackgroundTask(self.bgTask)
                 }
-                
                 bgTask = application.beginBackgroundTask(withName: "LongRunningSync", expirationHandler: {
-                    // TODO: Call the completion handler when the sync is done.
-                    // TODO: Provide the correct background fetch result to the completionHandler.
                     application.endBackgroundTask(self.bgTask)
                     self.bgTask = UIBackgroundTaskInvalid
-                    
-                    completionHandler(.newData)
                 })
+            }
+
+            if let aps = userInfo["aps"] as? [String : Any],
+              aps.count <= 3,
+              let contentAvailable = aps["content-available"] as? NSNumber,
+              contentAvailable.intValue == 1 {
+                Analytics.trackAppReceivedPushNotification(source: "silent")
+                completionHandler(.newData)
             } else {
+                Branch.getInstance().handlePushNotification(userInfo)
                 completionHandler(.noData)
             }
-            
-            Branch.getInstance().handlePushNotification(userInfo)
         }
     }
     
@@ -633,35 +790,137 @@ extension AppDelegate {
             NotificationCenter.default.post(name: .fetchedAppSettings, object: nil, userInfo:nil)  //this can cause UI changes and must be on main
         }
     }
+    
+    fileprivate func downloadDiscoverJsonIfNeeded(){
+        var needToDownload = true
+        if let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
+            let dbURL = documentDirectory.appendingPathComponent("DiscoverFilterCategories.json")
+            
+            if let attr = try? FileManager.default.attributesOfItem(atPath: dbURL.path) {
+                if let date = attr[.creationDate] as? Date {
+                    if abs(date.timeIntervalSinceNow) <  2 * .oneDay {
+                        needToDownload = false
+                    }
+                }
+            }
+            if needToDownload, let url = URL.init(string: "https://s3.amazonaws.com/screenshop-ordered-discover/DiscoverFilterCategories.json") {
+                let request =  URLRequest.init(url: url )
+                let task = URLSession.shared.downloadTask(with: request) { (tempLocalUrl, response, error) in
+                    if let response = response as? HTTPURLResponse, response.statusCode == 200,  let tempLocalUrl = tempLocalUrl, error == nil {
+                        try? FileManager.default.copyItem(at: tempLocalUrl, to: dbURL)
+                    }
+                }
+                task.resume()
+            }
+        }
+        
+//
+
+    }
+    
 }
 
 extension AppDelegate : UNUserNotificationCenterDelegate {
     
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        
+        var isHandled = false
         if let userInfo = response.notification.request.content.userInfo as? [String : Any] {
-            if let openingScreen = userInfo[Constants.openingScreenKey] as? String,
-                openingScreen == Constants.openingScreenValueScreenshot,
-                let openingAssetId = userInfo[Constants.openingAssetIdKey] as? String {
-                AssetSyncModel.sharedInstance.importPhotosToScreenshot(assetIds: [openingAssetId], source: .screenshot)
-                showScreenshotListTop()
+            InboxMessage.insertMessageFromPush(userInfo: userInfo)
+
+            if let openingScreen = userInfo[Constants.openingScreenKey] as? String {
+                isHandled = true
+                if openingScreen == Constants.openingScreenValueScreenshot {
+                    if let openingAssetId = userInfo[Constants.openingAssetIdKey] as? String {
+                        if response.notification.request.identifier == LocalNotificationIdentifier.saleScreenshot.rawValue   {
+                            // Go into screenshot for saleScreenshot local notification.
+                            showScreenshotListTop()
+                            if let mainTabBarController = self.window?.rootViewController as? MainTabBarController,
+                                let screenshot = DataModel.sharedInstance.mainMoc().screenshotWith(assetId: openingAssetId) {
+                                mainTabBarController.screenshotsNavigationController.presentScreenshot(screenshot)
+                            }
+                        }else if response.notification.request.identifier == LocalNotificationIdentifier.similarLooks.rawValue   {
+                            showScreenshotListTop()
+                            if let mainTabBarController = self.window?.rootViewController as? MainTabBarController,
+                                let screenshot = DataModel.sharedInstance.mainMoc().screenshotWith(assetId: openingAssetId) {
+                                let vc = ScreenshotSimilarLooksViewController.init(screenshot: screenshot)
+                                mainTabBarController.screenshotsNavigationController.pushViewController(vc, animated: false)
+                            }
+                            
+                        } else {
+                            // Show screenshot as first in screenshots list for screenshotAdded local notification.
+                            AssetSyncModel.sharedInstance.importPhotosToScreenshot(assetIds: [openingAssetId], source: .screenshot)
+                            showScreenshotListTop()
+                        }
+                    } else {
+                        showScreenshotListTop()
+                    }
+                }else if openingScreen == Constants.openingScreenValueDiscover {
+                    if let mainTabBarController = self.window?.rootViewController as? MainTabBarController {
+                        mainTabBarController.goTo(tab: .discover)
+                    }
+                }
+            } else if let openingProductKey = userInfo[Constants.openingProductKey] as? String {
+                isHandled = true
+                ProductDetailViewController.create(imageURL: openingProductKey) { viewController in
+                    if let viewController = viewController {
+                        AppDelegate.presentModally(viewController: viewController)
+                    }
+                }
             } else if let aps = userInfo["aps"] as? [String : Any],
-                let category = aps["category"] as? String,
-                category == "PRICE_ALERT",
-                let partNumber = userInfo["partNumber"] as? String,
-                !partNumber.isEmpty {
-                
-                ProductViewController.present(with: partNumber)
+              let category = aps["category"] as? String,
+              category == "PRICE_ALERT",
+              let dataDict = userInfo["data"] as? [String : Any],
+              let id = dataDict["variantId"] as? String,
+              !id.isEmpty {
+                isHandled = true
+                let updatedPrice = dataDict["price"] as? Float
+                let currency = dataDict["currency"] as? String ?? "USD"
+                let subscriptionId = dataDict["subscriptionId"] as? String
+                DataModel.sharedInstance.updateProductPrice(id: id, updatedPrice: updatedPrice, updatedCurrency: currency).then(on: .main) { id in
+                    ProductDetailViewController.create(productId: id, startedLoadingFromServer: {}) { viewController in
+                        if let viewController = viewController {
+                            AppDelegate.presentModally(viewController: viewController)
+                        }
+                    }
+                }.catch { error in
+                    Analytics.trackError(type: nil, domain: "Craze", code: 111, localizedDescription: error.localizedDescription + " subId:\(String(describing: subscriptionId))")
+                }
+                let pushTypeString = dataDict["type"] as? String
+                Analytics.trackAppOpenedFromPushNotification(source: pushTypeString)
             }
         }
         
+        guard isHandled else {
+            PushNotificationManager.push().notificationCenterDelegate.userNotificationCenter?(center, didReceive: response, withCompletionHandler: completionHandler)
+            return
+        }
+        
         completionHandler()
-        Analytics.trackAppOpenedFromLocalNotification()
+        switch response.notification.request.identifier {
+        case LocalNotificationIdentifier.similarLooks.rawValue:
+            Analytics.trackAppOpenedFromTimedLocalNotification(source: .similarLooks)
+        case LocalNotificationIdentifier.inactivityDiscover.rawValue:
+            Analytics.trackAppOpenedFromTimedLocalNotification(source: .inactivityDiscover)
+        case LocalNotificationIdentifier.favoritedItem.rawValue:
+            Analytics.trackAppOpenedFromTimedLocalNotification(source: .favoritedItem)
+        case LocalNotificationIdentifier.tappedProduct.rawValue:
+            Analytics.trackAppOpenedFromTimedLocalNotification(source: .tappedProduct)
+        case LocalNotificationIdentifier.saleScreenshot.rawValue:
+            Analytics.trackAppOpenedFromTimedLocalNotification(source: .saleCount)
+        case let x where x.hasPrefix(LocalNotificationIdentifier.screenshotAdded.rawValue):
+            Analytics.trackAppOpenedFromLocalNotification()
+        default:
+            break
+        }
     }
     
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        let category = notification.request.content.categoryIdentifier
-        let options: UNNotificationPresentationOptions = category == "PRICE_ALERT" ? [.alert, .badge, .sound] : []
-        completionHandler(options)
+        if notification.request.content.categoryIdentifier == "PRICE_ALERT" {
+            completionHandler([.alert, .badge, .sound])
+        } else {
+            completionHandler([])
+        }
     }
     
 }

@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Corey Werner on 1/25/18.
-//  Copyright © 2018 crazeapp. All rights reserved.
+//  Copyright (c) 2018 crazeapp. All rights reserved.
 //
 
 import Foundation
@@ -41,7 +41,6 @@ class ProductWebViewController : WebViewController {
         hidesBottomBarWhenPushed = true
         
         addNavigationItemLogo()
-        loaderLabelText = "webview.product.loading".localized
     }
     
     @objc fileprivate func favoriteAction() {
@@ -54,8 +53,10 @@ class ProductWebViewController : WebViewController {
         product.setFavorited(toFavorited: isFavorited)
         if isFavorited {
             Analytics.trackProductFavorited(product: product, page: .productWebView)
+            LocalNotificationModel.shared.registerCrazeFavoritedPriceAlert(id: product.id, merchant: product.merchant, lastPrice: product.floatPrice)
         }else{
             Analytics.trackProductUnfavorited(product: product, page: .productWebView)
+            LocalNotificationModel.shared.deregisterCrazeFavoritedPriceAlert(id: product.id, merchant: product.merchant)
         }
     }
 }

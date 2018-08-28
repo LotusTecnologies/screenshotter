@@ -3,87 +3,80 @@
 //  screenshot
 //
 //  Created by Jonathan Rose on 6/3/18.
-//  Copyright © 2018 crazeapp. All rights reserved.
+//  Copyright (c) 2018 crazeapp. All rights reserved.
 //
 
 import Foundation
 import CoreData
 
 extension Matchstick {
+    static func predicateForDisplayingMatchstick() -> NSPredicate {
+        return NSPredicate.init(format: "isDisplaying == true")
+    }
+    static func predicateForQueuedMatchstick(gender:String, category:String?) -> NSPredicate {
+        let basic = NSPredicate.init(format: "dateSkipped = nil AND was404 != true AND wasAdded != true AND isDisplaying != true")
+        var genderPredicate = NSPredicate.init(value: true)
+        if gender == "female" {
+            genderPredicate = NSPredicate.init(format: "isFemale == true")
+        }else if gender == "male" {
+            genderPredicate = NSPredicate.init(format: "isMale == true")
+        }
+        var categoryPredicate = NSPredicate.init(value: true)
+        
+        if let category = category, !category.isEmpty{
+            categoryPredicate = NSPredicate.init(format: "tags CONTAINS %@", "[\(category)]")
+        }
     
-    public func add(callback: ((_ screenshot: Screenshot) -> Void)? = nil) {
-        let managedObjectID = self.objectID
-        let dataModel = DataModel.sharedInstance
-        dataModel.performBackgroundTask { (managedObjectContext) in
-            do {
-                if let matchstick = managedObjectContext.object(with: managedObjectID) as? Matchstick,
-                    let assetId = matchstick.remoteId,
-                    let uploadedImageURL = matchstick.imageUrl,
-                    let syteJson = matchstick.syteJson,
-                    let segments = NetworkingPromise.sharedInstance.jsonDestringify(string: syteJson) {
-                    let addedScreenshot = dataModel.saveScreenshot(managedObjectContext: managedObjectContext,
-                                                                   assetId: assetId,
-                                                                   createdAt: Date(),
-                                                                   isRecognized: true,
-                                                                   source: .discover,
-                                                                   isHidden: false,
-                                                                   imageData: matchstick.imageData as Data?,
-                                                                   classification: nil)
-                    addedScreenshot.uploadedImageURL = uploadedImageURL
-                    addedScreenshot.syteJson = syteJson
-                    addedScreenshot.trackingInfo = matchstick.trackingInfo
-                    if callback == nil {
-                        managedObjectContext.delete(matchstick)
-                    }
-                    try managedObjectContext.save()
-                    AssetSyncModel.sharedInstance.processingQ.async {
-                        AssetSyncModel.sharedInstance.saveShoppables(assetId: assetId, uploadedURLString: uploadedImageURL, segments: segments)
-                    }
-                    DispatchQueue.main.async {
-                        AccumulatorModel.screenshotUninformed.incrementUninformedCount()
-                    }
-                    
-                    if let callback = callback {
-                        let addedScreenshotOID = addedScreenshot.objectID
-                        DispatchQueue.main.async {
-                            if let mainScreenshot = dataModel.mainMoc().object(with: addedScreenshotOID) as? Screenshot {
-                                callback(mainScreenshot)
-                            }
-                        }
-                    }
-                    if callback == nil,
-                        dataModel.isNextMatchsticksNeeded(matchstickCount: dataModel.countMatchsticks(managedObjectContext: managedObjectContext)) {
-                        MatchstickModel.shared.fetchNextIfBelowWatermark()
-                    }
-                } else {
-                    print("matchstick add managedObjectID:\(managedObjectID) not found")
-                }
-            } catch {
-                DataModel.sharedInstance.receivedCoreDataError(error: error)
-                print("matchstick add managedObjectID:\(managedObjectID) results with error:\(error)")
+        
+        return NSCompoundPredicate.init(andPredicateWithSubpredicates: [basic, genderPredicate, categoryPredicate])
+    }
+
+    static var skipRotationTime = TimeInterval.oneWeek
+    static var displayingSize = 2
+    static var queueSize = 5  //Must have at least this ammount  - if not grab random numbers
+    static var recombeeQueueSize = 10  // want to have this amount of recombee recommendations
+    static var recombeeQueueLowMark = 5 // if less than this amount make request for recombee recomendations (recombeeQueueSize - current)
+
+    var isInGarbage:Bool {
+        if self.wasAdded || self.was404 {
+            return true
+        }else if let date = self.dateSkipped {
+            if abs(date.timeIntervalSinceNow) < Matchstick.skipRotationTime {
+                return true                
             }
         }
+        return false
+    }
+  
+    public func add(callback: ((_ screenshot: Screenshot) -> Void)? = nil) {
+        DiscoverManager.shared.didAdd(self, callback:callback)
     }
     
     public func pass() {
-        let managedObjectID = self.objectID
-        let dataModel = DataModel.sharedInstance
-        dataModel.performBackgroundTask { (managedObjectContext) in
-            do {
-                if let matchstick = managedObjectContext.object(with: managedObjectID) as? Matchstick {
-                    managedObjectContext.delete(matchstick)
-                    try managedObjectContext.save()
-                    if dataModel.isNextMatchsticksNeeded(matchstickCount: dataModel.countMatchsticks(managedObjectContext: managedObjectContext)) {
-                        MatchstickModel.shared.fetchNextIfBelowWatermark()
-                    }
-                } else {
-                    print("matchstick pass managedObjectID:\(managedObjectID) not found")
-                }
-            } catch {
-                DataModel.sharedInstance.receivedCoreDataError(error: error)
-                print("matchstick pass managedObjectID:\(managedObjectID) results with error:\(error)")
-            }
-        }
+        DiscoverManager.shared.didSkip(self)
+    }
+    public func delayedAdd(){
+        DiscoverManager.shared.didDelayedAdd(self)
     }
     
+    static func lookupWith(remoteIds:[String], in context:NSManagedObjectContext) -> [String:Matchstick]{
+        let fetchRequest: NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "remoteId IN %@", remoteIds)
+        fetchRequest.sortDescriptors = nil
+        var matchstickLookup:[String:Matchstick] = [:]
+        if let results = try? context.fetch(fetchRequest) {
+            results.forEach { if let remoteId = $0.remoteId { matchstickLookup[remoteId] = $0  } }
+        }
+        return matchstickLookup
+    }
+    
+    static func with( imageUrl:String, in context:NSManagedObjectContext) -> Matchstick?{
+        let fetchRequest: NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "imageUrl == %@", imageUrl)
+        fetchRequest.sortDescriptors = nil
+        if let results = try? context.fetch(fetchRequest), let matchstick = results.first {
+            return matchstick
+        }
+        return nil
+    }
 }

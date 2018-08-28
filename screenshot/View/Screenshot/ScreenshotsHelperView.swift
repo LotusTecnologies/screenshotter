@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Corey Werner on 9/17/17.
-//  Copyright © 2017 crazeapp. All rights reserved.
+//  Copyright (c) 2017 crazeapp. All rights reserved.
 //
 
 import UIKit
@@ -30,11 +30,11 @@ class ScreenshotsHelperView: HelperView {
         
         uploadButton.translatesAutoresizingMaskIntoConstraints = false
         uploadButton.backgroundColor = .crazeGreen
-        uploadButton.setTitle("screenshot.empty.upload".localized, for: .normal)
+        uploadButton.setTitle("screenshots.actions.upload".localized, for: .normal)
         
         discoverButton.translatesAutoresizingMaskIntoConstraints = false
         discoverButton.backgroundColor = .crazeGreen
-        discoverButton.setTitle("screenshot.empty.discover".localized, for: .normal)
+        discoverButton.setTitle("screenshots.actions.discover".localized, for: .normal)
         
         syncType()
     }

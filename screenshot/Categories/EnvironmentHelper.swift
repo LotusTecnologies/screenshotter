@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Corey Werner on 11/15/17.
-//  Copyright © 2017 crazeapp. All rights reserved.
+//  Copyright (c) 2017 crazeapp. All rights reserved.
 //
 
 import UIKit
@@ -26,10 +26,7 @@ extension UIApplication {
         #endif
     }
     
-    static var isUSC: Bool {
-        // Revert to never use USC.
-        return false //UserDefaults.standard.bool(forKey: UserDefaultsKeys.isUSC)
-    }
+    
 }
 
 extension DispatchQueue {

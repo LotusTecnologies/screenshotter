@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Corey Werner on 3/15/18.
-//  Copyright © 2018 crazeapp. All rights reserved.
+//  Copyright (c) 2018 crazeapp. All rights reserved.
 //
 
 import UIKit
@@ -73,8 +73,10 @@ class ProductsCollectionView: UICollectionView {
         product.setFavorited(toFavorited: isFavorited)
         if isFavorited {
             Analytics.trackProductFavorited(product: product, page: .product)
+            LocalNotificationModel.shared.registerCrazeFavoritedPriceAlert(id: product.id, merchant: product.merchant, lastPrice: product.floatPrice)
         }else{
             Analytics.trackProductUnfavorited(product: product, page: .product)
+            LocalNotificationModel.shared.deregisterCrazeFavoritedPriceAlert(id: product.id, merchant: product.merchant)
         }
     }
 }

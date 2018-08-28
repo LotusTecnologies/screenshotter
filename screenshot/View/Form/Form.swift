@@ -3,11 +3,10 @@
 //  screenshot
 //
 //  Created by Corey Werner on 3/26/18.
-//  Copyright © 2018 crazeapp. All rights reserved.
+//  Copyright (c) 2018 crazeapp. All rights reserved.
 //
 
 import UIKit
-import CreditCardValidator
 
 class Form {
     var sections: [FormSection]? {
@@ -162,21 +161,7 @@ class FormRow: NSObject {
 }
 
 extension FormRow {
-    class Card: Text {
-        fileprivate override var validRegex: String? {
-            return "[0-9* ]{15,19}"
-        }
-        
-        override func isValid() -> Bool {
-            var isValid = super.isValid()
-            
-            if isValid, let number = value, !number.isEmpty {
-                isValid = CreditCardValidator().validate(string: number)
-            }
-            
-            return isValid
-        }
-    }
+   
     
     class Checkbox: FormRow {
         override init() {
@@ -198,68 +183,17 @@ extension FormRow {
         }
     }
     
-    class CVV: Number {
-        fileprivate override var validRegex: String? {
-            return "[0-9]{3,4}"
-        }
-    }
-    
     class Email: Text {
         fileprivate override var validRegex: String? {
             return "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
         }
     }
     
-    class Expiration: FormRow {
-        typealias Date = (month: Int, year: Int)
-        
-        // The value should be stored as "mm/yyyy"
-        static func date(for value: String?) -> Date? {
-            guard let components = value?.split(separator: "/"),
-                components.count == 2,
-                let month = Int(components[0]),
-                let year = Int(components[1])
-                else {
-                    return nil
-            }
-            
-            return Date(month: month, year: year)
-        }
-        
-        static func value(for date: Date?) -> String? {
-            guard let month = date?.month, let year = date?.year else {
-                return nil
-            }
-            
-            if month > 0 && year > 0 {
-                return String(format: "%02d/%d", month, year)
-            }
-            else if month > 0 {
-                return String(format: "%02d", month)
-            }
-            else {
-                return "\(year)"
-            }
-        }
-        
-        static func isYear(_ value: Int) -> Bool {
-            return value / 1000 > 1
-        }
-        
-        fileprivate override var validRegex: String? {
-            return "[0-9]{2}\\/[0-9]{4}"
-        }
-    }
+   
     
     class Number: Text {
         fileprivate override var validRegex: String? {
             return "[0-9]+"
-        }
-    }
-    
-    class Phone: Text {
-        fileprivate override var validRegex: String? {
-            return "\\+?[0-9-() ]{10,15}"
         }
     }
     

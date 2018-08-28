@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Jonathan Rose on 5/8/18.
-//  Copyright © 2018 crazeapp. All rights reserved.
+//  Copyright (c) 2018 crazeapp. All rights reserved.
 //
 
 import UIKit
@@ -83,6 +83,17 @@ class SectionBackgroundCollectionViewFlowLayout: UICollectionViewFlowLayout {
         }else{
             return super.layoutAttributesForSupplementaryView(ofKind: elementKind, at: indexPath)
         }
+    }
+    
+    override func layoutAttributesForSupplementaryView(ofKind elementKind: String, at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
+        if elementKind == SectionBackgroundCollectionViewFlowLayout.ElementKindSectionSectionBackground{
+            for a in self.decorationItems {
+                if a.indexPath == indexPath {
+                    return a
+                }
+            }
+        }
+        return super.layoutAttributesForSupplementaryView(ofKind: elementKind, at: indexPath)
     }
     
     override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {

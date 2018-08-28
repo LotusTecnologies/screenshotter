@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14135" systemVersion="17F77" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="DisplayingDiscoverItem" representedClassName="DisplayingDiscoverItem" syncable="YES" codeGenerationType="class">
+        <attribute name="dataAdded" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="imageURL" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="itemId" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="GarbageDiscoverItem" representedClassName="GarbageDiscoverItem" syncable="YES" codeGenerationType="class">
+        <attribute name="dateAdded" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="dateSkipped" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="imageURL" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="itemId" attributeType="String" syncable="YES"/>
+        <attribute name="recombeeRecommend" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="was404" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="wasAdded" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <fetchIndex name="byPropertyIndex">
+            <fetchIndexElement property="itemId" type="Binary" order="ascending"/>
+        </fetchIndex>
+    </entity>
+    <entity name="QueuedDiscoverItem" representedClassName="QueuedDiscoverItem" syncable="YES" codeGenerationType="class">
+        <attribute name="imageURL" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="itemId" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="recombeeRecommended" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <fetchIndex name="byPropertyIndex">
+            <fetchIndexElement property="itemId" type="Binary" order="ascending"/>
+        </fetchIndex>
+    </entity>
+    <elements>
+        <element name="DisplayingDiscoverItem" positionX="-63" positionY="-18" width="128" height="90"/>
+        <element name="GarbageDiscoverItem" positionX="-54" positionY="18" width="128" height="150"/>
+        <element name="QueuedDiscoverItem" positionX="-36" positionY="45" width="128" height="90"/>
+    </elements>
+</model>

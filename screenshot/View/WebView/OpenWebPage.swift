@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Jonathan Rose on 2/20/18.
-//  Copyright © 2018 crazeapp. All rights reserved.
+//  Copyright (c) 2018 crazeapp. All rights reserved.
 //
 
 import Foundation
@@ -59,7 +59,7 @@ enum OpenWebPage : String {
         case .safari:
             return UIApplication.shared.canOpenURL(url)
         case .chrome:
-            return  UIApplication.shared.canOpenInChrome(url: url)
+            return UIApplication.shared.canOpenInChrome(url: url)
         }
     }
     

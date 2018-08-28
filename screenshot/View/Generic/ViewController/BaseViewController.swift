@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Gershon Kagan on 2/11/18.
-//  Copyright © 2018 crazeapp. All rights reserved.
+//  Copyright (c) 2018 crazeapp. All rights reserved.
 //
 
 import UIKit
@@ -26,6 +26,7 @@ class BaseViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        AppDelegate.shared.syncHiddenLogo()
         lifeCycleDelegate?.viewController(self, didAppear: animated)
     }
     
@@ -36,6 +37,7 @@ class BaseViewController: UIViewController {
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
+        AppDelegate.shared.syncHiddenLogo()
         lifeCycleDelegate?.viewController(self, didDisappear: animated)
     }
     
@@ -53,11 +55,5 @@ class BaseViewController: UIViewController {
     
     override var prefersStatusBarHidden: Bool {
         return isStatusBarHidden
-    }
-    
-    // MARK: - Extra
-    
-    func addNavigationItemLogo() {
-        self.navigationItem.titleView = UIImageView(image: UIImage(named: "BrandLogo20h"))
     }
 }

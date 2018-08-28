@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Corey Werner on 11/7/17.
-//  Copyright © 2017 crazeapp. All rights reserved.
+//  Copyright (c) 2017 crazeapp. All rights reserved.
 //
 
 import Foundation
@@ -20,6 +20,8 @@ class ShadowCollectionViewCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        
+        contentView.clipsToBounds = true
         
         shadowView.translatesAutoresizingMaskIntoConstraints = false
         shadowView.layoutMargins = Shadow.basic.layoutMargins

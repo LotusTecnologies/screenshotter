@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Corey Werner on 10/3/17.
-//  Copyright © 2017 crazeapp. All rights reserved.
+//  Copyright (c) 2017 crazeapp. All rights reserved.
 //
 
 import UIKit
@@ -62,11 +62,21 @@ extension UIDevice {
     }
     
     fileprivate var modelIdentifierNumber: Double {
+        // https://www.theiphonewiki.com/wiki/Models
         return Double(modelIdentifier.replacingOccurrences(of: ",", with: ".").trimmingCharacters(in: CharacterSet.decimalDigits.inverted)) ?? 0
     }
     
     var hasTapticEngine: Bool {
         return modelIdentifierNumber >= 8 // greater then iPhone 6s
+    }
+    
+    var isIphoneX: Bool {
+        if UIDevice.isSimulator {
+            return self.userInterfaceIdiom == .phone && UIDevice.is812h
+        }
+        else {
+            return modelIdentifierNumber == 10.3 || modelIdentifierNumber == 10.6
+        }
     }
 }
 

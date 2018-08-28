@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Corey Werner on 12/27/17.
-//  Copyright © 2017 crazeapp. All rights reserved.
+//  Copyright (c) 2017 crazeapp. All rights reserved.
 //
 
 import Foundation
@@ -30,6 +30,11 @@ class FavoritesNavigationController : UINavigationController {
         viewControllers = [favoritesViewController]
     }
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        view.backgroundColor = .background
+    }
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
@@ -37,10 +42,9 @@ class FavoritesNavigationController : UINavigationController {
         self.popToRootViewController(animated: false)
     }
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        view.backgroundColor = .background
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        UniversalSearchController.shared.updateInboxBadgeCount()
     }
 }
 

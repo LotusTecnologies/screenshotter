@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Jonathan Rose on 3/4/18.
-//  Copyright © 2018 crazeapp. All rights reserved.
+//  Copyright (c) 2018 crazeapp. All rights reserved.
 //
 
 import UIKit
@@ -48,7 +48,7 @@ class AsyncOperationMonitor {
         if let userInfo = notification.userInfo, let changedTags = userInfo["tags"] as? [AsyncOperationTag], let queueUUID = userInfo["queueUUID"] as? UUID {
             if self.queueUUIDs.contains(queueUUID) {
                 var didChangeTag = false
-                for t  in changedTags {
+                for t in changedTags {
                     if tags.contains(t) {
                         didChangeTag = true
                     }
@@ -57,10 +57,8 @@ class AsyncOperationMonitor {
                     let oldValue = self.didStart
                     let newValue = calculateDidStart()
                     if oldValue != newValue {
-                        DispatchQueue.main.async {
-                            self.didStart = newValue
-                            self.delegate?.asyncOperationMonitorDidChange(self)
-                        }
+                        self.didStart = newValue
+                        self.delegate?.asyncOperationMonitorDidChange(self)
                     }
                 }
             }
@@ -80,41 +78,43 @@ class AsyncOperationMonitorCenter {
     
     
     public func registerStarted(queueUUID:UUID?, tags:[AsyncOperationTag]?) {
-        if let queueUUID = queueUUID, let tags = tags {
-            var queueDict = self.runningTags[queueUUID] ?? [:]
-            for tag in tags {
-                var tagDict = queueDict[tag.type] ?? [:]
-                tagDict[tag.value] = (tagDict[tag.value] ?? 0) + 1
-                queueDict[tag.type] = tagDict
+        DispatchQueue.mainAsyncIfNeeded {
+            if let queueUUID = queueUUID, let tags = tags {
+                var queueDict = self.runningTags[queueUUID] ?? [:]
+                
+                for tag in tags {
+                    var tagDict = queueDict[tag.type] ?? [:]
+                    tagDict[tag.value] = (tagDict[tag.value] ?? 0) + 1
+                    queueDict[tag.type] = tagDict
+                    
+                }
+                self.runningTags[queueUUID] = queueDict
+                NotificationCenter.default.post(name: .AsyncOperationTagMonitorCenterDidChange, object: nil, userInfo: ["tags":tags,"queueUUID":queueUUID])
             }
-            self.runningTags[queueUUID] = queueDict
-            NotificationCenter.default.post(name: .AsyncOperationTagMonitorCenterDidChange, object: nil, userInfo: ["tags":tags,"queueUUID":queueUUID.uuidString])
         }
 
     }
     
     public func registerStopped(queueUUID:UUID?, tags:[AsyncOperationTag]?) {
-        if let queueUUID = queueUUID, let tags = tags {
-            var queueDict = self.runningTags[queueUUID] ?? [:]
-            for tag in tags {
-                var tagDict = queueDict[tag.type] ?? [:]
-                tagDict[tag.value] = (tagDict[tag.value] ?? 1) - 1
-                queueDict[tag.type] = tagDict
+        DispatchQueue.mainAsyncIfNeeded {
+            
+            if let queueUUID = queueUUID, let tags = tags {
+                var queueDict = self.runningTags[queueUUID] ?? [:]
+                
+                for tag in tags {
+                    var tagDict = queueDict[tag.type] ?? [:]
+                    tagDict[tag.value] = (tagDict[tag.value] ?? 1) - 1
+                    queueDict[tag.type] = tagDict
+                }
+                
+                self.runningTags[queueUUID] = queueDict
+                NotificationCenter.default.post(name: .AsyncOperationTagMonitorCenterDidChange, object: nil, userInfo: ["tags":tags,"queueUUID":queueUUID])
             }
-            self.runningTags[queueUUID] = queueDict
-            NotificationCenter.default.post(name: .AsyncOperationTagMonitorCenterDidChange, object: nil, userInfo: ["tags":tags,"queueUUID":queueUUID])
         }
     }
     
     public func countFor(tag:AsyncOperationTag, queue:UUID) -> Int{
         return self.runningTags[queue]?[tag.type]?[tag.value] ?? 0
-    }
-    
-    func tagsEnded(_ tags:[AsyncOperationTag]) {
-    }
-    
-    func tagStarted(_ tags:[AsyncOperationTag]) {
-        NotificationCenter.default.post(name: .AsyncOperationTagMonitorCenterDidChange, object: nil, userInfo: ["tags":tags])
     }
     
 }
@@ -125,6 +125,7 @@ class AsyncOperationTag: Equatable {
         case assetId
         case shoppableId
         case productNumber
+        case filterChange
     }
     var type:TagType
     var value:String
@@ -141,13 +142,64 @@ class AsyncOperationTag: Equatable {
 }
 
 class AsyncOperationQueue : OperationQueue {
-    fileprivate let uuid = UUID.init()
+    let uuid = UUID.init()
+    
+    private static var observerContext = 0
+    
+    var operationPrioritySorting:((AsyncOperation, AsyncOperation) -> Bool?)? {
+        didSet{
+            setAllOperationPriority(operations:self.operations)
+        }
+    }
+    override init() {
+        super.init()
+        self.addObserver(self, forKeyPath: "operations", options: .new, context: &AsyncOperationQueue.observerContext)
+        
+    }
+    deinit {
+        self.removeObserver(self, forKeyPath: "operations", context: &AsyncOperationQueue.observerContext)
+    }
+    
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        
+        if context == &AsyncOperationQueue.observerContext {
+            setAllOperationPriority(operations:self.operations)
+        }else {
+            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
+        }
+    }
+    
+    private func setAllOperationPriority(operations:[Operation]) {
+        if let sort = self.operationPrioritySorting {
+            let sortedOperations = operations.filter{ $0.isCancelled == false && $0.isFinished == false && $0.isExecuting == false}.sorted { (op1, op2) -> Bool in
+                if let op1 = op1 as? AsyncOperation,
+                    let op2 = op2 as? AsyncOperation{
+                    if let result = sort(op1, op2) {
+                        return result
+                    }
+                }
+                return op1.hash > op2.hash
+            }
+            
+            var priorities:[Operation.QueuePriority] =  [.veryHigh, .high, .normal, .low, .veryLow]
+            sortedOperations.forEach { (op) in
+                if let priority = priorities.first{
+                    op.queuePriority = priority
+                    priorities.remove(at: 0)
+                }else{
+                    op.queuePriority = .veryLow
+                }
+            }
+        }
+    }
     
     override func addOperation(_ op: Operation) {
         if let op = op as? AsyncOperation {
             op.queueUuid = self.uuid
             AsyncOperationMonitorCenter.shared.registerStarted(queueUUID: uuid, tags: op.tags)
         }
+        let array = self.operations + [op]
+        setAllOperationPriority(operations: array)
         super.addOperation(op)
     }
 
@@ -166,6 +218,8 @@ class AsyncOperation: Operation {
     fileprivate let uuid = UUID.init()
     fileprivate var queueUuid:UUID?
 
+    var userInfo:[AnyHashable:Any] = [:]
+    
     override var isExecuting: Bool {
         return _executing
     }
@@ -194,7 +248,7 @@ class AsyncOperation: Operation {
     
     private var executionBlock: ((@escaping() -> ()) -> ())?
     private let timeout:TimeInterval?
-    fileprivate let tags:[AsyncOperationTag]
+    let tags:[AsyncOperationTag]
     
     convenience init(timeout:TimeInterval?, completion:@escaping ((@escaping() -> ()) -> ())) {
         self.init(timeout: timeout, tags: [], completion: completion)
@@ -264,7 +318,11 @@ extension AsyncOperation {
         if let shoppableId = shoppableId {
             tags.append(AsyncOperationTag.init(type: .shoppableId, value: shoppableId))
         }
+      
         self.init(timeout: timeout, tags: tags, completion: completion)
+        if let assetId = assetId {
+            userInfo = ["assetId":assetId]
+        }
     }
     
     convenience init(timeout:TimeInterval?, partNumbers:[String], completion:@escaping ((@escaping() -> ()) -> ())) {
@@ -286,14 +344,6 @@ extension AsyncOperationMonitor {
             tags.append(AsyncOperationTag.init(type: .shoppableId, value: shoppableId))
         }
         self.init(tags: tags, queues:queues, delegate: delegate)
-    }
-    
-    convenience init(tracking partNumbers:[String], delegate:AsyncOperationMonitorDelegate?) {
-        var tags:[AsyncOperationTag] = []
-        partNumbers.forEach { tags.append(AsyncOperationTag.init(type: .productNumber, value: $0)) }
-        
-        self.init(tags: tags, queues:[ShoppingCartModel.shared.priceAlertQueue], delegate: delegate)
-
     }
 
 }

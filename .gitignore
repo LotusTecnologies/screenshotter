@@ -1,12 +1,12 @@
 .DS_Store
 Pods/
-screenshot.xcodeproj/project.xcworkspace/
-screenshot.xcodeproj/xcuserdata/
-screenshot.xcworkspace/xcuserdata/
-#screenshot.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
+Screenshop.xcodeproj/project.xcworkspace/
+Screenshop.xcodeproj/xcuserdata/
+Screenshop.xcworkspace/xcuserdata/
+#Screenshop.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
 screenshot/.DS_Store
-screenshot.app.dSYM.zip
-screenshot.ipa
+Screenshop.app.dSYM.zip
+Screenshop.ipa
 
 # fastlane specific
 fastlane/report.xml

@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Corey Werner on 1/7/18.
-//  Copyright © 2018 crazeapp. All rights reserved.
+//  Copyright (c) 2018 crazeapp. All rights reserved.
 //
 
 import Foundation
@@ -14,7 +14,8 @@ protocol DiscoverScreenshotViewControllerDelegate : NSObjectProtocol {
     func discoverScreenshotViewController(_ viewController: DiscoverScreenshotViewController, didSelectItemAtIndexPath indexPath: IndexPath)
 }
 
-class DiscoverScreenshotViewController : BaseViewController {
+class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonitorDelegate {
+    
     fileprivate let collectionView = UICollectionView(frame: .zero, collectionViewLayout: DiscoverScreenshotCollectionViewLayout())
     fileprivate var matchstickFrc: FetchedResultsControllerManager<Matchstick>?
     fileprivate var matchsticks:[Matchstick] = []
@@ -22,8 +23,15 @@ class DiscoverScreenshotViewController : BaseViewController {
     fileprivate let addButton = UIButton()
     fileprivate var cardHelperView: DiscoverScreenshotHelperView?
     fileprivate let emptyView = HelperView()
-    
+    fileprivate let clearFilterView = HelperView()
+
+    fileprivate let discoverFilterControl = DiscoverFilterControl()
+
     weak var delegate: DiscoverScreenshotViewControllerDelegate?
+    
+    private var loading = Loader()
+    
+    var filterReloadMonitor:AsyncOperationMonitor?
     
     override var title: String? {
         set {}
@@ -42,14 +50,49 @@ class DiscoverScreenshotViewController : BaseViewController {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
         restorationIdentifier = String(describing: type(of: self))
-        
-        
-        addNavigationItemLogo()
     }
     
+    func updateViewsLoadingState(){
+        if self.matchsticks.count == 0 {
+            let isFilterReloading = self.filterReloadMonitor?.didStart ?? false
+            passButton.isHidden = isFilterReloading
+            addButton.isHidden = isFilterReloading
+            collectionView.isHidden = isFilterReloading
+            loading.isHidden = !isFilterReloading
+            if DiscoverManager.shared.isUnfiltered {
+                emptyView.isHidden = isFilterReloading
+                clearFilterView.isHidden = true
+            }else{
+                emptyView.isHidden = true
+                clearFilterView.isHidden = isFilterReloading
+                let name = discoverFilterControl.selectedCategory.displayName
+                clearFilterView.titleLabel.text = "discover.no_more".localized(withFormat: name)
+                
+            }
+            if isFilterReloading {
+                loading.startAnimation()
+            }else{
+                loading.stopAnimation()
+            }
+        }else{
+            passButton.isHidden = false
+            addButton.isHidden = false
+            collectionView.isHidden = false
+            loading.isHidden = true
+            emptyView.isHidden = true
+            clearFilterView.isHidden = true
+            loading.stopAnimation()
+        }
+        
+    }
+    func asyncOperationMonitorDidChange(_ monitor: AsyncOperationMonitor) {
+        updateViewsLoadingState()
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        self.filterReloadMonitor = DiscoverManager.shared.createFilterChangingMonitor(delegate: self)
+
         matchstickFrc = DataModel.sharedInstance.matchstickFrc(delegate:self)
         self.matchsticks = matchstickFrc?.fetchedObjects ?? []
         
@@ -59,6 +102,21 @@ class DiscoverScreenshotViewController : BaseViewController {
         if let layout = collectionView.collectionViewLayout as? DiscoverScreenshotCollectionViewLayout {
             layout.delegate = self
         }
+
+        loading.translatesAutoresizingMaskIntoConstraints = false
+        self.view.addSubview(loading)
+        loading.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
+        loading.centerYAnchor.constraint(equalTo: self.view.centerYAnchor).isActive = true
+        
+        discoverFilterControl.addTarget(self, action: #selector(didChangeCategoryFilter(_:)), for: .valueChanged)
+        discoverFilterControl.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(discoverFilterControl)
+        discoverFilterControl.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor, constant:5.0).isActive = true
+        
+        discoverFilterControl.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        discoverFilterControl.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        discoverFilterControl.heightAnchor.constraint(equalToConstant: DiscoverFilterControl.defaultHeight).isActive = true
+
         
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.dataSource = self
@@ -68,7 +126,7 @@ class DiscoverScreenshotViewController : BaseViewController {
         collectionView.scrollsToTop = false
         collectionView.register(DiscoverScreenshotCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
         view.addSubview(collectionView)
-        collectionView.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor).isActive = true
+        collectionView.topAnchor.constraint(equalTo: discoverFilterControl.bottomAnchor).isActive = true
         collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
@@ -118,29 +176,115 @@ class DiscoverScreenshotViewController : BaseViewController {
         emptyView.contentImage = UIImage(named: "DiscoverScreenshotEmptyListGraphic")
         emptyView.layoutMargins = UIEdgeInsets(top: .extendedPadding, left: .extendedPadding, bottom: .extendedPadding, right: .extendedPadding)
         view.insertSubview(emptyView, belowSubview: collectionView)
-        emptyView.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor).isActive = true
+        emptyView.topAnchor.constraint(equalTo: discoverFilterControl.bottomAnchor).isActive = true
         emptyView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         emptyView.bottomAnchor.constraint(equalTo: passButton.topAnchor).isActive = true
         emptyView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
+        
+        
+        clearFilterView.translatesAutoresizingMaskIntoConstraints = false
+        clearFilterView.titleLabel.text = "discover.no_more.default".localized
+        clearFilterView.contentImage = UIImage(named: "DiscoverNoMoreInFilter")
+        let button = MainButton()
+        button.addTarget(self, action: #selector(selectAllFilter(_:)), for: .touchUpInside)
+        button.backgroundColor = .crazeRed
+        button.setTitle("discover.no_more.show_all".localized, for: .normal)
+        button.setTitleColor(.white, for: .normal)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        clearFilterView.controlView.addSubview( button )
+        button.topAnchor.constraint(equalTo: clearFilterView.controlView.topAnchor).isActive = true
+        button.leadingAnchor.constraint(equalTo: clearFilterView.controlView.leadingAnchor).isActive = true
+        button.trailingAnchor.constraint(equalTo: clearFilterView.controlView.trailingAnchor).isActive = true
+        button.bottomAnchor.constraint(equalTo: clearFilterView.controlView.bottomAnchor).isActive = true
+        clearFilterView.layoutMargins = UIEdgeInsets(top: .extendedPadding, left: .extendedPadding, bottom: .extendedPadding, right: .extendedPadding)
+        view.insertSubview(clearFilterView, belowSubview: collectionView)
+        clearFilterView.topAnchor.constraint(equalTo: discoverFilterControl.bottomAnchor).isActive = true
+        clearFilterView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        clearFilterView.bottomAnchor.constraint(equalTo: passButton.topAnchor).isActive = true
+        clearFilterView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        
+        
+        
+//        self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "NavigationBarFilter"), style: .plain, target: self, action: #selector(showGenderPopup(_:)))
+
+        let isFilterReloading = true
+        passButton.isHidden = isFilterReloading
+        addButton.isHidden = isFilterReloading
+        collectionView.isHidden = isFilterReloading
+        loading.isHidden = !isFilterReloading
+        emptyView.isHidden = isFilterReloading
+        clearFilterView.isHidden = isFilterReloading
+        
         let pinchZoom = UIPinchGestureRecognizer.init(target: self, action: #selector(pinch(gesture:)))
         self.view.addGestureRecognizer(pinchZoom)
+        updateViewsLoadingState()
+
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
+        DiscoverManager.shared.discoverViewDidAppear()
         syncEmptyListViews()
     }
-    
-    
-    deinit {
-        if let layout = collectionView.collectionViewLayout as? DiscoverScreenshotCollectionViewLayout {
-            layout.delegate = nil
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        discoverFilterControl.scrollToSelected()
+
+    }
+    @objc func selectAllFilter(_ sender:Any){
+        self.discoverFilterControl.selectAllFilter()
+        DiscoverManager.shared.updateFilter(category: nil)
+        DiscoverManager.shared.updateGender(gender: "")
+
+        self.updateViewsLoadingState()
+    }
+
+    @objc func showGenderPopup(_ sender:Any){
+        if let sender = sender as? UIBarButtonItem {
+            let vc = DiscoverGenderOptionViewController.init()
+            vc.modalPresentationStyle = .popover
+            
+            vc.popoverPresentationController?.permittedArrowDirections = [.up, .down]
+            vc.popoverPresentationController?.delegate = self
+            vc.popoverPresentationController?.barButtonItem = sender
+            
+            self.present(vc, animated: true) {
+                
+            }
+        }
+    }
+    @objc func didChangeCategoryFilter(_ sender:Any){
+        let category = self.discoverFilterControl.selectedCategory
+        self.matchsticks = []
+        self.collectionView.reloadData()
+        if category.filterName == "" {
+            DiscoverManager.shared.updateFilter(category: nil)
+        }else{
+            DiscoverManager.shared.updateFilter(category: category.filterName)
+        }
+         if category.genderName == "male"{
+            DiscoverManager.shared.updateGender(gender: "male")
+         }else if category.genderName == "female" {
+            DiscoverManager.shared.updateGender(gender: "female")
+         }else{
+            DiscoverManager.shared.updateGender(gender: "")
         }
         
-        collectionView.dataSource = nil
-        collectionView.delegate = nil
+        self.updateViewsLoadingState()
+        
+    }
+    
+    deinit {
+        if isViewLoaded {
+            if let layout = collectionView.collectionViewLayout as? DiscoverScreenshotCollectionViewLayout {
+                layout.delegate = nil
+            }
+            
+            collectionView.dataSource = nil
+            collectionView.delegate = nil
+        }
     }
     
     // MARK:
@@ -196,7 +340,7 @@ class DiscoverScreenshotViewController : BaseViewController {
             if let matchStick = currentMatchstick {
                 removeCurrentMatchstickIfPossible()
                 screenshotsTabPulseAnimation()
-                matchStick.pass()
+                matchStick.delayedAdd()
             }
         }
     }
@@ -230,6 +374,7 @@ class DiscoverScreenshotViewController : BaseViewController {
             collectionView.deleteItems(at: [currentIndexPath])
         })
         
+        updateViewsLoadingState()
         setInteractiveElementsOffWithDelay()
     }
     
@@ -295,7 +440,10 @@ class DiscoverScreenshotViewController : BaseViewController {
                 }
                 
                 if self.matchsticks.count == 1 {
-                    emptyView.alpha = abs(percent)
+                    
+                    emptyView.alpha =  abs(percent)
+                    clearFilterView.alpha = abs(percent)
+                   
                 }
                 
                 if !tempButtonDisable {
@@ -438,6 +586,9 @@ class DiscoverScreenshotViewController : BaseViewController {
     
     fileprivate func syncEmptyListViews() {
         emptyView.alpha = isListEmpty ? 1 : 0
+        clearFilterView.alpha = isListEmpty ? 1 : 0
+        clearFilterView.titleLabel.text = "No more \(self.discoverFilterControl.selectedCategory.displayName) outfits"
+        
         syncInteractionElements()
     }
     
@@ -523,7 +674,6 @@ extension DiscoverScreenshotViewController : UICollectionViewDataSource {
             cell.flagButton.addTarget(self, action: #selector(presentReportAlertController), for: .touchUpInside)
             
             let matchstick = matchstickAt(index: indexPath)
-            
             if let imageData = matchstick?.imageData as Data? {
                 cell.image = UIImage(data: imageData)
             }else{
@@ -555,11 +705,18 @@ extension DiscoverScreenshotViewController : UICollectionViewDelegate {
 extension DiscoverScreenshotViewController : FetchedResultsControllerManagerDelegate {
     func managerDidChangeContent(_ controller: NSObject, change: FetchedResultsControllerManagerChange) {
         if isViewLoaded {
-            if change.insertedRows.count > 0 {
+            
+            if change.insertedRows.count > 0 || self.matchstickFrc?.fetchedObjectsCount ?? 0 == 0 {
+                let hadMatchsticks = self.matchsticks.count > 0
                 self.matchsticks = self.matchstickFrc?.fetchedObjects ?? []
+                let nowHasMatchsticks = (self.matchsticks.count > 0)
                 self.collectionView.reloadData()
+                if hadMatchsticks != nowHasMatchsticks {
+                    updateViewsLoadingState()
+                }
             }
             syncEmptyListViews()
+
         }
     }
 }
@@ -574,5 +731,22 @@ fileprivate extension UIButton {
     func isDisabled(_ disabled: Bool) {
         isEnabled = !disabled
         alpha = disabled ? 0.5 : 1
+    }
+}
+
+
+extension DiscoverScreenshotViewController :UIPopoverPresentationControllerDelegate {
+    func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
+        return .none
+    }
+    func popoverPresentationControllerDidDismissPopover(_ popoverPresentationController: UIPopoverPresentationController){
+        if let optionsVC = popoverPresentationController.presentedViewController as? DiscoverGenderOptionViewController {
+            if let updatedGender = optionsVC.updatedGender {
+                if optionsVC.gender != updatedGender {
+                    DiscoverManager.shared.updateGender(gender: updatedGender)
+                    self.updateViewsLoadingState()
+                }
+            }
+        }
     }
 }

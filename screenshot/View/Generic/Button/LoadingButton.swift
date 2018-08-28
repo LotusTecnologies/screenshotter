@@ -3,13 +3,23 @@
 //  screenshot
 //
 //  Created by Corey Werner on 3/21/18.
-//  Copyright © 2018 crazeapp. All rights reserved.
+//  Copyright (c) 2018 crazeapp. All rights reserved.
 //
 
 import UIKit
 
+extension UIControlState {
+    static var loading: UIControlState {
+        return self.application
+    }
+}
+
 class LoadingButton: UIButton {
-    var isLoading = Bool() {
+    override var state: UIControlState {
+        return isLoading ? [super.state, .loading] : super.state
+    }
+    
+    var isLoading = false {
         didSet {
             if isLoading {
                 imageView?.isHidden = true
@@ -53,9 +63,8 @@ class LoadingButton: UIButton {
     }()
     
     fileprivate func syncActivityIndicatorColor() {
-        guard hasActivityIndicator &&
-            state != .disabled else {
-                return
+        guard hasActivityIndicator && state != .disabled else {
+            return
         }
         
         activityIndicator.color = titleColor(for: state)

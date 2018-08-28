@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Jonathan Rose on 5/27/18.
-//  Copyright © 2018 crazeapp. All rights reserved.
+//  Copyright (c) 2018 crazeapp. All rights reserved.
 //
 
 import Foundation
@@ -20,32 +20,34 @@ fileprivate extension UIViewController {
 class ScreenshotShareManager {
     
     static func share(product:Product, in viewController:UIViewController){
-    
         guard let o = product.offer, let offersURL = URL.init(string: o) else {
             return
         }
         
-        
-        
-        let introductoryText = "products.share.title".localized
-        
-        
-        let productObjectId = product.objectID
-        
-        // iOS 11.1 has a bug where copying to clipboard while sharing doesn't put a space between activity items.
-        let space = " "
-
-        let items:[Any] = [introductoryText, space, offersURL]
-        let activityViewController = UIActivityViewController.init(activityItems: items, applicationActivities: [])
-        activityViewController.excludedActivityTypes = [UIActivityType.addToReadingList, UIActivityType.airDrop, UIActivityType.init("com.apple.reminders.RemindersEditorExtension"), UIActivityType.init("com.apple.mobilenotes.SharingExtension")]
-        activityViewController.completionWithItemsHandler = { (activityType, completed, returnedItems, activityError) in
-            let product = DataModel.sharedInstance.mainMoc().productWith(objectId: productObjectId)
-            if (completed) {
-                Analytics.trackProductShareSocial(product: product)
+        NetworkingPromise.sharedInstance.shorten(url: offersURL) { url in
+            let introductoryText = "products.share.title".localized
+            let productObjectId = product.objectID
+            
+            // iOS 11.1 has a bug where copying to clipboard while sharing doesn't put a space between activity items.
+            let space = " "
+            
+            let items: [Any] = [introductoryText, space, url ?? offersURL]
+            let activityViewController = UIActivityViewController.init(activityItems: items, applicationActivities: [])
+            activityViewController.excludedActivityTypes = [
+                UIActivityType.addToReadingList,
+                UIActivityType.airDrop,
+                UIActivityType.init("com.apple.reminders.RemindersEditorExtension"),
+                UIActivityType.init("com.apple.mobilenotes.SharingExtension")
+            ]
+            activityViewController.completionWithItemsHandler = { (activityType, completed, returnedItems, activityError) in
+                let product = DataModel.sharedInstance.mainMoc().productWith(objectId: productObjectId)
+                if completed {
+                    Analytics.trackProductShareSocial(product: product)
+                }
             }
+            activityViewController.popoverPresentationController?.sourceView = viewController.view
+            viewController.present(activityViewController, animated: true, completion: nil)
         }
-        activityViewController.popoverPresentationController?.sourceView = viewController.view
-        viewController.present(activityViewController, animated: true, completion: nil)
     }
 
     
@@ -104,6 +106,7 @@ class ScreenshotShareManager {
                             Analytics.trackShareSocial(screenshot: screenshot)
                         }
                     }
+                    activityViewController.setValue("screenshots.share.subject".localized, forKey: "Subject")
                     activityViewController.popoverPresentationController?.sourceView = viewController.view
                     viewController.present(activityViewController, animated: true, completion: nil)
                 }

@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Gershon Kagan on 9/6/17.
-//  Copyright © 2017 crazeapp. All rights reserved.
+//  Copyright (c) 2017 crazeapp. All rights reserved.
 //
 
 import UIKit
@@ -14,6 +14,7 @@ class ScreenshotActivityItemProvider: UIActivityItemProvider {
     var shareURL: URL?
     var didComplete: Bool = false
     var didSucceed: Bool = false
+    
     
     init(screenshot: Screenshot, placeholderURL: URL) {
         self.placeholderURL = placeholderURL

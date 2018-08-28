@@ -3,7 +3,7 @@
 //  screenshot
 //
 //  Created by Gershon Kagan on 3/27/18.
-//  Copyright © 2018 crazeapp. All rights reserved.
+//  Copyright (c) 2018 crazeapp. All rights reserved.
 //
 
 import UIKit
@@ -34,5 +34,13 @@ extension UIImage {
         UIGraphicsEndImageContext()
         
         return normalizedImage
+    }
+    
+    func grayscaleImage() -> UIImage {
+        if let ciImage = CIImage(image: self){
+            let grayscale = ciImage.applyingFilter("CIColorControls", parameters: [ kCIInputSaturationKey: 0.0, kCIInputBrightnessKey:0.5 ])
+            return UIImage.init(ciImage: grayscale)
+        }
+        return self
     }
 }

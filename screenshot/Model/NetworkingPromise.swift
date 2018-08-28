@@ -3,12 +3,12 @@
 //  screenshot
 //
 //  Created by Gershon Kagan on 8/14/17.
-//  Copyright © 2017 crazeapp. All rights reserved.
+//  Copyright (c) 2017 crazeapp. All rights reserved.
 //
 
 import UIKit
 import PromiseKit
-
+import CoreData
 
 struct ChangelogResponse : Decodable {
     enum CodingKeys : String, CodingKey {
@@ -56,15 +56,16 @@ class NetworkingPromise : NSObject {
         }
     }
 
-    func uploadToSyteWorkhorse(imageData: Data?, orImageUrlString:String?, imageClassification: ClarifaiModel.ImageClassification, isUsc: Bool) -> Promise<NSDictionary> {
-        guard imageClassification != .unrecognized else {
-                let emptyError = NSError(domain: "Craze", code: 3, userInfo: [NSLocalizedDescriptionKey : "Empty image passed to Syte"])
-                return Promise(error: emptyError)
-        }
+    func uploadToSyteURLRequest(imageData: Data?, orImageUrlString:String?) -> Promise<URLRequest> {
         var httpBody:Data?
         var payloadType:String = ""
-        if let url = orImageUrlString {
-            httpBody =  "[\"\(url)\"]".data(using: .utf8)
+        if let urlToSendToSyte = orImageUrlString {
+            if let urlListBody = "[\"\(urlToSendToSyte)\"]".data(using: .utf8) {
+                httpBody = urlListBody
+            } else {
+                let emptyError = NSError(domain: "Craze", code: 3, userInfo: [NSLocalizedDescriptionKey : "Bad URL array to Syte from:\(urlToSendToSyte)"])
+                return Promise(error: emptyError)
+            }
             payloadType = ""
         }else if let imageData = imageData {
             httpBody = imageData
@@ -74,10 +75,7 @@ class NetworkingPromise : NSObject {
             return Promise(error: emptyError)
         }
         
-        let isUSCFeed = isUsc || UserDefaults.standard.bool(forKey: UserDefaultsKeys.abUSC)
-        let urlString = imageClassification == .human
-            ? "https://syteapi.com/v1.1/offers/bb?account_id=\(Constants.syteAccountId)&sig=\(Constants.syteAccountSignature)&features=related_looks,validate&feed=\(isUSCFeed ? Constants.syteUscFeed : Constants.syteNonUscFeed)\(payloadType)"
-            : "https://homedecor.syteapi.com/v1.1/offers/bb?account_id=\(Constants.furnitureAccountId)&sig=\(Constants.furnitureAccountSignature)&features=related_looks,validate&feed=craze_home\(payloadType)"
+        let urlString = "https://syteapi.com/v1.1/offers/bb?account_id=\(Constants.syteAccountId)&sig=\(Constants.syteAccountSignature)&features=related_looks&catalog=fashion\(payloadType)"
 
         guard let url = URL(string: urlString) else {
             let malformedError = NSError(domain: "Craze", code: 3, userInfo: [NSLocalizedDescriptionKey : "Malformed upload url from: \(urlString)"])
@@ -88,25 +86,148 @@ class NetworkingPromise : NSObject {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.httpBody = httpBody
-        let sessionConfiguration = URLSessionConfiguration.default
-//        sessionConfiguration.timeoutIntervalForResource = 60  // On GPRS, even 60 seconds timeout.
-        sessionConfiguration.timeoutIntervalForRequest = 60
-        let promise = URLSession(configuration: sessionConfiguration).dataTask(with: request).asDictionary()
-        return promise
+        return Promise(value: request)
     }
 
-    func uploadToSyte(imageData: Data?, orImageUrlString:String?, imageClassification: ClarifaiModel.ImageClassification, isUsc: Bool) -> Promise<(String, [[String : Any]])> {
-        return uploadToSyteWorkhorse(imageData: imageData, orImageUrlString:orImageUrlString, imageClassification: imageClassification, isUsc: isUsc)
-            .then { dict -> Promise<(String, [[String : Any]])> in
-                guard let responseObjectDict = dict as? [String : Any],
-                    let uploadedURLString = responseObjectDict.keys.first,
-                    let segments = responseObjectDict[uploadedURLString] as? [[String : Any]],
-                    segments.count > 0 else {
-                        let emptyError = NSError(domain: "Craze", code: 4, userInfo: [NSLocalizedDescriptionKey : "Syte returned no segments"])
-                        print("Syte no segments. responseObject:\(dict)")
-                        return Promise(error: emptyError)
+    
+    enum UploadToSyteError : Error {
+        case unknown
+        case invalidResponse
+        case not200
+        case noData
+        case cannotParseJson
+        case jsonIsNotObjectWithStringKeys
+        case emptyObject
+        case shopablesIsNotArrayWithStringKeys
+        case noShoppables
+        public static var errorDomain: String {
+            return "io.crazeapp.screenshot.networkPromise.uploadToSyte"
+        }
+        public var errorCode: Int {
+            switch self {
+            case .unknown:
+                return -1
+            case .invalidResponse:
+                return 1
+            case .not200:
+                return 2
+            case .noData:
+                return 3
+            case .cannotParseJson:
+                return 4
+            case .jsonIsNotObjectWithStringKeys:
+                return 5
+            case .emptyObject:
+                return 6
+            case .shopablesIsNotArrayWithStringKeys:
+                return 7
+            case .noShoppables:
+                return 8
+            
+            
+            }
+        }
+        public var localizedDescription: String {
+            switch self {
+            case .unknown:
+                return "uploadToSyte internal coding error"
+            case .invalidResponse:
+                return "uploadToSyte invalid response"
+            case .not200:
+                return "uploadToSyte invalid status code"
+            case .noData:
+                return "uploadToSyte no data"
+            case .cannotParseJson:
+                return "uploadToSyte invalid json"
+            case .jsonIsNotObjectWithStringKeys:
+                return "uploadToSyte invalid response object dictionary"
+            case .emptyObject:
+                return "uploadToSyte empty object"
+            case .shopablesIsNotArrayWithStringKeys:
+                return "shopables is not an array with string"
+            case .noShoppables:
+                return "uploadToSyte returned no segments"
+            }
+        }
+    
+    }
+    func parseSyteResponse(data:Data?, response:URLResponse?, error:Error?) -> (NSError?, (String, [[String : Any]])?) {
+        if let error = error {
+            return (error as NSError, nil)
+        }
+        guard let response = response as? HTTPURLResponse else {
+            let error = UploadToSyteError.invalidResponse
+            return (NSError(domain: UploadToSyteError.errorDomain, code: error.errorCode, userInfo: [NSLocalizedDescriptionKey : error.localizedDescription]), nil)
+        }
+
+        guard response.statusCode >= 200 && response.statusCode < 300 else {
+            let error = UploadToSyteError.not200
+            var reason = error.localizedDescription
+            if let data = data, let dataString = String(data: data, encoding: .utf8) {
+                reason = dataString
+            }
+            return (NSError(domain: UploadToSyteError.errorDomain, code: error.errorCode, userInfo: [NSLocalizedDescriptionKey : reason,"statusCode":response.statusCode]), nil)
+        }
+        guard let data = data else {
+            let error = UploadToSyteError.noData
+            return (NSError(domain: UploadToSyteError.errorDomain, code: error.errorCode, userInfo: [NSLocalizedDescriptionKey : error.localizedDescription,"statusCode":response.statusCode]), nil)
+
+        }
+        guard let responseObject = (try? JSONSerialization.jsonObject(with: data, options: [])) else{
+            let error = UploadToSyteError.cannotParseJson
+            return (NSError(domain: UploadToSyteError.errorDomain, code: error.errorCode, userInfo: [NSLocalizedDescriptionKey : error.localizedDescription,"statusCode":response.statusCode]), nil)
+        }
+        guard let responseObjectDict = responseObject as? [String: Any] else {
+            let error = UploadToSyteError.jsonIsNotObjectWithStringKeys
+            return (NSError(domain: UploadToSyteError.errorDomain, code: error.errorCode, userInfo: [NSLocalizedDescriptionKey : error.localizedDescription,"statusCode":response.statusCode]), nil)
+        }
+        guard let uploadedURLString = responseObjectDict.keys.first else {
+            let error = UploadToSyteError.emptyObject
+            return (NSError(domain: UploadToSyteError.errorDomain, code: error.errorCode, userInfo: [NSLocalizedDescriptionKey : error.localizedDescription,"statusCode":response.statusCode]), nil)
+        }
+        guard let segments = responseObjectDict[uploadedURLString] as? [[String : Any]] else{
+            let error = UploadToSyteError.shopablesIsNotArrayWithStringKeys
+            return (NSError(domain: UploadToSyteError.errorDomain, code: error.errorCode, userInfo: [NSLocalizedDescriptionKey : error.localizedDescription,"statusCode":response.statusCode]), nil)
+        }
+        guard segments.count > 0 else {
+            let error = UploadToSyteError.noShoppables
+            return (NSError(domain: UploadToSyteError.errorDomain, code: error.errorCode, userInfo: [NSLocalizedDescriptionKey : error.localizedDescription,"statusCode":response.statusCode]), nil)
+        }
+        return (nil, (uploadedURLString, segments))
+    }
+    func uploadToSyteWorkHorse( request:URLRequest) -> Promise<(String, [[String : Any]])> {
+        return Promise { fulfill, reject in
+            let sessionConfiguration = URLSessionConfiguration.default
+            //        sessionConfiguration.timeoutIntervalForResource = 60  // On GPRS, even 60 seconds timeout.
+            sessionConfiguration.timeoutIntervalForRequest = 60
+            let dataTask = URLSession(configuration: sessionConfiguration).dataTask(with: request) { data, response, error in
+                let (error, tuple) = self.parseSyteResponse(data: data, response: response, error: error)
+                if let error = error {
+                    reject(error)
+                }else if let tuple = tuple{
+                    fulfill(tuple)
+                }else{
+                    //unexpected
+                    reject(UploadToSyteError.unknown)
                 }
-                return Promise(value: (uploadedURLString, segments))
+            }
+            dataTask.resume()
+        }
+    }
+    func uploadToSyte(imageData: Data?, orImageUrlString:String?, retry:Bool) -> Promise<(String, [[String : Any]])> {
+        return self.uploadToSyteURLRequest(imageData: imageData, orImageUrlString:orImageUrlString).then { request -> Promise<(String, [[String : Any]])> in
+            let maxRepeat = retry ? 2 : 0
+            return self.attempt(interdelay:.seconds(2), maxRepeat: maxRepeat, body: { return self.uploadToSyteWorkHorse(request: request) }, retryableError: { (error) -> (Bool) in
+                let nsError = error as NSError
+                let retryable:Bool =  ((nsError.code == UploadToSyteError.emptyObject.errorCode  || nsError.code == UploadToSyteError.noShoppables.errorCode ) && nsError.domain == UploadToSyteError.errorDomain)
+                if retryable {
+                    Analytics.trackDevLog(file:  NSString.init(string: #file).lastPathComponent, line: #line, message: "retrying {} or {id:[]} response from syte")
+                }
+                return retryable
+            }).catch(execute: { (error) in
+                let nsError = error as NSError
+                Analytics.trackReceivedUploadErrorFromSyte(imageUrl: orImageUrlString, httpStatusCode: (nsError.userInfo["statusCode"] as? Int), reason: error.localizedDescription)
+            })
         }
     }
     
@@ -201,13 +322,18 @@ class NetworkingPromise : NSObject {
     }
     
     // See: https://github.com/mxcl/PromiseKit/blob/master/Documentation/CommonPatterns.md
-    func attempt<T>(interdelay: DispatchTimeInterval = .seconds(2), maxRepeat: Int = 3, body: @escaping () -> Promise<T>) -> Promise<T> {
+    func attempt<T>(interdelay: DispatchTimeInterval = .seconds(2), maxRepeat: Int = 3, body: @escaping () -> Promise<T>, retryableError: ((Error)->(Bool))? = nil) -> Promise<T> {
         var attempts = 0
         
         func attempt() -> Promise<T> {
             attempts += 1
             return body().recover { error -> Promise<T> in
                 guard attempts < maxRepeat else { throw error }
+                if let retryableError = retryableError {
+                    if !retryableError(error) {
+                        throw error
+                    }
+                }
                 return after(interval: interdelay).then {
                     return attempt()
                 }
@@ -256,23 +382,109 @@ class NetworkingPromise : NSObject {
     func downloadProductsWithRetry(url: URL) -> Promise<[String : Any]> {
         return attempt(interdelay: .seconds(11), maxRepeat: 2, body: {self.downloadProducts(url: url)})
     }
-    
-    func nextMatchsticks() -> Promise<NSDictionary> {
-        let syncTokenParam: String
-        if let matchsticksSyncToken = UserDefaults.standard.string(forKey: UserDefaultsKeys.matchsticksSyncToken),
-          !matchsticksSyncToken.isEmpty {
-            syncTokenParam = "?start=\(matchsticksSyncToken)"
-        } else {
-            syncTokenParam = ""
+  
+    struct RecombeeRecommendation{
+        var imageURL:String
+        var remoteId:String
+        var properties:[String:[String]] = [:]
+    }
+    func recombeeRecommendation(count:Int, gender:String, category:String?) -> Promise<[RecombeeRecommendation]>{
+        let userId = AnalyticsUser.current.identifier
+        var params:[String:Any] = [:]
+        params["count"] = count
+        params["cascadeCreate"] = true
+        params["rotationRate"] = 0.99
+        var filter = "'displayable' == true"
+        params["returnProperties"] = true
+        params["includedProperties"] = "rekognition-labels,genders,itemTypes,rekognition-celebs,uid,tags"
+        if gender == "female" {
+            filter += " AND \"female\" in 'genders'"
+        }else if gender == "male"{
+            filter += " AND \"male\" in 'genders'"
         }
-        guard let url = URL(string: Constants.screenShotLambdaDomain + "screenshots/matchsticks" + syncTokenParam) else {
-            let error = NSError(domain: "Craze", code: 21, userInfo: [NSLocalizedDescriptionKey: "Cannot create matchsticks url from screenShotLambdaDomain:\(Constants.screenShotLambdaDomain)"])
-            return Promise(error: error)
+        if let category = category, !category.isEmpty {
+            filter += " AND \"\(category)\" in 'tags'"
         }
-        let sessionConfiguration = URLSessionConfiguration.default
-        sessionConfiguration.timeoutIntervalForRequest = 60
-        let promise = URLSession(configuration: sessionConfiguration).dataTask(with: URLRequest(url: url)).asDictionary()
-        return promise
+        
+        params["filter"] = filter
+        params["rotationTime"] = 60*60*24*2 // 2 days rotation
+        return NetworkingPromise.sharedInstance.recombeeRequest(path: "recomms/users/\(userId)/items/", method: "GET", params: params).then { (dict) -> Promise<[RecombeeRecommendation]> in
+            var toReturn:[RecombeeRecommendation] = []
+            if let recomms = dict["recomms"] as? [[String:Any]]{
+                if recomms.count == 0 {
+                    //turn off filter...
+//                     UserDefaults.standard.set(true, forKey: UserDefaultsKeys.discoverDontFilter)
+                }
+                recomms.forEach({ (matchstick) in
+                    if let index = matchstick["id"] as? String
+                    {
+                        var properties:[String:[String]] = [:]
+                        
+                        var imageURL = "https://s3.amazonaws.com/screenshop-ordered-matchsticks/\(index).jpg"
+
+                        if let values = matchstick["values"] as? [String:Any]{
+                            values.forEach({ (key, value) in
+                                if let value = value as? [String] {
+                                    properties[key] = value
+                                }
+                            })
+                            if let uid = values["uid"] {
+                                imageURL = "https://s3.amazonaws.com/screenshop-ordered-matchsticks/byUUID/\(uid).jpg"
+                            }
+                        }
+                        
+                        
+                        toReturn.append(RecombeeRecommendation.init(imageURL: imageURL, remoteId: "\(index)", properties:properties))
+                    }
+                })
+            }
+            return Promise.init(value:toReturn)
+        }
+    }
+    func recombeeRequest(path:String, method:String, params:[String:Any]? ) -> Promise<NSDictionary> {
+        let hostName = "rapi.recombee.com"
+        let databaseId = "screenshop"
+        let hmac_timestamp = String(Int(NSDate().timeIntervalSince1970))
+        let partialPath = "/\(databaseId)/\(path)"
+        var queryItems = [URLQueryItem.init(name: "hmac_timestamp", value: "\(hmac_timestamp)")]
+        if let params = params, method == "GET" {
+            params.forEach({ (arg) in
+                let (key, value) = arg
+                    queryItems.append( URLQueryItem.init(name: key, value: "\(value)"))
+
+
+            })
+        }
+        var components = URLComponents.init()
+        components.path = partialPath
+        components.queryItems = queryItems
+        if let string = components.string {
+            let recombeeKey = "TJVMFkb5sq4aaIXJGTCrCzPKsjxuyV8RLZOBlXt9QhGQSVOLNgy4jp3lqdlOc8Gn"
+            let hmac_sign = string.hmac(algorithm: .SHA1, key: recombeeKey)
+            let urlString = "https://\(hostName)\(string)&hmac_sign=\(hmac_sign)"
+            
+            if let url = URL.init(string: urlString ) {
+                var request = URLRequest.init(url: url )
+                request.httpMethod = method
+                request.addValue("application/json", forHTTPHeaderField: "Accept")
+                request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+                if let params = params, method == "POST" {
+                    do{
+                        let parameterData = try JSONSerialization.data(withJSONObject: params, options: [])
+                        request.httpBody = parameterData
+                        request.setValue("\(parameterData.count)", forHTTPHeaderField: "Content-Length")
+                    }catch{
+                        print("recombee request error:\(error)")
+                    }
+                }
+                let sessionConfiguration = URLSessionConfiguration.default
+                sessionConfiguration.timeoutIntervalForRequest = 60
+                let promise = URLSession(configuration: sessionConfiguration).dataTask(with: request).asDictionary()
+                return promise
+            }
+        }
+        return Promise.init(error: NSError.init(domain:  NSString.init(string: #file).lastPathComponent, code: #line, userInfo: [NSLocalizedDescriptionKey:"unable to make url\(path) = \(String(describing: params))"]))
+        
     }
     
     func downloadImageData(urlString: String) -> Promise<Data> {
@@ -294,86 +506,26 @@ class NetworkingPromise : NSObject {
         }
     }
     
-    func getAvailableVariants(partNumber: String) -> Promise<NSDictionary> {
-        guard let url = URL(string: Constants.shoppableDomain + "/product/" + partNumber) else {
-            let error = NSError(domain: "Craze", code: 27, userInfo: [NSLocalizedDescriptionKey: "Cannot create shoppable url from shoppableDomain:\(Constants.shoppableDomain)"])
-            return Promise(error: error)
+    func downloadTmp(from urlString: String, identifier: String) -> Promise<URL> {
+        guard let url = URL(string: urlString) else {
+            return Promise(error: NSError(domain: "Craze", code: 95, userInfo: [NSLocalizedDescriptionKey: "downloadTmp failed to form url for urlString:\(urlString)"]))
         }
-        var request = URLRequest(url: url)
-        request.addValue("bearer \(Constants.shoppableToken)", forHTTPHeaderField: "Authorization")
-        request.addValue(AnalyticsUser.current.identifier, forHTTPHeaderField: "cid")
         let sessionConfiguration = URLSessionConfiguration.default
-        sessionConfiguration.timeoutIntervalForResource = 60
-        let promise = URLSession(configuration: sessionConfiguration).dataTask(with: request).asDictionary()
-        return promise
-    }
-    
-    func createCart() -> Promise<NSDictionary> {
-        guard let url = URL(string: Constants.shoppableDomain + "/cart") else {
-            let error = NSError(domain: "Craze", code: 33, userInfo: [NSLocalizedDescriptionKey: "Cannot create cart url from shoppableDomain:\(Constants.shoppableDomain)"])
-            return Promise(error: error)
-        }
-        var request = URLRequest(url: url)
-        request.addValue("bearer \(Constants.shoppableToken)", forHTTPHeaderField: "Authorization")
-        request.addValue(AnalyticsUser.current.identifier, forHTTPHeaderField: "cid")
-        let sessionConfiguration = URLSessionConfiguration.default
-        sessionConfiguration.timeoutIntervalForResource = 60
-        let promise = URLSession(configuration: sessionConfiguration).dataTask(with: request).asDictionary()
-        return promise
-    }
-
-    func clearCart(remoteId: String) -> Promise<Bool> {
-        guard let url = URL(string: Constants.shoppableDomain + "/cart/\(remoteId)/clear") else {
-            let error = NSError(domain: "Craze", code: 43, userInfo: [NSLocalizedDescriptionKey: "Cannot create clearCart url from remoteId:\(remoteId)  shoppableDomain:\(Constants.shoppableDomain)"])
-            return Promise(error: error)
-        }
-        var request = URLRequest(url: url)
-        request.addValue("bearer \(Constants.shoppableToken)", forHTTPHeaderField: "Authorization")
-        request.addValue(AnalyticsUser.current.identifier, forHTTPHeaderField: "cid")
-        let sessionConfiguration = URLSessionConfiguration.default
-        sessionConfiguration.timeoutIntervalForResource = 60
-        return URLSession(configuration: sessionConfiguration).dataTask(with: request).asDataAndResponse().then { (data, response) -> Promise<Bool> in
-            guard let httpResponse = response as? HTTPURLResponse,
-                httpResponse.statusCode >= 200,
-                httpResponse.statusCode <  300 else {
-                    let error = NSError(domain: "Craze", code: 44, userInfo: [NSLocalizedDescriptionKey: "clearCart invalid http statusCode for url:\(url)"])
-                    print("clearCart httpResponse.statusCode error")
-                    return Promise(error: error)
-            }
-            // Don't bother parsing the contents of what was returned; http status is enough, as on Android.
-            // Contents changes between prod and dev, on March 13, 2018.
-            return Promise(value: true)
+        sessionConfiguration.timeoutIntervalForRequest = 60
+        return URLSession(configuration: sessionConfiguration).dataTask(with: URLRequest(url: url)).asDataAndResponse().then { (data, response) -> Promise<URL> in
+            return self.saveToTmp(data: data, identifier: identifier, originalExtension: url.pathExtension)
         }
     }
 
-    func validateCart(jsonObject: [String : Any]) -> Promise<[String : Any]> {
-        guard let url = URL(string: Constants.shoppableDomain + "/cart/put/bundling") else {
-            let error = NSError(domain: "Craze", code: 37, userInfo: [NSLocalizedDescriptionKey: "Cannot form cart bundle url from shoppableDomain:\(Constants.shoppableDomain)"])
+    func saveToTmp(data: Data, identifier: String, originalExtension: String) -> Promise<URL> {
+        let appendingExtension = originalExtension.isEmpty ? "jpg" : originalExtension
+        let tmpImageFileUrl = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(identifier).appendingPathExtension(appendingExtension)
+        do {
+            try data.write(to: tmpImageFileUrl)
+            return Promise(value: tmpImageFileUrl)
+        } catch {
+            print("saveToTmp error:\(error)")
             return Promise(error: error)
-        }
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.addValue("bearer \(Constants.shoppableToken)", forHTTPHeaderField: "Authorization")
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.addValue(AnalyticsUser.current.identifier, forHTTPHeaderField: "cid")
-        request.httpBody = jsonDatafy(object: jsonObject)
-        let sessionConfiguration = URLSessionConfiguration.default
-        sessionConfiguration.timeoutIntervalForResource = 60
-        return URLSession(configuration: sessionConfiguration).dataTask(with: request).asDataAndResponse().then { (data, response) -> Promise<[String : Any]> in
-            guard let httpResponse = response as? HTTPURLResponse,
-                httpResponse.statusCode >= 200,
-                httpResponse.statusCode <  300 else {
-                    let error = NSError(domain: "Craze", code: 41, userInfo: [NSLocalizedDescriptionKey: "validateCart invalid http statusCode for url:\(url)"])
-                    print("validateCart httpResponse.statusCode error")
-                    return Promise(error: error)
-            }
-            if let jsonObject = try JSONSerialization.jsonObject(with: data) as? [String : Any] {
-                return Promise(value: jsonObject)
-            } else {
-                let error = NSError(domain: "Craze", code: 42, userInfo: [NSLocalizedDescriptionKey: "validateCart JSONSerialize failed for url:\(url)"])
-                print("validateCart failed to JSONSerialize data.count:\(data.count)")
-                return Promise(error: error)
-            }
         }
     }
     
@@ -391,202 +543,16 @@ class NetworkingPromise : NSObject {
         return (firstName, lastName)
     }
     
-    func checkStock(partNumbers: [String]) -> Promise<([[String : Any]], [String])> {
-        guard let url = URL(string: Constants.shoppableDomain + "/product?part_numbers=" + partNumbers.joined(separator: "%2C")) else {
-            let error = NSError(domain: "Craze", code: 27, userInfo: [NSLocalizedDescriptionKey: "Cannot create shoppable url from shoppableDomain:\(Constants.shoppableDomain)"])
-            print("networking checkStock url error:\(error)")
+    
+    func getProductInfo(productId: String) -> Promise<NSDictionary> {
+        // Use production URL even in debug.  Production is more up to date and is safe to use for get only
+        guard let url = URL(string: Constants.notificationsApiEndpointProd + "/variant/" + productId) else {
+            let error = NSError(domain: "Craze", code: 9, userInfo: [NSLocalizedDescriptionKey: "Cannot create URL"])
             return Promise(error: error)
         }
-        var request = URLRequest(url: url)
-        request.addValue("bearer \(Constants.shoppableToken)", forHTTPHeaderField: "Authorization")
-        request.addValue(AnalyticsUser.current.identifier, forHTTPHeaderField: "cid")
-        let sessionConfiguration = URLSessionConfiguration.default
-        sessionConfiguration.timeoutIntervalForRequest = 60
-        return URLSession(configuration: sessionConfiguration).dataTask(with: request).asDataAndResponse().then { data, response -> Promise<([[String : Any]], [String])> in
-            guard let httpResponse = response as? HTTPURLResponse else {
-                let error = NSError(domain: "Craze", code: 42, userInfo: [NSLocalizedDescriptionKey: "checkStock no http response for url:\(String(describing: request.url))"])
-                print("checkStock no httpResponse")
-                return Promise(error: error)
-            }
-            let serializedObject: Any
-            do {
-                serializedObject = try JSONSerialization.jsonObject(with: data)
-            } catch {
-                let error = NSError(domain: "Craze", code: 42, userInfo: [NSLocalizedDescriptionKey: "checkStock JSONSerialize exception for url:\(String(describing: request.url))"])
-                print("checkStock exception on JSONSerialize")
-                return Promise(error: error)
-            }
-            guard httpResponse.statusCode >= 200,
-                httpResponse.statusCode < 300 else {
-                    let error: NSError
-                    if httpResponse.statusCode == 422,
-                        let jsonError = serializedObject as? [String : Any] {
-                        error = NSError(domain: "Shoppable", code: httpResponse.statusCode, userInfo: jsonError)
-                        print("checkStock Shoppable code:\(httpResponse.statusCode)  jsonError:\(String(describing: jsonError))")
-                    } else {
-                        error = NSError(domain: "Craze", code: 41, userInfo: [NSLocalizedDescriptionKey: "checkStock invalid http statusCode for url:\(String(describing: request.url))"])
-                        print("checkStock httpResponse.statusCode error")
-                    }
-                    return Promise(error: error)
-            }
-            if let jsonObject = serializedObject as? [[[String : Any]]] { // First array is array of variant info, second array is array of out of stock. Either may be empty.
-                let variantInfo: [[String : Any]] = jsonObject.first ?? []
-                let outOfStocks: [String] = jsonObject.count >= 2 ? jsonObject[1].compactMap { $0["part_number"] as? String } : []
-                return Promise(value: (variantInfo, outOfStocks))
-            } else if let jsonObject = serializedObject as? [String : Any] { // Unlikely. If passed in single partNumber, receive dictionary, like redirect to /product/partNumber.
-                let variantInfo: [[String : Any]]
-                let outOfStocks: [String]
-                if jsonObject["error"] as? String == "Product Not Found" {
-                    variantInfo = []
-                    if let partNumber = jsonObject["part_number"] as? String {
-                        outOfStocks = [partNumber]
-                    } else {
-                        outOfStocks = []
-                    }
-                } else {
-                    variantInfo = [jsonObject]
-                    outOfStocks = []
-                }
-                return Promise(value: (variantInfo, outOfStocks))
-            }
-            let error = NSError(domain: "Craze", code: 42, userInfo: [NSLocalizedDescriptionKey: "checkStock JSONSerialize failed for url:\(String(describing: request.url))"])
-            print("checkStock failed to JSONSerialize")
-            return Promise(error: error)
-        }
+        return URLSession.shared.dataTask(with: URLRequest(url: url)).asDictionary()
     }
     
-    func nativeCheckout(remoteId: String, card: Card, cvv: String, shippingAddress: ShippingAddress) -> Promise<[[String : Any]]> {
-        guard let url = URL(string: Constants.shoppableHosted + "/api/v3/token/\(Constants.shoppableToken)/checkout") else {
-            let error = NSError(domain: "Craze", code: 37, userInfo: [NSLocalizedDescriptionKey: "Cannot form nativeCheckout url from shoppableHosted:\(Constants.shoppableHosted)"])
-            return Promise(error: error)
-        }
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.addValue("bearer \(Constants.shoppableToken)", forHTTPHeaderField: "Authorization")
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.addValue("http://screenshopit.com", forHTTPHeaderField: "Referer")
-        request.addValue("no-cache", forHTTPHeaderField: "Cache-Control")
-        request.addValue(AnalyticsUser.current.identifier, forHTTPHeaderField: "cid")
-        let tuple = divideByLastSpace(fullName: card.fullName)
-        let billingFirstName = tuple.0
-        let billingLastName = tuple.1
-        let jsonObject: [String : Any] = [
-            "billing_city" : card.city ?? "",
-            "billing_country" : card.country ?? "",
-            "billing_email" : card.email ?? "",
-            "billing_first_name" : billingFirstName,
-            "billing_last_name" : billingLastName,
-            "billing_phone" : card.phone ?? "",
-            "billing_postal_code" : card.zipCode ?? "",
-            "billing_state" : card.state ?? "",
-            "billing_street1" : card.street ?? "",
-            "billing_street2" : "",
-            "card_name" : card.fullName ?? "",
-            "card_number" : card.retrieveCardNumber() ?? "",
-            "cartId" : remoteId,
-            "currency" : "USD",
-            "expiry_month" : "\(card.expirationMonth)",
-            "expiry_year" : "\(card.expirationYear)",
-            "referer" : "http://screenshopit.com",
-            "security_code" : cvv,
-            "shipping_city" : shippingAddress.city ?? "",
-            "shipping_country" : shippingAddress.country ?? "",
-            "shipping_email" : card.email ?? "",
-            "shipping_first_name" : shippingAddress.firstName ?? "",
-            "shipping_last_name" : shippingAddress.lastName ?? "",
-            "shipping_phone" : shippingAddress.phone ?? "",
-            "shipping_postal_code" : shippingAddress.zipCode ?? "",
-            "shipping_state" : shippingAddress.state ?? "",
-            "shipping_street1" : shippingAddress.street ?? "",
-            "shipping_street2" : ""
-        ]
-        request.httpBody = jsonDatafy(object: jsonObject)
-        let sessionConfiguration = URLSessionConfiguration.default
-        sessionConfiguration.timeoutIntervalForResource = 60
-        return sendAndParseNativeCheckout(request: request)
-    }
-    
-    func sendAndParseNativeCheckout(request: URLRequest) -> Promise<[[String : Any]]> {
-        let sessionConfiguration = URLSessionConfiguration.default
-        sessionConfiguration.timeoutIntervalForResource = 60
-        return Promise<[[String : Any]]> { fulfill, reject in
-            let dataTask = URLSession(configuration: sessionConfiguration).dataTask(with: request, completionHandler: { (data, response, error) in
-                if let error = error {
-                    print("sendAndParseNativeCheckout received error:\(error)")
-                    reject(error)
-                    return
-                }
-                guard let data = data else {
-                    let error = NSError(domain: "Craze", code: 42, userInfo: [NSLocalizedDescriptionKey: "sendAndParseNativeCheckout empty data for url:\(String(describing: request.url))"])
-                    print("sendAndParseNativeCheckout empty data")
-                    reject(error)
-                    return
-                }
-                guard let httpResponse = response as? HTTPURLResponse else {
-                    let error = NSError(domain: "Craze", code: 42, userInfo: [NSLocalizedDescriptionKey: "sendAndParseNativeCheckout no http response for url:\(String(describing: request.url))"])
-                    print("sendAndParseNativeCheckout no httpResponse")
-                    reject(error)
-                    return
-                }
-                let serializedObject: Any
-                do {
-                    serializedObject = try JSONSerialization.jsonObject(with: data)
-                } catch {
-                    let error = NSError(domain: "Craze", code: 42, userInfo: [NSLocalizedDescriptionKey: "sendAndParseNativeCheckout JSONSerialize exception for url:\(String(describing: request.url))"])
-                    print("sendAndParseNativeCheckout exception on JSONSerialize")
-                    reject(error)
-                    return
-                }
-                guard httpResponse.statusCode >= 200,
-                  httpResponse.statusCode < 300 else {
-                    let error: NSError
-                    if httpResponse.statusCode == 422,
-                      let jsonError = serializedObject as? [String : Any] {
-                        error = NSError(domain: "Shoppable", code: httpResponse.statusCode, userInfo: jsonError)
-                        print("sendAndParseNativeCheckout Shoppable code:\(httpResponse.statusCode)  jsonError:\(String(describing: jsonError))")
-                    } else {
-                        error = NSError(domain: "Craze", code: 41, userInfo: [NSLocalizedDescriptionKey: "sendAndParseNativeCheckout invalid http statusCode for url:\(String(describing: request.url))"])
-                        print("sendAndParseNativeCheckout httpResponse.statusCode error")
-                    }
-                    reject(error)
-                    return
-                }
-                guard let jsonObject = serializedObject as? [[String : Any]] else {
-                    let error = NSError(domain: "Craze", code: 42, userInfo: [NSLocalizedDescriptionKey: "sendAndParseNativeCheckout JSONSerialize failed for url:\(String(describing: request.url))"])
-                    print("sendAndParseNativeCheckout failed to JSONSerialize")
-                    reject(error)
-                    return
-                }
-                fulfill(jsonObject)
-            })
-            dataTask.resume()
-        }
-    }
-    
-    func geoLocateIsUSC() -> Promise<Bool> {
-        guard let url = URL(string: "http://www.geoplugin.net/json.gp?jsoncallback=") else {
-            let error = NSError(domain: "Craze", code: 49, userInfo: [NSLocalizedDescriptionKey: "Cannot form geoLocate url"])
-            return Promise(error: error)
-        }
-        let sessionConfiguration = URLSessionConfiguration.default
-        sessionConfiguration.timeoutIntervalForResource = 60
-        return URLSession(configuration: sessionConfiguration).dataTask(with: URLRequest(url: url)).asDictionary().then { dict -> Promise<Bool> in
-            var isUsc = false
-            if let countryCode = dict["geoplugin_countryCode"] as? String,
-              countryCode == "US" || countryCode == "IL" {
-                // Set half of the USC audience to non-USC UI, but continue to give USC feed.
-                if arc4random_uniform(2) == 1 {
-                    UserDefaults.standard.set(true, forKey: UserDefaultsKeys.abUSC)
-                } else {
-                    isUsc = true
-                }
-            }
-            UserDefaults.standard.set(isUsc, forKey: UserDefaultsKeys.isUSC)
-            UserDefaults.standard.synchronize()
-            NotificationCenter.default.post(name: .isUSCUpdated, object: nil)
-            return Promise(value: isUsc)
-        }
-    }
     
     // Promises to return an AWS Subscription ARN identifying this device's subscription to our AWS cloud
     func createAndSubscribeToSilentPushEndpoint(pushToken token: String, tzOffset: String, subscriptionARN arn: String? = nil) -> Promise<String> {
@@ -633,55 +599,26 @@ class NetworkingPromise : NSObject {
         }
     }
     
-    func registerPriceAlert(partNumber: String, lastPrice: Float, pushToken: String, outOfStock: Bool) -> Promise<Bool> {
-        let parameterDict: [String : Any] =
-            ["pushToken" : pushToken,
-             "pushTokenPlatform" : "ios",
-             "partNumber" : partNumber,
-             "lastPrice" : lastPrice,
-             "outOfStock" : outOfStock] // One of lastPrice and outOfStock must be provided. Each is optional.
-        return priceAlertWorkhorse(parameterDict: parameterDict, actionName: "registerPriceAlert", serverActionName: "track")
-    }
-    
-    func deregisterPriceAlert(partNumber: String, pushToken: String) -> Promise<Bool> {
-        let parameterDict: [String : Any] =
-            ["pushToken" : pushToken,
-             "pushTokenPlatform" : "ios",
-             "partNumber" : partNumber]
-        return priceAlertWorkhorse(parameterDict: parameterDict, actionName: "deregisterPriceAlert", serverActionName: "unTrack")
-    }
-
-    func priceAlertWorkhorse(parameterDict: [String : Any], actionName: String, serverActionName: String) -> Promise<Bool> {
-        guard let url = URL(string: Constants.screenShotLambdaDomain + "productSubscription/\(serverActionName)") else {
-            let error = NSError(domain: "Craze", code: 60, userInfo: [NSLocalizedDescriptionKey: "Cannot create \(actionName) url from screenShotLambdaDomain:\(Constants.screenShotLambdaDomain)"])
-            print(error)
+    // action = [tapped|favorited|disabled]
+    func registerCrazePriceAlert(id: String, merchant: String, lastPrice: Float, firebaseId: String, action: String = "favorited") -> Promise<(Data, URLResponse)> {
+        guard let url = URL(string: "\(Constants.notificationsApiEndpoint)/users/\(firebaseId)/subscriptions") else {
+            let error = NSError(domain: "Craze", code: 9, userInfo: [NSLocalizedDescriptionKey: "Cannot create url from notificationsApiEndpoint:\(Constants.notificationsApiEndpoint)"])
             return Promise(error: error)
         }
-        guard let parameterData = try? JSONSerialization.data(withJSONObject: parameterDict, options: []) else {
-            let error = NSError(domain: "Craze", code: 61, userInfo: [NSLocalizedDescriptionKey: "Cannot JSONSerialize \(actionName) parameterDict:\(parameterDict)"])
-            print(error)
-            return Promise(error: error)
-        }
-        
-        
+        let parameters = ["subscription" : ["priceAlert" : ["lastSeenPrice" : lastPrice, "variantId" : id, "type" : action, "merchant" : merchant]]]
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.addValue("application/json", forHTTPHeaderField: "Accept")
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.httpBody = parameterData
-        
-        return URLSession.shared.dataTask(with: request).asDataAndResponse().then { data, response -> Promise<Bool> in
-            guard let response = response as? HTTPURLResponse, response.statusCode >= 200 && response.statusCode < 300 else {
-                let error = NSError(domain: "Craze", code: 62, userInfo: [NSLocalizedDescriptionKey: "Invalid status code received from \(actionName) url:\(url)"])
-                print(error)
-                return Promise(error: error)
-            }
-            return Promise(value: true)
-        }.catch { (error) in
-                print("error from tracking price alert: \(error)")
-        }
-    }
+        request.addValue(AnalyticsUser.current.identifier, forHTTPHeaderField: "cid")
 
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: parameters, options: [])
+        } catch {
+            return Promise(error: error)
+        }
+        
+        return URLSession.shared.dataTask(with: request).asDataAndResponse()
+    }
+    
     func submitToDiscover(image: String, userName: String?,  intercomUserId: String?, email: String?) -> Promise<NSDictionary>{
         var parameterDict = ["image" : image]
         if let userName = userName, !userName.isEmpty {
@@ -773,6 +710,49 @@ class NetworkingPromise : NSObject {
         }
     }
     
+    func sendProductEmail( brand:String, title:String, offer:String, price:String, imageURL:String, email:String) -> Promise<NSDictionary>{
+        let postDict:[String:Any] = [
+            "email":email,
+            "products":[[
+                "brand":brand,
+                "title":title,
+                "link":offer,
+                "price":price,
+                "image":imageURL]]
+        ]
+        let userId = UserAccountManager.shared.user?.uid ?? "unknown"
+        
+        if let url = URL(string: Constants.notificationsApiEndpoint + "/users/\(userId)/emailme"), let postData = try? JSONSerialization.data(withJSONObject: postDict, options: []) {
+            let postLength = "\(postData.count)"
+            
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            request.addValue(postLength, forHTTPHeaderField: "Content-Length")
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.addValue("application/json", forHTTPHeaderField: "Accept")
+            request.addValue(AnalyticsUser.current.identifier, forHTTPHeaderField: "cid")
+
+            request.httpBody = postData
+            
+            
+            return URLSession.shared.dataTask(with: request).asDictionary()
+            
+        }else{
+            let error = NSError(domain: "Craze", code: #line, userInfo: [NSLocalizedDescriptionKey: "unable to send 'emailme' request"])
+            return Promise(error: error)
+            
+        }
+    }
+    
+    func sendProductEmailWithRetry( product:Product, email:String) -> Promise<NSDictionary>{
+        let title = product.productTitle() ?? ""
+        let brand = product.calculatedDisplayTitle ?? ""
+        let offer = product.offer ?? ""
+        let price = product.price ?? ""
+        let imageURL = product.imageURL ?? ""
+        return attempt(interdelay: .seconds(21), maxRepeat: 5, body: { self.sendProductEmail(brand: brand, title: title, offer: offer, price: price, imageURL: imageURL, email: email)   })
+    }
+    
     func appSettings() -> Promise<[String : Any]> {
         return Promise { fulfill, reject in
             guard let URL = URL(string: Constants.appSettingsDomain) else {
@@ -842,4 +822,211 @@ class NetworkingPromise : NSObject {
         dataTask.resume()
     }
 
+}
+
+//Amazon
+extension NetworkingPromise {
+    // https://docs.aws.amazon.com/AWSECommerceService/latest/DG/LocaleUS.html
+    // https://docs.aws.amazon.com/AWSECommerceService/latest/DG/ItemSearch.html
+    /// Page = 1...10
+    func searchAmazon(keywords: String, page: Int = 1, options: (sort: ProductsOptionsSort, gender: ProductsOptionsGender, size: ProductsOptionsSize)? = nil) -> Promise<AmazonResponse> {
+        // RFC 3986 section 2.3
+        let unreservedCharacters = CharacterSet.init(charactersIn:  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_.~")
+        
+        let secretKey = "DS2XiI+TpojibQxtMSFkfHGdLkcQVHaoM2mVGVh/"
+        var components = URLComponents.init()
+        components.scheme = "http"
+        components.host = "webservices.amazon.com"
+        components.path = "/onca/xml"
+        var queryItems:[URLQueryItem] = []
+        
+        var querySearchIndex = "Fashion"
+        var querySort: String?
+        
+        if let (sort, gender, size) = options {
+            switch sort {
+            case .similar:
+                querySort = "relevancerank"
+            case .priceAsc:
+                querySort = "price"
+            case .priceDes:
+                querySort = "-price"
+            case .review:
+                querySort = "reviewrank"
+            case .popularity:
+                querySort = "popularity-rank"
+            default:
+                break
+            }
+            
+            if gender == .male {
+                if size == .adult {
+                    querySearchIndex = "FashionMen"
+                }
+                else if size == .child {
+                    querySearchIndex = "FashionBoys"
+                }
+            }
+            else if gender == .female {
+                if size == .adult {
+                    querySearchIndex = "FashionWomen"
+                }
+                else if size == .child {
+                    querySearchIndex = "FashionGirls"
+                }
+            }
+        }
+        
+        queryItems.append(URLQueryItem.init(name: "Service", value: "AWSECommerceService"))
+        queryItems.append(URLQueryItem.init(name: "Operation", value: "ItemSearch"))
+        queryItems.append(URLQueryItem.init(name: "AWSAccessKeyId", value: "AKIAIQQSEU7DPKUSEXTA"))
+        queryItems.append(URLQueryItem.init(name: "AssociateTag", value: "041897-20"))
+        queryItems.append(URLQueryItem.init(name: "SearchIndex", value: querySearchIndex))
+        queryItems.append(URLQueryItem.init(name: "Availability", value: "Available"))
+        queryItems.append(URLQueryItem.init(name: "Keywords", value: keywords))
+        queryItems.append(URLQueryItem.init(name: "ResponseGroup", value: "Images,Offers,ItemAttributes"))
+        queryItems.append(URLQueryItem.init(name: "Version", value: "2013-08-01"))
+        queryItems.append(URLQueryItem.init(name: "ItemPage", value: "\(page)"))
+        
+        if let querySort = querySort {
+            queryItems.append(URLQueryItem.init(name: "Sort", value: querySort))
+        }
+        
+        let dateFormatter = ISO8601DateFormatter()
+        queryItems.append(URLQueryItem.init(name: "Timestamp", value: dateFormatter.string(from: Date())))
+        
+        queryItems.sort { (s1, s2) -> Bool in
+            let u1 = NSString.init(string: "\(s1.name)=\(s1.value ?? "")")
+            let u2 = NSString.init(string: "\(s2.name)=\(s2.value ?? "")")
+            
+            return u1.compare(u2 as String, options: .literal) == ComparisonResult.orderedAscending
+        }
+
+        let queryItemsString = queryItems.compactMap({ (item) -> String? in
+            if let name = item.name.addingPercentEncoding(withAllowedCharacters: unreservedCharacters),
+                let value = item.value?.addingPercentEncoding(withAllowedCharacters: unreservedCharacters) {
+                return "\(name)=\(value)"
+            }
+            return nil
+        }).joined(separator: "&")
+
+        let stringToHmac = "GET\u{0A}webservices.amazon.com\u{0A}/onca/xml\u{0A}\(queryItemsString)"
+        let hmac_sign = stringToHmac.hmacBase64(algorithm: .SHA256, key: secretKey)
+        let hmac_sign_escaped = hmac_sign.addingPercentEncoding(withAllowedCharacters: CharacterSet.init(charactersIn: "+").inverted) ?? ""
+
+        components.queryItems = queryItems
+        
+        return Promise<AmazonResponse> { (fulfill, reject) in
+            guard let urlUnsigned = components.url?.absoluteString, let url = URL.init(string: "\(urlUnsigned)&Signature=\(hmac_sign_escaped)") else {
+                reject(NSError(domain: "Craze", code: 12, userInfo: [NSLocalizedDescriptionKey : "amazon search invalid url"]))
+                return
+            }
+            
+            let request = URLRequest.init(url: url)
+            let dataTask = URLSession.shared.dataTask(with: request) { (data, response, error) in
+                guard let data = data, error == nil else {
+                    if let error = error {
+                        reject(error)
+                    }
+                    else {
+                        reject(NSError(domain: "Craze", code: 12, userInfo: [NSLocalizedDescriptionKey : "amazon search no data"]))
+                    }
+                    return
+                }
+                
+                let amazonParser = AmazonParserModel(xmlData: data)
+                
+                if let amazonError = amazonParser.error {
+                    reject(NSError(domain: "Craze", code: 12, userInfo: [NSLocalizedDescriptionKey : "\(amazonError.code): \(amazonError.message)"]))
+                }
+                else if let amazonResponse = amazonParser.response {
+                    fulfill(amazonResponse)
+                }
+                else {
+                    reject(NSError(domain: "Craze", code: 12, userInfo: [NSLocalizedDescriptionKey : "amazon search unexpected data"]))
+                }
+            }
+            dataTask.resume()
+        }
+    }
+}
+
+// MARK: - Search Category
+
+extension NetworkingPromise {
+    func fetchSearchCategories() -> Promise<SearchRoot> {
+        return Promise<SearchRoot> { fulfill, reject in
+            guard let url = URL(string: Constants.searchCategoriesDomain) else {
+                reject(NSError(domain: "Craze", code: 13, userInfo: [NSLocalizedDescriptionKey: "search category invalid url"]))
+                return
+            }
+            
+            let dataTask = URLSession.shared.dataTask(with: url) { (data, response, error) in
+                if let error = error {
+                    reject(error)
+                }
+                else if let data = data {
+                    if let searchRoot: SearchRoot = try? JSONDecoder().decode(SearchRoot.self, from: data) {
+                        fulfill(searchRoot)
+                    }
+                    else {
+                        reject(NSError(domain: "Craze", code: 13, userInfo: [NSLocalizedDescriptionKey: "search category invalid data"]))
+                    }
+                }
+                else {
+                    reject(NSError(domain: "Craze", code: 13, userInfo: [NSLocalizedDescriptionKey: "search category no data"]))
+                }
+            }
+            dataTask.resume()
+        }
+    }
+}
+extension NetworkingPromise {
+
+
+    func similarLooksTopToSaleProduct(imageUrl:String) -> Promise<[[String:Any]]> {
+        return self.uploadToSyte(imageData: nil, orImageUrlString: imageUrl, retry: false).then { (uploadedImageURL, syteJson) -> Promise<[[[String:Any]]]> in
+            var promises:[Promise<[[String:Any]]>] = []
+            
+            syteJson.forEach({ (dict) in
+                if let urlString = dict["offers"] as? String, let url = URL.init(string: urlString){
+                    let downloadPromise:Promise<[[String:Any]]> = self.downloadProducts(url: url).then(execute: { (dict) -> Promise<[[String:Any]]> in
+                        return Promise.init(value: (dict["ads"] as? [[String : Any]] ?? []));
+                    })
+                    
+                    promises.append(downloadPromise)
+                }
+            })
+            
+            let allDone = when(fulfilled: promises)
+            return allDone
+            }.then(execute: { responseArray -> Promise<[[String:Any]]> in
+                
+                
+                var products:[[String:Any]] = []
+                
+                for productsArray in responseArray {
+                    var order = 0
+                    for product in productsArray {
+                        order += 1
+                        if let _ = product["price"] as? String,
+                            let _ = product["originalPrice"] as? String,
+                            let price = DataModel.sharedInstance.parseFloat(product["floatPrice"]),
+                            let originalPrice  = DataModel.sharedInstance.parseFloat(product["floatOriginalPrice"]) {
+                            if price < originalPrice {
+                                var objectCopy = product
+                                objectCopy["order"] = order
+                                products.append(objectCopy)
+                            }
+                        }
+                    }
+                }
+                products.sort(by: { ($0["order"] as? Int) ?? 99  < ($1["order"] as? Int) ?? 99 } )
+                
+
+                
+                return Promise.init(value: products);
+            })
+        
+    }
 }
