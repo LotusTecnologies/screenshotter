@@ -203,6 +203,16 @@ class DiscoverManager {
             queuedFetchRequest.predicate = NSCompoundPredicate.init(andPredicateWithSubpredicates: [NSPredicate.init(format: "imageData != NULL"), queuedFetchRequestPredicate])
             queuedFetchRequest.sortDescriptors = [NSSortDescriptor.init(key: "recombeeRecommended", ascending: false)]
             if let queued = try? context.fetch(queuedFetchRequest), queued.count > 0 {
+                let queuedSize = queued.count
+                DispatchQueue.main.async {
+                    if let viewController = AppDelegate.shared.window?.rootViewController {
+                        let announcement = Announcement(title: "queue Size", subtitle: "\(queuedSize)", image: nil, duration:10.0, action:{
+                            
+                        })
+                        Whisper.show(shout: announcement, to: viewController, completion: {
+                        })
+                    }
+                }
                 queued.prefix(Matchstick.displayingSize).forEach({
                     $0.isDisplaying = true
                     $0.receivedAt = Date()
@@ -240,6 +250,8 @@ class DiscoverManager {
 //        queuedFetchRequest.fetchLimit = Matchstick.recombeeQueueSize + Matchstick.displayingSize
         
         if let displaying = try? context.fetch(displayingFetchRequest), let queued = try? context.fetch(queuedFetchRequest) {
+           
+            
             let displayingMatchStickNeeded = (Matchstick.displayingSize - displaying.count)
             var itemsAdded = 0
             let downloaded = queued.filter{ $0.imageData != nil }
