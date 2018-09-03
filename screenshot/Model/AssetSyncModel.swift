@@ -811,27 +811,10 @@ extension AssetSyncModel {
                     self.saveShoppables(assetId: assetId, uploadedURLString: uploadedURLString, segments: segments, optionsMask: optionsMask)
                 }.catch { error in
                     let nsError = error as NSError
-                    if nsError.domain == "Craze" {
-                        switch nsError.code {
-                        case 3, 4, 22:
-                            // Syte returned no segments
-                            print("Syte returned no segments:\(error)")
-                        default:
-                            break
-                        }
-                    }
                     let uploadedURLString = nsError.userInfo[NSURLErrorFailingURLStringErrorKey] as? String
-                    let imageUrl: String = uploadedURLString ?? orImageUrlString ?? gottenUploadedURLString ?? ""
+//                    let imageUrl: String = uploadedURLString ?? orImageUrlString ?? gottenUploadedURLString ?? ""
                     DataModel.sharedInstance.setNoShoppables(assetId: assetId, uploadedURLString: uploadedURLString)
-                    Analytics.trackReceivedResponseFromSyte(imageUrl: imageUrl, segmentCount: 0, categories: nil)
-                    if let e = error as? PMKURLError {
-                        Analytics.trackError(type: nil, domain: nsError.domain, code: nsError.code, localizedDescription: e.errorDescription)
-                    }else{
-                        Analytics.trackError(type: nil, domain: nsError.domain, code: nsError.code, localizedDescription: nsError.localizedDescription)
-                    }
                     
-                    
-                    print("uploadScreenshot inner uploadToSyte catch error:\(error)")
                 }.always {
                     self.networkingIndicatorDelegate?.networkingIndicatorDidComplete(type: .Product)
                     completion()
