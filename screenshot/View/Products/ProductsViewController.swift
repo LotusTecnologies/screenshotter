@@ -46,11 +46,7 @@ class ProductsViewController: BaseViewController {
     var productsRateNegativeFeedbackSubmitAction:UIAlertAction?
     var productsRateNegativeFeedbackTextField:UITextField?
     var shamrockButton : FloatingActionButton?
-    var screenshotLoadingState:ProductsViewControllerState = .unknown {
-        didSet {
-            Analytics.trackDevLog(file:  NSString.init(string: #file).lastPathComponent, line: #line, message: "from\(oldValue) to \(screenshotLoadingState)")            
-        }
-    }
+    var screenshotLoadingState:ProductsViewControllerState = .unknown
     var productLoadingState:ProductsViewControllerState = .unknown 
 
     var selectedShoppable:Shoppable?

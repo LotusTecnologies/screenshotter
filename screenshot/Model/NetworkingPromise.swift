@@ -215,18 +215,32 @@ class NetworkingPromise : NSObject {
         }
     }
     func uploadToSyte(imageData: Data?, orImageUrlString:String?, retry:Bool) -> Promise<(String, [[String : Any]])> {
+        let debugParamDescrition:String = {
+            if let urlToSendToSyte = orImageUrlString {
+                return "url(\(urlToSendToSyte))"
+            }else if let imageData = imageData {
+                let bcf = ByteCountFormatter.init()
+                let lengthString = bcf.string(fromByteCount: Int64(imageData.count))
+                return "data(\(lengthString))"
+            }else{
+                return "(!!!! No image data or url !!!!)"
+            }
+        }()
+
         return self.uploadToSyteURLRequest(imageData: imageData, orImageUrlString:orImageUrlString).then { request -> Promise<(String, [[String : Any]])> in
             let maxRepeat = retry ? 2 : 0
             return self.attempt(interdelay:.seconds(2), maxRepeat: maxRepeat, body: { return self.uploadToSyteWorkHorse(request: request) },retryableError: { (error) -> (Bool) in
                 let nsError = error as NSError
-                let retryable:Bool =  ((nsError.code == UploadToSyteError.emptyObject.errorCode  || nsError.code == UploadToSyteError.noShoppables.errorCode ) && nsError.domain == UploadToSyteError.errorDomain)
+                Analytics.trackError(  type:nil,  domain:nsError.domain,  code:nsError.code,  localizedDescription:nsError.localizedDescription )
+
+                let retryable:Bool =  ((nsError.code == UploadToSyteError.emptyObject.errorCode  || nsError.code == UploadToSyteError.noShoppables.errorCode || nsError.code == UploadToSyteError.not200.errorCode ) && nsError.domain == UploadToSyteError.errorDomain)
                 if retryable {
-                    Analytics.trackDevLog(file:  NSString.init(string: #file).lastPathComponent, line: #line, message: "retrying {} or {id:[]} response from syte")
+                    Analytics.trackDevLog(file:  NSString.init(string: #file).lastPathComponent, line: #line, message: "retrying bad response from syte \(debugParamDescrition)")
                 }
                 return retryable
             }).catch(execute: { (error) in
                 let nsError = error as NSError
-                Analytics.trackReceivedUploadErrorFromSyte(imageUrl: orImageUrlString, httpStatusCode: (nsError.userInfo["statusCode"] as? Int), reason: error.localizedDescription)
+                Analytics.trackReceivedUploadErrorFromSyte(imageUrl: orImageUrlString, httpStatusCode: (nsError.userInfo["statusCode"] as? Int), reason: "\(debugParamDescrition) - \(error.localizedDescription)")
             })
         }
     }
