@@ -34,7 +34,8 @@ extension InboxMessage {
     }
     
     static func insertMessageFromPush(userInfo: [AnyHashable : Any] ){
-        if let dataDict = userInfo["data"] as? [AnyHashable: Any],  let dict = dataDict["inbox"] as? [String:Any] {
+        // dict with only one value is local and only used to mark as read.
+        if let dataDict = userInfo["data"] as? [AnyHashable: Any],  let dict = dataDict["inbox"] as? [String:Any], dict.count > 1 {
             DataModel.sharedInstance.performBackgroundTask { (context) in
                 InboxMessage.createUpdateWith(lookupDict: nil, dictionary: dict, create: true, update: false, context: context)
                 context.saveIfNeeded()
@@ -43,7 +44,15 @@ extension InboxMessage {
     }
     
     static func markMessageAsReadFromPush(userInfo: [AnyHashable : Any] ){
-        if let dataDict = userInfo["data"] as? [AnyHashable: Any],  let dict = dataDict["inbox"] as? [String:Any], let uuid = dict["uuid"] as? String {
+        //This is need to deal with both remote and local notification which have differnt structor the userInfo
+        var uuid:String? = nil
+        if let dataDict = userInfo["data"] as? [AnyHashable: Any],  let dict = dataDict["inbox"] as? [String:Any] {
+            uuid = dict["uuid"] as? String
+        }
+        if let dict = userInfo["inbox"] as? [String:Any] {
+            uuid = dict["uuid"] as? String
+        }
+        if let uuid = uuid {
             DataModel.sharedInstance.performBackgroundTask { (context) in
                 let lookup = InboxMessage.lookupWith(uuids: [uuid], in: context)
                 if let message = lookup[uuid] {

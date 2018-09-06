@@ -166,8 +166,12 @@ class LocalNotificationModel {
                 let message = "notification.tapped.product.message".localized(withFormat: productTitle)
                 NetworkingPromise.sharedInstance.downloadTmp(from: imageURLString, identifier: identifier).then(execute: { (copiedTmpURL) -> Void in
                     let displayFromNow = TimeInterval.oneDay
+                    let uuid = UUID().uuidString
+                    let inboxDict = [
+                        "uuid":uuid,
+                    ]
                     self.scheduleImageLocalNotification(copiedTmpURL: copiedTmpURL,
-                                                        userInfo: [Constants.openingProductKey : imageURLString],
+                                                        userInfo: [Constants.openingProductKey : imageURLString, "inbox":inboxDict],
                                                         identifier: identifier,
                                                         body: message,
                                                         trigger: UNTimeIntervalNotificationTrigger(timeInterval: displayFromNow, repeats: false))
@@ -175,7 +179,7 @@ class LocalNotificationModel {
                         let date = Date.init(timeIntervalSinceNow:displayFromNow)
                         let expire = Date.init(timeIntervalSinceNow:displayFromNow + 7 * .oneDay)
                         
-                        InboxMessage.createUpdateWith(lookupDict: nil, actionType: "link", actionValue: offer, buttonText: "Buy Now", image: imageURLString, title: message, uuid: UUID().uuidString, expireDate: expire, date: date, showAfterDate: date, tracking: nil, create: true, update: false, context: context)
+                        InboxMessage.createUpdateWith(lookupDict: nil, actionType: "link", actionValue: offer, buttonText: "Buy Now", image: imageURLString, title: message, uuid: uuid, expireDate: expire, date: date, showAfterDate: date, tracking: nil, create: true, update: false, context: context)
                         context.saveIfNeeded()
                     })
                 })
@@ -200,9 +204,14 @@ class LocalNotificationModel {
                 let message = "notification.sale.screenshot.message".localized
                 NetworkingPromise.sharedInstance.saveToTmp(data: imageData, identifier: identifier, originalExtension: "").then { copiedTmpURL -> Void in
                     let displayFromNow = 2 * TimeInterval.oneDay
+                    let uuid = UUID().uuidString
+                    let inboxDict = [
+                        "uuid":uuid,
+                        ]
                     self.scheduleImageLocalNotification(copiedTmpURL: copiedTmpURL,
                                                         userInfo: [Constants.openingScreenKey  : Constants.openingScreenValueScreenshot,
-                                                                   Constants.openingAssetIdKey : assetIdString],
+                                                                   Constants.openingAssetIdKey : assetIdString,
+                                                                   "inbox":inboxDict],
                                                         identifier: identifier,
                                                         body: message,
                                                         trigger: UNTimeIntervalNotificationTrigger(timeInterval: displayFromNow, repeats: false))
@@ -213,7 +222,7 @@ class LocalNotificationModel {
                         let date = Date(timeIntervalSinceNow:displayFromNow)
                         let expire = Date(timeIntervalSinceNow:displayFromNow + 7 * .oneDay)
 
-                        InboxMessage.createUpdateWith(lookupDict: nil, actionType: "screenshot", actionValue: assetIdString, buttonText: "View Items", image: urlString, title: message, uuid: UUID().uuidString, expireDate:expire, date: date, showAfterDate: date, tracking: nil, create: true, update: false, context: context)
+                        InboxMessage.createUpdateWith(lookupDict: nil, actionType: "screenshot", actionValue: assetIdString, buttonText: "View Items", image: urlString, title: message, uuid: uuid, expireDate:expire, date: date, showAfterDate: date, tracking: nil, create: true, update: false, context: context)
                         context.saveIfNeeded()
                     }
                 }
@@ -245,15 +254,19 @@ class LocalNotificationModel {
                 let message = "notification.favorited.item.message".localized(withFormat: category)
                 NetworkingPromise.sharedInstance.downloadTmp(from: imageURLString, identifier: identifier).then { copiedTmpURL -> Void in
                     let displayFromNow = 3 * TimeInterval.oneDay
+                    let uuid = UUID().uuidString
+                    let inboxDict = [
+                        "uuid":uuid,
+                    ]
                     self.scheduleImageLocalNotification(copiedTmpURL: copiedTmpURL,
-                                                        userInfo: [Constants.openingProductKey : imageURLString],
+                                                        userInfo: [Constants.openingProductKey : imageURLString, "inbox":inboxDict],
                                                         identifier: identifier,
                                                         body: message,
                                                         trigger: UNTimeIntervalNotificationTrigger(timeInterval: displayFromNow, repeats: false))
                     DataModel.sharedInstance.performBackgroundTask { context in
                         let date = Date(timeIntervalSinceNow:displayFromNow)
                         let expire = Date(timeIntervalSinceNow:displayFromNow + 7 * .oneDay)
-                        InboxMessage.createUpdateWith(lookupDict: nil, actionType: "product", actionValue: productId, buttonText: "Show me!", image: imageURLString, title: message, uuid: UUID().uuidString, expireDate: expire, date: date, showAfterDate: date, tracking: nil, create: true, update: false, context: context)
+                        InboxMessage.createUpdateWith(lookupDict: nil, actionType: "product", actionValue: productId, buttonText: "Show me!", image: imageURLString, title: message, uuid: uuid, expireDate: expire, date: date, showAfterDate: date, tracking: nil, create: true, update: false, context: context)
                         context.saveIfNeeded()
                     }
                 }
@@ -294,9 +307,13 @@ class LocalNotificationModel {
                         threePmSunday.weekday = 1
                         threePmSunday.hour = 15
                         let displayDateTrigger = UNCalendarNotificationTrigger(dateMatching: threePmSunday, repeats: false)
+                        let uuid = UUID().uuidString
+                        let inboxDict = [
+                            "uuid":uuid,
+                        ]
                         self.scheduleImageLocalNotification(copiedTmpURL: copiedTmpURL,
                                                             userInfo: [Constants.openingScreenKey  : Constants.openingScreenValueScreenshot,
-                                                                       Constants.openingAssetIdKey : assetIdString],
+                                                                       Constants.openingAssetIdKey : assetIdString, "inbox":inboxDict],
                                                             identifier: identifier,
                                                             body: "notification.similar.looks.message".localized,
                                                             trigger: displayDateTrigger)
@@ -306,7 +323,7 @@ class LocalNotificationModel {
                         if let date = displayDateTrigger.nextTriggerDate() {
                             let expire = Date(timeInterval: 7 * .oneDay, since: date)
                             dataModel.performBackgroundTask { context in
-                                InboxMessage.createUpdateWith(lookupDict: nil, actionType: "similarLooks", actionValue: assetIdString, buttonText: "notification.similar.looks.message.button".localized, image: urlString, title: "notification.similar.looks.message.markup".localized, uuid: UUID().uuidString, expireDate:expire, date: date, showAfterDate: date, tracking: nil, create: true, update: false, context: context)
+                                InboxMessage.createUpdateWith(lookupDict: nil, actionType: "similarLooks", actionValue: assetIdString, buttonText: "notification.similar.looks.message.button".localized, image: urlString, title: "notification.similar.looks.message.markup".localized, uuid: uuid, expireDate:expire, date: date, showAfterDate: date, tracking: nil, create: true, update: false, context: context)
                                 context.saveIfNeeded()
                             }
                         }
