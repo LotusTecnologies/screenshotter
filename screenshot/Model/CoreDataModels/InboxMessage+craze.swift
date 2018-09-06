@@ -42,6 +42,19 @@ extension InboxMessage {
         }
     }
     
+    static func markMessageAsReadFromPush(userInfo: [AnyHashable : Any] ){
+        if let dataDict = userInfo["data"] as? [AnyHashable: Any],  let dict = dataDict["inbox"] as? [String:Any], let uuid = dict["uuid"] as? String {
+            DataModel.sharedInstance.performBackgroundTask { (context) in
+                let lookup = InboxMessage.lookupWith(uuids: [uuid], in: context)
+                if let message = lookup[uuid] {
+                    message.isNew = false
+                }
+
+                context.saveIfNeeded()
+            }
+        }
+    }
+    
     
     static func createUpdateWith(lookupDict:[String:InboxMessage]?, actionType:String, actionValue:String, buttonText:String, image:String, title:String, uuid:String, expireDate:Date, date:Date, showAfterDate:Date, tracking:[String:String]?, create:Bool, update:Bool, context:NSManagedObjectContext){
         let lookup = lookupDict ?? InboxMessage.lookupWith(uuids: [uuid], in: context)
