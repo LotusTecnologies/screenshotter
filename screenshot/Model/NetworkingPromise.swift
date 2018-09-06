@@ -200,6 +200,10 @@ class NetworkingPromise : NSObject {
             let sessionConfiguration = URLSessionConfiguration.default
             //        sessionConfiguration.timeoutIntervalForResource = 60  // On GPRS, even 60 seconds timeout.
             sessionConfiguration.timeoutIntervalForRequest = 60
+            // See https://stackoverflow.com/a/50322245 and https://stackoverflow.com/a/25996971
+            sessionConfiguration.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
+            sessionConfiguration.urlCache = nil
+            sessionConfiguration.httpAdditionalHeaders = ["Connection" : "close", "Keep-Alive" : "max=1"]
             let dataTask = URLSession(configuration: sessionConfiguration).dataTask(with: request) { data, response, error in
                 let (error, tuple) = self.parseSyteResponse(data: data, response: response, error: error)
                 if let error = error {
