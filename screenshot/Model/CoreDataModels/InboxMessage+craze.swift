@@ -34,8 +34,7 @@ extension InboxMessage {
     }
     
     static func insertMessageFromPush(userInfo: [AnyHashable : Any] ){
-        // dict with only one value is local and only used to mark as read.
-        if let dataDict = userInfo["data"] as? [AnyHashable: Any],  let dict = dataDict["inbox"] as? [String:Any], dict.count > 1 {
+        if let dataDict = userInfo["data"] as? [AnyHashable: Any],  let dict = dataDict["inbox"] as? [String:Any] {
             DataModel.sharedInstance.performBackgroundTask { (context) in
                 InboxMessage.createUpdateWith(lookupDict: nil, dictionary: dict, create: true, update: false, context: context)
                 context.saveIfNeeded()
