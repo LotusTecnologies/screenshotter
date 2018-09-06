@@ -821,7 +821,8 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
         var isHandled = false
         if let userInfo = response.notification.request.content.userInfo as? [String : Any] {
             InboxMessage.insertMessageFromPush(userInfo: userInfo)
-
+            InboxMessage.markMessageAsReadFromPush(userInfo: userInfo)
+            
             if let openingScreen = userInfo[Constants.openingScreenKey] as? String {
                 isHandled = true
                 if openingScreen == Constants.openingScreenValueScreenshot {
