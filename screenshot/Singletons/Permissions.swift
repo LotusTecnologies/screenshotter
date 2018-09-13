@@ -79,10 +79,10 @@ final class PermissionsManager : NSObject, CLLocationManagerDelegate {
         switch status {
         case .denied:
             return .denied
-        case .authorized:
-            return .authorized
         case .notDetermined:
             return .undetermined
+        default: // .authorized, .provisional
+            return .authorized
         }
     }
     
