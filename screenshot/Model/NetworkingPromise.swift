@@ -86,6 +86,11 @@ class NetworkingPromise : NSObject {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.httpBody = httpBody
+        // See https://stackoverflow.com/a/50322245 and https://stackoverflow.com/a/25996971
+        request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
+        request.setValue("close", forHTTPHeaderField: "Connection")
+        request.setValue("max=1", forHTTPHeaderField: "Keep-Alive")
+
         return Promise(value: request)
     }
 
@@ -203,7 +208,6 @@ class NetworkingPromise : NSObject {
             // See https://stackoverflow.com/a/50322245 and https://stackoverflow.com/a/25996971
             sessionConfiguration.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
             sessionConfiguration.urlCache = nil
-            sessionConfiguration.httpAdditionalHeaders = ["Connection" : "close", "Keep-Alive" : "max=1"]
             let dataTask = URLSession(configuration: sessionConfiguration).dataTask(with: request) { data, response, error in
                 let (error, tuple) = self.parseSyteResponse(data: data, response: response, error: error)
                 if let error = error {
