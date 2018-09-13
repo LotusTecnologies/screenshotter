@@ -804,10 +804,6 @@ extension AssetSyncModel {
                         })
                     })
                     
-                    #if STORE_NEW_TUTORIAL_SCREENSHOT
-
-                    print("uploadedURLString:\(uploadedURLString)\nsegments:\(segments)")
-                    #endif
                     self.saveShoppables(assetId: assetId, uploadedURLString: uploadedURLString, segments: segments, optionsMask: optionsMask)
                 }.catch { error in
                     let nsError = error as NSError
@@ -1380,87 +1376,16 @@ extension AssetSyncModel {
         let actualToTargetRatio = image.size.width / desiredSize.width
         let compressionQuality: CGFloat = 0.99
         var imageForData = image
-        #if STORE_NEW_TUTORIAL_SCREENSHOT
-        #else
         if actualToTargetRatio > 1.2 {
             let originalRect = CGRect(origin: .zero, size: image.size)
             let downSampledRect = CGRect(origin: .zero, size: desiredSize)
             let downSampleSize = originalRect.aspectFit(in: downSampledRect).size
             imageForData = image.downSample(toSize: downSampleSize)
         }
-        #endif
         let data = UIImageJPEGRepresentation(imageForData, compressionQuality)
         return data
     }
     
-}
-
-//Tutorial photo
-extension AssetSyncModel {
-    public func syncTutorialPhoto(image: UIImage) {
-        self.serialQ.async {
-            let dataModel = DataModel.sharedInstance
-            
-            self.processingQ.async {
-                let getData:Promise<Data?> = Promise.init(resolvers: { (fulfill, reject) in
-                    let imageData: Data?
-                    #if STORE_NEW_TUTORIAL_SCREENSHOT
-                    imageData = self.data(for: TutorialTrySlideViewController.rawGraphic ?? image)
-                    #else
-                    imageData = self.data(for: image)
-                    #endif
-                    fulfill(imageData)
-                })
-                getData.then(on: self.processingQ) { imageData -> Promise<Data?> in
-                    return Promise { fulfill, reject in
-                        self.performBackgroundTask(assetId: Constants.tutorialScreenshotAssetId, shoppableId: nil) { (managedObjectContext) in
-                            let assetId = Constants.tutorialScreenshotAssetId
-                            let _ = dataModel.saveScreenshot(upsert:true,
-                                                             managedObjectContext: managedObjectContext,
-                                                             assetId: assetId,
-                                                             createdAt: Date(),
-                                                             isRecognized: true,
-                                                             source: .tutorial,
-                                                             isHidden: false,
-                                                             imageData: imageData,
-                                                             uploadedImageURL: nil,
-                                                             syteJsonString: nil)
-                            managedObjectContext.saveIfNeeded()
-                            fulfill(imageData)
-                        }
-                    }
-                    }.then (on: self.processingQ) { imageData -> Void in
-                        #if STORE_NEW_TUTORIAL_SCREENSHOT
-                        self.syteProcessing(imageData: imageData, orImageUrlString:nil, assetId: Constants.tutorialScreenshotAssetId)
-                        #else
-                        let tuple = self.tupleForRawGraphic()
-                        self.saveShoppables(assetId: Constants.tutorialScreenshotAssetId, uploadedURLString: tuple.0, segments: tuple.1)
-                        #endif
-                    }.catch { error in
-                        print("syncTutorialPhoto outer catch error:\(error)")
-                }
-            }
-            
-        }
-    }
-    
-    
-    func tupleForRawGraphic() -> (String, [[String : Any]]) {
-        let imageURL = "https://s3-us-west-2.amazonaws.com/syte-image-uploads-west/-hJEtepr-0ctvjWrtAs28"
-        let segments = [
-            ["label":"Skirts","gender":"female","b0":[0.3360975980758667, 0.3655535876750946],"b1":[0.7115286588668823, 0.6397957801818848],
-             "offers":"https://d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy11cy13ZXN0LTIuYW1hem9uYXdzLmNvbS9zeXRlLWltYWdlLXVwbG9hZHMtd2VzdC8taEpFdGVwci0wY3R2aldydEFzMjg%3D&crop=eyJ5MiI6MC42NDk5OTM1OTg0NjExNTExLCJ5IjowLjM1NTM1NTc5OTE5ODE1MDYzLCJ4MiI6MC43MjU0ODkxOTkxNjE1Mjk1LCJ4IjowLjMyMjEzNzA1Nzc4MTIxOTV9&cats=WyJTa2lydHMiXQ%3D%3D&prob=0.8272&catalog=fashion&gender=female&feed=shoppable_production&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D"],
-            ["label":"Jackets","gender":"female","b0":[0.3194908499717712, 0.2713195383548737],"b1":[0.6690635085105896, 0.4435304701328278],
-             "offers":"https://d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy11cy13ZXN0LTIuYW1hem9uYXdzLmNvbS9zeXRlLWltYWdlLXVwbG9hZHMtd2VzdC8taEpFdGVwci0wY3R2aldydEFzMjg%3D&crop=eyJ5MiI6MC40NTQyMTExNzU0NDE3NDE5NCwieSI6MC4yNjA2Mzg4MzMwNDU5NTk1LCJ4MiI6MC42OTA3NDQzNDA0MTk3NjkzLCJ4IjowLjI5NzgxMDAxODA2MjU5MTU1fQ%3D%3D&cats=WyJDb2F0c0phY2tldHNTdWl0cyJd&prob=0.7578&catalog=fashion&gender=female&feed=shoppable_production&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D"],
-            ["label":"Bags","gender":"female","b0":[0.3161032795906067, 0.4687742590904236],"b1":[0.4117679595947266, 0.5696807503700256],
-             "offers":"https://d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy11cy13ZXN0LTIuYW1hem9uYXdzLmNvbS9zeXRlLWltYWdlLXVwbG9hZHMtd2VzdC8taEpFdGVwci0wY3R2aldydEFzMjg%3D&crop=eyJ5MiI6MC41OTI2NjM5NDM3Njc1NDc2LCJ5IjowLjQ0NTc5MTA2NTY5MjkwMTYsIngyIjowLjQzMzU1NzIxMjM1Mjc1MjcsIngiOjAuMjk0MzE0MDI2ODMyNTgwNTd9&cats=WyJIYW5kYmFncyJd&prob=0.7384&catalog=fashion&gender=female&feed=shoppable_production&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D"],
-            ["label":"Shoes","gender":"female","b0":[0.514782726764679, 0.6339548826217651],"b1":[0.6010540127754211, 0.7061108350753784],
-             "offers":"https://d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy11cy13ZXN0LTIuYW1hem9uYXdzLmNvbS9zeXRlLWltYWdlLXVwbG9hZHMtd2VzdC8taEpFdGVwci0wY3R2aldydEFzMjg%3D&crop=eyJ5MiI6MC43MjUyNTQ1MzU2NzUwNDg4LCJ5IjowLjYxNDgxMTE4MjAyMjA5NDcsIngyIjowLjYyMzk0MjY3MzIwNjMyOTMsIngiOjAuNDkxODk0MDY2MzMzNzcwNzV9&cats=WyJCb290cyIsIkZsYXRTYW5kYWxzIiwiRmxhdFNob2VzIiwiSGVlbFNhbmRhbHMiLCJIZWVsU2hvZXMiLCJTcG9ydFNob2VzIl0%3D&prob=0.6405&catalog=fashion&gender=female&feed=shoppable_production&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D"],
-            ["label":"Shoes","gender":"female","b0":[0.3859340250492096, 0.6467227935791016],"b1":[0.4655289947986603, 0.7181835174560547],
-             "offers":"https://d1wt9iscpot47x.cloudfront.net/offers?image_url=aHR0cHM6Ly9zMy11cy13ZXN0LTIuYW1hem9uYXdzLmNvbS9zeXRlLWltYWdlLXVwbG9hZHMtd2VzdC8taEpFdGVwci0wY3R2aldydEFzMjg%3D&crop=eyJ5MiI6MC43Mzc3MTAxMTgyOTM3NjIyLCJ5IjowLjYyNzE5NjE5Mjc0MTM5NCwieDIiOjAuNDg3Mjc4MjgyNjQyMzY0NSwieCI6MC4zNjQxODQ3MzcyMDU1MDUzN30%3D&cats=WyJCb290cyIsIkZsYXRTYW5kYWxzIiwiRmxhdFNob2VzIiwiSGVlbFNhbmRhbHMiLCJIZWVsU2hvZXMiLCJTcG9ydFNob2VzIl0%3D&prob=0.6160&catalog=fashion&gender=female&feed=shoppable_production&country=IL&account_id=6677&sig=GglIWwyIdqi5tBOhAmQMA6gEJVpCPEbgf73OCXYbzCU%3D"]
-        ]
-        return (imageURL, segments)
-    }
 }
 
 extension Screenshot {

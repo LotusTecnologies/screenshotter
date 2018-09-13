@@ -46,19 +46,10 @@ class ScreenshotDisplayViewController: BaseViewController, UIScrollViewDelegate 
         screenshotImageView.widthAnchor.constraint(equalTo:self.scrollView.widthAnchor, constant:-horizontal).isActive = true
         screenshotImageView.heightAnchor.constraint(equalTo:self.scrollView.heightAnchor, constant:-vertical).isActive = true
         
-        #if STORE_NEW_TUTORIAL_SCREENSHOT
-        
-        screenshotImageView.isUserInteractionEnabled = true
-        let longPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPressGesture(gestureRecognizer:)))
-        screenshotImageView.addGestureRecognizer(longPressGestureRecognizer)
-        
-        #else
-        
         screenshotImageView.didLayoutSubviews = { [weak self] in
             self?.insertShoppableFrames()
         }
         
-        #endif
     }
     
     override var previewActionItems: [UIPreviewActionItem] {
@@ -138,34 +129,6 @@ class ScreenshotDisplayViewController: BaseViewController, UIScrollViewDelegate 
         return self.screenshotImageView
     }
     
-    // MARK: - Gesture Recognizer
-
-    @objc func handleLongPressGesture(gestureRecognizer: UILongPressGestureRecognizer) {
-        guard gestureRecognizer.state == .recognized else {
-            return
-        }
-        let longPressPoint = gestureRecognizer.location(in: self.screenshotImageView)
-        let normalizedX = min(1, max(0, longPressPoint.x / self.screenshotImageView.bounds.size.width))
-        let normalizedY =  min(1, max(0, longPressPoint.y / self.screenshotImageView.bounds.size.height))
-    
-     
-        let normalizedPressPoint = CGPoint(x: normalizedX, y: normalizedY)
-        if self.b0 == .zero {
-            self.b0 = normalizedPressPoint
-            print("b0:\(self.b0)  longPressPoint:\(longPressPoint)  in size:\(self.screenshotImageView.bounds.size)")
-        } else {
-            let b1 = normalizedPressPoint
-            print("b1:\(b1)  longPressPoint:\(longPressPoint)  in size:\(self.screenshotImageView.bounds.size)")
-            let viewWidth = self.screenshotImageView.bounds.size.width
-            let viewHeight = self.screenshotImageView.bounds.size.height
-            let frame = CGRect(x: self.b0.x * viewWidth, y: self.b0.y * viewHeight, width: (b1.x - self.b0.x) * viewWidth, height: (b1.y - self.b0.y) * viewHeight)
-            let frameView = UIView(frame: frame)
-            frameView.layer.borderColor = UIColor.green.withAlphaComponent(0.7).cgColor
-            frameView.layer.borderWidth = 2
-            self.screenshotImageView.addSubview(frameView)
-            self.b0 = .zero
-        }
-    }
 }
 
 extension ScreenshotDisplayViewController: FetchedResultsControllerManagerDelegate {
