@@ -231,6 +231,16 @@ class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonit
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         discoverFilterControl.scrollToSelected()
+        
+        let campaign = UserDefaultsKeys.CampaignCompleted.campaign_2018_09_20.rawValue + UUID.init().uuidString
+        
+        if UserDefaults.standard.string(forKey: UserDefaultsKeys.lastCampaignCompleted) != campaign {
+            UserDefaults.standard.set(campaign, forKey: UserDefaultsKeys.lastCampaignCompleted)
+            
+            let campaign = CampaignPromotionViewController(modal: true)
+            campaign.delegate = self
+            present(campaign, animated: true, completion: nil)
+        }
 
     }
     @objc func selectAllFilter(_ sender:Any){
@@ -748,5 +758,16 @@ extension DiscoverScreenshotViewController :UIPopoverPresentationControllerDeleg
                 }
             }
         }
+    }
+}
+
+
+extension DiscoverScreenshotViewController: CampaignPromotionViewControllerDelegate {
+    func campaignPromotionViewControllerDidPressLearnMore(_ viewController: CampaignPromotionViewController) {
+        
+    }
+    
+    func campaignPromotionViewControllerDidPressSkip(_ viewController: CampaignPromotionViewController) {
+        dismiss(animated: true, completion: nil)
     }
 }

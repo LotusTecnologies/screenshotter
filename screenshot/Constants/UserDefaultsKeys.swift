@@ -49,6 +49,7 @@ class UserDefaultsKeys  {
     static let lastCampaignCompleted = "LastCampaignCompleted"  //in here is stored CampaignCompleted.rawValue
     enum CampaignCompleted : String {
         case campaign_2018_04_20 // A kim video to encourage users to submit to discover
+        case campaign_2018_09_20 // A farfetch.com campain with $50,000 give away
     }
 
     
