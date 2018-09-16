@@ -17,16 +17,16 @@ protocol CampaignPromotionViewControllerDelegate: class {
     
 }
 
-class CampaignPromotionViewController: UIViewController, CampaignPromotionExplanationViewControllerDelegate {
+class CampaignPromotionViewController: UIViewController {
     /*
         To re-use this viewController change the CampaignDescription
      */
     let campaign = CampaignDescription.init(
-            headline: "2018_04_20_campaign.headline".localized,
-            byline: "2018_04_20_campaign.body".localized,
-            buttonText: "2018_04_20_campaign.button".localized,
-            videoName: "campaign_video_2018_04_20",
-            thumbName: "campaign_thumb_2018_04_20.jpg",
+            headline: "2018_09_20_campaign.headline".localized,
+            byline: "2018_09_20_campaign.message".localized,
+            buttonText: "2018_09_20_campaign.button".localized,
+            videoName: "campaign_video_2018_09_20",
+            thumbName: "campaign_thumb_2018_09_20",
             videoRatio: 1280.0 / 720.0)
     
     var showsReplayButtonUponFinishing: Bool = true
@@ -176,8 +176,6 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
         playPauseButton.isUserInteractionEnabled = false
         playPauseButton.imageView?.contentMode = .scaleAspectFit
         playPauseButton.setImage(UIImage(named: "playCircle"), for: .normal)
-        playPauseButton.setImage(UIImage(named: "pauseCircle"), for: .selected)
-        playPauseButton.setImage(UIImage(named: "pauseCircle"), for: [.highlighted, .selected])
         playPauseButton.alpha = 1.0
         container.addSubview(playPauseButton)
         playPauseButton.centerXAnchor.constraint(equalTo: imageView.centerXAnchor).isActive = true
@@ -220,45 +218,28 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         if let player = self.player {
-            if player.playbackState != .paused {
+            if player.timeControlStatus != .paused {
                 self.player?.pause()
-                self.flashPauseOverlay()
+                self.showReplayButton()
             }
         }
     }
     
     @objc func tappedLearnMoreButton() {
         if let player = self.player {
-            if player.playbackState != .paused {
+            if player.timeControlStatus != .paused {
                 self.player?.pause()
-                self.flashPauseOverlay()
+                self.showReplayButton()
             }
         }
-        Analytics.trackOnboardingCampaignVideoLearnMore(campaign: .campaign2018204)
-        if self.willPresentInModal {
-            let explain = CampaignPromotionExplanationViewController(modal:self.willPresentInModal);
-            explain.delegate = self   
-            self.present(explain, animated: false, completion: nil)
-        }else{
-            self.delegate?.campaignPromotionViewControllerDidPressLearnMore(self)
-        }
+//        Analytics.trackOnboardingCampaignVideoLearnMore(campaign: .campaign2018204)
+       
     }
     
-    func campaignPromotionExplanationViewControllerDidPressDoneButton(_ campaignPromotionExplanationViewController: CampaignPromotionExplanationViewController) {
-        Analytics.trackOnboardingCampaignTextDone(campaign: .campaign2018204)
-        self.dismiss(animated: false, completion: nil)
-        self.delegate?.campaignPromotionViewControllerDidPressSkip(self)
-        
-    }
-    
-    func campaignPromotionExplanationViewControllerDidPressBackButton(_ campaignPromotionExplanationViewController: CampaignPromotionExplanationViewController) {
-        Analytics.trackOnboardingCampaignTextBack(campaign: .campaign2018204)
-        self.dismiss(animated: false, completion: nil)
-        
-    }
+   
     
     @objc func tappedSecondaryButton() {
-        Analytics.trackOnboardingCampaignVideoSkip(campaign: .campaign2018204)
+//        Analytics.trackOnboardingCampaignVideoSkip(campaign: .campaign2018204)
         self.delegate?.campaignPromotionViewControllerDidPressSkip(self)
     }
     
@@ -283,12 +264,12 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
             beginObserving(playerItem: playerItem)
         }
         if let player = self.player {
-            if player.playbackState == .paused {
+            if player.timeControlStatus == .paused {
                 player.play()
                 self.hideReplayButton()
             }else{
                 self.player?.pause()
-                self.flashPauseOverlay()
+                self.showReplayButton()
             }
         }        
     }
@@ -313,20 +294,7 @@ class CampaignPromotionViewController: UIViewController, CampaignPromotionExplan
             layer.frame = imageView.bounds
         }
     }
-    
-    func flashPauseOverlay() {
-        playPauseButton.isSelected = true
-        playPauseButton.alpha = 0
-        
-        UIView.animateKeyframes(withDuration: .defaultAnimationDuration * 3, delay: 0, options: UIViewKeyframeAnimationOptions(rawValue: 0), animations: {
-            UIView.addKeyframe(withRelativeStartTime: 0, relativeDuration: 0.33, animations: {
-                self.playPauseButton.alpha = 1
-            })
-            UIView.addKeyframe(withRelativeStartTime: 0.66, relativeDuration: 1, animations: {
-                self.playPauseButton.alpha = 0.0
-            })
-        })
-    }
+
     
     func showReplayButton() {
         playPauseButton.isSelected = false
