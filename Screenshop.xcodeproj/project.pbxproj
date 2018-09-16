@@ -101,11 +101,11 @@
 		31A0781B207E182100D70DC3 /* URL+craze.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31A0781A207E182100D70DC3 /* URL+craze.swift */; };
 		31A0781E20830D9A00D70DC3 /* UserFeedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31A0781D20830D9900D70DC3 /* UserFeedback.swift */; };
 		31C0C80620A15EAA002EE95B /* CrazeImageZoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C0C80520A15EAA002EE95B /* CrazeImageZoom.swift */; };
+		31C4D422214E68BE00E527D7 /* CampaignPromotionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C4D421214E68BE00E527D7 /* CampaignPromotionViewController.swift */; };
 		31C536A820B40446005810CA /* String+HTML.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C536A720B40446005810CA /* String+HTML.swift */; };
 		31CE11002035AC44000156EE /* UIApplication+openInChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE10FF2035AC44000156EE /* UIApplication+openInChrome.swift */; };
 		31CE11022039570B000156EE /* FetchedResultsControllerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE11012039570B000156EE /* FetchedResultsControllerManager.swift */; };
 		31D372B320EE5B91007E978E /* SimilarItemsPopupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31D372B220EE5B91007E978E /* SimilarItemsPopupViewController.swift */; };
-		31D5201D214E46FA0049E9A5 /* CampaignPromotionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31D5201C214E46FA0049E9A5 /* CampaignPromotionViewController.swift */; };
 		31D52022214E4EAB0049E9A5 /* campaign_video_2018_09_20.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 31D52021214E4EAA0049E9A5 /* campaign_video_2018_09_20.mp4 */; };
 		31EF9B092029D542006D3B35 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 31EF9B082029D542006D3B35 /* StoreKit.framework */; };
 		523CA4861F5EF93300873D78 /* UserDefaultsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528D18691F5EEF8C00078223 /* UserDefaultsKeys.swift */; };
@@ -363,12 +363,12 @@
 		31BFAFF020FDAFBF00D7C891 /* Model 21.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 21.xcdatamodel"; sourceTree = "<group>"; };
 		31C0C80520A15EAA002EE95B /* CrazeImageZoom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrazeImageZoom.swift; sourceTree = "<group>"; };
 		31C0C82620A30A02002EE95B /* Model 17.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 17.xcdatamodel"; sourceTree = "<group>"; };
+		31C4D421214E68BE00E527D7 /* CampaignPromotionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CampaignPromotionViewController.swift; sourceTree = "<group>"; };
 		31C536A720B40446005810CA /* String+HTML.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+HTML.swift"; sourceTree = "<group>"; };
 		31CE10FF2035AC44000156EE /* UIApplication+openInChrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplication+openInChrome.swift"; sourceTree = "<group>"; };
 		31CE11012039570B000156EE /* FetchedResultsControllerManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FetchedResultsControllerManager.swift; sourceTree = "<group>"; };
 		31CE110C203BEFC1000156EE /* Model 10.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 10.xcdatamodel"; sourceTree = "<group>"; };
 		31D372B220EE5B91007E978E /* SimilarItemsPopupViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimilarItemsPopupViewController.swift; sourceTree = "<group>"; };
-		31D5201C214E46FA0049E9A5 /* CampaignPromotionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CampaignPromotionViewController.swift; sourceTree = "<group>"; };
 		31D52021214E4EAA0049E9A5 /* campaign_video_2018_09_20.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = campaign_video_2018_09_20.mp4; sourceTree = "<group>"; };
 		31EF9B082029D542006D3B35 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		493CE8354B6ACA06E709778B /* Pods-Screenshop.prdrelease.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Screenshop.prdrelease.xcconfig"; path = "Pods/Target Support Files/Pods-Screenshop/Pods-Screenshop.prdrelease.xcconfig"; sourceTree = "<group>"; };
@@ -850,7 +850,7 @@
 		31D5201B214E46FA0049E9A5 /* Campaign */ = {
 			isa = PBXGroup;
 			children = (
-				31D5201C214E46FA0049E9A5 /* CampaignPromotionViewController.swift */,
+				31C4D421214E68BE00E527D7 /* CampaignPromotionViewController.swift */,
 			);
 			path = Campaign;
 			sourceTree = "<group>";
@@ -1558,7 +1558,7 @@
 				311A506820D90B780001D463 /* ScreenshotsDeleteButton.swift in Sources */,
 				311A50C920DAB2EF0001D463 /* RecoverLostSaleManager.swift in Sources */,
 				C58BAE8B20E101DD0051394A /* FacebookButton.swift in Sources */,
-				31D5201D214E46FA0049E9A5 /* CampaignPromotionViewController.swift in Sources */,
+				31C4D422214E68BE00E527D7 /* CampaignPromotionViewController.swift in Sources */,
 				52E547441FE2487B00627D6D /* ScreenshotHelper.swift in Sources */,
 				316C831620C3AEBD0012A908 /* Shoppable+craze.swift in Sources */,
 				311A506020D90B780001D463 /* ScreenshotDisplayNavigationController.swift in Sources */,

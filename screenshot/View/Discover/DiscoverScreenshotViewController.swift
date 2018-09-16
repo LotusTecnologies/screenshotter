@@ -232,7 +232,7 @@ class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonit
         super.viewDidAppear(animated)
         discoverFilterControl.scrollToSelected()
         
-        let campaign = UserDefaultsKeys.CampaignCompleted.campaign_2018_09_20.rawValue + UUID.init().uuidString
+        let campaign = UserDefaultsKeys.CampaignCompleted.campaign_2018_09_20.rawValue
         
         if UserDefaults.standard.string(forKey: UserDefaultsKeys.lastCampaignCompleted) != campaign {
             UserDefaults.standard.set(campaign, forKey: UserDefaultsKeys.lastCampaignCompleted)

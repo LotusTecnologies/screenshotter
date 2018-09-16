@@ -5,7 +5,6 @@
 //  Created by Jonathan Rose on 4/17/18.
 //  Copyright © 2018 crazeapp. All rights reserved.
 //
-
 import UIKit
 import AVFoundation
 
@@ -232,14 +231,19 @@ class CampaignPromotionViewController: UIViewController {
                 self.showReplayButton()
             }
         }
-//        Analytics.trackOnboardingCampaignVideoLearnMore(campaign: .campaign2018204)
-       
+        Analytics.trackOnboardingCampaignVideoShopAtFarfetch(campaign: .campaign20180920)
+        let affiliateLink = "https://click.linksynergy.com/fs-bin/click?id=4srWGRMQ3ec&offerid=255435.232&type=3&subid=0"
+        if let url = URL.init(string:affiliateLink) {
+            if UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            }
+        }
     }
     
    
     
     @objc func tappedSecondaryButton() {
-//        Analytics.trackOnboardingCampaignVideoSkip(campaign: .campaign2018204)
+        Analytics.trackOnboardingCampaignVideoSkip(campaign: .campaign20180920)
         self.delegate?.campaignPromotionViewControllerDidPressSkip(self)
     }
     
@@ -262,6 +266,7 @@ class CampaignPromotionViewController: UIViewController {
                 imageView.layer.addSublayer(layer)
             }
             beginObserving(playerItem: playerItem)
+            Analytics.trackOnboardingCampaignVideoPlay(campaign: .campaign20180920)
         }
         if let player = self.player {
             if player.timeControlStatus == .paused {
