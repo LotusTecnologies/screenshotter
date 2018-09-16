@@ -377,7 +377,7 @@ class AnalyticsTrackers : NSObject {
                 case .detailView:
                     return "detailviews/"
                 case .addToCart:
-                    return "cartadditions/"
+                    return "purchases/"
                 }
             }
             func postData(itemId:String) -> [String:Any]? {

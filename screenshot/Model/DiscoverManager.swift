@@ -84,6 +84,7 @@ class DiscoverManager {
                     imageData: item.imageData as Data?,
                     uploadedImageURL: uploadedImageURL,
                     syteJsonString: nil)
+                addedScreenshot.screenshotId = item.remoteId
                 addedScreenshot.trackingInfo = item.trackingInfo
                 Analytics.trackScreenshotCreated(screenshot: addedScreenshot)
                 AssetSyncModel.sharedInstance.syteProcessing(imageData: nil, orImageUrlString: uploadedImageURL, assetId: assetId, optionsMask: ProductsOptionsMask.global)
