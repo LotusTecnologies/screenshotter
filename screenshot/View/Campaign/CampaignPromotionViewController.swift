@@ -235,9 +235,11 @@ class CampaignPromotionViewController: UIViewController {
         let affiliateLink = "https://click.linksynergy.com/fs-bin/click?id=4srWGRMQ3ec&offerid=255435.232&type=3&subid=0"
         if let url = URL.init(string:affiliateLink) {
             if UIApplication.shared.canOpenURL(url) {
+                self.delegate?.campaignPromotionViewControllerDidPressLearnMore(self)
                 UIApplication.shared.open(url, options: [:], completionHandler: nil)
             }
         }
+
     }
     
    
