@@ -17,6 +17,8 @@
 "2018_09_20_campaign.message" = "See more details on our Instagram @screenshopit. In the meantime, check out great deals at Farfetch!";
 "2018_09_20_campaign.button" = "Shop At Farfetch";
 "2018_09_20_campaign.skip" = "Close";
+"2018_09_20_campaign.inbox.title" = "Win a year’s supply of clothes from Farfetch!";
+"2018_09_20_campaign.inbox.button" = "Learn More";
 
 "application.error.no_disk_space.message" = "Free up some space on your phone for a better Screenshop experience.";
 "application.error.no_disk_space.title" = "Out Of Space!";
