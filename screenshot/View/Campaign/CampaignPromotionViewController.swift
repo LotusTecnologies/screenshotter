@@ -8,7 +8,7 @@
 import UIKit
 import AVFoundation
 
-
+import ActiveLabel
 
 protocol CampaignPromotionViewControllerDelegate: class {
     func campaignPromotionViewControllerDidPressLearnMore(_ viewController:CampaignPromotionViewController)
@@ -35,7 +35,8 @@ class CampaignPromotionViewController: UIViewController {
     private var player: AVPlayer?
 
     var imageView:UIImageView?
-    
+    let explainationLabel = ActiveLabel()
+
     weak var delegate: CampaignPromotionViewControllerDelegate?
     private let transitioning = ViewControllerTransitioningDelegate.init(presentation: .intrinsicContentSize, transition: .modal)
     
@@ -122,9 +123,7 @@ class CampaignPromotionViewController: UIViewController {
         mainButton.setContentCompressionResistancePriority(.required, for: .vertical)
         
         
-        let explainationLabel = UILabel()
-        explainationLabel.font = UIFont.screenshopFont(.hind, textStyle: .body, staticSize: true)
-        explainationLabel.text = self.campaign.byline
+        explainationLabel.attributedText = NSAttributedString.init(string: self.campaign.byline, attributes: [.font:UIFont.screenshopFont(.hind, textStyle: .body, staticSize: true)])
         explainationLabel.translatesAutoresizingMaskIntoConstraints = false
         explainationLabel.textAlignment = .center
         explainationLabel.numberOfLines = 0
@@ -132,6 +131,13 @@ class CampaignPromotionViewController: UIViewController {
         explainationLabel.leadingAnchor.constraint(equalTo: container.layoutMarginsGuide.leadingAnchor).isActive = true
         explainationLabel.trailingAnchor.constraint(equalTo: container.layoutMarginsGuide.trailingAnchor).isActive = true
         explainationLabel.setContentCompressionResistancePriority(.required, for: .vertical)
+        explainationLabel.isUserInteractionEnabled = true
+
+        explainationLabel.handleMentionTap { userHandle in
+            if let url = URL.init(string: "https://www.instagram.com/screenshopit/"),  UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            }
+        }
         
         let headlineLabel = UILabel()
         headlineLabel.font = UIFont.screenshopFont(.hind, textStyle: .title3, staticSize: true)
