@@ -657,13 +657,11 @@ extension AppDelegate: PushNotificationDelegate {
     
     //this event is fired when the push gets received
     func onPushReceived(_ pushManager: PushNotificationManager!, withNotification pushNotification: [AnyHashable : Any]!, onStart: Bool) {
-        print("pushwoosh notification received: \(pushNotification)")
         // shows a push is received. Implement passive reaction to a push here, such as UI update or data download.
     }
     
     //this event is fired when user taps the notification
     func onPushAccepted(_ pushManager: PushNotificationManager!, withNotification pushNotification: [AnyHashable : Any]!, onStart: Bool) {
-        print("pushwoosh notification accepted: \(pushNotification)")
         // shows a user tapped the notification. Implement user interaction, such as showing push details
     }
     
