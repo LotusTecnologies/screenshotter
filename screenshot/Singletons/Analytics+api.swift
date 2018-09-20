@@ -1,6 +1,6 @@
 // STOP!  DO not edit the file below
 // only create by auto generting
-// created from: aa1330c 
+// created from: ddc3125 
 //  Copyright (c) 2018 crazeapp. All rights reserved.
 
 
@@ -1925,14 +1925,14 @@ extension AnalyticsAcceptedPushPermissions {
 }
 
  
-typealias AnalyticsOnboardingCampaignVideoShopAtFarfetch = Analytics
-extension AnalyticsOnboardingCampaignVideoShopAtFarfetch {
-  enum AnalyticsOnboardingCampaignVideoShopAtFarfetchCampaign : String{
+typealias AnalyticsOnboardingCampaignVideoShopAtBoohoo = Analytics
+extension AnalyticsOnboardingCampaignVideoShopAtBoohoo {
+  enum AnalyticsOnboardingCampaignVideoShopAtBoohooCampaign : String{
     case `campaign20180920` = "campaign-2018-09-20"
     }
     
-  static func trackOnboardingCampaignVideoShopAtFarfetch(campaign:AnalyticsOnboardingCampaignVideoShopAtFarfetchCampaign ) {
-      let key = "onboarding campaign Shop At Farfetch"
+  static func trackOnboardingCampaignVideoShopAtBoohoo(campaign:AnalyticsOnboardingCampaignVideoShopAtBoohooCampaign ) {
+      let key = "onboarding campaign Shop At Boohoo"
       var properties:[String:Any] = [:]
       propertiesForAllEvents().forEach { properties[$0] = $1 }
 

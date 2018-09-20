@@ -241,10 +241,10 @@ class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonit
             campaign.delegate = self
             present(campaign, animated: true, completion: nil)
             DataModel.sharedInstance.performBackgroundTask { (context) in
-                let affiliateLink = "https://click.linksynergy.com/fs-bin/click?id=4srWGRMQ3ec&offerid=255435.232&type=3&subid=0"
+                let affiliateLink = "http://www.tkqlhce.com/click-8539891-12810244"
                 let now = Date()
-
-                InboxMessage.createUpdateWith(lookupDict: nil, actionType: InboxMessage.ActionType.link.rawValue, actionValue: affiliateLink, buttonText: "2018_09_20_campaign.inbox.button".localized, image:"https://static.crazeapp.com/icons/Farfetch.png", title: "2018_09_20_campaign.inbox.title".localized, uuid: "campaign_2018_09_20", expireDate: now.addingTimeInterval(7 * .oneDay), date: now, showAfterDate: now, tracking: nil, create: true, update: false, context: context)
+                let expireDate = Date.init(timeIntervalSince1970: 1538629199)
+                InboxMessage.createUpdateWith(lookupDict: nil, actionType: InboxMessage.ActionType.campaign.rawValue, actionValue: affiliateLink, buttonText: "2018_09_20_campaign.inbox.button".localized, image:"https://static.crazeapp.com/icons/Boohoo.png", title: "2018_09_20_campaign.inbox.title".localized, uuid: "campaign_2018_09_20", expireDate: expireDate, date: now, showAfterDate: now, tracking: nil, create: true, update: false, context: context)
                 context.saveIfNeeded()
             }
             
