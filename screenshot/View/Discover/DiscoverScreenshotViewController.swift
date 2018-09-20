@@ -240,6 +240,14 @@ class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonit
             let campaign = CampaignPromotionViewController(modal: true)
             campaign.delegate = self
             present(campaign, animated: true, completion: nil)
+            DataModel.sharedInstance.performBackgroundTask { (context) in
+                let affiliateLink = "http://www.tkqlhce.com/click-8539891-12810244"
+                let now = Date()
+                let expireDate = Date.init(timeIntervalSince1970: 1538629199)
+                InboxMessage.createUpdateWith(lookupDict: nil, actionType: InboxMessage.ActionType.campaign.rawValue, actionValue: affiliateLink, buttonText: "2018_09_20_campaign.inbox.button".localized, image:"https://static.crazeapp.com/icons/Boohoo.png", title: "2018_09_20_campaign.inbox.title".localized, uuid: "campaign_2018_09_20", expireDate: expireDate, date: now, showAfterDate: now, tracking: nil, create: true, update: false, context: context)
+                context.saveIfNeeded()
+            }
+            
         }
 
     }
@@ -764,7 +772,7 @@ extension DiscoverScreenshotViewController :UIPopoverPresentationControllerDeleg
 
 extension DiscoverScreenshotViewController: CampaignPromotionViewControllerDelegate {
     func campaignPromotionViewControllerDidPressLearnMore(_ viewController: CampaignPromotionViewController) {
-        
+        dismiss(animated: false, completion: nil)
     }
     
     func campaignPromotionViewControllerDidPressSkip(_ viewController: CampaignPromotionViewController) {

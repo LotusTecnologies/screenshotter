@@ -210,7 +210,10 @@ extension MessageInboxViewController : UICollectionViewDelegate, UICollectionVie
                             }
                             actionButton?.setTitle(actionText, for: .normal)
                             actionButton?.isLoading = false
+                            
                         })
+                        message.markAsRead()
+
                     }
                 case .similarLooks:
                     if let urlString = message.actionValue,  let _ = URL.init(string: urlString){
@@ -223,6 +226,13 @@ extension MessageInboxViewController : UICollectionViewDelegate, UICollectionVie
                             message.markAsRead()
                         })
                     }
+                case .campaign:
+                    // actionValue is unused
+                    let vc = CampaignPromotionViewController.init(modal: false)
+                    vc.navigationItem.backBarButtonItem = UIBarButtonItem.init(title: "generic.back".localized, style: .plain, target: nil, action: nil)
+                    vc.navigationItem.title = "Boohoo";
+                    self.navigationController?.pushViewController(vc, animated: true)
+                    message.markAsRead()
                 }
             }else{
                 if let url = URL.init(string: "https://itunes.apple.com/us/app/screenshop-by-craze/id1254964391"), UIApplication.shared.canOpenURL(url){

@@ -1,4 +1,5 @@
 PODS:
+  - ActiveLabel (0.9.0)
   - Amplitude-iOS (4.2.1)
   - Analytics (3.6.9)
   - Appsee (2.4.4)
@@ -103,6 +104,7 @@ PODS:
   - Whisper (6.0.2)
 
 DEPENDENCIES:
+  - ActiveLabel
   - Amplitude-iOS (~> 4.2.1)
   - Analytics (~> 3.0)
   - Appsee
@@ -125,6 +127,7 @@ DEPENDENCIES:
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
+    - ActiveLabel
     - Amplitude-iOS
     - Analytics
     - Appsee
@@ -158,6 +161,7 @@ SPEC REPOS:
     - Whisper
 
 SPEC CHECKSUMS:
+  ActiveLabel: c4fdd14a288483e98b5a3dff0ab214699aeee74a
   Amplitude-iOS: 84da24ca8557fa3741888502c30c0b8b365acd7d
   Analytics: 6541ce337e99d9f7a2240a8b3953940a7be5f998
   Appsee: ee95b522257365d162c2c83f28e32386053bd980
@@ -190,6 +194,6 @@ SPEC CHECKSUMS:
   SWXMLHash: f0761e5c5d1a49f6553609bd0f5696a61738c5b9
   Whisper: 169760fc4bab0abf24d5529f9276f95c25cf1025
 
-PODFILE CHECKSUM: 873ee3545bd8a0d70727b21be8c56474f7de0033
+PODFILE CHECKSUM: c984411d33ea281e56dd3f97cfd4ef43ebf510c2
 
 COCOAPODS: 1.5.3

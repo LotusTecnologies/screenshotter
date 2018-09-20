@@ -24,7 +24,7 @@ target 'Screenshop' do
     pod 'SwiftLog', '~> 1.0.0'
     pod 'SWXMLHash'
     pod 'Cache'
-
+    pod 'ActiveLabel'
 end
 
 post_install do |installer|

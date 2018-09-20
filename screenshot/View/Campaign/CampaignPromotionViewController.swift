@@ -7,8 +7,7 @@
 //
 import UIKit
 import AVFoundation
-
-
+import ActiveLabel
 
 protocol CampaignPromotionViewControllerDelegate: class {
     func campaignPromotionViewControllerDidPressLearnMore(_ viewController:CampaignPromotionViewController)
@@ -93,8 +92,6 @@ class CampaignPromotionViewController: UIViewController {
         }else{
             container.layoutMargins = UIEdgeInsets(top: 25, left: 25, bottom: 25, right: 25)
         }
-        
-        
         let skipButton = UIButton.init()
         skipButton.translatesAutoresizingMaskIntoConstraints = false
         skipButton.titleLabel?.textAlignment = .center
@@ -102,13 +99,13 @@ class CampaignPromotionViewController: UIViewController {
         skipButton.addTarget(self, action: #selector(tappedSecondaryButton), for: .touchUpInside)
         skipButton.contentEdgeInsets = UIEdgeInsets(top: 10, left: 30, bottom: 10, right: 30)
         container.addSubview(skipButton)
-        skipButton.setTitle("generic.skip".localized, for: .normal)
+        skipButton.setTitle("2018_09_20_campaign.skip".localized, for: .normal)
         skipButton.setTitleColor(.gray3, for: .normal)
         skipButton.setTitleColor(.gray5, for: .highlighted)
         skipButton.centerXAnchor.constraint(equalTo: container.centerXAnchor).isActive = true
         skipButton.bottomAnchor.constraint(equalTo: container.layoutMarginsGuide.bottomAnchor, constant: -skipButton.contentEdgeInsets.bottom).isActive = true
         skipButton.setContentCompressionResistancePriority(.required, for: .vertical)
-        
+        skipButton.isHidden = !willPresentInModal
         
         let mainButton = MainButton.init()
         mainButton.translatesAutoresizingMaskIntoConstraints = false
@@ -121,10 +118,8 @@ class CampaignPromotionViewController: UIViewController {
         mainButton.bottomAnchor.constraint(equalTo: skipButton.topAnchor).isActive = true
         mainButton.setContentCompressionResistancePriority(.required, for: .vertical)
         
-        
-        let explainationLabel = UILabel()
-        explainationLabel.font = UIFont.screenshopFont(.hind, textStyle: .body, staticSize: true)
-        explainationLabel.text = self.campaign.byline
+        let explainationLabel = ActiveLabel()
+        explainationLabel.attributedText = NSAttributedString.init(string: self.campaign.byline, attributes: [.font:UIFont.screenshopFont(.hind, textStyle: .body, staticSize: true)])
         explainationLabel.translatesAutoresizingMaskIntoConstraints = false
         explainationLabel.textAlignment = .center
         explainationLabel.numberOfLines = 0
@@ -132,6 +127,13 @@ class CampaignPromotionViewController: UIViewController {
         explainationLabel.leadingAnchor.constraint(equalTo: container.layoutMarginsGuide.leadingAnchor).isActive = true
         explainationLabel.trailingAnchor.constraint(equalTo: container.layoutMarginsGuide.trailingAnchor).isActive = true
         explainationLabel.setContentCompressionResistancePriority(.required, for: .vertical)
+        explainationLabel.isUserInteractionEnabled = true
+
+        explainationLabel.handleMentionTap { userHandle in
+            if let url = URL.init(string: "https://www.instagram.com/screenshopit/"),  UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            }
+        }
         
         let headlineLabel = UILabel()
         headlineLabel.font = UIFont.screenshopFont(.hind, textStyle: .title3, staticSize: true)
@@ -231,11 +233,13 @@ class CampaignPromotionViewController: UIViewController {
                 self.showReplayButton()
             }
         }
-        Analytics.trackOnboardingCampaignVideoShopAtFarfetch(campaign: .campaign20180920)
-        let affiliateLink = "https://click.linksynergy.com/fs-bin/click?id=4srWGRMQ3ec&offerid=255435.232&type=3&subid=0"
+        Analytics.trackOnboardingCampaignVideoShopAtBoohoo(campaign: .campaign20180920)
+        let affiliateLink = "http://www.tkqlhce.com/click-8539891-12810244"
         if let url = URL.init(string:affiliateLink) {
             if UIApplication.shared.canOpenURL(url) {
-                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                UIApplication.shared.open(url, options: [:]) { (sucess) in
+                    self.delegate?.campaignPromotionViewControllerDidPressLearnMore(self)
+                }
             }
         }
     }
@@ -270,7 +274,7 @@ class CampaignPromotionViewController: UIViewController {
         }
         if let player = self.player {
             if player.timeControlStatus == .paused {
-                player.play()
+                player.playImmediately(atRate: 1.0)
                 self.hideReplayButton()
             }else{
                 self.player?.pause()
