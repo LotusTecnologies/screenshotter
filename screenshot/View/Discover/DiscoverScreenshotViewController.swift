@@ -764,7 +764,7 @@ extension DiscoverScreenshotViewController :UIPopoverPresentationControllerDeleg
 
 extension DiscoverScreenshotViewController: CampaignPromotionViewControllerDelegate {
     func campaignPromotionViewControllerDidPressLearnMore(_ viewController: CampaignPromotionViewController) {
-        
+        dismiss(animated: false, completion: nil)
     }
     
     func campaignPromotionViewControllerDidPressSkip(_ viewController: CampaignPromotionViewController) {
