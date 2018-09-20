@@ -88,8 +88,6 @@ class NetworkingPromise : NSObject {
         request.httpBody = httpBody
         // See https://stackoverflow.com/a/50322245 and https://stackoverflow.com/a/25996971
         request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
-        request.setValue("close", forHTTPHeaderField: "Connection")
-        request.setValue("max=1", forHTTPHeaderField: "Keep-Alive")
 
         return Promise(value: request)
     }
