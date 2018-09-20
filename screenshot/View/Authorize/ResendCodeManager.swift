@@ -30,7 +30,7 @@ class ResendCodeManager : NSObject {
     }
     
     private func updateButton(){
-        let time = abs(startTime.timeIntervalSinceNow)
+        let time = -startTime.timeIntervalSinceNow
         var attributes:[NSAttributedStringKey:Any] = [:]
         attributes[.underlineStyle] = NSUnderlineStyle.styleSingle.rawValue
         if time < countDownTime {
