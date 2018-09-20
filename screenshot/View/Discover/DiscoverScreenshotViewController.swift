@@ -245,6 +245,7 @@ class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonit
                 let now = Date()
 
                 InboxMessage.createUpdateWith(lookupDict: nil, actionType: InboxMessage.ActionType.link.rawValue, actionValue: affiliateLink, buttonText: "2018_09_20_campaign.inbox.button".localized, image:"https://static.crazeapp.com/icons/Farfetch.png", title: "2018_09_20_campaign.inbox.title".localized, uuid: "campaign_2018_09_20", expireDate: now.addingTimeInterval(7 * .oneDay), date: now, showAfterDate: now, tracking: nil, create: true, update: false, context: context)
+                context.saveIfNeeded()
             }
             
         }
