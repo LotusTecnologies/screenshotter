@@ -7,7 +7,6 @@
 //
 import UIKit
 import AVFoundation
-
 import ActiveLabel
 
 protocol CampaignPromotionViewControllerDelegate: class {
@@ -35,8 +34,7 @@ class CampaignPromotionViewController: UIViewController {
     private var player: AVPlayer?
 
     var imageView:UIImageView?
-    let explainationLabel = ActiveLabel()
-
+    
     weak var delegate: CampaignPromotionViewControllerDelegate?
     private let transitioning = ViewControllerTransitioningDelegate.init(presentation: .intrinsicContentSize, transition: .modal)
     
@@ -122,7 +120,7 @@ class CampaignPromotionViewController: UIViewController {
         mainButton.bottomAnchor.constraint(equalTo: skipButton.topAnchor).isActive = true
         mainButton.setContentCompressionResistancePriority(.required, for: .vertical)
         
-        
+        let explainationLabel = ActiveLabel()
         explainationLabel.attributedText = NSAttributedString.init(string: self.campaign.byline, attributes: [.font:UIFont.screenshopFont(.hind, textStyle: .body, staticSize: true)])
         explainationLabel.translatesAutoresizingMaskIntoConstraints = false
         explainationLabel.textAlignment = .center
