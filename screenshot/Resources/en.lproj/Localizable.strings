@@ -12,14 +12,6 @@
 // https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/man1/genstrings.1.html
 
 
-// May 1, 2018 campain is a $25 gift card for users who complete their first purchase.
-"2018_09_20_campaign.headline" = "Win A Year’s Supply Of Clothes From Boohoo!";
-"2018_09_20_campaign.message" = "See more details on our Instagram @screenshopit. In the meantime, check out great deals at Boohoo!";
-"2018_09_20_campaign.button" = "Shop At Boohoo";
-"2018_09_20_campaign.skip" = "Close";
-"2018_09_20_campaign.inbox.title" = "Win a year’s supply of clothes from Boohoo!";
-"2018_09_20_campaign.inbox.button" = "Learn More";
-
 "application.error.no_disk_space.message" = "Free up some space on your phone for a better Screenshop experience.";
 "application.error.no_disk_space.title" = "Out Of Space!";
 
