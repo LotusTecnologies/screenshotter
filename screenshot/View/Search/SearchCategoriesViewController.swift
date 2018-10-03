@@ -17,8 +17,8 @@ class SearchCategoriesViewController: UIViewController {
     }
     var columns = 1
     
-    private let searchResultsViewController = SearchResultsViewController()
-    private let searchPaginationController = SearchPaginationController()
+    private var searchResultsViewController = SearchResultsViewController()
+    private var searchPaginationController = SearchPaginationController()
     private var keywords = ""
     
     private let collectionViewLayout: UICollectionViewFlowLayout
@@ -90,7 +90,7 @@ extension SearchCategoriesViewController: UICollectionViewDataSource {
             let branch = branches[indexPath.item]
             
             cell.imageView.sd_setImage(with: URL(string: branch.image ?? ""))
-            cell.titleLabel.text = branch.category.title
+            cell.titleLabel.text = branch.title
         }
         
         return cell
@@ -110,7 +110,7 @@ extension SearchCategoriesViewController: UICollectionViewDelegate {
             let subcategoriesViewController = SearchCategoriesViewController()
             subcategoriesViewController.branches = subcategories
             subcategoriesViewController.parentBranch = branch
-            subcategoriesViewController.title = branch.category.title
+            subcategoriesViewController.title = branch.title
             navigationController?.pushViewController(subcategoriesViewController, animated: true)
         }
         else {
@@ -119,7 +119,7 @@ extension SearchCategoriesViewController: UICollectionViewDelegate {
         
         dismissKeyboard()
         
-        Analytics.trackSearchTappedCategory(category: branch.category.title)
+        Analytics.trackSearchTappedCategory(category: branch.title ?? "")
     }
 }
 
@@ -144,7 +144,10 @@ extension SearchCategoriesViewController: UICollectionViewDelegateFlowLayout {
 extension SearchCategoriesViewController {
     func searchAndPushResults(searchBranch: SearchBranch) {
         keywords = searchBranch.keyword ?? ""
-        
+        searchResultsViewController = SearchResultsViewController()
+        searchResultsViewController.delegate = self
+        searchPaginationController = SearchPaginationController()
+        searchPaginationController.delegate = self
         searchPaginationController.gender = {
             if let currentSearchClass = currentSearchClass {
                 switch currentSearchClass {
@@ -158,7 +161,7 @@ extension SearchCategoriesViewController {
         }()
         searchPaginationController.search(keywords)
         
-        searchResultsViewController.title = searchBranch.category.title
+        searchResultsViewController.title = searchBranch.title
         navigationController?.pushViewController(searchResultsViewController, animated: true)
     }
 }
