@@ -495,10 +495,7 @@ extension AppDelegate : ViewControllerLifeCycle {
 
 // MARK: - Framework Setup
 
-extension AppDelegate : KochavaTrackerDelegate {
-    func tracker(_ tracker: KochavaTracker, didRetrieveAttributionDictionary attributionDictionary: [AnyHashable : Any]) {
-    }
-    
+extension AppDelegate {
     fileprivate func frameworkSetup(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) {
         
         Appsee.start(Constants.appSeeApiKey)
@@ -506,13 +503,6 @@ extension AppDelegate : KochavaTrackerDelegate {
         
         Amplitude.instance().initializeApiKey(Constants.amplitudeApiKey)
         Amplitude.instance().trackingSessionEvents = true
-
-        var trackerParametersDictionary: [AnyHashable: Any] = [:]
-        trackerParametersDictionary[kKVAParamAppGUIDStringKey] = Constants.kocchavaGUIDKey
-        trackerParametersDictionary[kKVAParamLogLevelEnumKey] = kKVALogLevelEnumInfo
-        
-        KochavaTracker.shared.configure(withParametersDictionary: trackerParametersDictionary, delegate: self)
-                
         
         if UIApplication.isDev {
             Branch.setUseTestBranchKey(true)
