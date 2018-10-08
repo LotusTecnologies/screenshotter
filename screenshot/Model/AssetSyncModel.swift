@@ -295,7 +295,7 @@ extension AssetSyncModel {
                                 if let imageData = imageData {
                                     screenshot.imageData = imageData
                                 }else{
-                                    print("ERROR could not find imageData");
+                                    Analytics.trackDevLog(file:  NSString.init(string: #file).lastPathComponent, line: #line, message: "no image data on upload photo")
                                 }
                                 screenshot.isHidden = false
                                 screenshot.isRecognized = true
