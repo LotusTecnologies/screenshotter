@@ -901,7 +901,7 @@ extension UserAccountManager {
                         let color = dict["color"] as? String
                         let sku = dict["sku"] as? String
                         let fallbackPriceNumber =  dict["fallbackPrice"] as? NSNumber
-                        let similarityScore = dict["similarityScore"] as? Float
+                        let similarityScore:Double = (dict["similarityScore"] as? Double) ?? 0
                         let fallbackPrice = fallbackPriceNumber?.floatValue ?? 0.0
                         var optionsMask = ProductsOptionsMask.global.rawValue
                         if let option = dict["optionsMask"] as? NSNumber {

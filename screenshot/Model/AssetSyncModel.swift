@@ -915,6 +915,7 @@ extension AssetSyncModel {
         let dataModel = DataModel.sharedInstance
         let extractedCategories = prod["categories"] as? [String]
         var fallbackPrice: Float = 0
+        let similarityScore:Double = (prod["similarityScore"] as? Double) ?? 0
         var partNumber: String? = nil
         var id: String? = nil
         var color: String? = nil
@@ -944,7 +945,7 @@ extension AssetSyncModel {
                                       color: color,
                                       sku: sku,
                                       fallbackPrice: fallbackPrice,
-                                      similarityScore: prod["similarityScore"] as? Float,
+                                      similarityScore: similarityScore,
                                       optionsMask: optionsMask)
     }
     
