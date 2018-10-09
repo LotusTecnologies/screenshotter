@@ -944,6 +944,7 @@ extension AssetSyncModel {
                                       color: color,
                                       sku: sku,
                                       fallbackPrice: fallbackPrice,
+                                      similarityScore: prod["similarityScore"] as? Float,
                                       optionsMask: optionsMask)
     }
     

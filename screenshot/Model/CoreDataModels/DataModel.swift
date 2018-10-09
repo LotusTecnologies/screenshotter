@@ -371,6 +371,7 @@ extension DataModel {
                      color: String?,
                      sku: String?,
                      fallbackPrice: Float,
+                     similarityScore: Float?,
                      optionsMask: Int32) -> Product {
         if let current =  (shoppable?.products as? Set<Product>)?.first(where: { $0.offer == offer } ){
             return current
@@ -395,6 +396,7 @@ extension DataModel {
         productToSave.color = color
         productToSave.sku = sku
         productToSave.fallbackPrice = fallbackPrice
+        productToSave.similarityScore = similarityScore
         productToSave.optionsMask = optionsMask
         productToSave.dateRetrieved = Date()
         return productToSave
