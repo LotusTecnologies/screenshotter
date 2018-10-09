@@ -396,7 +396,7 @@ extension DataModel {
         productToSave.color = color
         productToSave.sku = sku
         productToSave.fallbackPrice = fallbackPrice
-        productToSave.similarityScore = similarityScore
+        productToSave.similarityScore = similarityScore ?? 0
         productToSave.optionsMask = optionsMask
         productToSave.dateRetrieved = Date()
         return productToSave
@@ -421,6 +421,7 @@ extension DataModel {
             let id = dict["id"] as? String
             let color = dict["color"] as? String
             let sku = dict["sku"] as? String
+            let similarityScore = dict["similarityScore"] as? Float
             let fallbackPriceNumber =  dict["fallbackPrice"] as? NSNumber
             let fallbackPrice = fallbackPriceNumber?.floatValue ?? 0.0
             var optionsMask = ProductsOptionsMask.global.rawValue
@@ -445,6 +446,7 @@ extension DataModel {
                                               color: color,
                                               sku: sku,
                                               fallbackPrice: fallbackPrice,
+                                              similarityScore:similarityScore,
                                               optionsMask: Int32(optionsMask))
             managedObjectContext.saveIfNeeded()
             return orphanedProduct

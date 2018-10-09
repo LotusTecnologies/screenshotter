@@ -10,7 +10,6 @@
         <attribute name="isExpired" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="isNew" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="showAfterDate" attributeType="Date" defaultDateTimeInterval="-978314400" usesScalarValueType="NO" syncable="YES"/>
-        <attribute name="similarityScore" optional="YES" attributeType="Float" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="trackingJSON" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="uuid" optional="YES" attributeType="String" syncable="YES"/>
@@ -61,6 +60,7 @@
         <attribute name="partNumber" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="price" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="productDescription" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="similarityScore" optional="YES" attributeType="Float" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="sku" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="screenshot" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Screenshot" inverseName="favorites" inverseEntity="Screenshot" syncable="YES"/>
@@ -121,9 +121,9 @@
         <relationship name="subShoppables" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Shoppable" inverseName="parentShoppable" inverseEntity="Shoppable" syncable="YES"/>
     </entity>
     <elements>
-        <element name="InboxMessage" positionX="-171" positionY="36" width="128" height="240"/>
+        <element name="InboxMessage" positionX="-171" positionY="36" width="128" height="225"/>
         <element name="Matchstick" positionX="-380" positionY="-117" width="128" height="270"/>
-        <element name="Product" positionX="-101" positionY="396" width="128" height="525"/>
+        <element name="Product" positionX="-101" positionY="396" width="128" height="540"/>
         <element name="ProductFilter" positionX="160" positionY="276" width="128" height="120"/>
         <element name="Screenshot" positionX="-191" positionY="-114" width="128" height="435"/>
         <element name="Shoppable" positionX="-38" positionY="18" width="128" height="300"/>
