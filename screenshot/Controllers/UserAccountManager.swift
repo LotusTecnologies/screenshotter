@@ -901,6 +901,7 @@ extension UserAccountManager {
                         let color = dict["color"] as? String
                         let sku = dict["sku"] as? String
                         let fallbackPriceNumber =  dict["fallbackPrice"] as? NSNumber
+                        let similarityScore:Double = (dict["similarityScore"] as? Double) ?? 0
                         let fallbackPrice = fallbackPriceNumber?.floatValue ?? 0.0
                         var optionsMask = ProductsOptionsMask.global.rawValue
                         if let option = dict["optionsMask"] as? NSNumber {
@@ -924,6 +925,7 @@ extension UserAccountManager {
                                                                                color:  color,
                                                                                sku: sku,
                                                                                fallbackPrice: fallbackPrice,
+                                                                               similarityScore:similarityScore,
                                                                                optionsMask: Int32(optionsMask))
                             
                             
@@ -972,6 +974,10 @@ extension UserAccountManager {
             
             if let partNumber = product.partNumber {
                 dict["partNumber"] = partNumber
+            }
+            
+            if product.similarityScore > 0 {
+                dict["similarityScore"] = product.similarityScore
             }
             
             if let id = product.id {

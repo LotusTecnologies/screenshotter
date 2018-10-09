@@ -259,6 +259,7 @@
 
 /* Begin PBXFileReference section */
 		31107DA92098B20C006E8B86 /* Model 16.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 16.xcdatamodel"; sourceTree = "<group>"; };
+		3111081D216D004B000AD0AE /* Model 28.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 28.xcdatamodel"; sourceTree = "<group>"; };
 		311A4F5220D90AED0001D463 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		311A4F5420D90B020001D463 /* UserAccountManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserAccountManager.swift; sourceTree = "<group>"; };
 		311A4F5720D90B730001D463 /* ProductWebViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProductWebViewController.swift; sourceTree = "<group>"; };
@@ -2408,6 +2409,7 @@
 		C5278FBD1F3C38510090E422 /* Model.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				3111081D216D004B000AD0AE /* Model 28.xcdatamodel */,
 				3121590321253AC900130E31 /* Model 27.xcdatamodel */,
 				31377F9F2122C6FE0052D6EE /* Model 26.xcdatamodel */,
 				C5CF0FCE212176A0007963BA /* Model 25.xcdatamodel */,
@@ -2436,7 +2438,7 @@
 				E42AC3921F60340B0035A07C /* Model 2.xcdatamodel */,
 				C5278FBE1F3C38510090E422 /* Model.xcdatamodel */,
 			);
-			currentVersion = 3121590321253AC900130E31 /* Model 27.xcdatamodel */;
+			currentVersion = 3111081D216D004B000AD0AE /* Model 28.xcdatamodel */;
 			path = Model.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
