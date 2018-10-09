@@ -82,7 +82,6 @@ PODS:
     - GoogleUtilities/Logger
   - GTMSessionFetcher/Core (1.2.0)
   - Hero (1.3.1)
-  - KochavaTrackeriOS (3.7.0)
   - leveldb-library (1.20)
   - lottie-ios (2.5.0)
   - nanopb (0.3.8):
@@ -116,7 +115,6 @@ DEPENDENCIES:
   - Firebase/Database
   - Firebase/Storage
   - Hero
-  - KochavaTrackeriOS
   - lottie-ios
   - PromiseKit/Foundation (= 4.5.2)
   - PushwooshInboxUI
@@ -148,7 +146,6 @@ SPEC REPOS:
     - GoogleUtilities
     - GTMSessionFetcher
     - Hero
-    - KochavaTrackeriOS
     - leveldb-library
     - lottie-ios
     - nanopb
@@ -182,7 +179,6 @@ SPEC CHECKSUMS:
   GoogleUtilities: 760ccb53b7c7f40f9c02d8c241f76f841a7a6162
   GTMSessionFetcher: 0c4baf0a73acd0041bf9f71ea018deedab5ea84e
   Hero: 1c3c625ba05856f305d29f5c270f8766c5ff2df7
-  KochavaTrackeriOS: f03e393fadc3e853276d902962868b7e2a73c66b
   leveldb-library: 08cba283675b7ed2d99629a4bc5fd052cd2bb6a5
   lottie-ios: d699fdee68d7b63e721d949388b015fef1aaa4ac
   nanopb: 5601e6bca2dbf1ed831b519092ec110f66982ca3
@@ -194,6 +190,6 @@ SPEC CHECKSUMS:
   SWXMLHash: f0761e5c5d1a49f6553609bd0f5696a61738c5b9
   Whisper: 169760fc4bab0abf24d5529f9276f95c25cf1025
 
-PODFILE CHECKSUM: c984411d33ea281e56dd3f97cfd4ef43ebf510c2
+PODFILE CHECKSUM: 6bf8abb6a7e2a21264bf21782fee4587bb198f6a
 
 COCOAPODS: 1.5.3
