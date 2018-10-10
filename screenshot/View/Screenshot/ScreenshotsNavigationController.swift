@@ -94,10 +94,10 @@ extension ScreenshotsNavigationController :ScreenshotsViewControllerDelegate{
         }
     }
     
-    func presentScreenshot(_ screenshot: Screenshot) {
+    func presentScreenshot(_ screenshot: Screenshot, animated:Bool = true) {
         
         let productsViewController = createProductsViewController(screenshot: screenshot)
-        self.pushViewController(productsViewController, animated: true)
+        self.pushViewController(productsViewController, animated: animated)
         
         if (screenshot.isNew) {
             if screenshot.source == .discover {

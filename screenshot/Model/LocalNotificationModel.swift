@@ -53,67 +53,104 @@ class LocalNotificationModel {
     
     // MARK: Local Notification
 
-    func sendScreenshotAddedLocalNotification(assetId: String, imageData: Data?) {
+    func getTextAndImageForNotification(assetId: String, imageData: Data?) -> Promise<(String, Data?)>{
+        return Promise.init(resolvers: { (fulfil, reject) in
+            DataModel.sharedInstance.performBackgroundTask { (context) in
+                let screenshot = context.screenshotWith(assetId: assetId)
+                let product = screenshot?.firstShoppable?.feturedProduct()
+                
+                if let product = product, let imageURL = product.imageURL, let url = URL.init(string:imageURL){
+                    let contentBody:String = {
+                        if let price = product.price, product.floatPrice < 40 {
+                            return "notification.message.productWithPrice".localized(withFormat: price)
+                        }else{
+                            return "notification.message.product".localized
+                        }
+                    }()
+                    SDWebImageManager.shared().loadImage(with: url, options: [], progress: nil, completed: { (image, data, error, cache, bool, url) in
+                        let imageData:Data? =  {
+                            if let data = data {
+                                return data
+                            }else if let i = image {
+                                return AssetSyncModel.sharedInstance.data(for: i)
+                            }
+                            return nil
+                        }()
+                        fulfil((contentBody, imageData))
+                    })
+                }else{
+                    fulfil(("notification.message".localized, imageData))
+                }
+            }
+        })
+       
+    }
+    func sendScreenshotAddedLocalNotification(assetId: String, imageData: Data?, startTimeForDebug:Date) {
         guard PermissionsManager.shared.hasPermission(for: .push) else {
             return
         }
-        
-        let content = UNMutableNotificationContent()
-        content.title = "notification.title".localized
-        content.body = "notification.message".localized
-        if let lastNotificationSound = UserDefaults.standard.object(forKey: UserDefaultsKeys.dateLastSound) as? Date,
-            -lastNotificationSound.timeIntervalSinceNow < 60 { // 1 minute
-            content.sound = nil
-        } else {
-            content.sound = UNNotificationSound.default()
-        }
-        UserDefaults.standard.setValue(Date(), forKey: UserDefaultsKeys.dateLastSound)
-        content.userInfo = [Constants.openingScreenKey  : Constants.openingScreenValueScreenshot]
-        
-        var identifier = LocalNotificationIdentifier.screenshotAdded.rawValue
-        if let representativeImageData = imageData {
+        getTextAndImageForNotification(assetId: assetId, imageData: imageData).then { (args) -> Void in
+            Analytics.trackDevLog(file:  NSString.init(string: #file).lastPathComponent, line: #line, message: "extra time for notification \(startTimeForDebug.timeIntervalSinceNow)")
+
+            let (contentBody, imageData) = args
+            let content = UNMutableNotificationContent()
+            content.title = "notification.title".localized
+            content.body = contentBody
             
-            content.userInfo = [Constants.openingScreenKey  : Constants.openingScreenValueScreenshot,
-                                Constants.openingAssetIdKey : assetId]
-            
-            identifier += String(assetId.unicodeScalars.filter { CharacterSet.alphanumerics.contains($0) }) // Strip out /.[]
-            // Add image url
-            let tmpImageFileUrl = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(identifier).appendingPathExtension("jpg")
-            do {
-                try representativeImageData.write(to: tmpImageFileUrl)
-                let attachment = try UNNotificationAttachment(identifier: identifier,
-                                                              url: tmpImageFileUrl,
-                                                              options: [UNNotificationAttachmentOptionsTypeHintKey : kUTTypeImage])
-                content.attachments = [attachment]
-            } catch {
-                let localizedDescription = "Screenshot notif identifier:\(identifier) attachment error:\(error)"
-                print(localizedDescription)
-                Analytics.trackAppSentLocalPushNotification(success: false, localizedDescription: localizedDescription)
-                Analytics.trackError(type: nil, domain: "Craze", code: 101, localizedDescription: localizedDescription)
-            }
-        }
-        
-        content.badge = NSNumber(value: AccumulatorModel.screenshotUninformed.uninformedCount)
-        
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.1, repeats: false)
-        let request = UNNotificationRequest(identifier: identifier,
-                                            content: content,
-                                            trigger: trigger)
-        UNUserNotificationCenter.current().add(request, withCompletionHandler: { (error) in
-            if let error = error {
-                let localizedDescription = "Screenshot notif identifier:\(identifier) schedule error:\(error)"
-                print(localizedDescription)
-                Analytics.trackAppSentLocalPushNotification(success: false, localizedDescription: localizedDescription)
-                Analytics.trackError(type: nil, domain: "Craze", code: 102, localizedDescription: localizedDescription)
+            if let lastNotificationSound = UserDefaults.standard.object(forKey: UserDefaultsKeys.dateLastSound) as? Date,
+                -lastNotificationSound.timeIntervalSinceNow < 60 { // 1 minute
+                content.sound = nil
             } else {
-                Analytics.trackAppSentLocalPushNotification(success: true, localizedDescription: nil)
+                content.sound = UNNotificationSound.default()
             }
-        })
+            UserDefaults.standard.setValue(Date(), forKey: UserDefaultsKeys.dateLastSound)
+            content.userInfo = [Constants.openingScreenKey  : Constants.openingScreenValueScreenshot]
+            
+            var identifier = LocalNotificationIdentifier.screenshotAdded.rawValue
+            if let representativeImageData = imageData {
+                
+                content.userInfo = [Constants.openingScreenKey  : Constants.openingScreenValueScreenshot,
+                                    Constants.openingAssetIdKey : assetId]
+                
+                identifier += String(assetId.unicodeScalars.filter { CharacterSet.alphanumerics.contains($0) }) // Strip out /.[]
+                // Add image url
+                let tmpImageFileUrl = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(identifier).appendingPathExtension("jpg")
+                do {
+                    try representativeImageData.write(to: tmpImageFileUrl)
+                    let attachment = try UNNotificationAttachment(identifier: identifier,
+                                                                  url: tmpImageFileUrl,
+                                                                  options: [UNNotificationAttachmentOptionsTypeHintKey : kUTTypeImage])
+                    content.attachments = [attachment]
+                } catch {
+                    let localizedDescription = "Screenshot notif identifier:\(identifier) attachment error:\(error)"
+                    print(localizedDescription)
+                    Analytics.trackAppSentLocalPushNotification(success: false, localizedDescription: localizedDescription)
+                    Analytics.trackError(type: nil, domain: "Craze", code: 101, localizedDescription: localizedDescription)
+                }
+            }
+            
+            content.badge = NSNumber(value: AccumulatorModel.screenshotUninformed.uninformedCount)
+            
+            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.1, repeats: false)
+            let request = UNNotificationRequest(identifier: identifier,
+                                                content: content,
+                                                trigger: trigger)
+            UNUserNotificationCenter.current().add(request, withCompletionHandler: { (error) in
+                if let error = error {
+                    let localizedDescription = "Screenshot notif identifier:\(identifier) schedule error:\(error)"
+                    print(localizedDescription)
+                    Analytics.trackAppSentLocalPushNotification(success: false, localizedDescription: localizedDescription)
+                    Analytics.trackError(type: nil, domain: "Craze", code: 102, localizedDescription: localizedDescription)
+                } else {
+                    Analytics.trackAppSentLocalPushNotification(success: true, localizedDescription: nil)
+                }
+            })
+        }
     }
 
-    func scheduleImageLocalNotification(copiedTmpURL: URL?, userInfo: [String : Any], identifier: String, body: String, trigger: UNNotificationTrigger) {
-        let content = UNMutableNotificationContent()
-        content.body = body
+func scheduleImageLocalNotification(copiedTmpURL: URL?, userInfo: [String : Any], identifier: String, body: String, trigger: UNNotificationTrigger) {
+    let content = UNMutableNotificationContent()
+    content.body = body
         content.sound = UNNotificationSound.default()
         content.userInfo = userInfo
         if let copiedTmpURL = copiedTmpURL {

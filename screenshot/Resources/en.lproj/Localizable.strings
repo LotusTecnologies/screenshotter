@@ -169,6 +169,8 @@
 "negative_feedback.title" = "Sorry To Hear That!";
 
 "notification.message" = "Discover the best deals on products in your screenshot";
+"notification.message.product" = "We found something similar for you";
+"notification.message.productWithPrice" = "We found something similar for you for %@";
 "notification.title" = "Shop Your Inspiration";
 
 

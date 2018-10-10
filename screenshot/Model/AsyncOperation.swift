@@ -20,6 +20,7 @@ class AsyncOperationMonitor {
     private(set) var didStart = false
     let tags:[AsyncOperationTag]
     let queueUUIDs:[UUID]
+   
     init(tags:[AsyncOperationTag], queues:[AsyncOperationQueue], delegate:AsyncOperationMonitorDelegate?) {
         self.tags = tags
         self.delegate = delegate
@@ -70,11 +71,37 @@ class AsyncOperationMonitor {
     
 }
 
-class AsyncOperationMonitorCenter {
+class AsyncOperationMonitorCenter: AsyncOperationMonitorDelegate {
     static let shared = AsyncOperationMonitorCenter()
     
     private var runningTags:[UUID:[AsyncOperationTag.TagType:[String:Int]]] = [:]
     
+    func asyncOperationMonitorDidChange(_ monitor: AsyncOperationMonitor) {
+        if !monitor.didStart {
+            monitor.delegate = nil
+            if let index = onCompleteMonitorEvents.firstIndex(where: { (e) -> Bool in
+               return e.monitor === monitor
+            }) {
+                let event = onCompleteMonitorEvents[index]
+                event.completion()
+                onCompleteMonitorEvents.remove(at: index)
+            }
+        }
+    }
+    struct OnCompleteMonitorEvent {
+        let monitor:AsyncOperationMonitor
+        let completion:()->()
+    }
+    var onCompleteMonitorEvents:[OnCompleteMonitorEvent] = []
+    func onComplete(tags:[AsyncOperationTag], queues:[AsyncOperationQueue], completion:@escaping ()->()){
+        let monitor = AsyncOperationMonitor.init(tags: tags, queues: queues, delegate: self)
+        let event = OnCompleteMonitorEvent.init(monitor: monitor, completion: completion)
+        if !monitor.didStart {
+            completion()
+        }else{
+            onCompleteMonitorEvents.append(event)
+        }
+    }
     
     
     public func registerStarted(queueUUID:UUID?, tags:[AsyncOperationTag]?) {

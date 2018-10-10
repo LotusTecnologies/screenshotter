@@ -555,7 +555,8 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                                 let error = NSError.init(domain: "Craze", code: -90, userInfo: [NSLocalizedDescriptionKey:"already have screenshot in database"])
                                 reject(error)
                             }else{
-                                let syteJsonString = NetworkingPromise.sharedInstance.jsonStringify(object: syteJson)
+                                self.syteProcessing(imageData: imageData, orImageUrlString:uploadedImageURL, assetId: asset.localIdentifier, optionsMask: ProductsOptionsMask.global, gottenUploadedURLString: uploadedImageURL, gottenSegments: syteJson)
+
                                 let _ = DataModel.sharedInstance.saveScreenshot(upsert: false,
                                                                                 managedObjectContext: managedObjectContext,
                                                                                 assetId: asset.localIdentifier,
@@ -565,7 +566,7 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                                                                                 isHidden: true,
                                                                                 imageData: imageData,
                                                                                 uploadedImageURL: uploadedImageURL,
-                                                                                syteJsonString: syteJsonString)
+                                                                                syteJsonString: nil)
                                 
                                 managedObjectContext.saveIfNeeded()
                                 
@@ -585,7 +586,13 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                         DispatchQueue.main.async {
                             // The accumulator updates the count in an async block.
                             // Without a delay the count is wrong when setting the content.badge.
-                            LocalNotificationModel.shared.sendScreenshotAddedLocalNotification(assetId: asset.localIdentifier, imageData: imageData)
+                            let startTime = Date()
+                            AsyncOperationMonitorCenter.shared.onComplete(tags: [AsyncOperationTag.init(type: .assetId, value: asset.localIdentifier)], queues: AssetSyncModel.sharedInstance.queues, completion: {
+                                DispatchQueue.mainAsyncIfNeeded {
+                                    LocalNotificationModel.shared.sendScreenshotAddedLocalNotification(assetId: asset.localIdentifier, imageData: imageData, startTimeForDebug: startTime)
+                                }
+                            })
+                            
                         }
                     }
                 }
@@ -689,7 +696,8 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                                     self.processingQ.async {
                                         if self.shouldSendPushWhenFindFashionWithoutUserScreenshotAction && ApplicationStateModel.sharedInstance.isBackground(){  //need to check twice due to async craziness
                                             self.shouldSendPushWhenFindFashionWithoutUserScreenshotAction = false
-                                            LocalNotificationModel.shared.sendScreenshotAddedLocalNotification(assetId: asset.localIdentifier, imageData: imageData)
+                                           let startTimeForDebug = Date()
+                                            LocalNotificationModel.shared.sendScreenshotAddedLocalNotification(assetId: asset.localIdentifier, imageData: imageData, startTimeForDebug: startTimeForDebug)
                                         }
                                     }
                                 }
