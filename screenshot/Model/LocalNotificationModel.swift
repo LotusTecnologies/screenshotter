@@ -62,9 +62,9 @@ class LocalNotificationModel {
                 if let product = product, let imageURL = product.imageURL, let url = URL.init(string:imageURL){
                     let contentBody:String = {
                         if let price = product.price, product.floatPrice < 40 {
-                            return "We found something similar for you for %@".localized(withFormat: price)
+                            return "notification.message.productWithPrice".localized(withFormat: price)
                         }else{
-                            return "We found something similar for you"
+                            return "notification.message.product".localized
                         }
                     }()
                     SDWebImageManager.shared().loadImage(with: url, options: [], progress: nil, completed: { (image, data, error, cache, bool, url) in
