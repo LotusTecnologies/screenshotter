@@ -11,6 +11,4 @@
 
 #import <CommonCrypto/CommonCrypto.h>
 
-#import "KochavaTracker.h"
-
 #endif /* screenshot_Bridging_Header_h */

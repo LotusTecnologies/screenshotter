@@ -279,10 +279,24 @@ extension AssetSyncModel {
                                 let wasHidden = screenshot.isHidden
                                 
                                 if screenshot.shoppablesCount > 0 {
-                                    screenshot.hideWorkhorse()
+                                    (screenshot.shoppables as? Set<Shoppable>)?.forEach({ (s) in
+                                        (s.products as? Set<Product>)?.forEach({ (p) in
+                                            if p.isFavorite {
+                                                p.screenshot = screenshot
+                                            }else{
+                                                managedObjectContext.delete(p)
+                                            }
+                                        })
+                                        managedObjectContext.delete(s)
+                                    })
+                                    screenshot.shoppables = nil
                                 }
                                 screenshot.shoppablesCount = 0
-                                screenshot.imageData = imageData
+                                if let imageData = imageData {
+                                    screenshot.imageData = imageData
+                                }else{
+                                    Analytics.trackDevLog(file:  NSString.init(string: #file).lastPathComponent, line: #line, message: "no image data on upload photo")
+                                }
                                 screenshot.isHidden = false
                                 screenshot.isRecognized = true
                                 screenshot.lastModified = Date()
@@ -709,54 +723,6 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
 
 extension AssetSyncModel {
     
-    
-    func resaveScreenshot(assetId: String, imageData: Data?) -> Promise<Data?> {
-        let dataModel = DataModel.sharedInstance
-        return Promise { fulfill, reject in
-            self.performBackgroundTask(assetId: nil, shoppableId: nil) { (managedObjectContext) in
-                if let screenshot = dataModel.retrieveScreenshot(managedObjectContext: managedObjectContext, assetId: assetId) {
-                    if let classification = screenshot.syteJson,
-                        classification.utf8.count == 1 { // Previously dual-purposed syteJson for imageClassification of "h" (human) or "f" (furniture)
-                        screenshot.syteJson = nil
-                    }
-                    let wasHidden  = screenshot.isHidden
-                    if screenshot.shoppablesCount > 0 {
-                        screenshot.hideWorkhorse()
-                    }
-                    screenshot.shoppablesCount = 0
-                    screenshot.imageData = imageData
-                    screenshot.isHidden = false
-                    screenshot.isRecognized = true
-                    screenshot.lastModified = Date()
-                    managedObjectContext.saveIfNeeded()
-                    if wasHidden {
-                        Analytics.trackScreenshotCreated(screenshot: screenshot)
-                    }
-                    fulfill(imageData)
-                } else {
-                    let error = NSError(domain: "Craze", code: 18, userInfo: [NSLocalizedDescriptionKey : "Could not retreive screenshot with assetId:\(assetId)"])
-                    reject(error)
-                }
-            }
-        }
-    }
-    
-    func rescanClassification(assetId: String, imageData: Data?, optionsMask: ProductsOptionsMask = ProductsOptionsMask.global) {
-        Analytics.trackBypassedClarifaiOnRetry()
-        self.userInitiatedQueue.addOperation(AsyncOperation.init(timeout: 90, assetId: assetId, shoppableId: nil, completion: { (completion) in
-            firstly {
-                self.resaveScreenshot(assetId: assetId, imageData: imageData)
-                }.then (on: self.processingQ) { imageData -> Void in
-                    return self.syteProcessing(imageData: imageData, orImageUrlString:nil, assetId: assetId, optionsMask: optionsMask)
-                }.catch { error in
-                    print("rescanClassification catch error:\(error)")
-                }.always {
-                    completion()
-            }
-            
-        }))
-    }
-    
     func syteProcessing(imageData: Data?,
                         orImageUrlString:String?,
                         assetId: String,
@@ -921,6 +887,7 @@ extension AssetSyncModel {
         let dataModel = DataModel.sharedInstance
         let extractedCategories = prod["categories"] as? [String]
         var fallbackPrice: Float = 0
+        let similarityScore:Double = (prod["similarityScore"] as? Double) ?? 0
         var partNumber: String? = nil
         var id: String? = nil
         var color: String? = nil
@@ -950,6 +917,7 @@ extension AssetSyncModel {
                                       color: color,
                                       sku: sku,
                                       fallbackPrice: fallbackPrice,
+                                      similarityScore: similarityScore,
                                       optionsMask: optionsMask)
     }
     
