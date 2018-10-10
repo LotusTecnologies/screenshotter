@@ -34,12 +34,15 @@ extension Shoppable {
     }
     
     func feturedProduct() ->Product? {
-        let productList = self.products?.sortedArray(using: [NSSortDescriptor(key: "order", ascending: false)]).prefix(5) as? ArraySlice<Product>
+        let productList = self.products?.sortedArray(using: [NSSortDescriptor(key: "order", ascending: false)]).prefix(5)
         let product = productList?.first(where: { (p) -> Bool in
-            return p.floatPrice < 40
-        })
+            if let p = p as? Product {
+                return p.floatPrice < 40
+            }
+            return false
+        }) as? Product
         
-        return product ?? productList?.first
+        return product ?? productList?.first as? Product
     }
     
     private func productFilter(managedObjectContext: NSManagedObjectContext, optionsMask: Int) -> ProductFilter? {
