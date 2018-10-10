@@ -842,8 +842,32 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
                             
                         } else {
                             // Show screenshot as first in screenshots list for screenshotAdded local notification.
-                            AssetSyncModel.sharedInstance.importPhotosToScreenshot(assetIds: [openingAssetId], source: .screenshot)
+                            AccumulatorModel.screenshot.removeAssetId(openingAssetId)
                             showScreenshotListTop()
+                            DataModel.sharedInstance.performBackgroundTask { (context) in
+                                if let screenshot = context.screenshotWith(assetId: openingAssetId) {
+                                    screenshot.isHidden = false
+                                    context.saveIfNeeded()
+                                }
+                            }
+                            if let screenshot = DataModel.sharedInstance.mainMoc().screenshotWith(assetId: openingAssetId) {
+                                if let product = screenshot.firstShoppable?.feturedProduct() {
+                                    if let mainTabBarController = self.window?.rootViewController as? MainTabBarController{
+                                        AssetSyncModel.sharedInstance.addSubShoppable(fromProduct: product).then { shoppable -> Void in
+                                            mainTabBarController.screenshotsNavigationController.presentScreenshot(screenshot, animated:false)
+                                            product.recordViewedProduct()
+                                            let vc = ProductDetailViewController.init()
+                                            vc.product = product
+                                            vc.shoppable = shoppable
+                                            let _ = vc.view
+                                            mainTabBarController.screenshotsNavigationController.pushViewController(vc, animated: false)
+                                        }
+                                       
+                                        
+                                    }
+
+                                }
+                            }
                         }
                     } else {
                         showScreenshotListTop()

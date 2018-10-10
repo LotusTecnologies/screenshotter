@@ -12,7 +12,53 @@ extension String {
     var nonEmptyValue: String? {
         return isEmpty ? nil : self
     }
-    
+    func singularSyteCategory() -> String {
+        var singulizeThis = [
+            "Backpacks":"backpack",
+            "Bags":"bag",
+            "Belts":"belt",
+            "Bracelets":"bracelet",
+            "Coats":"coat",
+            "Dresses":"dress",
+            "Hats":"hat",
+            "Jackets":"jacket",
+            "Jewelry":"jewelry",
+            "Jumpsuits":"jumpsuit",
+            "Makeup":"makeup",
+            "Neclesses":"necklace",
+            "PouchBag":"bag",
+            "Rings":"ring",
+            "Scarfs":"scarve",
+            "Shirts":"shirt",
+            "Shorts":"short",
+            "Skirts":"skirt",
+            "Swimwear":"swimwear",
+            "Ties":"tie",
+            "Wallets":"wallet",
+            "Watches":"watch"]
+        var singularizeThese = [
+            "Jeans":"jeans",
+            "Sunglasses":"sunglasses",
+            "SocksAndTights":"socks",
+            "Boots":"boots",
+            "Gloves":"gloves",
+            "Mittens":"mittens",
+            "Trousers":"trousers",
+            "Underwear":"underwear",
+            "Shoes":"shoes",
+            "Earrings":"earrings"
+]
+        if let value = singulizeThis[self]{
+            return "this \(value)"
+        }else if let value = singularizeThese[self]{
+            return "these \(value)"
+        }else{
+            return "this \(self)"
+        }
+
+       
+
+    }
     func normalizedSyteCategory() -> String? {
         var validCategories = ["Shoes":"Shoes",
                                "Shirts":"Shirts",

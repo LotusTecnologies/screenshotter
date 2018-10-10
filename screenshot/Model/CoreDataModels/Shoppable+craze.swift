@@ -33,6 +33,15 @@ extension Shoppable {
         return UIImage.cropped(image: image, thumbSize: thumbSize, relativeSizeCropRect: self.relativeRect())
     }
     
+    func feturedProduct() ->Product? {
+        let productList = self.products?.sortedArray(using: [NSSortDescriptor(key: "order", ascending: false)]).prefix(5) as? ArraySlice<Product>
+        let product = productList?.first(where: { (p) -> Bool in
+            return p.floatPrice < 40
+        })
+        
+        return product ?? productList?.first
+    }
+    
     private func productFilter(managedObjectContext: NSManagedObjectContext, optionsMask: Int) -> ProductFilter? {
         let shoppableID = self.objectID
         let fetchRequest: NSFetchRequest<ProductFilter> = ProductFilter.fetchRequest()

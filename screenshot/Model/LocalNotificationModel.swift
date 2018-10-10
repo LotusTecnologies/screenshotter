@@ -58,9 +58,22 @@ class LocalNotificationModel {
             return
         }
         
+        let screenshot = DataModel.sharedInstance.mainMoc().screenshotWith(assetId: assetId)
+        let product = screenshot?.firstShoppable?.feturedProduct()
+        
         let content = UNMutableNotificationContent()
-        content.title = "notification.title".localized
-        content.body = "notification.message".localized
+        if let product = product {
+            content.title = "notification.title".localized
+            if let price = product.price, product.floatPrice < 40 {
+                content.body = "We found something similar for you for %@".localized(withFormat: price)
+            }else{
+                content.body = "We found something similar for you"
+            }
+        }else{
+            content.title = "notification.title".localized
+            content.body = "notification.message".localized
+
+        }
         if let lastNotificationSound = UserDefaults.standard.object(forKey: UserDefaultsKeys.dateLastSound) as? Date,
             -lastNotificationSound.timeIntervalSinceNow < 60 { // 1 minute
             content.sound = nil
