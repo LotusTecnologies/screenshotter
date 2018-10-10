@@ -34,7 +34,7 @@ extension Shoppable {
     }
     
     func feturedProduct() ->Product? {
-        let productList = self.products?.sortedArray(using: [NSSortDescriptor(key: "order", ascending: false)]).prefix(5)
+        let productList = self.products?.sortedArray(using: [NSSortDescriptor(key: "order", ascending: true)]).prefix(5)
         let product = productList?.first(where: { (p) -> Bool in
             if let p = p as? Product {
                 return p.floatPrice < 40

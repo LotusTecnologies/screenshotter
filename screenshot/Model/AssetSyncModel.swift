@@ -586,9 +586,10 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                         DispatchQueue.main.async {
                             // The accumulator updates the count in an async block.
                             // Without a delay the count is wrong when setting the content.badge.
+                            let startTime = Date()
                             AsyncOperationMonitorCenter.shared.onComplete(tags: [AsyncOperationTag.init(type: .assetId, value: asset.localIdentifier)], queues: AssetSyncModel.sharedInstance.queues, completion: {
                                 DispatchQueue.mainAsyncIfNeeded {
-                                    LocalNotificationModel.shared.sendScreenshotAddedLocalNotification(assetId: asset.localIdentifier, imageData: imageData)
+                                    LocalNotificationModel.shared.sendScreenshotAddedLocalNotification(assetId: asset.localIdentifier, imageData: imageData, startTimeForDebug: startTime)
                                 }
                             })
                             
@@ -695,7 +696,8 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                                     self.processingQ.async {
                                         if self.shouldSendPushWhenFindFashionWithoutUserScreenshotAction && ApplicationStateModel.sharedInstance.isBackground(){  //need to check twice due to async craziness
                                             self.shouldSendPushWhenFindFashionWithoutUserScreenshotAction = false
-                                            LocalNotificationModel.shared.sendScreenshotAddedLocalNotification(assetId: asset.localIdentifier, imageData: imageData)
+                                           let startTimeForDebug = Date()
+                                            LocalNotificationModel.shared.sendScreenshotAddedLocalNotification(assetId: asset.localIdentifier, imageData: imageData, startTimeForDebug: startTimeForDebug)
                                         }
                                     }
                                 }

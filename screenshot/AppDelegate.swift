@@ -841,9 +841,9 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
                                 }
                             }
                             if let screenshot = DataModel.sharedInstance.mainMoc().screenshotWith(assetId: openingAssetId) {
-                                if let product = screenshot.firstShoppable?.feturedProduct() {
-                                    if let mainTabBarController = self.window?.rootViewController as? MainTabBarController{
+                                if let product = screenshot.firstShoppable?.feturedProduct(), let mainTabBarController = self.window?.rootViewController as? MainTabBarController{
                                         AssetSyncModel.sharedInstance.addSubShoppable(fromProduct: product).then { shoppable -> Void in
+                                            mainTabBarController.screenshotsNavigationController.popToRootViewController(animated: false)
                                             mainTabBarController.screenshotsNavigationController.presentScreenshot(screenshot, animated:false)
                                             product.recordViewedProduct()
                                             let vc = ProductDetailViewController.init()
@@ -853,9 +853,8 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
                                             mainTabBarController.screenshotsNavigationController.pushViewController(vc, animated: false)
                                         }
                                        
-                                        
-                                    }
-
+                                }else{
+                                    AssetSyncModel.sharedInstance.importPhotosToScreenshot(assetIds: [openingAssetId], source: .screenshot)
                                 }
                             }
                         }

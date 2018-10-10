@@ -85,12 +85,13 @@ class LocalNotificationModel {
         })
        
     }
-    func sendScreenshotAddedLocalNotification(assetId: String, imageData: Data?) {
+    func sendScreenshotAddedLocalNotification(assetId: String, imageData: Data?, startTimeForDebug:Date) {
         guard PermissionsManager.shared.hasPermission(for: .push) else {
             return
         }
         getTextAndImageForNotification(assetId: assetId, imageData: imageData).then { (args) -> Void in
-            
+            Analytics.trackDevLog(file:  NSString.init(string: #file).lastPathComponent, line: #line, message: "extra time for notification \(startTimeForDebug.timeIntervalSinceNow)")
+
             let (contentBody, imageData) = args
             let content = UNMutableNotificationContent()
             content.title = "notification.title".localized
