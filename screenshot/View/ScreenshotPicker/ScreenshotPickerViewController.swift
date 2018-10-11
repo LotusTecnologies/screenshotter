@@ -29,8 +29,6 @@ class ScreenshotPickerNavigationController : UINavigationController {
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
         
-        restorationIdentifier = "ScreenshotPickerNavigationController"
-        
         cancelButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: nil, action: nil)
         doneButton = UIBarButtonItem()
         internalDoneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(doneAction))
@@ -81,9 +79,7 @@ class ScreenshotPickerViewController : BaseViewController {
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-        
-        restorationIdentifier = "ScreenshotPickerViewController"
-        
+                
         NotificationCenter.default.addObserver(self, selector: #selector(applicationWillEnterForeground), name: NSNotification.Name.UIApplicationWillEnterForeground, object: nil)
     }
     

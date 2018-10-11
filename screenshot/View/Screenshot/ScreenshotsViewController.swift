@@ -39,7 +39,6 @@ class ScreenshotsViewController: BaseViewController {
     init() {
         super.init(nibName: nil, bundle: nil)
         
-        self.restorationIdentifier = "ScreenshotsViewController"
         title = "screenshots.title".localized
             
         NotificationCenter.default.addObserver(self, selector: #selector(applicationDidEnterBackground(_:)), name: .UIApplicationDidEnterBackground, object: nil)

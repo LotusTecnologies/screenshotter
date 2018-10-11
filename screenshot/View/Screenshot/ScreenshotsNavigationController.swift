@@ -24,8 +24,6 @@ class ScreenshotsNavigationController: UINavigationController {
         screenshotsViewController.navigationItem.rightBarButtonItem = screenshotsViewController.editButtonItem
         screenshotsViewController.delegate = self
         
-        self.restorationIdentifier = "ScreenshotsNavigationController"
-        
         self.viewControllers = [self.screenshotsViewController]
     }
     
@@ -157,40 +155,3 @@ extension ScreenshotsNavigationControllerPushPermission {
         UserDefaults.standard.synchronize()
     }
 }
-
-typealias ScreenshotsNavigationControllerStateRestoration = ScreenshotsNavigationController
-extension ScreenshotsNavigationControllerStateRestoration {
-    private var screenshotKey: String {
-        return "screenshotKey"
-    }
-    
-    override func encodeRestorableState(with coder: NSCoder) {
-        if let productsViewController = topViewController as? ProductsViewController {
-            coder.encode(productsViewController.screenshot.objectID.uriRepresentation(), forKey: screenshotKey)
-        }
-        
-        super.encodeRestorableState(with: coder)
-    }
-    
-    override func decodeRestorableState(with coder: NSCoder) {
-        super.decodeRestorableState(with: coder)
-        
-        // Below isn't needed until createRestoredProductsViewController is implemented
-        guard "keep the below code alive" == "but make this fail" else {
-            return
-        }
-        
-        guard let _ = DataModel.sharedInstance.mainMoc().persistentStoreCoordinator else {
-            return
-        }
-        
-        if coder.containsValue(forKey: screenshotKey),
-            let url = coder.decodeObject(forKey: screenshotKey) as? URL,
-            let objectID = DataModel.sharedInstance.mainMoc().objectId(for: url),
-            let screenshot = DataModel.sharedInstance.mainMoc().screenshotWith(objectId: objectID)
-        {
-            restoredProductsViewController?.screenshot = screenshot
-        }
-    }
-}
-
