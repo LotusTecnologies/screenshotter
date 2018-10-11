@@ -21,9 +21,7 @@ class ProfileNavigationController: UINavigationController {
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-        
-        restorationIdentifier = String(describing: type(of: self))
-        
+                
         profileViewController.navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(named: "NavigationBarGear"), style: .plain, target: self, action: #selector(pushSettingsViewController))
         
         viewControllers = [profileViewController]

@@ -133,9 +133,7 @@ class ProfileViewController: BaseTableViewController {
     
     override init(style: UITableViewStyle) {
         super.init(style: style)
-        
-        restorationIdentifier = String(describing: type(of: self))
-        
+                
         NotificationCenter.default.addObserver(self, selector: #selector(applicationDidBecomeActive(_:)), name: .UIApplicationDidBecomeActive, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(applicationWillEnterForeground(_:)), name: .UIApplicationWillEnterForeground, object: nil)
     }

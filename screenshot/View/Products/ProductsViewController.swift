@@ -78,7 +78,6 @@ class ProductsViewController: BaseViewController {
         self.loadingMonitor = AsyncOperationMonitor.init(assetId: screenshot.assetId, shoppableId:nil, queues: AssetSyncModel.sharedInstance.queues, delegate: self)
 
         self.title = "products.title".localized
-        self.restorationIdentifier = "ProductsViewController"
         
         self.productsOptions.delegate = self
         recoverLostSaleManager.delegate = self

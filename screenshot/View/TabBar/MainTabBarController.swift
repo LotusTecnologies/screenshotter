@@ -80,7 +80,6 @@ class MainTabBarController: UITabBarController, UITabBarControllerDelegate, Scre
         settingsTabBarItem = profileNavigationController.tabBarItem
         
         self.delegate = self
-        self.restorationIdentifier = String(describing: type(of: self))
     
         let viewControllerList =  [
             screenshotsNavigationController,

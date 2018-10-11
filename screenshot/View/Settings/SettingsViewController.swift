@@ -46,9 +46,7 @@ class SettingsViewController : BaseViewController {
     }
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-        
-        self.restorationIdentifier = String(describing: type(of: self))
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)        
     }
     
     override func viewDidLoad() {

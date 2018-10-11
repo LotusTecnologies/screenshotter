@@ -25,7 +25,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var window: UIWindow?
     var bgTask: UIBackgroundTaskIdentifier = UIBackgroundTaskInvalid
-    var shouldLoadDiscoverNextLoad = false
+    var shouldLoadDiscoverNextLoad = true
     let appSettings: AppSettings = AppSettings()
     var appLaunchedForFirstTime = false
     
@@ -363,121 +363,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return handled
     }
     
-    // MARK: State Restoration
-    
-    fileprivate var restorationViewControllers: [String : UIViewController] = [:]
-    
-    func application(_ application: UIApplication, shouldRestoreApplicationState coder: NSCoder) -> Bool {
-        return true
-    }
-    
-    func application(_ application: UIApplication, shouldSaveApplicationState coder: NSCoder) -> Bool {
-        return true
-    }
-    
-    func application(_ application: UIApplication, viewControllerWithRestorationIdentifierPath identifierComponents: [Any], coder: NSCoder) -> UIViewController? {
-        guard let identifier = identifierComponents.last as? String else {
-            return nil
-        }
-        
-        // Shorter convenience function
-        func s(_ class: AnyClass) -> String {
-            return String(describing: `class`)
-        }
-        
-        let viewController: UIViewController?
-        
-        switch identifier {
-        case s(MainTabBarController.self):
-            viewController = mainTabBarController
-            
-        case s(ScreenshotsNavigationController.self):
-            guard let tabBarController = restorationViewControllers[s(MainTabBarController.self)] as? MainTabBarController else {
-                return nil
-            }
-            
-            viewController = tabBarController.screenshotsNavigationController
-            
-        case s(ScreenshotsViewController.self):
-            guard let navigationController = restorationViewControllers[s(ScreenshotsNavigationController.self)] as? ScreenshotsNavigationController else {
-                return nil
-            }
-            
-            viewController = navigationController.screenshotsViewController
-            
-        case s(ProductsViewController.self):
-            guard let navigationController = restorationViewControllers[s(ScreenshotsNavigationController.self)] as? ScreenshotsNavigationController else {
-                return nil
-            }
-            
-            viewController = navigationController.createRestoredProductsViewController()
-            
-        case s(ScreenshotPickerNavigationController.self):
-            guard let navigationController = restorationViewControllers[s(ScreenshotsNavigationController.self)] as? ScreenshotsNavigationController else {
-                return nil
-            }
-            
-            viewController = navigationController.createScreenshotPickerNavigationController()
-            
-        case s(ScreenshotPickerViewController.self):
-            guard let navigationController = restorationViewControllers[s(ScreenshotPickerNavigationController.self)] as? ScreenshotPickerNavigationController else {
-                return nil
-            }
-            
-            viewController = navigationController.screenshotPickerViewController
-            
-        case s(FavoritesNavigationController.self):
-            guard let tabBarController = restorationViewControllers[s(MainTabBarController.self)] as? MainTabBarController else {
-                return nil
-            }
-            
-            viewController = tabBarController.favoritesNavigationController
-            
-        case s(FavoriteProductsViewController.self):
-            guard let navigationController = restorationViewControllers[s(FavoritesNavigationController.self)] as? FavoritesNavigationController else {
-                return nil
-            }
-            
-            viewController = navigationController.favoritesViewController
-        
-        case s(DiscoverNavigationController.self):
-            guard let tabBarController = restorationViewControllers[s(MainTabBarController.self)] as? MainTabBarController else {
-                return nil
-            }
-            
-            viewController = tabBarController.discoverNavigationController
-            
-        case s(DiscoverScreenshotViewController.self):
-            guard let navigationController = restorationViewControllers[s(DiscoverNavigationController.self)] as? DiscoverNavigationController else {
-                return nil
-            }
-            
-            viewController = navigationController.discoverScreenshotViewController
-            
-        case s(ProfileNavigationController.self):
-            guard let tabBarController = restorationViewControllers[s(MainTabBarController.self)] as? MainTabBarController else {
-                return nil
-            }
-            
-            viewController = tabBarController.profileNavigationController
-            
-        case s(ProfileViewController.self):
-            guard let navigationController = restorationViewControllers[s(ProfileNavigationController.self)] as? ProfileNavigationController else {
-                return nil
-            }
-            
-            viewController = navigationController.profileViewController
-            
-        default:
-            viewController = nil
-        }
-        
-        if viewController != nil {
-            restorationViewControllers[identifier] = viewController
-        }
-        
-        return viewController
-    }
     
     // MARK: Hidden Logo
     
