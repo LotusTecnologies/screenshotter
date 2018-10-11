@@ -50,7 +50,8 @@ class ProductsViewController: BaseViewController {
     var productLoadingState:ProductsViewControllerState = .unknown 
 
     var selectedShoppable:Shoppable?
-
+    var screenshotMatchId: String?
+    
     func getSelectedShoppable() -> Shoppable? {
         if let s = selectedShoppable {
             return s
@@ -266,8 +267,22 @@ extension ProductsViewControllerScrollViewDelegate: UIScrollViewDelegate {
 }
 
 extension ProductsViewController: ShoppablesToolbarDelegate {
+    func startScreenshotMatchingSessionOnNewShoppableList(shoppableList: [Shoppable]) {
+        if selectedShoppable == nil {
+            screenshotMatchId = UUID().uuidString
+            if let matchId = screenshotMatchId {
+                let shoppablesIdArray = shoppableList.compactMap { $0.offersURL }
+                let shoppablesIdArrayString = shoppablesIdArray.joined(separator: ", ")
+                Analytics.trackScreenshotMatching(screenshot: screenshot, screenshotMatchId: matchId, shoppableIdArray: shoppablesIdArrayString)
+            } else {
+                print("Start screenshot matching session, but screenshotMatchId nil")
+            }
+        }
+    }
+    
     func shoppablesToolbarDidChange(toolbar: ShoppablesToolbar) {
         if self.isViewLoaded  {
+            startScreenshotMatchingSessionOnNewShoppableList(shoppableList: toolbar.shoppables) // Must be before setting self.selectedShoppable
             if let selectedShoppable = self.getSelectedShoppable(){
                 if let currentShoppable = self.products.first?.shoppable, currentShoppable == selectedShoppable {
                     //already synced
@@ -287,6 +302,7 @@ extension ProductsViewController: ShoppablesToolbarDelegate {
     }
     
     func shoppablesToolbarDidChangeSelectedShoppable(toolbar:ShoppablesToolbar, shoppable:Shoppable){
+        startScreenshotMatchingSessionOnNewShoppableList(shoppableList: toolbar.shoppables) // Must be before setting self.selectedShoppable
         self.selectedShoppable = shoppable
         if let p = self.productsLoadingMonitor {
             p.delegate = nil
@@ -616,6 +632,13 @@ extension ProductsViewControllerProducts{
         
         if self.collectionView?.numberOfItems(inSection: ProductsSection.product.section) ?? 0 > 0 {
             self.collectionView?.scrollToItem(at: IndexPath(item: 0, section: ProductsSection.product.section), at: .top, animated: false)
+            if let matchId = screenshotMatchId {
+                let shoppableMatchId = UUID().uuidString
+                let productIdArrayString = self.products.compactMap { $0.imageURL }.joined(separator: ", ")
+                Analytics.trackShoppableMatching(shoppable: shoppable, screenshotMatchId: matchId, shoppableMatchId: shoppableMatchId, productIdArray: productIdArrayString)
+            } else {
+                print("Start shoppable matching session, but screenshotMatchId nil")
+            }
         }
         self.updateLoadingState()
         
