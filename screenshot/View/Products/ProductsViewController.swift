@@ -634,7 +634,9 @@ extension ProductsViewControllerProducts{
             if let matchId = screenshotMatchId {
                 let shoppableMatchId = UUID().uuidString
                 let productIdArrayString = self.products.compactMap { $0.imageURL }.joined(separator: ", ")
-                Analytics.trackShoppableMatching(shoppable: shoppable, screenshotMatchId: matchId, shoppableMatchId: shoppableMatchId, productIdArray: productIdArrayString)
+                let optionsMask = shoppable.getLast() ?? ProductsOptionsMask(.auto, .adult) // Historical value that was never set.
+                let (feedValue, genderValue, currencyValue) = AssetSyncModel.sharedInstance.augmentedParameters(optionsMask: optionsMask)
+                Analytics.trackShoppableMatching(shoppable: shoppable, screenshotMatchId: matchId, shoppableMatchId: shoppableMatchId, productIdArray: productIdArrayString, augmentedFeed: feedValue, augmentedGender: genderValue, augmentedCurrency: currencyValue)
             } else {
                 print("Start shoppable matching session, but screenshotMatchId nil")
             }

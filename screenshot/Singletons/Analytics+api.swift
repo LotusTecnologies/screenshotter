@@ -1,6 +1,6 @@
 // STOP!  DO not edit the file below
 // only create by auto generting
-// created from: 7b6d453 
+// created from: 1bef1cf 
 //  Copyright (c) 2018 crazeapp. All rights reserved.
 
 
@@ -4293,7 +4293,7 @@ extension AnalyticsShoppableScrolledFirstTime {
 typealias AnalyticsShoppableMatching = Analytics
 extension AnalyticsShoppableMatching {
     
-  static func trackShoppableMatching(shoppable:Shoppable?,  screenshotMatchId:String,  shoppableMatchId:String,  productIdArray:String ) {
+  static func trackShoppableMatching(shoppable:Shoppable?,  screenshotMatchId:String,  shoppableMatchId:String,  productIdArray:String,  augmentedFeed:String,  augmentedGender:String?,  augmentedCurrency:String? ) {
       let key = "Started shoppable matching session"
       var properties:[String:Any] = [:]
       propertiesForAllEvents().forEach { properties[$0] = $1 }
@@ -4310,6 +4310,19 @@ extension AnalyticsShoppableMatching {
 
 
       properties["productIdArray"] = productIdArray
+
+
+      properties["augmentedFeed"] = augmentedFeed
+
+
+      if let augmentedGender = augmentedGender {
+          properties["augmentedGender"] = augmentedGender
+      }
+
+
+      if let augmentedCurrency = augmentedCurrency {
+          properties["augmentedCurrency"] = augmentedCurrency
+      }
 
 
             

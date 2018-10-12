@@ -793,6 +793,29 @@ extension AssetSyncModel {
         }))
     }
     
+    func augmentedParameters(optionsMask: ProductsOptionsMask) -> (String, String?, String?) {
+        let isChild = optionsMask.rawValue & ProductsOptionsMask.sizeChild.rawValue > 0
+        let isPlus = optionsMask.rawValue & ProductsOptionsMask.sizePlus.rawValue > 0
+        
+        let feedValue = isPlus ? "craze_plus_size" : isChild ? "kids_craze" : Constants.syteFeed
+        let genderValue: String?
+        if optionsMask.rawValue & ProductsOptionsMask.genderMale.rawValue > 0 {
+            genderValue = isChild ? "boy" : "male"
+        } else if optionsMask.rawValue & ProductsOptionsMask.genderFemale.rawValue > 0 {
+            genderValue = isChild ? "girl" : "female"
+        } else {
+            genderValue = nil
+        }
+        let currencyValue: String?
+        if let productCurrency = UserDefaults.standard.string(forKey: UserDefaultsKeys.productCurrency),
+            (!productCurrency.isEmpty && productCurrency != CurrencyMap.autoCode) {
+            currencyValue = productCurrency
+        } else {
+            currencyValue = nil
+        }
+        return (feedValue, genderValue, currencyValue)
+    }
+    
     func augmentedUrl(offersURL: String, optionsMask: ProductsOptionsMask) -> URL? {
         guard var components = URLComponents(string: offersURL) else {
             return nil
@@ -803,19 +826,14 @@ extension AssetSyncModel {
         // Strip out any existing currency, feed or gender query parameters.
         let filterOutNames = Set<String>(arrayLiteral: "currency", "feed", "gender")
         var fixedQueryitems: [URLQueryItem] = components.queryItems?.filter { !filterOutNames.contains($0.name) } ?? []
-        let isChild = optionsMask.rawValue & ProductsOptionsMask.sizeChild.rawValue > 0
-        let isPlus = optionsMask.rawValue & ProductsOptionsMask.sizePlus.rawValue > 0
-        if let productCurrency = UserDefaults.standard.string(forKey: UserDefaultsKeys.productCurrency),
-            (!productCurrency.isEmpty && productCurrency != CurrencyMap.autoCode) {
-            fixedQueryitems.append(URLQueryItem(name: "force_currency", value: productCurrency))
+        
+        let (feedValue, genderValue, currencyValue) = augmentedParameters(optionsMask: optionsMask)
+        fixedQueryitems.append(URLQueryItem(name: "feed", value: feedValue))
+        if let genderValue = genderValue {
+            fixedQueryitems.append(URLQueryItem(name: "force_gender", value: genderValue))
         }
-       
-        let sizeValue = isPlus ? "craze_plus_size" : isChild ? "kids_craze" : Constants.syteFeed
-        fixedQueryitems.append(URLQueryItem(name: "feed", value: sizeValue))
-        if optionsMask.rawValue & ProductsOptionsMask.genderMale.rawValue > 0 {
-            fixedQueryitems.append(URLQueryItem(name: "force_gender", value: isChild ? "boy" : "male"))
-        } else if optionsMask.rawValue & ProductsOptionsMask.genderFemale.rawValue > 0 {
-            fixedQueryitems.append(URLQueryItem(name: "force_gender", value: isChild ? "girl" : "female"))
+        if let currencyValue = currencyValue {
+            fixedQueryitems.append(URLQueryItem(name: "force_currency", value: currencyValue))
         }
         components.queryItems = fixedQueryitems
         return components.url
