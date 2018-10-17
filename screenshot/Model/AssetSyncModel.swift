@@ -112,7 +112,18 @@ class AssetSyncModel: NSObject {
                 DataModel.sharedInstance.performBackgroundTask({ (context) in
                     if let screenshot = context.screenshotWith(assetId: asset.localIdentifier) {
                         if screenshot.isRecognized && screenshot.isNew{
-                            self.importPhotosToScreenshot(assets: [asset], source: .screenshot)
+                            
+                            self.performBackgroundTask(assetId: asset.localIdentifier, shoppableId: nil, { (context) in
+                                var shouldAutoCreate = true
+                                if let screenshot = context.screenshotWith(assetId: asset.localIdentifier){
+                                    if screenshot.isHidden == false{
+                                        shouldAutoCreate = false
+                                    }
+                                }
+                                if shouldAutoCreate {
+                                    self.uploadPhoto(asset: asset, source: .screenshot)
+                                }
+                            })
                         }
                     }else{
                         // will be added when "clarifai" style processing is done
@@ -577,7 +588,18 @@ extension AssetSyncModel: PHPhotoLibraryChangeObserver {
                     }
             }.then (on: self.processingQ) { imageData, gottenUploadedURLString, gottenSegments -> Void in
                 if let lastDidBecomeActiveDate = self.lastDidBecomeActiveDate, let creationDate = asset.creationDate,  creationDate.timeIntervalSince(lastDidBecomeActiveDate) > -60.0 && ApplicationStateModel.sharedInstance.isActive(){
-                    self.uploadPhoto(asset: asset, source: .screenshot)
+                    self.performBackgroundTask(assetId: asset.localIdentifier, shoppableId: nil, { (context) in
+                        var shouldAutoCreate = true
+                        if let screenshot = context.screenshotWith(assetId: asset.localIdentifier){
+                            if screenshot.isHidden == false{
+                                shouldAutoCreate = false
+                            }
+                        }
+                        if shouldAutoCreate {
+                            self.uploadPhoto(asset: asset, source: .screenshot)
+                        }
+                    })
+                    
                 }else{
                     // Screenshot taken while app in background (or killed)
                     AccumulatorModel.screenshot.addAssetId(asset.localIdentifier)
