@@ -45,7 +45,8 @@ extension DiscoverManager {
 
     func isUndisplayable(index:String) -> Bool{
         loadTagsDictIfNeeded()
-        return self.undisplayable?.contains(index) ?? false
+        let isUndisplayableBool = self.undisplayable?.contains(index) ?? false
+        return isUndisplayableBool
     }
     
     private func loadTagsDictIfNeeded() {

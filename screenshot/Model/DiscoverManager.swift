@@ -234,10 +234,12 @@ class DiscoverManager {
                 while (queueItemsNeeded >= newDiscover.count && loopCount < loopLimit) {
                     loopCount += 1
                     for _ in 0...queueItemsNeeded {
-                        newDiscover.insert("\(currentIndex)")
-                        currentIndex += 1
-                        if currentIndex > Constants.discoverTotal {
-                            currentIndex = 0
+                        if !self.isUndisplayable(index: "\(currentIndex)") {
+                            newDiscover.insert("\(currentIndex)")
+                            currentIndex += 1
+                            if currentIndex > Constants.discoverTotal {
+                                currentIndex = 0
+                            }
                         }
                     }
                     let existingFetchRequest:NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
@@ -271,9 +273,11 @@ class DiscoverManager {
                         loopCount += 1
                         for _ in 0...queueItemsNeeded {
                             if arrayLength > currentIndex {
-                                let value = array[currentIndex]
-                                newDiscover.insert(value)
-                                currentIndex += 1
+                                if !self.isUndisplayable(index: "\(currentIndex)") {
+                                    let value = array[currentIndex]
+                                    newDiscover.insert(value)
+                                    currentIndex += 1
+                                }
                             }
                         }
                         let existingFetchRequest:NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
@@ -296,7 +300,7 @@ class DiscoverManager {
             
             newDiscover.forEach { (remoteId) in
                 
-                let imageUrl = "https://s3.amazonaws.com/screenshop-ordered-matchsticks/\(remoteId).jpg"
+                let imageUrl = self.urlStringFor(index: remoteId)
                 let _ = DataModel.sharedInstance.saveMatchstick(managedObjectContext: context, remoteId: remoteId, imageUrl: imageUrl, properties: self.propertiesFor(id: remoteId))
                 self.downloadIfNeeded(imageURL: imageUrl, priority: .low)
             }
