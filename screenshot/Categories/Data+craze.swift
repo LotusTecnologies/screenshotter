@@ -7,6 +7,8 @@
 //
 
 import Foundation
+
+//Source: https://stackoverflow.com/a/47476781/1143046
 extension Data {
     private static let hexAlphabet = "0123456789abcdef".unicodeScalars.map { $0 }
     

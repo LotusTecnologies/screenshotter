@@ -9,6 +9,7 @@
 import Foundation
 
 extension String {
+    //source: https://stackoverflow.com/a/32166735/1143046
     func md5() -> Data {
         return String.MD5(string: self)
     }
