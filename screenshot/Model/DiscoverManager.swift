@@ -26,7 +26,7 @@ class DiscoverManager {
     }()
    
 
-    var tags:[String:[String]]?
+    var tags:[String:SortedArray<String>]?
     var undisplayable:Set<String>?
     var gender:String = {
             return UserDefaults.standard.string(forKey: UserDefaultsKeys.discoverGenderFilter) ?? ""

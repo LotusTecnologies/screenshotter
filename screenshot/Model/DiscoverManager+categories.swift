@@ -33,7 +33,7 @@ extension DiscoverManager {
             "genders":genders
         ]
     }
-    func indexForCategory(_ category:String) -> [String]? {
+    func indexForCategory(_ category:String) -> SortedArray<String>? {
         loadTagsDictIfNeeded()
         
         return self.tags?[category]
@@ -60,7 +60,12 @@ extension DiscoverManager {
                             self.undisplayable = Set(undisplayableArray)
                         }
                         if let tagsDict = json["tags"] as? [String:[String]] {
-                            self.tags = tagsDict
+                            var tagsLocal:[String:SortedArray<String>] = [:]
+                            tagsDict.forEach({ (args) in
+                                let (key, value) = args
+                                tagsLocal[key] = SortedArray.init(sorted: value)
+                            })
+                            self.tags = tagsLocal
                         }
                     }
                     
