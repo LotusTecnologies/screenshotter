@@ -24,14 +24,10 @@ class DiscoverManager {
         queue.maxConcurrentOperationCount = 1
         return queue
     }()
-    var recombeeRequestQueue:AsyncOperationQueue = {
-        var queue = AsyncOperationQueue()
-        queue.name = "DiscoverManager recombeeRequest"
-        queue.maxConcurrentOperationCount = 1
-        return queue
-    }()
-    let recombeeTrackLastQueue = DispatchQueue(label: "io.crazeapp.screenshot.recombeeTrackLastQueue")
+   
 
+    var tags:[String:SortedArray<String>]?
+    var undisplayable:Set<String>?
     var gender:String = {
             return UserDefaults.standard.string(forKey: UserDefaultsKeys.discoverGenderFilter) ?? ""
         }() {
@@ -62,7 +58,7 @@ class DiscoverManager {
     }
 
     func createFilterChangingMonitor(delegate:AsyncOperationMonitorDelegate) -> AsyncOperationMonitor {
-        return AsyncOperationMonitor.init(tags: [AsyncOperationTag.init(type: .filterChange, value: "DiscoverManager")], queues: [self.databaseQueue, self.downloadMatchsitckQueue, self.recombeeRequestQueue], delegate: delegate)
+        return AsyncOperationMonitor.init(tags: [AsyncOperationTag.init(type: .filterChange, value: "DiscoverManager")], queues: [self.databaseQueue, self.downloadMatchsitckQueue], delegate: delegate)
     }
     func didAdd(_ item:Matchstick, callback: ((_ screenshot: Screenshot) -> Void)? = nil ){
         let managedObjectID = item.objectID
@@ -99,11 +95,6 @@ class DiscoverManager {
                 }
                 context.saveIfNeeded()
                 
-                
-                // send recombee rating = 0.5 completion { request more recombee }
-                self.sendrecombee(event: .positiveRating, assetId: assetId)
-               
-                
                 if let callback = callback {
                     let addedScreenshotOID = addedScreenshot.objectID
                     DispatchQueue.main.async {
@@ -134,8 +125,7 @@ class DiscoverManager {
         let managedObjectID = item.objectID
         
         self.performBackgroundTask { (context) in
-            if let item = context.object(with: managedObjectID) as? Matchstick,
-                let assetId = item.remoteId {
+            if let item = context.object(with: managedObjectID) as? Matchstick {
                 // DisplayingItem -> GarbageItem
                 item.dateSkipped = Date()
                 item.isDisplaying = false
@@ -144,47 +134,8 @@ class DiscoverManager {
                 //fill up queues
                 self.fillQueues(in: context)
                 
-                // send recombee rating = -0.5 completion { request more recombee }
-                self.sendrecombee(event: .negativeRating, assetId: assetId)
-                
                 context.saveIfNeeded()
             }
-        }
-    }
-    
-    private func sendrecombee(event:AnalyticsTrackers.RecombeeAnalyticsTracker.RecombeeEvent, assetId:String){
-        let isRecombeeId = (Int(assetId) != nil)
-        if isRecombeeId {
-            NetworkingPromise.sharedInstance.recombeeRequest(path: event.path(), method: "POST", params: event.postData(itemId: assetId)).always {
-                self.recombeRequest(count:1)
-            }
-        }else{
-            self.recombeRequest(count:1)
-        }
-        
-    }
-    
-    var lastRecombeeRequest = UUID()
-    private func recombeRequest(count:Int){
-        self.recombeeTrackLastQueue.async {
-            let dateRequested = Date()
-            let uuid = UUID()
-            self.lastRecombeeRequest = uuid
-            self.recombeeRequestQueue.addOperation(AsyncOperation.init(timeout: nil, tags: [AsyncOperationTag.init(type: .filterChange, value: "DiscoverManager")], completion: { (completion) in
-                if uuid == self.lastRecombeeRequest {
-                    NetworkingPromise.sharedInstance.recombeeRecommendation(count:count, gender:self.gender, category:self.discoverCategoryFilter).then(execute: { (recommendations) -> Promise<Void> in
-                        return self.recombeeRecommendation(recommendations, dateRequested: dateRequested)
-                    }).catch(execute: { (error) in
-                        print("recombee error: \(error)")
-                    }).always{
-                        completion()
-                        
-                    }
-                }else{
-                    completion()
-                }
-                
-            }))
         }
     }
     
@@ -237,7 +188,7 @@ class DiscoverManager {
         let queuedFetchRequestPredicate = Matchstick.predicateForQueuedMatchstick(gender: self.gender, category: self.discoverCategoryFilter)
         queuedFetchRequest.predicate = queuedFetchRequestPredicate
         queuedFetchRequest.sortDescriptors = [NSSortDescriptor.init(key: "recombeeRecommended", ascending: false)]
-//        queuedFetchRequest.fetchLimit = Matchstick.recombeeQueueSize + Matchstick.displayingSize
+        queuedFetchRequest.fetchLimit = Matchstick.queueSize + Matchstick.displayingSize
         
         if let displaying = try? context.fetch(displayingFetchRequest), let queued = try? context.fetch(queuedFetchRequest) {
            
@@ -271,21 +222,24 @@ class DiscoverManager {
             if queued.count == 0 {
                 Analytics.trackMatchsticksFilterNoResults(gender: self.gender, category: self.discoverCategoryFilter)
             }
+            var newDiscover = Set<String>()
+            let currentQueueSize = (queued.count - itemsAdded)
+            let queueItemsNeeded =  (Matchstick.queueSize - currentQueueSize)
+
             if self.isUnfiltered {
-                let currentQueueSize = (queued.count - itemsAdded)
-                let queueItemsNeeded =  (Matchstick.queueSize - currentQueueSize)
                 var currentIndex = UserDefaults.standard.integer(forKey: UserDefaultsKeys.discoverCurrentIndex)
                 
-                var newDiscover = Set<String>()
                 let loopLimit = 10
                 var loopCount = 0
                 while (queueItemsNeeded >= newDiscover.count && loopCount < loopLimit) {
                     loopCount += 1
                     for _ in 0...queueItemsNeeded {
-                        newDiscover.insert("\(currentIndex)")
-                        currentIndex += 1
-                        if currentIndex > Constants.discoverTotal {
-                            currentIndex = 0
+                        if !self.isUndisplayable(index: "\(currentIndex)") {
+                            newDiscover.insert("\(currentIndex)")
+                            currentIndex += 1
+                            if currentIndex > Constants.discoverTotal {
+                                currentIndex = 0
+                            }
                         }
                     }
                     let existingFetchRequest:NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
@@ -300,19 +254,55 @@ class DiscoverManager {
                         loopCount = loopLimit
                     }
                 }
-                
-                newDiscover.forEach { (remoteId) in
-                    let imageUrl = "https://s3.amazonaws.com/screenshop-ordered-matchsticks/\(remoteId).jpg"
-                    let _ = DataModel.sharedInstance.saveMatchstick(managedObjectContext: context, remoteId: remoteId, imageUrl: imageUrl, properties: nil)
-                    self.downloadIfNeeded(imageURL: imageUrl, priority: .low)
+                UserDefaults.standard.setValue(currentIndex, forKey: UserDefaultsKeys.discoverCurrentIndex)
+            }else{
+                let sortKey:String = {
+                    if self.gender == "male" {
+                        return "male"
+                    }else{
+                        return self.discoverCategoryFilter
+                    }
+                }()
+                if let array = self.indexForCategory(sortKey) {
+                    let arrayLength = array.count
+                    var currentIndex = UserDefaults.standard.integer(forKey: "offset_\(sortKey)")
+                    
+                    let loopLimit = 10
+                    var loopCount = 0
+                    while (queueItemsNeeded >= newDiscover.count && loopCount < loopLimit) {
+                        loopCount += 1
+                        for _ in 0...queueItemsNeeded {
+                            if arrayLength > currentIndex {
+                                if !self.isUndisplayable(index: "\(currentIndex)") {
+                                    let value = array[currentIndex]
+                                    newDiscover.insert(value)
+                                    currentIndex += 1
+                                }
+                            }
+                        }
+                        let existingFetchRequest:NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
+                        existingFetchRequest.predicate = NSPredicate.init(format: "remoteId IN %@", newDiscover)
+                        if let existing = try? context.fetch(displayingFetchRequest){
+                            for matchstick in existing {
+                                if let remoteId = matchstick.remoteId {
+                                    newDiscover.remove(remoteId)
+                                }
+                            }
+                        }else{
+                            loopCount = loopLimit
+                        }
+                    }
+                    UserDefaults.standard.setValue(currentIndex, forKey: "offset_\(sortKey)")
                 }
                 
-                UserDefaults.standard.setValue(currentIndex, forKey: UserDefaultsKeys.discoverCurrentIndex)
+                
             }
             
-            let recombeeCount = queued.filter{ $0.recombeeRecommended != nil && $0.isDisplaying == false }.count
-            if recombeeCount <= Matchstick.recombeeQueueLowMark {
-                self.recombeRequest(count:Matchstick.recombeeQueueSize - recombeeCount)
+            newDiscover.forEach { (remoteId) in
+                
+                let imageUrl = self.urlStringFor(index: remoteId)
+                let _ = DataModel.sharedInstance.saveMatchstick(managedObjectContext: context, remoteId: remoteId, imageUrl: imageUrl, properties: self.propertiesFor(id: remoteId))
+                self.downloadIfNeeded(imageURL: imageUrl, priority: .low)
             }
         }
     }
@@ -378,35 +368,6 @@ class DiscoverManager {
             operation.queuePriority = priority
             downloadMatchsitckQueue.addOperation(operation)
         }
-    }
-    
-    func recombeeRecommendation(_ recommendations:[NetworkingPromise.RecombeeRecommendation], dateRequested:Date) -> Promise<Void>{
-        return Promise.init(resolvers: { (fulfil, reject) in
-            self.performBackgroundTask { (context) in
-                let remoteIds = recommendations.map{ $0.remoteId }
-                
-                var matchstickLookup = Matchstick.lookupWith(remoteIds: remoteIds, in: context)
-                
-                var mayNeedToRequestMore = false
-                recommendations.forEach({ (recomend) in
-                    if let matchstick = matchstickLookup[recomend.remoteId], (matchstick.isInGarbage || matchstick.isDisplaying) {
-                        mayNeedToRequestMore = true
-                    }else {
-                        let matchstick = matchstickLookup[recomend.remoteId] ?? DataModel.sharedInstance.saveMatchstick(managedObjectContext: context, remoteId: recomend.remoteId, imageUrl: recomend.imageURL, properties: recomend.properties)
-                        if let matchstick = matchstick {
-                            matchstick.recombeeRecommended = dateRequested
-                            matchstick.dateSkipped = nil
-                            self.downloadIfNeeded(imageURL: recomend.imageURL, priority:.high)
-                        }
-                    }
-                })
-                if mayNeedToRequestMore {
-                    self.fillQueues(in: context)
-                }
-                context.saveIfNeeded()
-                fulfil(())
-            }
-        })
     }
     
     func currentDownloadingImageUrls() -> Set<String> {
