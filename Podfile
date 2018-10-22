@@ -13,7 +13,6 @@ target 'Screenshop' do
     pod 'Branch'
     pod 'lottie-ios'
     pod 'Whisper'
-    pod 'PushwooshInboxUI'
     pod 'Hero'
     pod 'Firebase/Core'
     pod 'Firebase/Auth'

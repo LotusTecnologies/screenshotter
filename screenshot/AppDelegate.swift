@@ -15,7 +15,6 @@ import Branch
 import PromiseKit
 import Amplitude_iOS
 import AdSupport
-import Pushwoosh
 import Firebase
 
 @UIApplicationMain
@@ -75,7 +74,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UIApplication.migrateUserDefaultsKeys()
         UIApplication.appearanceSetup()
         UserFeedback.shared.applicationDidFinishLaunching() // only setups notificationCenter observing. does nothing now
-        PWInAppManager.shared().setUserId(AnalyticsUser.current.identifier)
         return true
     }
     
@@ -343,16 +341,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 if let mainTabBarController = self.window?.rootViewController as? MainTabBarController {
                     mainTabBarController.dismiss(animated: true)
                 }
-                
-                PWInbox.loadMessages { (messages, error) in
-                    let codes = messages?.compactMap({ message -> String? in
-                        return message.isActionPerformed ? message.code : nil
-                    })
-                    
-                    if let codes = codes {
-                        PWInbox.deleteMessages(withCodes: codes)
-                    }
-                }
             }
         }
         return false
@@ -454,11 +442,6 @@ extension AppDelegate {
 //        Branch.getInstance().validateSDKIntegration()
         
         FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
-        
-        // Pushwoosh
-        PushNotificationManager.push().delegate = self
-        // UNUserNotificationCenter.current().delegate = PushNotificationManager.push().notificationCenterDelegate // Set to self in willFinishLaunching; forwards the calls to pushwoosh.
-        PushNotificationManager.push().sendAppOpen()
     }
     
 }
@@ -528,22 +511,9 @@ extension AppDelegate : TutorialNavigationControllerDelegate {
 
 // MARK: - Push Notifications
 
-extension AppDelegate: PushNotificationDelegate {
-    
-    //this event is fired when the push gets received
-    func onPushReceived(_ pushManager: PushNotificationManager!, withNotification pushNotification: [AnyHashable : Any]!, onStart: Bool) {
-        // shows a push is received. Implement passive reaction to a push here, such as UI update or data download.
-    }
-    
-    //this event is fired when user taps the notification
-    func onPushAccepted(_ pushManager: PushNotificationManager!, withNotification pushNotification: [AnyHashable : Any]!, onStart: Bool) {
-        // shows a user tapped the notification. Implement user interaction, such as showing push details
-    }
+extension AppDelegate {
     
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        PushNotificationManager.push().handlePushRegistration(deviceToken)
-        
-        
         UserDefaults.standard.set(deviceToken, forKey: UserDefaultsKeys.deviceToken)
         UserDefaults.standard.synchronize()
         UserAccountManager.shared.setToken()
@@ -555,8 +525,6 @@ extension AppDelegate: PushNotificationDelegate {
     }
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
-        PushNotificationManager.push().handlePushRegistrationFailure(error)
-        
         let e = error as NSError
         Analytics.trackError(type: nil, domain: e.domain, code: e.code, localizedDescription: e.localizedDescription)
     }
@@ -621,7 +589,6 @@ extension AppDelegate: PushNotificationDelegate {
             LocalNotificationModel.shared.cancelPendingNotifications(within: Date(timeIntervalSinceNow: TimeInterval.oneDay))
             let pushTypeString = dataDict["type"] as? String
             Analytics.trackAppReceivedPushNotification(source: pushTypeString)
-            PushNotificationManager.push().handlePushReceived(userInfo)  // pushwoosh
             completionHandler(.newData)
         } else {
             // Only spin up a background task if we are already in the background
@@ -782,9 +749,8 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
             }
         }
         
-        guard isHandled else {
-            PushNotificationManager.push().notificationCenterDelegate.userNotificationCenter?(center, didReceive: response, withCompletionHandler: completionHandler)
-            return
+        if !isHandled {
+            print("Received unrecognized push response: \(response)")
         }
         
         completionHandler()

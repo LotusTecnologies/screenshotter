@@ -1,7 +1,5 @@
 //
 //  NotificationService.swift
-//  Pushwoosh SDK
-//  (c) Pushwoosh 2017
 //
 
 import UserNotifications

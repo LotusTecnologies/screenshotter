@@ -95,9 +95,6 @@ PODS:
   - PromiseKit/CorePromise (4.5.2)
   - PromiseKit/Foundation (4.5.2):
     - PromiseKit/CorePromise
-  - Pushwoosh (5.9.1)
-  - PushwooshInboxUI (5.8.5):
-    - Pushwoosh (> 5.5)
   - SDWebImage (4.4.2):
     - SDWebImage/Core (= 4.4.2)
   - SDWebImage/Core (4.4.2)
@@ -120,7 +117,6 @@ DEPENDENCIES:
   - Hero
   - lottie-ios
   - PromiseKit/Foundation (= 4.5.2)
-  - PushwooshInboxUI
   - SDWebImage (~> 4.0)
   - SwiftLog (~> 1.0.0)
   - SWXMLHash
@@ -153,8 +149,6 @@ SPEC REPOS:
     - lottie-ios
     - nanopb
     - PromiseKit
-    - Pushwoosh
-    - PushwooshInboxUI
     - SDWebImage
     - SwiftLog
     - SWXMLHash
@@ -186,13 +180,11 @@ SPEC CHECKSUMS:
   lottie-ios: 3fef45d3fabe63e3c7c2eb603dd64ddfffc73062
   nanopb: 5601e6bca2dbf1ed831b519092ec110f66982ca3
   PromiseKit: 743e497a5f505a470d3bbbf4ce0663c1268af0a4
-  Pushwoosh: 38e31c3da27ba6c072f8b96884fe3660bd16cd2d
-  PushwooshInboxUI: eccc16b1ed9dd28d7df684697be6bf3f844d98e9
   SDWebImage: 624d6e296c69b244bcede364c72ae0430ac14681
   SwiftLog: f6c4f9a4ade06263555ab34b2c0f72025ffcda9e
   SWXMLHash: b35739a5cfd915c3b482977aa720d6708e260a90
   Whisper: 169760fc4bab0abf24d5529f9276f95c25cf1025
 
-PODFILE CHECKSUM: 6bf8abb6a7e2a21264bf21782fee4587bb198f6a
+PODFILE CHECKSUM: 5df74f88220fab8bf36836cc51dd6ef73d17fce9
 
 COCOAPODS: 1.5.3
