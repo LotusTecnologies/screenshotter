@@ -26,6 +26,7 @@ class Constants {
     static let openingScreenKey = "openingScreenKey"
     static let openingScreenValueScreenshot = "openingScreenValueScreenshot"
     static let openingScreenValueDiscover = "openingScreenValueDiscover"
+    static let openingScreenValueInbox = "openingScreenValueInbox"
     static let openingAssetIdKey = "openingAssetIdKey"
     static let tutorialScreenshotAssetId = "tutorialScreenshotAssetId"
     static let openingProductKey = "openingProductKey"

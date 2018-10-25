@@ -717,6 +717,11 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
                     if let mainTabBarController = self.window?.rootViewController as? MainTabBarController {
                         mainTabBarController.goTo(tab: .discover)
                     }
+                } else if openingScreen == Constants.openingScreenValueInbox {
+                    if let mainTabBarController = self.window?.rootViewController as? MainTabBarController {
+                        mainTabBarController.goTo(tab: .discover)
+                        UniversalSearchController.shared.presentNotificationInbox(from: mainTabBarController)
+                    }
                 }
             } else if let openingProductKey = userInfo[Constants.openingProductKey] as? String {
                 isHandled = true
