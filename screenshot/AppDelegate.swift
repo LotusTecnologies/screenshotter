@@ -661,7 +661,7 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
         var isHandled = false
         if let userInfo = response.notification.request.content.userInfo as? [String : Any] {
             InboxMessage.insertMessageFromPush(userInfo: userInfo)
-            InboxMessage.markMessageAsReadFromPush(userInfo: userInfo)
+            var isMessageMarkedAsRead = true
             
             if let openingScreen = userInfo[Constants.openingScreenKey] as? String {
                 isHandled = true
@@ -722,6 +722,7 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
                         mainTabBarController.goTo(tab: .discover)
                         UniversalSearchController.shared.presentNotificationInbox(from: mainTabBarController)
                     }
+                    isMessageMarkedAsRead = false
                 }
             } else if let openingProductKey = userInfo[Constants.openingProductKey] as? String {
                 isHandled = true
@@ -751,6 +752,9 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
                 }
                 let pushTypeString = dataDict["type"] as? String
                 Analytics.trackAppOpenedFromPushNotification(source: pushTypeString)
+            }
+            if isMessageMarkedAsRead {
+                InboxMessage.markMessageAsReadFromPush(userInfo: userInfo)
             }
         }
         
