@@ -125,6 +125,7 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
                 
             } else {
                 imageView.image = nil
+                Analytics.trackDevLog(file: NSString(string: #file).lastPathComponent, line: #line, message: "blank screenshot")
             }
         }
     }

@@ -305,8 +305,8 @@ extension AssetSyncModel {
                                 screenshot.shoppablesCount = 0
                                 if let imageData = imageData {
                                     screenshot.imageData = imageData
-                                }else{
-                                    Analytics.trackDevLog(file:  NSString.init(string: #file).lastPathComponent, line: #line, message: "no image data on upload photo")
+                                } else {
+                                    Analytics.trackDevLog(file: NSString(string: #file).lastPathComponent, line: #line, message: "no image data")
                                 }
                                 screenshot.isHidden = false
                                 screenshot.isRecognized = true
@@ -331,7 +331,11 @@ extension AssetSyncModel {
                                 screenshot.lastModified = creationDate
                                 screenshot.isRecognized = true
                                 screenshot.isHidden = false
-                                screenshot.imageData = imageData
+                                if let imageData = imageData {
+                                    screenshot.imageData = imageData
+                                } else {
+                                    Analytics.trackDevLog(file: NSString(string: #file).lastPathComponent, line: #line, message: "no image data")
+                                }
                                 screenshot.source = source
                                 
                                 Analytics.trackScreenshotCreated(screenshot: screenshot)
