@@ -1,6 +1,6 @@
 // STOP!  DO not edit the file below
 // only create by auto generting
-// created from: 1bef1cf 
+// created from: 6dd7cb3 
 //  Copyright (c) 2018 crazeapp. All rights reserved.
 
 
@@ -3484,7 +3484,7 @@ extension AnalyticsProductUnfavorited {
 typealias AnalyticsAppOpenedFromPushNotification = Analytics
 extension AnalyticsAppOpenedFromPushNotification {
     
-  static func trackAppOpenedFromPushNotification(source:String? ) {
+  static func trackAppOpenedFromPushNotification(source:String?,  tracking:[String:String] ) {
       let key = "pushNotification-opened"
       var properties:[String:Any] = [:]
       propertiesForAllEvents().forEach { properties[$0] = $1 }
@@ -3493,6 +3493,9 @@ extension AnalyticsAppOpenedFromPushNotification {
       if let source = source {
           properties["source"] = source
       }
+
+
+      tracking.forEach { properties[$0] = $1 }
 
 
             
@@ -3513,7 +3516,7 @@ extension AnalyticsAppOpenedFromPushNotification {
 typealias AnalyticsAppReceivedPushNotification = Analytics
 extension AnalyticsAppReceivedPushNotification {
     
-  static func trackAppReceivedPushNotification(source:String? ) {
+  static func trackAppReceivedPushNotification(source:String?,  tracking:[String:String] ) {
       let key = "pushNotification-received"
       var properties:[String:Any] = [:]
       propertiesForAllEvents().forEach { properties[$0] = $1 }
@@ -3522,6 +3525,9 @@ extension AnalyticsAppReceivedPushNotification {
       if let source = source {
           properties["source"] = source
       }
+
+
+      tracking.forEach { properties[$0] = $1 }
 
 
             

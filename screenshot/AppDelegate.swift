@@ -588,7 +588,8 @@ extension AppDelegate {
           !id.isEmpty {
             LocalNotificationModel.shared.cancelPendingNotifications(within: Date(timeIntervalSinceNow: TimeInterval.oneDay))
             let pushTypeString = dataDict["type"] as? String
-            Analytics.trackAppReceivedPushNotification(source: pushTypeString)
+            let tracking = dataDict["pushTracking"] as? [String : String] ?? [:]
+            Analytics.trackAppReceivedPushNotification(source: pushTypeString, tracking: tracking)
             completionHandler(.newData)
         } else {
             // Only spin up a background task if we are already in the background
@@ -602,11 +603,17 @@ extension AppDelegate {
                 })
             }
 
-            if let aps = userInfo["aps"] as? [String : Any],
-              aps.count <= 3,
-              let contentAvailable = aps["content-available"] as? NSNumber,
-              contentAvailable.intValue == 1 {
-                Analytics.trackAppReceivedPushNotification(source: "silent")
+            if let aps = userInfo["aps"] as? [String : Any] {
+                let dataDict = userInfo["data"] as? [String : Any]
+                var pushTypeString = dataDict?["type"] as? String
+                if pushTypeString == nil,
+                  aps.count <= 3,
+                  let contentAvailable = aps["content-available"] as? NSNumber,
+                  contentAvailable.intValue == 1 {
+                    pushTypeString = "silent"
+                }
+                let tracking = dataDict?["pushTracking"] as? [String : String] ?? [:]
+                Analytics.trackAppReceivedPushNotification(source: pushTypeString, tracking: tracking)
                 completionHandler(.newData)
             } else {
                 Branch.getInstance().handlePushNotification(userInfo)
@@ -750,11 +757,15 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
                 }.catch { error in
                     Analytics.trackError(type: nil, domain: "Craze", code: 111, localizedDescription: error.localizedDescription + " subId:\(String(describing: subscriptionId))")
                 }
-                let pushTypeString = dataDict["type"] as? String
-                Analytics.trackAppOpenedFromPushNotification(source: pushTypeString)
             }
             if isMessageMarkedAsRead {
                 InboxMessage.markMessageAsReadFromPush(userInfo: userInfo)
+            }
+            if let _ = userInfo["aps"] as? [String : Any] { // Is a push notification.
+                let dataDict = userInfo["data"] as? [String : Any]
+                let pushTypeString = dataDict?["type"] as? String
+                let tracking = dataDict?["pushTracking"] as? [String :String] ?? [:]
+                Analytics.trackAppOpenedFromPushNotification(source: pushTypeString, tracking: tracking)
             }
         }
         
