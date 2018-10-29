@@ -170,6 +170,9 @@ extension DataModel {
         screenshotToSave.isHidden = isHidden
         screenshotToSave.isNew = true
         screenshotToSave.imageData = imageData
+        if imageData == nil {
+            Analytics.trackDevLog(file:  NSString(string: #file).lastPathComponent, line: #line, message: "no image data")
+        }
         screenshotToSave.uploadedImageURL = uploadedImageURL
         screenshotToSave.syteJson = syteJsonString
 
