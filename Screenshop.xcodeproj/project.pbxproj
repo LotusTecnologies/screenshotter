@@ -78,9 +78,9 @@
 		311C5989210EE01600F44F12 /* MessageInboxHeaderCollectionReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 311C5988210EE01600F44F12 /* MessageInboxHeaderCollectionReusableView.swift */; };
 		312159052125496200130E31 /* DiscoverFilterControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 312159042125496200130E31 /* DiscoverFilterControl.swift */; };
 		31215907212553BB00130E31 /* DiscoverFilterCategories.json in Resources */ = {isa = PBXBuildFile; fileRef = 31215906212553BB00130E31 /* DiscoverFilterCategories.json */; };
-		3125446B2091C3A0009410D5 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
-		3125446C2091C3A0009410D5 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
-		3125446D2091C3A0009410D5 /* BuildFile in Sources */ = {isa = PBXBuildFile; };
+		3125446B2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
+		3125446C2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
+		3125446D2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		3125448F209871B4009410D5 /* Analytics+api.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3125448E209871B4009410D5 /* Analytics+api.swift */; };
 		31357EE220F6636D00515116 /* UIColor+craze.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31357EE120F6636D00515116 /* UIColor+craze.swift */; };
 		31377FA22122EA5B0052D6EE /* ScreenshotSimilarLooksViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31377FA12122EA5B0052D6EE /* ScreenshotSimilarLooksViewController.swift */; };
@@ -119,6 +119,7 @@
 		529A36661FCC99B300BCA798 /* SilentPushSubscriptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529A36651FCC99B300BCA798 /* SilentPushSubscriptionManager.swift */; };
 		52E547441FE2487B00627D6D /* ScreenshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E547431FE2487B00627D6D /* ScreenshotHelper.swift */; };
 		52FA93911F6FF106000C7A71 /* UpdatePrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52FA93901F6FF106000C7A71 /* UpdatePrompt.swift */; };
+		928CC03E2191444200A8BEFB /* HTTPHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 928CC03D2191444200A8BEFB /* HTTPHelper.swift */; };
 		A1BB93398D02CA6BE20E4B49 /* Pods_Screenshop.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC53E8002BDC1493B0EF237F /* Pods_Screenshop.framework */; };
 		C50131A3212406C200DB2FEB /* UIScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50131A2212406C200DB2FEB /* UIScrollView.swift */; };
 		C515A413211DAF9800482B21 /* SearchCategoriesNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515A412211DAF9800482B21 /* SearchCategoriesNavigationController.swift */; };
@@ -390,6 +391,7 @@
 		52FA93901F6FF106000C7A71 /* UpdatePrompt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdatePrompt.swift; sourceTree = "<group>"; };
 		5D46F5FB952185827C62CED4 /* Pods-Screenshop.devdebug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Screenshop.devdebug.xcconfig"; path = "Pods/Target Support Files/Pods-Screenshop/Pods-Screenshop.devdebug.xcconfig"; sourceTree = "<group>"; };
 		77779D7BFEE5D04A53C2725F /* Pods-Screenshop.devrelease.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Screenshop.devrelease.xcconfig"; path = "Pods/Target Support Files/Pods-Screenshop/Pods-Screenshop.devrelease.xcconfig"; sourceTree = "<group>"; };
+		928CC03D2191444200A8BEFB /* HTTPHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPHelper.swift; sourceTree = "<group>"; };
 		C43822AEF9F923C6F6F8E840 /* Pods-Screenshop.prddebug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Screenshop.prddebug.xcconfig"; path = "Pods/Target Support Files/Pods-Screenshop/Pods-Screenshop.prddebug.xcconfig"; sourceTree = "<group>"; };
 		C50131A2212406C200DB2FEB /* UIScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIScrollView.swift; sourceTree = "<group>"; };
 		C515A412211DAF9800482B21 /* SearchCategoriesNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchCategoriesNavigationController.swift; sourceTree = "<group>"; };
@@ -878,6 +880,14 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
+		928CC03C2191443600A8BEFB /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				928CC03D2191444200A8BEFB /* HTTPHelper.swift */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
 		BEBA23337A8F69FF9EF80643 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
@@ -1228,6 +1238,7 @@
 		E4139D421F09083B00E8A53B /* screenshot */ = {
 			isa = PBXGroup;
 			children = (
+				928CC03C2191443600A8BEFB /* Helpers */,
 				C5CCBB3D1F41BBDB00D6B392 /* Categories */,
 				C55184D01F4D5FAB00EE7855 /* Constants */,
 				C528DC131F57F33900F4E723 /* Controllers */,
@@ -1549,7 +1560,7 @@
 				C54124C220A8308600CA03DB /* AccumulatorModel.swift in Sources */,
 				C53B46581FBC3DFA00A8C886 /* NotificationCenterKeys.swift in Sources */,
 				C58BAE7F20E101DD0051394A /* TextFieldTableViewCell.swift in Sources */,
-				3125446C2091C3A0009410D5 /* BuildFile in Sources */,
+				3125446C2091C3A0009410D5 /* (null) in Sources */,
 				C58BAE6D20E101DD0051394A /* SaleView.swift in Sources */,
 				311A506820D90B780001D463 /* ScreenshotsDeleteButton.swift in Sources */,
 				311A50C920DAB2EF0001D463 /* RecoverLostSaleManager.swift in Sources */,
@@ -1665,10 +1676,11 @@
 				311A4F5520D90B020001D463 /* UserAccountManager.swift in Sources */,
 				311A502320D90B780001D463 /* WebView.swift in Sources */,
 				C58BAE5F20E101DD0051394A /* DynamicTypeAccessibilityLayout.swift in Sources */,
-				3125446D2091C3A0009410D5 /* BuildFile in Sources */,
+				3125446D2091C3A0009410D5 /* (null) in Sources */,
 				C58BAE8F20E101DD0051394A /* MainButton.swift in Sources */,
 				C58BAE7B20E101DD0051394A /* CollectionView.swift in Sources */,
 				C53B15BE1FDE585B00658A78 /* LocalizeHelper.swift in Sources */,
+				928CC03E2191444200A8BEFB /* HTTPHelper.swift in Sources */,
 				311A505920D90B780001D463 /* FavoriteControl.swift in Sources */,
 				311A506320D90B780001D463 /* ScreenshotCollectionViewCell.swift in Sources */,
 				E49261D6206A704C006FE84E /* UIImage+craze.swift in Sources */,
@@ -1694,7 +1706,7 @@
 				311A505C20D90B780001D463 /* FavoriteProductsViewController.swift in Sources */,
 				311A506520D90B780001D463 /* ScreenshotsViewController.swift in Sources */,
 				31377FA22122EA5B0052D6EE /* ScreenshotSimilarLooksViewController.swift in Sources */,
-				3125446B2091C3A0009410D5 /* BuildFile in Sources */,
+				3125446B2091C3A0009410D5 /* (null) in Sources */,
 				311A50C520D90B780001D463 /* Form.swift in Sources */,
 				311A506E20D90B780001D463 /* RegisterConfirmationViewController.swift in Sources */,
 				31CE11002035AC44000156EE /* UIApplication+openInChrome.swift in Sources */,

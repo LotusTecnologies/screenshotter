@@ -228,7 +228,7 @@ class DiscoverManager {
 
             if self.isUnfiltered {
                 var currentIndex = UserDefaults.standard.integer(forKey: UserDefaultsKeys.discoverCurrentIndex)
-                
+
                 let loopLimit = 10
                 var loopCount = 0
                 while (queueItemsNeeded >= newDiscover.count && loopCount < loopLimit) {
@@ -294,17 +294,52 @@ class DiscoverManager {
                     }
                     UserDefaults.standard.setValue(currentIndex, forKey: "offset_\(sortKey)")
                 }
-                
+
                 
             }
             
-            newDiscover.forEach { (remoteId) in
-                
+            
+            
+        }
+        
+        //FIXME: Hard-coded user id = 13 as this is what Jake was testing with
+        if let responseJSON = getProductIdsFromServer(user_id:13) {
+            for remoteId in responseJSON {
+                print("REMOTE ID = \(remoteId)")
                 let imageUrl = self.urlStringFor(index: remoteId)
                 let _ = DataModel.sharedInstance.saveMatchstick(managedObjectContext: context, remoteId: remoteId, imageUrl: imageUrl, properties: self.propertiesFor(id: remoteId))
                 self.downloadIfNeeded(imageURL: imageUrl, priority: .low)
             }
         }
+    }
+    
+    /*
+     * Make API call to server with user Id to get product recommendations for display in discover feed.
+     */
+    func getProductIdsFromServer(user_id:Int) -> [String]? {
+        let jsonLiteral:[String:Any] = ["id": user_id]
+        let jsonData = try? JSONSerialization.data(withJSONObject: jsonLiteral)
+        
+        // create post request
+        let url = URL(string: "https://z5eep8o661.execute-api.us-east-1.amazonaws.com/default/fill-discover-queue")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        
+        // insert json data to the request
+        request.httpBody = jsonData
+        
+        var responseJSON:[String]? = nil
+        
+        let session = URLSession.shared
+        let (data, response, error) = session.synchronousDataTask(with: request)
+        if let d = data {
+            do {
+                responseJSON = try JSONSerialization.jsonObject(with: d, options: JSONSerialization.ReadingOptions.allowFragments) as? [String]
+            } catch {
+                //report error
+            }
+        }
+        return responseJSON
     }
     
     func discoverViewDidAppear() {
