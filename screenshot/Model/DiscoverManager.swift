@@ -302,8 +302,11 @@ class DiscoverManager {
             
         }
         
+        let userID:String! = UserDefaults.standard.string(forKey: UserDefaultsKeys.userID) ?? ""
+        print("User ID = \(userID)")
+        
         //FIXME: Hard-coded user id = 13 as this is what Jake was testing with
-        if let responseJSON = getProductIdsFromServer(user_id:13) {
+        if let responseJSON = getProductIdsFromServer(user_id:userID) {
             for remoteId in responseJSON {
                 print("REMOTE ID = \(remoteId)")
                 let imageUrl = self.urlStringFor(index: remoteId)
@@ -316,7 +319,7 @@ class DiscoverManager {
     /*
      * Make API call to server with user Id to get product recommendations for display in discover feed.
      */
-    func getProductIdsFromServer(user_id:Int) -> [String]? {
+    func getProductIdsFromServer(user_id:String) -> [String]? {
         let jsonLiteral:[String:Any] = ["id": user_id]
         let jsonData = try? JSONSerialization.data(withJSONObject: jsonLiteral)
         
