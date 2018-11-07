@@ -52,7 +52,7 @@ class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonit
     
     func updateViewsLoadingState(){
         if self.matchsticks.count == 0 {
-            let isFilterReloading = self.filterReloadMonitor?.didStart ?? false
+            let isFilterReloading = (self.filterReloadMonitor?.didStart ?? false) || DiscoverManager.shared.processing
             passButton.isHidden = isFilterReloading
             addButton.isHidden = isFilterReloading
             collectionView.isHidden = isFilterReloading
@@ -585,7 +585,6 @@ class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonit
         emptyView.alpha = isListEmpty ? 1 : 0
         clearFilterView.alpha = isListEmpty ? 1 : 0
         clearFilterView.titleLabel.text = "No more \(self.discoverFilterControl.selectedCategory.displayName) outfits"
-        loading.isHidden = !isListEmpty
         syncInteractionElements()
     }
     
