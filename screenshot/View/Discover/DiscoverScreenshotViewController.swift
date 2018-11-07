@@ -585,7 +585,7 @@ class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonit
         emptyView.alpha = isListEmpty ? 1 : 0
         clearFilterView.alpha = isListEmpty ? 1 : 0
         clearFilterView.titleLabel.text = "No more \(self.discoverFilterControl.selectedCategory.displayName) outfits"
-        
+        loading.isHidden = !isListEmpty
         syncInteractionElements()
     }
     
