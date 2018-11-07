@@ -24,8 +24,14 @@ class DiscoverManager {
         queue.maxConcurrentOperationCount = 1
         return queue
     }()
+    var apiCallQueue:AsyncOperationQueue = {
+        var queue = AsyncOperationQueue()
+        queue.name = "DiscoverManager apiCallQueue"
+        queue.maxConcurrentOperationCount = 1
+        return queue
+    }()
    
-
+    var processing:Bool = false
     var tags:[String:SortedArray<String>]?
     var undisplayable:Set<String>?
     var gender:String = {
@@ -229,23 +235,23 @@ class DiscoverManager {
             let currentQueueSize = (queued.count - itemsAdded)
             print("[SSC] Queue size = \(currentQueueSize)")
             let queueItemsNeeded:Bool = (Matchstick.minQueueSize >= currentQueueSize)
-            //var currentIndex = UserDefaults.standard.integer(forKey: UserDefaultsKeys.discoverCurrentIndex)
             
-            // FIXME: Add check for a 'processing' Bool to prevent multiple call race condition
-            if queueItemsNeeded {
+            // 'processing' Bool is used to "lock" thread and prevent multiple calls race condition
+            if queueItemsNeeded && !processing {
+                processing = true
                 print("[SSC] Making API Call to populate more items.")
                 let userID:String! = UserDefaults.standard.string(forKey: UserDefaultsKeys.userID) ?? ""
                 if let responseJSON = getProductIdsFromServer(user_id:userID) {
                     for remoteId in responseJSON {
-                        //currentIndex += 1
                         print("REMOTE ID = \(remoteId)")
                         let imageUrl = self.urlStringFor(index: remoteId)
                         let _ = DataModel.sharedInstance.saveMatchstick(managedObjectContext: context, remoteId: remoteId, imageUrl: imageUrl, properties: self.propertiesFor(id: remoteId))
                         self.downloadIfNeeded(imageURL: imageUrl, priority: .low)
+                        self.fillQueues(in: context)
                     }
                     print("[SSC] Added \(responseJSON.count) items to queue.")
-                    print("[SSC] Queue size now = \(queued.count - itemsAdded)")
                 }
+                processing = false
             }
         }
     }
@@ -254,7 +260,7 @@ class DiscoverManager {
      * Make API call to server with user Id to get product recommendations for display in discover feed.
      */
     func getProductIdsFromServer(user_id:String) -> [String]? {
-        let jsonLiteral:[String:Any] = ["id": user_id]
+        let jsonLiteral:[String:Any] = ["id": user_id, "size": 20]
         let jsonData = try? JSONSerialization.data(withJSONObject: jsonLiteral)
         
         // create post request
