@@ -229,6 +229,7 @@ class DiscoverManager {
             let queueItemsNeeded:Bool = (Matchstick.minQueueSize >= currentQueueSize)
             //var currentIndex = UserDefaults.standard.integer(forKey: UserDefaultsKeys.discoverCurrentIndex)
             
+            // FIXME: Add check for a 'processing' Bool to prevent multiple call race condition
             if queueItemsNeeded {
                 print("[SSC] Making API Call to populate more items.")
                 let userID:String! = UserDefaults.standard.string(forKey: UserDefaultsKeys.userID) ?? ""

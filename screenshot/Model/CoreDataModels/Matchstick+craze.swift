@@ -34,8 +34,10 @@ extension Matchstick {
     static var skipRotationTime = TimeInterval.oneWeek
     static var displayingSize = 2
     
-    // FIXME: minQueueSize should be populated by API call
-    static var minQueueSize = 5  //Must have at least this amount in "Queue" ready to display on UI.
+    //Must have at least this amount in "Queue" ready to display on UI.
+    var minQueueSize:Int {
+        return UserDefaults.standard.integer(forKey: UserDefaultsKeys.discoverMinQueueSize)
+    }
     
     var isInGarbage:Bool {
         if self.wasAdded || self.was404 {
@@ -78,5 +80,16 @@ extension Matchstick {
             return matchstick
         }
         return nil
+    }
+    
+    public class func refreshMinQueueSize() {
+        return
+        //TODO: Input actual URL below and remove above return line to allow function to run
+        let url = URL(string: "https://blank")!
+        let request = URLRequest(url: url)
+        HTTPHelper.asyncRequest(request) { (data, error) in
+            //TODO: process data to extract the minQueueSize config var and then set it below
+            UserDefaults.standard.set(5, forKey: UserDefaultsKeys.discoverMinQueueSize)
+        }
     }
 }

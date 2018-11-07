@@ -253,6 +253,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         PermissionsManager.shared.fetchPushPermissionStatus()
         Analytics.trackSessionStarted()
         AssetSyncModel.sharedInstance.scanPhotoGalleryForFashion()
+        Matchstick.refreshMinQueueSize()
     }
     
     func applicationDidBecomeActive(_ application: UIApplication) {
