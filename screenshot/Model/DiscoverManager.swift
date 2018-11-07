@@ -188,7 +188,9 @@ class DiscoverManager {
         let queuedFetchRequestPredicate = Matchstick.predicateForQueuedMatchstick(gender: self.gender, category: self.discoverCategoryFilter)
         queuedFetchRequest.predicate = queuedFetchRequestPredicate
         queuedFetchRequest.sortDescriptors = [NSSortDescriptor.init(key: "recombeeRecommended", ascending: false)]
-        queuedFetchRequest.fetchLimit = Matchstick.minQueueSize + Matchstick.displayingSize
+        
+        // Queue size limit must be set, currently API is returning 100 items so using 200 to be safe
+        queuedFetchRequest.fetchLimit = 200
         
         if let displaying = try? context.fetch(displayingFetchRequest), let queued = try? context.fetch(queuedFetchRequest) {
            
