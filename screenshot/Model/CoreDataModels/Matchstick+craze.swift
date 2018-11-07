@@ -35,7 +35,7 @@ extension Matchstick {
     static var displayingSize = 2
     
     //Must have at least this amount in "Queue" ready to display on UI.
-    var minQueueSize:Int {
+    public class var minQueueSize:Int {
         return UserDefaults.standard.integer(forKey: UserDefaultsKeys.discoverMinQueueSize)
     }
     
