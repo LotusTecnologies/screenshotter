@@ -84,13 +84,12 @@ extension Matchstick {
     
     // NOTE: This will get called every time the app enters the forground
     public class func refreshMinQueueSize() {
-        return
         //TODO: Input actual URL below and remove above return line to allow function to run
         let url = URL(string: "https://blank")!
         let request = URLRequest(url: url)
         HTTPHelper.asyncRequest(request) { (data, error) in
             //TODO: process data to extract the minQueueSize config var and then set it below
-            UserDefaults.standard.set(5, forKey: UserDefaultsKeys.discoverMinQueueSize)
+            UserDefaults.standard.set(20, forKey: UserDefaultsKeys.discoverMinQueueSize)
         }
     }
 }

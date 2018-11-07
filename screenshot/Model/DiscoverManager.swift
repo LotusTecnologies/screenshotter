@@ -236,22 +236,9 @@ class DiscoverManager {
             print("[SSC] Queue size = \(currentQueueSize)")
             let queueItemsNeeded:Bool = (Matchstick.minQueueSize >= currentQueueSize)
             
-            // 'processing' Bool is used to "lock" thread and prevent multiple calls race condition
-            if queueItemsNeeded && !processing {
-                processing = true
-                print("[SSC] Making API Call to populate more items.")
+            if queueItemsNeeded {
                 let userID:String! = UserDefaults.standard.string(forKey: UserDefaultsKeys.userID) ?? ""
-                if let responseJSON = getProductIdsFromServer(user_id:userID) {
-                    for remoteId in responseJSON {
-                        print("REMOTE ID = \(remoteId)")
-                        let imageUrl = self.urlStringFor(index: remoteId)
-                        let _ = DataModel.sharedInstance.saveMatchstick(managedObjectContext: context, remoteId: remoteId, imageUrl: imageUrl, properties: self.propertiesFor(id: remoteId))
-                        self.downloadIfNeeded(imageURL: imageUrl, priority: .low)
-                        self.fillQueues(in: context)
-                    }
-                    print("[SSC] Added \(responseJSON.count) items to queue.")
-                }
-                processing = false
+                getProductIdsFromServer(user_id: userID, context: context)
             }
         }
     }
@@ -259,7 +246,14 @@ class DiscoverManager {
     /*
      * Make API call to server with user Id to get product recommendations for display in discover feed.
      */
-    func getProductIdsFromServer(user_id:String) -> [String]? {
+    func getProductIdsFromServer(user_id:String, context: NSManagedObjectContext) {
+        // 'processing' Bool is used to "lock" thread and prevent multiple calls race condition
+        if processing {
+            return
+        }
+        processing = true
+        
+        print("[SSC] Making API Call to populate more items.")
         let jsonLiteral:[String:Any] = ["id": user_id, "size": 20]
         let jsonData = try? JSONSerialization.data(withJSONObject: jsonLiteral)
         
@@ -274,15 +268,28 @@ class DiscoverManager {
         var responseJSON:[String]? = nil
         
         let session = URLSession.shared
-        let (data, _, _) = session.synchronousDataTask(with: request)
-        if let d = data {
-            do {
-                responseJSON = try JSONSerialization.jsonObject(with: d, options: JSONSerialization.ReadingOptions.allowFragments) as? [String]
-            } catch {
-                //report error
+        let task = session.dataTask(with: request) { (data, res, error) in
+            if let d = data {
+                do {
+                    responseJSON = try JSONSerialization.jsonObject(with: d, options: JSONSerialization.ReadingOptions.allowFragments) as? [String]
+                    if let r = responseJSON {
+                        for remoteId in r {
+                            print("REMOTE ID = \(remoteId)")
+                            let imageUrl = self.urlStringFor(index: remoteId)
+                            let _ = DataModel.sharedInstance.saveMatchstick(managedObjectContext: context, remoteId: remoteId, imageUrl: imageUrl, properties: self.propertiesFor(id: remoteId))
+                            self.downloadIfNeeded(imageURL: imageUrl, priority: .low)
+                        }
+                        print("[SSC] Added \(r.count) items to queue.")
+                    }
+                } catch {
+                    //report error
+                }
             }
+            context.saveIfNeeded()
+            self.processing = false
+            self.discoverViewDidAppear()
         }
-        return responseJSON
+        task.resume()
     }
     
     func discoverViewDidAppear() {

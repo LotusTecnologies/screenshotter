@@ -109,7 +109,7 @@ extension UIApplication {
         // Version 8.6 keys
         if UserDefaults.standard.object(forKey: UserDefaultsKeys.discoverMinQueueSize) == nil {
             // Default value for how low the queue can get before refresh should be 5
-            UserDefaults.standard.set(5, forKey: UserDefaultsKeys.discoverMinQueueSize)
+            UserDefaults.standard.set(20, forKey: UserDefaultsKeys.discoverMinQueueSize)
         }
         
         // Version 4.2 keys
