@@ -40,7 +40,7 @@ extension DiscoverManager {
     }
     
     func urlStringFor(index:String) -> String{
-        return "https://s3.amazonaws.com/screenshop-ordered-matchsticks/byMD5/\(index.md5String()).jpg"
+        return "https://s3.amazonaws.com/screenshop-ordered-matchsticks/byUUID/\(index)1.jpg"
     }
 
     func isUndisplayable(index:String) -> Bool{
