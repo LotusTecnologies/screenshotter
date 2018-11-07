@@ -82,6 +82,7 @@ extension Matchstick {
         return nil
     }
     
+    // NOTE: This will get called every time the app enters the forground
     public class func refreshMinQueueSize() {
         return
         //TODO: Input actual URL below and remove above return line to allow function to run
