@@ -33,8 +33,10 @@ extension Matchstick {
 
     static var skipRotationTime = TimeInterval.oneWeek
     static var displayingSize = 2
-    static var queueSize = 25  //Must have at least this ammount  - if not grab random numbers
-
+    
+    // FIXME: minQueueSize should be populated by API call
+    static var minQueueSize = 5  //Must have at least this amount in "Queue" ready to display on UI.
+    
     var isInGarbage:Bool {
         if self.wasAdded || self.was404 {
             return true

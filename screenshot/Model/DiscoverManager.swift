@@ -188,11 +188,11 @@ class DiscoverManager {
         let queuedFetchRequestPredicate = Matchstick.predicateForQueuedMatchstick(gender: self.gender, category: self.discoverCategoryFilter)
         queuedFetchRequest.predicate = queuedFetchRequestPredicate
         queuedFetchRequest.sortDescriptors = [NSSortDescriptor.init(key: "recombeeRecommended", ascending: false)]
-        queuedFetchRequest.fetchLimit = Matchstick.queueSize + Matchstick.displayingSize
+        queuedFetchRequest.fetchLimit = Matchstick.minQueueSize + Matchstick.displayingSize
         
         if let displaying = try? context.fetch(displayingFetchRequest), let queued = try? context.fetch(queuedFetchRequest) {
            
-            
+            // Move items from "Queue" (data ready for display) to "Display" (cards rendered by UI)
             let displayingMatchStickNeeded = (Matchstick.displayingSize - displaying.count)
             var itemsAdded = 0
             let downloaded = queued.filter{ $0.imageData != nil }
@@ -222,96 +222,27 @@ class DiscoverManager {
             if queued.count == 0 {
                 Analytics.trackMatchsticksFilterNoResults(gender: self.gender, category: self.discoverCategoryFilter)
             }
-            var newDiscover = Set<String>()
+            
+            // If "Queue" falls below minimum allowed size, make an API call to get more items
             let currentQueueSize = (queued.count - itemsAdded)
-            let queueItemsNeeded =  (Matchstick.queueSize - currentQueueSize)
-
-            if self.isUnfiltered {
-                var currentIndex = UserDefaults.standard.integer(forKey: UserDefaultsKeys.discoverCurrentIndex)
-
-                let loopLimit = 10
-                var loopCount = 0
-                while (queueItemsNeeded >= newDiscover.count && loopCount < loopLimit) {
-                    loopCount += 1
-                    for _ in 0...queueItemsNeeded {
-                        if !self.isUndisplayable(index: "\(currentIndex)") {
-                            newDiscover.insert("\(currentIndex)")
-                            currentIndex += 1
-                            if currentIndex > Constants.discoverTotal {
-                                currentIndex = 0
-                            }
-                        }
+            print("[SSC] Queue size = \(currentQueueSize)")
+            let queueItemsNeeded:Bool = (Matchstick.minQueueSize >= currentQueueSize)
+            //var currentIndex = UserDefaults.standard.integer(forKey: UserDefaultsKeys.discoverCurrentIndex)
+            
+            if queueItemsNeeded {
+                print("[SSC] Making API Call to populate more items.")
+                let userID:String! = UserDefaults.standard.string(forKey: UserDefaultsKeys.userID) ?? ""
+                if let responseJSON = getProductIdsFromServer(user_id:userID) {
+                    for remoteId in responseJSON {
+                        //currentIndex += 1
+                        print("REMOTE ID = \(remoteId)")
+                        let imageUrl = self.urlStringFor(index: remoteId)
+                        let _ = DataModel.sharedInstance.saveMatchstick(managedObjectContext: context, remoteId: remoteId, imageUrl: imageUrl, properties: self.propertiesFor(id: remoteId))
+                        self.downloadIfNeeded(imageURL: imageUrl, priority: .low)
                     }
-                    let existingFetchRequest:NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
-                    existingFetchRequest.predicate = NSPredicate.init(format: "remoteId IN %@", newDiscover)
-                    if let existing = try? context.fetch(displayingFetchRequest){
-                        for matchstick in existing {
-                            if let remoteId = matchstick.remoteId {
-                                newDiscover.remove(remoteId)
-                            }
-                        }
-                    }else{
-                        loopCount = loopLimit
-                    }
+                    print("[SSC] Added \(responseJSON.count) items to queue.")
+                    print("[SSC] Queue size now = \(queued.count - itemsAdded)")
                 }
-                UserDefaults.standard.setValue(currentIndex, forKey: UserDefaultsKeys.discoverCurrentIndex)
-            }else{
-                let sortKey:String = {
-                    if self.gender == "male" {
-                        return "male"
-                    }else{
-                        return self.discoverCategoryFilter
-                    }
-                }()
-                if let array = self.indexForCategory(sortKey) {
-                    let arrayLength = array.count
-                    var currentIndex = UserDefaults.standard.integer(forKey: "offset_\(sortKey)")
-                    
-                    let loopLimit = 10
-                    var loopCount = 0
-                    while (queueItemsNeeded >= newDiscover.count && loopCount < loopLimit) {
-                        loopCount += 1
-                        for _ in 0...queueItemsNeeded {
-                            if arrayLength > currentIndex {
-                                if !self.isUndisplayable(index: "\(currentIndex)") {
-                                    let value = array[currentIndex]
-                                    newDiscover.insert(value)
-                                    currentIndex += 1
-                                }
-                            }
-                        }
-                        let existingFetchRequest:NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
-                        existingFetchRequest.predicate = NSPredicate.init(format: "remoteId IN %@", newDiscover)
-                        if let existing = try? context.fetch(displayingFetchRequest){
-                            for matchstick in existing {
-                                if let remoteId = matchstick.remoteId {
-                                    newDiscover.remove(remoteId)
-                                }
-                            }
-                        }else{
-                            loopCount = loopLimit
-                        }
-                    }
-                    UserDefaults.standard.setValue(currentIndex, forKey: "offset_\(sortKey)")
-                }
-
-                
-            }
-            
-            
-            
-        }
-        
-        let userID:String! = UserDefaults.standard.string(forKey: UserDefaultsKeys.userID) ?? ""
-        print("User ID = \(userID)")
-        
-        //FIXME: Hard-coded user id = 13 as this is what Jake was testing with
-        if let responseJSON = getProductIdsFromServer(user_id:userID) {
-            for remoteId in responseJSON {
-                print("REMOTE ID = \(remoteId)")
-                let imageUrl = self.urlStringFor(index: remoteId)
-                let _ = DataModel.sharedInstance.saveMatchstick(managedObjectContext: context, remoteId: remoteId, imageUrl: imageUrl, properties: self.propertiesFor(id: remoteId))
-                self.downloadIfNeeded(imageURL: imageUrl, priority: .low)
             }
         }
     }
@@ -334,7 +265,7 @@ class DiscoverManager {
         var responseJSON:[String]? = nil
         
         let session = URLSession.shared
-        let (data, response, error) = session.synchronousDataTask(with: request)
+        let (data, _, _) = session.synchronousDataTask(with: request)
         if let d = data {
             do {
                 responseJSON = try JSONSerialization.jsonObject(with: d, options: JSONSerialization.ReadingOptions.allowFragments) as? [String]
