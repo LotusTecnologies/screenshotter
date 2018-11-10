@@ -84,12 +84,24 @@ extension Matchstick {
     
     // NOTE: This will get called every time the app enters the forground
     public class func refreshMinQueueSize() {
-        //TODO: Input actual URL below and remove above return line to allow function to run
-        let url = URL(string: "https://blank")!
+        print("[SSC] Making API call to get minQueueSize config.")
+        let url = URL(string: "https://1sk0jdnp91.execute-api.us-east-1.amazonaws.com/default/discover_queue_config")!
         let request = URLRequest(url: url)
         HTTPHelper.asyncRequest(request) { (data, error) in
-            //TODO: process data to extract the minQueueSize config var and then set it below
-            UserDefaults.standard.set(20, forKey: UserDefaultsKeys.discoverMinQueueSize)
+            //Process data to extract the minQueueSize config var and then set it below
+            if let d = data {
+                do {
+                    let responseJSON = try JSONSerialization.jsonObject(with: d, options: JSONSerialization.ReadingOptions.allowFragments) as? [String:Int]
+                    if let r = responseJSON {
+                        if let n:Int = r["min_n_in_queue"] {
+                            UserDefaults.standard.set(n, forKey: UserDefaultsKeys.discoverMinQueueSize)
+                            print("[SSC] New minQueueSize = \(n)")
+                        }
+                    }
+                } catch {
+                    // report error
+                }
+            }
         }
     }
 }
