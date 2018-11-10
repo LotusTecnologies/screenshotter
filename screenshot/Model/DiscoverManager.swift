@@ -265,19 +265,20 @@ class DiscoverManager {
         // insert json data to the request
         request.httpBody = jsonData
         
-        var responseJSON:[String]? = nil
+        var responseJSON:[[String:String]]? = nil
         
         let session = URLSession.shared
         let task = session.dataTask(with: request) { (data, res, error) in
             if let d = data {
                 do {
-                    responseJSON = try JSONSerialization.jsonObject(with: d, options: JSONSerialization.ReadingOptions.allowFragments) as? [String]
+                    responseJSON = try JSONSerialization.jsonObject(with: d, options: JSONSerialization.ReadingOptions.allowFragments) as? [[String:String]]
                     if let r = responseJSON {
-                        for remoteId in r {
-                            print("REMOTE ID = \(remoteId)")
-                            let imageUrl = self.urlStringFor(index: remoteId)
-                            let _ = DataModel.sharedInstance.saveMatchstick(managedObjectContext: context, remoteId: remoteId, imageUrl: imageUrl, properties: self.propertiesFor(id: remoteId))
-                            self.downloadIfNeeded(imageURL: imageUrl, priority: .low)
+                        for dict in r {
+                            if let remoteId = dict["legacy_filtered_discover_picture_integer_id"], let imageUrl = dict["image_url"] {
+                                print("REMOTE ID = \(remoteId)")
+                                let _ = DataModel.sharedInstance.saveMatchstick(managedObjectContext: context, remoteId: remoteId, imageUrl: imageUrl, properties: self.propertiesFor(id: remoteId))
+                                self.downloadIfNeeded(imageURL: imageUrl, priority: .low)
+                            }
                         }
                         print("[SSC] Added \(r.count) items to queue.")
                     }
