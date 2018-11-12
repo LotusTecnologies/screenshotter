@@ -32,6 +32,7 @@ class DiscoverManager {
     }()
    
     var processing:Bool = false
+    var failureStop:Bool = false
     var tags:[String:SortedArray<String>]?
     var undisplayable:Set<String>?
     var gender:String = {
@@ -248,7 +249,7 @@ class DiscoverManager {
      */
     func getProductIdsFromServer(user_id:String, context: NSManagedObjectContext) {
         // 'processing' Bool is used to "lock" thread and prevent multiple calls race condition
-        if processing {
+        if processing || failureStop {
             return
         }
         processing = true
@@ -269,21 +270,29 @@ class DiscoverManager {
         
         let session = URLSession.shared
         let task = session.dataTask(with: request) { (data, res, error) in
-            if let d = data {
-                do {
-                    responseJSON = try JSONSerialization.jsonObject(with: d, options: JSONSerialization.ReadingOptions.allowFragments) as? [[String:String]]
-                    if let r = responseJSON {
-                        for dict in r {
-                            if let remoteId = dict["legacy_filtered_discover_picture_integer_id"], let imageUrl = dict["image_url"] {
-                                print("REMOTE ID = \(remoteId)")
-                                let _ = DataModel.sharedInstance.saveMatchstick(managedObjectContext: context, remoteId: remoteId, imageUrl: imageUrl, properties: self.propertiesFor(id: remoteId))
-                                self.downloadIfNeeded(imageURL: imageUrl, priority: .low)
+            if error != nil {
+                self.failureStop = true
+            } else {
+                if let d = data {
+                    do {
+                        responseJSON = try JSONSerialization.jsonObject(with: d, options: JSONSerialization.ReadingOptions.allowFragments) as? [[String:String]]
+                        if let r = responseJSON {
+                            for dict in r {
+                                if let remoteId = dict["legacy_filtered_discover_picture_integer_id"], let imageUrl = dict["image_url"] {
+                                    print("REMOTE ID = \(remoteId)")
+                                    let _ = DataModel.sharedInstance.saveMatchstick(managedObjectContext: context, remoteId: remoteId, imageUrl: imageUrl, properties: self.propertiesFor(id: remoteId))
+                                    self.downloadIfNeeded(imageURL: imageUrl, priority: .low)
+                                }
                             }
+                            print("[SSC] Added \(r.count) items to queue.")
+                        } else {
+                            self.failureStop = true
                         }
-                        print("[SSC] Added \(r.count) items to queue.")
+                    } catch {
+                        self.failureStop = true
                     }
-                } catch {
-                    //report error
+                } else {
+                    self.failureStop = true
                 }
             }
             context.saveIfNeeded()

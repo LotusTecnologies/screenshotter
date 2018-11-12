@@ -21,6 +21,7 @@ class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonit
     fileprivate var matchsticks:[Matchstick] = []
     fileprivate let passButton = UIButton()
     fileprivate let addButton = UIButton()
+    fileprivate let retryButton = UIButton()
     fileprivate var cardHelperView: DiscoverScreenshotHelperView?
     fileprivate let emptyView = HelperView()
     fileprivate let clearFilterView = HelperView()
@@ -179,7 +180,24 @@ class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonit
         emptyView.bottomAnchor.constraint(equalTo: passButton.topAnchor).isActive = true
         emptyView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
-        
+        retryButton.translatesAutoresizingMaskIntoConstraints = false
+        //retryButton.setTitle("discover.screenshot.retry".localized, for: .normal)
+        retryButton.setTitle("Retry", for: .normal)
+        retryButton.setTitleColor(.black, for: .normal)
+        retryButton.layer.borderWidth = 1
+        retryButton.layer.borderColor = UIColor.black.cgColor
+        retryButton.transform = CGAffineTransform(scaleX: -1.0, y: 1.0)
+        retryButton.titleLabel?.transform = CGAffineTransform(scaleX: -1.0, y: 1.0)
+        retryButton.titleLabel?.font = .screenshopFont(.hindMedium, textStyle: .subheadline, staticSize: true)
+        retryButton.imageEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+        retryButton.contentEdgeInsets = UIEdgeInsets(top: .padding, left: .padding, bottom: .padding, right: .padding)
+        retryButton.addTarget(self, action: #selector(retryButtonAction), for: .touchUpInside)
+        retryButton.adjustsImageWhenDisabled = false
+        retryButton.isExclusiveTouch = true
+        emptyView.addSubview(retryButton)
+        retryButton.topAnchor.constraint(equalTo: emptyView.subtitleLabel.bottomAnchor, constant: 20).isActive = true
+        retryButton.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 0).isActive = true
+        retryButton.layer.cornerRadius = 100 / 2.0
         
         clearFilterView.translatesAutoresizingMaskIntoConstraints = false
         clearFilterView.titleLabel.text = "discover.no_more.default".localized
@@ -537,6 +555,12 @@ class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonit
         Analytics.trackMatchsticksAdd(matchstick: currentMatchstick, by: .tap)
         
         decidedToAdd()
+    }
+    
+    @objc fileprivate func retryButtonAction() {
+        let dm = DiscoverManager.shared
+        dm.failureStop = false
+        dm.discoverViewDidAppear()
     }
     
     // MARK: Helper View
