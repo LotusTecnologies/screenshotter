@@ -105,39 +105,51 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
     
     var screenshot: Screenshot? {
         didSet {
-            if let screenshot = screenshot {
-                // If the screenshot object does not have imageData but does have a URL, so we can go fetch it again
-                if screenshot.imageData == nil, let i = screenshot.uploadedImageURL {
+            // If the screenshot object does not have imageData but does have a URL, go fetch async then callback
+            if let screenshot = screenshot, screenshot.imageData == nil, let i = screenshot.uploadedImageURL {
+                DispatchQueue.global().async {
                     if let url = URL(string: i) {
                         if let data = try? Data(contentsOf: url) {
                             screenshot.imageData = data
                         }
                     }
+                    DispatchQueue.main.async {
+                        self.setScreenshot(screenshot: screenshot)
+                    }
                 }
+            } else {
+                setScreenshot(screenshot: screenshot)
             }
+        }
+    }
+    
+    func setScreenshot(screenshot: Screenshot?) {
+        //Since this can be called asynchonously (if image needs to be downloaded - lines 110-119) and the screenshot associated with the cell may have changed by the time we make the callback, we need to check that the screenshot we fetched for is still valid (i.e. the screenshot variable associated with the view cell equals the one passed into the callback)
+        if self.screenshot?.screenshotId != screenshot?.screenshotId {
+            return
+        }
+        
+        if let screenshot = screenshot, let data = screenshot.imageData as Data? {
+            let size = bounds.size
+            let rect = screenshot.shoppablesBoundingFrame(in: size)
             
-            if let screenshot = screenshot, let data = screenshot.imageData as Data? {
-                let size = bounds.size
-                let rect = screenshot.shoppablesBoundingFrame(in: size)
+            if rect.isNull {
+                // When there's no shoppables, scale the image by 110%
+                let scaleRatio = CGFloat(0.1)
+                let scaleSize = CGSize(width: size.width * scaleRatio, height: size.height * scaleRatio)
                 
-                if rect.isNull {
-                    // When there's no shoppables, scale the image by 110%
-                    let scaleRatio = CGFloat(0.1)
-                    let scaleSize = CGSize(width: size.width * scaleRatio, height: size.height * scaleRatio)
-                    
-                    imageView.layoutMargins = UIEdgeInsets(top: scaleSize.height, left: scaleSize.width, bottom: scaleSize.height, right: scaleSize.width)
-                    
-                } else {
-                    // Use the shoppables to display the outer bounding rect
-                    imageView.layoutMargins = UIEdgeInsets(top: rect.origin.y, left: rect.origin.x, bottom: size.height - rect.maxY, right: size.width - rect.maxX)
-                }
-                
-                imageView.image = UIImage(data: data)
+                imageView.layoutMargins = UIEdgeInsets(top: scaleSize.height, left: scaleSize.width, bottom: scaleSize.height, right: scaleSize.width)
                 
             } else {
-                imageView.image = nil
-                Analytics.trackDevLog(file: NSString(string: #file).lastPathComponent, line: #line, message: "blank screenshot")
+                // Use the shoppables to display the outer bounding rect
+                imageView.layoutMargins = UIEdgeInsets(top: rect.origin.y, left: rect.origin.x, bottom: size.height - rect.maxY, right: size.width - rect.maxX)
             }
+            
+            imageView.image = UIImage(data: data)
+            
+        } else {
+            imageView.image = nil
+            Analytics.trackDevLog(file: NSString(string: #file).lastPathComponent, line: #line, message: "blank screenshot")
         }
     }
     
