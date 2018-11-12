@@ -105,6 +105,17 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
     
     var screenshot: Screenshot? {
         didSet {
+            if let screenshot = screenshot {
+                // If the screenshot object does not have imageData but does have a URL, so we can go fetch it again
+                if screenshot.imageData == nil, let i = screenshot.uploadedImageURL {
+                    if let url = URL(string: i) {
+                        if let data = try? Data(contentsOf: url) {
+                            screenshot.imageData = data
+                        }
+                    }
+                }
+            }
+            
             if let screenshot = screenshot, let data = screenshot.imageData as Data? {
                 let size = bounds.size
                 let rect = screenshot.shoppablesBoundingFrame(in: size)
