@@ -147,5 +147,23 @@ extension Screenshot {
 
     }
     
+    func fetchImageIfNeeded(completion:@escaping (Screenshot) -> Void) {
+        // If the screenshot object does not have imageData but does have a URL, go fetch async then callback
+        if imageData == nil, let i = uploadedImageURL {
+            DispatchQueue.global().async {
+                if let url = URL(string: i) {
+                    if let data = try? Data(contentsOf: url) {
+                        self.imageData = data
+                        //TODO: Save context
+                    }
+                }
+                DispatchQueue.main.async {
+                    completion(self)
+                }
+            }
+        } else {
+            completion(self)
+        }
+    }
 }
 
