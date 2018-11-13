@@ -197,7 +197,8 @@ class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonit
         emptyView.addSubview(retryButton)
         retryButton.topAnchor.constraint(equalTo: emptyView.subtitleLabel.bottomAnchor, constant: 20).isActive = true
         retryButton.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 0).isActive = true
-        retryButton.layer.cornerRadius = 100 / 2.0
+        retryButton.layer.cornerRadius = 60 / 2.0
+        retryButton.backgroundColor = .white
         
         clearFilterView.translatesAutoresizingMaskIntoConstraints = false
         clearFilterView.titleLabel.text = "discover.no_more.default".localized
