@@ -105,27 +105,34 @@ class ScreenshotCollectionViewCell: ShadowCollectionViewCell {
     
     var screenshot: Screenshot? {
         didSet {
-            if let screenshot = screenshot, let data = screenshot.imageData as Data? {
-                let size = bounds.size
-                let rect = screenshot.shoppablesBoundingFrame(in: size)
-                
-                if rect.isNull {
-                    // When there's no shoppables, scale the image by 110%
-                    let scaleRatio = CGFloat(0.1)
-                    let scaleSize = CGSize(width: size.width * scaleRatio, height: size.height * scaleRatio)
-                    
-                    imageView.layoutMargins = UIEdgeInsets(top: scaleSize.height, left: scaleSize.width, bottom: scaleSize.height, right: scaleSize.width)
-                    
-                } else {
-                    // Use the shoppables to display the outer bounding rect
-                    imageView.layoutMargins = UIEdgeInsets(top: rect.origin.y, left: rect.origin.x, bottom: size.height - rect.maxY, right: size.width - rect.maxX)
+            self.imageView.image = nil
+            if let screenshot = screenshot {
+                screenshot.fetchImageIfNeeded { (screenshot) in
+                    //Since this can be called asynchonously (if image needs to be downloaded - lines 110-119) and the screenshot associated with the cell may have changed by the time we make the callback, we need to check that the screenshot we fetched for is still valid (i.e. the screenshot variable associated with the view cell equals the one passed into the callback)
+                    if self.screenshot?.screenshotId == screenshot.screenshotId {
+                        if let data = screenshot.imageData as Data? {
+                            let size = self.bounds.size
+                            let rect = screenshot.shoppablesBoundingFrame(in: size)
+                            
+                            if rect.isNull {
+                                // When there's no shoppables, scale the image by 110%
+                                let scaleRatio = CGFloat(0.1)
+                                let scaleSize = CGSize(width: size.width * scaleRatio, height: size.height * scaleRatio)
+                                
+                                self.imageView.layoutMargins = UIEdgeInsets(top: scaleSize.height, left: scaleSize.width, bottom: scaleSize.height, right: scaleSize.width)
+                                
+                            } else {
+                                // Use the shoppables to display the outer bounding rect
+                                self.imageView.layoutMargins = UIEdgeInsets(top: rect.origin.y, left: rect.origin.x, bottom: size.height - rect.maxY, right: size.width - rect.maxX)
+                            }
+                            
+                            self.imageView.image = UIImage(data: data)
+                            
+                        } else {
+                            Analytics.trackDevLog(file: NSString(string: #file).lastPathComponent, line: #line, message: "blank screenshot")
+                        }
+                    }
                 }
-                
-                imageView.image = UIImage(data: data)
-                
-            } else {
-                imageView.image = nil
-                Analytics.trackDevLog(file: NSString(string: #file).lastPathComponent, line: #line, message: "blank screenshot")
             }
         }
     }
