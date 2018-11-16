@@ -15,7 +15,7 @@ class DiscoverManager {
     var downloadMatchsitckQueue:AsyncOperationQueue = {
         var queue = AsyncOperationQueue()
         queue.name = "Download matchsticks Queue"
-        queue.maxConcurrentOperationCount = 4
+        queue.maxConcurrentOperationCount = 8
         return queue
     }()
     var databaseQueue:AsyncOperationQueue = {
@@ -214,8 +214,8 @@ class DiscoverManager {
                         item.receivedAt = Date()
                         itemsAdded += 1
                     }else{
-                        if let imageUrl = item.imageUrl, downloadingAndDownloaded < Matchstick.displayingSize  {
-                            self.downloadIfNeeded(imageURL: imageUrl, priority: .high)
+                        if let imageUrl = item.imageUrl  {
+                            self.downloadIfNeeded(imageURL: imageUrl, priority: (downloadingAndDownloaded < Matchstick.displayingSize) ? .high : .low)
                         }
                     }
                 }else{
