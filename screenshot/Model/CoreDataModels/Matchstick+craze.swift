@@ -114,4 +114,9 @@ extension Matchstick {
             }
         }
     }
+    
+    public class func incrementSessionNumber() {
+        let n = UserDefaults.standard.integer(forKey: UserDefaultsKeys.userSessionNumber)
+        UserDefaults.standard.set(n+1, forKey: UserDefaultsKeys.userSessionNumber)
+    }
 }

@@ -68,6 +68,8 @@ class DiscoverManager {
         return AsyncOperationMonitor.init(tags: [AsyncOperationTag.init(type: .filterChange, value: "DiscoverManager")], queues: [self.databaseQueue], delegate: delegate)
     }
     func didAdd(_ item:Matchstick, callback: ((_ screenshot: Screenshot) -> Void)? = nil ){
+        logUserSwipe(item, actionType: "swipe_right")
+        
         let managedObjectID = item.objectID
 
         self.performBackgroundTask { (context) in
@@ -114,6 +116,8 @@ class DiscoverManager {
         }
     }
     func didDelayedAdd(_ item:Matchstick) {
+        logUserSwipe(item, actionType: "tap_to_shop")
+        
         let managedObjectID = item.objectID
         
         self.performBackgroundTask { (context) in
@@ -128,6 +132,7 @@ class DiscoverManager {
     }
 
     func didSkip(_ item:Matchstick) {
+        logUserSwipe(item, actionType: "swipe_left")
         
         let managedObjectID = item.objectID
         
@@ -144,6 +149,14 @@ class DiscoverManager {
                 context.saveIfNeeded()
             }
         }
+    }
+    
+    func logUserSwipe(_ item:Matchstick, actionType:String) {
+        let userID:String! = UserDefaults.standard.string(forKey: UserDefaultsKeys.userID) ?? ""
+        let servingAlgorithmID:String! = UserDefaults.standard.string(forKey: UserDefaultsKeys.discoverAlgoUUID) ?? ""
+        let discoverSessionID:Int = UserDefaults.standard.integer(forKey: UserDefaultsKeys.userSessionNumber)
+        let discoverPictureID:String = item.remoteId ?? ""
+        postUserActionToServer(userID: userID, discoverPictureID: discoverPictureID, actionType: actionType, servingAlgorithmID: servingAlgorithmID, discoverSessionID: discoverSessionID)
     }
     
     func updateFilterAndGetMoreIfNeeded(){
@@ -397,7 +410,32 @@ class DiscoverManager {
     /*
      * Make API call to server to record a user has swipped y/n on a discover card
      */
-    func postUserActionToServer(userID:String, discoverPictureID:String, actionType:String, servingAlgorithmID:String, DiscoverSessionID:String, context: NSManagedObjectContext) {
+    func postUserActionToServer(userID:String, discoverPictureID:String?, actionType:String, servingAlgorithmID:String?, discoverSessionID:Int?) {
+        print("[SSC] Making API Call to post user swipe action.")
+        var jsonLiteral:[String:Any] = ["user_ss_uuid": userID, "action_type": actionType]
+        if let algoUuid = servingAlgorithmID {
+            jsonLiteral["serving_algorithm_ss_uuid"] = algoUuid
+        }
+        if let dpID = discoverPictureID {
+            jsonLiteral["discover_picture_ss_uuid"] = dpID
+        }
+        if let dsID = discoverSessionID {
+            jsonLiteral["discover_session_ss_uuid"] = dsID
+        }
+        let jsonData = try? JSONSerialization.data(withJSONObject: jsonLiteral)
         
+        // create post request
+        let url = URL(string: HTTPHelper.ADD_USER_ACTION_URL)!
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        
+        // insert json data to the request
+        request.httpBody = jsonData
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        HTTPHelper.asyncRequest(request) { (data, error) in
+            // No action needed
+            // We are just logging user events to the server
+        }
     }
 }

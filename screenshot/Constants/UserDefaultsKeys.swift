@@ -80,6 +80,7 @@ class UserDefaultsKeys  {
     static let discoverGenderFilter = "discoverGenderFilter"
     static let discoverMinQueueSize = "discoverMinQueueSize"
     static let discoverAlgoUUID = "discoverAlgoUUID"
+    static let userSessionNumber = "userSessionNumber"
 
     // Game
     @available(*, deprecated)
