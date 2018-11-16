@@ -362,8 +362,7 @@ class DiscoverManager {
         
         var responseJSON:[[String:Any]]? = nil
         
-        let session = URLSession.shared
-        let task = session.dataTask(with: request) { (data, res, error) in
+        HTTPHelper.asyncRequest(request) { (data, error) in
             if error != nil {
                 self.failureStop = true
             } else {
@@ -393,7 +392,6 @@ class DiscoverManager {
             self.processing = false
             self.discoverViewDidAppear()
         }
-        task.resume()
     }
     
     /*
