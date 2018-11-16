@@ -65,7 +65,7 @@ class DiscoverManager {
     }
 
     func createFilterChangingMonitor(delegate:AsyncOperationMonitorDelegate) -> AsyncOperationMonitor {
-        return AsyncOperationMonitor.init(tags: [AsyncOperationTag.init(type: .filterChange, value: "DiscoverManager")], queues: [self.databaseQueue, self.downloadMatchsitckQueue], delegate: delegate)
+        return AsyncOperationMonitor.init(tags: [AsyncOperationTag.init(type: .filterChange, value: "DiscoverManager")], queues: [self.databaseQueue], delegate: delegate)
     }
     func didAdd(_ item:Matchstick, callback: ((_ screenshot: Screenshot) -> Void)? = nil ){
         let managedObjectID = item.objectID
@@ -358,8 +358,9 @@ class DiscoverManager {
         
         // insert json data to the request
         request.httpBody = jsonData
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         
-        var responseJSON:[[String:String]]? = nil
+        var responseJSON:[[String:Any]]? = nil
         
         let session = URLSession.shared
         let task = session.dataTask(with: request) { (data, res, error) in
@@ -368,10 +369,10 @@ class DiscoverManager {
             } else {
                 if let d = data {
                     do {
-                        responseJSON = try JSONSerialization.jsonObject(with: d, options: JSONSerialization.ReadingOptions.allowFragments) as? [[String:String]]
+                        responseJSON = try JSONSerialization.jsonObject(with: d, options: JSONSerialization.ReadingOptions.allowFragments) as? [[String:Any]]
                         if let r = responseJSON {
                             for dict in r {
-                                if let remoteId = dict["picture_ss_uuid"], let imageUrl = dict["image_url"] {
+                                if let remoteId = dict["picture_ss_uuid"] as! String?, let imageUrl = dict["image_url"] as! String? {
                                     print("REMOTE ID = \(remoteId)")
                                     let _ = DataModel.sharedInstance.saveMatchstick(managedObjectContext: context, remoteId: remoteId, imageUrl: imageUrl, properties: self.propertiesFor(id: remoteId))
                                     self.downloadIfNeeded(imageURL: imageUrl, priority: .low)
