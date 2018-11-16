@@ -255,11 +255,11 @@ class DiscoverManager {
         processing = true
         
         print("[SSC] Making API Call to populate more items.")
-        let jsonLiteral:[String:Any] = ["id": user_id, "size": 20]
+        let jsonLiteral:[String:String] = ["user_ss_uuid": user_id]
         let jsonData = try? JSONSerialization.data(withJSONObject: jsonLiteral)
         
         // create post request
-        let url = URL(string: "https://z5eep8o661.execute-api.us-east-1.amazonaws.com/default/fill-discover-queue")!
+        let url = URL(string: HTTPHelper.FILL_DISCOVER_URL)!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         
