@@ -239,7 +239,7 @@ class DiscoverManager {
             
             if queueItemsNeeded {
                 let userID:String! = UserDefaults.standard.string(forKey: UserDefaultsKeys.userID) ?? ""
-                getProductIdsFromServer(user_id: userID, context: context)
+                getProductIdsFromServer(userID: userID, algoID: UserDefaults.standard.string(forKey: UserDefaultsKeys.discoverAlgoUUID), context: context)
             }
         }
     }
@@ -337,7 +337,7 @@ class DiscoverManager {
     /*
      * Make API call to server with user Id to get product recommendations for display in discover feed.
      */
-    func getProductIdsFromServer(user_id:String, context: NSManagedObjectContext) {
+    func getProductIdsFromServer(userID:String, algoID:String?, context: NSManagedObjectContext) {
         // 'processing' Bool is used to "lock" thread and prevent multiple calls race condition
         if processing || failureStop {
             return
@@ -345,8 +345,8 @@ class DiscoverManager {
         processing = true
         
         print("[SSC] Making API Call to populate more items.")
-        var jsonLiteral:[String:String] = ["user_ss_uuid": user_id]
-        if let algoUuid = UserDefaults.standard.string(forKey: UserDefaultsKeys.discoverAlgoUUID) {
+        var jsonLiteral:[String:String] = ["user_ss_uuid": userID]
+        if let algoUuid = algoID {
             jsonLiteral["discover_algorithm_ss_uuid"] = algoUuid
         }
         let jsonData = try? JSONSerialization.data(withJSONObject: jsonLiteral)
@@ -371,7 +371,7 @@ class DiscoverManager {
                         responseJSON = try JSONSerialization.jsonObject(with: d, options: JSONSerialization.ReadingOptions.allowFragments) as? [[String:String]]
                         if let r = responseJSON {
                             for dict in r {
-                                if let remoteId = dict["legacy_filtered_discover_picture_integer_id"], let imageUrl = dict["image_url"] {
+                                if let remoteId = dict["picture_ss_uuid"], let imageUrl = dict["image_url"] {
                                     print("REMOTE ID = \(remoteId)")
                                     let _ = DataModel.sharedInstance.saveMatchstick(managedObjectContext: context, remoteId: remoteId, imageUrl: imageUrl, properties: self.propertiesFor(id: remoteId))
                                     self.downloadIfNeeded(imageURL: imageUrl, priority: .low)
@@ -395,4 +395,10 @@ class DiscoverManager {
         task.resume()
     }
     
+    /*
+     * Make API call to server to record a user has swipped y/n on a discover card
+     */
+    func postUserActionToServer(userID:String, discoverPictureID:String, actionType:String, servingAlgorithmID:String, DiscoverSessionID:String, context: NSManagedObjectContext) {
+        
+    }
 }
