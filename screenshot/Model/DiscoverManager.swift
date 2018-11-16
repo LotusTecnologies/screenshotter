@@ -244,67 +244,6 @@ class DiscoverManager {
         }
     }
     
-    /*
-     * Make API call to server with user Id to get product recommendations for display in discover feed.
-     */
-    func getProductIdsFromServer(user_id:String, context: NSManagedObjectContext) {
-        // 'processing' Bool is used to "lock" thread and prevent multiple calls race condition
-        if processing || failureStop {
-            return
-        }
-        processing = true
-        
-        print("[SSC] Making API Call to populate more items.")
-        var jsonLiteral:[String:String] = ["user_ss_uuid": user_id]
-        if let algoUuid = UserDefaults.standard.string(forKey: UserDefaultsKeys.discoverAlgoUUID) {
-            jsonLiteral["discover_algorithm_ss_uuid"] = algoUuid
-        }
-        let jsonData = try? JSONSerialization.data(withJSONObject: jsonLiteral)
-        
-        // create post request
-        let url = URL(string: HTTPHelper.FILL_DISCOVER_URL)!
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        
-        // insert json data to the request
-        request.httpBody = jsonData
-        
-        var responseJSON:[[String:String]]? = nil
-        
-        let session = URLSession.shared
-        let task = session.dataTask(with: request) { (data, res, error) in
-            if error != nil {
-                self.failureStop = true
-            } else {
-                if let d = data {
-                    do {
-                        responseJSON = try JSONSerialization.jsonObject(with: d, options: JSONSerialization.ReadingOptions.allowFragments) as? [[String:String]]
-                        if let r = responseJSON {
-                            for dict in r {
-                                if let remoteId = dict["legacy_filtered_discover_picture_integer_id"], let imageUrl = dict["image_url"] {
-                                    print("REMOTE ID = \(remoteId)")
-                                    let _ = DataModel.sharedInstance.saveMatchstick(managedObjectContext: context, remoteId: remoteId, imageUrl: imageUrl, properties: self.propertiesFor(id: remoteId))
-                                    self.downloadIfNeeded(imageURL: imageUrl, priority: .low)
-                                }
-                            }
-                            print("[SSC] Added \(r.count) items to queue.")
-                        } else {
-                            self.failureStop = true
-                        }
-                    } catch {
-                        self.failureStop = true
-                    }
-                } else {
-                    self.failureStop = true
-                }
-            }
-            context.saveIfNeeded()
-            self.processing = false
-            self.discoverViewDidAppear()
-        }
-        task.resume()
-    }
-    
     func discoverViewDidAppear() {
         
         self.performBackgroundTask { (context) in
@@ -391,6 +330,69 @@ class DiscoverManager {
             }
         }
         return nil
+    }
+    
+    // MARK: - Networking Calls
+    
+    /*
+     * Make API call to server with user Id to get product recommendations for display in discover feed.
+     */
+    func getProductIdsFromServer(user_id:String, context: NSManagedObjectContext) {
+        // 'processing' Bool is used to "lock" thread and prevent multiple calls race condition
+        if processing || failureStop {
+            return
+        }
+        processing = true
+        
+        print("[SSC] Making API Call to populate more items.")
+        var jsonLiteral:[String:String] = ["user_ss_uuid": user_id]
+        if let algoUuid = UserDefaults.standard.string(forKey: UserDefaultsKeys.discoverAlgoUUID) {
+            jsonLiteral["discover_algorithm_ss_uuid"] = algoUuid
+        }
+        let jsonData = try? JSONSerialization.data(withJSONObject: jsonLiteral)
+        
+        // create post request
+        let url = URL(string: HTTPHelper.FILL_DISCOVER_URL)!
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        
+        // insert json data to the request
+        request.httpBody = jsonData
+        
+        var responseJSON:[[String:String]]? = nil
+        
+        let session = URLSession.shared
+        let task = session.dataTask(with: request) { (data, res, error) in
+            if error != nil {
+                self.failureStop = true
+            } else {
+                if let d = data {
+                    do {
+                        responseJSON = try JSONSerialization.jsonObject(with: d, options: JSONSerialization.ReadingOptions.allowFragments) as? [[String:String]]
+                        if let r = responseJSON {
+                            for dict in r {
+                                if let remoteId = dict["legacy_filtered_discover_picture_integer_id"], let imageUrl = dict["image_url"] {
+                                    print("REMOTE ID = \(remoteId)")
+                                    let _ = DataModel.sharedInstance.saveMatchstick(managedObjectContext: context, remoteId: remoteId, imageUrl: imageUrl, properties: self.propertiesFor(id: remoteId))
+                                    self.downloadIfNeeded(imageURL: imageUrl, priority: .low)
+                                }
+                            }
+                            print("[SSC] Added \(r.count) items to queue.")
+                        } else {
+                            self.failureStop = true
+                        }
+                    } catch {
+                        self.failureStop = true
+                    }
+                } else {
+                    self.failureStop = true
+                }
+            }
+            context.saveIfNeeded()
+            self.processing = false
+            self.discoverViewDidAppear()
+        }
+        task.resume()
     }
     
 }
