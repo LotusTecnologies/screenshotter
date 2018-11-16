@@ -95,11 +95,17 @@ extension Matchstick {
             //Process data to extract the minQueueSize config var and then set it below
             if let d = data {
                 do {
-                    let responseJSON = try JSONSerialization.jsonObject(with: d, options: JSONSerialization.ReadingOptions.allowFragments) as? [String:Int]
+                    let responseJSON = try JSONSerialization.jsonObject(with: d, options: JSONSerialization.ReadingOptions.allowFragments) as? [String:String]
                     if let r = responseJSON {
-                        if let n:Int = r["min_n_in_queue"] {
-                            UserDefaults.standard.set(n, forKey: UserDefaultsKeys.discoverMinQueueSize)
-                            print("[SSC] New minQueueSize = \(n)")
+                        if let minSize:String = r["min_n_in_queue"] {
+                            if let n = Int(minSize) {
+                                UserDefaults.standard.set(n, forKey: UserDefaultsKeys.discoverMinQueueSize)
+                                print("[SSC] New minQueueSize = \(n)")
+                            }
+                        }
+                        if let aldoUuid:String = r["discover_algorithm_ss_uuid"] {
+                            UserDefaults.standard.set(aldoUuid, forKey: UserDefaultsKeys.discoverAlgoUUID)
+                            print("[SSC] New algorithmUUID = \(aldoUuid)")
                         }
                     }
                 } catch {

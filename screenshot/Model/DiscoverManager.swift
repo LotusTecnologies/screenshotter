@@ -255,7 +255,10 @@ class DiscoverManager {
         processing = true
         
         print("[SSC] Making API Call to populate more items.")
-        let jsonLiteral:[String:String] = ["user_ss_uuid": user_id]
+        var jsonLiteral:[String:String] = ["user_ss_uuid": user_id]
+        if let algoUuid = UserDefaults.standard.string(forKey: UserDefaultsKeys.discoverAlgoUUID) {
+            jsonLiteral["discover_algorithm_ss_uuid"] = algoUuid
+        }
         let jsonData = try? JSONSerialization.data(withJSONObject: jsonLiteral)
         
         // create post request
