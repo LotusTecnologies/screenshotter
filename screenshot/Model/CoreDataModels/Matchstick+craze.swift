@@ -139,9 +139,9 @@ extension Matchstick {
                 do {
                     let responseJSON = try JSONSerialization.jsonObject(with: d, options: JSONSerialization.ReadingOptions.allowFragments) as? [String:Any]
                     if let r = responseJSON {
-                        if let n = (r["min_n_in_queue"] as! Int?) {
-                            UserDefaults.standard.set(n, forKey: UserDefaultsKeys.userSessionNumber)
-                            print("[SSC] New discover session = \(n)")
+                        if let str = (r["ss_uuid"] as! String?) {
+                            UserDefaults.standard.set(str, forKey: UserDefaultsKeys.userSessionNumber)
+                            print("[SSC] New discover session = \(str)")
                         }
                         failure = false
                     }
