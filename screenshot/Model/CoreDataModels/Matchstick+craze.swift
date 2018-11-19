@@ -89,7 +89,7 @@ extension Matchstick {
         if let userID = UserDefaults.standard.string(forKey: UserDefaultsKeys.userID) {
             userUrlParam = "?user_id=\(userID)"
         }
-        let url = URL(string: "https://1sk0jdnp91.execute-api.us-east-1.amazonaws.com/default/discover_queue_config\(userUrlParam)")!
+        let url = URL(string: HTTPHelper.DISCOVER_CONFIG_URL+userUrlParam)!
         let request = URLRequest(url: url)
         HTTPHelper.asyncRequest(request) { (data, error) in
             //Process data to extract the minQueueSize config var and then set it below
