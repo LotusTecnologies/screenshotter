@@ -12,6 +12,7 @@ public class HTTPHelper {
     static let FILL_DISCOVER_URL = "https://2xsab50nui.execute-api.us-east-1.amazonaws.com/dev_api/fill-discover-queue"
     static let ADD_USER_ACTION_URL = "https://2xsab50nui.execute-api.us-east-1.amazonaws.com/dev_api/add-user-action"
     static let DISCOVER_CONFIG_URL = "https://2xsab50nui.execute-api.us-east-1.amazonaws.com/dev_api/get-discover-config"
+    static let DISCOVER_SESSION_URL = "https://2xsab50nui.execute-api.us-east-1.amazonaws.com/dev_api/start-discover-session"
     
     public class func asyncRequest(_ request: URLRequest, completion:@escaping (Data?, NSError?) -> Void) -> () {
         // Create a NSURLSession task

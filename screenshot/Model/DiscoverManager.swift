@@ -152,11 +152,14 @@ class DiscoverManager {
     }
     
     func logUserSwipe(_ item:Matchstick, actionType:String) {
-        let userID:String! = UserDefaults.standard.string(forKey: UserDefaultsKeys.userID) ?? ""
-        let servingAlgorithmID:String! = UserDefaults.standard.string(forKey: UserDefaultsKeys.discoverAlgoUUID) ?? ""
-        let discoverSessionID:Int = UserDefaults.standard.integer(forKey: UserDefaultsKeys.userSessionNumber)
-        let discoverPictureID:String = item.remoteId ?? ""
-        postUserActionToServer(userID: userID, discoverPictureID: discoverPictureID, actionType: actionType, servingAlgorithmID: servingAlgorithmID, discoverSessionID: discoverSessionID)
+        if let userID:String = UserDefaults.standard.string(forKey: UserDefaultsKeys.userID) {
+            let servingAlgorithmID:String? = UserDefaults.standard.string(forKey: UserDefaultsKeys.discoverAlgoUUID)
+            let discoverSessionID:String? = UserDefaults.standard.string(forKey: UserDefaultsKeys.userSessionNumber)
+            let discoverPictureID:String? = item.remoteId
+            postUserActionToServer(userID: userID, discoverPictureID: discoverPictureID, actionType: actionType, servingAlgorithmID: servingAlgorithmID, discoverSessionID: discoverSessionID)
+        } else {
+            print("[SSC] ERROR, userID is null can't make call to swipe endpoint.")
+        }
     }
     
     func updateFilterAndGetMoreIfNeeded(){
@@ -410,7 +413,7 @@ class DiscoverManager {
     /*
      * Make API call to server to record a user has swipped y/n on a discover card
      */
-    func postUserActionToServer(userID:String, discoverPictureID:String?, actionType:String, servingAlgorithmID:String?, discoverSessionID:Int?) {
+    func postUserActionToServer(userID:String, discoverPictureID:String?, actionType:String, servingAlgorithmID:String?, discoverSessionID:String?) {
         print("[SSC] Making API Call to post user swipe action.")
         var jsonLiteral:[String:Any] = ["user_ss_uuid": userID, "action_type": actionType]
         if let algoUuid = servingAlgorithmID {

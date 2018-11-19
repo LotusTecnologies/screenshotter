@@ -76,7 +76,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UserFeedback.shared.applicationDidFinishLaunching() // only setups notificationCenter observing. does nothing now
         
         Matchstick.refreshMinQueueSize()
-        Matchstick.incrementSessionNumber()
+        Matchstick.getDiscoverSessionID()
         return true
     }
     
@@ -257,7 +257,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Analytics.trackSessionStarted()
         AssetSyncModel.sharedInstance.scanPhotoGalleryForFashion()
         Matchstick.refreshMinQueueSize()
-        Matchstick.incrementSessionNumber()
+        Matchstick.getDiscoverSessionID()
     }
     
     func applicationDidBecomeActive(_ application: UIApplication) {

@@ -113,8 +113,45 @@ extension Matchstick {
         }
     }
     
-    public class func incrementSessionNumber() {
-        let n = UserDefaults.standard.integer(forKey: UserDefaultsKeys.userSessionNumber)
-        UserDefaults.standard.set(n+1, forKey: UserDefaultsKeys.userSessionNumber)
+    public class func getDiscoverSessionID() {
+        print("[SSC] Making API call to start new discover session.")
+        var jsonLiteral = [String:Any]()
+        if let userID = UserDefaults.standard.string(forKey: UserDefaultsKeys.userID) {
+            jsonLiteral["user_ss_uuid"] = userID
+        }
+        if let algoUuid = UserDefaults.standard.string(forKey: UserDefaultsKeys.discoverAlgoUUID) {
+            jsonLiteral["discover_algorithm_ss_uuid"] = algoUuid
+        }
+        let jsonData = try? JSONSerialization.data(withJSONObject: jsonLiteral)
+        
+        let url = URL(string: HTTPHelper.DISCOVER_SESSION_URL)!
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        
+        // insert json data to the request
+        request.httpBody = jsonData
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        HTTPHelper.asyncRequest(request) { (data, error) in
+            //Process data to extract the minQueueSize config var and then set it below
+            var failure = true
+            if let d = data {
+                do {
+                    let responseJSON = try JSONSerialization.jsonObject(with: d, options: JSONSerialization.ReadingOptions.allowFragments) as? [String:Any]
+                    if let r = responseJSON {
+                        if let n = (r["min_n_in_queue"] as! Int?) {
+                            UserDefaults.standard.set(n, forKey: UserDefaultsKeys.userSessionNumber)
+                            print("[SSC] New discover session = \(n)")
+                        }
+                        failure = false
+                    }
+                } catch {
+                    // report error
+                }
+            }
+            if failure {
+                UserDefaults.standard.set(nil, forKey: UserDefaultsKeys.userSessionNumber)
+            }
+        }
     }
 }
