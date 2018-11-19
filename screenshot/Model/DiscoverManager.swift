@@ -255,7 +255,7 @@ class DiscoverManager {
             
             if queueItemsNeeded {
                 let userID:String! = UserDefaults.standard.string(forKey: UserDefaultsKeys.userID) ?? ""
-                getProductIdsFromServer(userID: userID, algoID: UserDefaults.standard.string(forKey: UserDefaultsKeys.discoverAlgoUUID), context: context)
+                getProductIdsFromServer(userID: userID, algoID: UserDefaults.standard.string(forKey: UserDefaultsKeys.discoverAlgoUUID), sessionID: UserDefaults.standard.string(forKey: UserDefaultsKeys.userSessionNumber),  context: context)
             }
         }
     }
@@ -353,7 +353,7 @@ class DiscoverManager {
     /*
      * Make API call to server with user Id to get product recommendations for display in discover feed.
      */
-    func getProductIdsFromServer(userID:String, algoID:String?, context: NSManagedObjectContext) {
+    func getProductIdsFromServer(userID:String, algoID:String?, sessionID:String?, context: NSManagedObjectContext) {
         // 'processing' Bool is used to "lock" thread and prevent multiple calls race condition
         if processing || failureStop {
             return
@@ -365,20 +365,18 @@ class DiscoverManager {
         if let algoUuid = algoID {
             jsonLiteral["discover_algorithm_ss_uuid"] = algoUuid
         }
+        if let sessionID = sessionID {
+            jsonLiteral["discover_session_ss_uuid"] = sessionID
+        }
         let jsonData = try? JSONSerialization.data(withJSONObject: jsonLiteral)
         
-        // create post request
-        let url = URL(string: HTTPHelper.FILL_DISCOVER_URL)!
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        
-        // insert json data to the request
+        // create request
+        let request = HTTPHelper.buildRequest(HTTPHelper.FILL_DISCOVER_URL, method: "POST")
         request.httpBody = jsonData
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         
         var responseJSON:[[String:Any]]? = nil
         
-        HTTPHelper.asyncRequest(request) { (data, error) in
+        HTTPHelper.asyncRequest(request as URLRequest) { (data, error) in
             if error != nil {
                 self.failureStop = true
             } else {
@@ -427,16 +425,11 @@ class DiscoverManager {
         }
         let jsonData = try? JSONSerialization.data(withJSONObject: jsonLiteral)
         
-        // create post request
-        let url = URL(string: HTTPHelper.ADD_USER_ACTION_URL)!
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        
-        // insert json data to the request
+        // create request
+        let request = HTTPHelper.buildRequest(HTTPHelper.ADD_USER_ACTION_URL, method: "POST")
         request.httpBody = jsonData
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         
-        HTTPHelper.asyncRequest(request) { (data, error) in
+        HTTPHelper.asyncRequest(request as URLRequest) { (data, error) in
             // No action needed
             // We are just logging user events to the server
         }

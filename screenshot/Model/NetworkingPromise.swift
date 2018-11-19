@@ -959,16 +959,11 @@ extension NetworkingPromise {
         let jsonLiteral:[String:String] = ["user_ss_uuid": userID, "image_url": imageURL, "device_uuid" :deviceID]
         let jsonData = try? JSONSerialization.data(withJSONObject: jsonLiteral)
         
-        // create post request
-        let url = URL(string: HTTPHelper.UPLOAD_DISCOVER_IMAGE_URL)!
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        
-        // insert json data to the request
+        // create request
+        let request = HTTPHelper.buildRequest(HTTPHelper.UPLOAD_DISCOVER_IMAGE_URL, method: "POST")
         request.httpBody = jsonData
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         
-        HTTPHelper.asyncRequest(request) { (data, error) in
+        HTTPHelper.asyncRequest(request as URLRequest) { (data, error) in
             // No action needed
             // We are just logging user events to the server
         }

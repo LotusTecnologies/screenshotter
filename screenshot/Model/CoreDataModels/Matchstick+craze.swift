@@ -89,9 +89,8 @@ extension Matchstick {
         if let userID = UserDefaults.standard.string(forKey: UserDefaultsKeys.userID) {
             userUrlParam = "?user_id=\(userID)"
         }
-        let url = URL(string: HTTPHelper.DISCOVER_CONFIG_URL+userUrlParam)!
-        let request = URLRequest(url: url)
-        HTTPHelper.asyncRequest(request) { (data, error) in
+        let request = HTTPHelper.buildRequest(HTTPHelper.DISCOVER_CONFIG_URL+userUrlParam, method: "GET")
+        HTTPHelper.asyncRequest(request as URLRequest) { (data, error) in
             //Process data to extract the minQueueSize config var and then set it below
             if let d = data {
                 do {
@@ -124,15 +123,10 @@ extension Matchstick {
         }
         let jsonData = try? JSONSerialization.data(withJSONObject: jsonLiteral)
         
-        let url = URL(string: HTTPHelper.DISCOVER_SESSION_URL)!
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        
-        // insert json data to the request
+        let request = HTTPHelper.buildRequest(HTTPHelper.DISCOVER_SESSION_URL, method: "POST")
         request.httpBody = jsonData
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         
-        HTTPHelper.asyncRequest(request) { (data, error) in
+        HTTPHelper.asyncRequest(request as URLRequest) { (data, error) in
             //Process data to extract the minQueueSize config var and then set it below
             var failure = true
             if let d = data {
