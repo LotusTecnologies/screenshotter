@@ -234,6 +234,11 @@ class NetworkingPromise : NSObject {
         }()
 
         return self.uploadToSyteURLRequest(imageData: imageData, orImageUrlString:orImageUrlString).then { request -> Promise<(String, [[String : Any]])> in
+            // Send firebase image URL to new upload-discover-photo endpoint in addition to below logic (which I think sends it to syte)
+            if let str = orImageUrlString, let userID = UserDefaults.standard.string(forKey: UserDefaultsKeys.userID), let deviceId = UserDefaults.standard.string(forKey: UserDefaultsKeys.deviceID) {
+                self.postDiscoverImageUpload(userID: userID, imageURL: str, deviceID: deviceId)
+            }
+            
             let maxRepeat = retry ? 2 : 0
             return self.attempt(interdelay:.seconds(2), maxRepeat: maxRepeat, body: { return self.uploadToSyteWorkHorse(request: request) },retryableError: { (error) -> (Bool) in
                 let nsError = error as NSError
@@ -944,5 +949,28 @@ extension NetworkingPromise {
                 return Promise.init(value: products);
             })
         
+    }
+    
+    /*
+     * Make API call to server to record a URL of a firebase uploaded discover image
+     */
+    func postDiscoverImageUpload(userID:String, imageURL:String, deviceID:String) {
+        print("[SSC] Making API Call to post uploaded discover image.")
+        let jsonLiteral:[String:String] = ["user_ss_uuid": userID, "image_url": imageURL, "device_uuid" :deviceID]
+        let jsonData = try? JSONSerialization.data(withJSONObject: jsonLiteral)
+        
+        // create post request
+        let url = URL(string: HTTPHelper.UPLOAD_DISCOVER_IMAGE_URL)!
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        
+        // insert json data to the request
+        request.httpBody = jsonData
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        HTTPHelper.asyncRequest(request) { (data, error) in
+            // No action needed
+            // We are just logging user events to the server
+        }
     }
 }

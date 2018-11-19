@@ -16,6 +16,7 @@ class UserDefaultsKeys  {
     static let name = "Name"
     static let avatarURL = "AvatarURL"
     static let userID = "UserID"
+    static let deviceID = "DeviceID"
     static let referralChannel = "ReferralChannel"
     static let campaign = "Campaign"
 
@@ -108,6 +109,12 @@ class UserDefaultsKeys  {
 
 extension UIApplication {
     static func migrateUserDefaultsKeys() {
+        // Generate a DeviceUUID if one is not set
+        if UserDefaults.standard.object(forKey: UserDefaultsKeys.deviceID) == nil {
+            let uuid = NSUUID().uuidString
+            UserDefaults.standard.set(uuid, forKey: UserDefaultsKeys.deviceID)
+        }
+        
         // Version 8.6 keys
         if UserDefaults.standard.object(forKey: UserDefaultsKeys.discoverMinQueueSize) == nil {
             // Default value for how low the queue can get before refresh should be 5
