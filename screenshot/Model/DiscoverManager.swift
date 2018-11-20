@@ -15,7 +15,7 @@ class DiscoverManager {
     var downloadMatchsitckQueue:AsyncOperationQueue = {
         var queue = AsyncOperationQueue()
         queue.name = "Download matchsticks Queue"
-        queue.maxConcurrentOperationCount = 8
+        queue.maxConcurrentOperationCount = 4
         return queue
     }()
     var databaseQueue:AsyncOperationQueue = {
