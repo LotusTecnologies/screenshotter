@@ -64,12 +64,8 @@ public class HTTPHelper {
                         completion(data, nil)
                     } else {
                         //if request was made ok, but server returned error (non 200)
-                        do {
-                            let responseError : NSError = NSError(domain: "HTTPHelperError", code: httpResponse.statusCode, userInfo: nil)
-                            completion(data, responseError)
-                        } catch {
-                            //json parsing error -- do something.
-                        }
+                        let responseError : NSError = NSError(domain: "HTTPHelperError", code: httpResponse.statusCode, userInfo: nil)
+                        completion(data, responseError)
                     }
                 }
             }
