@@ -65,8 +65,7 @@ public class HTTPHelper {
                     } else {
                         //if request was made ok, but server returned error (non 200)
                         do {
-                            let errorDict = try JSONSerialization.jsonObject(with: data!, options: JSONSerialization.ReadingOptions.allowFragments) as? NSDictionary
-                            let responseError : NSError = NSError(domain: "HTTPHelperError", code: httpResponse.statusCode, userInfo: errorDict as? [AnyHashable: Any] as! [String : Any])
+                            let responseError : NSError = NSError(domain: "HTTPHelperError", code: httpResponse.statusCode, userInfo: nil)
                             completion(data, responseError)
                         } catch {
                             //json parsing error -- do something.
