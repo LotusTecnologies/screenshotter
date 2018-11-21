@@ -90,11 +90,15 @@ extension UIViewController {
         navigationItem.leftBarButtonItem = inboxBarButtonItem
         UniversalSearchController.shared.inboxBarButtonItems.append(inboxBarButtonItem)
         
-        let searchBar = SearchBar()
-        searchBar.delegate = UniversalSearchController.shared
-        searchBar.placeholder = "search.placeholder".localized
-        searchBar.searchBarStyle = .minimal
-        navigationItem.titleView = searchBar
+        /*
+         * FIXME: Removing search bar by commenting out below lines. If we want to remove it permenantly we should
+         * clean up all related code rather than the below quick fix.
+         */
+        //let searchBar = SearchBar()
+        //searchBar.delegate = UniversalSearchController.shared
+        //searchBar.placeholder = "search.placeholder".localized
+        //searchBar.searchBarStyle = .minimal
+        //navigationItem.titleView = searchBar
     }
     
     @objc func presentNotificationInbox() {
