@@ -115,7 +115,16 @@ class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonit
         discoverFilterControl.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         discoverFilterControl.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         discoverFilterControl.heightAnchor.constraint(equalToConstant: DiscoverFilterControl.defaultHeight).isActive = true
-
+        
+        /*
+         * FIXME: Hiding and disabling interaction with discoverFilterControl for now while we figure out how it
+         * will work with new server side queue generation. If we want to remove it permenantly we should clean up
+         * all code here and in Discover Manager that leverages the filter rather than the below hack.
+         * out.
+         */
+        discoverFilterControl.selectAllFilter()
+        discoverFilterControl.isUserInteractionEnabled = false
+        discoverFilterControl.isHidden = true
         
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.dataSource = self
