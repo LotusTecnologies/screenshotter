@@ -578,6 +578,7 @@
 		92B4830B21A73692004C0586 /* FavoriteHeart.json in Resources */ = {isa = PBXBuildFile; fileRef = C53B15B01FDD1EF400658A78 /* FavoriteHeart.json */; };
 		92B4830C21A73692004C0586 /* ISO4217.plist in Resources */ = {isa = PBXBuildFile; fileRef = C5CAF2791FCC0EFD006F37DC /* ISO4217.plist */; };
 		92B4831021A73692004C0586 /* productAlert.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = E4F124C1205FBA670026D91B /* productAlert.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		92B4831921A7398A004C0586 /* Screenshop.plist in Resources */ = {isa = PBXBuildFile; fileRef = 92B4831821A7398A004C0586 /* Screenshop.plist */; };
 		A1BB93398D02CA6BE20E4B49 /* Pods_Screenshop.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC53E8002BDC1493B0EF237F /* Pods_Screenshop.framework */; };
 		C50131A3212406C200DB2FEB /* UIScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50131A2212406C200DB2FEB /* UIScrollView.swift */; };
 		C515A413211DAF9800482B21 /* SearchCategoriesNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C515A412211DAF9800482B21 /* SearchCategoriesNavigationController.swift */; };
@@ -887,9 +888,10 @@
 		77779D7BFEE5D04A53C2725F /* Pods-Screenshop.devrelease.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Screenshop.devrelease.xcconfig"; path = "Pods/Target Support Files/Pods-Screenshop/Pods-Screenshop.devrelease.xcconfig"; sourceTree = "<group>"; };
 		928CC03D2191444200A8BEFB /* HTTPHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPHelper.swift; sourceTree = "<group>"; };
 		92B4821F21A735BA004C0586 /* Screenshop Test.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Screenshop Test.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		92B4822021A735BA004C0586 /* Screenshop copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Screenshop copy-Info.plist"; path = "/Users/Zach/Documents/Code/XCode 4.6.2 Projects/screenshotter/Screenshop copy-Info.plist"; sourceTree = "<absolute>"; };
+		92B4822021A735BA004C0586 /* Screenshop Test.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Screenshop Test.plist"; path = "/Users/Zach/Documents/Code/XCode 4.6.2 Projects/screenshotter/Screenshop Test.plist"; sourceTree = "<absolute>"; };
 		92B4831621A73692004C0586 /* Screenshop Local Dev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Screenshop Local Dev.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		92B4831721A73693004C0586 /* Screenshop Test copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Screenshop Test copy-Info.plist"; path = "/Users/Zach/Documents/Code/XCode 4.6.2 Projects/screenshotter/Screenshop Test copy-Info.plist"; sourceTree = "<absolute>"; };
+		92B4831721A73693004C0586 /* Screenshop Local Dev.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Screenshop Local Dev.plist"; path = "/Users/Zach/Documents/Code/XCode 4.6.2 Projects/screenshotter/Screenshop Local Dev.plist"; sourceTree = "<absolute>"; };
+		92B4831821A7398A004C0586 /* Screenshop.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Screenshop.plist; sourceTree = "<group>"; };
 		C43822AEF9F923C6F6F8E840 /* Pods-Screenshop.prddebug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Screenshop.prddebug.xcconfig"; path = "Pods/Target Support Files/Pods-Screenshop/Pods-Screenshop.prddebug.xcconfig"; sourceTree = "<group>"; };
 		C50131A2212406C200DB2FEB /* UIScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIScrollView.swift; sourceTree = "<group>"; };
 		C515A412211DAF9800482B21 /* SearchCategoriesNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchCategoriesNavigationController.swift; sourceTree = "<group>"; };
@@ -1739,8 +1741,9 @@
 				BEBA23337A8F69FF9EF80643 /* Pods */,
 				EED5E55462B98A9C783AC0F5 /* Frameworks */,
 				E47D1E452084BA98001296E0 /* Recovered References */,
-				92B4822021A735BA004C0586 /* Screenshop copy-Info.plist */,
-				92B4831721A73693004C0586 /* Screenshop Test copy-Info.plist */,
+				92B4831821A7398A004C0586 /* Screenshop.plist */,
+				92B4822021A735BA004C0586 /* Screenshop Test.plist */,
+				92B4831721A73693004C0586 /* Screenshop Local Dev.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -2044,6 +2047,7 @@
 				E4DB2B7C1F7E1D4600320BE5 /* LaunchScreen.storyboard in Resources */,
 				C53B15BA1FDD638C00658A78 /* Localizable.strings in Resources */,
 				C572FF00205C00070046BFEB /* Hind-Regular.ttf in Resources */,
+				92B4831921A7398A004C0586 /* Screenshop.plist in Resources */,
 				C572FF02205C00070046BFEB /* Hind-Medium.ttf in Resources */,
 				C572FEFE205C00070046BFEB /* Hind-Light.ttf in Resources */,
 				31183F0B217C566900918623 /* DiscoverTags.json in Resources */,
@@ -3074,7 +3078,7 @@
 				CURRENT_PROJECT_VERSION = 213;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/dev/;
-				INFOPLIST_FILE = "Screenshop copy-Info.plist";
+				INFOPLIST_FILE = "Screenshop Test.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" -Xfrontend -warn-long-function-bodies=200";
 				PRODUCT_BUNDLE_IDENTIFIER = io.crazeapp.screenshot;
@@ -3105,7 +3109,7 @@
 				CURRENT_PROJECT_VERSION = 213;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/dev/;
-				INFOPLIST_FILE = "Screenshop copy-Info.plist";
+				INFOPLIST_FILE = "Screenshop Test.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" -Xfrontend -warn-long-function-bodies=200";
 				PRODUCT_BUNDLE_IDENTIFIER = io.crazeapp.screenshot;
@@ -3137,7 +3141,7 @@
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/dev/;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				INFOPLIST_FILE = "Screenshop copy-Info.plist";
+				INFOPLIST_FILE = "Screenshop Test.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" -Xfrontend -warn-long-function-bodies=200";
 				PRODUCT_BUNDLE_IDENTIFIER = io.crazeapp.screenshot;
@@ -3166,7 +3170,7 @@
 				CURRENT_PROJECT_VERSION = 213;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/prd/;
-				INFOPLIST_FILE = "Screenshop copy-Info.plist";
+				INFOPLIST_FILE = "Screenshop Test.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" -Xfrontend -warn-long-function-bodies=200";
 				PRODUCT_BUNDLE_IDENTIFIER = io.crazeapp.screenshot;
@@ -3196,7 +3200,7 @@
 				CURRENT_PROJECT_VERSION = 213;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/dev/;
-				INFOPLIST_FILE = "Screenshop Test copy-Info.plist";
+				INFOPLIST_FILE = "Screenshop Local Dev.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" -Xfrontend -warn-long-function-bodies=200";
 				PRODUCT_BUNDLE_IDENTIFIER = io.crazeapp.screenshot;
@@ -3227,7 +3231,7 @@
 				CURRENT_PROJECT_VERSION = 213;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/dev/;
-				INFOPLIST_FILE = "Screenshop Test copy-Info.plist";
+				INFOPLIST_FILE = "Screenshop Local Dev.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" -Xfrontend -warn-long-function-bodies=200";
 				PRODUCT_BUNDLE_IDENTIFIER = io.crazeapp.screenshot;
@@ -3259,7 +3263,7 @@
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/dev/;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				INFOPLIST_FILE = "Screenshop Test copy-Info.plist";
+				INFOPLIST_FILE = "Screenshop Local Dev.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" -Xfrontend -warn-long-function-bodies=200";
 				PRODUCT_BUNDLE_IDENTIFIER = io.crazeapp.screenshot;
@@ -3288,7 +3292,7 @@
 				CURRENT_PROJECT_VERSION = 213;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/prd/;
-				INFOPLIST_FILE = "Screenshop Test copy-Info.plist";
+				INFOPLIST_FILE = "Screenshop Local Dev.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" -Xfrontend -warn-long-function-bodies=200";
 				PRODUCT_BUNDLE_IDENTIFIER = io.crazeapp.screenshot;
@@ -3429,7 +3433,7 @@
 				CURRENT_PROJECT_VERSION = 213;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/dev/;
-				INFOPLIST_FILE = screenshot/dev/Info.plist;
+				INFOPLIST_FILE = Screenshop.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" -Xfrontend -warn-long-function-bodies=200";
 				PRODUCT_BUNDLE_IDENTIFIER = io.crazeapp.screenshot;
@@ -3461,7 +3465,7 @@
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/dev/;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				INFOPLIST_FILE = screenshot/dev/Info.plist;
+				INFOPLIST_FILE = Screenshop.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" -Xfrontend -warn-long-function-bodies=200";
 				PRODUCT_BUNDLE_IDENTIFIER = io.crazeapp.screenshot;
@@ -3548,7 +3552,7 @@
 				CURRENT_PROJECT_VERSION = 213;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/dev/;
-				INFOPLIST_FILE = screenshot/dev/Info.plist;
+				INFOPLIST_FILE = Screenshop.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" -Xfrontend -warn-long-function-bodies=200";
 				PRODUCT_BUNDLE_IDENTIFIER = io.crazeapp.screenshot;
@@ -3632,7 +3636,7 @@
 				CURRENT_PROJECT_VERSION = 213;
 				DEVELOPMENT_TEAM = ZWQ99C9M3P;
 				ENVIRONMENT_FOLDER = screenshot/prd/;
-				INFOPLIST_FILE = screenshot/prd/Info.plist;
+				INFOPLIST_FILE = Screenshop.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" -Xfrontend -warn-long-function-bodies=200";
 				PRODUCT_BUNDLE_IDENTIFIER = io.crazeapp.screenshot;
