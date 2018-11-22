@@ -1001,8 +1001,6 @@
 		E4104DBF20DC540200683FE9 /* LocalNotificationModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocalNotificationModel.swift; sourceTree = "<group>"; };
 		E4139D401F09083B00E8A53B /* Screenshop.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Screenshop.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4139D4F1F09083B00E8A53B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		E41BB9321F61BDD200A74F04 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		E41BB9341F61BDD900A74F04 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E41BB9361F652EA000A74F04 /* Model 3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 3.xcdatamodel"; sourceTree = "<group>"; };
 		E41D98791FE26114006EB79E /* Model 6.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 6.xcdatamodel"; sourceTree = "<group>"; };
 		E42AC3901F5FD6B70035A07C /* ScreenshotActivityItemProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenshotActivityItemProvider.swift; sourceTree = "<group>"; };
@@ -1793,7 +1791,6 @@
 			isa = PBXGroup;
 			children = (
 				311A4F5220D90AED0001D463 /* GoogleService-Info.plist */,
-				E41BB9321F61BDD200A74F04 /* Info.plist */,
 				E4D6D8A61F61B047009DD999 /* Screenshop.entitlements */,
 			);
 			path = dev;
@@ -1803,7 +1800,6 @@
 			isa = PBXGroup;
 			children = (
 				E45C7AFE20E0235600A8B4A9 /* GoogleService-Info.plist */,
-				E41BB9341F61BDD900A74F04 /* Info.plist */,
 				E4D6D8A51F61AF3A009DD999 /* Screenshop.entitlements */,
 			);
 			path = prd;
@@ -1980,8 +1976,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				E4139D3F1F09083B00E8A53B /* Screenshop */,
 				E4F124C0205FBA670026D91B /* productAlert */,
+				E4139D3F1F09083B00E8A53B /* Screenshop */,
 				92B4812A21A735BA004C0586 /* Screenshop Test */,
 				92B4822121A73692004C0586 /* Screenshop Local Dev */,
 			);

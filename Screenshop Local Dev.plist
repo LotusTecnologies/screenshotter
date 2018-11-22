@@ -85,6 +85,11 @@
 	<string>This allows you to invite friends from your address book.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>We scan your screenshots to match for similar products.</string>
+	<key>Server Config</key>
+	<dict>
+		<key>Domain</key>
+		<string>http://localhost:5000</string>
+	</dict>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Hind-Bold.ttf</string>

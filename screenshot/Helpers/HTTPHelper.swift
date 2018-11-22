@@ -14,13 +14,17 @@ public enum HTTPRequestContentType {
 }
 
 public class HTTPHelper {
-    static let FILL_DISCOVER_URL = "https://2xsab50nui.execute-api.us-east-1.amazonaws.com/dev_api/fill-discover-queue"
-    static let ADD_USER_ACTION_URL = "https://2xsab50nui.execute-api.us-east-1.amazonaws.com/dev_api/add-user-action"
-    static let DISCOVER_CONFIG_URL = "https://2xsab50nui.execute-api.us-east-1.amazonaws.com/dev_api/get-discover-config"
-    static let DISCOVER_SESSION_URL = "https://2xsab50nui.execute-api.us-east-1.amazonaws.com/dev_api/start-discover-session"
-    static let UPLOAD_DISCOVER_IMAGE_URL = "https://2xsab50nui.execute-api.us-east-1.amazonaws.com/dev_api/upload-discover-photo"
+    static var serverConfig: NSDictionary! {
+        return (Bundle.main.object(forInfoDictionaryKey: "Server Config") as? NSDictionary) ?? NSDictionary()
+    }
+    static let API_KEY:String? = serverConfig.value(forKey: "API Key") as? String
+    static let DOMAIN = serverConfig.value(forKey: "Domain") as? String ?? ""
     
-    static let API_KEY = "Q4ueHFYAuOaEm0512B2lW5HhclvKEe6T9zsFqVrm"
+    static let FILL_DISCOVER_URL = DOMAIN+"/fill-discover-queue"
+    static let ADD_USER_ACTION_URL = DOMAIN+"/add-user-action"
+    static let DISCOVER_CONFIG_URL = DOMAIN+"/get-discover-config"
+    static let DISCOVER_SESSION_URL = DOMAIN+"/start-discover-session"
+    static let UPLOAD_DISCOVER_IMAGE_URL = DOMAIN+"/upload-discover-photo"
     
     public class func buildRequest(_ path: String!, method: String, requestContentType: HTTPRequestContentType = HTTPRequestContentType.httpJsonContent, requestBoundary:String = "") -> NSMutableURLRequest {
         // 1. Create the request URL from path
@@ -40,7 +44,9 @@ public class HTTPHelper {
         }
         
         // 3. Set the correct Authorization header.
-        request.addValue(API_KEY, forHTTPHeaderField: "x-api-key")
+        if let key = API_KEY {
+            request.addValue(key, forHTTPHeaderField: "x-api-key")
+        }
         
         return request
     }

@@ -85,6 +85,13 @@
 	<string>This allows you to invite friends from your address book.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>We scan your screenshots to match for similar products.</string>
+	<key>Server Config</key>
+	<dict>
+		<key>API Key</key>
+		<string>7i0MuNMv1u0CIlYPquyL2zNUD24PyJ8gfdupt3N8eDBgr4r5Sarwnuaj37fDA0F2</string>
+		<key>Domain</key>
+		<string>https://2xsab50nui.execute-api.us-east-1.amazonaws.com/dev_api</string>
+	</dict>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Hind-Bold.ttf</string>
