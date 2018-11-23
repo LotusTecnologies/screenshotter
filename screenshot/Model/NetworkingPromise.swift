@@ -234,10 +234,6 @@ class NetworkingPromise : NSObject {
         }()
 
         return self.uploadToSyteURLRequest(imageData: imageData, orImageUrlString:orImageUrlString).then { request -> Promise<(String, [[String : Any]])> in
-            // Send firebase image URL to new upload-discover-photo endpoint in addition to below logic (which I think sends it to syte)
-            if let str = orImageUrlString, let userID = UserDefaults.standard.string(forKey: UserDefaultsKeys.userID), let deviceId = UserDefaults.standard.string(forKey: UserDefaultsKeys.deviceID) {
-                self.postDiscoverImageUpload(userID: userID, imageURL: str, deviceID: deviceId)
-            }
             
             let maxRepeat = retry ? 2 : 0
             return self.attempt(interdelay:.seconds(2), maxRepeat: maxRepeat, body: { return self.uploadToSyteWorkHorse(request: request) },retryableError: { (error) -> (Bool) in
