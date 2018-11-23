@@ -55,7 +55,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>218</string>
+	<string>219</string>
 	<key>FacebookAppID</key>
 	<string>1960379067541863</string>
 	<key>FacebookDisplayName</key>
@@ -88,7 +88,7 @@
 	<key>Server Config</key>
 	<dict>
 		<key>API Key</key>
-		<string>7i0MuNMv1u0CIlYPquyL2zNUD24PyJ8gfdupt3N8eDBgr4r5Sarwnuaj37fDA0F2</string>
+		<string>Q4ueHFYAuOaEm0512B2lW5HhclvKEe6T9zsFqVrm</string>
 		<key>Domain</key>
 		<string>https://2xsab50nui.execute-api.us-east-1.amazonaws.com/dev_api</string>
 	</dict>
