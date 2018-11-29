@@ -230,7 +230,7 @@ class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonit
         super.viewDidAppear(animated)
         discoverFilterControl.scrollToSelected()
         
-        let campaignKey = UUID.init().uuidString + UserDefaultsKeys.CampaignCompleted.campaign_2018_12_01.rawValue
+        let campaignKey = UserDefaultsKeys.CampaignCompleted.campaign_2018_12_01.rawValue
         
         if UserDefaults.standard.string(forKey: UserDefaultsKeys.lastCampaignCompleted) != campaignKey {
             UserDefaults.standard.set(campaignKey, forKey: UserDefaultsKeys.lastCampaignCompleted)
@@ -240,7 +240,7 @@ class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonit
             present(campaign, animated: true, completion: nil)
             DataModel.sharedInstance.performBackgroundTask { (context) in
                 let now = Date()
-                let expireDate = Date.init(timeIntervalSince1970: 1538629199)
+                let expireDate = Date.init(timeIntervalSince1970: 1548979200) // feb 1, 2019
                 InboxMessage.createUpdateWith(lookupDict: nil, actionType: InboxMessage.ActionType.link.rawValue, actionValue: "https://www.instagram.com/screenshopit/", buttonText: "Learn More", image:"https://s3.amazonaws.com/search-bar/daily-discover-notification-image%403x.png", title: "Introducing our Daily Discover Contest! Follow us on Instagram and swipe on Discover for full rules and regulations!", uuid: campaignKey, expireDate: expireDate, date: now, showAfterDate: now, tracking: nil, create: true, update: false, context: context)
                 context.saveIfNeeded()
             }
