@@ -20,13 +20,13 @@ class CampaignPromotionViewController: UIViewController {
         To re-use this viewController change the CampaignDescription
      */
     let campaign = CampaignDescription.init(
-            headline: "2018_09_20_campaign.headline".localized,
-            byline: "2018_09_20_campaign.message".localized,
-            buttonText: "2018_09_20_campaign.button".localized,
-            videoName: "campaign_video_2018_09_20",
-            thumbName: "campaign_thumb_2018_09_20",
-            videoRatio: 1280.0 / 720.0)
-    
+            headline: "Visit our Instagram to learn how to participate!",
+            byline: "",
+            buttonText: "Follow Us",
+            videoName: "campaign_video_2018_12_01",
+            thumbName: "campaign_thumb_2018_12_01",
+            videoRatio: 1080.0 / 608.0)
+
     var showsReplayButtonUponFinishing: Bool = true
     var willPresentInModal:Bool = false
     private(set) var playPauseButton = UIButton()
@@ -99,7 +99,7 @@ class CampaignPromotionViewController: UIViewController {
         skipButton.addTarget(self, action: #selector(tappedSecondaryButton), for: .touchUpInside)
         skipButton.contentEdgeInsets = UIEdgeInsets(top: 10, left: 30, bottom: 10, right: 30)
         container.addSubview(skipButton)
-        skipButton.setTitle("2018_09_20_campaign.skip".localized, for: .normal)
+        skipButton.setTitle("skip", for: .normal)
         skipButton.setTitleColor(.gray3, for: .normal)
         skipButton.setTitleColor(.gray5, for: .highlighted)
         skipButton.centerXAnchor.constraint(equalTo: container.centerXAnchor).isActive = true
@@ -234,7 +234,7 @@ class CampaignPromotionViewController: UIViewController {
             }
         }
         Analytics.trackOnboardingCampaignVideoShopAtBoohoo(campaign: .campaign20180920)
-        let affiliateLink = "http://www.tkqlhce.com/click-8539891-12810244"
+        let affiliateLink = "https://www.instagram.com/screenshopit/"
         if let url = URL.init(string:affiliateLink) {
             if UIApplication.shared.canOpenURL(url) {
                 UIApplication.shared.open(url, options: [:]) { (sucess) in
@@ -253,7 +253,7 @@ class CampaignPromotionViewController: UIViewController {
     
     @objc func tappedVideo(){
         if self.player == nil {
-            let playerItem = AVPlayerItem(url: Bundle.main.url(forResource: self.campaign.videoName, withExtension: "mp4")!)
+            let playerItem = AVPlayerItem(url: Bundle.main.url(forResource: self.campaign.videoName, withExtension: "mov")!)
             let player = AVPlayer(playerItem: playerItem)
             player.allowsExternalPlayback = false
             do {

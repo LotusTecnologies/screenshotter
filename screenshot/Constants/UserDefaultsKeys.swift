@@ -50,6 +50,8 @@ class UserDefaultsKeys  {
     enum CampaignCompleted : String {
         case campaign_2018_04_20 // A kim video to encourage users to submit to discover
         case campaign_2018_09_20 // A boohoo.com campain with $50,000 give away
+        case campaign_2018_12_01 // A Daily discover constent to ecourage users to submit to discover
+
     }
 
     
