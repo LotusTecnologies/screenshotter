@@ -82,6 +82,7 @@
 		3125446C2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		3125446D2091C3A0009410D5 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		3125448F209871B4009410D5 /* Analytics+api.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3125448E209871B4009410D5 /* Analytics+api.swift */; };
+		312C2C5121B5B776005E463A /* campaign_video_2018_12_01.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 312C2C5021B5B776005E463A /* campaign_video_2018_12_01.mp4 */; };
 		31357EE220F6636D00515116 /* UIColor+craze.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31357EE120F6636D00515116 /* UIColor+craze.swift */; };
 		31377FA22122EA5B0052D6EE /* ScreenshotSimilarLooksViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31377FA12122EA5B0052D6EE /* ScreenshotSimilarLooksViewController.swift */; };
 		31377FA42123F3400052D6EE /* ScreenshotSimilarLooksCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31377FA32123F3400052D6EE /* ScreenshotSimilarLooksCollectionViewCell.swift */; };
@@ -838,6 +839,7 @@
 		31215906212553BB00130E31 /* DiscoverFilterCategories.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = DiscoverFilterCategories.json; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.javascript; };
 		31254460209079C7009410D5 /* screenshot-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "screenshot-Bridging-Header.h"; sourceTree = "<group>"; };
 		3125448E209871B4009410D5 /* Analytics+api.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Analytics+api.swift"; sourceTree = "<group>"; };
+		312C2C5021B5B776005E463A /* campaign_video_2018_12_01.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = campaign_video_2018_12_01.mp4; sourceTree = "<group>"; };
 		31357EE120F6636D00515116 /* UIColor+craze.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+craze.swift"; sourceTree = "<group>"; };
 		31377F9F2122C6FE0052D6EE /* Model 26.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Model 26.xcdatamodel"; sourceTree = "<group>"; };
 		31377FA12122EA5B0052D6EE /* ScreenshotSimilarLooksViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotSimilarLooksViewController.swift; sourceTree = "<group>"; };
@@ -1390,6 +1392,7 @@
 				C50EE26D1FC406F1002B4259 /* Fonts */,
 				C5CAF2791FCC0EFD006F37DC /* ISO4217.plist */,
 				31215906212553BB00130E31 /* DiscoverFilterCategories.json */,
+				312C2C5021B5B776005E463A /* campaign_video_2018_12_01.mp4 */,
 				31183F0A217C566900918623 /* DiscoverTags.json */,
 				C53B15BC1FDD638C00658A78 /* Localizable.strings */,
 			);
@@ -2042,6 +2045,7 @@
 				E464F8DC211B25E1009B51AB /* Screenshop.entitlements in Resources */,
 				E4DB2B7C1F7E1D4600320BE5 /* LaunchScreen.storyboard in Resources */,
 				C53B15BA1FDD638C00658A78 /* Localizable.strings in Resources */,
+				312C2C5121B5B776005E463A /* campaign_video_2018_12_01.mp4 in Resources */,
 				C572FF00205C00070046BFEB /* Hind-Regular.ttf in Resources */,
 				92B4831921A7398A004C0586 /* Screenshop.plist in Resources */,
 				C572FF02205C00070046BFEB /* Hind-Medium.ttf in Resources */,
