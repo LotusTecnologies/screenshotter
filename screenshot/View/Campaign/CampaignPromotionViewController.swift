@@ -253,7 +253,7 @@ class CampaignPromotionViewController: UIViewController {
     
     @objc func tappedVideo(){
         if self.player == nil {
-            let playerItem = AVPlayerItem(url: Bundle.main.url(forResource: self.campaign.videoName, withExtension: "mov")!)
+            let playerItem = AVPlayerItem(url: Bundle.main.url(forResource: self.campaign.videoName, withExtension: "mp4")!)
             let player = AVPlayer(playerItem: playerItem)
             player.allowsExternalPlayback = false
             do {
@@ -264,7 +264,8 @@ class CampaignPromotionViewController: UIViewController {
             player.actionAtItemEnd = .pause
             self.player = player
             let layer = AVPlayerLayer(player: player)
-            layer.videoGravity = .resizeAspectFill
+            layer.videoGravity = .resizeAspect
+            layer.backgroundColor = UIColor.white.cgColor
             if  let imageView = self.imageView {
                 layer.frame = imageView.bounds
                 imageView.layer.addSublayer(layer)
