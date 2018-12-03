@@ -153,10 +153,9 @@ class DiscoverManager {
     
     func logUserSwipe(_ item:Matchstick, actionType:String) {
         if let userID:String = UserDefaults.standard.string(forKey: UserDefaultsKeys.userID) {
-            let servingAlgorithmID:String? = UserDefaults.standard.string(forKey: UserDefaultsKeys.discoverAlgoUUID)
             let discoverSessionID:String? = UserDefaults.standard.string(forKey: UserDefaultsKeys.userSessionNumber)
             let discoverPictureID:String? = item.remoteId
-            postUserActionToServer(userID: userID, discoverPictureID: discoverPictureID, actionType: actionType, servingAlgorithmID: servingAlgorithmID, discoverSessionID: discoverSessionID)
+            postUserActionToServer(userID: userID, discoverPictureID: discoverPictureID, actionType: actionType, discoverSessionID: discoverSessionID)
         } else {
             print("[SSC] ERROR, userID is null can't make call to swipe endpoint.")
         }
@@ -255,7 +254,7 @@ class DiscoverManager {
             
             if queueItemsNeeded {
                 let userID:String! = UserDefaults.standard.string(forKey: UserDefaultsKeys.userID) ?? ""
-                getProductIdsFromServer(userID: userID, algoID: UserDefaults.standard.string(forKey: UserDefaultsKeys.discoverAlgoUUID), sessionID: UserDefaults.standard.string(forKey: UserDefaultsKeys.userSessionNumber),  context: context)
+                getProductIdsFromServer(userID: userID, sessionID: UserDefaults.standard.string(forKey: UserDefaultsKeys.userSessionNumber),  context: context)
             }
         }
     }
@@ -353,7 +352,7 @@ class DiscoverManager {
     /*
      * Make API call to server with user Id to get product recommendations for display in discover feed.
      */
-    func getProductIdsFromServer(userID:String, algoID:String?, sessionID:String?, context: NSManagedObjectContext) {
+    func getProductIdsFromServer(userID:String, sessionID:String?, context: NSManagedObjectContext) {
         // 'processing' Bool is used to "lock" thread and prevent multiple calls race condition
         if processing || failureStop {
             return
@@ -362,9 +361,6 @@ class DiscoverManager {
         
         print("[SSC] Making API Call to populate more items.")
         var jsonLiteral:[String:String] = ["user_ss_uuid": userID]
-        if let algoUuid = algoID {
-            jsonLiteral["discover_algorithm_ss_uuid"] = algoUuid
-        }
         if let sessionID = sessionID {
             jsonLiteral["discover_session_ss_uuid"] = sessionID
         }
@@ -411,12 +407,9 @@ class DiscoverManager {
     /*
      * Make API call to server to record a user has swipped y/n on a discover card
      */
-    func postUserActionToServer(userID:String, discoverPictureID:String?, actionType:String, servingAlgorithmID:String?, discoverSessionID:String?) {
+    func postUserActionToServer(userID:String, discoverPictureID:String?, actionType:String, discoverSessionID:String?) {
         print("[SSC] Making API Call to post user swipe action.")
         var jsonLiteral:[String:Any] = ["user_ss_uuid": userID, "action_type": actionType]
-        if let algoUuid = servingAlgorithmID {
-            jsonLiteral["serving_algorithm_ss_uuid"] = algoUuid
-        }
         if let dpID = discoverPictureID {
             jsonLiteral["discover_picture_ss_uuid"] = dpID
         }

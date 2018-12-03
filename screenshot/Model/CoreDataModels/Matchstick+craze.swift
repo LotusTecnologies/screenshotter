@@ -100,10 +100,6 @@ extension Matchstick {
                             UserDefaults.standard.set(n, forKey: UserDefaultsKeys.discoverMinQueueSize)
                             print("[SSC] New minQueueSize = \(n)")
                         }
-                        if let aldoUuid:String = (r["discover_algorithm_ss_uuid"] as! String?) {
-                            UserDefaults.standard.set(aldoUuid, forKey: UserDefaultsKeys.discoverAlgoUUID)
-                            print("[SSC] New algorithmUUID = \(aldoUuid)")
-                        }
                     }
                 } catch {
                     // report error
