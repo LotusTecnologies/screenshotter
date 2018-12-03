@@ -230,7 +230,7 @@ extension MessageInboxViewController : UICollectionViewDelegate, UICollectionVie
                     // actionValue is unused
                     let vc = CampaignPromotionViewController.init(modal: false)
                     vc.navigationItem.backBarButtonItem = UIBarButtonItem.init(title: "generic.back".localized, style: .plain, target: nil, action: nil)
-                    vc.navigationItem.title = "Boohoo";
+                    vc.navigationItem.title = "Daily Discover";
                     self.navigationController?.pushViewController(vc, animated: true)
                     message.markAsRead()
                 }
