@@ -74,6 +74,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UIApplication.migrateUserDefaultsKeys()
         UIApplication.appearanceSetup()
         UserFeedback.shared.applicationDidFinishLaunching() // only setups notificationCenter observing. does nothing now
+        
+        Matchstick.refreshMinQueueSize()
+        Matchstick.getDiscoverSessionID()
         return true
     }
     
@@ -253,6 +256,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         PermissionsManager.shared.fetchPushPermissionStatus()
         Analytics.trackSessionStarted()
         AssetSyncModel.sharedInstance.scanPhotoGalleryForFashion()
+        Matchstick.refreshMinQueueSize()
+        Matchstick.getDiscoverSessionID()
     }
     
     func applicationDidBecomeActive(_ application: UIApplication) {

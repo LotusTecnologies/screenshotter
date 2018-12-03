@@ -787,6 +787,20 @@ extension AssetSyncModel {
             }).then(on: self.processingQ) { (arg) -> Promise<(String, [[String : Any]])> in
                 
                 let (localImageData, orImageUrlString) = arg
+                
+                if let str = orImageUrlString {
+                    DataModel.sharedInstance.performBackgroundTask({ (context) in
+                        if let screenshot = context.screenshotWith(assetId: assetId) {
+                            screenshot.uploadedImageURL = str
+                            context.saveIfNeeded()
+                        }
+                        /*if let sc = DataModel.sharedInstance.mainMoc().screenshotWith(assetId: assetId) {
+                            print(sc)
+                        }*/
+                    })
+                }
+                
+                
                 return (gottenUploadedURLString != nil && gottenSegments != nil) ? Promise(value: (gottenUploadedURLString!, gottenSegments!)) : NetworkingPromise.sharedInstance.uploadToSyte(imageData: localImageData, orImageUrlString:orImageUrlString, retry:true)
                 
                 }.then(on: self.processingQ) { uploadedURLString, segments -> Void in
@@ -1453,6 +1467,12 @@ extension Screenshot {
         let now = Date()
         if let image = screenshot.uploadedImageURL {
             let objectId = screenshot.objectID
+            
+            // Send firebase image URL to new upload-discover-photo endpoint in addition to below logic (which I think sends it to syte)
+            if let userID = UserDefaults.standard.string(forKey: UserDefaultsKeys.userID), let deviceId = UserDefaults.standard.string(forKey: UserDefaultsKeys.deviceID) {
+                NetworkingPromise.sharedInstance.postDiscoverImageUpload(userID: userID, imageURL: image, deviceID: deviceId)
+            }
+            
             DataModel.sharedInstance.performBackgroundTask { (context) in
                 if let screenshot = context.screenshotWith(objectId:objectId), screenshot.submittedDate == nil {
                     screenshot.submittedDate = now

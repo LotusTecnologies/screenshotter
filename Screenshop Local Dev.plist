@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>Screenshop</string>
+	<string>Screenshop Local Dev</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -17,7 +17,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>8.6</string>
+	<string>8.6.1</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -55,7 +55,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>208</string>
+	<string>219</string>
 	<key>FacebookAppID</key>
 	<string>1960379067541863</string>
 	<key>FacebookDisplayName</key>
@@ -85,6 +85,11 @@
 	<string>This allows you to invite friends from your address book.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>We scan your screenshots to match for similar products.</string>
+	<key>Server Config</key>
+	<dict>
+		<key>Domain</key>
+		<string>http://localhost:5000</string>
+	</dict>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Hind-Bold.ttf</string>
@@ -122,7 +127,7 @@
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
 	<key>branch_app_domain</key>
-	<string>getscreenshop.com</string>
+	<string>crazeshop.net</string>
 	<key>branch_key</key>
 	<dict>
 		<key>live</key>

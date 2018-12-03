@@ -33,8 +33,12 @@ extension Matchstick {
 
     static var skipRotationTime = TimeInterval.oneWeek
     static var displayingSize = 2
-    static var queueSize = 25  //Must have at least this ammount  - if not grab random numbers
-
+    
+    //Must have at least this amount in "Queue" ready to display on UI.
+    public class var minQueueSize:Int {
+        return UserDefaults.standard.integer(forKey: UserDefaultsKeys.discoverMinQueueSize)
+    }
+    
     var isInGarbage:Bool {
         if self.wasAdded || self.was404 {
             return true
@@ -76,5 +80,72 @@ extension Matchstick {
             return matchstick
         }
         return nil
+    }
+    
+    // NOTE: This will get called every time the app enters the forground
+    public class func refreshMinQueueSize() {
+        print("[SSC] Making API call to get minQueueSize config.")
+        var userUrlParam = ""
+        if let userID = UserDefaults.standard.string(forKey: UserDefaultsKeys.userID) {
+            userUrlParam = "?user_id=\(userID)"
+        }
+        let request = HTTPHelper.buildRequest(HTTPHelper.DISCOVER_CONFIG_URL+userUrlParam, method: "GET")
+        HTTPHelper.asyncRequest(request as URLRequest) { (data, error) in
+            //Process data to extract the minQueueSize config var and then set it below
+            if let d = data {
+                do {
+                    let responseJSON = try JSONSerialization.jsonObject(with: d, options: JSONSerialization.ReadingOptions.allowFragments) as? [String:Any]
+                    if let r = responseJSON {
+                        if let n = (r["min_n_in_queue"] as! Int?) {
+                            UserDefaults.standard.set(n, forKey: UserDefaultsKeys.discoverMinQueueSize)
+                            print("[SSC] New minQueueSize = \(n)")
+                        }
+                        if let aldoUuid:String = (r["discover_algorithm_ss_uuid"] as! String?) {
+                            UserDefaults.standard.set(aldoUuid, forKey: UserDefaultsKeys.discoverAlgoUUID)
+                            print("[SSC] New algorithmUUID = \(aldoUuid)")
+                        }
+                    }
+                } catch {
+                    // report error
+                }
+            }
+        }
+    }
+    
+    public class func getDiscoverSessionID() {
+        print("[SSC] Making API call to start new discover session.")
+        var jsonLiteral = [String:Any]()
+        if let userID = UserDefaults.standard.string(forKey: UserDefaultsKeys.userID) {
+            jsonLiteral["user_ss_uuid"] = userID
+        }
+        if let algoUuid = UserDefaults.standard.string(forKey: UserDefaultsKeys.discoverAlgoUUID) {
+            jsonLiteral["discover_algorithm_ss_uuid"] = algoUuid
+        }
+        let jsonData = try? JSONSerialization.data(withJSONObject: jsonLiteral)
+        
+        let request = HTTPHelper.buildRequest(HTTPHelper.DISCOVER_SESSION_URL, method: "POST")
+        request.httpBody = jsonData
+        
+        HTTPHelper.asyncRequest(request as URLRequest) { (data, error) in
+            //Process data to extract the minQueueSize config var and then set it below
+            var failure = true
+            if let d = data {
+                do {
+                    let responseJSON = try JSONSerialization.jsonObject(with: d, options: JSONSerialization.ReadingOptions.allowFragments) as? [String:Any]
+                    if let r = responseJSON {
+                        if let str = (r["ss_uuid"] as! String?) {
+                            UserDefaults.standard.set(str, forKey: UserDefaultsKeys.userSessionNumber)
+                            print("[SSC] New discover session = \(str)")
+                        }
+                        failure = false
+                    }
+                } catch {
+                    // report error
+                }
+            }
+            if failure {
+                UserDefaults.standard.set(nil, forKey: UserDefaultsKeys.userSessionNumber)
+            }
+        }
     }
 }

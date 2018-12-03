@@ -24,8 +24,15 @@ class DiscoverManager {
         queue.maxConcurrentOperationCount = 1
         return queue
     }()
+    var apiCallQueue:AsyncOperationQueue = {
+        var queue = AsyncOperationQueue()
+        queue.name = "DiscoverManager apiCallQueue"
+        queue.maxConcurrentOperationCount = 1
+        return queue
+    }()
    
-
+    var processing:Bool = false
+    var failureStop:Bool = false
     var tags:[String:SortedArray<String>]?
     var undisplayable:Set<String>?
     var gender:String = {
@@ -58,9 +65,11 @@ class DiscoverManager {
     }
 
     func createFilterChangingMonitor(delegate:AsyncOperationMonitorDelegate) -> AsyncOperationMonitor {
-        return AsyncOperationMonitor.init(tags: [AsyncOperationTag.init(type: .filterChange, value: "DiscoverManager")], queues: [self.databaseQueue, self.downloadMatchsitckQueue], delegate: delegate)
+        return AsyncOperationMonitor.init(tags: [AsyncOperationTag.init(type: .filterChange, value: "DiscoverManager")], queues: [self.databaseQueue], delegate: delegate)
     }
     func didAdd(_ item:Matchstick, callback: ((_ screenshot: Screenshot) -> Void)? = nil ){
+        logUserSwipe(item, actionType: "swipe_right")
+        
         let managedObjectID = item.objectID
 
         self.performBackgroundTask { (context) in
@@ -107,6 +116,8 @@ class DiscoverManager {
         }
     }
     func didDelayedAdd(_ item:Matchstick) {
+        logUserSwipe(item, actionType: "tap_to_shop")
+        
         let managedObjectID = item.objectID
         
         self.performBackgroundTask { (context) in
@@ -121,6 +132,7 @@ class DiscoverManager {
     }
 
     func didSkip(_ item:Matchstick) {
+        logUserSwipe(item, actionType: "swipe_left")
         
         let managedObjectID = item.objectID
         
@@ -136,6 +148,17 @@ class DiscoverManager {
                 
                 context.saveIfNeeded()
             }
+        }
+    }
+    
+    func logUserSwipe(_ item:Matchstick, actionType:String) {
+        if let userID:String = UserDefaults.standard.string(forKey: UserDefaultsKeys.userID) {
+            let servingAlgorithmID:String? = UserDefaults.standard.string(forKey: UserDefaultsKeys.discoverAlgoUUID)
+            let discoverSessionID:String? = UserDefaults.standard.string(forKey: UserDefaultsKeys.userSessionNumber)
+            let discoverPictureID:String? = item.remoteId
+            postUserActionToServer(userID: userID, discoverPictureID: discoverPictureID, actionType: actionType, servingAlgorithmID: servingAlgorithmID, discoverSessionID: discoverSessionID)
+        } else {
+            print("[SSC] ERROR, userID is null can't make call to swipe endpoint.")
         }
     }
     
@@ -188,11 +211,13 @@ class DiscoverManager {
         let queuedFetchRequestPredicate = Matchstick.predicateForQueuedMatchstick(gender: self.gender, category: self.discoverCategoryFilter)
         queuedFetchRequest.predicate = queuedFetchRequestPredicate
         queuedFetchRequest.sortDescriptors = [NSSortDescriptor.init(key: "recombeeRecommended", ascending: false)]
-        queuedFetchRequest.fetchLimit = Matchstick.queueSize + Matchstick.displayingSize
+        
+        // Queue size limit must be set, currently API is returning 100 items so using 200 to be safe
+        queuedFetchRequest.fetchLimit = 200
         
         if let displaying = try? context.fetch(displayingFetchRequest), let queued = try? context.fetch(queuedFetchRequest) {
            
-            
+            // Move items from "Queue" (data ready for display) to "Display" (cards rendered by UI)
             let displayingMatchStickNeeded = (Matchstick.displayingSize - displaying.count)
             var itemsAdded = 0
             let downloaded = queued.filter{ $0.imageData != nil }
@@ -205,8 +230,8 @@ class DiscoverManager {
                         item.receivedAt = Date()
                         itemsAdded += 1
                     }else{
-                        if let imageUrl = item.imageUrl, downloadingAndDownloaded < Matchstick.displayingSize  {
-                            self.downloadIfNeeded(imageURL: imageUrl, priority: .high)
+                        if let imageUrl = item.imageUrl  {
+                            self.downloadIfNeeded(imageURL: imageUrl, priority: (downloadingAndDownloaded < Matchstick.displayingSize) ? .high : .low)
                         }
                     }
                 }else{
@@ -222,87 +247,15 @@ class DiscoverManager {
             if queued.count == 0 {
                 Analytics.trackMatchsticksFilterNoResults(gender: self.gender, category: self.discoverCategoryFilter)
             }
-            var newDiscover = Set<String>()
-            let currentQueueSize = (queued.count - itemsAdded)
-            let queueItemsNeeded =  (Matchstick.queueSize - currentQueueSize)
-
-            if self.isUnfiltered {
-                var currentIndex = UserDefaults.standard.integer(forKey: UserDefaultsKeys.discoverCurrentIndex)
-                
-                let loopLimit = 10
-                var loopCount = 0
-                while (queueItemsNeeded >= newDiscover.count && loopCount < loopLimit) {
-                    loopCount += 1
-                    for _ in 0...queueItemsNeeded {
-                        if !self.isUndisplayable(index: "\(currentIndex)") {
-                            newDiscover.insert("\(currentIndex)")
-                            currentIndex += 1
-                            if currentIndex > Constants.discoverTotal {
-                                currentIndex = 0
-                            }
-                        }
-                    }
-                    let existingFetchRequest:NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
-                    existingFetchRequest.predicate = NSPredicate.init(format: "remoteId IN %@", newDiscover)
-                    if let existing = try? context.fetch(displayingFetchRequest){
-                        for matchstick in existing {
-                            if let remoteId = matchstick.remoteId {
-                                newDiscover.remove(remoteId)
-                            }
-                        }
-                    }else{
-                        loopCount = loopLimit
-                    }
-                }
-                UserDefaults.standard.setValue(currentIndex, forKey: UserDefaultsKeys.discoverCurrentIndex)
-            }else{
-                let sortKey:String = {
-                    if self.gender == "male" {
-                        return "male"
-                    }else{
-                        return self.discoverCategoryFilter
-                    }
-                }()
-                if let array = self.indexForCategory(sortKey) {
-                    let arrayLength = array.count
-                    var currentIndex = UserDefaults.standard.integer(forKey: "offset_\(sortKey)")
-                    
-                    let loopLimit = 10
-                    var loopCount = 0
-                    while (queueItemsNeeded >= newDiscover.count && loopCount < loopLimit) {
-                        loopCount += 1
-                        for _ in 0...queueItemsNeeded {
-                            if arrayLength > currentIndex {
-                                if !self.isUndisplayable(index: "\(currentIndex)") {
-                                    let value = array[currentIndex]
-                                    newDiscover.insert(value)
-                                    currentIndex += 1
-                                }
-                            }
-                        }
-                        let existingFetchRequest:NSFetchRequest<Matchstick> = Matchstick.fetchRequest()
-                        existingFetchRequest.predicate = NSPredicate.init(format: "remoteId IN %@", newDiscover)
-                        if let existing = try? context.fetch(displayingFetchRequest){
-                            for matchstick in existing {
-                                if let remoteId = matchstick.remoteId {
-                                    newDiscover.remove(remoteId)
-                                }
-                            }
-                        }else{
-                            loopCount = loopLimit
-                        }
-                    }
-                    UserDefaults.standard.setValue(currentIndex, forKey: "offset_\(sortKey)")
-                }
-                
-                
-            }
             
-            newDiscover.forEach { (remoteId) in
-                
-                let imageUrl = self.urlStringFor(index: remoteId)
-                let _ = DataModel.sharedInstance.saveMatchstick(managedObjectContext: context, remoteId: remoteId, imageUrl: imageUrl, properties: self.propertiesFor(id: remoteId))
-                self.downloadIfNeeded(imageURL: imageUrl, priority: .low)
+            // If "Queue" falls below minimum allowed size, make an API call to get more items
+            let currentQueueSize = (queued.count - itemsAdded)
+            print("[SSC] Queue size = \(currentQueueSize)")
+            let queueItemsNeeded:Bool = (Matchstick.minQueueSize >= currentQueueSize)
+            
+            if queueItemsNeeded {
+                let userID:String! = UserDefaults.standard.string(forKey: UserDefaultsKeys.userID) ?? ""
+                getProductIdsFromServer(userID: userID, algoID: UserDefaults.standard.string(forKey: UserDefaultsKeys.discoverAlgoUUID), sessionID: UserDefaults.standard.string(forKey: UserDefaultsKeys.userSessionNumber),  context: context)
             }
         }
     }
@@ -395,4 +348,90 @@ class DiscoverManager {
         return nil
     }
     
+    // MARK: - Networking Calls
+    
+    /*
+     * Make API call to server with user Id to get product recommendations for display in discover feed.
+     */
+    func getProductIdsFromServer(userID:String, algoID:String?, sessionID:String?, context: NSManagedObjectContext) {
+        // 'processing' Bool is used to "lock" thread and prevent multiple calls race condition
+        if processing || failureStop {
+            return
+        }
+        processing = true
+        
+        print("[SSC] Making API Call to populate more items.")
+        var jsonLiteral:[String:String] = ["user_ss_uuid": userID]
+        if let algoUuid = algoID {
+            jsonLiteral["discover_algorithm_ss_uuid"] = algoUuid
+        }
+        if let sessionID = sessionID {
+            jsonLiteral["discover_session_ss_uuid"] = sessionID
+        }
+        let jsonData = try? JSONSerialization.data(withJSONObject: jsonLiteral)
+        
+        // create request
+        let request = HTTPHelper.buildRequest(HTTPHelper.FILL_DISCOVER_URL, method: "POST")
+        request.httpBody = jsonData
+        
+        var responseJSON:[[String:Any]]? = nil
+        
+        HTTPHelper.asyncRequest(request as URLRequest) { (data, error) in
+            if error != nil {
+                self.failureStop = true
+            } else {
+                if let d = data {
+                    do {
+                        responseJSON = try JSONSerialization.jsonObject(with: d, options: JSONSerialization.ReadingOptions.allowFragments) as? [[String:Any]]
+                        if let r = responseJSON {
+                            for dict in r {
+                                if let remoteId = dict["picture_ss_uuid"] as! String?, let imageUrl = dict["image_url"] as! String? {
+                                    print("REMOTE ID = \(remoteId)")
+                                    let _ = DataModel.sharedInstance.saveMatchstick(managedObjectContext: context, remoteId: remoteId, imageUrl: imageUrl, properties: self.propertiesFor(id: remoteId))
+                                    self.downloadIfNeeded(imageURL: imageUrl, priority: .low)
+                                }
+                            }
+                            print("[SSC] Added \(r.count) items to queue.")
+                        } else {
+                            self.failureStop = true
+                        }
+                    } catch {
+                        self.failureStop = true
+                    }
+                } else {
+                    self.failureStop = true
+                }
+            }
+            context.saveIfNeeded()
+            self.processing = false
+            self.discoverViewDidAppear()
+        }
+    }
+    
+    /*
+     * Make API call to server to record a user has swipped y/n on a discover card
+     */
+    func postUserActionToServer(userID:String, discoverPictureID:String?, actionType:String, servingAlgorithmID:String?, discoverSessionID:String?) {
+        print("[SSC] Making API Call to post user swipe action.")
+        var jsonLiteral:[String:Any] = ["user_ss_uuid": userID, "action_type": actionType]
+        if let algoUuid = servingAlgorithmID {
+            jsonLiteral["serving_algorithm_ss_uuid"] = algoUuid
+        }
+        if let dpID = discoverPictureID {
+            jsonLiteral["discover_picture_ss_uuid"] = dpID
+        }
+        if let dsID = discoverSessionID {
+            jsonLiteral["discover_session_ss_uuid"] = dsID
+        }
+        let jsonData = try? JSONSerialization.data(withJSONObject: jsonLiteral)
+        
+        // create request
+        let request = HTTPHelper.buildRequest(HTTPHelper.ADD_USER_ACTION_URL, method: "POST")
+        request.httpBody = jsonData
+        
+        HTTPHelper.asyncRequest(request as URLRequest) { (data, error) in
+            // No action needed
+            // We are just logging user events to the server
+        }
+    }
 }
