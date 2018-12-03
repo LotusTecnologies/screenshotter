@@ -1469,8 +1469,8 @@ extension Screenshot {
             let objectId = screenshot.objectID
             
             // Send firebase image URL to new upload-discover-photo endpoint in addition to below logic (which I think sends it to syte)
-            if let userID = UserDefaults.standard.string(forKey: UserDefaultsKeys.userID), let deviceId = UserDefaults.standard.string(forKey: UserDefaultsKeys.deviceID) {
-                NetworkingPromise.sharedInstance.postDiscoverImageUpload(userID: userID, imageURL: image, deviceID: deviceId)
+            if let deviceId = UserDefaults.standard.string(forKey: UserDefaultsKeys.deviceID) {
+                NetworkingPromise.sharedInstance.postDiscoverImageUpload(imageURL: image, deviceID: deviceId)
             }
             
             DataModel.sharedInstance.performBackgroundTask { (context) in

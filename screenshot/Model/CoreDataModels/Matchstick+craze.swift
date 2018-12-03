@@ -84,12 +84,8 @@ extension Matchstick {
     
     // NOTE: This will get called every time the app enters the forground
     public class func refreshMinQueueSize() {
-        print("[SSC] Making API call to get minQueueSize config.")
-        var userUrlParam = ""
-        if let userID = UserDefaults.standard.string(forKey: UserDefaultsKeys.userID) {
-            userUrlParam = "?user_id=\(userID)"
-        }
-        let request = HTTPHelper.buildRequest(HTTPHelper.DISCOVER_CONFIG_URL+userUrlParam, method: "GET")
+        print("[SSC] Making API call to get minQueueSize config.")        
+        let request = HTTPHelper.buildRequest(HTTPHelper.DISCOVER_CONFIG_URL, method: "GET")
         HTTPHelper.asyncRequest(request as URLRequest) { (data, error) in
             //Process data to extract the minQueueSize config var and then set it below
             if let d = data {
@@ -110,18 +106,7 @@ extension Matchstick {
     
     public class func getDiscoverSessionID() {
         print("[SSC] Making API call to start new discover session.")
-        var jsonLiteral = [String:Any]()
-        if let userID = UserDefaults.standard.string(forKey: UserDefaultsKeys.userID) {
-            jsonLiteral["user_ss_uuid"] = userID
-        }
-        if let algoUuid = UserDefaults.standard.string(forKey: UserDefaultsKeys.discoverAlgoUUID) {
-            jsonLiteral["discover_algorithm_ss_uuid"] = algoUuid
-        }
-        let jsonData = try? JSONSerialization.data(withJSONObject: jsonLiteral)
-        
         let request = HTTPHelper.buildRequest(HTTPHelper.DISCOVER_SESSION_URL, method: "POST")
-        request.httpBody = jsonData
-        
         HTTPHelper.asyncRequest(request as URLRequest) { (data, error) in
             //Process data to extract the minQueueSize config var and then set it below
             var failure = true

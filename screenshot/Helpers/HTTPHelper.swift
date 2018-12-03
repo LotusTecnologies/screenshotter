@@ -26,15 +26,37 @@ public class HTTPHelper {
     static let DISCOVER_SESSION_URL = DOMAIN+"/start-discover-session"
     static let UPLOAD_DISCOVER_IMAGE_URL = DOMAIN+"/upload-discover-photo"
     
-    public class func buildRequest(_ path: String!, method: String, requestContentType: HTTPRequestContentType = HTTPRequestContentType.httpJsonContent, requestBoundary:String = "") -> NSMutableURLRequest {
-        // 1. Create the request URL from path
-        let requestURL = URL(string: path)
-        let request = NSMutableURLRequest(url: requestURL!)
+    public class func buildRequest(_ path: String!, method: String, params inparams:[String:Any] = [String:Any](), requestContentType: HTTPRequestContentType = HTTPRequestContentType.httpJsonContent, requestBoundary:String = "") -> NSMutableURLRequest {
         
-        // Set HTTP request method and Content-Type
+        var params = inparams
+        
+        // Decorate with params that should accompany every request
+        let userID = UserDefaults.standard.string(forKey: UserDefaultsKeys.userID) ?? ""
+        params["user_id"] = userID
+        params["user_ss_uuid"] = userID
+        
+        var jsonData:Data? = nil
+        var urlParamString = ""
+        if method == "GET" {
+            // Add params as URL params
+            for (key, value) in params {
+                let paramPrefix:String = urlParamString.isEmpty ? "?" : "&"
+                urlParamString += "\(paramPrefix)\(key)=\(value)"
+            }
+        } else {
+            // Add params as body Data
+            jsonData = try? JSONSerialization.data(withJSONObject: params)
+        }
+        
+        // Create the request URL from path and add params
+        let requestURL = URL(string: path+urlParamString)!
+        let request = NSMutableURLRequest(url: requestURL)
         request.httpMethod = method
+        if let data = jsonData {
+            request.httpBody = data
+        }
         
-        // 2. Set the correct Content-Type for the HTTP Request. This will be multipart/form-data for photo upload request and application/json for other requests in this app
+        // Set the correct Content-Type for the HTTP Request. This will be multipart/form-data for photo upload request and application/json for other requests in this app
         switch requestContentType {
         case .httpJsonContent:
             request.addValue("application/json", forHTTPHeaderField: "Content-Type")

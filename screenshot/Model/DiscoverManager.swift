@@ -152,13 +152,9 @@ class DiscoverManager {
     }
     
     func logUserSwipe(_ item:Matchstick, actionType:String) {
-        if let userID:String = UserDefaults.standard.string(forKey: UserDefaultsKeys.userID) {
-            let discoverSessionID:String? = UserDefaults.standard.string(forKey: UserDefaultsKeys.userSessionNumber)
-            let discoverPictureID:String? = item.remoteId
-            postUserActionToServer(userID: userID, discoverPictureID: discoverPictureID, actionType: actionType, discoverSessionID: discoverSessionID)
-        } else {
-            print("[SSC] ERROR, userID is null can't make call to swipe endpoint.")
-        }
+        let discoverSessionID:String? = UserDefaults.standard.string(forKey: UserDefaultsKeys.userSessionNumber)
+        let discoverPictureID:String? = item.remoteId
+        postUserActionToServer(discoverPictureID: discoverPictureID, actionType: actionType, discoverSessionID: discoverSessionID)
     }
     
     func updateFilterAndGetMoreIfNeeded(){
@@ -253,8 +249,7 @@ class DiscoverManager {
             let queueItemsNeeded:Bool = (Matchstick.minQueueSize >= currentQueueSize)
             
             if queueItemsNeeded {
-                let userID:String! = UserDefaults.standard.string(forKey: UserDefaultsKeys.userID) ?? ""
-                getProductIdsFromServer(userID: userID, sessionID: UserDefaults.standard.string(forKey: UserDefaultsKeys.userSessionNumber),  context: context)
+                getProductIdsFromServer(sessionID: UserDefaults.standard.string(forKey: UserDefaultsKeys.userSessionNumber),  context: context)
             }
         }
     }
@@ -352,7 +347,7 @@ class DiscoverManager {
     /*
      * Make API call to server with user Id to get product recommendations for display in discover feed.
      */
-    func getProductIdsFromServer(userID:String, sessionID:String?, context: NSManagedObjectContext) {
+    func getProductIdsFromServer(sessionID:String?, context: NSManagedObjectContext) {
         // 'processing' Bool is used to "lock" thread and prevent multiple calls race condition
         if processing || failureStop {
             return
@@ -360,18 +355,13 @@ class DiscoverManager {
         processing = true
         
         print("[SSC] Making API Call to populate more items.")
-        var jsonLiteral:[String:String] = ["user_ss_uuid": userID]
+        var jsonLiteral:[String:Any] = [String:Any]()
         if let sessionID = sessionID {
             jsonLiteral["discover_session_ss_uuid"] = sessionID
         }
-        let jsonData = try? JSONSerialization.data(withJSONObject: jsonLiteral)
-        
-        // create request
-        let request = HTTPHelper.buildRequest(HTTPHelper.FILL_DISCOVER_URL, method: "POST")
-        request.httpBody = jsonData
-        
+
+        let request = HTTPHelper.buildRequest(HTTPHelper.FILL_DISCOVER_URL, method: "POST", params: jsonLiteral)
         var responseJSON:[[String:Any]]? = nil
-        
         HTTPHelper.asyncRequest(request as URLRequest) { (data, error) in
             if error != nil {
                 self.failureStop = true
@@ -407,21 +397,17 @@ class DiscoverManager {
     /*
      * Make API call to server to record a user has swipped y/n on a discover card
      */
-    func postUserActionToServer(userID:String, discoverPictureID:String?, actionType:String, discoverSessionID:String?) {
+    func postUserActionToServer(discoverPictureID:String?, actionType:String, discoverSessionID:String?) {
         print("[SSC] Making API Call to post user swipe action.")
-        var jsonLiteral:[String:Any] = ["user_ss_uuid": userID, "action_type": actionType]
+        var jsonLiteral:[String:Any] = ["action_type": actionType]
         if let dpID = discoverPictureID {
             jsonLiteral["discover_picture_ss_uuid"] = dpID
         }
         if let dsID = discoverSessionID {
             jsonLiteral["discover_session_ss_uuid"] = dsID
         }
-        let jsonData = try? JSONSerialization.data(withJSONObject: jsonLiteral)
-        
-        // create request
-        let request = HTTPHelper.buildRequest(HTTPHelper.ADD_USER_ACTION_URL, method: "POST")
-        request.httpBody = jsonData
-        
+
+        let request = HTTPHelper.buildRequest(HTTPHelper.ADD_USER_ACTION_URL, method: "POST", params: jsonLiteral)
         HTTPHelper.asyncRequest(request as URLRequest) { (data, error) in
             // No action needed
             // We are just logging user events to the server

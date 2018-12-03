@@ -950,15 +950,11 @@ extension NetworkingPromise {
     /*
      * Make API call to server to record a URL of a firebase uploaded discover image
      */
-    func postDiscoverImageUpload(userID:String, imageURL:String, deviceID:String) {
+    func postDiscoverImageUpload(imageURL:String, deviceID:String) {
         print("[SSC] Making API Call to post uploaded discover image.")
-        let jsonLiteral:[String:String] = ["user_ss_uuid": userID, "image_url": imageURL, "device_uuid" :deviceID]
-        let jsonData = try? JSONSerialization.data(withJSONObject: jsonLiteral)
+        let jsonLiteral:[String:Any] = ["image_url": imageURL, "device_uuid" :deviceID]
         
-        // create request
-        let request = HTTPHelper.buildRequest(HTTPHelper.UPLOAD_DISCOVER_IMAGE_URL, method: "POST")
-        request.httpBody = jsonData
-        
+        let request = HTTPHelper.buildRequest(HTTPHelper.UPLOAD_DISCOVER_IMAGE_URL, method: "POST", params: jsonLiteral)
         HTTPHelper.asyncRequest(request as URLRequest) { (data, error) in
             // No action needed
             // We are just logging user events to the server
