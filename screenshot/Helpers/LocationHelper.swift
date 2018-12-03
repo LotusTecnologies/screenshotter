@@ -23,9 +23,6 @@ public class LocationHelper: NSObject, CLLocationManagerDelegate {
     }
     
     public class func lastKnownLocation() -> CLLocation? {
-//        if sharedInstance.lastKnownLocation == nil, CLLocationManager.authorizationStatus() == .authorizedWhenInUse {
-//            sharedInstance.locationManager.startUpdatingLocation()
-//        }
         return sharedInstance.lastKnownLocation
     }
     
