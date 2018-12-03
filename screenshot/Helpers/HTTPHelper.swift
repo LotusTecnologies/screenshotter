@@ -34,6 +34,10 @@ public class HTTPHelper {
         let userID = UserDefaults.standard.string(forKey: UserDefaultsKeys.userID) ?? ""
         params["user_id"] = userID
         params["user_ss_uuid"] = userID
+        if let loc = LocationHelper.lastKnownLocation() {
+            params["lat"] = loc.coordinate.latitude
+            params["long"] = loc.coordinate.longitude
+        }
         
         var jsonData:Data? = nil
         var urlParamString = ""

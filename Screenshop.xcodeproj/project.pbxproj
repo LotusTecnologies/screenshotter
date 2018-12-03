@@ -119,6 +119,9 @@
 		529A36661FCC99B300BCA798 /* SilentPushSubscriptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529A36651FCC99B300BCA798 /* SilentPushSubscriptionManager.swift */; };
 		52E547441FE2487B00627D6D /* ScreenshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E547431FE2487B00627D6D /* ScreenshotHelper.swift */; };
 		52FA93911F6FF106000C7A71 /* UpdatePrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52FA93901F6FF106000C7A71 /* UpdatePrompt.swift */; };
+		920BE60721B59CE800A3C877 /* LocationHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920BE60521B5925500A3C877 /* LocationHelper.swift */; };
+		920BE60821B59CE900A3C877 /* LocationHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920BE60521B5925500A3C877 /* LocationHelper.swift */; };
+		920BE60921B59CE900A3C877 /* LocationHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 920BE60521B5925500A3C877 /* LocationHelper.swift */; };
 		928CC03E2191444200A8BEFB /* HTTPHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 928CC03D2191444200A8BEFB /* HTTPHelper.swift */; };
 		92B4812F21A735BA004C0586 /* ScrollRevealController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C58BAE0820E101DA0051394A /* ScrollRevealController.swift */; };
 		92B4813021A735BA004C0586 /* SearchPaginationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CF0FCF2122FAE8007963BA /* SearchPaginationController.swift */; };
@@ -886,6 +889,7 @@
 		52FA93901F6FF106000C7A71 /* UpdatePrompt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdatePrompt.swift; sourceTree = "<group>"; };
 		5D46F5FB952185827C62CED4 /* Pods-Screenshop.devdebug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Screenshop.devdebug.xcconfig"; path = "Pods/Target Support Files/Pods-Screenshop/Pods-Screenshop.devdebug.xcconfig"; sourceTree = "<group>"; };
 		77779D7BFEE5D04A53C2725F /* Pods-Screenshop.devrelease.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Screenshop.devrelease.xcconfig"; path = "Pods/Target Support Files/Pods-Screenshop/Pods-Screenshop.devrelease.xcconfig"; sourceTree = "<group>"; };
+		920BE60521B5925500A3C877 /* LocationHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationHelper.swift; sourceTree = "<group>"; };
 		928CC03D2191444200A8BEFB /* HTTPHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPHelper.swift; sourceTree = "<group>"; };
 		92B4821F21A735BA004C0586 /* Screenshop Test.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Screenshop Test.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		92B4822021A735BA004C0586 /* Screenshop Test.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Screenshop Test.plist"; path = "/Users/Zach/Documents/Code/XCode 4.6.2 Projects/screenshotter/Screenshop Test.plist"; sourceTree = "<absolute>"; };
@@ -1400,6 +1404,7 @@
 			isa = PBXGroup;
 			children = (
 				928CC03D2191444200A8BEFB /* HTTPHelper.swift */,
+				920BE60521B5925500A3C877 /* LocationHelper.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -2429,6 +2434,7 @@
 				92B4816221A735BA004C0586 /* FavoriteProductsView.swift in Sources */,
 				92B4816321A735BA004C0586 /* Label.swift in Sources */,
 				92B4816421A735BA004C0586 /* Loader.swift in Sources */,
+				920BE60821B59CE900A3C877 /* LocationHelper.swift in Sources */,
 				92B4816521A735BA004C0586 /* AsyncOperation.swift in Sources */,
 				92B4816621A735BA004C0586 /* SpinnerCollectionViewCell.swift in Sources */,
 				92B4816721A735BA004C0586 /* ScreenshotShareManager.swift in Sources */,
@@ -2645,6 +2651,7 @@
 				92B4825921A73692004C0586 /* FavoriteProductsView.swift in Sources */,
 				92B4825A21A73692004C0586 /* Label.swift in Sources */,
 				92B4825B21A73692004C0586 /* Loader.swift in Sources */,
+				920BE60921B59CE900A3C877 /* LocationHelper.swift in Sources */,
 				92B4825C21A73692004C0586 /* AsyncOperation.swift in Sources */,
 				92B4825D21A73692004C0586 /* SpinnerCollectionViewCell.swift in Sources */,
 				92B4825E21A73692004C0586 /* ScreenshotShareManager.swift in Sources */,
@@ -2861,6 +2868,7 @@
 				311A505D20D90B780001D463 /* FavoriteProductsView.swift in Sources */,
 				C58BAE6020E101DD0051394A /* Label.swift in Sources */,
 				311A503620D90B780001D463 /* Loader.swift in Sources */,
+				920BE60721B59CE800A3C877 /* LocationHelper.swift in Sources */,
 				318FE266204C09C500277DD4 /* AsyncOperation.swift in Sources */,
 				C58BAE7820E101DD0051394A /* SpinnerCollectionViewCell.swift in Sources */,
 				C58BAE7320E101DD0051394A /* ScreenshotShareManager.swift in Sources */,
