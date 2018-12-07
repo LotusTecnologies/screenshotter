@@ -670,6 +670,10 @@ class DiscoverScreenshotViewController : BaseViewController, AsyncOperationMonit
         alertController.addAction(UIAlertAction(title: "generic.ok".localized, style: .cancel, handler: nil))
         present(alertController, animated: true, completion: nil)
         
+        if let id = currentMatchstick?.remoteId {
+            DiscoverManager.shared.reportDiscoverPhoto(discoverPictureID: id)
+        }
+        
         Analytics.trackMatchsticksFlagged(matchstick: currentMatchstick, why: .inappropriate)
     }
     

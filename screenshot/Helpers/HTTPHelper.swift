@@ -25,6 +25,7 @@ public class HTTPHelper {
     static let DISCOVER_CONFIG_URL = DOMAIN+"/get-discover-config"
     static let DISCOVER_SESSION_URL = DOMAIN+"/start-discover-session"
     static let UPLOAD_DISCOVER_IMAGE_URL = DOMAIN+"/upload-discover-photo"
+    static let REPORT_DISOVER_URL = DOMAIN+"/report-discover-photo"
     
     public class func buildRequest(_ path: String!, method: String, params inparams:[String:Any] = [String:Any](), requestContentType: HTTPRequestContentType = HTTPRequestContentType.httpJsonContent, requestBoundary:String = "") -> NSMutableURLRequest {
         

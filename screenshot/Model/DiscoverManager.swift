@@ -413,4 +413,17 @@ class DiscoverManager {
             // We are just logging user events to the server
         }
     }
+    
+    /*
+     * Make API call to server to report a discover photo
+     */
+    func reportDiscoverPhoto(discoverPictureID:String) {
+        print("[SSC] Making API Call to report discover photo.")
+        let jsonLiteral:[String:Any] = ["discover_picture_ss_uuid": discoverPictureID]
+        let request = HTTPHelper.buildRequest(HTTPHelper.REPORT_DISOVER_URL, method: "POST", params: jsonLiteral)
+        HTTPHelper.asyncRequest(request as URLRequest) { (data, error) in
+            // No action needed
+            // We are just logging user events to the server
+        }
+    }
 }
