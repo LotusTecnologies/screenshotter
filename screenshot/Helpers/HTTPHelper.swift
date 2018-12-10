@@ -33,7 +33,6 @@ public class HTTPHelper {
         
         // Decorate with params that should accompany every request
         let userID = UserDefaults.standard.string(forKey: UserDefaultsKeys.userID) ?? ""
-        params["user_id"] = userID
         params["user_ss_uuid"] = userID
         if let loc = LocationHelper.lastKnownLocation() {
             params["lat"] = loc.coordinate.latitude
