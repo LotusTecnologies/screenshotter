@@ -48,7 +48,8 @@ class ProductsViewController: BaseViewController {
     var shamrockButton : FloatingActionButton?
     var screenshotLoadingState:ProductsViewControllerState = .unknown
     var productLoadingState:ProductsViewControllerState = .unknown 
-
+    var shareToDiscoverButton: UIButton?
+    
     var selectedShoppable:Shoppable?
     var screenshotMatchId: String?
     
@@ -140,6 +141,23 @@ class ProductsViewController: BaseViewController {
         }()
         self.collectionView = collectionView
         
+        if let img = UIImage(named: "ProductShareToDiscover") {
+            let btn = UIButton()
+            btn.translatesAutoresizingMaskIntoConstraints = false
+            self.shareToDiscoverButton = btn
+            self.view.addSubview(btn)
+            
+            let margins = view.layoutMarginsGuide
+            btn.bottomAnchor.constraint(equalTo: margins.bottomAnchor, constant: -16.0).isActive = true
+            btn.widthAnchor.constraint(equalToConstant: 355.0).isActive = true
+            btn.centerXAnchor.constraint(equalTo: margins.centerXAnchor).isActive = true
+            btn.heightAnchor.constraint(equalToConstant: 71.0).isActive = true
+            btn.setImage(img, for: .normal)
+            self.view.layoutIfNeeded()
+            
+            btn.addTarget(self, action: #selector(shareToDiscover), for: .touchUpInside)
+        }
+        
         rateView.translatesAutoresizingMaskIntoConstraints = false
         rateView.voteUpButton.addTarget(self, action: #selector(productsRatePositiveAction), for: .touchUpInside)
         rateView.voteDownButton.addTarget(self, action: #selector(productsRateNegativeAction), for: .touchUpInside)
@@ -212,7 +230,17 @@ class ProductsViewController: BaseViewController {
         if let assetId = self.screenshot.assetId {
             AssetSyncModel.sharedInstance.moveScreenshotToTopOfQueue(assetId: assetId)
         }
-
+        
+        if let btn = self.shareToDiscoverButton {
+            if self.screenshot.submittedDate != nil {
+                //Already been submitted to discover
+                btn.isHidden = true
+                btn.isEnabled = false
+            } else {
+                btn.isHidden = false
+                btn.isEnabled = true
+            }
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -686,6 +714,16 @@ extension ProductsViewControllerRatings: UITextFieldDelegate {
         if  let shoppable = self.getSelectedShoppable(){
             shoppable.setRating(positive: false)
             self.presentProductsRateNegativeAlert()
+        }
+    }
+    
+    @objc func shareToDiscover() {
+        self.screenshot.submitToDiscover()
+        UIView.animate(withDuration: .defaultAnimationDuration, animations: {
+            self.shareToDiscoverButton?.alpha = 0
+        }) { completed in
+            self.shareToDiscoverButton?.isHidden = true
+            self.shareToDiscoverButton?.isEnabled = false
         }
     }
     
