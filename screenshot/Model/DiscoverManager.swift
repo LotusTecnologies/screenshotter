@@ -274,7 +274,12 @@ class DiscoverManager {
                         self.performBackgroundTask { (context) in
                             
                             if let matchstick = Matchstick.with(imageUrl: imageURL, in: context) {
-                                matchstick.imageData = imageData
+                                //Check to ensure the data is a valid image (we've been seeing some currupt images returned by backend)
+                                if UIImage(data: imageData) != nil {
+                                    matchstick.imageData = imageData
+                                } else {
+                                    context.delete(matchstick)
+                                }
                                 
                              
                             }else{
