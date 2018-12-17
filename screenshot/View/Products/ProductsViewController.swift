@@ -230,7 +230,17 @@ class ProductsViewController: BaseViewController {
         if let assetId = self.screenshot.assetId {
             AssetSyncModel.sharedInstance.moveScreenshotToTopOfQueue(assetId: assetId)
         }
-
+        
+        if let btn = self.shareToDiscoverButton {
+            if self.screenshot.submittedDate != nil {
+                //Already been submitted to discover
+                btn.isHidden = true
+                btn.isEnabled = false
+            } else {
+                btn.isHidden = false
+                btn.isEnabled = true
+            }
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -709,6 +719,12 @@ extension ProductsViewControllerRatings: UITextFieldDelegate {
     
     @objc func shareToDiscover() {
         self.screenshot.submitToDiscover()
+        UIView.animate(withDuration: .defaultAnimationDuration, animations: {
+            self.shareToDiscoverButton?.alpha = 0
+        }) { completed in
+            self.shareToDiscoverButton?.isHidden = true
+            self.shareToDiscoverButton?.isEnabled = false
+        }
     }
     
     func presentProductsRateNegativeFeedbackAlert() {
