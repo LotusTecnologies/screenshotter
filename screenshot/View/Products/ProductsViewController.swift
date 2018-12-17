@@ -154,6 +154,8 @@ class ProductsViewController: BaseViewController {
             btn.heightAnchor.constraint(equalToConstant: 71.0).isActive = true
             btn.setImage(img, for: .normal)
             self.view.layoutIfNeeded()
+            
+            btn.addTarget(self, action: #selector(shareToDiscover), for: .touchUpInside)
         }
         
         rateView.translatesAutoresizingMaskIntoConstraints = false
@@ -703,6 +705,10 @@ extension ProductsViewControllerRatings: UITextFieldDelegate {
             shoppable.setRating(positive: false)
             self.presentProductsRateNegativeAlert()
         }
+    }
+    
+    @objc func shareToDiscover() {
+        self.screenshot.submitToDiscover()
     }
     
     func presentProductsRateNegativeFeedbackAlert() {
