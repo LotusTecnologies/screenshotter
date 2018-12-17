@@ -48,7 +48,8 @@ class ProductsViewController: BaseViewController {
     var shamrockButton : FloatingActionButton?
     var screenshotLoadingState:ProductsViewControllerState = .unknown
     var productLoadingState:ProductsViewControllerState = .unknown 
-
+    var shareToDiscoverButton: UIButton?
+    
     var selectedShoppable:Shoppable?
     var screenshotMatchId: String?
     
@@ -139,6 +140,21 @@ class ProductsViewController: BaseViewController {
             return collectionView
         }()
         self.collectionView = collectionView
+        
+        if let img = UIImage(named: "ProductShareToDiscover") {
+            let btn = UIButton()
+            btn.translatesAutoresizingMaskIntoConstraints = false
+            self.shareToDiscoverButton = btn
+            self.view.addSubview(btn)
+            
+            let margins = view.layoutMarginsGuide
+            btn.bottomAnchor.constraint(equalTo: margins.bottomAnchor, constant: -16.0).isActive = true
+            btn.widthAnchor.constraint(equalToConstant: 355.0).isActive = true
+            btn.centerXAnchor.constraint(equalTo: margins.centerXAnchor).isActive = true
+            btn.heightAnchor.constraint(equalToConstant: 71.0).isActive = true
+            btn.setImage(img, for: .normal)
+            self.view.layoutIfNeeded()
+        }
         
         rateView.translatesAutoresizingMaskIntoConstraints = false
         rateView.voteUpButton.addTarget(self, action: #selector(productsRatePositiveAction), for: .touchUpInside)
