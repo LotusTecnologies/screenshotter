@@ -821,7 +821,7 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
                                 let mdata = m.data(using: .utf8),
                                 var message = try JSONSerialization.jsonObject(with: mdata, options: JSONSerialization.ReadingOptions.allowFragments) as? [String:Any],
                                 let apns = message["APNS"] as? String, let apnsData = apns.data(using: .utf8),
-                                var apnsPayload = try JSONSerialization.jsonObject(with: apnsData, options: JSONSerialization.ReadingOptions.allowFragments) as? [String:Any] {
+                                let apnsPayload = try JSONSerialization.jsonObject(with: apnsData, options: JSONSerialization.ReadingOptions.allowFragments) as? [String:Any] {
                                 InboxMessage.insertMessageFromPush(userInfo: apnsPayload)
                             }
                         }
