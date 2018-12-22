@@ -77,7 +77,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         Matchstick.refreshMinQueueSize()
         Matchstick.getDiscoverSessionID()
-        addMissingNotificationsToInbox()
+        getNewPushNotificationsFromServer()
         return true
     }
     
@@ -259,7 +259,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         AssetSyncModel.sharedInstance.scanPhotoGalleryForFashion()
         Matchstick.refreshMinQueueSize()
         Matchstick.getDiscoverSessionID()
-        addMissingNotificationsToInbox()
+        getNewPushNotificationsFromServer()
     }
     
     func applicationDidBecomeActive(_ application: UIApplication) {
@@ -807,7 +807,13 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
         }
     }
     
-    func addMissingNotificationsToInbox() {
+    // MARK: - Networking Calls
+    
+    /*
+     * Make API call to server to get new push notifications that may have come in while the app was not running
+     * and add them to the Inbox.
+     */
+    func getNewPushNotificationsFromServer() {
         //API call to server to get array of push notifications
         print("[SSC] Making API Call to get all APNS messages.")
         let request = HTTPHelper.buildRequest(HTTPHelper.GET_APNS_MSGS_URL, method: "GET")
