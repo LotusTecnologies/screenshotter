@@ -77,6 +77,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         Matchstick.refreshMinQueueSize()
         Matchstick.getDiscoverSessionID()
+        addMissingNotificationsToInbox()
         return true
     }
     
@@ -258,6 +259,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         AssetSyncModel.sharedInstance.scanPhotoGalleryForFashion()
         Matchstick.refreshMinQueueSize()
         Matchstick.getDiscoverSessionID()
+        addMissingNotificationsToInbox()
     }
     
     func applicationDidBecomeActive(_ application: UIApplication) {
@@ -805,4 +807,30 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
         }
     }
     
+    func addMissingNotificationsToInbox() {
+        //API call to server to get array of push notifications
+        print("[SSC] Making API Call to get all APNS messages.")
+        let request = HTTPHelper.buildRequest(HTTPHelper.GET_APNS_MSGS_URL, method: "GET")
+        HTTPHelper.asyncRequest(request as URLRequest) { (data, error) in
+            if let d = data {
+                do {
+                    let responseJSON = try JSONSerialization.jsonObject(with: d, options: JSONSerialization.ReadingOptions.allowFragments) as? [[String:Any]]
+                    if let r = responseJSON {
+                        for dict in r {
+                            if let m = dict["message"] as? String,
+                                let mdata = m.data(using: .utf8),
+                                var message = try JSONSerialization.jsonObject(with: mdata, options: JSONSerialization.ReadingOptions.allowFragments) as? [String:Any],
+                                let apns = message["APNS"] as? String, let apnsData = apns.data(using: .utf8),
+                                var apnsPayload = try JSONSerialization.jsonObject(with: apnsData, options: JSONSerialization.ReadingOptions.allowFragments) as? [String:Any] {
+                                InboxMessage.insertMessageFromPush(userInfo: apnsPayload)
+                            }
+                        }
+                    } else {
+                    }
+                } catch {
+                    print("[SSC] JSON Serialization error in addMissingNotificationsToInbox line 829.")
+                }
+            }
+        }
+    }
 }

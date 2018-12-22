@@ -139,7 +139,7 @@ extension InboxMessage {
             let buttonText = dictionary["buttonText"] as? String,
             let image = dictionary["image"] as? String,
             let title = dictionary["title"] as? String,
-            let uuid = dictionary["uuid"] as? String,
+            let uuid = dictionary["message_ss_uuid"] as? String,
             let expireNumber = dictionary["expireDate"] as? NSNumber,
             let dateNumber = dictionary["date"] as? NSNumber
         {
