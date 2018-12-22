@@ -675,6 +675,15 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
         var isHandled = false
         if let userInfo = response.notification.request.content.userInfo as? [String : Any] {
             InboxMessage.insertMessageFromPush(userInfo: userInfo)
+            
+            //Make call to server to mark that push was receievd.
+            //NOTE: The push flows should still work without this call, as we also have de-dupping logic when we call for new push notifications and add them to the Inbox
+            if let dataDict = userInfo["data"] as? [AnyHashable: Any],
+                let dict = dataDict["inbox"] as? [String:Any],
+                let uuid = dict["message_ss_uuid"] as? String {
+                logPushReceieved(messageID: uuid)
+            }
+            
             var isMessageMarkedAsRead = true
             
             if let openingScreen = userInfo[Constants.openingScreenKey] as? String {
@@ -837,6 +846,19 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
                     print("[SSC] JSON Serialization error in addMissingNotificationsToInbox line 829.")
                 }
             }
+        }
+    }
+    
+    /*
+     * Make API call to server to log that a push notification was recieved.
+     */
+    func logPushReceieved(messageID:String) {
+        print("[SSC] Making API Call to log push notification received.")
+        let jsonLiteral:[String:Any] = ["message_ss_uuid": messageID]
+        let request = HTTPHelper.buildRequest(HTTPHelper.LOG_APNS_RECEIVED_URL, method: "POST", params: jsonLiteral)
+        HTTPHelper.asyncRequest(request as URLRequest) { (data, error) in
+            // No action needed
+            // We are just logging user events to the server
         }
     }
 }
